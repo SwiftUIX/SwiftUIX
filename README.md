@@ -1,3 +1,3 @@
 # SwiftUIX
 
-A description of this package.
+A collection of useful SwiftUI components and tools.
