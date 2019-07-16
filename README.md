@@ -19,4 +19,4 @@ A replacement for the buggy (as of Xcode 11 beta 3) `PresentationLink`. Usage is
 
 ## License
 
-SwiftUIX is licensed under the [MIT license](https://vmanot.mit-license.org).
+SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
