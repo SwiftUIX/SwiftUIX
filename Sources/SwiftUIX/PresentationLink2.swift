@@ -4,55 +4,60 @@
 
 import SwiftUI
 
+private enum SetPresentedViewKey: EnvironmentKey {
+    static var defaultValue: (AnyView?) -> () {
+        fatalError()
+    }
+}
+
+private extension EnvironmentValues {
+    var setPresentedView: (AnyView?) -> () {
+        get {
+            self[SetPresentedViewKey.self]
+        } set {
+            self[SetPresentedViewKey.self] = newValue
+        }
+    }
+}
+
 /// A replacement for the buggy (as of Xcode 11 b3) `PresentationLink`.
-public struct PresentationLink2<Label: View, Destination: View>: View {
+public struct PresentationLink2<Destination: View, Label: View>: View {
     public let destination: Destination
+    public let label: Label
 
-    let _label: () -> Label
+    @Environment(\.setPresentedView) private var setPresentedView
+    @State private var presentedView: AnyView? = nil
 
-    public var label: Label {
-        return _label()
+    public init(destination: Destination, @ViewBuilder _ label: () -> Label) {
+        self.destination = destination
+        self.label = label()
     }
 
-    public init(destination: Destination, label: @escaping () -> Label) {
-        self.destination = destination
-        self._label = label
+    private struct _Body<Destination: View, Label: View>: View {
+        @Environment(\.setPresentedView) private var setPresentedView
+
+        let destination: Destination
+        let label: Label
+
+        init(destination: Destination, label: Label) {
+            self.destination = destination
+            self.label = label
+        }
+
+        var body: some View {
+            Button(action: present, label: { label })
+        }
+
+        func present() {
+            setPresentedView(AnyView(destination))
+        }
     }
 
     public var body: some View {
-        _label().tapAction {
-            UIApplication
-                .topMostViewController?
-                .present(UIHostingController(rootView: self.destination), animated: true)
-        }
+        _Body(destination: destination, label: label)
+            .environment(\.setPresentedView, { self.presentedView = $0 })
+            .presentation(presentedView.map {
+                Modal($0, onDismiss: { self.presentedView = nil })
+            })
     }
 }
-
-// MARK: - Helpers -
-
-extension UIApplication {
-    static var topMostViewController: UIViewController? {
-        return UIApplication
-            .shared
-            .windows
-            .last?
-            .rootViewController?
-            .visibleViewController
-    }
-}
-
-extension UIViewController {
-    /// https://stackoverflow.com/a/45473125/2747515
-    fileprivate var visibleViewController: UIViewController? {
-        if let navigationController = self as? UINavigationController {
-            return navigationController.topViewController?.visibleViewController
-        } else if let tabBarController = self as? UITabBarController {
-            return tabBarController.selectedViewController?.visibleViewController
-        } else if let presentedViewController = presentedViewController {
-            return presentedViewController.visibleViewController
-        } else {
-            return self
-        }
-    }
-}
-
