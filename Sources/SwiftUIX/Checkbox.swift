@@ -5,16 +5,30 @@
 import SwiftUI
 
 /// A checkbox control.
-public struct Checkbox: View {
-    @State public var isOn: Bool = false
+public struct Checkbox<Label: View>: View {
+    /// A view that describes the effect of toggling `isOn`.
+    public let label: Label
+
+    /// Whether or not `self` is currently "on" or "off".
+    @Binding public var isOn: Bool
+
+    public init(isOn: Binding<Bool>, @ViewBuilder label: () -> Label) {
+        self.$isOn = isOn
+        self.label = label()
+    }
 
     public var body: some View {
-        Button(action: {
-            self.isOn.toggle()
-        }) { isOn
-            ? Image(systemName: "checkmark.square.fill")
-            : Image(systemName: "checkmark.square")
+        HStack {
+            label
+            Button(action: toggle) {
+                isOn
+                    ? Image(systemName: "checkmark.square.fill")
+                    : Image(systemName: "checkmark.square")
             }
-            .frame(width: 25, height: 25)
+        }
+    }
+
+    func toggle() {
+        isOn.toggle()
     }
 }
