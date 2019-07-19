@@ -10,7 +10,7 @@ A simple checkbox control. Its API mimics that of `Toggle`.
 
 ### `PresentationLink2`
 
-A replacement for the buggy (as of Xcode 11 beta 3) `PresentationLink`. Usage is the exact same as the official version.
+A revival of `PresentationLink` and a replacement for the buggy `View.sheet` (as of Xcode 11 beta 4). `View.sheet` seems to function abnormally whilst embedded in a `NavigationView`.
 
 ## Installation
 
