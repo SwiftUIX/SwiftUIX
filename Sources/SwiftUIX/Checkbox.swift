@@ -10,10 +10,10 @@ public struct Checkbox<Label: View>: View {
     public let label: Label
 
     /// Whether or not `self` is currently "on" or "off".
-    @Binding public var isOn: Bool
+    public let isOn: Binding<Bool>
 
     public init(isOn: Binding<Bool>, @ViewBuilder label: () -> Label) {
-        self.$isOn = isOn
+        self.isOn = isOn
         self.label = label()
     }
 
@@ -21,14 +21,14 @@ public struct Checkbox<Label: View>: View {
         HStack {
             label
             Button(action: toggle) {
-                isOn
+                isOn.value
                     ? Image(systemName: "checkmark.square.fill")
                     : Image(systemName: "checkmark.square")
             }
         }
     }
 
-    func toggle() {
-        isOn.toggle()
+    private func toggle() {
+        isOn.value.toggle()
     }
 }
