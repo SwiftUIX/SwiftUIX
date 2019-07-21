@@ -5,6 +5,14 @@
 import SwiftUI
 
 extension Binding {
+    public static var unsafeDummy: Binding {
+        return .init(getValue: { fatalError() }, setValue: { _ in fatalError() })
+    }
+
+    public init(_unsafeValue: Value) {
+        self.init(getValue: { _unsafeValue }, setValue: { _ in fatalError() })
+    }
+    
     public func unsafeGetterMap<Result>(_ transform: @escaping (Value) -> Result) -> Binding<Result> {
         .init(
             getValue: { transform(self.wrappedValue) },
