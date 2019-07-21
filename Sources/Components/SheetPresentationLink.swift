@@ -9,8 +9,10 @@ import SwiftUI
 public struct SheetPresentationLink<Destination: View, Label: View>: View {
     public let destination: Destination
     public let label: Label
+
     private let onDismiss: (() -> ())?
 
+    @Environment(\.isSheetPresented) private var isSheetPresented
     @Environment(\.onSheetPresentationDismiss) private var onSheetPresentationDismiss
     @Environment(\.presentedSheetView) private var presentedSheetView
 
@@ -25,7 +27,8 @@ public struct SheetPresentationLink<Destination: View, Label: View>: View {
     }
 
     public func present() {
-        onSheetPresentationDismiss!.value = onDismiss
-        presentedSheetView!.value = .init(destination)
+        onSheetPresentationDismiss!.set(onDismiss)
+        presentedSheetView!.set(.init(destination))
+        isSheetPresented!.set(true)
     }
 }

@@ -6,8 +6,11 @@ import Combine
 import SwiftUI
 
 public struct SheetPresentationView<Body: View>: View {
+    @Environment(\.isPresented) var isPresented
+
     @State private var presentedView: AnyView? = nil
     @State private var onDismiss: (() -> ())? = nil
+    @State private var isPresenting: Bool = false
 
     public let _body: Body
 
@@ -15,37 +18,59 @@ public struct SheetPresentationView<Body: View>: View {
         self._body = body()
     }
 
-    public var isPresenting: Binding<Bool> {
-        return .init(
-            getValue: { self.presentedView != nil },
-            setValue: { self.presentedView = $0 ? self.presentedView : nil }
+    public var isSheetPresented: Binding<Bool> {
+        .init(
+            getValue: { self.isPresenting },
+            setValue: { newValue in
+                if newValue {
+                    self.present()
+                } else {
+                    self.dismiss()
+                }
+            }
         )
+    }
+
+    func present() {
+        isPresented?.value = true
+        isPresenting = true
+    }
+
+    func dismiss() {
+        isPresented?.value = false
+        isPresenting = false
+        presentedView = nil
+
+        onDismiss?()
+    }
+
+    func sheetContent() -> some View {
+        presentedView!
+            .environment(\.isSheetPresented, isSheetPresented)
+            .environment(\.onSheetPresentationDismiss, .init($onDismiss))
+
     }
 
     public var body: some View {
         return _body
-            .environment(\.presentedSheetView, $presentedView)
-            .environment(\.onSheetPresentationDismiss, $onDismiss)
+            .environment(\.isSheetPresented, isSheetPresented)
+            .environment(\.onSheetPresentationDismiss, .init($onDismiss))
+            .environment(\.presentedSheetView, .init($presentedView))
             .sheet(
-                isPresented: isPresenting,
+                isPresented: $isPresenting,
                 onDismiss: dismiss,
-                content: content
+                content: sheetContent
             )
-    }
-
-    func content() -> some View {
-        (presentedView ?? .init(EmptyView()))
-            .environment(\.isPresented, isPresenting)
-            ._wrapAsPresentationSheetView()
-    }
-
-    func dismiss() {
-        presentedView = nil
-        onDismiss?()
     }
 }
 
 // MARK: - Helpers -
+
+struct IsSheetPresentedViewEnvironmentKey: EnvironmentKey {
+    static var defaultValue: Binding<Bool>? {
+        return nil
+    }
+}
 
 struct PresentedSheetViewEnvironmentKey: EnvironmentKey {
     static var defaultValue: Binding<AnyView?>? {
@@ -60,6 +85,14 @@ struct OnSheetPresentationDismissEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    var isSheetPresented: Binding<Bool>? {
+        get {
+            self[IsSheetPresentedViewEnvironmentKey.self]
+        } set {
+            self[IsSheetPresentedViewEnvironmentKey.self] = newValue
+        }
+    }
+
     var presentedSheetView: Binding<AnyView?>? {
         get {
             self[PresentedSheetViewEnvironmentKey.self]

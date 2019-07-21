@@ -19,4 +19,8 @@ extension Binding {
             setValue: { _ in fatalError() }
         )
     }
+
+    public func set(_ newValue: Value) {
+        value = newValue
+    }
 }
