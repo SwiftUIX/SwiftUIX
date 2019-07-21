@@ -48,7 +48,7 @@ public struct SheetPresentationView<Body: View>: View {
         presentedView!
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
-
+            ._wrapAsPresentationSheetView()
     }
 
     public var body: some View {

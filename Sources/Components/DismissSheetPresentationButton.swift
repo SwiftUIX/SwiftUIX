@@ -35,7 +35,14 @@ public struct DismissSheetPresentationButton<Label: View>: View {
     }
 
     public func dismiss() {
-        isSheetPresented!.value = false
+        // This is a hack until @Environment(\.isPresented) is fixed.
+        UIApplication
+            .shared
+            .windows[0]
+            .rootViewController!
+            .dismiss(animated: true, completion: nil)
+
+        // isSheetPresented!.value = false
     }
 }
 
