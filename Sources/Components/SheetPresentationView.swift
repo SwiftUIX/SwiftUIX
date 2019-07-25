@@ -5,6 +5,8 @@
 import Combine
 import SwiftUI
 
+/// A workaround for `View.sheet` presentation bugs.
+/// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
     @Environment(\.isPresented) var isPresented
 
