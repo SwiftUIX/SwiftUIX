@@ -30,7 +30,11 @@ extension Font {
 }
 
 extension Font {
-    public func toUIFont() -> UIFont {
-        .preferredFont(forTextStyle: (getTextStyle() ?? .body).toUIFontTextStyle())
+    public func toUIFont() -> UIFont? {
+        guard let textStyle = getTextStyle()?.toUIFontTextStyle() else {
+            return nil
+        }
+
+        return .preferredFont(forTextStyle: textStyle)
     }
 }

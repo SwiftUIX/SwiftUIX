@@ -5,7 +5,7 @@
 import SwiftUI
 
 extension Font.TextStyle {
-    public func toUIFontTextStyle() -> UIFont.TextStyle {
+    public func toUIFontTextStyle() -> UIFont.TextStyle? {
         switch self {
         case .largeTitle:
             return .largeTitle
@@ -22,7 +22,7 @@ extension Font.TextStyle {
         case .caption:
             return .caption1
         default:
-            return .body
+            return nil
         }
     }
 }
