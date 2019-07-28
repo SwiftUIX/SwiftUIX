@@ -8,10 +8,6 @@ A collection of useful SwiftUI components and tools.
 
 A simple checkbox control. Its API mimics that of `Toggle`.
 
-### `PresentationLink2`
-
-A revival of `PresentationLink` and a replacement for the buggy `View.sheet` (as of Xcode 11 beta 4). `View.sheet` seems to function abnormally whilst embedded in a `NavigationView`.
-
 ## Installation
 
 1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
