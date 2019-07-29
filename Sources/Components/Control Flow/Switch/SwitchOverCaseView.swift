@@ -67,15 +67,13 @@ public struct SwitchOverCaseNext<PreviousCase: SwitchOverCaseView, Content: View
     public typealias Data = PreviousCase.Data
 
     public let previous: PreviousCase
+    public let comparate: Data
+    public let predicate: (Data, Data) -> Bool
+    public let body: _ConditionalContent<PreviousCase, Content?>
 
     public var comparator: Data {
         return previous.comparator
     }
-
-    public let comparate: Data
-    public let predicate: (Data, Data) -> Bool
-
-    public let body: _ConditionalContent<PreviousCase, Content?>
 
     public var isAMatch: Bool {
         guard !previous.isAMatch else {
@@ -95,14 +93,10 @@ public struct SwitchOverCaseNext<PreviousCase: SwitchOverCaseView, Content: View
         self.comparate = comparate
         self.predicate = predicate
 
-        if previous.isAMatch  {
-            self.body = ViewBuilder.buildEither(first: previous)
+        if predicate(previous.comparator, comparate) && !previous.isAMatch {
+            self.body = ViewBuilder.buildEither(second: content())
         } else {
-            if predicate(previous.comparator, comparate) {
-                self.body = ViewBuilder.buildEither(second: content())
-            } else {
-                self.body = ViewBuilder.buildEither(second: nil)
-            }
+            self.body = ViewBuilder.buildEither(first: previous)
         }
     }
 }
