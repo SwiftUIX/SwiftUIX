@@ -6,8 +6,6 @@ import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
 public struct DismissPresentationButton<Label: View>: View {
-    @Environment(\.isPresented) private var isPresented
-
     public let label: Label
 
     private let action: (() -> ())?
@@ -17,16 +15,21 @@ public struct DismissPresentationButton<Label: View>: View {
         self.label = label()
     }
 
-    public func dismiss() {
-        action?()
-
-        isPresented!.value = false
-    }
-
     public var body: some View {
         Button(action: dismiss) {
             label
         }
+    }
+
+    @Environment(\.isPresented) private var isPresented
+
+    public func dismiss() {
+        guard let isPresented = isPresented else {
+            fatalError("a presentation must be active for it to be dismissed")
+        }
+
+        action?()
+        isPresented.value = false
     }
 }
 
