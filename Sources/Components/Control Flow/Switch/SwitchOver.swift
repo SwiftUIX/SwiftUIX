@@ -25,7 +25,7 @@ extension SwitchOver {
         _ comparate: Data,
         predicate: @escaping (Data, Data) -> Bool,
         @ViewBuilder content: () -> Content
-    ) -> SwitchOverCaseFirst<Data, Content> {
+    ) -> SwitchOverCaseFirstView<Data, Content> {
         return .init(
             comparator: comparator,
             comparate: comparate,
@@ -38,7 +38,7 @@ extension SwitchOver {
     public func `case`<Content: View>(
         _ comparate: Data,
         @ViewBuilder content: () -> Content
-    ) -> SwitchOverCaseFirst<Data, Content> where Data: Equatable {
+    ) -> SwitchOverCaseFirstView<Data, Content> where Data: Equatable {
         return .init(
             comparator: comparator,
             comparate: comparate,
