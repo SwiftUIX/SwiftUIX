@@ -7,7 +7,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
 1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
 2. Paste the repository URL (`https://github.com/swiftuix/SwiftUIX`) and click **Next**.
-3. For **Rules**, select **Branch** with the branch set to `master`.
+3. For **Rules**, select **Branch** (with branch set to `master`).
 4. Click **Finish**.
 
 # Usage
@@ -20,9 +20,11 @@ A simple checkbox control. Its API mimics that of `Toggle`.
 
 ## Control Flow: 
 
-### `SwitchOver`
+SwiftUIX offers affordances for emulating certain types of control flow.
 
-This library offers affordances for emulating multiple types of control flow. Below is an example of a [`switch`](https://en.wikipedia.org/wiki/Control_flow#Case_and_switch_statements) control flow. 
+### Switch Statements
+
+Below is an example of a [`switch`](https://en.wikipedia.org/wiki/Control_flow#Case_and_switch_statements) control flow being emulated. 
 
 The following, for example, will render a circle:
 
