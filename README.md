@@ -3,6 +3,15 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
+# Installation
+
+1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
+2. Paste the repository URL (`https://github.com/swiftuix/SwiftUIX`) and click **Next**.
+3. For **Rules**, select **Branch** with the branch set to `master`.
+4. Click **Finish**.
+
+# Usage
+
 ## Controls:
 
 ### `Checkbox`
@@ -54,11 +63,6 @@ struct ContentView: View {
 ```
 
 Whereas changing `shapeType` to `.squircle` would render the default case `Text("Woah!")`.
-
-# Installation
-
-1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
-2. Paste the repository URL (`https://github.com/swiftuix/SwiftUIX`)
 
 # License
 
