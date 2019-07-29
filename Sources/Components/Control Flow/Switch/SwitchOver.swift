@@ -1,0 +1,48 @@
+//
+// Copyright (c) Vatsal Manot
+//
+
+import SwiftUI
+
+/// A view representing the start of a `switch` control flow.
+public struct SwitchOver<Data>: View {
+    public let comparator: Data
+
+    public init(_ comparator: Data) {
+        self.comparator = comparator
+    }
+
+    public var body: some View {
+        return EmptyView()
+    }
+}
+
+// MARK: - Extensions -
+
+extension SwitchOver {
+    /// Handles a case in a `switch` control flow.
+    public func `case`<Content: View>(
+        _ comparate: Data,
+        predicate: @escaping (Data, Data) -> Bool,
+        @ViewBuilder content: () -> Content
+    ) -> SwitchOverCaseFirst<Data, Content> {
+        return .init(
+            comparator: comparator,
+            comparate: comparate,
+            predicate: predicate,
+            content: content
+        )
+    }
+
+    /// Handles a case in a `switch` control flow.
+    public func `case`<Content: View>(
+        _ comparate: Data,
+        @ViewBuilder content: () -> Content
+    ) -> SwitchOverCaseFirst<Data, Content> where Data: Equatable {
+        return .init(
+            comparator: comparator,
+            comparate: comparate,
+            content: content
+        )
+    }
+}
