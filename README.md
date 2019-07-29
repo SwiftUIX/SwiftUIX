@@ -35,7 +35,7 @@ Below is an example of a [`switch`](https://en.wikipedia.org/wiki/Control_flow#C
 The following, for example, will render a circle:
 
 
-```
+```Swift
 enum ShapeType {
     case capsule
     case circle
