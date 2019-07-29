@@ -75,7 +75,7 @@ public struct SwitchOverCaseNext<PreviousCase: SwitchOverCaseView, Content: View
     public let comparate: Data
     public let predicate: (Data, Data) -> Bool
 
-    public let body: ConditionalContent<PreviousCase, Content?>
+    public let body: _ConditionalContent<PreviousCase, Content?>
 
     public var isAMatch: Bool {
         guard !previous.isAMatch else {
@@ -127,7 +127,7 @@ public struct SwitchOverCaseDefault<PreviousCase: SwitchOverCaseView, Content: V
     public typealias Data = PreviousCase.Data
 
     public let previous: PreviousCase
-    public let body: ConditionalContent<PreviousCase, Content>
+    public let body: _ConditionalContent<PreviousCase, Content>
 
     public init(previous: PreviousCase, content: () -> Content) {
         self.previous = previous

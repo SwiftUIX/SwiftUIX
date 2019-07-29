@@ -8,7 +8,7 @@ import SwiftUI
 /// A workaround for `View.sheet` presentation bugs.
 /// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
-    @Environment(\.isPresented) var isPresented
+    @Environment(\.presentationMode) private var presentationMode
 
     @State private var presentedView: AnyView? = nil
     @State private var onDismiss: (() -> ())? = nil
@@ -22,8 +22,8 @@ public struct SheetPresentationView<Body: View>: View {
 
     public var isSheetPresented: Binding<Bool> {
         .init(
-            getValue: { self.isPresenting },
-            setValue: { newValue in
+            get: { self.isPresenting },
+            set: { newValue in
                 if newValue {
                     self.present()
                 } else {
@@ -34,12 +34,12 @@ public struct SheetPresentationView<Body: View>: View {
     }
 
     func present() {
-        isPresented?.value = true
         isPresenting = true
     }
 
     func dismiss() {
-        isPresented?.value = false
+        presentationMode.value.dismiss()
+
         isPresenting = false
         presentedView = nil
 

@@ -21,15 +21,11 @@ public struct DismissPresentationButton<Label: View>: View {
         }
     }
 
-    @Environment(\.isPresented) private var isPresented
+    @Environment(\.presentationMode) private var presentationMode
 
     public func dismiss() {
-        guard let isPresented = isPresented else {
-            fatalError("a presentation must be active for it to be dismissed")
-        }
-
         action?()
-        isPresented.value = false
+        presentationMode.value.dismiss()
     }
 }
 
