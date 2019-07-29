@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let package = Package.init(
+let package = Package(
     name: "SwiftUIX",
     platforms: [
         .iOS(.v13),
