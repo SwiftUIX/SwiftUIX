@@ -50,6 +50,8 @@ extension View {
 // MARK: General
 
 extension View {
+    /// Returns a type-erased version of `self`.
+    @inlinable
     public func eraseToAnyView() -> AnyView {
         return .init(self)
     }
