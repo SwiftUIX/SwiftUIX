@@ -1,13 +1,17 @@
-<img src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" alt="Miss Electric Eel 2016" width="36" height="36"> SwiftUIX: An extension to the standard SwiftUI library.
+<img align=middle src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX: An extension to the standard SwiftUI library.
 ======================================
+
+SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
 ## Controls:
 
-#### `Checkbox`
+### `Checkbox`
 
 A simple checkbox control. Its API mimics that of `Toggle`.
 
 ## Control Flow: 
+
+### `SwitchOver`
 
 This library offers affordances for emulating multiple types of control flow. Below is an example of a [`switch`](https://en.wikipedia.org/wiki/Control_flow#Case_and_switch_statements) control flow. 
 
