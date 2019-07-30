@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+
 extension Font.TextStyle {
     public func toUIFontTextStyle() -> UIFont.TextStyle? {
         switch self {
@@ -26,3 +28,5 @@ extension Font.TextStyle {
         }
     }
 }
+
+#endif
