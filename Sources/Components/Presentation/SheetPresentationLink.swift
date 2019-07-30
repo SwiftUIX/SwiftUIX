@@ -27,8 +27,8 @@ public struct SheetPresentationLink<Destination: View, Label: View>: View {
     }
 
     private func present() {
-        onSheetPresentationDismiss!.set(onDismiss)
-        presentedSheetView!.set(.init(destination))
-        isSheetPresented!.set(true)
+        onSheetPresentationDismiss!.value = onDismiss
+        presentedSheetView!.value = .init(destination)
+        isSheetPresented!.value = true
     }
 }
