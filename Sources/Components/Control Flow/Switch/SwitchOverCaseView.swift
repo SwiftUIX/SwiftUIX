@@ -12,11 +12,8 @@ public protocol SwitchOverCaseView: ControlFlowView {
     /// The data being compared against in the control flow.
     var comparator: Data { get }
 
-    /// The data being compared with in the control flow.
-    var comparate: Data { get }
-
-    /// The predicate being used for data comparison in the control flow.
-    var predicate: (Data, Data) -> Bool { get }
+    /// The predicate being used for matching in the control flow.
+    var predicate: (Data) -> Bool { get }
 
     /// Whether `self` represents a match in the control flow.
     var isAMatch: Bool { get }
@@ -28,13 +25,12 @@ public protocol SwitchOverCaseView: ControlFlowView {
 /// A view representing first `case` statement in a `switch` control flow.
 public struct SwitchOverCaseFirstView<Data, Content: View>: SwitchOverCaseView {
     public let comparator: Data
-    public let comparate: Data
-    public let predicate: (Data, Data) -> Bool
+    public let predicate: (Data) -> Bool
 
     public let body: Content?
 
     public var isAMatch: Bool {
-        return predicate(comparator, comparate)
+        return predicate(comparator)
     }
 
     public var hasMatchedPreviously: Bool? {
@@ -43,15 +39,13 @@ public struct SwitchOverCaseFirstView<Data, Content: View>: SwitchOverCaseView {
 
     public init(
         comparator: Data,
-        comparate: Data,
-        predicate: @escaping (Data, Data) -> Bool,
+        predicate: @escaping (Data) -> Bool,
         content: () -> Content
     ) {
         self.comparator = comparator
-        self.comparate = comparate
         self.predicate = predicate
 
-        body = predicate(comparator, comparate) ? content() : nil
+        body = predicate(comparator) ? content() : nil
     }
 }
 
@@ -61,11 +55,11 @@ extension SwitchOverCaseFirstView where Data: Equatable {
         comparate: Data,
         content: () -> Content
     )  {
-        self.comparator = comparator
-        self.comparate = comparate
-        self.predicate = { $0 == $1 }
-
-        body = predicate(comparator, comparate) ? content() : nil
+        self.init(
+            comparator: comparator,
+            predicate: { $0 == comparate },
+            content: content
+        )
     }
 }
 
@@ -74,8 +68,7 @@ public struct SwitchOverCaseNextView<PreviousCase: SwitchOverCaseView, Content: 
     public typealias Data = PreviousCase.Data
 
     public let previous: PreviousCase
-    public let comparate: Data
-    public let predicate: (Data, Data) -> Bool
+    public let predicate: (Data) -> Bool
     public let body: _ConditionalContent<PreviousCase, Content?>
 
     public var comparator: Data {
@@ -83,7 +76,7 @@ public struct SwitchOverCaseNextView<PreviousCase: SwitchOverCaseView, Content: 
     }
 
     public var isAMatch: Bool {
-        return predicate(comparator, comparate)
+        return predicate(comparator)
     }
 
     public var hasMatchedPreviously: Bool? {
@@ -96,17 +89,15 @@ public struct SwitchOverCaseNextView<PreviousCase: SwitchOverCaseView, Content: 
 
     public init(
         previous: PreviousCase,
-        comparate: Data,
-        predicate: @escaping (Data, Data) -> Bool,
+        predicate: @escaping (Data) -> Bool,
         content: () -> Content
     ) {
         self.previous = previous
-        self.comparate = comparate
         self.predicate = predicate
 
         if (previous.isAMatch || (previous.hasMatchedPreviously ?? false)) {
             self.body = ViewBuilder.buildEither(first: previous)
-        } else if predicate(previous.comparator, comparate) {
+        } else if predicate(previous.comparator) {
             self.body = ViewBuilder.buildEither(second: content())
         } else {
             self.body = ViewBuilder.buildEither(second: nil)
@@ -122,8 +113,7 @@ extension SwitchOverCaseNextView where Data: Equatable {
     )  {
         self.init(
             previous: previous,
-            comparate: comparate,
-            predicate: { $0 == $1 },
+            predicate: { $0 == comparate },
             content: content
         )
     }
@@ -153,12 +143,11 @@ extension SwitchOverCaseView {
     /// Handles a case in a `switch` control flow.
     public func `case`<Content: View>(
         _ comparate: Data,
-        predicate: @escaping (Data, Data) -> Bool,
+        predicate: @escaping (Data) -> Bool,
         @ViewBuilder content: () -> Content
     ) -> SwitchOverCaseNextView<Self, Content> {
         .init(
             previous: self,
-            comparate: comparate,
             predicate: predicate,
             content: content
         )

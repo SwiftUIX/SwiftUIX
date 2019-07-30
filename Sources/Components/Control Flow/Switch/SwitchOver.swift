@@ -22,13 +22,11 @@ public struct SwitchOver<Data>: View {
 extension SwitchOver {
     /// Handles a case in a `switch` control flow.
     public func `case`<Content: View>(
-        _ comparate: Data,
-        predicate: @escaping (Data, Data) -> Bool,
+        predicate: @escaping (Data) -> Bool,
         @ViewBuilder content: () -> Content
     ) -> SwitchOverCaseFirstView<Data, Content> {
         return .init(
             comparator: comparator,
-            comparate: comparate,
             predicate: predicate,
             content: content
         )
