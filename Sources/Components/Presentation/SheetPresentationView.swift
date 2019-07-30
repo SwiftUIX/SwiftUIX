@@ -6,6 +6,7 @@ import Combine
 import SwiftUI
 
 /// A workaround for `View.sheet` presentation bugs.
+///
 /// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
     @Environment(\.presentationMode) private var presentationMode
@@ -33,11 +34,11 @@ public struct SheetPresentationView<Body: View>: View {
         )
     }
 
-    func present() {
+    private func present() {
         isPresenting = true
     }
 
-    func dismiss() {
+    private func dismiss() {
         presentationMode.value.dismiss()
 
         isPresenting = false
@@ -46,7 +47,7 @@ public struct SheetPresentationView<Body: View>: View {
         onDismiss?()
     }
 
-    func sheetContent() -> some View {
+    private func sheetContent() -> some View {
         presentedView!
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))

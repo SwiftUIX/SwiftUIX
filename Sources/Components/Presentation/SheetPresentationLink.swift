@@ -26,7 +26,7 @@ public struct SheetPresentationLink<Destination: View, Label: View>: View {
         return Button(action: present, label: { label })
     }
 
-    public func present() {
+    private func present() {
         onSheetPresentationDismiss!.set(onDismiss)
         presentedSheetView!.set(.init(destination))
         isSheetPresented!.set(true)
