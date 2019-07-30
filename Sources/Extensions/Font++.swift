@@ -29,6 +29,8 @@ extension Font {
     }
 }
 
+#if canImport(UIKit)
+
 extension Font {
     public func toUIFont() -> UIFont? {
         guard let textStyle = getTextStyle()?.toUIFontTextStyle() else {
@@ -38,3 +40,5 @@ extension Font {
         return .preferredFont(forTextStyle: textStyle)
     }
 }
+
+#endif
