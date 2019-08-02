@@ -68,7 +68,7 @@ extension Color {
         return .init(.quaternaryLabel)
     }
 
-    
+
     /* Foreground color for standard system links.
      */
     public static var link: Color {
@@ -81,7 +81,7 @@ extension Color {
     public static var placeholderText: Color {
         return .init(.placeholderText)
     }
-    
+
 
     /* Foreground colors for separators (thin border or divider lines).
      * `separatorColor` may be partially transparent, so it can go on top of any content.
