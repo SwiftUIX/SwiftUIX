@@ -15,7 +15,7 @@ public struct TextView<Label: View>: View {
 
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            _TextView(
+            TextViewCore(
                 text: text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit
@@ -38,7 +38,7 @@ extension TextView where Label == Text {
     }
 }
 
-fileprivate struct _TextView {
+fileprivate struct TextViewCore {
     var text: Binding<String>
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
@@ -56,13 +56,13 @@ fileprivate struct _TextView {
 
 // MARK: - Protocol Implementations -
 
-extension _TextView: UIViewRepresentable {
+extension TextViewCore: UIViewRepresentable {
     typealias UIViewType = UITextView
 
     class Coordinator: NSObject, UITextViewDelegate {
-        var view: _TextView
+        var view: TextViewCore
 
-        init(_ view: _TextView) {
+        init(_ view: TextViewCore) {
             self.view = view
         }
 
