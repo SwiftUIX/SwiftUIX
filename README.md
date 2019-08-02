@@ -72,6 +72,39 @@ struct ContentView: View {
 
 Whereas changing `shapeType` to `.squircle` would render the default case `Text("Woah!")`.
 
+## Extensions:
+
+### `Color`
+
+SwiftUIX ports the following `UIColor` named colors and exposes them as static type properties on `Color`:
+- `systemRed`
+- `systemGreen`
+- `systemBlue`
+- `systemOrange`
+- `systemYellow`
+- `systemPink`
+- `systemPurple`
+- `systemTeal`
+- `systemIndigo`
+- `label`
+- `secondaryLabel`
+- `tertiaryLabel`
+- `quaternaryLabel`
+- `link`
+- `placeholderText`
+- `separator`
+- `opaqueSeparator`
+- `systemBackground`
+- `secondarySystemBackground`
+- `tertiarySystemBackground`
+- `systemGroupedBackground`
+- `secondarySystemGroupedBackground`
+- `tertiarySystemGroupedBackground`
+- `systemFill`
+- `secondarySystemFill`
+- `tertiarySystemFill`
+- `quaternarySystemFill`
+
 # License
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
