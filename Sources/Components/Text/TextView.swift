@@ -5,6 +5,8 @@
 import SwiftUI
 import UIKit
 
+#if canImport(UIKit)
+
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {
     private let label: Label
@@ -25,17 +27,12 @@ public struct TextView<Label: View>: View {
     }
 }
 
-extension TextView where Label == Text {
-    public init<S: StringProtocol>(
-        _ title: S,
-        text: Binding<String>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.label = Text(title)
-        self.text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
+class _UITextView: UITextView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        textContainerInset = .zero
+        textContainer.lineFragmentPadding = 0
     }
 }
 
@@ -55,10 +52,26 @@ fileprivate struct TextViewCore {
     }
 }
 
+// MARK: - Extensions -
+
+extension TextView where Label == Text {
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.label = Text(title).foregroundColor(.placeholderText)
+        self.text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+}
+
 // MARK: - Protocol Implementations -
 
 extension TextViewCore: UIViewRepresentable {
-    typealias UIViewType = UITextView
+    typealias UIViewType = _UITextView
 
     class Coordinator: NSObject, UITextViewDelegate {
         var view: TextViewCore
@@ -87,8 +100,8 @@ extension TextViewCore: UIViewRepresentable {
         Coordinator(self)
     }
 
-    func makeUIView(context: Context) -> UITextView {
-        let view = UITextView()
+    func makeUIView(context: Context) -> _UITextView {
+        let view = _UITextView()
 
         view.backgroundColor = nil
         view.text = text.value
@@ -105,7 +118,7 @@ extension TextViewCore: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ textView: UITextView, context: Context) {
+    func updateUIView(_ textView: _UITextView, context: Context) {
         if let font = context.environment.font, font.toUIFont() != textView.font {
             textView.font = font.toUIFont()
         }
@@ -113,3 +126,5 @@ extension TextViewCore: UIViewRepresentable {
         textView.text = text.value
     }
 }
+
+#endif
