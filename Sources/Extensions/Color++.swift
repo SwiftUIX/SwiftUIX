@@ -35,7 +35,6 @@ extension Color {
         return .init(.systemPink)
     }
 
-    @available(iOS 9.0, *)
     public static var systemPurple: Color {
         return .init(.systemPurple)
     }
@@ -44,7 +43,6 @@ extension Color {
         return .init(.systemTeal)
     }
 
-    @available(iOS 13.0, *)
     public static var systemIndigo: Color {
         return .init(.systemIndigo)
     }
