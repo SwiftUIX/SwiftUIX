@@ -21,16 +21,8 @@ public struct DismissSheetPresentationButton<Label: View>: View {
     public var body: some View {
         Button(action: dismiss) {
             label
-        }.onAppear(perform: setupOnSheetPresentationDismiss)
-    }
-
-    public func setupOnSheetPresentationDismiss() {
-        let onDismiss = onSheetPresentationDismiss!
-
-        if let value = onDismiss.value {
-            onDismiss.value = { value(); self.onDismiss?() }
-        } else {
-            onDismiss.value = self.onDismiss
+        }.onAppear {
+            self.onSheetPresentationDismiss!.value = self.onDismiss
         }
     }
 
