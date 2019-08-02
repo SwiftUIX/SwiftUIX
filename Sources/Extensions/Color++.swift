@@ -132,7 +132,7 @@ extension Color {
     }
 
     public static var secondarySystemGroupedBackground: Color {
-        return .init(.systemBackground)
+        return .init(.secondarySystemGroupedBackground)
     }
 
     public static var tertiarySystemGroupedBackground: Color {
