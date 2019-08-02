@@ -17,7 +17,9 @@ public struct TextView<Label: View>: View {
 
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            label
+            if text.value.isEmpty {
+                label
+            }
             TextViewCore(
                 text: text,
                 onEditingChanged: onEditingChanged,
