@@ -177,7 +177,7 @@ extension Color {
     /**
     Creates a color from a 6-digit hex color code.
 
-    - Parameter hex: A 6-digic hex representation of the color.
+    - Parameter hexadecimal: A 6-digic hex representation of the color.
 
     - Returns: A Color from given hex. Returns nil if invalid hex.
     */
