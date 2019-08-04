@@ -80,7 +80,7 @@ SwiftUIX offers a port for `UITextView`, exposing an interface similar to that o
 
 ```swift
 /// A control that displays an editable text interface.
-public struct TextView<Label> : View where Label : View {
+public struct TextView<Label: View>: View {
     /// Declares the content and behavior of this view.
     public var body: some View { get }
 }
