@@ -173,27 +173,39 @@ extension Color {
     public static var quaternarySystemFill: Color {
         return .init(.quaternarySystemFill)
     }
-    
-    /**
-    Creates a color from a 6-digit hex color code.
+}
 
-    - Parameter hexadecimal: A 6-digic hex representation of the color.
-
-    - Returns: A Color from given hex. Returns nil if invalid hex.
-    */
+extension Color {
+    /// Creates a color from a 6-digit hexadecimal color code.
+    ///
+    /// Parameter hexadecimal: A 6-digic hexadecimal representation of the color.
+    ///
+    /// Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
     public init?(hexadecimal: String) {
-        var hexString: String = hexadecimal.uppercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if hexString.hasPrefix("#") { hexString.remove(at: hexString.startIndex) }
-        guard hexString.count == 6 else { return nil }
-        
-        guard let rgb = UInt32(hexString, radix: 16) else { return nil }
-        
-        self.init(UIColor(
-            red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgb & 0x0000FF) / 255.0,
-            alpha: 1.0))
+        var hexadicmal = hexadecimal
+            .uppercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if hexadicmal.hasPrefix("#") {
+            hexadicmal.remove(at: hexadicmal.startIndex)
+        }
+
+        guard hexadicmal.count == 6 else {
+            return nil
+        }
+
+        guard let rgb = UInt32(hexadicmal, radix: 16) else {
+            return nil
+        }
+
+        self.init(
+            UIColor(
+                red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
+                green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
+                blue: CGFloat(rgb & 0x0000FF) / 255.0,
+                alpha: 1.0
+            )
+        )
     }
 }
 
