@@ -178,9 +178,9 @@ extension Color {
 extension Color {
     /// Creates a color from a 6-digit hexadecimal color code.
     ///
-    /// Parameter hexadecimal: A 6-digic hexadecimal representation of the color.
+    /// - Parameter hexadecimal: A 6-digic hexadecimal representation of the color.
     ///
-    /// Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
+    /// - Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
     public init?(hexadecimal: String) {
         var hexadicmal = hexadecimal
             .uppercased()
