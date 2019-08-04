@@ -20,6 +20,7 @@ public struct TextView<Label: View>: View {
             if text.value.isEmpty {
                 label
             }
+            
             TextViewCore(
                 text: text,
                 onEditingChanged: onEditingChanged,
