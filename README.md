@@ -42,6 +42,14 @@ public struct ProgressBar: View {
 }
 ```
 
+Usage:
+
+```swift
+ProgressBar(0.5)
+    .foregroundColor(.blue)
+    .frame(height: 20)
+```
+
 ## Control Flow: 
 
 SwiftUIX offers affordances for emulating certain types of control flow.
