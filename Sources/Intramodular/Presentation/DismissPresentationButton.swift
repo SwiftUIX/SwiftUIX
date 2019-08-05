@@ -10,7 +10,7 @@ public struct DismissPresentationButton<Label: View>: View {
 
     private let action: (() -> ())?
 
-    public init(action: (() -> ())? = nil, @ViewBuilder label: () -> Label) {
+    public init(action: (() -> ())? = nil, label: () -> Label) {
         self.action = action
         self.label = label()
     }
@@ -22,10 +22,23 @@ public struct DismissPresentationButton<Label: View>: View {
     }
 
     @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.isSheetPresented) private var isSheetPresented
 
     public func dismiss() {
         action?()
-        presentationMode.value.dismiss()
+
+        if let isSheetPresented = isSheetPresented {
+            // This is a hack until @Environment(\.isPresented) is fixed.
+            UIApplication
+                .shared
+                .windows[0]
+                .rootViewController!
+                .dismiss(animated: true, completion: nil)
+
+            isSheetPresented.value = false
+        } else {
+            presentationMode.value.dismiss()
+        }
     }
 }
 
