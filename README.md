@@ -42,7 +42,7 @@ public struct ProgressBar: View {
 }
 ```
 
-Usage:
+Example usage:
 
 ```swift
 ProgressBar(0.5)
