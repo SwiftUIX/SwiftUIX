@@ -28,7 +28,7 @@ public struct PresentationLink<Destination: View, Label: View>: View {
                 isPresented: $isPresented,
                 onDismiss: dismiss,
                 content: { self.destination }
-            )
+        )
     }
 
     private func present() {
