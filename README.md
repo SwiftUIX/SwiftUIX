@@ -24,6 +24,24 @@ SwiftUIX offers (opinionated) default implementations for commonly used UI contr
 
 A simple checkbox control. Its API mimics that of `Toggle`.
 
+
+## Data Representation
+
+### `ProgressBar`
+
+A view that depicts the progress of a task over time.
+
+```swift
+public struct ProgressBar: View {
+    public let value: CGFloat
+
+    public init(_ value: CGFloat)
+
+    /// Declares the content and behavior of this view.
+    public var body: some View { get }
+}
+```
+
 ## Control Flow: 
 
 SwiftUIX offers affordances for emulating certain types of control flow.
