@@ -33,8 +33,6 @@ A view that depicts the progress of a task over time.
 
 ```swift
 public struct ProgressBar: View {
-    public let value: CGFloat
-
     public init(_ value: CGFloat)
 
     /// Declares the content and behavior of this view.
