@@ -183,19 +183,19 @@ extension Color {
     ///
     /// - Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
     public init?(hexadecimal: String) {
-        var hexadicmal = hexadecimal
+        var hexadecimal = hexadecimal
             .uppercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if hexadicmal.hasPrefix("#") {
-            hexadicmal.remove(at: hexadicmal.startIndex)
+        if hexadecimal.hasPrefix("#") {
+            hexadecimal.remove(at: hexadecimal.startIndex)
         }
 
-        guard hexadicmal.count == 6 else {
+        guard hexadecimal.count == 6 else {
             return nil
         }
 
-        guard let rgb = UInt32(hexadicmal, radix: 16) else {
+        guard let rgb = UInt32(hexadecimal, radix: 16) else {
             return nil
         }
 
