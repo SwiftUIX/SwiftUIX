@@ -1,8 +1,13 @@
 //
-//  File.swift
-//  
-//
-//  Created by Vatsal Manot on 8/8/19.
+// Copyright (c) Vatsal Manot
 //
 
-import Foundation
+import Swift
+import SwiftUI
+
+public enum ColorRank {
+    case primary
+    case secondary
+    case tertiary
+    case quaternary
+}
