@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Swift
 import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.

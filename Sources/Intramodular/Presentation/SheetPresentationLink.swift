@@ -3,6 +3,7 @@
 //
 
 import Combine
+import Swift
 import SwiftUI
 
 /// A control which presents content when triggered.

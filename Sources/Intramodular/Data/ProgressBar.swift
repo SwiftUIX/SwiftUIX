@@ -2,8 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
-import SwiftUI
 import Swift
+import SwiftUI
 
 // A view that depicts the progress of a task over time.
 public struct ProgressBar: View {

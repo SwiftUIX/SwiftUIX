@@ -3,6 +3,7 @@
 //
 
 import Combine
+import Swift
 import SwiftUI
 
 /// A workaround for `View.sheet` presentation bugs.
@@ -59,7 +60,7 @@ public struct SheetPresentationView<Body: View>: View {
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             .environment(\.presentedSheetView, .init($presentedView))
-            .sheet(
+            .fullScreenSheet(
                 isPresented: $isPresenting,
                 onDismiss: dismiss,
                 content: sheetContent
