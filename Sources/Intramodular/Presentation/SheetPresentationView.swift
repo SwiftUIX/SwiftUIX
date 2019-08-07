@@ -60,7 +60,7 @@ public struct SheetPresentationView<Body: View>: View {
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             .environment(\.presentedSheetView, .init($presentedView))
-            .fullScreenSheet(
+            .sheet(
                 isPresented: $isPresenting,
                 onDismiss: dismiss,
                 content: sheetContent
