@@ -8,19 +8,6 @@ import SwiftUI
 // MARK: Relative Sizing
 
 extension View {
-    /// Causes the view to fill into its superview.
-    public func _fill(alignment: Alignment = .center) -> some View {
-        GeometryReader { geometry in
-            return self.frame(
-                width: geometry.size.width,
-                height: geometry.size.height,
-                alignment: alignment
-            )
-        }
-    }
-}
-
-extension View {
     public func relativeHeight(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
         GeometryReader { geometry in
             self.frame(
@@ -39,7 +26,7 @@ extension View {
         }
     }
 
-    public func relativeSize(_ widthRatio: CGFloat, _ heightRatio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeSize(width widthRatio: CGFloat, height heightRatio: CGFloat, alignment: Alignment = .center) -> some View {
         GeometryReader { geometry in
             self.frame(
                 width: geometry.size.width * widthRatio,
@@ -47,6 +34,11 @@ extension View {
                 alignment: alignment
             )
         }
+    }
+
+    /// Causes the view to fill into its superview.
+    public func fill(alignment: Alignment = .center) -> some View {
+        relativeSize(width: 1.0, height: 1.0)
     }
 }
 
