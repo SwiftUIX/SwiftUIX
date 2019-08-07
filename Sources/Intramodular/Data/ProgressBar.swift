@@ -7,7 +7,7 @@ import Swift
 
 // A view that depicts the progress of a task over time.
 public struct ProgressBar: View {
-    public let value: CGFloat
+    private let value: CGFloat
 
     public init(_ value: CGFloat) {
         self.value = value
@@ -15,7 +15,7 @@ public struct ProgressBar: View {
 
     public var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: Alignment.topLeading) {
+            ZStack(alignment: .topLeading) {
                 Capsule()
                     .frame(width: geometry.size.width)
                     .opacity(0.3)
