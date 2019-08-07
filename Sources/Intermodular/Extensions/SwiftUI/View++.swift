@@ -17,8 +17,10 @@ extension View {
             )
         }
     }
+}
 
-    public func _relativeHeight(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
+extension View {
+    public func relativeHeight(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
         GeometryReader { geometry in
             self.frame(
                 height: geometry.size.height * ratio,
@@ -27,7 +29,7 @@ extension View {
         }
     }
 
-    public func _relativeWidth(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeWidth(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
         GeometryReader { geometry in
             self.frame(
                 width: geometry.size.width * ratio,
@@ -36,7 +38,7 @@ extension View {
         }
     }
 
-    public func _relativeSize(_ widthRatio: CGFloat, _ heightRatio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeSize(_ widthRatio: CGFloat, _ heightRatio: CGFloat, alignment: Alignment = .center) -> some View {
         GeometryReader { geometry in
             self.frame(
                 width: geometry.size.width * widthRatio,
