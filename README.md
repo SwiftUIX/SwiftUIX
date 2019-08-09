@@ -94,7 +94,7 @@ struct ContentView: View {
 }
 ```
 
-Whereas changing `shapeType` to `.squircle` would render the default case `Text("Woah!")`.
+Whereas changing `shapeType` to `.squircle` would render the default case `Text("Whoa!")`.
 
 ## Text
 
