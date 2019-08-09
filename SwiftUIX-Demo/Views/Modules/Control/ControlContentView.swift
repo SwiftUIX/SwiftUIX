@@ -11,9 +11,12 @@ struct ControlContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack {
-                Text("Control")
+            VStack(alignment: .leading) {
+                CheckboxSectionView()
+
+                Divider()
             }
+            .padding()
         }
         .navigationBarTitle("Control")
     }
