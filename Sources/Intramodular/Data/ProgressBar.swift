@@ -10,7 +10,9 @@ public struct ProgressBar: View {
     private let value: CGFloat
 
     public init(_ value: CGFloat) {
-        self.value = value
+        assert(value >= 0 && value <= 1)
+
+        self.value = max(value, 1)
     }
 
     public var body: some View {
@@ -19,9 +21,9 @@ public struct ProgressBar: View {
                 Capsule()
                     .frame(width: geometry.size.width)
                     .opacity(0.3)
-                Capsule()
+                Rectangle()
                     .frame(width: geometry.size.width * self.value)
             }
-        }
+        }.clipShape(Capsule())
     }
 }
