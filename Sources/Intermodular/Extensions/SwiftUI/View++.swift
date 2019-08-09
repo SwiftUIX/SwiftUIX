@@ -8,7 +8,10 @@ import SwiftUI
 // MARK: Relative Sizing
 
 extension View {
-    public func relativeHeight(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeHeight(
+        _ ratio: CGFloat,
+        alignment: Alignment = .center
+    ) -> some View {
         GeometryReader { geometry in
             self.frame(
                 height: geometry.size.height * ratio,
@@ -17,7 +20,10 @@ extension View {
         }
     }
 
-    public func relativeWidth(_ ratio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeWidth(
+        _ ratio: CGFloat,
+        alignment: Alignment = .center
+    ) -> some View {
         GeometryReader { geometry in
             self.frame(
                 width: geometry.size.width * ratio,
@@ -26,7 +32,11 @@ extension View {
         }
     }
 
-    public func relativeSize(width widthRatio: CGFloat, height heightRatio: CGFloat, alignment: Alignment = .center) -> some View {
+    public func relativeSize(
+        width widthRatio: CGFloat,
+        height heightRatio: CGFloat,
+        alignment: Alignment = .center
+    ) -> some View {
         GeometryReader { geometry in
             self.frame(
                 width: geometry.size.width * widthRatio,
