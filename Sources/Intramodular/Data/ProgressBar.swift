@@ -12,7 +12,7 @@ public struct ProgressBar: View {
     public init(_ value: CGFloat) {
         assert(value >= 0 && value <= 1)
 
-        self.value = max(value, 1)
+        self.value = value
     }
 
     public var body: some View {
