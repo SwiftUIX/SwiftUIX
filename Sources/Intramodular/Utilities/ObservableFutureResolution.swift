@@ -9,11 +9,7 @@ import SwiftUI
 public final class ObservableFutureResolution<Output, Failure: Error>: ObservableObject, Subscriber {
     public typealias Input = Output
 
-    public var result: Result<Output, Failure>? {
-        willSet {
-            objectWillChange.send()
-        }
-    }
+    @Published(initialValue: nil) public var result: Result<Output, Failure>?
 
     public init<S: Scheduler>(future: Future<Output, Failure>, scheduler: S) {
         future
