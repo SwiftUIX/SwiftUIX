@@ -48,6 +48,31 @@ ProgressBar(0.5)
     .frame(height: 20)
 ```
 
+### `CircularProgressBar`
+
+A view that depicts the progress of a task over time.
+
+```swift
+public struct CircularProgressBar: View {
+    public init(_ value: CGFloat)
+
+    /// Declares the content and behavior of this view.
+    public var body: some View { get }
+    
+    /// Set the border width for the circular progress bar view
+    public func lineWidth(_ lineWidth: CGFloat) -> CircularProgressBar
+}
+```
+
+Example usage:
+
+```swift
+CircularProgressBar(0.5)
+    .lineWidth(10)
+    .foregroundColor(.blue)
+    .frame(height: 100)
+```
+
 ## Control Flow: 
 
 SwiftUIX offers affordances for emulating certain types of control flow.
