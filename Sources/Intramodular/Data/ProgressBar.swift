@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-// A view that depicts the progress of a task over time.
+/// A view that depicts the progress of a task over time.
 public struct ProgressBar: View {
     private let value: CGFloat
 
