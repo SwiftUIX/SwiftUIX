@@ -29,7 +29,7 @@ A simple checkbox control. Its API mimics that of `Toggle`.
 
 ### `ProgressBar`
 
-A view that depicts the progress of a task over time.
+A linear view that depicts the progress of a task over time.
 
 ```swift
 public struct ProgressBar: View {
@@ -44,13 +44,13 @@ Example usage:
 
 ```swift
 ProgressBar(0.5)
-    .foregroundColor(.blue)
     .frame(height: 20)
+    .foregroundColor(.blue)
 ```
 
 ### `CircularProgressBar`
 
-A view that depicts the progress of a task over time.
+A circular view that depicts the progress of a task over time.
 
 ```swift
 public struct CircularProgressBar: View {
@@ -59,7 +59,7 @@ public struct CircularProgressBar: View {
     /// Declares the content and behavior of this view.
     public var body: some View { get }
     
-    /// Set the border width for the circular progress bar view
+    /// Sets the line width of the view.
     public func lineWidth(_ lineWidth: CGFloat) -> CircularProgressBar
 }
 ```
@@ -68,7 +68,7 @@ Example usage:
 
 ```swift
 CircularProgressBar(0.5)
-    .lineWidth(10)
+    .lineWidth(2)
     .foregroundColor(.blue)
     .frame(height: 100)
 ```
