@@ -7,9 +7,12 @@ import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
 public struct DismissPresentationButton<Label: View>: View {
-    public let label: Label
-
+    private let label: Label
     private let action: (() -> ())?
+
+    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.isNavigationButtonActive) private var isNavigationButtonActive
+    @Environment(\.isSheetPresented) private var isSheetPresented
 
     public init(action: (() -> ())? = nil, label: () -> Label) {
         self.action = action
@@ -17,24 +20,20 @@ public struct DismissPresentationButton<Label: View>: View {
     }
 
     public var body: some View {
-        Button(action: dismiss) {
-            label
-        }
+        Button(action: dismiss, label: { label })
     }
-
-    @Environment(\.presentationMode) private var presentationMode
-    @Environment(\.isSheetPresented) private var isSheetPresented
 
     public func dismiss() {
         action?()
 
-        if let isSheetPresented = isSheetPresented {
-            // This is a hack until @Environment(\.isPresented) is fixed.
+        if let isNavigationButtonActive = isNavigationButtonActive {
+            isNavigationButtonActive.value = false
+        } else if let isSheetPresented = isSheetPresented {
             UIApplication
                 .shared
                 .windows[0]
                 .rootViewController!
-                .dismiss(animated: true, completion: nil)
+                .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
 
             isSheetPresented.value = false
         } else {
