@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A control which presents navigated content when triggered.
 public struct NavigationPresentationLink<Label: View, Destination: View>: View {
     @State private var isActive: Bool = false
 
