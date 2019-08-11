@@ -28,11 +28,13 @@ public struct ObservableState<Value>: DynamicProperty {
         get {
             _wrappedValue.current
         } nonmutating set {
+            let current = _wrappedValue.current
+
             defer {
-                _didChange.send((_wrappedValue.current, newValue))
+                _didChange.send((current, newValue))
             }
 
-            _willChange.send((_wrappedValue.current, newValue))
+            _willChange.send((current, newValue))
 
             _wrappedValue = (_wrappedValue.current, newValue)
         }
@@ -49,5 +51,9 @@ public struct ObservableState<Value>: DynamicProperty {
         self._willChange = .init()
         self._didChange = .init()
         self.__wrappedValue = .init(initialValue: (nil, value))
+    }
+
+    public mutating func update() {
+        self.__wrappedValue.update()
     }
 }
