@@ -5,7 +5,25 @@
 import Swift
 import SwiftUI
 
-// MARK: Relative Sizing
+// MARK: - General -
+
+extension View {
+    /// Returns a type-erased version of `self`.
+    @inlinable
+    public func eraseToAnyView() -> AnyView {
+        return .init(self)
+    }
+}
+
+// MARK: - Positioning -
+
+extension View {
+    public func offset(by point: CGPoint) -> some View {
+        return offset(x: point.x, y: point.y)
+    }
+}
+
+// MARK: - Relative Sizing -
 
 extension View {
     public func relativeHeight(
@@ -49,15 +67,5 @@ extension View {
     /// Causes the view to fill into its superview.
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0)
-    }
-}
-
-// MARK: General
-
-extension View {
-    /// Returns a type-erased version of `self`.
-    @inlinable
-    public func eraseToAnyView() -> AnyView {
-        return .init(self)
     }
 }
