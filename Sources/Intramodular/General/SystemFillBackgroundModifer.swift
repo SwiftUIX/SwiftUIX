@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if canImport(UIKit)
+
 fileprivate struct SystemFillBackgroundModifer: ViewModifier {
     let colorRank: ColorRank
 
@@ -37,3 +39,5 @@ extension View {
         return modifier(SystemFillBackgroundModifer(colorRank))
     }
 }
+
+#endif

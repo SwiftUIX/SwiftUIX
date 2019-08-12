@@ -2,11 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(UIKit)
+
 import Swift
 import SwiftUI
 import UIKit
-
-#if canImport(UIKit)
 
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {

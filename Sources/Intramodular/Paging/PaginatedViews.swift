@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(UKit)
+
 import Swift
 import SwiftUI
 import UIKit
@@ -52,3 +54,5 @@ public struct PaginatedViews<Child: View>: View {
         }
     }
 }
+
+#endif

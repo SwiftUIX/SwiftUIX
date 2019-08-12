@@ -29,13 +29,15 @@ public struct DismissPresentationButton<Label: View>: View {
         if let isNavigationButtonActive = isNavigationButtonActive {
             isNavigationButtonActive.value = false
         } else if let isSheetPresented = isSheetPresented {
-            UIApplication
-                .shared
-                .windows[0]
-                .rootViewController!
-                .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
-
             isSheetPresented.value = false
+
+            #if os(iOS)
+                UIApplication
+                    .shared
+                    .windows[0]
+                    .rootViewController!
+                    .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
+            #endif
         } else if !presentationMode.value.isPresented {
             fatalError()
         }

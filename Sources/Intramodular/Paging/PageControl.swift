@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(UKit)
+
 import Swift
 import SwiftUI
 import UIKit
@@ -55,3 +57,5 @@ extension PageControl: UIViewRepresentable {
         .init(self)
     }
 }
+
+#endif
