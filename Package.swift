@@ -15,7 +15,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "SwiftUIX", dependencies: [], path: "Sources"),
-        .testTarget(name: "SwiftUIXTests", dependencies: ["SwiftUIX"])
+        .testTarget(name: "SwiftUIXTests", dependencies: ["SwiftUIX"], path: "Tests")
     ],
     swiftLanguageVersions: [
         .version("5.1")
