@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS)
 
 import Swift
 import UIKit

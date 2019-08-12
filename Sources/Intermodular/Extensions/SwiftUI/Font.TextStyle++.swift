@@ -10,8 +10,10 @@ import SwiftUI
 extension Font.TextStyle {
     public func toUIFontTextStyle() -> UIFont.TextStyle? {
         switch self {
+        #if os(iOS) || os(macOS)
         case .largeTitle:
             return .largeTitle
+        #endif
         case .title:
             return .title1
         case .headline:

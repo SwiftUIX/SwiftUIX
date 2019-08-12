@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(iOS)
 
 fileprivate struct SystemFillBackgroundModifer: ViewModifier {
     let colorRank: ColorRank

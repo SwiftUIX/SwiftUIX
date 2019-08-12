@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS)
 
 extension Color {
     /* Some colors that are used by system elements and applications.
@@ -94,8 +94,11 @@ extension Color {
     public static var opaqueSeparator: Color {
         return .init(.opaqueSeparator)
     }
+}
 
+#if os(iOS)
 
+extension Color {
     /* We provide two design systems (also known as "stacks") for structuring an iOS app's backgrounds.
      *
      * Each stack has three "levels" of background colors. The first color is intended to be the
@@ -175,6 +178,8 @@ extension Color {
         return .init(.quaternarySystemFill)
     }
 }
+
+#endif
 
 extension Color {
     /// Creates a color from a 6-digit hexadecimal color code.
