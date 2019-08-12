@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(UKit)
+#if canImport(UIKit)
 
 import Swift
 import SwiftUI
