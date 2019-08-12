@@ -32,11 +32,11 @@ public struct DismissPresentationButton<Label: View>: View {
             isSheetPresented.value = false
 
             #if os(iOS)
-                UIApplication
-                    .shared
-                    .windows[0]
-                    .rootViewController!
-                    .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
+            UIApplication
+                .shared
+                .windows[0]
+                .rootViewController!
+                .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
             #endif
         } else if !presentationMode.value.isPresented {
             fatalError()
