@@ -36,9 +36,11 @@ public struct DismissPresentationButton<Label: View>: View {
                 .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
 
             isSheetPresented.value = false
-        } else {
-            presentationMode.value.dismiss()
+        } else if !presentationMode.value.isPresented {
+            fatalError()
         }
+
+        presentationMode.value.dismiss()
     }
 }
 
