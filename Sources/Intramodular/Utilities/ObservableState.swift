@@ -16,14 +16,17 @@ public struct ObservableState<Value>: DynamicProperty {
 
     @State private var _wrappedValue: (previous: Value?, current: Value)
 
+    /// An observable stream of value changes, before they happen.
     public var willChange: AnyPublisher<ValueChange, Never> {
         return _willChange.eraseToAnyPublisher()
     }
 
+    /// An observable stream of value changes, after they happen.
     public var didChange: AnyPublisher<ValueChange, Never> {
         return _didChange.eraseToAnyPublisher()
     }
 
+    /// The current state value.
     public var wrappedValue: Value {
         get {
             _wrappedValue.current
@@ -40,13 +43,7 @@ public struct ObservableState<Value>: DynamicProperty {
         }
     }
 
-    public var binding: Binding<Value> {
-        return .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
-    }
-
+    /// Initialize with the provided initial value.
     public init(wrappedValue value: Value) {
         self._willChange = .init()
         self._didChange = .init()
@@ -55,5 +52,13 @@ public struct ObservableState<Value>: DynamicProperty {
 
     public mutating func update() {
         self.__wrappedValue.update()
+    }
+
+    /// Returns a binding referencing the state value.
+    public var binding: Binding<Value> {
+        return .init(
+            get: { self.wrappedValue },
+            set: { self.wrappedValue = $0 }
+        )
     }
 }
