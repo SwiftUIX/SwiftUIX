@@ -3,6 +3,11 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
+# Requirements 
+
+- Xcode 11 (beta 5).
+- Swift 5.1 (beta)
+
 # Installation
 
 The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
@@ -18,6 +23,11 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 
 SwiftUIX's documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
 
+# Contributing
+
+SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
+
 # License
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
+
