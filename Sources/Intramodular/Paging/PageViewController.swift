@@ -9,14 +9,14 @@ import SwiftUI
 import UIKit
 
 /// A SwiftUI port of `UIPageViewController`.
-public struct PageViewController {
+struct PageViewController {
     private let children: [UIViewController]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
 
     @Binding private var currentPageIndex: Int
 
-    public init(
+    init(
         children: [UIViewController],
         axis: Axis,
         pageIndicatorAlignment: Alignment,
@@ -32,16 +32,16 @@ public struct PageViewController {
 // MARK: - Protocol Implementations -
 
 extension PageViewController: UIViewControllerRepresentable {
-    public class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        public var parent: PageViewController
+    class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+        var parent: PageViewController
 
-        public init(_ parent: PageViewController) {
+        init(_ parent: PageViewController) {
             self.parent = parent
         }
 
         // MARK: - Data Source
 
-        public func pageViewController(
+        func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerBefore viewController: UIViewController
         ) -> UIViewController? {
@@ -55,7 +55,7 @@ extension PageViewController: UIViewControllerRepresentable {
                 })
         }
 
-        public func pageViewController(
+        func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerAfter viewController: UIViewController
         ) -> UIViewController? {
@@ -71,7 +71,7 @@ extension PageViewController: UIViewControllerRepresentable {
 
         // MARK: - Delegate
 
-        public func pageViewController(
+        func pageViewController(
             _ pageViewController: UIPageViewController,
             didFinishAnimating _: Bool,
             previousViewControllers: [UIViewController],
@@ -101,16 +101,16 @@ extension PageViewController: UIViewControllerRepresentable {
             super.init(parent)
         }
 
-        @objc public func presentationCount(for pageViewController: UIPageViewController) -> Int {
+        @objc func presentationCount(for pageViewController: UIPageViewController) -> Int {
             return parent.children.count
         }
 
-        @objc public func presentationIndex(for pageViewController: UIPageViewController) -> Int {
+        @objc func presentationIndex(for pageViewController: UIPageViewController) -> Int {
             return currentPageIndex
         }
     }
 
-    public func makeUIViewController(context: Context) -> UIPageViewController {
+    func makeUIViewController(context: Context) -> UIPageViewController {
         let result = UIPageViewController(
             transitionStyle: .scroll,
             navigationOrientation: axis == .horizontal
@@ -124,7 +124,7 @@ extension PageViewController: UIViewControllerRepresentable {
         return result
     }
 
-    public func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
+    func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
         pageViewController.setViewControllers(
             [children[currentPageIndex]],
             direction: .forward,
@@ -132,7 +132,7 @@ extension PageViewController: UIViewControllerRepresentable {
         )
     }
 
-    public func makeCoordinator() -> Coordinator {
+    func makeCoordinator() -> Coordinator {
         if axis == .vertical || pageIndicatorAlignment != .center {
             return _Coordinator_Default_UIPageControl(self)
         } else {
