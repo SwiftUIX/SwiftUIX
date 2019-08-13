@@ -9,15 +9,15 @@ import SwiftUI
 import UIKit
 
 /// A view that paginates its children along a given axis.
-public struct PaginatedViews<Child: View>: View {
-    private let children: [UIHostingController<Child>]
+public struct PaginatedViews<Content: View>: View {
+    private let children: [UIHostingController<Content>]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
 
     @State private var currentPageIndex = 0
 
     public init(
-        _ pages: [Child],
+        _ pages: [Content],
         axis: Axis = .horizontal,
         pageIndicatorAlignment: Alignment? = nil
     ) {
