@@ -7,16 +7,16 @@ import SwiftUI
 
 /// A view that shows that a task is in progress.
 public struct ActivityIndicator {
-    private var isAnimating: Bool = true
+    private var isAnimated: Bool = true
 
     public init() {
 
     }
 
-    public func animating(_ isAnimating: Bool) -> ActivityIndicator {
+    public func animated(_ isAnimated: Bool) -> ActivityIndicator {
         var result = self
 
-        result.isAnimating = isAnimating
+        result.isAnimated = isAnimated
 
         return result
     }
@@ -35,7 +35,7 @@ extension ActivityIndicator: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
+        isAnimated ? uiView.startAnimating() : uiView.stopAnimating()
     }
 }
 
@@ -58,7 +58,7 @@ extension ActivityIndicator: NSViewRepresentable {
     }
 
     public func updateNSView(_ nsView: NSViewType, context: Context) {
-        isAnimating ? nsView.startAnimation(self) : nsView.stopAnimation(self)
+        isAnimated ? nsView.startAnimation(self) : nsView.stopAnimation(self)
     }
 }
 
