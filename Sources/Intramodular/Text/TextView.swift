@@ -4,9 +4,6 @@
 
 import Swift
 import SwiftUI
-import UIKit
-
-#if os(iOS) || os(tvOS)
 
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {
@@ -28,15 +25,6 @@ public struct TextView<Label: View>: View {
                 onCommit: onCommit
             )
         }
-    }
-}
-
-class _UITextView: UITextView {
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        textContainerInset = .zero
-        textContainer.lineFragmentPadding = 0
     }
 }
 
@@ -71,6 +59,10 @@ extension TextView where Label == Text {
         self.onCommit = onCommit
     }
 }
+
+#if os(iOS) || os(tvOS)
+
+import UIKit
 
 // MARK: - Protocol Implementations -
 
@@ -129,6 +121,72 @@ extension TextViewCore: UIViewRepresentable {
 
         textView.text = text.value
     }
+}
+
+class _UITextView: UITextView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        textContainerInset = .zero
+        textContainer.lineFragmentPadding = 0
+    }
+}
+
+#elseif canImport(AppKit)
+
+import AppKit
+
+extension TextViewCore: NSViewRepresentable {
+    typealias NSViewType = _NSTextView
+
+    class Coordinator: NSObject, NSTextViewDelegate {
+        var view: TextViewCore
+
+        init(_ view: TextViewCore) {
+            self.view = view
+        }
+
+        func textDidBeginEditing(_ notification: Notification) {
+            view.onEditingChanged(true)
+        }
+
+        func textDidChange(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else {
+                return
+            }
+
+            view.text.value = textView.string
+
+            view.onEditingChanged(true)
+        }
+
+        func textDidEndEditing(_ notification: Notification) {
+            view.onEditingChanged(true)
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeNSView(context: Context) -> NSViewType {
+        let view = _NSTextView()
+
+        view.backgroundColor = .clear
+        view.string = text.value
+        view.textContainerInset = .zero
+        view.delegate = context.coordinator
+
+        return view
+    }
+
+    func updateNSView(_ textView: NSViewType, context: Context) {
+
+    }
+}
+
+class _NSTextView: NSTextView {
+
 }
 
 #endif

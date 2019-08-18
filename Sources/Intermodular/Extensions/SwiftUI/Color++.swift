@@ -5,6 +5,18 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
+extension Color {
+    /* Foreground color for placeholder text in controls or text fields or text views.
+     */
+    public static var placeholderText: Color {
+        return .init(.placeholderText)
+    }
+}
+
+#endif
+
 #if os(iOS) || os(tvOS)
 
 extension Color {
@@ -72,13 +84,6 @@ extension Color {
      */
     public static var link: Color {
         return .init(.link)
-    }
-
-
-    /* Foreground color for placeholder text in controls or text fields or text views.
-     */
-    public static var placeholderText: Color {
-        return .init(.placeholderText)
     }
 
 
