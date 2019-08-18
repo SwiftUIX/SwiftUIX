@@ -33,6 +33,4 @@ SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
 
 # Credits
 
-SwiftUIX was created and is primarily maintained by @vmanot. 
-
-SwiftUIX is currently being built by @vmanot and @siddarthgandhi. 
+SwiftUIX was created and is primarily maintained by [@vmanot](https://github.com/vmanot), and is currently being built with the help of [@siddarthgandhi](https://github.com/siddarthgandhi).
