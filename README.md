@@ -5,7 +5,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
 # Requirements 
 
-- Xcode 11 (beta 5).
+- Xcode 11 (beta 6).
 - Swift 5.1
 
 # Installation
