@@ -9,5 +9,17 @@ import SwiftUI
 public protocol ModelView: View {
     associatedtype Model
 
-    init(model: Model)
+    init(_: Model)
+}
+
+public protocol ModelBindingView: ModelView {
+    init(_: Binding<Model>)
+}
+
+// MARK: - Implementation -
+
+extension ModelBindingView {
+    public init(_ model: Model) {
+        self.init(.constant(model))
+    }
 }

@@ -40,7 +40,7 @@ public struct SheetPresentationView<Body: View>: View {
     }
 
     private func dismiss() {
-        presentationMode.value.dismiss()
+        presentationMode.wrappedValue.dismiss()
 
         isPresenting = false
         presentedView = nil

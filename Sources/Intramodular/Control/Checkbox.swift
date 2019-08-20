@@ -22,7 +22,7 @@ public struct Checkbox<Label: View>: View {
         HStack {
             label
             Button(action: toggle) {
-                isOn.value
+                isOn.wrappedValue
                     ? Image(systemName: "checkmark.square.fill")
                     : Image(systemName: "checkmark.square")
             }
@@ -30,6 +30,6 @@ public struct Checkbox<Label: View>: View {
     }
 
     private func toggle() {
-        isOn.value.toggle()
+        isOn.wrappedValue.toggle()
     }
 }

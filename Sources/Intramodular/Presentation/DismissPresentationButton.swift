@@ -27,9 +27,9 @@ public struct DismissPresentationButton<Label: View>: View {
         action?()
 
         if let isNavigationButtonActive = isNavigationButtonActive {
-            isNavigationButtonActive.value = false
+            isNavigationButtonActive.wrappedValue = false
         } else if let isSheetPresented = isSheetPresented {
-            isSheetPresented.value = false
+            isSheetPresented.wrappedValue = false
 
             #if os(iOS)
             UIApplication
@@ -38,11 +38,11 @@ public struct DismissPresentationButton<Label: View>: View {
                 .rootViewController!
                 .dismiss(animated: true, completion: nil) // FIXME(@vmanot): This is a hack until @Environment(\.isPresented) is fixed.
             #endif
-        } else if !presentationMode.value.isPresented {
+        } else if !presentationMode.wrappedValue.isPresented {
             fatalError()
         }
 
-        presentationMode.value.dismiss()
+        presentationMode.wrappedValue.dismiss()
     }
 }
 

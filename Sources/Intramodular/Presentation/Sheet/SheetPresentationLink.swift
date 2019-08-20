@@ -28,8 +28,8 @@ public struct SheetPresentationLink<Destination: View, Label: View>: View {
     }
 
     private func present() {
-        onSheetPresentationDismiss!.value = onDismiss
-        presentedSheetView!.value = .init(destination)
-        isSheetPresented!.value = true
+        onSheetPresentationDismiss!.wrappedValue = onDismiss
+        presentedSheetView!.wrappedValue = .init(destination)
+        isSheetPresented!.wrappedValue = true
     }
 }

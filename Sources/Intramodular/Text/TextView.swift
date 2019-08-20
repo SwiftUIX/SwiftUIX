@@ -15,7 +15,7 @@ public struct TextView<Label: View>: View {
 
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            if text.value.isEmpty {
+            if text.wrappedValue.isEmpty {
                 label
             }
 
@@ -81,7 +81,7 @@ extension TextViewCore: UIViewRepresentable {
         }
 
         func textViewDidChange(_ textView: UITextView) {
-            view.text.value = textView.text
+            view.text.wrappedValue = textView.text
 
             view.onEditingChanged(true)
         }
@@ -100,7 +100,7 @@ extension TextViewCore: UIViewRepresentable {
         let view = _UITextView()
 
         view.backgroundColor = nil
-        view.text = text.value
+        view.text = text.wrappedValue
 
         if let font = context.environment.font {
             view.font = font.toUIFont()
@@ -119,7 +119,7 @@ extension TextViewCore: UIViewRepresentable {
             textView.font = font.toUIFont()
         }
 
-        textView.text = text.value
+        textView.text = text.wrappedValue
     }
 }
 

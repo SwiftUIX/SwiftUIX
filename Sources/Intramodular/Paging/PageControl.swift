@@ -30,7 +30,7 @@ extension PageControl: UIViewRepresentable {
         }
 
         @objc public func updateCurrentPage(sender: UIViewType) {
-            parent.currentPage.value = sender.currentPage
+            parent.currentPage.wrappedValue = sender.currentPage
         }
     }
 
@@ -50,7 +50,7 @@ extension PageControl: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.currentPage = currentPage.value
+        uiView.currentPage = currentPage.wrappedValue
     }
 
     public func makeCoordinator() -> Coordinator {

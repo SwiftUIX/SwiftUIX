@@ -8,18 +8,6 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension Color {
-    /* Foreground color for placeholder text in controls or text fields or text views.
-     */
-    public static var placeholderText: Color {
-        return .init(.placeholderText)
-    }
-}
-
-#endif
-
-#if os(iOS) || os(tvOS)
-
-extension Color {
     /* Some colors that are used by system elements and applications.
      * These return named colors whose values may vary between different contexts and releases.
      * Do not make assumptions about the color spaces or actual colors used.
@@ -59,8 +47,21 @@ extension Color {
     public static var systemIndigo: Color {
         return .init(.systemIndigo)
     }
+}
 
+extension Color {
+    /* Foreground color for placeholder text in controls or text fields or text views.
+     */
+    public static var placeholderText: Color {
+        return .init(.placeholderText)
+    }
+}
 
+#endif
+
+#if os(iOS) || os(tvOS)
+
+extension Color {
     /* Foreground colors for static text and related elements.
      */
     public static var label: Color {
