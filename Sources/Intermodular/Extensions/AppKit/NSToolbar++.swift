@@ -1,0 +1,23 @@
+//
+// Copyright (c) Vatsal Manot
+//
+
+#if os(macOS)
+
+import AppKit
+import Swift
+import SwiftUI
+
+extension NSToolbar {
+    public func setItems(_ newItems: [NSToolbarItem]) {
+        for _ in items {
+            removeItem(at: 0)
+        }
+
+        for item in newItems.reversed() {
+            insertItem(withItemIdentifier: item.itemIdentifier, at: 0)
+        }
+    }
+}
+
+#endif
