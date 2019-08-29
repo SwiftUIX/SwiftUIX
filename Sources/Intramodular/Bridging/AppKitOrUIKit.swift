@@ -4,7 +4,7 @@
 
 import Swift
 
-#if canImport(AppKit)
+#if os(macOS)
 
 import AppKit
 
@@ -25,7 +25,7 @@ public typealias AppKitOrUIKitWindow = NSWindow
 
 #endif
 
-#if canImport(UIKit)
+#if os(iOS)
 
 import UIKit
 
@@ -56,13 +56,3 @@ public enum AppKitOrUIKitLayoutAlignment: Hashable {
     case center
     case fill
 }
-
-#if canImport(UIKit)
-
-extension UIControl.Event: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
-    }
-}
-
-#endif
