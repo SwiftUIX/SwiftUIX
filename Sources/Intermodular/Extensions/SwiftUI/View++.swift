@@ -69,3 +69,21 @@ extension View {
         relativeSize(width: 1.0, height: 1.0)
     }
 }
+
+// MARK: - Compatibility -
+
+#if os(macOS)
+
+extension View {
+    @available(*, deprecated, message: "This function is currently unavailable on macOS.")
+    public func navigationBarTitle(_ title: String) -> some View {
+        return self
+    }
+
+    @available(*, deprecated, message: "This function is currently unavailable on macOS.")
+    public func navigationBarItems<V: View>(trailing: V) -> some View {
+        return self
+    }
+}
+
+#endif
