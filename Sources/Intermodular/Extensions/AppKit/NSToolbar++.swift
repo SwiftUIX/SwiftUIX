@@ -10,7 +10,7 @@ import SwiftUI
 
 extension NSToolbar {
     public func setItems(_ newItems: [NSToolbarItem]) {
-        for _ in items {
+        for _ in 0..<items.count {
             removeItem(at: 0)
         }
 
