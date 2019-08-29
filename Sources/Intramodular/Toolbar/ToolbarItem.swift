@@ -12,26 +12,59 @@ import SwiftUI
 /// A toolbar item.
 public struct ToolbarItem {
     public enum Content {
-        case nsImage(NSImage)
         case view(AnyView)
+
+        case nsImage(NSImage)
+        case nsView(NSView)
+
         case none
     }
 
-    let itemIdentifier: String
-    let action: () -> ()
-    let label: String
-    let content: Content
+    private(set) var itemIdentifier: String
+    private(set) var content: Content
+    private(set) var action: () -> () = { }
+    private(set) var label: String?
+
+    private(set) var isBordered: Bool = false
 
     public init(
         itemIdentifier: String,
-        action: @escaping () -> (),
-        label: String = "",
         content: Content = .none
     ) {
         self.itemIdentifier = itemIdentifier
-        self.action = action
-        self.label = label
         self.content = content
+    }
+
+    public func content(_ content: Content) -> ToolbarItem {
+        var result = self
+
+        result.content = content
+
+        return result
+    }
+
+    public func action(_ action: @escaping () -> ()) -> ToolbarItem {
+        var result = self
+
+        result.action = action
+
+        return result
+    }
+
+    public func label(_ label: String) -> ToolbarItem {
+        var result = self
+
+        result.label = label
+
+        return result
+    }
+
+    public func bordered(_ isBordered: Bool) -> ToolbarItem {
+        var result = self
+
+        result.isBordered = isBordered
+
+        return result
     }
 }
 
@@ -53,13 +86,15 @@ extension ToolbarItem {
     func toNSToolbarItem() -> NSToolbarItem {
         let result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
 
-        result.label = label
-
         switch content {
-        case let .nsImage(image):
-            result.image = image
         case let .view(view):
             result.view = NSHostingView(rootView: view)
+
+        case let .nsImage(image):
+            result.image = image
+        case let .nsView(view):
+            result.view = view
+
         case .none:
             break
         }
@@ -67,6 +102,13 @@ extension ToolbarItem {
         let target = NSToolbarItemTarget(action: action)
 
         objc_setAssociatedObject(result, &ToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
+
+        result.target = target
+        result.action = #selector(NSToolbarItemTarget.performAction)
+
+        if let label = label {
+            result.label = label
+        }
 
         return result
     }
@@ -95,8 +137,8 @@ public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
 }
 
 extension View {
-    public func toolbarItem(withIdentifier identifier: String, action: @escaping () -> ()) -> ToolbarItem {
-        return .init(itemIdentifier: identifier, action: action, content: .view(.init(self)))
+    public func toolbarItem(withIdentifier identifier: String) -> ToolbarItem {
+        return .init(itemIdentifier: identifier, content: .view(.init(self)))
     }
 
     public func toolbarItems(_ toolbarItems: ToolbarItem...) -> some View {
