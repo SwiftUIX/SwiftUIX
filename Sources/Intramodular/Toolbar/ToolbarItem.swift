@@ -14,6 +14,7 @@ public struct ToolbarItem {
     public enum Content {
         case nsImage(NSImage)
         case view(AnyView)
+        case none
     }
 
     let itemIdentifier: String
@@ -25,7 +26,7 @@ public struct ToolbarItem {
         itemIdentifier: String,
         action: @escaping () -> (),
         label: String = "",
-        content: Content
+        content: Content = .none
     ) {
         self.itemIdentifier = itemIdentifier
         self.action = action
@@ -59,6 +60,8 @@ extension ToolbarItem {
             result.image = image
         case let .view(view):
             result.view = NSHostingView(rootView: view)
+        case .none:
+            break
         }
 
         let target = NSToolbarItemTarget(action: action)
