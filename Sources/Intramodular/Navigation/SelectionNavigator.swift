@@ -9,12 +9,15 @@ import SwiftUI
 public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
     private let selection: Binding<Selection?>
     private let destination: Destination?
+    private let onDismiss: (() -> ())?
 
     public init(
         selection: Binding<Selection?>,
+        onDismiss: (() -> ())?,
         @ViewBuilder destination: (Selection) -> Destination
     ) {
         self.selection = selection
+        self.onDismiss = onDismiss
         self.destination = selection.wrappedValue.map(destination)
     }
 
@@ -24,10 +27,11 @@ public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
             set: { newValue in
                 if !newValue {
                     self.selection.wrappedValue = nil
+                    self.onDismiss?()
                 } else if self.selection.wrappedValue == nil {
                     fatalError()
                 }
-            }
+        }
         )
     }
 
@@ -44,10 +48,12 @@ public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
 extension View {
     public func navigate<Selection, Destination: View>(
         selection: Binding<Selection?>,
+        onDismiss: (() -> ())? = nil,
         @ViewBuilder destination: (Selection) -> Destination
     ) -> some View {
         modifier(SelectionNavigator(
             selection: selection,
+            onDismiss: onDismiss,
             destination: destination
         ))
     }
