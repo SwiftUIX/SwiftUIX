@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 /// A utility view modifier that allows for dynamic navigation based on some arbitrary selection value.
-public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
+fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
     private let selection: Binding<Selection?>
     private let destination: Destination?
     private let onDismiss: (() -> ())?
