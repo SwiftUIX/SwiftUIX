@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A utility view modifier that allows for dynamic navigation based on some arbitrary selection value.
 public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
     private let selection: Binding<Selection?>
     private let destination: Destination?
@@ -44,6 +45,8 @@ public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
         }
     }
 }
+
+// MARK: - Helpers -
 
 extension View {
     public func navigate<Selection, Destination: View>(
