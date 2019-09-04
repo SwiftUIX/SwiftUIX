@@ -27,12 +27,15 @@ public struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
             get: { self.selection.wrappedValue != nil },
             set: { newValue in
                 if !newValue {
+                    if self.selection.wrappedValue != nil {
+                        self.onDismiss?()
+                    }
+
                     self.selection.wrappedValue = nil
-                    self.onDismiss?()
                 } else if self.selection.wrappedValue == nil {
                     fatalError()
                 }
-        }
+            }
         )
     }
 
@@ -61,3 +64,4 @@ extension View {
         ))
     }
 }
+
