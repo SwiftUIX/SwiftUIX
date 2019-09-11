@@ -155,7 +155,7 @@ extension TextViewCore: NSViewRepresentable {
                 return
             }
 
-            view.text.value = textView.string
+            view.text.wrappedValue = textView.string
 
             view.onEditingChanged(true)
         }
@@ -173,7 +173,7 @@ extension TextViewCore: NSViewRepresentable {
         let view = _NSTextView()
 
         view.backgroundColor = .clear
-        view.string = text.value
+        view.string = text.wrappedValue
         view.textContainerInset = .zero
         view.delegate = context.coordinator
 
