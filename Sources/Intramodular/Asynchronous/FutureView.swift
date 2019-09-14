@@ -8,7 +8,7 @@ import SwiftUI
 
 /// A view that eventually produces its content.
 public struct FutureView<Output, Failure: Error, Placeholder: View, Content: View>: View {
-    @ObservedObject private var resolution: ObservableFutureResolution<Output, Failure>
+    @ObservedObject private var resolution: FutureObservation<Output, Failure>
 
     private let placeholder: Placeholder
     private let makeContent: (Result<Output, Failure>) -> Content

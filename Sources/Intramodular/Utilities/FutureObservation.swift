@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public final class ObservableFutureResolution<Output, Failure: Error>: ObservableObject, Subscriber {
+public final class FutureObservation<Output, Failure: Error>: ObservableObject, Subscriber {
     public typealias Input = Output
 
     @Published(initialValue: nil) public var result: Result<Output, Failure>?
