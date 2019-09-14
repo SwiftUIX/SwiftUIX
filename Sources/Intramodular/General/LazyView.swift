@@ -6,7 +6,6 @@ import Swift
 import SwiftUI
 
 /// A lazily loaded view.
-@frozen
 public struct LazyView<Body: View>: View {
     public let makeBody: () -> Body
 
