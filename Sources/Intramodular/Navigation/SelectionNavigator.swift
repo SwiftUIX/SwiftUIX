@@ -41,10 +41,10 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
 
     public func body(content: Content) -> some View {
         ZStack {
-            content
             NavigationLink(destination: destination, isActive: isActive) {
                 EmptyView()
             }
+            content
         }
     }
 }
