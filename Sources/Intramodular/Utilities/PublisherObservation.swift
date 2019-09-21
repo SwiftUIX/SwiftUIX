@@ -9,12 +9,16 @@ import SwiftUI
 public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
     public typealias Input = P.Output
 
+    private var _subscribeImpl: Optional<() -> ()> = nil
+
     @Published(initialValue: nil) public var lastValue: Result<P.Output, P.Failure>?
 
     public init(publisher: P, scheduler: S) {
-        publisher
-            .subscribe(on: scheduler)
-            .receive(subscriber: self)
+        _subscribeImpl = {
+            publisher
+                .subscribe(on: scheduler)
+                .receive(subscriber: self)
+        }
     }
 
     public func receive(subscription: Subscription) {
@@ -34,5 +38,10 @@ public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableO
             case .failure(let failure):
                 lastValue = .failure(failure)
         }
+    }
+
+    public func attach() {
+        _subscribeImpl?()
+        _subscribeImpl = nil
     }
 }
