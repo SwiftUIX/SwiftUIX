@@ -7,7 +7,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
 - iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
 - Swift 5.1
-- Xcode 11 GM
+- Xcode 11
 
 # Installation
 
