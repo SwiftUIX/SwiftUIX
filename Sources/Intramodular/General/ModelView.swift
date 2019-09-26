@@ -8,7 +8,7 @@ import SwiftUI
 /// A view backed by some model type.
 public protocol ModelView: View {
     associatedtype Model
-
+    
     init(_: Model)
 }
 

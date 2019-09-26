@@ -8,11 +8,11 @@ import SwiftUI
 
 public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
     public typealias Input = P.Output
-
+    
     private var _subscribeImpl: Optional<() -> ()> = nil
-
+    
     @Published(initialValue: nil) public var lastValue: Result<P.Output, P.Failure>?
-
+    
     public init(publisher: P, scheduler: S) {
         _subscribeImpl = {
             publisher
@@ -20,17 +20,17 @@ public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableO
                 .receive(subscriber: self)
         }
     }
-
+    
     public func receive(subscription: Subscription) {
         subscription.request(.unlimited)
     }
-
+    
     public func receive(_ input: Input) -> Subscribers.Demand {
         lastValue = .success(input)
-
+        
         return .unlimited
     }
-
+    
     public func receive(completion: Subscribers.Completion<P.Failure>) {
         switch completion {
             case .finished:
@@ -39,7 +39,7 @@ public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableO
                 lastValue = .failure(failure)
         }
     }
-
+    
     public func attach() {
         _subscribeImpl?()
         _subscribeImpl = nil

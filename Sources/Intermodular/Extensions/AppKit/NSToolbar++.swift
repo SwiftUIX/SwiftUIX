@@ -13,7 +13,7 @@ extension NSToolbar {
         for _ in 0..<items.count {
             removeItem(at: 0)
         }
-
+        
         for item in newItems.reversed() {
             insertItem(withItemIdentifier: item.itemIdentifier, at: 0)
         }

@@ -11,17 +11,17 @@ import SwiftUI
 /// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
     @Environment(\.presentationMode) private var presentationMode
-
+    
     @State private var presentedView: AnyView? = nil
     @State private var onDismiss: (() -> ())? = nil
     @State private var isPresenting: Bool = false
-
+    
     public let _body: Body
-
+    
     public init(@ViewBuilder body: () -> Body) {
         self._body = body()
     }
-
+    
     public var isSheetPresented: Binding<Bool> {
         .init(
             get: { self.isPresenting },
@@ -31,30 +31,30 @@ public struct SheetPresentationView<Body: View>: View {
                 } else {
                     self.dismiss()
                 }
-            }
+        }
         )
     }
-
+    
     private func present() {
         isPresenting = true
     }
-
+    
     private func dismiss() {
         presentationMode.wrappedValue.dismiss()
-
+        
         isPresenting = false
         presentedView = nil
-
+        
         onDismiss?()
     }
-
+    
     private func sheetContent() -> some View {
         presentedView!
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             ._wrapAsPresentationSheetView()
     }
-
+    
     public var body: some View {
         return _body
             .environment(\.isSheetPresented, isSheetPresented)
@@ -64,7 +64,7 @@ public struct SheetPresentationView<Body: View>: View {
                 isPresented: $isPresenting,
                 onDismiss: dismiss,
                 content: sheetContent
-            )
+        )
     }
 }
 
@@ -84,7 +84,7 @@ struct PresentedSheetViewEnvironmentKey: EnvironmentKey {
 
 struct OnSheetPresentationDismissEnvironmentKey: EnvironmentKey {
     static var defaultValue: Binding<(() -> ())?>? {
-       return nil
+        return nil
     }
 }
 
@@ -96,7 +96,7 @@ extension EnvironmentValues {
             self[IsSheetPresentedViewEnvironmentKey.self] = newValue
         }
     }
-
+    
     var presentedSheetView: Binding<AnyView?>? {
         get {
             self[PresentedSheetViewEnvironmentKey.self]
@@ -104,7 +104,7 @@ extension EnvironmentValues {
             self[PresentedSheetViewEnvironmentKey.self] = newValue
         }
     }
-
+    
     var onSheetPresentationDismiss: Binding<(() -> ())?>? {
         get {
             self[OnSheetPresentationDismissEnvironmentKey.self]

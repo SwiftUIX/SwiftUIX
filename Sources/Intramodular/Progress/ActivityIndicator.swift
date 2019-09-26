@@ -8,16 +8,16 @@ import SwiftUI
 /// A view that shows that a task is in progress.
 public struct ActivityIndicator {
     private var isAnimated: Bool = true
-
+    
     public init() {
-
+        
     }
-
+    
     public func animated(_ isAnimated: Bool) -> ActivityIndicator {
         var result = self
-
+        
         result.isAnimated = isAnimated
-
+        
         return result
     }
 }
@@ -29,11 +29,11 @@ import UIKit
 extension ActivityIndicator: UIViewRepresentable {
     public typealias Context = UIViewRepresentableContext<Self>
     public typealias UIViewType = UIActivityIndicatorView
-
+    
     public func makeUIView(context: Context) -> UIViewType {
         UIActivityIndicatorView(style: .medium)
     }
-
+    
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         isAnimated ? uiView.startAnimating() : uiView.stopAnimating()
     }
@@ -47,16 +47,16 @@ import AppKit
 extension ActivityIndicator: NSViewRepresentable {
     public typealias Context = NSViewRepresentableContext<Self>
     public typealias NSViewType = NSProgressIndicator
-
+    
     public func makeNSView(context: Context) -> NSViewType {
         let nsView = NSProgressIndicator()
-
+        
         nsView.isIndeterminate = true
         nsView.style = .spinning
-
+        
         return nsView
     }
-
+    
     public func updateNSView(_ nsView: NSViewType, context: Context) {
         isAnimated ? nsView.startAnimation(self) : nsView.stopAnimation(self)
     }

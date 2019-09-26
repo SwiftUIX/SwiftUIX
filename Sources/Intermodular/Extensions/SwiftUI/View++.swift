@@ -37,7 +37,7 @@ extension View {
             )
         }
     }
-
+    
     public func relativeWidth(
         _ ratio: CGFloat,
         alignment: Alignment = .center
@@ -49,7 +49,7 @@ extension View {
             )
         }
     }
-
+    
     public func relativeSize(
         width widthRatio: CGFloat,
         height heightRatio: CGFloat,
@@ -63,7 +63,7 @@ extension View {
             )
         }
     }
-
+    
     /// Causes the view to fill into its superview.
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0)
@@ -79,7 +79,7 @@ extension View {
     public func navigationBarTitle(_ title: String) -> some View {
         return self
     }
-
+    
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")
     public func navigationBarItems<V: View>(trailing: V) -> some View {
         return self

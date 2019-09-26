@@ -13,9 +13,9 @@ struct PageViewController {
     private let children: [UIViewController]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
-
+    
     @Binding private var currentPageIndex: Int
-
+    
     init(
         children: [UIViewController],
         axis: Axis,
@@ -34,13 +34,13 @@ struct PageViewController {
 extension PageViewController: UIViewControllerRepresentable {
     class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
         var parent: PageViewController
-
+        
         init(_ parent: PageViewController) {
             self.parent = parent
         }
-
+        
         // MARK: - Data Source
-
+        
         func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerBefore viewController: UIViewController
@@ -54,7 +54,7 @@ extension PageViewController: UIViewControllerRepresentable {
                         : parent.children[$0 - 1]
                 })
         }
-
+        
         func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerAfter viewController: UIViewController
@@ -68,9 +68,9 @@ extension PageViewController: UIViewControllerRepresentable {
                         : parent.children[$0 + 1]
                 })
         }
-
+        
         // MARK: - Delegate
-
+        
         func pageViewController(
             _ pageViewController: UIPageViewController,
             didFinishAnimating _: Bool,
@@ -80,7 +80,7 @@ extension PageViewController: UIViewControllerRepresentable {
             guard completed else {
                 return
             }
-
+            
             if let controller = pageViewController.viewControllers?.first {
                 parent
                     .children
@@ -91,25 +91,25 @@ extension PageViewController: UIViewControllerRepresentable {
             }
         }
     }
-
+    
     private class _Coordinator_Default_UIPageControl: Coordinator {
         var currentPageIndex: Int
-
+        
         override init(_ parent: PageViewController) {
             self.currentPageIndex = parent.currentPageIndex
-
+            
             super.init(parent)
         }
-
+        
         @objc func presentationCount(for pageViewController: UIPageViewController) -> Int {
             return parent.children.count
         }
-
+        
         @objc func presentationIndex(for pageViewController: UIPageViewController) -> Int {
             return currentPageIndex
         }
     }
-
+    
     func makeUIViewController(context: Context) -> UIPageViewController {
         let result = UIPageViewController(
             transitionStyle: .scroll,
@@ -117,13 +117,13 @@ extension PageViewController: UIViewControllerRepresentable {
                 ? .horizontal
                 : .vertical
         )
-
+        
         result.dataSource = context.coordinator
         result.delegate = context.coordinator
-
+        
         return result
     }
-
+    
     func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
         pageViewController.setViewControllers(
             [children[currentPageIndex]],
@@ -131,7 +131,7 @@ extension PageViewController: UIViewControllerRepresentable {
             animated: true
         )
     }
-
+    
     func makeCoordinator() -> Coordinator {
         if axis == .vertical || pageIndicatorAlignment != .center {
             return _Coordinator_Default_UIPageControl(self)

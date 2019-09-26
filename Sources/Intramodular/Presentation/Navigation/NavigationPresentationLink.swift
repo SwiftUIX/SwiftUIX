@@ -9,15 +9,15 @@ import SwiftUI
 /// A control which presents navigated content when triggered.
 public struct NavigationPresentationLink<Label: View, Destination: View>: View {
     @State private var isActive: Bool = false
-
+    
     private let destination: Destination
     private let label: Label
-
+    
     public init(destination: Destination, @ViewBuilder label: () -> Label) {
         self.destination = destination
         self.label = label()
     }
-
+    
     public var body: some View {
         NavigationLink(
             destination: destination

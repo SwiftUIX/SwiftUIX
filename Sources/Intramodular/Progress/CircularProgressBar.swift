@@ -8,15 +8,15 @@ import SwiftUI
 /// A circular view that depicts the progress of a task over time.
 public struct CircularProgressBar: View {
     public let value: CGFloat
-
+    
     private var lineWidth: CGFloat = 2
-
+    
     public init(_ value: CGFloat) {
         assert(value >= 0 && value <= 1)
-
+        
         self.value = value
     }
-
+    
     public var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .topLeading) {
@@ -32,13 +32,13 @@ public struct CircularProgressBar: View {
             }
         }
     }
-
+    
     /// Sets the line width of the view.
     public func lineWidth(_ lineWidth: CGFloat) -> CircularProgressBar {
         var result = self
-
+        
         result.lineWidth = lineWidth
-
+        
         return result
     }
 }

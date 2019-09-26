@@ -11,7 +11,7 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
     private let selection: Binding<Selection?>
     private let destination: Destination?
     private let onDismiss: (() -> ())?
-
+    
     public init(
         selection: Binding<Selection?>,
         onDismiss: (() -> ())?,
@@ -21,7 +21,7 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
         self.onDismiss = onDismiss
         self.destination = selection.wrappedValue.map(destination)
     }
-
+    
     private var isActive: Binding<Bool> {
         .init(
             get: { self.selection.wrappedValue != nil },
@@ -30,7 +30,7 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
                     if self.selection.wrappedValue != nil {
                         self.onDismiss?()
                     }
-
+                    
                     self.selection.wrappedValue = nil
                 } else if self.selection.wrappedValue == nil {
                     fatalError()
@@ -38,7 +38,7 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
             }
         )
     }
-
+    
     public func body(content: Content) -> some View {
         ZStack {
             NavigationLink(destination: destination, isActive: isActive) {

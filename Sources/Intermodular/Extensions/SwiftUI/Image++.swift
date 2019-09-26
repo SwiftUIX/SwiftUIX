@@ -13,11 +13,11 @@ extension Image {
         #else
         let image = UIImage(data: data)
         #endif
-
+        
         guard let _image = image else {
             return nil
         }
-
+        
         #if os(macOS)
         self.init(nsImage: _image)
         #else

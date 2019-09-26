@@ -13,9 +13,9 @@ public struct PaginatedViews<Content: View>: View {
     private let children: [UIHostingController<Content>]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
-
+    
     @State private var currentPageIndex = 0
-
+    
     public init(
         _ pages: [Content],
         axis: Axis = .horizontal,
@@ -23,15 +23,15 @@ public struct PaginatedViews<Content: View>: View {
     ) {
         self.children = pages.map(UIHostingController.init)
         self.axis = axis
-
+        
         switch axis {
-        case .horizontal:
-            self.pageIndicatorAlignment = .center
-        case .vertical:
-            self.pageIndicatorAlignment = .leading
+            case .horizontal:
+                self.pageIndicatorAlignment = .center
+            case .vertical:
+                self.pageIndicatorAlignment = .leading
         }
     }
-
+    
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             PageViewController(
@@ -40,7 +40,7 @@ public struct PaginatedViews<Content: View>: View {
                 pageIndicatorAlignment: pageIndicatorAlignment,
                 currentPageIndex: $currentPageIndex
             )
-
+            
             if axis == .vertical || pageIndicatorAlignment != .center {
                 PageControl(
                     numberOfPages: children.count,

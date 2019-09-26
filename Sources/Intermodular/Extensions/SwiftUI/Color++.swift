@@ -15,35 +15,35 @@ extension Color {
     public static var systemRed: Color {
         return .init(.systemRed)
     }
-
+    
     public static var systemGreen: Color {
         return .init(.systemGreen)
     }
-
+    
     public static var systemBlue: Color {
         return .init(.systemBlue)
     }
-
+    
     public static var systemOrange: Color {
         return .init(.systemOrange)
     }
-
+    
     public static var systemYellow: Color {
         return .init(.systemYellow)
     }
-
+    
     public static var systemPink: Color {
         return .init(.systemPink)
     }
-
+    
     public static var systemPurple: Color {
         return .init(.systemPurple)
     }
-
+    
     public static var systemTeal: Color {
         return .init(.systemTeal)
     }
-
+    
     public static var systemIndigo: Color {
         return .init(.systemIndigo)
     }
@@ -67,27 +67,27 @@ extension Color {
     public static var label: Color {
         return .init(.label)
     }
-
+    
     public static var secondaryLabel: Color {
         return .init(.secondaryLabel)
     }
-
+    
     public static var tertiaryLabel: Color {
         return .init(.tertiaryLabel)
     }
-
+    
     public static var quaternaryLabel: Color {
         return .init(.quaternaryLabel)
     }
-
-
+    
+    
     /* Foreground color for standard system links.
      */
     public static var link: Color {
         return .init(.link)
     }
-
-
+    
+    
     /* Foreground colors for separators (thin border or divider lines).
      * `separatorColor` may be partially transparent, so it can go on top of any content.
      * `opaqueSeparatorColor` is intended to look similar, but is guaranteed to be opaque, so it will
@@ -96,7 +96,7 @@ extension Color {
     public static var separator: Color {
         return .init(.separator)
     }
-
+    
     public static var opaqueSeparator: Color {
         return .init(.opaqueSeparator)
     }
@@ -122,16 +122,16 @@ extension Color {
     public static var systemBackground: Color {
         return .init(.systemBackground)
     }
-
+    
     public static var secondarySystemBackground: Color {
         return .init(.secondarySystemBackground)
     }
-
+    
     public static var tertiarySystemBackground: Color {
         return .init(.tertiarySystemBackground)
     }
-
-
+    
+    
     /* 2. systemGroupedBackground
      *    Use this stack for views with grouped content, such as grouped tables and
      *    platter-based designs. These are like grouped table views, but you may use these
@@ -140,16 +140,16 @@ extension Color {
     public static var systemGroupedBackground: Color {
         return .init(.systemBackground)
     }
-
+    
     public static var secondarySystemGroupedBackground: Color {
         return .init(.secondarySystemGroupedBackground)
     }
-
+    
     public static var tertiarySystemGroupedBackground: Color {
         return .init(.tertiarySystemGroupedBackground)
     }
-
-
+    
+    
     /* Fill colors for UI elements.
      * These are meant to be used over the background colors, since their alpha component is less than 1.
      *
@@ -159,24 +159,24 @@ extension Color {
     public static var systemFill: Color {
         return .init(.systemFill)
     }
-
-
+    
+    
     /* secondarySystemFillColor is appropriate for filling medium-size shapes.
      * Example: The background of a switch.
      */
     public static var secondarySystemFill: Color {
         return .init(.secondarySystemFill)
     }
-
-
+    
+    
     /* tertiarySystemFillColor is appropriate for filling large shapes.
      * Examples: Input fields, search bars, buttons.
      */
     public static var tertiarySystemFill: Color {
         return .init(.tertiarySystemFill)
     }
-
-
+    
+    
     /* quaternarySystemFillColor is appropriate for filling large areas containing complex content.
      * Example: Expanded table cells.
      */
@@ -197,19 +197,19 @@ extension Color {
         var hexadecimal = hexadecimal
             .uppercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
-
+        
         if hexadecimal.hasPrefix("#") {
             hexadecimal.remove(at: hexadecimal.startIndex)
         }
-
+        
         guard hexadecimal.count == 6 else {
             return nil
         }
-
+        
         guard let rgb = UInt32(hexadecimal, radix: 16) else {
             return nil
         }
-
+        
         self.init(
             UIColor(
                 red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,

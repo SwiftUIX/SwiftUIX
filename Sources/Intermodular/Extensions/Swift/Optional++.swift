@@ -18,7 +18,7 @@ extension Optional {
             return nil
         }
     }
-
+    
     /// Evaluates the given closure when this `Optional` instance is not `nil`,
     /// passing the unwrapped value as a parameter.
     ///

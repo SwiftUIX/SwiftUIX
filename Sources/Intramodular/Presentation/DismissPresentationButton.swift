@@ -9,28 +9,28 @@ import SwiftUI
 public struct DismissPresentationButton<Label: View>: View {
     private let label: Label
     private let action: (() -> ())?
-
+    
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.isNavigationButtonActive) private var isNavigationButtonActive
     @Environment(\.isSheetPresented) private var isSheetPresented
-
+    
     public init(action: (() -> ())? = nil, label: () -> Label) {
         self.action = action
         self.label = label()
     }
-
+    
     public var body: some View {
         Button(action: dismiss, label: { label })
     }
-
+    
     public func dismiss() {
         action?()
-
+        
         if let isNavigationButtonActive = isNavigationButtonActive {
             isNavigationButtonActive.wrappedValue = false
         } else if let isSheetPresented = isSheetPresented {
             isSheetPresented.wrappedValue = false
-
+            
             #if os(iOS)
             UIApplication
                 .shared
@@ -41,7 +41,7 @@ public struct DismissPresentationButton<Label: View>: View {
         } else if !presentationMode.wrappedValue.isPresented {
             fatalError()
         }
-
+        
         presentationMode.wrappedValue.dismiss()
     }
 }

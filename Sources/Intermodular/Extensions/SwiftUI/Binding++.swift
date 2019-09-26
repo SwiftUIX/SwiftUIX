@@ -12,4 +12,11 @@ extension Binding {
             set: { _ in fatalError() }
         )
     }
+    
+    public func withDefaultValue<T>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
+        return .init(
+            get: { self.wrappedValue ?? defaultValue },
+            set: { self.wrappedValue = $0 }
+        )
+    }
 }
