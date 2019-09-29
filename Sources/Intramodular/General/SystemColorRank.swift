@@ -5,8 +5,8 @@
 import Swift
 import SwiftUI
 
-/// The rank of a `Color`.
-public enum ColorRank {
+/// The rank of a system `Color`.
+public enum SystemColorRank {
     case primary
     case secondary
     case tertiary

@@ -8,9 +8,9 @@ import SwiftUI
 #if os(iOS)
 
 fileprivate struct SystemFillBackgroundModifer: ViewModifier {
-    let colorRank: ColorRank
+    let colorRank: SystemColorRank
     
-    init(_ colorRank: ColorRank) {
+    init(_ colorRank: SystemColorRank) {
         self.colorRank = colorRank
     }
     
@@ -35,7 +35,7 @@ fileprivate struct SystemFillBackgroundModifer: ViewModifier {
 // MARK: - Helpers -
 
 extension View {
-    public func systemFillBackground(_ colorRank: ColorRank) -> some View {
+    public func systemFillBackground(_ colorRank: SystemColorRank) -> some View {
         return modifier(SystemFillBackgroundModifer(colorRank))
     }
 }
