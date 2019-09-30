@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A view that fills the device's screen.
 public struct DeviceScreenFill: View {
     public init() {
         
@@ -12,8 +13,7 @@ public struct DeviceScreenFill: View {
     
     public var body: some View {
         GeometryReader { proxy in
-            Rectangle()
-                .fill(Color.clear)
+            EmptyView()
                 .inset(by: proxy.frame(in: .global).origin)
         }
         .edgesIgnoringSafeArea(.all)
