@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-public struct BlurEffectView {
+public struct BlurEffectView: View {
     public let style: UIBlurEffect.Style
     
     public init(style: UIBlurEffect.Style) {
