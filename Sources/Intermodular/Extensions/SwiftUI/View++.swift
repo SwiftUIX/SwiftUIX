@@ -18,6 +18,10 @@ extension View {
 // MARK: - Positioning -
 
 extension View {
+    public func inset(by point: CGPoint) -> some View {
+        return offset(x: -point.x, y: -point.y)
+    }
+
     public func offset(by point: CGPoint) -> some View {
         return offset(x: point.x, y: point.y)
     }
@@ -67,6 +71,18 @@ extension View {
     /// Causes the view to fill into its superview.
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0)
+    }
+}
+
+// MARK: - Debugging -
+
+extension View {
+    public func debugBorderRed() -> some View {
+        return border(Color.red, width: 2)
+    }
+
+    public func debugBorderGreen() -> some View {
+        return border(Color.green, width: 2)
     }
 }
 

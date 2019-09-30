@@ -35,3 +35,17 @@ extension View {
         }
     }
 }
+
+extension View {
+    public func overlayWithFirstViewPosition<V: View, T: View>(of type: V.Type, transform: @escaping (ViewPositionAnchorPreferenceKeyValue<V>?) -> T) -> some View {
+        overlayPreferenceValue(TakeFirstViewPositionAnchorPreferenceKey<V>.self) {
+            transform($0)
+        }
+    }
+
+    public func backgroundWithFirstViewPosition<V: View, T: View>(of type: V.Type, transform: @escaping (ViewPositionAnchorPreferenceKeyValue<V>?) -> T) -> some View {
+        backgroundPreferenceValue(TakeFirstViewPositionAnchorPreferenceKey<V>.self) {
+            transform($0)
+        }
+    }
+}
