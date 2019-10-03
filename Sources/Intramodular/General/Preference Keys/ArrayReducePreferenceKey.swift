@@ -5,8 +5,8 @@
 import Swift
 import SwiftUI
 
-public struct ArrayReducePreferenceKey<T>: PreferenceKey {
-    public typealias Value = [T]
+public struct ArrayReducePreferenceKey<Element>: PreferenceKey {
+    public typealias Value = [Element]
     
     public static var defaultValue: Value {
         return []
