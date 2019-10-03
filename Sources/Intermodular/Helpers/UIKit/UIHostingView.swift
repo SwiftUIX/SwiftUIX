@@ -8,27 +8,27 @@ import Swift
 import SwiftUI
 import UIKit
 
-public final class UIHostingView<Content: View>: UIView {
+/// A `UIView` subclass capable of hosting a SwiftUI view.
+open class UIHostingView<Content: View>: UIView {
     private let rootView: Content
     private let rootViewHostingController: UIHostingController<Content>
-    private let rootViewContainer = UIView()
     
-    public init(content: Content) {
-        self.rootView = content
-        self.rootViewHostingController = UIHostingController(rootView: content)
+    public init(rootView: Content) {
+        self.rootView = rootView
+        self.rootViewHostingController = UIHostingController(rootView: rootView)
         
         super.init(frame: .zero)
         
-        rootViewContainer.frame.origin = .init(x: 100, y: 100)
-        addSubview(rootViewContainer)
-        
-        rootViewContainer.addSubview(rootViewHostingController.view)
+        addSubview(rootViewHostingController.view)
     }
     
-    public override func layoutSubviews() {
-        super.layoutSubviews()
+    override public func didMoveToSuperview() {
+        super.didMoveToSuperview()
         
-        rootViewContainer.frame.size = rootViewHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        frame.size = rootViewHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
+        
+        rootViewHostingController.view.frame.size = frame.size
+        rootViewHostingController.view.backgroundColor = .red
     }
     
     public required init?(coder: NSCoder) {
