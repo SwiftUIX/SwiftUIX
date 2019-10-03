@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A linear view that depicts the progress of a task over time.
-public struct ProgressBar: View {
+public struct LinearProgressBar: View {
     private let value: CGFloat
     
     public init(_ value: CGFloat) {
