@@ -14,11 +14,7 @@ public struct ActivityIndicator {
     }
     
     public func animated(_ isAnimated: Bool) -> ActivityIndicator {
-        var result = self
-        
-        result.isAnimated = isAnimated
-        
-        return result
+        then { $0.isAnimated = isAnimated }
     }
 }
 

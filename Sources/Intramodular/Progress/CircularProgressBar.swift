@@ -35,10 +35,6 @@ public struct CircularProgressBar: View {
     
     /// Sets the line width of the view.
     public func lineWidth(_ lineWidth: CGFloat) -> CircularProgressBar {
-        var result = self
-        
-        result.lineWidth = lineWidth
-        
-        return result
+        then { $0.lineWidth = lineWidth }
     }
 }
