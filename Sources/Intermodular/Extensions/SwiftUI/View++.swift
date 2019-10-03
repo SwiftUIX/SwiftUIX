@@ -8,6 +8,14 @@ import SwiftUI
 // MARK: - General -
 
 extension View {
+    public func then(_ body: (inout Self) -> Void) -> Self {
+        var result = self
+        
+        body(&result)
+        
+        return result
+    }
+
     /// Returns a type-erased version of `self`.
     @inlinable
     public func eraseToAnyView() -> AnyView {
