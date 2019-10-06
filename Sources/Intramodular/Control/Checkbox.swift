@@ -23,8 +23,8 @@ public struct Checkbox<Label: View>: View {
             label
             Button(action: toggle) {
                 isOn.wrappedValue
-                    ? Image(systemName: "checkmark.square.fill")
-                    : Image(systemName: "checkmark.square")
+                    ? Image(systemName: .checkmarkSquareFill)
+                    : Image(systemName: .checkmarkSquare)
             }
         }
     }

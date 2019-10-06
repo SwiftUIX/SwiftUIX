@@ -1713,6 +1713,7 @@ public enum SanFranciscoSymbolName: String, CaseIterable {
 // MARK: - Helpers -
 
 public extension Image {
+    @available(*, deprecated, message: "This function is currently unavailable on macOS.")
     init(systemName: SanFranciscoSymbolName) {
         self.init(systemName: systemName.rawValue)
     }

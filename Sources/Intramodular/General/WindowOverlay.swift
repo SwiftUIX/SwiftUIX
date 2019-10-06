@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(UIKit)
+
 import Swift
 import SwiftUI
 
@@ -94,3 +96,5 @@ extension View {
         WindowOverlay(rootView: self, content: content(), isKeyAndVisible: isKeyAndVisible)
     }
 }
+
+#endif

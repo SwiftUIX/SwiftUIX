@@ -49,7 +49,7 @@ public struct DismissPresentationButton<Label: View>: View {
 extension DismissPresentationButton where Label == Image {
     public init(action: (() -> ())? = nil) {
         self.init(action: action) {
-            Image(systemName: "x.circle.fill")
+            Image(systemName: .xCircleFill)
         }
     }
 }

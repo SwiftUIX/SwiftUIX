@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if canImport(UIKit)
+
 /// A view that fills the device's screen.
 public struct DeviceScreenFill: View {
     public init() {
@@ -23,3 +25,5 @@ public struct DeviceScreenFill: View {
         )
     }
 }
+
+#endif
