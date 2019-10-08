@@ -35,6 +35,15 @@ extension View {
     }
 }
 
+// MARK: - Preference Keys -
+
+extension View {
+    @inlinable
+    public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
+        background(EmptyView().preference(key: K.self, value: value))
+    }
+}
+
 // MARK: - Relative Sizing -
 
 extension View {
