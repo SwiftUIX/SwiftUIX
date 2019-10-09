@@ -21,6 +21,7 @@ public struct Checkbox<Label: View>: View {
     public var body: some View {
         HStack {
             label
+            
             Button(action: toggle) {
                 isOn.wrappedValue
                     ? Image(systemName: .checkmarkSquareFill)
