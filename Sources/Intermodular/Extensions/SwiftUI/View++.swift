@@ -90,15 +90,12 @@ extension View {
     }
 }
 
-// MARK: - Debugging -
+// MARK: - Sizing
 
 extension View {
-    public func debugBorderRed() -> some View {
-        return border(Color.red, width: 2)
-    }
-
-    public func debugBorderGreen() -> some View {
-        return border(Color.green, width: 2)
+    @inlinable
+    public func frame(_ size: CGSize, alignment: Alignment = .center) -> some View {
+        frame(width: size.width, height: size.height, alignment: alignment)
     }
 }
 
