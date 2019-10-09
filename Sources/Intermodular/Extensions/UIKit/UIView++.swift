@@ -9,6 +9,12 @@ import UIKit
 
 extension UIView {
     public func constrain(to other: UIView) {
+        if superview == nil {
+            other.addSubview(self)
+        }
+        
+        translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             centerXAnchor.constraint(equalTo: other.centerXAnchor),
             centerYAnchor.constraint(equalTo: other.centerYAnchor),
