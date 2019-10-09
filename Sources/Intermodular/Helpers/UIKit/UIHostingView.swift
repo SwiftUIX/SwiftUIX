@@ -28,7 +28,6 @@ open class UIHostingView<Content: View>: UIView {
         frame.size = rootViewHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         
         rootViewHostingController.view.frame.size = frame.size
-        rootViewHostingController.view.backgroundColor = .red
     }
     
     public required init?(coder: NSCoder) {
