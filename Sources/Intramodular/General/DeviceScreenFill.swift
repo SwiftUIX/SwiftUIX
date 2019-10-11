@@ -5,25 +5,27 @@
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
-
 /// A view that fills the device's screen.
-public struct DeviceScreenFill: View {
-    public init() {
-        
+public struct DeviceScreenFill<Content: View>: View {
+    @ObservedObject private var screen = Screen.main
+    
+    private let content: Content
+    
+    public init(@ViewBuilder _ content: () -> Content) {
+        self.content = content()
     }
     
     public var body: some View {
-        GeometryReader { proxy in
-            EmptyView()
-                .inset(by: proxy.frame(in: .global).origin)
+        ZStack {
+            GeometryReader { proxy in
+                self.content
+                    .inset(by: proxy.frame(in: .global).origin)
+            }
+            .frame(
+                width: screen.bounds.width,
+                height: screen.bounds.height
+            )
+            .edgesIgnoringSafeArea(.all)
         }
-        .edgesIgnoringSafeArea(.all)
-        .frame(
-            width: UIScreen.main.bounds.width,
-            height: UIScreen.main.bounds.height
-        )
     }
 }
-
-#endif
