@@ -9,41 +9,46 @@ import SwiftUI
 /// A utility view modifier that allows for dynamic navigation based on some arbitrary selection value.
 fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifier {
     private let selection: Binding<Selection?>
-    private let destination: Destination?
+    private let destination: (Selection) -> Destination
     private let onDismiss: (() -> ())?
     
     public init(
         selection: Binding<Selection?>,
         onDismiss: (() -> ())?,
-        @ViewBuilder destination: (Selection) -> Destination
+        @ViewBuilder destination: @escaping (Selection) -> Destination
     ) {
         self.selection = selection
         self.onDismiss = onDismiss
-        self.destination = selection.wrappedValue.map(destination)
+        self.destination = destination
+    }
+    
+    private func setIsActive(_ isActive: Bool) {
+        if !isActive {
+            if selection.wrappedValue != nil {
+                onDismiss?()
+            }
+            
+            selection.wrappedValue = nil
+        } else if selection.wrappedValue == nil {
+            fatalError()
+        }
     }
     
     private var isActive: Binding<Bool> {
         .init(
             get: { self.selection.wrappedValue != nil },
-            set: { newValue in
-                if !newValue {
-                    if self.selection.wrappedValue != nil {
-                        self.onDismiss?()
-                    }
-                    
-                    self.selection.wrappedValue = nil
-                } else if self.selection.wrappedValue == nil {
-                    fatalError()
-                }
-            }
+            set: setIsActive
         )
     }
     
     public func body(content: Content) -> some View {
         ZStack {
-            NavigationLink(destination: destination, isActive: isActive) {
-                EmptyView()
+            NavigationLink(destination: LazyView {
+                self.destination(self.selection.wrappedValue!)
+            }, isActive: isActive) {
+                EmptyView().frame(CGSize.zero)
             }
+            
             content
         }
     }
@@ -55,7 +60,7 @@ extension View {
     public func navigate<Selection, Destination: View>(
         selection: Binding<Selection?>,
         onDismiss: (() -> ())? = nil,
-        @ViewBuilder destination: (Selection) -> Destination
+        @ViewBuilder destination: @escaping (Selection) -> Destination
     ) -> some View {
         modifier(SelectionNavigator(
             selection: selection,
@@ -64,4 +69,3 @@ extension View {
         ))
     }
 }
-

@@ -16,7 +16,7 @@ public struct BlurEffectView: View {
     }
     
     public var body: some View {
-        return VisualEffectView(effect: UIBlurEffect(style: style))
+        VisualEffectView(effect: UIBlurEffect(style: style))
     }
 }
 

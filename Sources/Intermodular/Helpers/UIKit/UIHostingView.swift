@@ -10,11 +10,17 @@ import UIKit
 
 /// A `UIView` subclass capable of hosting a SwiftUI view.
 open class UIHostingView<Content: View>: UIView {
-    private let rootView: Content
+    public var rootView: Content {
+        get {
+            return rootViewHostingController.rootView
+        } set {
+            rootViewHostingController.rootView = newValue
+        }
+    }
+    
     private let rootViewHostingController: UIHostingController<Content>
     
     public init(rootView: Content) {
-        self.rootView = rootView
         self.rootViewHostingController = UIHostingController(rootView: rootView)
         
         super.init(frame: .zero)
@@ -22,16 +28,26 @@ open class UIHostingView<Content: View>: UIView {
         addSubview(rootViewHostingController.view)
     }
     
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        
-        frame.size = rootViewHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
-        
-        rootViewHostingController.view.frame.size = frame.size
-    }
-    
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        
+        rootViewHostingController.view.frame = self.bounds
+    }
+    
+    override open func sizeThatFits(_ size: CGSize) -> CGSize {
+        rootViewHostingController.sizeThatFits(in: size)
+    }
+    
+    override open func systemLayoutSizeFitting(
+        _ targetSize: CGSize,
+        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+        verticalFittingPriority: UILayoutPriority
+    ) -> CGSize {
+        rootViewHostingController.sizeThatFits(in: targetSize)
     }
 }
 

@@ -8,11 +8,7 @@ import Swift
 import UIKit
 
 extension UIView {
-    public func constrain(to other: UIView) {
-        if superview == nil {
-            other.addSubview(self)
-        }
-        
+    func constrain(to other: UIView) {
         translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -21,6 +17,14 @@ extension UIView {
             widthAnchor.constraint(equalTo: other.widthAnchor),
             heightAnchor.constraint(equalTo: other.heightAnchor)
         ])
+    }
+    
+    func constrainSubview(_ subview: UIView) {
+        if subview.superview == nil {
+            addSubview(subview)
+        }
+        
+        subview.constrain(to: self)
     }
 }
 
