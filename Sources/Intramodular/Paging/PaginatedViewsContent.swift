@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 /// A SwiftUI port of `UIPageViewController`.
-struct PageViewController {
+struct PaginatedViewsContent {
     private let children: [UIViewController]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
@@ -31,11 +31,11 @@ struct PageViewController {
 
 // MARK: - Protocol Implementations -
 
-extension PageViewController: UIViewControllerRepresentable {
+extension PaginatedViewsContent: UIViewControllerRepresentable {
     class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        var parent: PageViewController
+        var parent: PaginatedViewsContent
         
-        init(_ parent: PageViewController) {
+        init(_ parent: PaginatedViewsContent) {
             self.parent = parent
         }
         
@@ -45,7 +45,7 @@ extension PageViewController: UIViewControllerRepresentable {
             _ pageViewController: UIPageViewController,
             viewControllerBefore viewController: UIViewController
         ) -> UIViewController? {
-            return parent
+            parent
                 .children
                 .firstIndex(of: viewController)
                 .flatMap({
@@ -95,7 +95,7 @@ extension PageViewController: UIViewControllerRepresentable {
     private class _Coordinator_Default_UIPageControl: Coordinator {
         var currentPageIndex: Int
         
-        override init(_ parent: PageViewController) {
+        override init(_ parent: PaginatedViewsContent) {
             self.currentPageIndex = parent.currentPageIndex
             
             super.init(parent)

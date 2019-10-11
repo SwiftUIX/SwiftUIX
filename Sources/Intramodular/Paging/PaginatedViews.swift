@@ -34,7 +34,7 @@ public struct PaginatedViews<Content: View>: View {
     
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
-            PageViewController(
+            PaginatedViewsContent(
                 children: children,
                 axis: axis,
                 pageIndicatorAlignment: pageIndicatorAlignment,
