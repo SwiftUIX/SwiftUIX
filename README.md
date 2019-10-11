@@ -3,6 +3,18 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
+Notable offerings:
+
+- Asynchronous views
+- Controls such as checkboxes
+- Control flow views for operations such as `switch`
+- Programmatic navigation
+- A port for `UIPageViewController`
+- Progress views such as activity indicators, circular & linear progress bars
+- A port for `UITextView`
+- A reimplementation of `Text` supporting `NSAttributedString` 
+- A SwiftUI port for `NSToolbar` and `NSToolbarItem` 
+
 # Requirements 
 
 - iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
