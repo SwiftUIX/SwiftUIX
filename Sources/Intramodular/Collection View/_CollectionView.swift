@@ -114,9 +114,9 @@ extension _CollectionView {
         ) {
             self.data = data
             self.makeCellContentView = makeCellContentView
-                        
+            
             super.init(frame: .zero, collectionViewLayout: collectionViewLayout)
-
+            
             backgroundColor = .clear
             dataSource = coordinator
             delegate = coordinator

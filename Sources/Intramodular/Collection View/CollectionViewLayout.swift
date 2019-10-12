@@ -15,12 +15,21 @@ public protocol CollectionViewLayout {
 // MARK: - Implementations -
 
 public struct CollectionViewFlowLayout: CollectionViewLayout {
-    public init() {
-        
+    public let minimumLineSpacing: CGFloat
+    public let minimumInteritemSpacing: CGFloat
+    
+    public init(
+        minimumLineSpacing: CGFloat = 10,
+        minimumInteritemSpacing: CGFloat = 10
+    ) {
+        self.minimumLineSpacing = minimumLineSpacing
+        self.minimumInteritemSpacing = minimumInteritemSpacing
     }
     
     public func _toUICollectionViewLayout() -> UICollectionViewLayout {
         UICollectionViewFlowLayout().then {
+            $0.minimumLineSpacing = minimumLineSpacing
+            $0.minimumInteritemSpacing = minimumInteritemSpacing
             $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
             $0.itemSize = UICollectionViewFlowLayout.automaticSize
         }
