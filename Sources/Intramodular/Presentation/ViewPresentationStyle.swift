@@ -9,6 +9,6 @@ import SwiftUI
 public enum ViewPresentationStyle {
     case actionSheet
     case alert
-    case modal
+    case sheet
     case popover
 }

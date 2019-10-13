@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
@@ -16,8 +16,7 @@ public final class UIParentViewController<Child: UIViewController>: UIViewContro
         
         super.init(nibName: nil, bundle: nil)
         
-        view.addSubview(child.view)
-        view.constrain(to: child.view)
+        view.constrainSubview(child.view)
         
         addChild(child)
         

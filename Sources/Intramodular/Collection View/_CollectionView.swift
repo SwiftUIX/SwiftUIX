@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct _CollectionView<Data: RandomAccessCollection, CellView: View>: UIViewRepresentable where Data.Element: Identifiable {
     typealias Context = UIViewRepresentableContext<Self>

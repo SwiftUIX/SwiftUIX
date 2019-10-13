@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public protocol CollectionViewLayout {
     func _toUICollectionViewLayout() -> UICollectionViewLayout

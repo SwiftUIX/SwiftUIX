@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 /// A view that shows that a task is in progress.
 public struct ActivityIndicator {
     private var isAnimated: Bool = true
@@ -57,5 +59,7 @@ extension ActivityIndicator: NSViewRepresentable {
         isAnimated ? nsView.startAnimation(self) : nsView.stopAnimation(self)
     }
 }
+
+#endif
 
 #endif

@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CollectionView<SelectionValue: Hashable, Content: View>: View {
     struct Index: Identifiable {

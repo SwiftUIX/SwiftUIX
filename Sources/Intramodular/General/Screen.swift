@@ -12,17 +12,19 @@ public class Screen: ObservableObject {
     private let notificationCenter = NotificationCenter.default
     
     public var bounds: CGRect  {
-        #if os(iOS) || os(tvOS) || os(watchOS)
+        #if os(iOS) || os(tvOS)
         return UIScreen.main.bounds
         #elseif os(macOS)
         return NSScreen.main?.frame ?? CGRect.zero
+        #elseif os(watchOS)
+        return WKInterfaceDevice.current().screenBounds
         #endif
     }
     
     var orientationObserver: NSObjectProtocol?
     
     private init() {
-        #if os(iOS) || os(tvOS) || os(watchOS)
+        #if os(iOS) || os(tvOS)
         orientationObserver = notificationCenter.addObserver(
             forName: UIDevice.orientationDidChangeNotification,
             object: nil,
