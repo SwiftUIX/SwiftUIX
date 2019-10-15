@@ -81,6 +81,8 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.rootView = rootView
+        
         uiViewController.setContentWindowVisibility()
     }
     

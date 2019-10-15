@@ -10,7 +10,7 @@ public class Screen: ObservableObject {
     public static let main = Screen()
     
     private let notificationCenter = NotificationCenter.default
-    
+        
     public var bounds: CGRect  {
         #if os(iOS) || os(tvOS)
         return UIScreen.main.bounds
@@ -21,6 +21,16 @@ public class Screen: ObservableObject {
         #endif
     }
     
+    public var scale: CGFloat {
+        #if os(iOS) || os(tvOS)
+        return UIScreen.main.scale
+        #elseif os(macOS)
+        return NSScreen.main?.backingScaleFactor ?? 1.0
+        #elseif os(watchOS)
+        return WKInterfaceDevice.current().screenScale
+        #endif
+    }
+
     var orientationObserver: NSObjectProtocol?
     
     private init() {
