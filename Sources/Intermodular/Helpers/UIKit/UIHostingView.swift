@@ -18,7 +18,7 @@ open class UIHostingView<Content: View>: UIView {
         }
     }
     
-    private let rootViewHostingController: UIHostingController<Content>
+    public let rootViewHostingController: UIHostingController<Content>
     
     public init(rootView: Content) {
         self.rootViewHostingController = UIHostingController(rootView: rootView)
