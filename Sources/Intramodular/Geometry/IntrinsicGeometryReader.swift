@@ -7,8 +7,11 @@ import Swift
 import SwiftUI
 
 public struct IntrinsicGeometryProxy {
-    public let containerOriginInGlobal: CGPoint
     public let frame: CGRect?
+    
+    public var estimatedFrame: CGRect {
+        return frame ?? .zero
+    }
 }
 
 /// A container view that recursively defines its content as a function of the content's size and coordinate space.
@@ -29,29 +32,34 @@ public struct IntrinsicGeometryReader<Content: View>: View {
         let bounds: Anchor<CGRect>
     }
     
-    private let makeContent: (IntrinsicGeometryProxy) -> Content
+    private let content: (IntrinsicGeometryProxy) -> Content
     
-    public init(@ViewBuilder _ makeContent: @escaping (IntrinsicGeometryProxy) -> Content) {
-        self.makeContent = makeContent
+    public init(@ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content) {
+        self.content = content
     }
     
     @State var frame: CGRect?
     
     public var body: some View {
-        GeometryReader { geometry in
-            self.makeContent(.init(containerOriginInGlobal: geometry.frame(in: .global).origin, frame: self.frame)).anchorPreference(key: Preferences.Key.self, value: .bounds) {
-                .init(bounds: $0)
+        Group {
+            self.content(.init(frame: self.frame))
+                .anchorPreference(key: Preferences.Key.self, value: .bounds) {
+                    .init(bounds: $0)
             }
-            .backgroundPreferenceValue(Preferences.Key.self) { value -> EmptyView in
-                guard let value = value else {
-                    return EmptyView()
-                }
-                
-                DispatchQueue.main.async {
-                    self.frame = geometry[value.bounds]
-                }
-                
-                return EmptyView()
+        }
+        .backgroundPreferenceValue(Preferences.Key.self) { value in
+            GeometryReader { geometry in
+                ZStack { () -> Color in
+                    guard let value = value else {
+                        return .clear
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.frame = geometry[value.bounds]
+                    }
+                    
+                    return .clear
+                }.frame(width: .infinity, height: .infinity, alignment: .topLeading)
             }
         }
     }
