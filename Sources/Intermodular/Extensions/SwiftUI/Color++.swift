@@ -47,6 +47,30 @@ extension Color {
     public static var systemIndigo: Color {
         return .init(.systemIndigo)
     }
+    
+    public static var systemGray: Color {
+        return .init(.systemGray)
+    }
+    
+    public static var systemGray2: Color {
+        return .init(.systemGray2)
+    }
+    
+    public static var systemGray3: Color {
+        return .init(.systemGray3)
+    }
+    
+    public static var systemGray4: Color {
+        return .init(.systemGray4)
+    }
+    
+    public static var systemGray5: Color {
+        return .init(.systemGray5)
+    }
+    
+    public static var systemGray6: Color {
+        return .init(.systemGray6)
+    }
 }
 
 extension Color {
