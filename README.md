@@ -47,3 +47,7 @@ SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
 # Credits
 
 SwiftUIX was created and is primarily maintained by [@vmanot](https://github.com/vmanot), and is currently being built with the help of [@siddarthgandhi](https://github.com/siddarthgandhi).
+
+# Support 
+
+SwiftUIX is and will always be free and open. Maintaining SwiftUIX, however, is a time-consuming endeavour. If you're reliant on SwiftUIX for your app/project and would like to see it grow, consider contributing/donating as way to help.
