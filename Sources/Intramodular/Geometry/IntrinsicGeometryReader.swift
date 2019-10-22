@@ -38,7 +38,7 @@ public struct IntrinsicGeometryReader<Content: View>: View {
         self.content = content
     }
     
-    @State var frame: CGRect?
+    @DelayedState var frame: CGRect?
     
     public var body: some View {
         Group {
@@ -49,17 +49,12 @@ public struct IntrinsicGeometryReader<Content: View>: View {
         }
         .backgroundPreferenceValue(Preferences.Key.self) { value in
             GeometryReader { geometry in
-                ZStack { () -> Color in
-                    guard let value = value else {
-                        return .clear
+                ZStack {
+                    Color.clear.then { _ in
+                        self.frame = value.map({ geometry[$0.bounds] })
                     }
-                    
-                    DispatchQueue.main.async {
-                        self.frame = geometry[value.bounds]
-                    }
-                    
-                    return .clear
-                }.frame(width: .infinity, height: .infinity, alignment: .topLeading)
+                }
+                .frame(width: .infinity, height: .infinity)
             }
         }
     }
