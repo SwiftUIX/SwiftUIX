@@ -13,7 +13,7 @@ Notable offerings:
 - Progress views such as activity indicators, circular & linear progress bars
 - A port for `UITextView`
 - A reimplementation of `Text` supporting `NSAttributedString` 
-- A SwiftUI port for `NSToolbar` and `NSToolbarItem` 
+- A port for `NSToolbar` and `NSToolbarItem` 
 
 # Requirements 
 
