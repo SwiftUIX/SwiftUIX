@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 
 import AppKit
 import ObjectiveC
@@ -14,9 +14,9 @@ public struct ToolbarItem {
     public enum Content {
         case view(AnyView)
         
-        case nsImage(NSImage)
-        case nsView(NSView)
-        
+        case cocoaImage(AppKitOrUIKitImage)
+        case cocoaView(AppKitOrUIKitView)
+
         case none
     }
     
@@ -90,9 +90,9 @@ extension ToolbarItem {
             case let .view(view):
                 result.view = NSHostingView(rootView: view)
             
-            case let .nsImage(image):
+            case let .cocoaImage(image):
                 result.image = image
-            case let .nsView(view):
+            case let .cocoaView(view):
                 result.view = view
             
             case .none:
@@ -147,3 +147,6 @@ extension View {
 }
 
 #endif
+
+
+
