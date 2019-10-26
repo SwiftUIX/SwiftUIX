@@ -245,6 +245,15 @@ extension Color {
             )
         )
     }
+    
+    /// Creates a color from a 6-digit hexadecimal color code.
+    public init(hexadecimal: Int) {
+        let red = Double((hexadecimal & 0xFF0000) >> 16) / 255.0
+        let green = Double((hexadecimal & 0x00FF00) >> 8) / 255.0
+        let blue = Double(hexadecimal & 0x0000FF) / 255.0
+        
+        self.init(red: red, green: green, blue: blue)
+    }
 }
 
 #endif
