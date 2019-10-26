@@ -16,7 +16,7 @@ public struct ToolbarItem {
         
         case cocoaImage(AppKitOrUIKitImage)
         case cocoaView(AppKitOrUIKitView)
-
+        
         case none
     }
     
@@ -88,7 +88,7 @@ extension ToolbarItem {
         
         switch content {
             case let .view(view):
-                result.view = NSHostingView(rootView: view)
+                result.view = AppKitOrUIKitHostingView(rootView: view)
             
             case let .cocoaImage(image):
                 result.image = image
@@ -147,6 +147,3 @@ extension View {
 }
 
 #endif
-
-
-
