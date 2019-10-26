@@ -219,7 +219,7 @@ extension Color {
     /// - Parameter hexadecimal: A 6-digic hexadecimal representation of the color.
     ///
     /// - Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
-    public init?(hexadecimal: String) {
+    public init!(hexadecimal: String) {
         var hexadecimal = hexadecimal
             .uppercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
