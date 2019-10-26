@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS) || targetEnvironment(macCatalyst)
+#if os(macOS)
 
 import AppKit
 import ObjectiveC
@@ -88,7 +88,7 @@ extension ToolbarItem {
         
         switch content {
             case let .view(view):
-                result.view = AppKitOrUIKitHostingView(rootView: view)
+                result.view = NSHostingView(rootView: view)
             
             case let .cocoaImage(image):
                 result.image = image
