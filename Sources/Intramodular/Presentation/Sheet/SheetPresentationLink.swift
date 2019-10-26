@@ -28,7 +28,7 @@ public struct SheetPresentationLink<Destination: View, Label: View>: View {
     }
     
     public var body: some View {
-        return Button(action: present, label: { label })
+        Button(action: present, label: { label })
     }
     
     private func present() {
