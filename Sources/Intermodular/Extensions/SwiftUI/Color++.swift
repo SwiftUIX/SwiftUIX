@@ -51,7 +51,21 @@ extension Color {
     public static var systemGray: Color {
         return .init(.systemGray)
     }
-    
+}
+
+extension Color {
+    /* Foreground color for placeholder text in controls or text fields or text views.
+     */
+    public static var placeholderText: Color {
+        return .init(.placeholderText)
+    }
+}
+
+#endif
+
+#if os(iOS) || os(tvOS)
+
+extension Color {
     public static var systemGray2: Color {
         return .init(.systemGray2)
     }
@@ -72,18 +86,6 @@ extension Color {
         return .init(.systemGray6)
     }
 }
-
-extension Color {
-    /* Foreground color for placeholder text in controls or text fields or text views.
-     */
-    public static var placeholderText: Color {
-        return .init(.placeholderText)
-    }
-}
-
-#endif
-
-#if os(iOS) || os(tvOS)
 
 extension Color {
     /* Foreground colors for static text and related elements.
@@ -126,7 +128,7 @@ extension Color {
     }
 }
 
-#if os(iOS)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     /* We provide two design systems (also known as "stacks") for structuring an iOS app's backgrounds.
