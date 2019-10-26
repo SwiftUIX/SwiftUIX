@@ -3,6 +3,7 @@
 //
 
 import Swift
+import SwiftUI
 
 #if os(macOS)
 
@@ -12,7 +13,9 @@ public typealias AppKitOrUIKitApplication = NSApplication
 public typealias AppKitOrUIKitButton = NSButton
 public typealias AppKitOrUIKitColor = NSColor
 public typealias AppKitOrUIKitControl = NSControl
+public typealias AppKitOrUIKitEvent = NSEvent
 public typealias AppKitOrUIKitFont = NSFont
+public typealias AppKitOrUIKitHostingView<Content: View> = NSHostingView<Content>
 public typealias AppKitOrUIKitImage = NSImage
 public typealias AppKitOrUIKitLayoutAxis = NSUserInterfaceLayoutOrientation
 public typealias AppKitOrUIKitLayoutGuide = NSLayoutGuide
@@ -22,6 +25,12 @@ public typealias AppKitOrUIKitTableView = NSTableView
 public typealias AppKitOrUIKitView = NSView
 public typealias AppKitOrUIKitViewController = NSViewController
 public typealias AppKitOrUIKitWindow = NSWindow
+
+extension NSView {
+    @objc open func hitTest(_ point: CGPoint, with event: NSEvent?) -> NSView? {
+        hitTest(point)
+    }
+}
 
 #endif
 
@@ -34,7 +43,9 @@ public typealias AppKitOrUIKitButton = UIButton
 public typealias AppKitOrUIKitColor = UIColor
 public typealias AppKitOrUIKitControl = UIControl
 public typealias AppKitOrUIKitControlEvent = UIControl.Event
+public typealias AppKitOrUIKitEvent = UIEvent
 public typealias AppKitOrUIKitFont = UIFont
+public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
 public typealias AppKitOrUIKitImage = UIImage
 public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide

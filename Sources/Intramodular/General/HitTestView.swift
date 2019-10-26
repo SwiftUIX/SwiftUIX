@@ -5,28 +5,17 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A view for hit testing.
-fileprivate struct HitTestView<Content: View>: UIViewRepresentable {
-    typealias Context = UIViewRepresentableContext<Self>
-    typealias UIViewType = HitTestContentView
+fileprivate struct HitTestView<Content: View>: AppKitOrUIKitViewRepresentable {
+    typealias AppKitOrUIKitView = HitTestContentView
     
-    class HitTestContentView: UIHostingView<Content> {
-        let hitTest: (CGPoint) -> Bool
+    class HitTestContentView: AppKitOrUIKitHostingView<Content> {
+        var hitTest: ((CGPoint) -> Bool)? = nil
         
-        init(rootView: Content, hitTest: @escaping (CGPoint) -> Bool) {
-            self.hitTest = hitTest
-            
-            super.init(rootView: rootView)
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
-        override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-            self.hitTest(point) ? super.hitTest(point, with: event) : nil
+        override func hitTest(_ point: CGPoint, with event: AppKitOrUIKitEvent?) -> SwiftUIX.AppKitOrUIKitView? {
+            (self.hitTest?(point) ?? true) ? super.hitTest(point, with: event) : nil
         }
     }
     
@@ -38,12 +27,14 @@ fileprivate struct HitTestView<Content: View>: UIViewRepresentable {
         self.hitTest = hitTest
     }
     
-    func makeUIView(context: Context) -> UIViewType {
-        return .init(rootView: rootView, hitTest: hitTest)
+    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView {
+        AppKitOrUIKitView(rootView: rootView).then {
+            $0.hitTest = hitTest
+        }
     }
     
-    func updateUIView(_ uiView: UIViewType, context: Context) {
-        
+    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitView, context: Context) {
+        view.hitTest = hitTest
     }
 }
 

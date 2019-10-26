@@ -18,9 +18,9 @@ open class UIHostingView<Content: View>: UIView {
         }
     }
     
-    public let rootViewHostingController: UIHostingController<Content>
+    private let rootViewHostingController: UIHostingController<Content>
     
-    public init(rootView: Content) {
+    public required init(rootView: Content) {
         self.rootViewHostingController = UIHostingController(rootView: rootView)
         
         super.init(frame: .zero)
