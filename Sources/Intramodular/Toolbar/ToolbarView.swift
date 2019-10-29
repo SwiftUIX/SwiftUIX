@@ -2,51 +2,92 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 
 import AppKit
 import Swift
 import SwiftUI
 
-public struct ToolbarView<Content: View>: NSViewRepresentable {
-    public typealias Context = NSViewRepresentableContext<ToolbarView>
-    public typealias NSViewType = NSView
+public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
+    public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
-    public let content: Content
+    private let content: Content
+    private let toolbar: NSToolbar
     
-    public init(_ content: () -> Content) {
+    public init(identifier: String = UUID().uuidString, content: () -> Content) {
         self.content = content()
+        self.toolbar = NSToolbar(identifier: identifier)
     }
     
-    public func makeNSView(context: Context) -> NSViewType {
+    private class HostingView<Content: View>: AppKitOrUIKitHostingView<Content> {
+        weak var toolbar: NSToolbar?
+        
+        func updateToolbar() {
+            #if os(macOS)
+            window?.toolbar = toolbar
+            #elseif targetEnvironment(macCatalyst)
+            window?.windowScene?.titlebar?.toolbar = toolbar
+            #endif
+        }
+        
+        #if os(macOS)
+        
+        override open func viewDidMoveToSuperview() {
+            super.viewDidMoveToWindow()
+            
+            updateToolbar()
+        }
+        
+        override open func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            
+            updateToolbar()
+        }
+        
+        #elseif targetEnvironment(macCatalyst)
+        
+        override open func didMoveToSuperview() {
+            super.didMoveToSuperview()
+            
+            updateToolbar()
+        }
+        
+        override open func didMoveToWindow() {
+            super.didMoveToWindow()
+            
+            updateToolbar()
+        }
+        
+        #endif
+    }
+    
+    public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
+        context.coordinator.toolbar = toolbar
+        
         let rootView = content.onPreferenceChange(ToolbarViewItemsPreferenceKey.self) { items in
             context.coordinator.items = items.map({ $0.toNSToolbarItem() })
         }
         
-        return NSHostingView(rootView: rootView)
+        return HostingView(rootView: rootView).then {
+            $0.toolbar = self.toolbar
+        }
     }
     
-    public func updateNSView(_ nsView: NSViewType, context: Context) {
-        guard let window = nsView.window else {
-            return
-        }
-        
-        let toolbar: NSToolbar
-        
-        if let _toolbar = window.toolbar {
-            toolbar = _toolbar
-        } else {
-            toolbar = NSToolbar(identifier: "toolbar")
-            
-            toolbar.allowsUserCustomization = true
-            toolbar.delegate = context.coordinator
-        }
-        
-        window.toolbar = toolbar
+    public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
+        toolbar.allowsUserCustomization = true
+        toolbar.delegate = context.coordinator
     }
     
     public class Coordinator: NSObject, NSToolbarDelegate {
-        public var items: [NSToolbarItem] = []
+        public var toolbar: NSToolbar!
+        
+        public var items: [NSToolbarItem] = [] {
+            didSet {
+                toolbar.delegate = nil
+                toolbar.delegate = self
+                toolbar.setItems(items)
+            }
+        }
         
         public override init() {
             
@@ -82,10 +123,7 @@ public struct ToolbarView<Content: View>: NSViewRepresentable {
     public func makeCoordinator() -> Coordinator {
         Coordinator()
     }
-    
-    public static func dismantleNSView(_ nsView: NSViewType, coordinator: Coordinator) {
-        
-    }
 }
 
 #endif
+

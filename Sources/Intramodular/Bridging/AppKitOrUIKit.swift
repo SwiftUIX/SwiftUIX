@@ -69,3 +69,11 @@ public enum AppKitOrUIKitLayoutAlignment: Hashable {
     case center
     case fill
 }
+
+#if !os(macOS) && !targetEnvironment(macCatalyst)
+
+protocol NSToolbarDelegate {
+    
+}
+
+#endif

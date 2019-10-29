@@ -2,20 +2,32 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS)
+#if os(macOS) || os(iOS)
 
+#if targetEnvironment(macCatalyst)
 import AppKit
+#endif
+
 import ObjectiveC
 import Swift
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 /// A toolbar item.
 public struct ToolbarItem {
     public enum Content {
-        case view(AnyView)
+        #if targetEnvironment(macCatalyst)
+        case systemSymbol(SanFranciscoSymbolName)
+        #endif
         
-        case cocoaImage(AppKitOrUIKitImage)
-        case cocoaView(AppKitOrUIKitView)
+        #if os(macOS)
+        case view(AnyView)
+        case cocoaImage(NSImage)
+        case cocoaView(NSView)
+        #endif
         
         case none
     }
@@ -24,6 +36,7 @@ public struct ToolbarItem {
     private(set) var content: Content
     private(set) var action: () -> () = { }
     private(set) var label: String?
+    private(set) var title: String?
     
     private(set) var isBordered: Bool = false
     
@@ -59,6 +72,14 @@ public struct ToolbarItem {
         return result
     }
     
+    public func title(_ title: String) -> ToolbarItem {
+        var result = self
+        
+        result.title = title
+        
+        return result
+    }
+    
     public func bordered(_ isBordered: Bool) -> ToolbarItem {
         var result = self
         
@@ -83,18 +104,27 @@ class NSToolbarItemTarget {
 extension ToolbarItem {
     static var targetAssociationKey: Void = ()
     
+    #if os(macOS) || targetEnvironment(macCatalyst)
+    
     func toNSToolbarItem() -> NSToolbarItem {
+//barButtonItem: UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
         let result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
         
         switch content {
+            #if os(macOS)
             case let .view(view):
                 result.view = NSHostingView(rootView: view)
-            
             case let .cocoaImage(image):
                 result.image = image
             case let .cocoaView(view):
                 result.view = view
+            #endif
             
+            #if targetEnvironment(macCatalyst)
+            case let .systemSymbol(name):
+                result.image = AppKitOrUIKitImage(systemName: name.rawValue)
+            #endif
+
             case .none:
                 break
         }
@@ -103,15 +133,22 @@ extension ToolbarItem {
         
         objc_setAssociatedObject(result, &ToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
         
-        result.target = target
         result.action = #selector(NSToolbarItemTarget.performAction)
-        
+        result.isEnabled = true
+        result.target = target
+
         if let label = label {
             result.label = label
         }
         
+        if let title = title {
+            result.title = title
+        }
+        
         return result
     }
+    
+    #endif
 }
 
 // MARK: - Protocol Implementations -
@@ -137,9 +174,11 @@ public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
 }
 
 extension View {
+    #if os(macOS)
     public func toolbarItem(withIdentifier identifier: String) -> ToolbarItem {
-        return .init(itemIdentifier: identifier, content: .view(.init(self)))
+        .init(itemIdentifier: identifier, content: .view(.init(self)))
     }
+    #endif
     
     public func toolbarItems(_ toolbarItems: ToolbarItem...) -> some View {
         preference(key: ToolbarViewItemsPreferenceKey.self, value: toolbarItems)
@@ -147,3 +186,4 @@ extension View {
 }
 
 #endif
+
