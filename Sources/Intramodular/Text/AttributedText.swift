@@ -5,11 +5,10 @@
 import Swift
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct AttributedText: UIViewRepresentable {
-    public typealias Context = UIViewRepresentableContext<Self>
-    public typealias UIViewType = UILabel
+public struct AttributedText: AppKitOrUIKitViewRepresentable {
+    public typealias AppKitOrUIKitViewType = AppKitOrUIKitLabel
     
     public let content: NSAttributedString
     
@@ -17,18 +16,14 @@ public struct AttributedText: UIViewRepresentable {
         self.content = content
     }
     
-    public func makeUIView(context: Context) -> UIViewType {
+    public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
         .init()
     }
     
-    public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.numberOfLines = 0
-        uiView.attributedText = content
+    public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
+        view.numberOfLines = 0
+        view.attributedText = content
     }
 }
-
-#elseif os(macOS)
-
-// TODO(@vmanot)
 
 #endif

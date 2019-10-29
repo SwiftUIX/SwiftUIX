@@ -9,12 +9,12 @@ import SwiftUI
 
 /// A view for hit testing.
 fileprivate struct HitTestView<Content: View>: AppKitOrUIKitViewRepresentable {
-    typealias AppKitOrUIKitView = HitTestContentView
+    typealias AppKitOrUIKitViewType = HitTestContentView
     
     class HitTestContentView: AppKitOrUIKitHostingView<Content> {
         var hitTest: ((CGPoint) -> Bool)? = nil
         
-        override func hitTest(_ point: CGPoint, with event: AppKitOrUIKitEvent?) -> SwiftUIX.AppKitOrUIKitView? {
+        override func hitTest(_ point: CGPoint, with event: AppKitOrUIKitEvent?) -> AppKitOrUIKitView? {
             (self.hitTest?(point) ?? true) ? super.hitTest(point, with: event) : nil
         }
     }
@@ -27,13 +27,13 @@ fileprivate struct HitTestView<Content: View>: AppKitOrUIKitViewRepresentable {
         self.hitTest = hitTest
     }
     
-    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView {
-        AppKitOrUIKitView(rootView: rootView).then {
+    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
+        AppKitOrUIKitViewType(rootView: rootView).then {
             $0.hitTest = hitTest
         }
     }
     
-    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitView, context: Context) {
+    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         view.hitTest = hitTest
     }
 }

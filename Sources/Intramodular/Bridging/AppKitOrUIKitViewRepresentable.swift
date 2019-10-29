@@ -8,26 +8,26 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public protocol AppKitOrUIKitViewRepresentable: UIViewRepresentable {
-    associatedtype AppKitOrUIKitView where AppKitOrUIKitView == UIViewType
+    associatedtype AppKitOrUIKitViewType where AppKitOrUIKitViewType == UIViewType
     
-    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView
-    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitView, context: Context)
+    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType
+    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context)
     
-    static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitView, coordinator: Coordinator)
+    static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
 }
 
 extension AppKitOrUIKitViewRepresentable {
     public typealias Context = UIViewRepresentableContext<Self>
     
-    public func makeUIView(context: Context) -> AppKitOrUIKitView {
+    public func makeUIView(context: Context) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
     
-    public func updateUIView(_ view: AppKitOrUIKitView, context: Context) {
+    public func updateUIView(_ view: AppKitOrUIKitViewType, context: Context) {
         updateAppKitOrUIKitView(view, context: context)
     }
     
-    public static func dismantleUIView(_ view: AppKitOrUIKitView, coordinator: Coordinator) {
+    public static func dismantleUIView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
     }
 }
@@ -35,26 +35,26 @@ extension AppKitOrUIKitViewRepresentable {
 #elseif os(macOS)
 
 public protocol AppKitOrUIKitViewRepresentable: NSViewRepresentable {
-    associatedtype AppKitOrUIKitView where AppKitOrUIKitView == NSViewType
+    associatedtype AppKitOrUIKitViewType where AppKitOrUIKitViewType == NSViewType
     
-    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView
-    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitView, context: Context)
+    func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType
+    func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context)
     
-    static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitView, coordinator: Coordinator)
+    static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
 }
 
 extension AppKitOrUIKitViewRepresentable {
     public typealias Context = NSViewRepresentableContext<Self>
     
-    public func makeNSView(context: Context) -> AppKitOrUIKitView {
+    public func makeNSView(context: Context) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
     
-    public func updateNSView(_ view: AppKitOrUIKitView, context: Context) {
+    public func updateNSView(_ view: AppKitOrUIKitViewType, context: Context) {
         updateAppKitOrUIKitView(view, context: context)
     }
     
-    public static func dismantleNSView(_ view: AppKitOrUIKitView, coordinator: Coordinator) {
+    public static func dismantleNSView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
     }
 }
@@ -64,7 +64,7 @@ extension AppKitOrUIKitViewRepresentable {
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension AppKitOrUIKitViewRepresentable {
-    public static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitView, coordinator: Coordinator) {
+    public static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         
     }
 }
