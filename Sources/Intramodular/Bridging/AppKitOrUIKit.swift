@@ -48,6 +48,7 @@ public typealias AppKitOrUIKitEvent = UIEvent
 public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
 public typealias AppKitOrUIKitImage = UIImage
+public typealias AppKitOrUIKitLabel = UILabel
 public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
 public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
