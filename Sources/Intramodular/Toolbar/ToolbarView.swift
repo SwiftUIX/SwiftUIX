@@ -2,11 +2,12 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Swift
+import SwiftUI
+
 #if os(macOS) || targetEnvironment(macCatalyst)
 
 import AppKit
-import Swift
-import SwiftUI
 
 public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
@@ -125,5 +126,8 @@ public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
     }
 }
 
-#endif
+#elseif os(iOS)
 
+public typealias ToolbarView<Content: View> = PassthroughView<Content>
+
+#endif

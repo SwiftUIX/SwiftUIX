@@ -19,8 +19,9 @@ import UIKit
 /// A toolbar item.
 public struct ToolbarItem {
     public enum Content {
-        #if targetEnvironment(macCatalyst)
+        #if os(iOS) || targetEnvironment(macCatalyst)
         case systemSymbol(SanFranciscoSymbolName)
+        case systemItem(UIBarButtonItem.SystemItem)
         #endif
         
         #if os(macOS)
@@ -107,8 +108,7 @@ extension ToolbarItem {
     #if os(macOS) || targetEnvironment(macCatalyst)
     
     func toNSToolbarItem() -> NSToolbarItem {
-//barButtonItem: UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
-        let result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
+        var result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
         
         switch content {
             #if os(macOS)
@@ -123,8 +123,18 @@ extension ToolbarItem {
             #if targetEnvironment(macCatalyst)
             case let .systemSymbol(name):
                 result.image = AppKitOrUIKitImage(systemName: name.rawValue)
+            case let .systemItem(item): do {
+                result = NSToolbarItem(
+                    itemIdentifier: .init(rawValue: itemIdentifier),
+                    barButtonItem: UIBarButtonItem(
+                        barButtonSystemItem: item,
+                        target: self,
+                        action: Selector(String("FIXME"))
+                    )
+                )
+            }
             #endif
-
+            
             case .none:
                 break
         }
@@ -136,7 +146,7 @@ extension ToolbarItem {
         result.action = #selector(NSToolbarItemTarget.performAction)
         result.isEnabled = true
         result.target = target
-
+        
         if let label = label {
             result.label = label
         }
