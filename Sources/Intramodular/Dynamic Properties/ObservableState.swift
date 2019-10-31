@@ -54,8 +54,8 @@ public struct ObservableState<Value>: DynamicProperty {
         self.__wrappedValue.update()
     }
     
-    /// Returns a binding referencing the state value.
-    public var binding: Binding<Value> {
+    /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
+    public var projectedValue: Binding<Value> {
         return .init(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0 }

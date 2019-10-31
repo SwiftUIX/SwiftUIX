@@ -36,14 +36,15 @@ public struct UserDefaultsState<Value: Codable>: DynamicProperty {
         }
     }
     
+    public mutating func update() {
+        self.__wrappedValue.update()
+    }
+    
+    /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
     public var projectedValue: Binding<Value> {
         return .init(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0 }
         )
-    }
-
-    public mutating func update() {
-        self.__wrappedValue.update()
     }
 }

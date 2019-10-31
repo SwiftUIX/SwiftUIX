@@ -25,20 +25,16 @@ public struct DelayedState<Value>: DynamicProperty {
     public init(wrappedValue value: Value) {
         self.__wrappedValue = .init(initialValue: value)
     }
-    
+        
     public mutating func update() {
         self.__wrappedValue.update()
     }
     
-    /// Returns a binding referencing the state value.
-    public var binding: Binding<Value> {
+    /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
+    public var projectedValue: Binding<Value> {
         return .init(
             get: { self.wrappedValue },
-            set: { newValue in
-                DispatchQueue.main.async {
-                    self._wrappedValue = newValue
-                }
-            }
+            set: { self.wrappedValue = $0 }
         )
     }
 }
