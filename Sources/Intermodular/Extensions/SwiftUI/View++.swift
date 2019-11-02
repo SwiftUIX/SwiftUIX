@@ -97,6 +97,26 @@ extension View {
     public func frame(_ size: CGSize, alignment: Alignment = .center) -> some View {
         frame(width: size.width, height: size.height, alignment: alignment)
     }
+    
+    @inlinable
+    public func frame(minimum size: CGSize?, alignment: Alignment = .center) -> some View {
+        frame(minWidth: size?.width, minHeight: size?.height, alignment: alignment)
+    }
+    
+    @inlinable
+    public func frame(
+        minimum minSize: CGSize?,
+        maximum maxSize: CGSize?,
+        alignment: Alignment = .center
+    ) -> some View {
+        frame(
+            minWidth: minSize?.width,
+            maxWidth: maxSize?.width,
+            minHeight: minSize?.height,
+            maxHeight: maxSize?.height,
+            alignment: alignment
+        )
+    }
 }
 
 // MARK: - Compatibility -
