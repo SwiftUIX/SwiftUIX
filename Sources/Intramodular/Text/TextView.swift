@@ -21,7 +21,7 @@ public struct TextView<Label: View>: View {
                 label
             }
             
-            TextViewCore(
+            _TextView(
                 text: text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit
@@ -30,7 +30,7 @@ public struct TextView<Label: View>: View {
     }
 }
 
-fileprivate struct TextViewCore {
+fileprivate struct _TextView {
     var text: Binding<String>
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
@@ -68,13 +68,13 @@ import UIKit
 
 // MARK: - Protocol Implementations -
 
-extension TextViewCore: UIViewRepresentable {
+extension _TextView: UIViewRepresentable {
     typealias UIViewType = _UITextView
     
     class Coordinator: NSObject, UITextViewDelegate {
-        var view: TextViewCore
+        var view: _TextView
         
-        init(_ view: TextViewCore) {
+        init(_ view: _TextView) {
             self.view = view
         }
         
@@ -102,6 +102,7 @@ extension TextViewCore: UIViewRepresentable {
         let view = _UITextView()
         
         view.backgroundColor = nil
+        view.isSelectable = true
         view.text = text.wrappedValue
         
         if let font = context.environment.font {
@@ -138,13 +139,13 @@ class _UITextView: UITextView {
 
 import AppKit
 
-extension TextViewCore: NSViewRepresentable {
+extension _TextView: NSViewRepresentable {
     typealias NSViewType = _NSTextView
     
     class Coordinator: NSObject, NSTextViewDelegate {
-        var view: TextViewCore
+        var view: _TextView
         
-        init(_ view: TextViewCore) {
+        init(_ view: _TextView) {
             self.view = view
         }
         
