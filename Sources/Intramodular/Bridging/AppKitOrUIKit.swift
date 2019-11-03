@@ -72,7 +72,13 @@ public enum AppKitOrUIKitLayoutAlignment: Hashable {
 
 #if !os(macOS) && !targetEnvironment(macCatalyst)
 
-protocol NSToolbarDelegate {
+public enum ControlSize: CaseIterable {
+    case regular
+    case small
+    case mini
+}
+
+public protocol NSToolbarDelegate {
     
 }
 
