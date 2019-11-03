@@ -8,10 +8,6 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension Color {
-    /* Some colors that are used by system elements and applications.
-     * These return named colors whose values may vary between different contexts and releases.
-     * Do not make assumptions about the color spaces or actual colors used.
-     */
     public static var systemRed: Color {
         return .init(.systemRed)
     }
@@ -54,8 +50,7 @@ extension Color {
 }
 
 extension Color {
-    /* Foreground color for placeholder text in controls or text fields or text views.
-     */
+    /// A color for placeholder text in controls or text fields or text views.
     public static var placeholderText: Color {
         return .init(.placeholderText)
     }
@@ -87,9 +82,8 @@ extension Color {
     }
 }
 
+/// Foreground colors for static text and related elements.
 extension Color {
-    /* Foreground colors for static text and related elements.
-     */
     public static var label: Color {
         return .init(.label)
     }
@@ -105,24 +99,20 @@ extension Color {
     public static var quaternaryLabel: Color {
         return .init(.quaternaryLabel)
     }
-    
-    
-    /* Foreground color for standard system links.
-     */
+}
+
+extension Color {
+    /// A foreground color for standard system links.
     public static var link: Color {
         return .init(.link)
     }
     
-    
-    /* Foreground colors for separators (thin border or divider lines).
-     * `separatorColor` may be partially transparent, so it can go on top of any content.
-     * `opaqueSeparatorColor` is intended to look similar, but is guaranteed to be opaque, so it will
-     * completely cover anything behind it. Depending on the situation, you may need one or the other.
-     */
+    /// A forground color for separators (thin border or divider lines).
     public static var separator: Color {
         return .init(.separator)
     }
     
+    /// A forground color intended to look similar to `Color.separated`, but is guaranteed to be opaque, so it will.
     public static var opaqueSeparator: Color {
         return .init(.opaqueSeparator)
     }
@@ -131,20 +121,6 @@ extension Color {
 #if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
-    /* We provide two design systems (also known as "stacks") for structuring an iOS app's backgrounds.
-     *
-     * Each stack has three "levels" of background colors. The first color is intended to be the
-     * main background, farthest back. Secondary and tertiary colors are layered on top
-     * of the main background, when appropriate.
-     *
-     * Inside of a discrete piece of UI, choose a stack, then use colors from that stack.
-     * We do not recommend mixing and matching background colors between stacks.
-     * The foreground colors above are designed to work in both stacks.
-     *
-     * 1. systemBackground
-     *    Use this stack for views with standard table views, and designs which have a white
-     *    primary background in light mode.
-     */
     public static var systemBackground: Color {
         return .init(.systemBackground)
     }
@@ -157,12 +133,6 @@ extension Color {
         return .init(.tertiarySystemBackground)
     }
     
-    
-    /* 2. systemGroupedBackground
-     *    Use this stack for views with grouped content, such as grouped tables and
-     *    platter-based designs. These are like grouped table views, but you may use these
-     *    colors in places where a table view wouldn't make sense.
-     */
     public static var systemGroupedBackground: Color {
         return .init(.systemBackground)
     }
@@ -174,38 +144,38 @@ extension Color {
     public static var tertiarySystemGroupedBackground: Color {
         return .init(.tertiarySystemGroupedBackground)
     }
-    
-    
-    /* Fill colors for UI elements.
-     * These are meant to be used over the background colors, since their alpha component is less than 1.
-     *
-     * systemFillColor is appropriate for filling thin and small shapes.
-     * Example: The track of a slider.
-     */
+}
+
+/// Fill colors for UI elements.
+/// These are meant to be used over the background colors, since their alpha component is less than 1.
+extension Color {
+    /// A color  appropriate for filling thin and small shapes.
+    ///
+    /// Example: The track of a slider.
     public static var systemFill: Color {
         return .init(.systemFill)
     }
     
     
-    /* secondarySystemFillColor is appropriate for filling medium-size shapes.
-     * Example: The background of a switch.
-     */
+    /// A color appropriate for filling medium-size shapes.
+    ///
+    /// Example: The background of a switch.
     public static var secondarySystemFill: Color {
         return .init(.secondarySystemFill)
     }
     
     
-    /* tertiarySystemFillColor is appropriate for filling large shapes.
-     * Examples: Input fields, search bars, buttons.
-     */
+    /// A color appropriate for filling large shapes.
+    ///
+    /// Examples: Input fields, search bars, buttons.
     public static var tertiarySystemFill: Color {
         return .init(.tertiarySystemFill)
     }
     
     
-    /* quaternarySystemFillColor is appropriate for filling large areas containing complex content.
-     * Example: Expanded table cells.
-     */
+    /// A color appropriate for filling large areas containing complex content.
+    ///
+    /// Example: Expanded table cells.
     public static var quaternarySystemFill: Color {
         return .init(.quaternarySystemFill)
     }
