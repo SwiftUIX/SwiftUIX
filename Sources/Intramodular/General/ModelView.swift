@@ -12,13 +12,13 @@ public protocol ModelView: View {
     init(_: Model)
 }
 
-public protocol ModelBindingView: ModelView {
+public protocol ModelMutatingView: ModelView {
     init(_: Binding<Model>)
 }
 
 // MARK: - Implementation -
 
-extension ModelBindingView {
+extension ModelMutatingView {
     public init(_ model: Model) {
         self.init(.constant(model))
     }
