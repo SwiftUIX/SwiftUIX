@@ -15,7 +15,7 @@ extension View {
         
         return result
     }
-
+    
     /// Returns a type-erased version of `self`.
     @inlinable
     public func eraseToAnyView() -> AnyView {
@@ -29,9 +29,23 @@ extension View {
     public func inset(by point: CGPoint) -> some View {
         return offset(x: -point.x, y: -point.y)
     }
-
+    
     public func offset(by point: CGPoint) -> some View {
         return offset(x: point.x, y: point.y)
+    }
+}
+
+extension View {
+    public func bottomTrailing() -> some View {
+        ZStack {
+            HStack {
+                Spacer()
+                VStack {
+                    Spacer()
+                    self
+                }
+            }
+        }
     }
 }
 
@@ -90,7 +104,7 @@ extension View {
     }
 }
 
-// MARK: - Sizing
+// MARK: - Sizing -
 
 extension View {
     @inlinable
