@@ -18,14 +18,24 @@ public struct DeviceScreenFill<Content: View>: View {
     public var body: some View {
         ZStack {
             GeometryReader { proxy in
-                self.content
-                    .inset(by: proxy.frame(in: .global).origin)
+                self.content.offset(proxy.centerOffsetInGlobalframe)
             }
-            .frame(
-                width: screen.bounds.width,
-                height: screen.bounds.height
-            )
+            .frame(screen.bounds.size)
             .edgesIgnoringSafeArea(.all)
         }
+    }
+}
+
+// MARK: - Helpers -
+
+private extension GeometryProxy {
+    var centerOffsetInGlobalframe: CGSize {
+        let frame = self.frame(in: .global)
+        let screenSize = Screen.main.bounds.size
+        
+        return .init(
+            width: ((screenSize.width - frame.width) / 2) - frame.origin.x,
+            height: ((screenSize.height - frame.height) / 2) - frame.origin.y
+        )
     }
 }
