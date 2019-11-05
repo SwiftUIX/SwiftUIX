@@ -11,6 +11,7 @@ public enum ModalViewPresentationStyle {
     case page
     case form
     case overFullScreen
+    case overCurrentContext
     case popover
     case automatic
     case none
@@ -31,6 +32,8 @@ extension UIModalPresentationStyle {
                 self = .formSheet
             case .overFullScreen:
                 self = .overFullScreen
+            case .overCurrentContext:
+                self = .overCurrentContext
             case .popover:
                 self = .popover
             case .automatic:
