@@ -25,6 +25,8 @@ open class UIHostingView<Content: View>: UIView {
         
         super.init(frame: .zero)
         
+        rootViewHostingController.view.backgroundColor = .clear
+        
         addSubview(rootViewHostingController.view)
     }
     
