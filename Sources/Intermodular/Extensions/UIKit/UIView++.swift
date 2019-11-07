@@ -8,7 +8,7 @@ import Swift
 import UIKit
 
 extension UIView {
-    public func constrain(to other: UIView) {
+    func constrain(to other: UIView) {
         translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -19,7 +19,7 @@ extension UIView {
         ])
     }
     
-    public func constrainSubview(_ subview: UIView) {
+    func constrainSubview(_ subview: UIView) {
         if subview.superview == nil {
             addSubview(subview)
         }
