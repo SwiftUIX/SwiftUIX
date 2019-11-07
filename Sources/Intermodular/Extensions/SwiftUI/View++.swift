@@ -26,11 +26,11 @@ extension View {
 // MARK: - Positioning -
 
 extension View {
-    public func inset(by point: CGPoint) -> some View {
+    public func inset(_ point: CGPoint) -> some View {
         return offset(x: -point.x, y: -point.y)
     }
     
-    public func offset(by point: CGPoint) -> some View {
+    public func offset(_ point: CGPoint) -> some View {
         return offset(x: point.x, y: point.y)
     }
 }
