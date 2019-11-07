@@ -17,11 +17,19 @@ public struct DeviceScreenFill<Content: View>: View {
     
     public var body: some View {
         ZStack {
-            GeometryReader { proxy in
-                self.content.offset(proxy.centerOffsetInGlobalframe)
+            GeometryReader { geometry in
+                self.content.offset(geometry.centerOffsetInGlobalframe)
             }
             .frame(screen.bounds.size)
             .edgesIgnoringSafeArea(.all)
+        }
+    }
+}
+
+extension DeviceScreenFill where Content == EmptyFillView {
+    public init() {
+        self.init {
+            EmptyFillView()
         }
     }
 }
