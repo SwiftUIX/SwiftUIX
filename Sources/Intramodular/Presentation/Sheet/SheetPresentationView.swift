@@ -10,11 +10,11 @@ import SwiftUI
 ///
 /// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationManager) private var presentationManager
     
     @State private var presentedView: AnyView? = nil
     @State private var onDismiss: (() -> ())? = nil
-    @State private var isPresenting: Bool = false
+    @State private var isPresented: Bool = false
     
     public let _body: Body
     
@@ -24,25 +24,25 @@ public struct SheetPresentationView<Body: View>: View {
     
     public var isSheetPresented: Binding<Bool> {
         .init(
-            get: { self.isPresenting },
+            get: { self.isPresented },
             set: { newValue in
                 if newValue {
                     self.present()
                 } else {
                     self.dismiss()
                 }
-        }
+            }
         )
     }
     
     private func present() {
-        isPresenting = true
+        isPresented = true
     }
     
     private func dismiss() {
-        presentationMode.wrappedValue.dismiss()
+        presentationManager.dismiss()
         
-        isPresenting = false
+        isPresented = false
         presentedView = nil
         
         onDismiss?()
@@ -61,7 +61,7 @@ public struct SheetPresentationView<Body: View>: View {
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             .environment(\.presentedSheetView, .init($presentedView))
             .sheet(
-                isPresented: $isPresenting,
+                isPresented: $isPresented,
                 onDismiss: dismiss,
                 content: sheetContent
         )
