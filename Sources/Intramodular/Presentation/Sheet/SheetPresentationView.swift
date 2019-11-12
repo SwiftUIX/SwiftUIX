@@ -64,7 +64,7 @@ public struct SheetPresentationView<Body: View>: View {
                 isPresented: $isPresented,
                 onDismiss: dismiss,
                 content: sheetContent
-        )
+            )
     }
 }
 

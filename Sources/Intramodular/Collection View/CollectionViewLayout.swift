@@ -12,7 +12,7 @@ public protocol CollectionViewLayout {
     func _toUICollectionViewLayout() -> UICollectionViewLayout
 }
 
-// MARK: - Implementations -
+// MARK: - Concrete Implementations -
 
 public struct CollectionViewFlowLayout: CollectionViewLayout {
     public let minimumLineSpacing: CGFloat

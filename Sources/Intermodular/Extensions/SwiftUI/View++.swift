@@ -5,8 +5,6 @@
 import Swift
 import SwiftUI
 
-// MARK: - General -
-
 extension View {
     public func then(_ body: (inout Self) -> Void) -> Self {
         var result = self
@@ -23,15 +21,9 @@ extension View {
     }
 }
 
-// MARK: - Positioning -
-
 extension View {
-    public func inset(_ point: CGPoint) -> some View {
-        return offset(x: -point.x, y: -point.y)
-    }
-    
-    public func offset(_ point: CGPoint) -> some View {
-        return offset(x: point.x, y: point.y)
+    public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
+        background(EmptyView().preference(key: K.self, value: value))
     }
 }
 
@@ -49,15 +41,15 @@ extension View {
     }
 }
 
-// MARK: - Preference Keys -
-
 extension View {
-    public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
-        background(EmptyView().preference(key: K.self, value: value))
+    public func inset(_ point: CGPoint) -> some View {
+        return offset(x: -point.x, y: -point.y)
+    }
+    
+    public func offset(_ point: CGPoint) -> some View {
+        return offset(x: point.x, y: point.y)
     }
 }
-
-// MARK: - Relative Sizing -
 
 extension View {
     public func relativeHeight(
@@ -104,8 +96,6 @@ extension View {
     }
 }
 
-// MARK: - Sizing -
-
 extension View {
     @inlinable
     public func frame(_ size: CGSize, alignment: Alignment = .center) -> some View {
@@ -132,8 +122,6 @@ extension View {
         )
     }
 }
-
-// MARK: - Compatibility -
 
 #if os(macOS)
 

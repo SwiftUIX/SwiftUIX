@@ -31,7 +31,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Implementations -
+// MARK: - Concrete Implementations -
 
 extension Binding: PresentationManager where Value: PresentationModeProtocol {
     public var isPresented: Bool {

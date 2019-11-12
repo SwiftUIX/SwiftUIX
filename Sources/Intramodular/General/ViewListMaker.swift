@@ -9,7 +9,7 @@ public protocol ViewListMaker {
     func makeViewList() -> [AnyView]
 }
 
-// MARK: - Implementations -
+// MARK: - Concrete Implementations -
 
 extension EmptyView: ViewListMaker {
     public func makeViewList() -> [AnyView] {
