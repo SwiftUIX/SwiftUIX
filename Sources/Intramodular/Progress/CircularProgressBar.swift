@@ -22,12 +22,12 @@ public struct CircularProgressBar: View {
             ZStack(alignment: .topLeading) {
                 Circle()
                     .stroke(lineWidth: self.lineWidth)
-                    .frame(width: min(geometry.size.width, geometry.size.height))
+                    .frame(width: geometry.size.minimumDimensionLength)
                     .opacity(0.3)
                 Circle()
                     .trim(from: 0, to: self.value)
                     .stroke(lineWidth: self.lineWidth)
-                    .frame(width: min(geometry.size.width, geometry.size.height))
+                    .frame(width: geometry.size.minimumDimensionLength)
                     .rotationEffect(.degrees(-90))
             }
         }
@@ -35,6 +35,8 @@ public struct CircularProgressBar: View {
     
     /// Sets the line width of the view.
     public func lineWidth(_ lineWidth: CGFloat) -> CircularProgressBar {
-        then { $0.lineWidth = lineWidth }
+        then {
+            $0.lineWidth = lineWidth
+        }
     }
 }

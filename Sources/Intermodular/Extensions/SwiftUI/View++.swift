@@ -94,6 +94,15 @@ extension View {
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0)
     }
+    
+    public func fit() -> some View {
+        GeometryReader { geometry in
+            self.frame(
+                width: geometry.size.minimumDimensionLength,
+                height: geometry.size.minimumDimensionLength
+            )
+        }
+    }
 }
 
 extension View {
