@@ -51,6 +51,7 @@ extension PageControl: UIViewRepresentable {
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.currentPage = currentPage.wrappedValue
+        uiView.numberOfPages = numberOfPages
     }
     
     public func makeCoordinator() -> Coordinator {
