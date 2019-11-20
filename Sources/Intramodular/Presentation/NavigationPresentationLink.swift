@@ -21,27 +21,27 @@ public struct NavigationPresentationLink<Label: View, Destination: View>: View {
     public var body: some View {
         NavigationLink(
             destination: destination
-                .environment(\.isNavigationButtonActive, $isActive),
+                .environment(\.presentationManager, NavigationPresentationManager(isActive: $isActive)),
             isActive: $isActive,
             label: { label }
         )
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Auxiliary Implementation -
 
-public struct IsNavigationButtonActiveEnvironmentKey: EnvironmentKey {
-    public static var defaultValue: Binding<Bool>? {
-        return nil
+public struct NavigationPresentationManager: PresentationManager {
+    let isActive: Binding<Bool>
+    
+    init(isActive: Binding<Bool>) {
+        self.isActive = isActive
     }
-}
-
-extension EnvironmentValues {
-    public var isNavigationButtonActive: Binding<Bool>? {
-        get {
-            self[IsNavigationButtonActiveEnvironmentKey.self]
-        } set {
-            self[IsNavigationButtonActiveEnvironmentKey.self] = newValue
-        }
+    
+    public var isPresented: Bool {
+        return isActive.wrappedValue
+    }
+    
+    public func dismiss() {
+        isActive.wrappedValue = false
     }
 }

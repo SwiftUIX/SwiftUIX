@@ -6,12 +6,26 @@ import Combine
 import Swift
 import SwiftUI
 
+public struct SheetViewPresentationManager: PresentationManager {
+    let _isPresented: Binding<Bool>
+    
+    init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented
+    }
+    
+    public var isPresented: Bool {
+        _isPresented.wrappedValue
+    }
+    
+    public func dismiss() {
+        _isPresented.wrappedValue = false
+    }
+}
+
 /// A workaround for `View.sheet` presentation bugs.
 ///
 /// Wrap your `NavigationView` in this, and use `SheetPresentationLink` within.
 public struct SheetPresentationView<Body: View>: View {
-    @Environment(\.presentationManager) private var presentationManager
-    
     @State private var presentedView: AnyView? = nil
     @State private var onDismiss: (() -> ())? = nil
     @State private var isPresented: Bool = false
@@ -40,8 +54,6 @@ public struct SheetPresentationView<Body: View>: View {
     }
     
     private func dismiss() {
-        presentationManager.dismiss()
-        
         isPresented = false
         presentedView = nil
         
@@ -50,6 +62,7 @@ public struct SheetPresentationView<Body: View>: View {
     
     private func sheetContent() -> some View {
         presentedView!
+            .environment(\.presentationManager, SheetViewPresentationManager(isPresented: $isPresented))
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             ._wrapAsPresentationSheetView()
@@ -57,6 +70,7 @@ public struct SheetPresentationView<Body: View>: View {
     
     public var body: some View {
         return _body
+            .environment(\.presentationManager, SheetViewPresentationManager(isPresented: $isPresented))
             .environment(\.isSheetPresented, isSheetPresented)
             .environment(\.onSheetPresentationDismiss, .init($onDismiss))
             .environment(\.presentedSheetView, .init($presentedView))
