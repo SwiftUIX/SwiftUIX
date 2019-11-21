@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol PresentationManager {
+public protocol PresentationManager: ViewInteractor {
     var isPresented: Bool { get }
     
     func dismiss()
@@ -13,7 +13,9 @@ public protocol PresentationManager {
 
 // MARK: - Auxiliary Implementation -
 
-private struct _PresentationManagerEnvironmentKey: EnvironmentKey {
+private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey {
+    typealias ViewInteractor = PresentationManager
+    
     static var defaultValue: PresentationManager? {
         get {
             return nil

@@ -20,3 +20,9 @@ extension ViewInteractorEnvironmentKey {
         return nil
     }
 }
+
+// MARK: - Concrete Implementations -
+
+extension Binding: ViewInteractor {
+    
+}
