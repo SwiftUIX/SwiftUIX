@@ -9,12 +9,13 @@ import SwiftUI
 import UIKit
 
 /// A view that paginates its children along a given axis.
-public struct PaginatedViews<Content: View>: View {
+public struct PaginationView<Content: View>: View {
     private let children: [UIHostingController<Content>]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
     
     @State private var currentPageIndex = 0
+    @State private var progressionController: ProgressionController?
     
     public init(
         _ pages: [Content],
@@ -34,11 +35,12 @@ public struct PaginatedViews<Content: View>: View {
     
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
-            _PaginatedContent(
+            _PaginationView(
                 children: children,
                 axis: axis,
                 pageIndicatorAlignment: pageIndicatorAlignment,
-                currentPageIndex: $currentPageIndex
+                currentPageIndex: $currentPageIndex,
+                progressionController: $progressionController
             )
             
             if axis == .vertical || pageIndicatorAlignment != .center {
@@ -52,6 +54,7 @@ public struct PaginatedViews<Content: View>: View {
                 )
             }
         }
+        .environment(\.progressionController, progressionController)
     }
 }
 

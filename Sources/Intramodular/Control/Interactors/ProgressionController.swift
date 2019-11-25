@@ -18,6 +18,10 @@ public struct ProgressionControllerEnvironmentKey: ViewInteractorEnvironmentKey 
 
 extension EnvironmentValues {
     public var progressionController: ProgressionController? {
-        return self[ProgressionControllerEnvironmentKey.self]
+        get {
+            self[ProgressionControllerEnvironmentKey.self]
+        } set {
+            self[ProgressionControllerEnvironmentKey.self] = newValue
+        }
     }
 }

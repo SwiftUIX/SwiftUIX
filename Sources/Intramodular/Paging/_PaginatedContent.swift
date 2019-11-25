@@ -9,33 +9,66 @@ import SwiftUI
 import UIKit
 
 /// A SwiftUI port of `UIPageViewController`.
-struct _PaginatedContent {
+struct _PaginationView {
     private let children: [UIViewController]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
     
     @Binding private var currentPageIndex: Int
+    @Binding private var progressionController: ProgressionController?
     
     init(
         children: [UIViewController],
         axis: Axis,
         pageIndicatorAlignment: Alignment,
-        currentPageIndex: Binding<Int>
+        currentPageIndex: Binding<Int>,
+        progressionController: Binding<ProgressionController?>
     ) {
         self.children = children
         self.axis = axis
         self.pageIndicatorAlignment = pageIndicatorAlignment
         self._currentPageIndex = currentPageIndex
+        self._progressionController = progressionController
     }
 }
 
 // MARK: - Protocol Implementations -
 
-extension _PaginatedContent: UIViewControllerRepresentable {
-    class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        var parent: _PaginatedContent
+extension _PaginationView: UIViewControllerRepresentable {
+    struct _ProgressionController: ProgressionController {
+        weak var base: UIPageViewController?
         
-        init(_ parent: _PaginatedContent) {
+        func moveToNext() {
+            guard
+                let base = base,
+                let baseDataSource = base.dataSource,
+                let currentViewController = base.viewControllers?.first,
+                let nextViewController = baseDataSource.pageViewController(base, viewControllerAfter: currentViewController)
+                else {
+                    return
+            }
+            
+            base.setViewControllers([nextViewController], direction: .forward, animated: false)
+        }
+        
+        func moveToPrevious() {
+            guard
+                let base = base,
+                let baseDataSource = base.dataSource,
+                let currentViewController = base.viewControllers?.first,
+                let previousViewController = baseDataSource.pageViewController(base, viewControllerBefore: currentViewController)
+                else {
+                    return
+            }
+            
+            base.setViewControllers([previousViewController], direction: .reverse, animated: false)
+        }
+    }
+    
+    class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+        var parent: _PaginationView
+        
+        init(_ parent: _PaginationView) {
             self.parent = parent
         }
         
@@ -95,7 +128,7 @@ extension _PaginatedContent: UIViewControllerRepresentable {
     private class _Coordinator_Default_UIPageControl: Coordinator {
         var currentPageIndex: Int
         
-        override init(_ parent: _PaginatedContent) {
+        override init(_ parent: _PaginationView) {
             self.currentPageIndex = parent.currentPageIndex
             
             super.init(parent)
@@ -120,6 +153,8 @@ extension _PaginatedContent: UIViewControllerRepresentable {
         
         result.dataSource = context.coordinator
         result.delegate = context.coordinator
+        
+        progressionController = _ProgressionController(base: result)
         
         return result
     }
