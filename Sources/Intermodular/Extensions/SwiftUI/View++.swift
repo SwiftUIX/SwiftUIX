@@ -132,6 +132,17 @@ extension View {
     }
 }
 
+extension View {
+    @ViewBuilder
+    public func hidden(_ isHidden: Bool) -> some View {
+        if isHidden {
+            return hidden()
+        } else {
+            return self
+        }
+    }
+}
+
 #if os(macOS)
 
 extension View {
