@@ -12,8 +12,6 @@ public struct EmptyFillView: View {
     }
 
     public var body: some View {
-        ZStack {
-            Color.clear
-        }
+        GeometryReader { _ in EmptyView() }
     }
 }
