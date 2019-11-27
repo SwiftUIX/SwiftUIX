@@ -48,7 +48,7 @@ extension _PaginationView: UIViewControllerRepresentable {
                     return
             }
             
-            base.setViewControllers([nextViewController], direction: .forward, animated: false)
+            base.setViewControllers([nextViewController], direction: .forward, animated: true)
         }
         
         func moveToPrevious() {
@@ -61,7 +61,7 @@ extension _PaginationView: UIViewControllerRepresentable {
                     return
             }
             
-            base.setViewControllers([previousViewController], direction: .reverse, animated: false)
+            base.setViewControllers([previousViewController], direction: .reverse, animated: true)
         }
     }
     

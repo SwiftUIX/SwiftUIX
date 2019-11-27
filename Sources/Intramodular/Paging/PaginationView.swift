@@ -15,7 +15,7 @@ public struct PaginationView<Content: View>: View {
     private let pageIndicatorAlignment: Alignment
     
     @State private var currentPageIndex = 0
-    @State private var progressionController: ProgressionController?
+    @DelayedState private var progressionController: ProgressionController?
     
     public init(
         _ pages: [Content],

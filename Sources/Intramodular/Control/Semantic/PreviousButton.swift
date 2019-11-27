@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A button that triggers a regression.
-public struct PreviousButton<Label: View> {
+public struct PreviousButton<Label: View>: View {
     @Environment(\.progressionController) var progressionController
     
     private let label: Label

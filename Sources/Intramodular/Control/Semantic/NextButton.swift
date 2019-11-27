@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A button that triggers a progression.
-public struct NextButton<Label: View> {
+public struct NextButton<Label: View>: View {
     @Environment(\.progressionController) var progressionController
     
     private let label: Label
