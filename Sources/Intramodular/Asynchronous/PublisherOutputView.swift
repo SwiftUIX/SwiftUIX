@@ -15,7 +15,7 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
     
     @ObservedObject private var observer: PublisherObserver<P, DispatchQueue>
     
-    private let subscriptionPolicy: SubscriptionPolicy
+    private let policy: SubscriptionPolicy
     private let placeholder: Placeholder
     private let makeContent: (Result<P.Output, P.Failure>) -> Content
     
@@ -26,11 +26,11 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
         content: @escaping (Result<P.Output, P.Failure>) -> Content
     ) {
         self.observer = .init(publisher: publisher, scheduler: DispatchQueue.main)
-        self.subscriptionPolicy = policy
+        self.policy = policy
         self.placeholder = placeholder
         self.makeContent = content
         
-        if self.subscriptionPolicy == .immediate {
+        if self.policy == .immediate {
             self.observer.attach()
         }
     }
@@ -40,7 +40,7 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
             observer.lastValue.map(makeContent) ?? placeholder
         }
         .onAppear {
-            if self.subscriptionPolicy == .delayed {
+            if self.policy == .delayed {
                 self.observer.attach()
             }
         }
