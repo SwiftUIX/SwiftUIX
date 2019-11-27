@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension Binding {
-    public func _mapGetter<Result>(_ transform: @escaping (Value) -> Result) -> Binding<Result> {
+    public func _unsafeMapGetter<Result>(_ transform: @escaping (Value) -> Result) -> Binding<Result> {
         .init(
             get: { transform(self.wrappedValue) },
             set: { _ in fatalError() }
