@@ -68,4 +68,19 @@ extension View {
             destination: destination
         ))
     }
+    
+    public func navigate<Destination: View>(
+        isActive: Binding<Bool>,
+        onDismiss: (() -> ())? = nil,
+        @ViewBuilder to destination: @escaping () -> Destination
+    ) -> some View {
+        navigate(
+            selection:  Binding<Void?>(
+                get: { isActive.wrappedValue ? () : nil },
+                set: { isActive.wrappedValue = $0 != nil }
+            ),
+            onDismiss: onDismiss,
+            destination: destination
+        )
+    }
 }
