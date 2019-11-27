@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 @propertyWrapper
-public struct EnvironmentOrState<Value: ObservableObject>: DynamicProperty {
+public struct EnvironmentObjectOrState<Value: ObservableObject>: DynamicProperty {
     @EnvironmentObject<Value>
     private var _wrappedValue0: Value
     @State
@@ -32,6 +32,10 @@ public struct EnvironmentOrState<Value: ObservableObject>: DynamicProperty {
     /// Initialize with the provided initial value.
     public init(wrappedValue value: Value) {
         self.__wrappedValue1 = .init(initialValue: value)
+    }
+    
+    public init() {
+        
     }
     
     public mutating func update() {
