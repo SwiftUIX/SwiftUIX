@@ -6,22 +6,23 @@ import Combine
 import Swift
 import SwiftUI
 
-public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
+public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
     public typealias Input = P.Output
     
-    private var _subscribeImpl: Optional<() -> ()> = nil
+    private let publisher: P
+    private let scheduler: S
+    private var subscription: Subscription?
     
     @Published(initialValue: nil) public var lastValue: Result<P.Output, P.Failure>?
     
     public init(publisher: P, scheduler: S) {
-        _subscribeImpl = {
-            publisher
-                .subscribe(on: scheduler)
-                .receive(subscriber: self)
-        }
+        self.publisher = publisher
+        self.scheduler = scheduler
     }
     
     public func receive(subscription: Subscription) {
+        self.subscription = subscription
+        
         subscription.request(.unlimited)
     }
     
@@ -40,8 +41,20 @@ public final class PublisherObservation<P: Publisher, S: Scheduler>: ObservableO
         }
     }
     
+    /// Attach the receiver to the target publisher.
     public func attach() {
-        _subscribeImpl?()
-        _subscribeImpl = nil
+        publisher
+            .subscribe(on: scheduler)
+            .receive(subscriber: self)
+    }
+    
+    /// Detach the receiver from the target publisher.
+    public func detatch() {
+        subscription?.cancel()
+        subscription = nil
+    }
+    
+    deinit {
+        detatch()
     }
 }

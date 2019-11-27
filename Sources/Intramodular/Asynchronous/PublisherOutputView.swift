@@ -13,7 +13,7 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
         case delayed
     }
     
-    @ObservedObject private var observation: PublisherObservation<P, DispatchQueue>
+    @ObservedObject private var observation: ObservedPublisher<P, DispatchQueue>
     
     private let subscriptionPolicy: SubscriptionPolicy
     private let placeholder: Placeholder
@@ -38,7 +38,8 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
     public var body: some View {
         Group {
             observation.lastValue.map(makeContent) ?? placeholder
-        }.onAppear {
+        }
+        .onAppear {
             if self.subscriptionPolicy == .delayed {
                 self.observation.attach()
             }
