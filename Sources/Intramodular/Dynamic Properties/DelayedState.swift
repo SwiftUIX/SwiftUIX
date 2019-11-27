@@ -25,7 +25,7 @@ public struct DelayedState<Value>: DynamicProperty {
     public init(wrappedValue value: Value) {
         self.__wrappedValue = .init(initialValue: value)
     }
-        
+    
     public mutating func update() {
         self.__wrappedValue.update()
     }
