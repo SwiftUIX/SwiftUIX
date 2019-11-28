@@ -12,4 +12,3 @@ public final class MutableHeapWrapper<T> {
         self.value = value
     }
 }
-
