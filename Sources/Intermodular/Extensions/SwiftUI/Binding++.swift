@@ -19,7 +19,7 @@ extension Binding {
             set: { self.wrappedValue = $0 as! Value }
         )
     }
-
+    
     public func withDefaultValue<T>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
         return .init(
             get: { self.wrappedValue ?? defaultValue },
@@ -38,6 +38,28 @@ extension Binding {
         return .init(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0; body($0) }
+        )
+    }
+}
+
+extension Binding where Value == String {
+    public func prefix(_ count: Int) -> Self {
+        .init(
+            get: { self.wrappedValue },
+            set: {
+                self.wrappedValue = $0
+                self.wrappedValue = .init($0.prefix(count))
+            }
+        )
+    }
+    
+    public func suffix(_ count: Int) -> Self {
+        .init(
+            get: { self.wrappedValue },
+            set: {
+                self.wrappedValue = $0
+                self.wrappedValue = .init($0.suffix(count))
+            }
         )
     }
 }
