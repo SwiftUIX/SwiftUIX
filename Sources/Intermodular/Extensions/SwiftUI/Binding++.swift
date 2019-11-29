@@ -6,14 +6,7 @@ import Swift
 import SwiftUI
 
 extension Binding {
-    public func _unsafeMapGetter<Result>(_ transform: @escaping (Value) -> Result) -> Binding<Result> {
-        .init(
-            get: { transform(self.wrappedValue) },
-            set: { _ in fatalError() }
-        )
-    }
-    
-    public func _unsafeForceCast<U>(to type: U.Type) -> Binding<U> {
+    public func forceCast<U>(to type: U.Type) -> Binding<U> {
         return .init(
             get: { self.wrappedValue as! U },
             set: { self.wrappedValue = $0 as! Value }
@@ -26,7 +19,9 @@ extension Binding {
             set: { self.wrappedValue = $0 }
         )
     }
-    
+}
+
+extension Binding {
     public func prehookSetter(_ body: @escaping (Value) -> ()) -> Self {
         return .init(
             get: { self.wrappedValue },
