@@ -24,9 +24,8 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
     
     private func setIsActive(_ isActive: Bool) {
         if !isActive {
-            selection.wrappedValue = nil
-            
             if selection.wrappedValue != nil {
+                selection.wrappedValue = nil
                 onDismiss?()
             }
         } else if selection.wrappedValue == nil {
