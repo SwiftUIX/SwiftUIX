@@ -153,8 +153,6 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         result.dataSource = context.coordinator
         result.delegate = context.coordinator
-        result.pageControl?.pageIndicatorTintColor = Color.accentColor.toUIColor()
-        result.pageControl?.currentPageIndicatorTintColor = Color.accentColor.opacity(0.5).toUIColor()
 
         progressionController = _ProgressionController(base: result)
         
@@ -162,14 +160,15 @@ extension _PaginationView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
+        if let coordinator = context.coordinator as? _Coordinator_Default_UIPageControl {
+            coordinator.currentPageIndex = currentPageIndex
+        }
+        
         pageViewController.setViewControllers(
             [children[currentPageIndex]],
             direction: .forward,
             animated: true
         )
-        
-        pageViewController.pageControl?.pageIndicatorTintColor = Color.accentColor.toUIColor()
-        pageViewController.pageControl?.currentPageIndicatorTintColor = Color.accentColor.opacity(0.5).toUIColor()
     }
     
     func makeCoordinator() -> Coordinator {
