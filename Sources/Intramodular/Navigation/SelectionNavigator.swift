@@ -24,11 +24,11 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
     
     private func setIsActive(_ isActive: Bool) {
         if !isActive {
+            selection.wrappedValue = nil
+            
             if selection.wrappedValue != nil {
                 onDismiss?()
             }
-            
-            selection.wrappedValue = nil
         } else if selection.wrappedValue == nil {
             fatalError()
         }
@@ -77,6 +77,21 @@ extension View {
         navigate(
             selection:  Binding<Void?>(
                 get: { isActive.wrappedValue ? () : nil },
+                set: { isActive.wrappedValue = $0 != nil }
+            ),
+            onDismiss: onDismiss,
+            destination: destination
+        )
+    }
+    
+    public func navigate<Destination: View>(
+        isActive: Binding<Bool?>,
+        onDismiss: (() -> ())? = nil,
+        @ViewBuilder to destination: @escaping () -> Destination
+    ) -> some View {
+        navigate(
+            selection: Binding<Void?>(
+                get: { (isActive.wrappedValue ?? false) ? () : nil },
                 set: { isActive.wrappedValue = $0 != nil }
             ),
             onDismiss: onDismiss,
