@@ -37,10 +37,10 @@ private struct KeyboardAvoidingViewController<Content: View>: UIViewControllerRe
                 let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
                 let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
                 let endFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-            else {
-                return
+                else {
+                    return
             }
-
+            
             let endFrameInWindow = window.convert(endFrame, from: nil)
             let endFrameInView = view.convert(endFrameInWindow, from: nil)
             let endFrameIntersection = view.bounds.intersection(endFrameInView)

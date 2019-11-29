@@ -7,21 +7,18 @@ import Swift
 import SwiftUI
 
 public struct NavigateBackButton<Label: View>: View {
-    @Environment(\.presentationMode) private var presentationMode
-    
+    private let onDismiss: () -> ()
     private let label: Label
     
-    public init(@ViewBuilder label: () -> Label) {
+    public init(
+        onDismiss: @escaping () -> (),
+        @ViewBuilder label: () -> Label
+    ) {
+        self.onDismiss = onDismiss
         self.label = label()
     }
     
     public var body: some View {
-        Button(action: trigger) {
-            label
-        }
-    }
-    
-    private func trigger() {
-        presentationMode.dismiss()
+        DismissPresentationButton(action: onDismiss, label: { label })
     }
 }

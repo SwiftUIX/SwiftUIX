@@ -28,4 +28,36 @@ extension UIView {
     }
 }
 
+extension UIView {
+    func takeSnapshot() -> UIImage {
+        let format = UIGraphicsImageRendererFormat.preferred()
+        let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
+        let image = renderer.image { (context) in
+            UIGraphicsPushContext(context.cgContext)
+            self.drawHierarchy(in: self.bounds, afterScreenUpdates: false)
+            UIGraphicsPopContext()
+        }
+        
+        return image
+    }
+}
+
+extension UIView {
+    func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
+        guard !subviews.isEmpty else {
+            return nil
+        }
+        
+        for subview in subviews {
+            if subview.isKind(of: kind) {
+                return subview as? T
+            } else if let result = subview.findSubview(ofKind: kind) {
+                return result
+            }
+        }
+        
+        return nil
+    }
+}
+
 #endif

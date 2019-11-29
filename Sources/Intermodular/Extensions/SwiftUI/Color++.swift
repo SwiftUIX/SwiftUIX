@@ -181,6 +181,18 @@ extension Color {
     }
 }
 
+extension Color {
+    public func toUIColor() -> UIColor {
+        UIColor(
+            patternImage: UIHostingView(
+                rootView: Rectangle()
+                    .fill(self)
+                    .frame(.init(width: 10, height: 10))
+            ).takeSnapshot()
+        ) // FIXME
+    }
+}
+
 #endif
 
 extension Color {
