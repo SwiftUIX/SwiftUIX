@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 struct NavigationBarHider: ViewModifier {
-    @State private var isHidden: Bool = false
+    @DelayedState private var isHidden: Bool = false
     
     func body(content: Content) -> some View {
         content
