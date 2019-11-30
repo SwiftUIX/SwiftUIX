@@ -62,7 +62,7 @@ extension Binding where Value == String {
             set: {
                 self.wrappedValue = $0
                 self.wrappedValue = .init($0.prefix(count))
-        }
+            }
         )
     }
     
@@ -72,7 +72,7 @@ extension Binding where Value == String {
             set: {
                 self.wrappedValue = $0
                 self.wrappedValue = .init($0.suffix(count))
-        }
+            }
         )
     }
 }
