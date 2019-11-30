@@ -55,6 +55,7 @@ public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
 public typealias AppKitOrUIKitResponder = UIResponder
 public typealias AppKitOrUIKitTableView = UITableView
 public typealias AppKitOrUIKitTableViewController = UITableViewController
+public typealias AppKitOrUIKitTextField = UITextField
 public typealias AppKitOrUIKitView = UIView
 public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
