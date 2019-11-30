@@ -37,6 +37,24 @@ extension Binding {
     }
 }
 
+extension Binding where Value == Bool {
+    public static func && (lhs: Binding, rhs: Bool) -> Binding {
+        .init(
+            get: { lhs.wrappedValue && rhs },
+            set: { lhs.wrappedValue = $0 }
+        )
+    }
+}
+
+extension Binding where Value == Bool? {
+    public static func && (lhs: Binding, rhs: Bool) -> Binding {
+        .init(
+            get: { lhs.wrappedValue.map({ $0 && rhs }) },
+            set: { lhs.wrappedValue = $0 }
+        )
+    }
+}
+
 extension Binding where Value == String {
     public func prefix(_ count: Int) -> Self {
         .init(
@@ -44,7 +62,7 @@ extension Binding where Value == String {
             set: {
                 self.wrappedValue = $0
                 self.wrappedValue = .init($0.prefix(count))
-            }
+        }
         )
     }
     
@@ -54,7 +72,7 @@ extension Binding where Value == String {
             set: {
                 self.wrappedValue = $0
                 self.wrappedValue = .init($0.suffix(count))
-            }
+        }
         )
     }
 }
