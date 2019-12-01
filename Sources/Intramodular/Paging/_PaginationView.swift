@@ -153,7 +153,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         result.dataSource = context.coordinator
         result.delegate = context.coordinator
-
+        
         progressionController = _ProgressionController(base: result)
         
         return result
