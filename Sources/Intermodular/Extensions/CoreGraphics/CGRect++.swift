@@ -13,7 +13,7 @@ extension CGRect {
     public var maximumDimensionLength: CGFloat {
         max(width, height)
     }
-
+    
     public func inflate(by factor: CGFloat) -> CGRect {
         let x = origin.x
         let y = origin.y

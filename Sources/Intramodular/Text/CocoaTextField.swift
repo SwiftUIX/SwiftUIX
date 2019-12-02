@@ -19,10 +19,8 @@ public struct CocoaTextField<Label: View>: View {
     private var kerning: CGFloat?
     
     public var body: some View {
-        return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            if text.wrappedValue.isEmpty {
-                label
-            }
+        return ZStack {
+            label.opacity(text.wrappedValue.isEmpty ? 1.0 : 0.0)
             
             _CocoaTextField(
                 text: text,
@@ -58,6 +56,8 @@ public struct _CocoaTextField: UIViewRepresentable {
     var font: UIFont?
     var placeholder: String?
     var kerning: CGFloat?
+    
+    @Environment(\.multilineTextAlignment) var multilineTextAlignment
     
     init(
         text: Binding<String>,
@@ -95,7 +95,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var isFirstResponder: Bool = false
     
     public func makeUIView(context: Context) -> UIViewType {
-        let textField = UITextField(frame: .zero)
+        let textField = _UITextField()
         
         textField.delegate = context.coordinator
         textField.configure(for: self)
@@ -127,6 +127,18 @@ extension CocoaTextField where Label == Text {
         self.onCommit = onCommit
     }
     
+    public init(
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { },
+        @ViewBuilder label: () -> Text
+    ) {
+        self.label = label()
+        self.text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+    
     public func kerning(_ kerning: CGFloat) -> Self {
         then {
             $0.kerning = kerning
@@ -147,6 +159,7 @@ extension UITextField {
         
         placeholder = textField.placeholder
         text = textField.text
+        textAlignment = .init(textField.multilineTextAlignment)
     }
 }
 
