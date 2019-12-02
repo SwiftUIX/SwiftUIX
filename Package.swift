@@ -14,7 +14,11 @@ let package = Package(
         .library(name: "SwiftUIX", targets: ["SwiftUIX"])
     ],
     targets: [
-        .target(name: "SwiftUIX", dependencies: [], path: "Sources"),
+        .target(
+            name: "SwiftUIX",
+            dependencies: [],
+            path: "Sources"
+        ),
     ],
     swiftLanguageVersions: [
         .version("5.1")
