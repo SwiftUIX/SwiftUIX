@@ -9,7 +9,7 @@ import SwiftUI
 /// A control which presents content when triggered.
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
-public struct PresentationLink<Destination: View, Label: View>: View {
+public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     enum PresentationMechanism {
         case system
         case patch
@@ -31,12 +31,19 @@ public struct PresentationLink<Destination: View, Label: View>: View {
     
     public init(
         destination: Destination,
-        onDismiss: (() -> ())? = nil,
+        onDismiss: (() -> ())?,
         @ViewBuilder label: () -> Label
     ) {
         self.destination = destination
         self.label = label()
         self.onDismiss = onDismiss
+    }
+    
+    public init(
+        destination: Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(destination: destination, onDismiss: nil, label: label)
     }
     
     public var body: some View {
