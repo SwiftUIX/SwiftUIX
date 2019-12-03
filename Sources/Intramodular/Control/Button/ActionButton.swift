@@ -5,8 +5,12 @@
 import Swift
 import SwiftUI
 
+public protocol opaque_ActionButton: opaque_ActionTriggerView {
+    
+}
+
 /// A button whose primary action can be modified even after construction.
-public struct ActionButton<Label: View>: View, ActionTriggerView {
+public struct ActionButton<Label: View>: opaque_ActionButton, ActionTriggerView {
     private let label: Label
     private var actionList: [() -> ()] = []
     
