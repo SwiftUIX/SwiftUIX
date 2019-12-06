@@ -11,6 +11,8 @@ private struct KeyboardAvoidingViewController<Content: View>: UIViewControllerRe
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             
+            view.backgroundColor = .clear
+            
             NotificationCenter.default.addObserver(
                 self,
                 selector: #selector(keyboardWillChangeFrame),
