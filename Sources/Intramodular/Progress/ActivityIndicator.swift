@@ -5,18 +5,26 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 /// A view that shows that a task is in progress.
 public struct ActivityIndicator {
+    public enum Style {
+        case medium
+        case large
+    }
+    
     private var isAnimated: Bool = true
+    private var style: Style?
     
     public init() {
         
     }
     
     public func animated(_ isAnimated: Bool) -> ActivityIndicator {
-        then { $0.isAnimated = isAnimated }
+        then({ $0.isAnimated = isAnimated })
+    }
+    
+    public func style(_ style: Style?) -> ActivityIndicator {
+        then({ $0.style = style })
     }
 }
 
@@ -34,6 +42,10 @@ extension ActivityIndicator: UIViewRepresentable {
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         isAnimated ? uiView.startAnimating() : uiView.stopAnimating()
+        
+        if let style = style {
+            uiView.style = .init(style)
+        }
     }
 }
 
@@ -61,5 +73,20 @@ extension ActivityIndicator: NSViewRepresentable {
 }
 
 #endif
+
+// MARK: - Helpers -
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension UIActivityIndicatorView.Style {
+    public init(_ style: ActivityIndicator.Style) {
+        switch style {
+            case .medium:
+                self = .medium
+            case .large:
+                self = .large
+        }
+    }
+}
 
 #endif
