@@ -19,15 +19,13 @@ public struct CircularProgressBar: View {
     
     public var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
+            ZStack {
                 Circle()
                     .stroke(lineWidth: self.lineWidth)
-                    .frame(width: geometry.size.minimumDimensionLength)
                     .opacity(0.3)
                 Circle()
                     .trim(from: 0, to: self.value)
                     .stroke(lineWidth: self.lineWidth)
-                    .frame(width: geometry.size.minimumDimensionLength)
                     .rotationEffect(.degrees(-90))
             }
         }

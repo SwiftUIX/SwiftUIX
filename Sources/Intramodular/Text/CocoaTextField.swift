@@ -17,6 +17,7 @@ public struct CocoaTextField<Label: View>: View {
     private var font: UIFont?
     private var placeholder: String?
     private var kerning: CGFloat?
+    private var keyboardType: UIKeyboardType = .default
     
     public var body: some View {
         return ZStack {
@@ -27,6 +28,7 @@ public struct CocoaTextField<Label: View>: View {
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
                 font: font,
+                keyboardType: keyboardType,
                 placeholder: placeholder,
                 kerning: kerning
             )
@@ -44,6 +46,10 @@ public struct CocoaTextField<Label: View>: View {
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
     }
+    
+    public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
+        then({ $0.keyboardType = keyboardType })
+    }
 }
 
 public struct _CocoaTextField: UIViewRepresentable {
@@ -54,6 +60,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
     var font: UIFont?
+    var keyboardType: UIKeyboardType
     var placeholder: String?
     var kerning: CGFloat?
     
@@ -64,6 +71,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
         onCommit: @escaping () -> Void = { },
         font: UIFont?,
+        keyboardType: UIKeyboardType,
         placeholder: String?,
         kerning: CGFloat?
     ) {
@@ -71,6 +79,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
         self.font = font
+        self.keyboardType = keyboardType
         self.placeholder = placeholder
         self.kerning = kerning
     }
@@ -157,6 +166,7 @@ extension UITextField {
             defaultTextAttributes.updateValue(kerning, forKey: .kern)
         }
         
+        keyboardType = textField.keyboardType
         placeholder = textField.placeholder
         text = textField.text
         textAlignment = .init(textField.multilineTextAlignment)
