@@ -11,13 +11,13 @@ import UIKit
 
 /// An object representing the keyboard.
 public final class Keyboard: ObservableObject {
-    public struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        public static var defaultValue: Keyboard {
-            Keyboard()
-        }
-    }
+    public static let main = Keyboard()
     
     @Published public var state: State = .default
+    
+    public var isShowing: Bool {
+        return state.height != 0
+    }
     
     private var subscription: AnyCancellable?
     
@@ -73,18 +73,6 @@ extension Keyboard {
                 self.keyboardFrame = nil
                 self.height = nil
             }
-        }
-    }
-}
-
-// MARK: - Helpers -
-
-extension EnvironmentValues {
-    public var keyboard: Keyboard {
-        get {
-            self[Keyboard.EnvironmentKey.self]
-        } set {
-            self[Keyboard.EnvironmentKey.self] = newValue
         }
     }
 }
