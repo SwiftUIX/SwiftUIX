@@ -16,7 +16,7 @@ public final class Keyboard: ObservableObject {
     @Published public var state: State = .default
     
     public var isShowing: Bool {
-        return state.height != 0
+        state.height.map({ $0 != 0 }) ?? false
     }
     
     private var subscription: AnyCancellable?
@@ -74,6 +74,48 @@ extension Keyboard {
                 self.height = nil
             }
         }
+    }
+}
+
+// MARK: - Helpers -
+
+struct HiddenIfKeyboardActive: ViewModifier {
+    @ObservedObject var keyboard: Keyboard
+    
+    init() {
+        keyboard = .main
+    }
+    
+    func body(content: Content) -> some View {
+        content.hidden(keyboard.isShowing)
+    }
+}
+
+struct RemoveIfKeyboardActive: ViewModifier {
+    @ObservedObject var keyboard: Keyboard
+    
+    init() {
+        keyboard = .main
+    }
+    
+    func body(content: Content) -> some View {
+        Group {
+            if keyboard.isShowing {
+                EmptyView()
+            } else {
+                content
+            }
+        }
+    }
+}
+
+extension View {
+    public func hiddenIfKeyboardActive() -> some View {
+        modifier(HiddenIfKeyboardActive())
+    }
+    
+    public func removeIfKeyboardActive() -> some View {
+        modifier(RemoveIfKeyboardActive())
     }
 }
 
