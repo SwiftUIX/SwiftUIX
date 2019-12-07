@@ -101,8 +101,6 @@ public struct _CocoaTextField: UIViewRepresentable {
         }
     }
     
-    var isFirstResponder: Bool = false
-    
     public func makeUIView(context: Context) -> UIViewType {
         let textField = _UITextField()
         

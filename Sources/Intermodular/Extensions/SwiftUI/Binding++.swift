@@ -56,7 +56,7 @@ extension Binding where Value == Bool? {
 }
 
 extension Binding where Value == String {
-    public func prefix(_ count: Int) -> Self {
+    public func takePrefix(_ count: Int) -> Self {
         .init(
             get: { self.wrappedValue },
             set: {
@@ -66,7 +66,7 @@ extension Binding where Value == String {
         )
     }
     
-    public func suffix(_ count: Int) -> Self {
+    public func takeSuffix(_ count: Int) -> Self {
         .init(
             get: { self.wrappedValue },
             set: {
