@@ -26,6 +26,18 @@ extension Image {
     }
 }
 
+extension Image {
+    public func resizable(_ resizable: Bool) -> some View {
+        Group {
+            if resizable {
+                self.resizable()
+            } else {
+                self
+            }
+        }
+    }
+}
+
 #if os(macOS)
 
 extension Image {
