@@ -39,6 +39,18 @@ public struct AdaptableTextField<Placeholder: View>: View {
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
+    
+    public init(
+        text: Binding<String?>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { },
+        @ViewBuilder placeholder: () -> Placeholder
+    ) {
+        self.placeholder = placeholder()
+        self._text = text.withDefaultValue("")
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
 }
 
 extension AdaptableTextField where Placeholder == Text {
