@@ -99,6 +99,14 @@ public struct _CocoaTextField: UIViewRepresentable {
             base.onEditingChanged(false)
             base.onCommit()
         }
+        
+        public func textField(
+            _ textField: UITextField,
+            shouldChangeCharactersIn range: NSRange,
+            replacementString string: String
+        ) -> Bool {
+            return true
+        }
     }
     
     public func makeUIView(context: Context) -> UIViewType {
