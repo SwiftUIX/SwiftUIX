@@ -35,4 +35,20 @@ extension Angle {
     public init(radians: Int) {
         self.init(radians: Double(radians))
     }
+    
+    public static func degrees(_ value: CGFloat) -> Angle {
+        return .init(degrees: value)
+    }
+    
+    public static func degrees(_ value: Int) -> Angle {
+        return .init(degrees: value)
+    }
+    
+    public static func radians(_ value: CGFloat) -> Angle {
+        return .init(radians: value)
+    }
+    
+    public static func radians(_ value: Int) -> Angle {
+        return .init(radians: value)
+    }
 }
