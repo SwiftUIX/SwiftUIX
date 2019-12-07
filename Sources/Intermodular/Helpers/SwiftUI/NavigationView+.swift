@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 struct NavigationBarHider: ViewModifier {
     @DelayedState private var isHidden: Bool = false
     
@@ -27,3 +29,5 @@ extension View {
         modifier(NavigationBarHider())
     }
 }
+
+#endif
