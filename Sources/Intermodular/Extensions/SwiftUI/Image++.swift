@@ -6,6 +6,11 @@ import Swift
 import SwiftUI
 
 extension Image {
+    public enum Encoding {
+        case png
+        case jpeg(compressionQuality: CGFloat)
+    }
+    
     /// Initializes and returns the image with the specified data.
     public init?(data: Data) {
         #if os(macOS)
