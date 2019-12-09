@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CocoaTextField<Label: View>: View {
+public struct CocoaTextField<Label: View>: CocoaView {
     private var label: Label
     
     private var text: Binding<String>
@@ -105,14 +105,10 @@ public struct _CocoaTextField: UIViewRepresentable {
         uiView.configure(for: self)
         
         if let isFirstResponder = isFirstResponder, uiView.window != nil {
-            if isFirstResponder {
-                if !uiView.isFirstResponder {
-                    uiView.becomeFirstResponder()
-                }
-            } else {
-                if uiView.isFirstResponder {
-                    uiView.resignFirstResponder()
-                }
+            if isFirstResponder && !uiView.isFirstResponder {
+                uiView.becomeFirstResponder()
+            } else if uiView.isFirstResponder {
+                uiView.resignFirstResponder()
             }
         }
     }
