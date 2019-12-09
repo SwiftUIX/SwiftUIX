@@ -14,7 +14,17 @@ public protocol ActionLabelView: View {
 // MARK: - Extensions -
 
 extension ActionLabelView {
-    public init(toggle boolean: Binding<Bool>, @ViewBuilder label: () -> Label) {
+    public init(
+        dismiss presentation: Binding<PresentationMode>,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(action: { presentation.wrappedValue.dismiss() }, label: label)
+    }
+    
+    public init(
+        toggle boolean: Binding<Bool>,
+        @ViewBuilder label: () -> Label
+    ) {
         self.init(action: { boolean.wrappedValue.toggle() }, label: label)
     }
 }
