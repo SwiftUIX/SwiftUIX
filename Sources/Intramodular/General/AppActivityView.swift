@@ -7,11 +7,15 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct ActivityServiceView: UIViewControllerRepresentable {
+public struct AppActivityView: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIActivityViewController
     
     private var activityItems: [Any]
     private var excludedActivityTypes: [UIActivity.ActivityType] = []
+    
+    public init(activityItems: [Any]) {
+        self.activityItems = activityItems
+    }
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(activityItems: activityItems, applicationActivities: nil)
