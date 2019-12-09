@@ -168,7 +168,9 @@ extension CocoaTextField {
     public func isFirstResponder(_ isFirstResponder: Bool) -> Self {
         then({ $0.isFirstResponder = isFirstResponder })
     }
-    
+}
+
+extension CocoaTextField {
     public func autocapitalization(_ autocapitalization: UITextAutocapitalizationType) -> Self {
         then({ $0.autocapitalization = autocapitalization })
     }
