@@ -9,8 +9,8 @@ import SwiftUI
 import UIKit
 
 /// A view that paginates its children along a given axis.
-public struct PaginationView<Content: View>: View {
-    private let children: [UIHostingController<Content>]
+public struct PaginationView<Page: View>: View {
+    private let children: [UIHostingController<Page>]
     private let axis: Axis
     private let pageIndicatorAlignment: Alignment
     
@@ -18,7 +18,7 @@ public struct PaginationView<Content: View>: View {
     @DelayedState private var progressionController: ProgressionController?
     
     public init(
-        _ pages: [Content],
+        pages: [Page],
         axis: Axis = .horizontal,
         pageIndicatorAlignment: Alignment? = nil
     ) {
@@ -31,6 +31,18 @@ public struct PaginationView<Content: View>: View {
             case .vertical:
                 self.pageIndicatorAlignment = .leading
         }
+    }
+    
+    public init(
+        axis: Axis = .horizontal,
+        pageIndicatorAlignment: Alignment? = nil,
+        @ArrayBuilder<Page> content: () -> [Page]
+    ) {
+        self.init(
+            pages: content(),
+            axis: axis,
+            pageIndicatorAlignment: pageIndicatorAlignment
+        )
     }
     
     public var body: some View {
