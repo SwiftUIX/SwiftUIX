@@ -11,18 +11,17 @@ import SwiftUI
 public struct TextView<Label: View>: View {
     private let label: Label
     
-    private var text: Binding<String>
+    @Binding private var text: String
+    
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
     
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            if text.wrappedValue.isEmpty {
-                label
-            }
+            label.hidden(text.isEmpty)
             
             _TextView(
-                text: text,
+                text: $text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit
             )
@@ -31,7 +30,8 @@ public struct TextView<Label: View>: View {
 }
 
 fileprivate struct _TextView {
-    var text: Binding<String>
+    @Binding var text: String
+    
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
     
@@ -40,7 +40,7 @@ fileprivate struct _TextView {
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
         onCommit: @escaping () -> Void = { }
     ) {
-        self.text = text
+        self._text = text
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
@@ -56,7 +56,7 @@ extension TextView where Label == Text {
         onCommit: @escaping () -> Void = { }
     ) {
         self.label = Text(title).foregroundColor(.placeholderText)
-        self.text = text
+        self._text = text
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
@@ -83,7 +83,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            view.text.wrappedValue = textView.text
+            view.text = textView.text
             
             view.onEditingChanged(true)
         }
@@ -103,7 +103,7 @@ extension _TextView: UIViewRepresentable {
         
         view.backgroundColor = nil
         view.isSelectable = true
-        view.text = text.wrappedValue
+        view.text = text
         
         if let font = context.environment.font {
             view.font = font.toUIFont()
@@ -122,7 +122,7 @@ extension _TextView: UIViewRepresentable {
             textView.font = font.toUIFont()
         }
         
-        textView.text = text.wrappedValue
+        textView.text = text
     }
 }
 
