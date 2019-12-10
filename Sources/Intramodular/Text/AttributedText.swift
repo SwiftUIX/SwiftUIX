@@ -27,23 +27,29 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     }
     
     public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
-        AppKitOrUIKitViewType().then {
-            $0.attributedText = content
-        }
+        AppKitOrUIKitViewType().then({ $0.configure(with: self) })
     }
     
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-        view.attributedText = content
-        view.minimumScaleFactor = minimumScaleFactor
-        view.numberOfLines = lineLimit ?? 0
+        view.configure(with: self)
+    }
+}
+
+// MARK: - Helpers -
+
+extension AppKitOrUIKitLabel {
+    func configure(with attributedText: AttributedText) {
+        self.attributedText = attributedText.content
+        self.minimumScaleFactor = attributedText.minimumScaleFactor
+        self.numberOfLines = attributedText.lineLimit ?? 0
         
-        #if os(iOS)
-        view.allowsDefaultTighteningForTruncation = allowsTightening
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
         #endif
         
         #if os(macOS)
-        view.setAccessibilityEnabled(accessibilityEnabled)
-        view.userInterfaceLayoutDirection = .init(layoutDirection)
+        self.setAccessibilityEnabled(attributedText.accessibilityEnabled)
+        self.userInterfaceLayoutDirection = .init(attributedText.layoutDirection)
         #endif
     }
 }
