@@ -22,6 +22,11 @@ extension View {
 }
 
 extension View {
+    @inlinable
+    public func backgroundColor(_ color: Color) -> some View {
+        background(color)
+    }
+    
     public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
         background(EmptyView().preference(key: K.self, value: value))
     }
