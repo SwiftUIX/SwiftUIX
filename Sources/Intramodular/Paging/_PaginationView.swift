@@ -118,9 +118,7 @@ extension _PaginationView: UIViewControllerRepresentable {
                 parent
                     .children
                     .firstIndex(of: controller)
-                    .map({
-                        parent.currentPageIndex = $0
-                    })
+                    .map({ parent.currentPageIndex = $0 })
             }
         }
     }
