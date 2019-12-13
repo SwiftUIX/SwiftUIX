@@ -29,7 +29,9 @@ public final class Keyboard: ObservableObject {
     }
     
     public class func dismiss() {
-        UIApplication.shared.firstKeyWindow?.endEditing(true)
+        if Keyboard.main.isShowing {
+            UIApplication.shared.firstKeyWindow?.endEditing(true)
+        }
     }
 }
 
