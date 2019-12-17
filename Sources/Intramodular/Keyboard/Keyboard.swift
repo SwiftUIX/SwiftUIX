@@ -28,6 +28,12 @@ public final class Keyboard: ObservableObject {
             .assign(to: \.state, on: self)
     }
     
+    public func dismiss() {
+        if isShowing {
+            UIApplication.shared.firstKeyWindow?.endEditing(true)
+        }
+    }
+    
     public class func dismiss() {
         if Keyboard.main.isShowing {
             UIApplication.shared.firstKeyWindow?.endEditing(true)
@@ -93,6 +99,18 @@ struct HiddenIfKeyboardActive: ViewModifier {
     }
 }
 
+struct VisibleIfKeyboardActive: ViewModifier {
+    @ObservedObject var keyboard: Keyboard
+    
+    init() {
+        keyboard = .main
+    }
+    
+    func body(content: Content) -> some View {
+        content.hidden(!keyboard.isShowing)
+    }
+}
+
 struct RemoveIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard
     
@@ -111,13 +129,39 @@ struct RemoveIfKeyboardActive: ViewModifier {
     }
 }
 
+struct AddIfKeyboardActive: ViewModifier {
+    @ObservedObject var keyboard: Keyboard
+    
+    init() {
+        keyboard = .main
+    }
+    
+    func body(content: Content) -> some View {
+        Group {
+            if keyboard.isShowing {
+                content
+            } else {
+                EmptyView()
+            }
+        }
+    }
+}
+
 extension View {
     public func hiddenIfKeyboardActive() -> some View {
         modifier(HiddenIfKeyboardActive())
     }
     
+    public func visibleIfKeyboardActive() -> some View {
+        modifier(VisibleIfKeyboardActive())
+    }
+
     public func removeIfKeyboardActive() -> some View {
         modifier(RemoveIfKeyboardActive())
+    }
+    
+    public func addIfKeyboardActive() -> some View {
+        modifier(AddIfKeyboardActive())
     }
 }
 

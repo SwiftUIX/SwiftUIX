@@ -37,6 +37,15 @@ extension Binding {
     }
 }
 
+extension Binding {
+    public func isNotNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
+        .init(
+            get: { self.wrappedValue != nil },
+            set: { isNotNil in self.wrappedValue = isNotNil ? self.wrappedValue : nil  }
+        )
+    }
+}
+
 extension Binding where Value == Bool {
     public static func && (lhs: Binding, rhs: Bool) -> Binding {
         .init(
