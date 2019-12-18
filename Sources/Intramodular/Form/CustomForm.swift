@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-public struct AdaptableForm<Content: View>: View {
+public struct CustomForm<Content: View>: View {
     public let content: Content
     
     public init(@ViewBuilder content: () -> Content) {

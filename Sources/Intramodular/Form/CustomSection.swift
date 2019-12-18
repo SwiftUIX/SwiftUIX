@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-public struct AdaptableSection<Parent: View, Footer: View, Content: View>: View {
+public struct CustomSection<Parent: View, Footer: View, Content: View>: View {
     private let header: Parent
     private let footer: Footer
     private let content: Content
@@ -34,7 +34,7 @@ public struct AdaptableSection<Parent: View, Footer: View, Content: View>: View 
     }
 }
 
-extension AdaptableSection where Footer == EmptyView {
+extension CustomSection where Footer == EmptyView {
     public init(
         header: Parent,
         @ViewBuilder content: () -> Content

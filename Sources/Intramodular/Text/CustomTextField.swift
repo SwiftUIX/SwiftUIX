@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public struct AdaptableTextField<Placeholder: View>: View {
+public struct CustomTextField<Placeholder: View>: View {
     private let placeholder: Placeholder
     
     private let onEditingChanged: (Bool) -> ()
@@ -53,7 +53,7 @@ public struct AdaptableTextField<Placeholder: View>: View {
     }
 }
 
-extension AdaptableTextField where Placeholder == Text {
+extension CustomTextField where Placeholder == Text {
     public init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,
