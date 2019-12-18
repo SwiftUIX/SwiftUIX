@@ -22,8 +22,8 @@ public struct CustomTabView<SelectionValue: Hashable, Content: View>: View {
     }
 }
 
+@available(watchOS, unavailable)
 extension CustomTabView where SelectionValue == Int {
-    @available(watchOS, unavailable)
     public init(@ViewBuilder content: () -> Content) {
         _tabView = .init(content: content)
     }

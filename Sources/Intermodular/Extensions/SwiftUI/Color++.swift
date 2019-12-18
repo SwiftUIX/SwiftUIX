@@ -5,6 +5,17 @@
 import Swift
 import SwiftUI
 
+extension Color {
+    /// A color for placeholder text in controls or text fields or text views.
+    public static var placeholderText: Color {
+        #if os(iOS) || os(macOS) || os(tvOS)
+        return .init(.placeholderText)
+        #else
+        return .gray // FIXME
+        #endif
+    }
+}
+
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension Color {
@@ -46,13 +57,6 @@ extension Color {
     
     public static var systemGray: Color {
         return .init(.systemGray)
-    }
-}
-
-extension Color {
-    /// A color for placeholder text in controls or text fields or text views.
-    public static var placeholderText: Color {
-        return .init(.placeholderText)
     }
 }
 

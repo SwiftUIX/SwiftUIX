@@ -18,14 +18,6 @@ public struct ActivityIndicator {
     public init() {
         
     }
-    
-    public func animated(_ isAnimated: Bool) -> ActivityIndicator {
-        then({ $0.isAnimated = isAnimated })
-    }
-    
-    public func style(_ style: Style?) -> ActivityIndicator {
-        then({ $0.style = style })
-    }
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -46,6 +38,14 @@ extension ActivityIndicator: UIViewRepresentable {
         if let style = style {
             uiView.style = .init(style)
         }
+    }
+    
+    public func animated(_ isAnimated: Bool) -> ActivityIndicator {
+        then({ $0.isAnimated = isAnimated })
+    }
+    
+    public func style(_ style: Style?) -> ActivityIndicator {
+        then({ $0.style = style })
     }
 }
 

@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 struct Flip3DGeometryEffect: GeometryEffect {
     var animatableData: Double {
         get {
@@ -19,16 +21,18 @@ struct Flip3DGeometryEffect: GeometryEffect {
     func effectValue(size: CGSize) -> ProjectionTransform {
         let a = CGFloat(Angle(degrees: angle).radians)
         
-        var transform = CATransform3DIdentity;
+        var transform = CATransform3DIdentity
         transform.m34 = -0.0005
         
-        transform = CATransform3DTranslate(transform, size.width/2, 0, 0)
+        transform = CATransform3DTranslate(transform, size.width / 2, 0, 0)
         transform = CATransform3DRotate(transform, a, 0, 1, 0)
-        transform = CATransform3DTranslate(transform, -size.width/2, 0, 0)
+        transform = CATransform3DTranslate(transform, -size.width / 2, 0, 0)
         
         return ProjectionTransform(transform)
     }
 }
+
+#endif
 
 struct Flip3D<Reverse: View>: ViewModifier {
     @Binding private var isFlipped: Bool
