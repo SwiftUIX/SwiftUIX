@@ -12,7 +12,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<AnyView> {
         let coordinator = CocoaPresentationCoordinator()
         
         super.init(
-            rootView: CocoaPresentationSupport(coordinator: coordinator) {
+            rootView: _CocoaPresentationView(coordinator: coordinator) {
                 rootView
             }.eraseToAnyView()
         )

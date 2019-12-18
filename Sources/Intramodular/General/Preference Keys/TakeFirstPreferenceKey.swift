@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public struct TakeFirstPreferenceKey<T>: PreferenceKey {
+open class TakeFirstPreferenceKey<T>: PreferenceKey {
     public typealias Value = T?
     
     public static var defaultValue: Value {

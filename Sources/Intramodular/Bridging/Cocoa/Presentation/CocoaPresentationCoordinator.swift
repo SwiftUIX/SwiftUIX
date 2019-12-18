@@ -43,7 +43,7 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         let coordinator = CocoaPresentationCoordinator(sheet: sheet, presentingCoordinator: self)
         
         let rootView =
-            CocoaPresentationSupport(coordinator: coordinator) {
+            _CocoaPresentationView(coordinator: coordinator) {
                 sheet.content()
         }
         

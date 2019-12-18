@@ -7,6 +7,10 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+final class CocoaPresentationPreferenceKey: TakeFirstPreferenceKey<CocoaPresentation> {
+    
+}
+
 private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     @Binding var isPresented: Bool
     

@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-struct CocoaPresentationSupport<Content: View>: View  {
+struct _CocoaPresentationView<Content: View>: View  {
     private let coordinator: CocoaPresentationCoordinator
     private let content: () -> Content
     
