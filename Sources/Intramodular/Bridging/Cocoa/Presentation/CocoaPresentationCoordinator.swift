@@ -8,7 +8,9 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDelegate {
-    private var sheet: CocoaPresentation?
+    private var presentation: CocoaPresentation?
+    private var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    
     private weak var presentingCoordinator: CocoaPresentationCoordinator?
     
     var onDidAttemptToDismiss: [CocoaPresentationDidAttemptToDismissCallback] = []
@@ -22,35 +24,39 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
     var presentedCoordinator: CocoaPresentationCoordinator?
     
     override init() {
-        self.sheet = nil
+        self.presentation = nil
         self.presentingCoordinator = nil
     }
     
-    init(sheet: CocoaPresentation? = nil, presentingCoordinator: CocoaPresentationCoordinator? = nil) {
-        self.sheet = sheet
+    init(
+        presentation: CocoaPresentation? = nil,
+        presentingCoordinator: CocoaPresentationCoordinator? = nil
+    ) {
+        self.presentation = presentation
         self.presentingCoordinator = presentingCoordinator
     }
     
-    func present(sheet: CocoaPresentation) {
-        if let presentedSheet = presentedCoordinator?.sheet {
-            if presentedSheet.shouldDismiss() {
-                presentedCoordinator?.dismiss()
-            } else {
+    func present(presentation: CocoaPresentation) {
+        if let presentation = presentedCoordinator?.presentation {
+            guard presentation.shouldDismiss() else {
                 return
             }
+            
+            presentedCoordinator?.dismiss()
         }
         
-        let coordinator = CocoaPresentationCoordinator(sheet: sheet, presentingCoordinator: self)
+        let coordinator = CocoaPresentationCoordinator(presentation: presentation, presentingCoordinator: self)
         
         let rootView =
             _CocoaPresentationView(coordinator: coordinator) {
-                sheet.content()
+                presentation.content()
         }
         
         let viewController = UIHostingController(rootView: rootView)
         
-        viewController.modalPresentationStyle = .init(sheet.presentationStyle)
+        viewController.modalPresentationStyle = .init(presentation.presentationStyle)
         viewController.view.backgroundColor = .clear
+        viewController.transitioningDelegate = presentation.presentationStyle.transitioningDelegate
         
         coordinator.viewController = viewController
         
@@ -60,7 +66,7 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
     }
     
     func dismissPresentedSheet() {
-        guard let presentedCoordinator = presentedCoordinator, let sheet = presentedCoordinator.sheet else {
+        guard let presentedCoordinator = presentedCoordinator, let presentation = presentedCoordinator.presentation else {
             return
         }
         
@@ -71,11 +77,11 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         
         self.presentedCoordinator = nil
         
-        if !sheet.shouldDismiss() {
-            sheet.resetBinding()
+        if !presentation.shouldDismiss() {
+            presentation.resetBinding()
         }
         
-        sheet.onDismiss?()
+        presentation.onDismiss?()
     }
     
     func dismiss() {

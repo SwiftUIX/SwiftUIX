@@ -15,6 +15,18 @@ public enum ModalViewPresentationStyle {
     case popover
     case automatic
     case none
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    case custom(UIViewControllerTransitioningDelegate)
+    
+    public var transitioningDelegate: UIViewControllerTransitioningDelegate? {
+        if case let .custom(delegate) = self {
+            return delegate
+        } else {
+            return nil
+        }
+    }
+    #endif
 }
 
 // MARK: - Helpers-
@@ -40,6 +52,8 @@ extension UIModalPresentationStyle {
                 self = .automatic
             case .none:
                 self = .none
+            case .custom:
+                self = .custom
         }
     }
 }

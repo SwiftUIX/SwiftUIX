@@ -26,9 +26,9 @@ struct _CocoaPresentationView<Content: View>: View  {
     var body: some View {
         content()
             .environment(\.presentationManager, $presentationMode)
-            .onPreferenceChange(CocoaPresentationPreferenceKey.self) { sheet in
-                if let sheet = sheet {
-                    self.coordinator.present(sheet: sheet)
+            .onPreferenceChange(CocoaPresentationPreferenceKey.self) { presentation in
+                if let presentation = presentation {
+                    self.coordinator.present(presentation: presentation)
                 } else {
                     self.coordinator.dismissPresentedSheet()
                 }
