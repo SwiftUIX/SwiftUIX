@@ -29,7 +29,7 @@ public struct ActionButton<Label: View>: opaque_ActionButton, ActionTriggerView 
         actionList.forEach({ $0() })
     }
     
-    public func onPrimaryAction(_ action: @escaping () -> ()) -> ActionButton {
+    public func onPrimaryTrigger(perform action: @escaping () -> ()) -> ActionButton {
         then {
             $0.actionList.append(action)
         }

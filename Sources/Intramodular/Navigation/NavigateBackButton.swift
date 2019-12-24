@@ -22,3 +22,9 @@ public struct NavigateBackButton<Label: View>: View {
         DismissPresentationButton(action: onDismiss, label: { label })
     }
 }
+
+extension NavigateBackButton: ActionTriggerView {
+    public func onPrimaryTrigger(perform action: @escaping () -> ()) -> Self {
+        .init(onDismiss: { action(); return self.onDismiss() }, label: { label })
+    }
+}

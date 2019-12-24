@@ -20,7 +20,7 @@ extension View {
         Group {
             if self is opaque_ActionButton {
                 (self as! opaque_ActionButton)
-                    .onPrimaryAction(action)
+                    .onPrimaryTrigger(perform: action)
                     .eraseToAnyView()
             } else {
                 buttonStyle(AddActionPrimitiveButtonStlye(action: action))

@@ -32,7 +32,7 @@ public struct AnyCancellableButton<Label: View>: View {
 }
 
 extension AnyCancellableButton: ActionTriggerView {
-    public func onPrimaryAction(_ body: @escaping () -> ()) -> Self {
-        .init(action: { body(); return self.action() }, label: { label })
+    public func onPrimaryTrigger(perform action: @escaping () -> ()) -> Self {
+        .init(action: { action(); return self.action() }, label: { label })
     }
 }
