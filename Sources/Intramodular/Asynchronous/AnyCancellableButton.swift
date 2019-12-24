@@ -30,3 +30,9 @@ public struct AnyCancellableButton<Label: View>: View {
         cancellable = action()
     }
 }
+
+extension AnyCancellableButton: ActionTriggerView {
+    public func onPrimaryAction(_ body: @escaping () -> ()) -> Self {
+        .init(action: { body(); return self.action() }, label: { label })
+    }
+}

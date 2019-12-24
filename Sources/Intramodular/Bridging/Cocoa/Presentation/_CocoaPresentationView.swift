@@ -32,7 +32,8 @@ struct _CocoaPresentationView<Content: View>: View  {
                 } else {
                     self.coordinator.dismissPresentedSheet()
                 }
-        }.onPreferenceChange(CocoaPresentationDidAttemptToDismissCallbacksPreferenceKey.self) { value in
+        }
+        .onPreferenceChange(CocoaPresentationDidAttemptToDismissCallbacksPreferenceKey.self) { value in
             self.coordinator.onDidAttemptToDismiss = value
         }
         .onPreferenceChange(CocoaPresentationIsModalInPresentationPreferenceKey.self) { value in
