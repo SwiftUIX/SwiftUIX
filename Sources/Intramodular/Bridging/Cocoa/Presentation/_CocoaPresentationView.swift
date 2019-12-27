@@ -30,15 +30,15 @@ struct _CocoaPresentationView<Content: View>: View  {
                 if let presentation = presentation {
                     self.coordinator.present(presentation: presentation)
                 } else {
-                    self.coordinator.dismissPresentedSheet()
+                    self.coordinator.dismissPresentedView()
                 }
-        }
-        .onPreferenceChange(CocoaPresentationDidAttemptToDismissCallbacksPreferenceKey.self) { value in
-            self.coordinator.onDidAttemptToDismiss = value
-        }
-        .onPreferenceChange(CocoaPresentationIsModalInPresentationPreferenceKey.self) { value in
-            self.coordinator.viewController?.isModalInPresentation = value ?? false
-        }
+            }
+        .onPreferenceChange(CocoaPresentation.DidAttemptToDismissCallbacksPreferenceKey.self) { value in
+                self.coordinator.onDidAttemptToDismiss = value
+            }
+            .onPreferenceChange(CocoaPresentation.IsModalInPresentationPreferenceKey.self) { value in
+                self.coordinator.viewController?.isModalInPresentation = value ?? false
+            }
     }
 }
 

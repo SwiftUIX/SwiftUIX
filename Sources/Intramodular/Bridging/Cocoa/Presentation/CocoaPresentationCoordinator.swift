@@ -13,7 +13,7 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
     
     private weak var presentingCoordinator: CocoaPresentationCoordinator?
     
-    var onDidAttemptToDismiss: [CocoaPresentationDidAttemptToDismissCallback] = []
+    var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
     
     weak var viewController: UIViewController? {
         didSet {
@@ -65,7 +65,15 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         self.viewController?.present(viewController, animated: true)
     }
     
-    func dismissPresentedSheet() {
+    func dismiss() {
+        guard let presentingCoordinator = presentingCoordinator, presentingCoordinator.presentedCoordinator === self else {
+            return
+        }
+        
+        presentingCoordinator.dismissPresentedView()
+    }
+    
+    func dismissPresentedView() {
         guard let presentedCoordinator = presentedCoordinator, let presentation = presentedCoordinator.presentation else {
             return
         }
@@ -82,11 +90,6 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         }
         
         presentation.onDismiss?()
-    }
-    
-    func dismiss() {
-        guard let presentingCoordinator = presentingCoordinator, presentingCoordinator.presentedCoordinator === self else { return }
-        presentingCoordinator.dismissPresentedSheet()
     }
     
     func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {

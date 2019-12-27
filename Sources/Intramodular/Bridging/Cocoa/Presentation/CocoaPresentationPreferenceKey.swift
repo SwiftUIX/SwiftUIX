@@ -28,12 +28,11 @@ public struct CocoaPresentationLink<Destination: View, Label: View>: View {
     }
     
     public var body: some View {
-        Button(action: present, label: { label })
-            .cocoaPresentation(
-                isPresented: $isPresented,
-                onDismiss: dismiss,
-                presentationStyle: presentationStyle,
-                content: { self.destination }
+        Button(action: present, label: { label }).cocoaPresentation(
+            isPresented: $isPresented,
+            onDismiss: dismiss,
+            presentationStyle: presentationStyle,
+            content: { self.destination }
         )
     }
     
