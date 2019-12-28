@@ -56,7 +56,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 Button(action: present, label: { label }).cocoaPresentation(
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    presentationStyle: .page,
+                    presentationStyle: .automatic,
                     content: { self.destination }
                 )
             }

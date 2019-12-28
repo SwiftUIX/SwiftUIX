@@ -2,75 +2,40 @@
 // Copyright (c) Vatsal Manot
 //
 
-import SwiftUI
-
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-private struct KeyboardAvoidingViewController<Content: View>: UIViewControllerRepresentable {
-    class _UIHostingController: UIHostingController<Content> {
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
+import Combine
+import SwiftUI
+
+public struct KeyboardAvoiding: ViewModifier {
+    @State private var keyboardHeight: CGFloat = 0
+    
+    public var keyBoardHeightPublisher: Publishers.Merge<Publishers.CompactMap<NotificationCenter.Publisher, CGFloat>, Publishers.Map<NotificationCenter.Publisher, CGFloat>> {
+        Publishers.Merge(
+            NotificationCenter
+                .default
+                .publisher(for: UIResponder.keyboardWillShowNotification)
+                .compactMap({ $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect })
+                .map({ $0.height }),
             
-            view.backgroundColor = .clear
-            
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(keyboardWillChangeFrame),
-                name: UIResponder.keyboardWillChangeFrameNotification,
-                object: nil
-            )
-        }
-        
-        override func viewDidDisappear(_ animated: Bool) {
-            super.viewDidDisappear(animated)
-            
-            NotificationCenter.default.removeObserver(
-                self,
-                name: UIResponder.keyboardWillChangeFrameNotification,
-                object: nil
-            )
-        }
-        
-        @objc private func keyboardWillChangeFrame(_ notification: Notification) {
-            guard
-                isViewLoaded,
-                let window = view.window,
-                let userInfo = notification.userInfo,
-                let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
-                let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt,
-                let endFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-                else {
-                    return
-            }
-            
-            let endFrameInWindow = window.convert(endFrame, from: nil)
-            let endFrameInView = view.convert(endFrameInWindow, from: nil)
-            let endFrameIntersection = view.bounds.intersection(endFrameInView)
-            let keyboardHeight = view.bounds.maxY - endFrameIntersection.minY
-            
-            UIView.animate(withDuration: animationDuration, delay: 0, options: .init(rawValue: animationCurve << 16), animations: {
-                self.additionalSafeAreaInsets.bottom = keyboardHeight
-                self.view.layoutIfNeeded()
-            })
-        }
+            NotificationCenter
+                .default
+                .publisher(for: UIResponder.keyboardWillHideNotification)
+                .map({ _ in 0 })
+        )
     }
     
-    public typealias UIViewControllerType = _UIHostingController
-    
-    var rootView: Content
-    
-    func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(rootView: rootView)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.rootView = rootView
+    public func body(content: Content) -> some View {
+        content
+            .padding(.bottom, keyboardHeight)
+            .animation(Animation.spring(response: 0.4, dampingFraction: 0.9, blendDuration: 1.0))
+            .onReceive(keyBoardHeightPublisher, perform: { self.keyboardHeight = $0 })
     }
 }
 
 extension View {
     public func keyboardAvoiding() -> some View {
-        KeyboardAvoidingViewController(rootView: self)
+        modifier(KeyboardAvoiding())
     }
 }
 

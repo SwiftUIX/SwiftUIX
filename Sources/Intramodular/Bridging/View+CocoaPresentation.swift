@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-final class CocoaPresentationPreferenceKey: TakeFirstPreferenceKey<CocoaPresentation> {
+final class CocoaPresentationPreferenceKey: TakeLastPreferenceKey<CocoaPresentation> {
     
 }
 
@@ -22,7 +22,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
         .init(
             content: { AnyView(self.content()) },
             onDismiss: onDismiss,
-            shouldDismiss: { !self.isPresented },
+            shouldDismiss: { self.isPresented },
             resetBinding: { self.isPresented = false },
             presentationStyle: presentationStyle
         )
