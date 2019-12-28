@@ -25,10 +25,11 @@ struct _CocoaPresentationView<Content: View>: View  {
     
     var body: some View {
         content()
+            .environment(\.dynamicViewPresenter, coordinator)
             .environment(\.presentationManager, $presentationMode)
             .onPreferenceChange(CocoaPresentationPreferenceKey.self) { presentation in
                 if let presentation = presentation {
-                    self.coordinator.present(presentation: presentation)
+                    self.coordinator.present(presentation)
                 } else {
                     self.coordinator.dismissPresentedView()
                 }

@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDelegate {
+class CocoaPresentationCoordinator: NSObject {
     private var presentation: CocoaPresentation?
     private var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
@@ -36,14 +36,8 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         self.presentingCoordinator = presentingCoordinator
     }
     
-    func present(presentation: CocoaPresentation) {
-        if let presentation = presentedCoordinator?.presentation {
-            guard presentation.shouldDismiss() else {
-                return
-            }
-            
-            presentedCoordinator?.dismiss()
-        }
+    func present(_ presentation: CocoaPresentation) {
+        presentedCoordinator?.dismissSelf()
         
         let coordinator = CocoaPresentationCoordinator(presentation: presentation, presentingCoordinator: self)
         
@@ -65,7 +59,11 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         self.viewController?.present(viewController, animated: true)
     }
     
-    func dismiss() {
+    func dismissSelf() {
+        guard let presentation = presentation, presentation.shouldDismiss() else {
+            return
+        }
+        
         guard let presentingCoordinator = presentingCoordinator, presentingCoordinator.presentedCoordinator === self else {
             return
         }
@@ -78,10 +76,8 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
             return
         }
         
-        if let viewController = presentedCoordinator.viewController {
-            presentedCoordinator.viewController = nil
-            viewController.dismiss(animated: true)
-        }
+        presentedCoordinator.viewController?.dismiss(animated: true)
+        presentedCoordinator.viewController = nil
         
         self.presentedCoordinator = nil
         
@@ -91,17 +87,45 @@ class CocoaPresentationCoordinator: NSObject, UIAdaptivePresentationControllerDe
         
         presentation.onDismiss?()
     }
-    
+}
+
+// MARK: - Protocol Implementations -
+
+extension CocoaPresentationCoordinator: DynamicViewPresenter {
+    public func present<V: View>(
+        _ view: V,
+        onDismiss: (() -> Void)?,
+        presentationStyle: ModalViewPresentationStyle
+    ) {
+        present(CocoaPresentation(
+            content: { view.eraseToAnyView() },
+            onDismiss: onDismiss,
+            shouldDismiss: { true },
+            resetBinding: { },
+            presentationStyle: presentationStyle
+        ))
+    }
+}
+
+extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
         for callback in onDidAttemptToDismiss {
             callback.action()
         }
     }
     
+    func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
+        presentation?.shouldDismiss() ?? true
+    }
+    
+    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+        
+    }
+    
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        viewController = nil
-        dismiss()
+        dismissSelf()
     }
 }
 
 #endif
+
