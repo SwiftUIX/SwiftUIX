@@ -30,10 +30,9 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         content.background(
-            EmptyView()
-                .preference(
-                    key: CocoaPresentationPreferenceKey.self,
-                    value: isPresented ? sheet() : nil
+            EmptyView().preference(
+                key: CocoaPresentationPreferenceKey.self,
+                value: isPresented ? sheet() : nil
             )
         )
     }

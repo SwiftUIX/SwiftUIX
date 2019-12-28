@@ -12,11 +12,7 @@ import SwiftUI
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     enum PresentationMechanism {
         case system
-        case patch
-    }
-    
-    private var mechanism: PresentationMechanism {
-        isSheetPresented == nil ? .system : .patch
+        case custom
     }
     
     private let destination: Destination
@@ -25,9 +21,11 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     @State private var isPresented: Bool = false
     
-    @Environment(\.isSheetPresented) private var isSheetPresented
-    @Environment(\.onSheetPresentationDismiss) private var onSheetPresentationDismiss
-    @Environment(\.presentedSheetView) private var presentedSheetView
+    @Environment(\.dynamicViewPresenter) private var dynamicViewPresenter
+    
+    private var mechanism: PresentationMechanism {
+        (dynamicViewPresenter is CocoaPresentationCoordinator) ? .custom : .system
+    }
     
     public init(
         destination: Destination,
@@ -47,24 +45,25 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public var body: some View {
-        return Button(action: present, label: { label }).sheet(
-            isPresented: $isPresented,
-            onDismiss: { self.isPresented = false; self.onDismiss?() },
-            content: { self.destination }
-        )
+        Group {
+            if mechanism == .system {
+                Button(action: present, label: { label }).sheet(
+                    isPresented: $isPresented,
+                    onDismiss: { self.isPresented = false; self.onDismiss?() },
+                    content: { self.destination }
+                )
+            } else if mechanism == .custom {
+                Button(action: present, label: { label }).cocoaPresentation(
+                    isPresented: $isPresented,
+                    onDismiss: { self.isPresented = false; self.onDismiss?() },
+                    presentationStyle: .page,
+                    content: { self.destination }
+                )
+            }
+        }
     }
     
     private func present() {
-        switch mechanism {
-            case .system: do {
-                isPresented = true
-            }
-            
-            case .patch: do {
-                onSheetPresentationDismiss!.wrappedValue = onDismiss
-                presentedSheetView!.wrappedValue = .init(destination)
-                isSheetPresented!.wrappedValue = true
-            }
-        }
+        isPresented = true
     }
 }
