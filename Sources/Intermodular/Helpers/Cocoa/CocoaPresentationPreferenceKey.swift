@@ -8,20 +8,19 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaPresentationLink<Destination: View, Label: View>: View {
-    private let presentationStyle: ModalViewPresentationStyle
     private let destination: Destination
     private let label: Label
     private let onDismiss: (() -> ())?
     
+    private var presentationStyle: ModalViewPresentationStyle = .automatic
+    
     @State private var isPresented: Bool = false
     
     public init(
-        presentationStyle: ModalViewPresentationStyle,
         destination: Destination,
         onDismiss: (() -> ())? = nil,
         @ViewBuilder label: () -> Label
     ) {
-        self.presentationStyle = presentationStyle
         self.destination = destination
         self.label = label()
         self.onDismiss = onDismiss
@@ -44,6 +43,12 @@ public struct CocoaPresentationLink<Destination: View, Label: View>: View {
         isPresented = false
         
         onDismiss?()
+    }
+}
+
+extension CocoaPresentationLink {
+    public func presentationStyle(_ style: ModalViewPresentationStyle) -> Self {
+        then({ $0.presentationStyle = style })
     }
 }
 

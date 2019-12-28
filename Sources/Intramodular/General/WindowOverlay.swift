@@ -28,7 +28,7 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
                 return
             }
             
-            let contentWindow = UIHostingWindow(
+            let contentWindow = CocoaHostingView(
                 windowScene: windowScene,
                 rootView: content
             )
@@ -61,7 +61,7 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
         
         override fileprivate func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
-                        
+            
             setupContentWindowIfNecessary()
         }
     }
@@ -94,7 +94,10 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
 // MARK: - Helpers -
 
 extension View {
-    public func windowOverlay<Content: View>(isKeyAndVisible: Binding<Bool>, @ViewBuilder _ content: () -> Content) -> some View {
+    public func windowOverlay<Content: View>(
+        isKeyAndVisible: Binding<Bool>,
+        @ViewBuilder _ content: () -> Content
+    ) -> some View {
         WindowOverlay(rootView: self, content: content(), isKeyAndVisible: isKeyAndVisible)
     }
 }

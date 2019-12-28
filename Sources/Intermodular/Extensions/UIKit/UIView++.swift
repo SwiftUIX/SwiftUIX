@@ -26,6 +26,22 @@ extension UIView {
         
         subview.constrain(to: self)
     }
+    
+    func
+        constrainEdges(to guide: UILayoutGuide) {
+        if superview == nil {
+            guide.owningView?.addSubview(self)
+        }
+        
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+            trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            topAnchor.constraint(equalTo: guide.topAnchor),
+            bottomAnchor.constraint(equalTo: guide.bottomAnchor)
+        ])
+    }
 }
 
 extension UIView {

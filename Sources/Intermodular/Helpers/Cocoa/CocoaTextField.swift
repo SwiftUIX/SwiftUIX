@@ -18,6 +18,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     
     private var autocapitalization: UITextAutocapitalizationType?
     private var font: UIFont?
+    private var inputAccessoryView: AnyView?
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
@@ -36,6 +37,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 isFirstResponder: isFirstResponder,
                 autocapitalization: autocapitalization,
                 font: font,
+                inputAccessoryView: inputAccessoryView,
                 kerning: kerning,
                 keyboardType: keyboardType,
                 placeholder: placeholder,
@@ -53,10 +55,13 @@ public struct _CocoaTextField: UIViewRepresentable {
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
     
+    @Environment(\.font) var environmentFont
+    
     var isFirstResponder: Bool?
     
     var autocapitalization: UITextAutocapitalizationType?
     var font: UIFont?
+    var inputAccessoryView: AnyView?
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
@@ -95,14 +100,52 @@ public struct _CocoaTextField: UIViewRepresentable {
     public func makeUIView(context: Context) -> UIViewType {
         let uiView = _UITextField()
         
-        uiView.configure(for: self)
         uiView.delegate = context.coordinator
         
         return uiView
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.configure(for: self)
+        uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        
+        if let autocapitalization = autocapitalization {
+            uiView.autocapitalizationType = autocapitalization
+        }
+        
+        uiView.font = environmentFont?.toUIFont() ?? font
+        
+        if let kerning = kerning {
+            uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
+        }
+        
+        if let inputAccessoryView = inputAccessoryView {
+            if let _inputAccessoryView = uiView.inputAccessoryView as? UIHostingView<AnyView> {
+                _inputAccessoryView.rootView = inputAccessoryView
+            } else {
+                uiView.inputAccessoryView = UIHostingView(rootView: inputAccessoryView)
+                uiView.inputAccessoryView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            }
+        } else {
+            uiView.inputAccessoryView = nil
+        }
+        
+        uiView.keyboardType = keyboardType
+        
+        if let placeholder = placeholder {
+            uiView.attributedPlaceholder = NSAttributedString(
+                string: placeholder, attributes: [
+                    .paragraphStyle: NSMutableParagraphStyle().then {
+                        $0.alignment = .init(textAlignment)
+                    }
+                ]
+            )
+        } else {
+            uiView.attributedPlaceholder = nil
+            uiView.placeholder = nil
+        }
+        
+        uiView.text = text
+        uiView.textAlignment = .init(textAlignment)
         
         if let isFirstResponder = isFirstResponder, uiView.window != nil {
             if isFirstResponder && !uiView.isFirstResponder {
@@ -175,6 +218,14 @@ extension CocoaTextField {
         then({ $0.font = font })
     }
     
+    public func inputAccessoryView<InputAccessoryView: View>(_ view: InputAccessoryView) -> Self {
+        then({ $0.inputAccessoryView = .init(view) })
+    }
+    
+    public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
+        then({ $0.inputAccessoryView = .init(view()) })
+    }
+    
     public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
         then({ $0.keyboardType = keyboardType })
     }
@@ -194,42 +245,6 @@ extension CocoaTextField where Label == Text {
     
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.label = Text(placeholder).kerning(kerning) })
-    }
-}
-
-// MARK: - Helpers -
-
-extension UITextField {
-    public func configure(for textField: _CocoaTextField) {
-        setContentHuggingPriority(.defaultHigh, for: .vertical)
-        
-        if let autocapitalization = textField.autocapitalization {
-            autocapitalizationType = autocapitalization
-        }
-        
-        font = textField.font
-        
-        if let kerning = textField.kerning {
-            defaultTextAttributes.updateValue(kerning, forKey: .kern)
-        }
-        
-        keyboardType = textField.keyboardType
-        
-        if let placeholder = textField.placeholder {
-            attributedPlaceholder = NSAttributedString(
-                string: placeholder, attributes: [
-                    .paragraphStyle: NSMutableParagraphStyle().then {
-                        $0.alignment = .init(textField.textAlignment)
-                    }
-                ]
-            )
-        } else {
-            attributedPlaceholder = nil
-            placeholder = nil
-        }
-        
-        text = textField.text
-        textAlignment = .init(textField.textAlignment)
     }
 }
 

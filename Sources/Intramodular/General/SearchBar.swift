@@ -8,12 +8,14 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct SearchBar: UIViewRepresentable {
+    public typealias UIViewType = UISearchBar
+    
     @Binding fileprivate var text: String
     
     private let onEditingChanged: (Bool) -> ()
     private let onCommit: () -> ()
     
-    fileprivate var searchBarStyle: UISearchBar.Style = .default
+    private var searchBarStyle: UISearchBar.Style = .default
     
     public init(
         text: Binding<String>,
@@ -25,15 +27,24 @@ public struct SearchBar: UIViewRepresentable {
         self.onEditingChanged = onEditingChanged
     }
     
-    public func makeUIView(context: Context) -> UISearchBar {
-        UISearchBar(frame: .zero).then {
-            $0.configure(for: self)
-            $0.delegate = context.coordinator
-        }
+    public func makeUIView(context: Context) -> UIViewType {
+        let uiView = UIViewType()
+        
+        uiView.delegate = context.coordinator
+        
+        configureUIView(uiView, context: context)
+        
+        return uiView
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.configure(for: self)
+        configureUIView(uiView, context: context)
+    }
+
+    public func configureUIView(_ uiView: UIViewType, context: Context) {
+        uiView.searchBarStyle = searchBarStyle
+        uiView.text = text
+        uiView.tintColor = Color.accentColor.toUIColor()
     }
     
     public class Coordinator: NSObject, UISearchBarDelegate {
@@ -67,14 +78,6 @@ public struct SearchBar: UIViewRepresentable {
 extension SearchBar {
     public func searchBarStyle(_ searchBarStyle: UISearchBar.Style) -> Self {
         then { $0.searchBarStyle = searchBarStyle }
-    }
-}
-
-extension UISearchBar {
-    public func configure(for parent: SearchBar) {
-        searchBarStyle = parent.searchBarStyle
-        text = parent.text
-        tintColor = Color.accentColor.toUIColor()
     }
 }
 
