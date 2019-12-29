@@ -37,6 +37,12 @@ class CocoaPresentationCoordinator: NSObject {
     }
     
     func present(_ presentation: CocoaPresentation) {
+        if let viewController = viewController?.presentedViewController as? UIHostingController<_CocoaPresentationView<AnyView>> {
+            viewController.rootView = .init(coordinator: viewController.rootView.coordinator, content: presentation.content)
+            
+            return
+        }
+        
         presentedCoordinator?.dismissSelf()
         
         let coordinator = CocoaPresentationCoordinator(presentation: presentation, presentingCoordinator: self)
@@ -113,11 +119,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
             callback.action()
         }
     }
-    
-    func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
-        presentation?.shouldDismiss() ?? true
-    }
-    
+        
     func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         
     }

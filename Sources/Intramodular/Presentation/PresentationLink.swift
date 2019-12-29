@@ -24,7 +24,11 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @Environment(\.dynamicViewPresenter) private var dynamicViewPresenter
     
     private var mechanism: PresentationMechanism {
-        (dynamicViewPresenter is CocoaPresentationCoordinator) ? .custom : .system
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        return (dynamicViewPresenter is CocoaPresentationCoordinator) ? .custom : .system
+        #else
+        return .system
+        #endif
     }
     
     public init(
@@ -46,6 +50,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     public var body: some View {
         Group {
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
             if mechanism == .system {
                 Button(action: present, label: { label }).sheet(
                     isPresented: $isPresented,
@@ -60,6 +66,16 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     content: { self.destination }
                 )
             }
+            
+            #else
+            
+            Button(action: present, label: { label }).sheet(
+                isPresented: $isPresented,
+                onDismiss: { self.isPresented = false; self.onDismiss?() },
+                content: { self.destination }
+            )
+
+            #endif
         }
     }
     

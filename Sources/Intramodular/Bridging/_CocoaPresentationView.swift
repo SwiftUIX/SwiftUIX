@@ -8,8 +8,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct _CocoaPresentationView<Content: View>: View  {
-    private let coordinator: CocoaPresentationCoordinator
-    private let content: () -> Content
+    let coordinator: CocoaPresentationCoordinator
+    let content: () -> Content
     
     @State private var presentationMode: CocoaPresentationMode
     

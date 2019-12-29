@@ -7,7 +7,7 @@
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationManager) var presentationManager
     @Binding private var data: Data?
     
     private let encoding: Image.Encoding
@@ -51,11 +51,11 @@ public struct ImagePicker: UIViewControllerRepresentable {
         ) {
             base.data = (info[UIImagePickerController.InfoKey.editedImage] as! UIImage).data(using: base.encoding)
             
-            base.presentationMode.dismiss()
+            base.presentationManager.dismiss()
         }
         
         public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            base.presentationMode.dismiss()
+            base.presentationManager.dismiss()
         }
     }
     

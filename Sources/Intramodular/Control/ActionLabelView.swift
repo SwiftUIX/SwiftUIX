@@ -22,6 +22,13 @@ extension ActionLabelView {
     }
     
     public init(
+        dismiss presentation: PresentationManager,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(action: { presentation.dismiss() }, label: label)
+    }
+
+    public init(
         toggle boolean: Binding<Bool>,
         @ViewBuilder label: () -> Label
     ) {
