@@ -12,9 +12,9 @@ struct NavigationBarHider: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .navigationBarTitle("")
+            .navigationBarTitle(String())
             .navigationBarHidden(isHidden)
-            .onAppear { self.isHidden = true }
+            .onAppear(perform: { self.isHidden = true })
     }
 }
 
