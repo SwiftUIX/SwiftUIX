@@ -37,16 +37,18 @@ extension PageControl: UIViewRepresentable {
     public typealias UIViewType = UIPageControl
     
     public func makeUIView(context: Context) -> UIViewType {
-        let result = UIPageControl()
+        let uiView = UIPageControl()
         
-        result.numberOfPages = numberOfPages
-        result.addTarget(
+        uiView.numberOfPages = numberOfPages
+        uiView.tintColor = Color.accentColor.toUIColor()
+        
+        uiView.addTarget(
             context.coordinator,
             action: #selector(Coordinator.updateCurrentPage(sender:)),
             for: .valueChanged
         )
         
-        return result
+        return uiView
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {

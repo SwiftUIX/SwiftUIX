@@ -157,12 +157,14 @@ extension _PaginationView: UIViewControllerRepresentable {
         return result
     }
     
-    func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: UIPageViewController, context: Context) {
         if let coordinator = context.coordinator as? _Coordinator_Default_UIPageControl {
             coordinator.currentPageIndex = currentPageIndex
         }
         
-        pageViewController.setViewControllers(
+        uiViewController.pageControl?.tintColor = Color.accentColor.toUIColor()
+        
+        uiViewController.setViewControllers(
             [children[currentPageIndex]],
             direction: .forward,
             animated: true

@@ -38,6 +38,8 @@ extension ActivityIndicator: UIViewRepresentable {
         if let style = style {
             uiView.style = .init(style)
         }
+        
+        uiView.tintColor = Color.accentColor.toUIColor()
     }
     
     public func animated(_ isAnimated: Bool) -> ActivityIndicator {
