@@ -6,6 +6,7 @@ import Dispatch
 import Swift
 import SwiftUI
 
+/// An `@EnvironmentObject` wrapper that affords `Optional`-ity to environment objects.
 @propertyWrapper
 public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicProperty {
     @EnvironmentObject private var _wrappedValue: ObjectType
