@@ -12,7 +12,6 @@ struct CocoaPresentation: Equatable, Identifiable {
     let content: () -> AnyView
     let onDismiss: (() -> Void)?
     let shouldDismiss: () -> Bool
-    let resetBinding: () -> Void
     let style: ModalViewPresentationStyle
     
     static func == (lhs: CocoaPresentation, rhs: CocoaPresentation) -> Bool {

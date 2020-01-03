@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol DynamicViewPresenter {
+public protocol DynamicViewPresenter: PresentationManager {
     func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,

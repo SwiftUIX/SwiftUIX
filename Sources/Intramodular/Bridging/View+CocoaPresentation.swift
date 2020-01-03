@@ -24,7 +24,6 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
             content: { AnyView(self.content()) },
             onDismiss: onDismiss,
             shouldDismiss: shouldDismiss ?? { true },
-            resetBinding: { self.isPresented = false },
             style: style
         )
     }
@@ -51,7 +50,6 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
             content: { AnyView(self.content(item)) },
             onDismiss: onDismiss,
             shouldDismiss: { self.item?.id != item.id },
-            resetBinding: { self.item = nil },
             style: style
         )
     }

@@ -38,8 +38,6 @@ class CocoaPresentationCoordinator: NSObject {
             return
         }
         
-        presentedCoordinator?.dismissSelf()
-        
         let presentationCoordinator = CocoaPresentationCoordinator(
             presentation: presentation,
             presentingCoordinator: self
@@ -60,40 +58,15 @@ class CocoaPresentationCoordinator: NSObject {
             completion: nil
         )
     }
-    
-    func dismissSelf() {
-        guard let presentation = presentation, presentation.shouldDismiss() else {
-            return
-        }
-        
-        guard let presentingCoordinator = presentingCoordinator, presentingCoordinator.presentedCoordinator === self else {
-            return
-        }
-        
-        presentingCoordinator.dismissPresentedView()
-    }
-    
-    func dismissPresentedView() {
-        guard let presentedCoordinator = presentedCoordinator, let presentation = presentedCoordinator.presentation else {
-            return
-        }
-        
-        presentedCoordinator.viewController?.dismiss(animated: true)
-        presentedCoordinator.viewController = nil
-        
-        self.presentedCoordinator = nil
-        
-        if !presentation.shouldDismiss() {
-            presentation.resetBinding()
-        }
-        
-        presentation.onDismiss?()
-    }
 }
 
 // MARK: - Protocol Implementations -
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
+    public var isPresented: Bool {
+        return presentedCoordinator != nil
+    }
+    
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
@@ -103,9 +76,28 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             content: { view.eraseToAnyView() },
             onDismiss: onDismiss,
             shouldDismiss: { true },
-            resetBinding: { },
             style: style
         ))
+    }
+    
+    public func dismiss() {
+        guard
+            let viewController = viewController,
+            let presentedCoordinator = presentedCoordinator,
+            let presentation = presentedCoordinator.presentation,
+            viewController.presentedViewController != nil,
+            presentation.shouldDismiss() else {
+                return
+        }
+        
+        viewController.dismiss(animated: true) {
+            presentation.onDismiss?()
+            self.presentedCoordinator = nil
+        }
+    }
+    
+    public func dismissSelf() {
+        presentingCoordinator?.dismiss()
     }
 }
 
@@ -133,9 +125,8 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        dismissSelf()
+        presentation?.onDismiss?()
     }
 }
 
 #endif
-

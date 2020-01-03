@@ -43,14 +43,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     public convenience init(rootView: Content) {
         self.init(rootView: rootView, presentation: nil, presentationCoordinator: .init())
     }
-    
-    public override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
-        super.dismiss(animated: flag, completion: {
-            completion?()
-            self.presentationCoordinator?.presentedCoordinator?.dismissSelf()
-        })
-    }
-    
+        
     public convenience init(@ViewBuilder rootView: () -> Content) {
         self.init(rootView: rootView())
     }

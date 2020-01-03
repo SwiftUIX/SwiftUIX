@@ -31,15 +31,17 @@ struct _CocoaPresentationView<Content: View>: View  {
                 if let presentation = presentation {
                     self.coordinator.present(presentation)
                 } else {
-                    self.coordinator.dismissPresentedView()
+                    self.coordinator.dismiss()
                 }
             }
-        .onPreferenceChange(CocoaPresentation.DidAttemptToDismissCallbacksPreferenceKey.self) { value in
+            .onPreferenceChange(CocoaPresentation.DidAttemptToDismissCallbacksPreferenceKey.self) { value in
                 self.coordinator.onDidAttemptToDismiss = value
             }
             .onPreferenceChange(CocoaPresentation.IsModalInPresentationPreferenceKey.self) { value in
                 self.coordinator.viewController?.isModalInPresentation = value ?? false
             }
+            .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
+            .preference(key: CocoaPresentation.IsModalInPresentationPreferenceKey.self, value: nil)
     }
 }
 
