@@ -9,7 +9,7 @@ public protocol DynamicViewPresenter {
     func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        presentationStyle: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle
     )
 }
 

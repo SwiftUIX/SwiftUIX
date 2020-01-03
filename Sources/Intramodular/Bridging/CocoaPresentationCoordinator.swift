@@ -37,30 +37,25 @@ class CocoaPresentationCoordinator: NSObject {
     }
     
     func present(_ presentation: CocoaPresentation) {
-        if let viewController = viewController?.presentedViewController as? UIHostingController<_CocoaPresentationView<AnyView>> {
-            viewController.rootView = .init(coordinator: viewController.rootView.coordinator, content: presentation.content)
+        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyView>, viewController.modalViewPresentationStyle == presentation.style {
+            viewController.rootViewContent = presentation.content()
             
             return
         }
         
         presentedCoordinator?.dismissSelf()
         
-        let coordinator = CocoaPresentationCoordinator(presentation: presentation, presentingCoordinator: self)
+        let presentationCoordinator = CocoaPresentationCoordinator(
+            presentation: presentation,
+            presentingCoordinator: self
+        )
         
-        let rootView =
-            _CocoaPresentationView(coordinator: coordinator) {
-                presentation.content()
-        }
+        let viewController = CocoaHostingController(
+            presentation: presentation,
+            presentationCoordinator: presentationCoordinator
+        )
         
-        let viewController = UIHostingController(rootView: rootView)
-        
-        viewController.modalPresentationStyle = .init(presentation.presentationStyle)
-        viewController.view.backgroundColor = .clear
-        viewController.transitioningDelegate = presentation.presentationStyle.transitioningDelegate
-        
-        coordinator.viewController = viewController
-        
-        presentedCoordinator = coordinator
+        presentedCoordinator = presentationCoordinator
         
         self.viewController?.present(viewController, animated: true)
     }
@@ -101,14 +96,14 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        presentationStyle: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle
     ) {
         present(CocoaPresentation(
             content: { view.eraseToAnyView() },
             onDismiss: onDismiss,
             shouldDismiss: { true },
             resetBinding: { },
-            presentationStyle: presentationStyle
+            style: style
         ))
     }
 }
@@ -119,7 +114,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
             callback.action()
         }
     }
-        
+    
     func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         
     }

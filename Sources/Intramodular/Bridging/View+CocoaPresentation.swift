@@ -24,7 +24,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
             onDismiss: onDismiss,
             shouldDismiss: { self.isPresented },
             resetBinding: { self.isPresented = false },
-            presentationStyle: presentationStyle
+            style: presentationStyle
         )
     }
     
@@ -45,20 +45,20 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
     let presentationStyle: ModalViewPresentationStyle
     let content: (Item) -> Sheet
     
-    func sheet(for item: Item) -> CocoaPresentation {
+    func presentation(for item: Item) -> CocoaPresentation {
         CocoaPresentation(
             content: { AnyView(self.content(item)) },
             onDismiss: onDismiss,
             shouldDismiss: { self.item?.id != item.id },
             resetBinding: { self.item = nil },
-            presentationStyle: presentationStyle
+            style: presentationStyle
         )
     }
     
     func body(content: Content) -> some View {
         content.backgroundPreference(
             key: CocoaPresentationPreferenceKey.self,
-            value: self.item != nil ? self.sheet(for: self.item!) : nil
+            value: item != nil ? presentation(for: self.item!) : nil
         )
     }
 }
