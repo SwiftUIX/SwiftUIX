@@ -11,6 +11,8 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     let presentation: CocoaPresentation?
     let presentationCoordinator: CocoaPresentationCoordinator?
     
+    var _transitioningDelegate: UIViewControllerTransitioningDelegate?
+    
     public var rootViewContent: Content {
         get {
             rootView.content
@@ -69,8 +71,9 @@ extension CocoaHostingController where Content == AnyView {
             presentationCoordinator: presentationCoordinator
         )
         
+        _transitioningDelegate = presentation.style.transitioningDelegate
         modalPresentationStyle = .init(presentation.style)
-        transitioningDelegate = presentation.style.transitioningDelegate
+        transitioningDelegate = _transitioningDelegate
         view.backgroundColor = .clear
     }
 }

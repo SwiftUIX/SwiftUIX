@@ -51,7 +51,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     public var body: some View {
         Group {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
+            
             if mechanism == .system {
                 Button(action: present, label: { label }).sheet(
                     isPresented: $isPresented,
@@ -62,7 +62,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 Button(action: present, label: { label }).cocoaPresentation(
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    presentationStyle: .automatic,
+                    style: .automatic,
                     content: { self.destination }
                 )
             }
@@ -74,7 +74,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 onDismiss: { self.isPresented = false; self.onDismiss?() },
                 content: { self.destination }
             )
-
+            
             #endif
         }
     }

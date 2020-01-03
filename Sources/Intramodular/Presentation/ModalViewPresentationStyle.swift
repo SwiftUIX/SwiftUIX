@@ -35,7 +35,13 @@ public enum ModalViewPresentationStyle: Equatable {
                 return true
             case (.page, .page):
                 return true
+            case (.page, .automatic):
+                return true // FIXME
+            case (.automatic, .page):
+                return true // FIXME
             case (.form, .form):
+                return true
+            case (.currentContext, .currentContext):
                 return true
             case (.overFullScreen, .overFullScreen):
                 return true

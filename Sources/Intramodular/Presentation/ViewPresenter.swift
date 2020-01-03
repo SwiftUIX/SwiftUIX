@@ -13,6 +13,12 @@ public protocol DynamicViewPresenter {
     )
 }
 
+// MARK: - Extensions -
+
+extension DynamicViewPresenter {
+    
+}
+
 // MARK: - Auxiliary Implementation -
 
 private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {

@@ -30,7 +30,7 @@ public struct CocoaPresentationLink<Destination: View, Label: View>: View {
         Button(action: present, label: { label }).cocoaPresentation(
             isPresented: $isPresented,
             onDismiss: dismiss,
-            presentationStyle: presentationStyle,
+            style: presentationStyle,
             content: { self.destination }
         )
     }

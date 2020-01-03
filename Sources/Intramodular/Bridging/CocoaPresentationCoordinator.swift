@@ -8,20 +8,15 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 class CocoaPresentationCoordinator: NSObject {
-    private var presentation: CocoaPresentation?
-    private var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    private let presentation: CocoaPresentation?
     
     private weak var presentingCoordinator: CocoaPresentationCoordinator?
     
     var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
-    
-    weak var viewController: UIViewController? {
-        didSet {
-            viewController?.presentationController?.delegate = self
-        }
-    }
-    
     var presentedCoordinator: CocoaPresentationCoordinator?
+    var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    
+    weak var viewController: UIViewController?
     
     override init() {
         self.presentation = nil
@@ -50,14 +45,20 @@ class CocoaPresentationCoordinator: NSObject {
             presentingCoordinator: self
         )
         
-        let viewController = CocoaHostingController(
+        let viewControllerToBePresented = CocoaHostingController(
             presentation: presentation,
             presentationCoordinator: presentationCoordinator
         )
         
         presentedCoordinator = presentationCoordinator
         
-        self.viewController?.present(viewController, animated: true)
+        viewControllerToBePresented.presentationController?.delegate = presentationCoordinator
+        
+        self.viewController?.present(
+            viewControllerToBePresented,
+            animated: true,
+            completion: nil
+        )
     }
     
     func dismissSelf() {
@@ -109,6 +110,18 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
 }
 
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        if let presentation = presentation {
+            return .init(presentation.style)
+        } else {
+            return .automatic
+        }
+    }
+    
+    func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
+        presentation?.shouldDismiss() ?? true
+    }
+    
     func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
         for callback in onDidAttemptToDismiss {
             callback.action()
