@@ -102,6 +102,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         while let presentedCoordinator = coordinator.presentedCoordinator {
             if (presentedCoordinator.viewController as? CocoaHostingController<AnyNamedOrUnnamedView>)?.rootViewContentName == name {
                 presentedCoordinator.dismissSelf()
+                break
             } else {
                 coordinator = presentedCoordinator
             }

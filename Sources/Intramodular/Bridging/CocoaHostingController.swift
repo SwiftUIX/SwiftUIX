@@ -13,6 +13,14 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     var _transitioningDelegate: UIViewControllerTransitioningDelegate?
     
+    public override var description: String {
+        if let name = rootViewContentName {
+            return String(describing: name)
+        } else {
+            return super.description
+        }
+    }
+    
     public var rootViewContent: Content {
         get {
             rootView.content
