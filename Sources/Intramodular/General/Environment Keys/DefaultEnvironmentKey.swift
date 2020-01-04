@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public struct DefaultEnvironmentKey<Value>: EnvironmentKey {
+open class DefaultEnvironmentKey<Value>: EnvironmentKey {
     public static var defaultValue: Value? {
         nil
     }

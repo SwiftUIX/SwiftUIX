@@ -40,6 +40,8 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
                 presentationCoordinator: presentationCoordinator
             )
         )
+        
+        presentationCoordinator.viewController = self
     }
     
     public convenience init(rootView: Content) {
@@ -70,8 +72,6 @@ extension CocoaHostingController where Content == AnyNamedOrUnnamedView {
         modalPresentationStyle = .init(presentation.style)
         transitioningDelegate = _transitioningDelegate
         view.backgroundColor = .clear
-        
-        presentationCoordinator.viewController = self
     }
 }
 

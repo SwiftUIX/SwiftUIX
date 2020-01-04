@@ -20,7 +20,7 @@ public struct NamedView<V: View>: opaque_NamedView, View {
     }
     
     public var body: some View {
-        environment(\.viewName, name).anchorPreference(
+        view.environment(\.viewName, name).anchorPreference(
             key: ArrayReducePreferenceKey<ViewNamePreferenceKeyValue>.self,
             value: .bounds
         ) {

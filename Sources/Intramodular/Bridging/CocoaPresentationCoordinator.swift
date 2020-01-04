@@ -16,7 +16,7 @@ class CocoaPresentationCoordinator: NSObject {
     var presentedCoordinator: CocoaPresentationCoordinator?
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
-    weak var viewController: CocoaHostingController<AnyNamedOrUnnamedView>?
+    weak var viewController: UIViewController?
     
     override init() {
         self.presentation = nil
@@ -96,11 +96,11 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
     }
     
-    public func dismiss(_ name: ViewName) {
+    public func dismiss(viewNamed name: ViewName) {
         var coordinator = self
         
         while let presentedCoordinator = coordinator.presentedCoordinator {
-            if presentedCoordinator.viewController?.rootViewContentName == name {
+            if (presentedCoordinator.viewController as? CocoaHostingController<AnyNamedOrUnnamedView>)?.rootViewContentName == name {
                 presentedCoordinator.dismissSelf()
             } else {
                 coordinator = presentedCoordinator
