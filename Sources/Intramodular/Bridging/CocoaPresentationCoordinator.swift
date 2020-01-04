@@ -16,7 +16,7 @@ class CocoaPresentationCoordinator: NSObject {
     var presentedCoordinator: CocoaPresentationCoordinator?
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
-    weak var viewController: UIViewController?
+    weak var viewController: CocoaHostingController<AnyNamedOrUnnamedView>?
     
     override init() {
         self.presentation = nil
@@ -32,7 +32,7 @@ class CocoaPresentationCoordinator: NSObject {
     }
     
     func present(_ presentation: CocoaPresentation) {
-        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyView>, viewController.modalViewPresentationStyle == presentation.style {
+        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyNamedOrUnnamedView>, viewController.modalViewPresentationStyle == presentation.style {
             viewController.rootViewContent = presentation.content()
             
             return
@@ -73,9 +73,9 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         style: ModalViewPresentationStyle
     ) {
         present(CocoaPresentation(
-            content: { view.eraseToAnyView() },
-            onDismiss: onDismiss,
+            content: { view },
             shouldDismiss: { true },
+            onDismiss: onDismiss,
             style: style
         ))
     }
@@ -93,6 +93,18 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         viewController.dismiss(animated: true) {
             presentation.onDismiss?()
             self.presentedCoordinator = nil
+        }
+    }
+    
+    public func dismiss(_ name: ViewName) {
+        var coordinator = self
+        
+        while let presentedCoordinator = coordinator.presentedCoordinator {
+            if presentedCoordinator.viewController?.rootViewContentName == name {
+                presentedCoordinator.dismissSelf()
+            } else {
+                coordinator = presentedCoordinator
+            }
         }
     }
     

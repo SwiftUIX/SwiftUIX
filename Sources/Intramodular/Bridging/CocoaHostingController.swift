@@ -21,6 +21,10 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         }
     }
     
+    public var rootViewContentName: ViewName? {
+        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? AnyNamedOrUnnamedView)?.name
+    }
+    
     init(
         rootView: Content,
         presentation: CocoaPresentation?,
@@ -36,14 +40,12 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
                 presentationCoordinator: presentationCoordinator
             )
         )
-        
-        presentationCoordinator.viewController = self
     }
     
     public convenience init(rootView: Content) {
         self.init(rootView: rootView, presentation: nil, presentationCoordinator: .init())
     }
-        
+    
     public convenience init(@ViewBuilder rootView: () -> Content) {
         self.init(rootView: rootView())
     }
@@ -53,7 +55,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
 }
 
-extension CocoaHostingController where Content == AnyView {
+extension CocoaHostingController where Content == AnyNamedOrUnnamedView {
     convenience init(
         presentation: CocoaPresentation,
         presentationCoordinator: CocoaPresentationCoordinator
@@ -68,6 +70,8 @@ extension CocoaHostingController where Content == AnyView {
         modalPresentationStyle = .init(presentation.style)
         transitioningDelegate = _transitioningDelegate
         view.backgroundColor = .clear
+        
+        presentationCoordinator.viewController = self
     }
 }
 

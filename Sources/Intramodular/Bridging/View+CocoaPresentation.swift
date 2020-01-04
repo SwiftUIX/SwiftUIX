@@ -13,17 +13,17 @@ final class CocoaPresentationPreferenceKey: TakeLastPreferenceKey<CocoaPresentat
 
 private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     @Binding var isPresented: Bool
-    
-    let onDismiss: (() -> Void)?
-    let shouldDismiss: (() -> Bool)?
+
     let content: () -> Sheet
+    let shouldDismiss: (() -> Bool)?
+    let onDismiss: (() -> Void)?
     let style: ModalViewPresentationStyle
     
     func sheet() -> CocoaPresentation {
         .init(
-            content: { AnyView(self.content()) },
-            onDismiss: onDismiss,
+            content: { self.content() },
             shouldDismiss: shouldDismiss ?? { true },
+            onDismiss: onDismiss,
             style: style
         )
     }
@@ -48,8 +48,8 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
     func presentation(for item: Item) -> CocoaPresentation {
         CocoaPresentation(
             content: { AnyView(self.content(item)) },
-            onDismiss: onDismiss,
             shouldDismiss: { self.item?.id != item.id },
+            onDismiss: onDismiss,
             style: style
         )
     }
@@ -72,9 +72,9 @@ extension View {
         modifier(
             CocoaPresentationIsPresented(
                 isPresented: isPresented,
-                onDismiss: onDismiss,
-                shouldDismiss: nil,
                 content: content,
+                shouldDismiss: nil,
+                onDismiss: onDismiss,
                 style: style
             )
         )
