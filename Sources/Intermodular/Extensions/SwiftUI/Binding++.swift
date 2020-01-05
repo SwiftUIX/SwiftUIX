@@ -22,14 +22,14 @@ extension Binding {
 }
 
 extension Binding {
-    public func prehookSetter(_ body: @escaping (Value) -> ()) -> Self {
+    public func beforeSet(_ body: @escaping (Value) -> ()) -> Self {
         return .init(
             get: { self.wrappedValue },
             set: { body($0); self.wrappedValue = $0 }
         )
     }
     
-    public func posthookSetter(_ body: @escaping (Value) -> ()) -> Self {
+    public func onSet(_ body: @escaping (Value) -> ()) -> Self {
         return .init(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0; body($0) }
