@@ -16,12 +16,22 @@ public struct UnwrapOptionalView<Value, Content: View>: View {
     public var body: some View {
         content ?? EmptyView()
     }
+    
+    public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
+        Group {
+            if lhs.content == nil {
+                rhs
+            } else {
+                lhs
+            }
+        }
+    }
 }
 
 // MARK: - Helpers -
 
 extension Optional {
-    public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> some View {
-        UnwrapOptionalView(self, content: content)
+    public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Wrapped, Content> {
+        .init(self, content: content)
     }
 }
