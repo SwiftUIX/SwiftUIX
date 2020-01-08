@@ -32,9 +32,10 @@ class CocoaPresentationCoordinator: NSObject {
     }
     
     func present(_ presentation: CocoaPresentation) {
-        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyNamedOrUnnamedView>, viewController.modalViewPresentationStyle == presentation.style {
-            viewController.rootViewContent = presentation.content()
-            
+        if let viewController = viewController?.presentedViewController as? CocoaHostingController<OpaqueView>, viewController.modalViewPresentationStyle == presentation.style {
+            viewController.rootView.content = presentation.content()
+            viewController.rootView.environment = presentation.environment
+
             return
         }
         
@@ -70,13 +71,16 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle,
+        environment: EnvironmentValues?
     ) {
         present(CocoaPresentation(
             content: { view },
             shouldDismiss: { true },
             onDismiss: onDismiss,
-            style: style
+            resetBinding: { },
+            style: style,
+            environment: environment
         ))
     }
     
@@ -100,7 +104,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         var coordinator = self
         
         while let presentedCoordinator = coordinator.presentedCoordinator {
-            if (presentedCoordinator.viewController as? CocoaHostingController<AnyNamedOrUnnamedView>)?.rootViewContentName == name {
+            if (presentedCoordinator.viewController as? CocoaHostingController<OpaqueView>)?.rootViewContentName == name {
                 presentedCoordinator.dismissSelf()
                 break
             } else {

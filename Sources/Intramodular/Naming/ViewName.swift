@@ -7,9 +7,13 @@ import Swift
 import SwiftUI
 
 /// The opaque representation of a view's name.
-public struct ViewName: Hashable {
+public struct ViewName: CustomStringConvertible, Hashable {
     private let baseType: ObjectIdentifier
     private let base: AnyHashable
+    
+    public var description: String {
+        return base.description
+    }
     
     public init<H: Hashable>(_ base: H) {
         if let base = base as? ViewName {

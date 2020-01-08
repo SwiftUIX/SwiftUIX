@@ -83,3 +83,13 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         isPresented = true
     }
 }
+
+// MARK: - API -
+
+extension View {
+    public func presentationLink<V: View>(to destination: V) -> some View {
+        PresentationLink(destination: destination) {
+            self
+        }
+    }
+}

@@ -12,4 +12,15 @@ extension View {
             environment = newEnvironment
         }
     }
+    
+    @inlinable
+    public func environment(_ newEnvironment: EnvironmentValues?) -> some View {
+        Group {
+            if newEnvironment != nil {
+                environment(newEnvironment!)
+            } else {
+                self
+            }
+        }
+    }
 }

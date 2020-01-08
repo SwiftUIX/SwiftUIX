@@ -33,15 +33,15 @@ struct _CocoaPresentationView<Content: View>: View  {
                 } else {
                     self.coordinator.dismiss()
                 }
-            }
-            .onPreferenceChange(CocoaPresentation.DidAttemptToDismissCallbacksPreferenceKey.self) { value in
-                self.coordinator.onDidAttemptToDismiss = value
-            }
-            .onPreferenceChange(CocoaPresentation.IsModalInPresentationPreferenceKey.self) { value in
-                self.coordinator.viewController?.isModalInPresentation = value ?? false
-            }
-            .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
-            .preference(key: CocoaPresentation.IsModalInPresentationPreferenceKey.self, value: nil)
+        }
+        .onPreferenceChange(CocoaPresentation.DidAttemptToDismissCallbacksPreferenceKey.self) { value in
+            self.coordinator.onDidAttemptToDismiss = value
+        }
+        .onPreferenceChange(CocoaPresentation.IsModalInPresentationPreferenceKey.self) { value in
+            self.coordinator.viewController?.isModalInPresentation = value ?? false
+        }
+        .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
+        .preference(key: CocoaPresentation.IsModalInPresentationPreferenceKey.self, value: nil)
     }
 }
 

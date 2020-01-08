@@ -6,6 +6,15 @@ import Swift
 import SwiftUI
 
 extension Binding {
+    public static func receiveValue<Wrapped>(_ receiveValue: @escaping (Wrapped?) -> ()) -> Binding where Optional<Wrapped> == Value {
+        .init(
+            get: { nil },
+            set: receiveValue
+        )
+    }
+}
+
+extension Binding {
     public func forceCast<U>(to type: U.Type) -> Binding<U> {
         return .init(
             get: { self.wrappedValue as! U },
@@ -38,6 +47,13 @@ extension Binding {
 }
 
 extension Binding {
+    public func isNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
+        .init(
+            get: { self.wrappedValue == nil },
+            set: { isNil in self.wrappedValue = isNil ? nil : self.wrappedValue  }
+        )
+    }
+
     public func isNotNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
             get: { self.wrappedValue != nil },
@@ -81,6 +97,28 @@ extension Binding where Value == String {
             set: {
                 self.wrappedValue = $0
                 self.wrappedValue = .init($0.suffix(count))
+            }
+        )
+    }
+}
+
+extension Binding where Value == String? {
+    public func takePrefix(_ count: Int) -> Self {
+        .init(
+            get: { self.wrappedValue },
+            set: {
+                self.wrappedValue = $0
+                self.wrappedValue = $0.map({ .init($0.prefix(count)) })
+            }
+        )
+    }
+    
+    public func takeSuffix(_ count: Int) -> Self {
+        .init(
+            get: { self.wrappedValue },
+            set: {
+                self.wrappedValue = $0
+                self.wrappedValue = $0.map({ .init($0.suffix(count)) })
             }
         )
     }

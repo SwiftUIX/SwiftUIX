@@ -9,21 +9,27 @@ import SwiftUI
 
 struct CocoaPresentation: Equatable, Identifiable {
     let id = UUID()
-    let content: () -> AnyNamedOrUnnamedView
-    let onDismiss: (() -> Void)?
+    let content: () -> OpaqueView
     let shouldDismiss: () -> Bool
+    let onDismiss: (() -> Void)?
+    let resetBinding: () -> ()
     let style: ModalViewPresentationStyle
+    let environment: EnvironmentValues?
     
     public init<V: View>(
         content: @escaping () -> V,
         shouldDismiss: @escaping () -> Bool,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        resetBinding: @escaping () -> (),
+        style: ModalViewPresentationStyle,
+        environment: EnvironmentValues?
     ) {
         self.content = { .init(content()) }
         self.shouldDismiss = shouldDismiss
         self.onDismiss = onDismiss
         self.style = style
+        self.resetBinding = resetBinding
+        self.environment = environment
     }
     
     static func == (lhs: CocoaPresentation, rhs: CocoaPresentation) -> Bool {

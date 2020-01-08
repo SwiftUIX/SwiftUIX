@@ -10,7 +10,8 @@ import SwiftUI
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
     let presentation: CocoaPresentation?
     let presentationCoordinator: CocoaPresentationCoordinator?
-    
+    let environment: EnvironmentValues?
+
     var _transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     public override var description: String {
@@ -30,22 +31,25 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
     
     public var rootViewContentName: ViewName? {
-        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? AnyNamedOrUnnamedView)?.name
+        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? OpaqueView)?.name
     }
     
     init(
         rootView: Content,
         presentation: CocoaPresentation?,
-        presentationCoordinator: CocoaPresentationCoordinator
+        presentationCoordinator: CocoaPresentationCoordinator,
+        environment: EnvironmentValues?
     ) {
         self.presentation = presentation
         self.presentationCoordinator = presentationCoordinator
+        self.environment = environment
         
         super.init(
             rootView: CocoaHostingControllerContent(
                 content: rootView,
                 presentation: presentation,
-                presentationCoordinator: presentationCoordinator
+                presentationCoordinator: presentationCoordinator,
+                environment: environment
             )
         )
         
@@ -53,7 +57,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
     
     public convenience init(rootView: Content) {
-        self.init(rootView: rootView, presentation: nil, presentationCoordinator: .init())
+        self.init(rootView: rootView, presentation: nil, presentationCoordinator: .init(), environment: nil)
     }
     
     public convenience init(@ViewBuilder rootView: () -> Content) {
@@ -65,7 +69,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
 }
 
-extension CocoaHostingController where Content == AnyNamedOrUnnamedView {
+extension CocoaHostingController where Content == OpaqueView {
     convenience init(
         presentation: CocoaPresentation,
         presentationCoordinator: CocoaPresentationCoordinator
@@ -73,7 +77,8 @@ extension CocoaHostingController where Content == AnyNamedOrUnnamedView {
         self.init(
             rootView: presentation.content(),
             presentation: presentation,
-            presentationCoordinator: presentationCoordinator
+            presentationCoordinator: presentationCoordinator,
+            environment: presentation.environment
         )
         
         _transitioningDelegate = presentation.style.transitioningDelegate

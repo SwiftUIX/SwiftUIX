@@ -12,6 +12,8 @@ final class CocoaPresentationPreferenceKey: TakeLastPreferenceKey<CocoaPresentat
 }
 
 private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
+    @Environment(\.self) var environment
+    
     @Binding var isPresented: Bool
 
     let content: () -> Sheet
@@ -24,7 +26,9 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
             content: { self.content() },
             shouldDismiss: shouldDismiss ?? { true },
             onDismiss: onDismiss,
-            style: style
+            resetBinding: { self.isPresented = false },
+            style: style,
+            environment: environment
         )
     }
     
@@ -39,6 +43,8 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
 }
 
 private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModifier  {
+    @Environment(\.self) var environment
+
     @Binding var item: Item?
     
     let onDismiss: (() -> Void)?
@@ -50,7 +56,9 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
             content: { AnyView(self.content(item)) },
             shouldDismiss: { self.item?.id != item.id },
             onDismiss: onDismiss,
-            style: style
+            resetBinding: { self.item = nil },
+            style: style,
+            environment: environment
         )
     }
     

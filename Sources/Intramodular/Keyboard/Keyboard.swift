@@ -19,13 +19,20 @@ public final class Keyboard: ObservableObject {
         state.height.map({ $0 != 0 }) ?? false
     }
     
-    private var subscription: AnyCancellable?
-    
+    private var keyboardWillChangeFrameSubscription: AnyCancellable?
+    private var keyboardDidHideSubscription: AnyCancellable?
+
     public init(notificationCenter: NotificationCenter = .default) {
-        self.subscription = notificationCenter
+        self.keyboardWillChangeFrameSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             .compactMap({ Keyboard.State(notification: $0, screen: .main) })
+            .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
+        
+        self.keyboardDidHideSubscription = notificationCenter
+            .publisher(for: UIResponder.keyboardDidHideNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] _ in self.state = .init() }
     }
     
     public func dismiss() {
@@ -50,7 +57,7 @@ extension Keyboard {
         public let keyboardFrame: CGRect?
         public let height: CGFloat?
         
-        private init() {
+        init() {
             self.animationDuration = 0.25
             self.animationCurve = 0
             self.keyboardFrame = nil
@@ -155,7 +162,7 @@ extension View {
     public func visibleIfKeyboardActive() -> some View {
         modifier(VisibleIfKeyboardActive())
     }
-
+    
     public func removeIfKeyboardActive() -> some View {
         modifier(RemoveIfKeyboardActive())
     }

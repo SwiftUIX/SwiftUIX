@@ -12,11 +12,13 @@ public struct CocoaHostingControllerContent<Content: View>: View {
 
     private var presentation: CocoaPresentation?
     private var presentationCoordinator: CocoaPresentationCoordinator
+    public var environment: EnvironmentValues?
     
     init(
         content: Content,
         presentation: CocoaPresentation?,
-        presentationCoordinator: CocoaPresentationCoordinator
+        presentationCoordinator: CocoaPresentationCoordinator,
+        environment: EnvironmentValues?
     ) {
         self.content = content
         self.presentationCoordinator = presentationCoordinator
@@ -25,7 +27,7 @@ public struct CocoaHostingControllerContent<Content: View>: View {
     public var body: some View {
         _CocoaPresentationView(coordinator: presentationCoordinator) {
             self.content
-        }
+        }.environment(environment)
     }
 }
 

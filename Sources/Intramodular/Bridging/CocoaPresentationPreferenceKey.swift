@@ -14,6 +14,7 @@ public struct CocoaPresentationLink<Destination: View, Label: View>: View {
     
     private var presentationStyle: ModalViewPresentationStyle = .automatic
     
+    @Environment(\.self) var environment
     @State private var isPresented: Bool = false
     
     public init(
