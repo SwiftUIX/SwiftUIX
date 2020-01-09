@@ -20,6 +20,7 @@ public final class Keyboard: ObservableObject {
     }
     
     private var keyboardWillChangeFrameSubscription: AnyCancellable?
+    private var keyboardDidChangeFrameSubscription: AnyCancellable?
     private var keyboardDidHideSubscription: AnyCancellable?
 
     public init(notificationCenter: NotificationCenter = .default) {
@@ -29,6 +30,12 @@ public final class Keyboard: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
         
+        self.keyboardDidChangeFrameSubscription = notificationCenter
+            .publisher(for: UIResponder.keyboardDidChangeFrameNotification)
+            .compactMap({ Keyboard.State(notification: $0, screen: .main) })
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.state, on: self)
+
         self.keyboardDidHideSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardDidHideNotification)
             .receive(on: DispatchQueue.main)

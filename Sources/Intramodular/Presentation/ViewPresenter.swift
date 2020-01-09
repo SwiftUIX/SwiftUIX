@@ -19,6 +19,20 @@ public protocol DynamicViewPresenter: PresentationManager {
 // MARK: - Extensions -
 
 extension DynamicViewPresenter {
+    public func present<V: View>(
+        _ view: V,
+        onDismiss: (() -> Void)?,
+        style: ModalViewPresentationStyle,
+        environment: EnvironmentValues?
+    ) {
+        present(
+            view,
+            onDismiss: onDismiss,
+            style: .automatic,
+            environment: environment
+        )
+    }
+    
     public func dismiss<H: Hashable>(viewNamed name: H) {
         dismiss(viewNamed: .init(name))
     }

@@ -13,6 +13,8 @@ public protocol ModelView: View {
 }
 
 public protocol ModelMutatingView: ModelView {
+    typealias ModelBinding = Binding<Model>
+    
     init(_: Binding<Model>)
 }
 
