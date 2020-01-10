@@ -24,6 +24,8 @@ public final class Keyboard: ObservableObject {
     private var keyboardDidHideSubscription: AnyCancellable?
 
     public init(notificationCenter: NotificationCenter = .default) {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        
         self.keyboardWillChangeFrameSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             .compactMap({ Keyboard.State(notification: $0, screen: .main) })
@@ -40,6 +42,8 @@ public final class Keyboard: ObservableObject {
             .publisher(for: UIResponder.keyboardDidHideNotification)
             .receive(on: DispatchQueue.main)
             .sink { [unowned self] _ in self.state = .init() }
+        
+        #endif
     }
     
     public func dismiss() {
@@ -72,6 +76,8 @@ extension Keyboard {
         }
         
         init?(notification: Notification, screen: Screen) {
+            #if os(iOS) || targetEnvironment(macCatalyst)
+
             guard
                 let userInfo = notification.userInfo,
                 let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
@@ -95,6 +101,12 @@ extension Keyboard {
                 self.keyboardFrame = nil
                 self.height = nil
             }
+            
+            #else
+            
+            return nil
+            
+            #endif
         }
     }
 }

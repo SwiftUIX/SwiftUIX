@@ -34,7 +34,7 @@ public class Screen: ObservableObject {
     var orientationObserver: NSObjectProtocol?
     
     private init() {
-        #if os(iOS) || os(tvOS)
+        #if os(iOS) 
         orientationObserver = notificationCenter.addObserver(
             forName: UIDevice.orientationDidChangeNotification,
             object: nil,

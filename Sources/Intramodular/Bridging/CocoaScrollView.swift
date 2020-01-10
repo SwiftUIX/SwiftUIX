@@ -56,7 +56,9 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.alwaysBounceVertical = alwaysBounceVertical
         uiView.alwaysBounceHorizontal = alwaysBounceHorizontal
+        #if os(iOS) || targetEnvironment(macCatalyst)
         uiView.isPagingEnabled = isPagingEnabled
+        #endif
         uiView.isScrollEnabled = isScrollEnabled
         uiView.isDirectionalLockEnabled = isDirectionalLockEnabled
         uiView.showsVerticalScrollIndicator = showsVerticalScrollIndicator

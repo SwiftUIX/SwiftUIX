@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 public struct SearchBar: UIViewRepresentable {
     public typealias UIViewType = UISearchBar

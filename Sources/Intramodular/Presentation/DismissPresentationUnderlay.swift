@@ -6,6 +6,8 @@ import Combine
 import Swift
 import SwiftUI
 
+#if !os(tvOS)
+
 public struct DismissPresentationUnderlay<Content: View>: View {
     @Environment(\.presentationManager) var presentationManager
     
@@ -28,3 +30,5 @@ public struct DismissPresentationUnderlay<Content: View>: View {
         }
     }
 }
+
+#endif

@@ -62,7 +62,7 @@ extension Color {
 
 #endif
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     public static var systemGray2: Color {
@@ -121,8 +121,6 @@ extension Color {
         return .init(.opaqueSeparator)
     }
 }
-
-#if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     public static var systemBackground: Color {
@@ -186,6 +184,8 @@ extension Color {
 }
 
 #endif
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     /// Creates a color from a 6-digit hexadecimal color code.

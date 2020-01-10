@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 public struct ListSeparatorStyleNoneModifier: ViewModifier {
     public func body(content: Content) -> some View {

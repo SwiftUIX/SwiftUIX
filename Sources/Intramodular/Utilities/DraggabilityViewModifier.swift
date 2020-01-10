@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if !os(tvOS)
+
 /// A view modifier that enables draggability.
 public struct DraggabilityViewModifier: ViewModifier {
     private let minimumDistance: CGFloat
@@ -33,3 +35,5 @@ extension View {
         return modifier(DraggabilityViewModifier())
     }
 }
+
+#endif
