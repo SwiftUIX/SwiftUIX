@@ -147,8 +147,10 @@ extension UIViewController {
                 return .overFullScreen
             case .overCurrentContext:
                 return .overCurrentContext
+            #if os(tvOS)
             case .blurOverFullScreen:
                 return .blurOverFullScreen
+            #endif
             #if os(iOS) || targetEnvironment(macCatalyst)
             case .popover:
                 return .popover
