@@ -6,14 +6,21 @@ import Swift
 import SwiftUI
 
 public struct EnvironmentObjects {
+    fileprivate var descriptionObjects: [Any] = []
     fileprivate var environmentTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
     fileprivate var otherTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
+    
+    public var isEmpty: Bool {
+        environmentTransforms.isEmpty && otherTransforms.isEmpty
+    }
     
     public init() {
         
     }
     
     public mutating func append<B: ObservableObject>(_ bindable: B) {
+        descriptionObjects.append(bindable)
+        
         environmentTransforms[ObjectIdentifier(type(of: bindable))] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
     
@@ -21,6 +28,8 @@ public struct EnvironmentObjects {
         for (key, value) in bindables.environmentTransforms {
             environmentTransforms[key] = value
         }
+        
+        descriptionObjects.append(contentsOf: bindables.descriptionObjects)
     }
     
     public mutating func set<H: Hashable, V: View>(
@@ -40,10 +49,24 @@ public struct EnvironmentObjects {
     }
 }
 
+// MARK: - Protocol Implementations -
+
+extension EnvironmentObjects: CustomStringConvertible {
+    public var description: String {
+        return descriptionObjects.description
+    }
+}
+
 // MARK: - Helpers -
 
 extension View {
     public func environmentObjects(_ objects: EnvironmentObjects) -> some View {
-        objects.transform(eraseToAnyView())
+        Group {
+            if objects.isEmpty {
+                self
+            } else {
+                objects.transform(eraseToAnyView())
+            }
+        }
     }
 }

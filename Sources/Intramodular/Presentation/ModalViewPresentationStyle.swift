@@ -31,14 +31,6 @@ public enum ModalViewPresentationStyle: Equatable {
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     case custom(UIViewControllerTransitioningDelegate)
-    
-    public var transitioningDelegate: UIViewControllerTransitioningDelegate? {
-        if case let .custom(delegate) = self {
-            return delegate
-        } else {
-            return nil
-        }
-    }
     #endif
     
     private var _automatic: ModalViewPresentationStyle {
@@ -94,6 +86,16 @@ public enum ModalViewPresentationStyle: Equatable {
 // MARK: - Helpers-
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension ModalViewPresentationStyle {
+    public var transitioningDelegate: UIViewControllerTransitioningDelegate? {
+        if case let .custom(delegate) = self {
+            return delegate
+        } else {
+            return nil
+        }
+    }
+}
 
 extension UIModalPresentationStyle {
     public init(_ style: ModalViewPresentationStyle) {
