@@ -16,3 +16,21 @@ extension HashIdentifiable {
         hashValue
     }
 }
+
+// MARK: - Helpers -
+
+extension Hashable {
+    public var hashIdentifiable: HashIdentifiableValue<Self> {
+        return .init(self)
+    }
+}
+
+// MARK: - Concrete Implementations -
+
+public struct HashIdentifiableValue<Value: Hashable>: HashIdentifiable {
+    public let value: Value
+    
+    public init(_ value: Value) {
+        self.value = value
+    }
+}
