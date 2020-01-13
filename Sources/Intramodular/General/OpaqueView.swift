@@ -9,6 +9,7 @@ import SwiftUI
 /// A (better) type-erased `View`.
 public struct OpaqueView: CustomStringConvertible, View {
     private let base: AnyView
+    private let baseType: ObjectIdentifier
     private let environment: EnvironmentValues?
 
     public let name: ViewName?
@@ -26,6 +27,7 @@ public struct OpaqueView: CustomStringConvertible, View {
             self = view
         } else {
             self.base = view.eraseToAnyView()
+            self.baseType = .init(type(of: view))
             self.name = (view as? opaque_NamedView)?.name
             self.environment = environment
         }

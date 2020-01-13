@@ -29,7 +29,7 @@ public final class OptionalObservableObject<ObjectType: ObservableObject>: Obser
 }
 
 @propertyWrapper
-public struct OptionalObservedObject<ObjectType: ObservableObject> {
+public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicProperty {
     @ObservedObject private var _wrappedValue: OptionalObservableObject<ObjectType>
     
     /// The current state value.

@@ -88,8 +88,10 @@ extension CocoaHostingController where Content == OpaqueView {
     }
 }
 
-extension CocoaHostingController {
-    public func present(
+// MARK: - Protocol Implementations -
+
+extension CocoaHostingController: CocoaController {
+    open func present(
         _ presentation: CocoaPresentation,
         animated: Bool,
         completion: @escaping () -> () = { }
