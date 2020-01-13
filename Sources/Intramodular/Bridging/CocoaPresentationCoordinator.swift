@@ -31,7 +31,11 @@ class CocoaPresentationCoordinator: NSObject {
         self.presentingCoordinator = presentingCoordinator
     }
     
-    func present(_ presentation: CocoaPresentation) {
+    func present(
+        _ presentation: CocoaPresentation,
+        animated: Bool = true,
+        completion: @escaping () -> () = { }
+    ) {
         if let viewController = viewController?.presentedViewController as? CocoaHostingController<OpaqueView>, viewController.modalViewPresentationStyle == presentation.style {
             viewController.rootView.content = presentation.content()
             viewController.rootView.environment = presentation.environment
@@ -55,8 +59,8 @@ class CocoaPresentationCoordinator: NSObject {
         
         self.viewController?.present(
             viewControllerToBePresented,
-            animated: true,
-            completion: nil
+            animated: animated,
+            completion: completion
         )
     }
 }

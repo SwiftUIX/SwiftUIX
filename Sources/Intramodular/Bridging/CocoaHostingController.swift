@@ -9,9 +9,9 @@ import SwiftUI
 
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
     let presentation: CocoaPresentation?
-    let presentationCoordinator: CocoaPresentationCoordinator?
+    let presentationCoordinator: CocoaPresentationCoordinator
     let environment: EnvironmentValues?
-
+    
     var _transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     public override var description: String {
@@ -85,6 +85,20 @@ extension CocoaHostingController where Content == OpaqueView {
         modalPresentationStyle = .init(presentation.style)
         transitioningDelegate = _transitioningDelegate
         view.backgroundColor = .clear
+    }
+}
+
+extension CocoaHostingController {
+    public func present(
+        _ presentation: CocoaPresentation,
+        animated: Bool,
+        completion: @escaping () -> () = { }
+    ) {
+        presentationCoordinator.present(
+            presentation,
+            animated: animated,
+            completion: completion
+        )
     }
 }
 

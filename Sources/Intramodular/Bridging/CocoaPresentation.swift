@@ -7,8 +7,9 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-struct CocoaPresentation: Equatable, Identifiable {
-    let id = UUID()
+public struct CocoaPresentation: Equatable, Identifiable {
+    public let id = UUID()
+    
     let content: () -> OpaqueView
     let shouldDismiss: () -> Bool
     let onDismiss: (() -> Void)?
@@ -32,7 +33,7 @@ struct CocoaPresentation: Equatable, Identifiable {
         self.environment = environment
     }
     
-    static func == (lhs: CocoaPresentation, rhs: CocoaPresentation) -> Bool {
+    public static func == (lhs: CocoaPresentation, rhs: CocoaPresentation) -> Bool {
         return lhs.id == rhs.id
     }
 }
