@@ -27,7 +27,7 @@ public struct CocoaHostingControllerContent<Content: View>: View {
     public var body: some View {
         _CocoaPresentationView(coordinator: presentationCoordinator) {
             self.content
-        }.environment(environment)
+        }
     }
 }
 

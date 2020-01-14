@@ -15,7 +15,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         case custom
     }
     
-    private let destination: Destination
+    private let destination: () -> Destination
     private let label: Label
     private let onDismiss: (() -> ())?
     
@@ -32,7 +32,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public init(
-        destination: Destination,
+        destination: @autoclosure @escaping () -> Destination,
         onDismiss: (() -> ())?,
         @ViewBuilder label: () -> Label
     ) {
@@ -42,10 +42,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public init(
-        destination: Destination,
+        destination: @autoclosure @escaping () -> Destination,
         @ViewBuilder label: () -> Label
     ) {
-        self.init(destination: destination, onDismiss: nil, label: label)
+        self.init(destination: destination(), onDismiss: nil, label: label)
     }
     
     public var body: some View {
@@ -56,14 +56,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 Button(action: present, label: { label }).sheet(
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    content: { self.destination }
+                    content: self.destination
                 )
             } else if mechanism == .custom {
                 Button(action: present, label: { label }).cocoaPresentation(
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
                     style: .automatic,
-                    content: { self.destination }
+                    content: self.destination
                 )
             }
             

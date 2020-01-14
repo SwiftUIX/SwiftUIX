@@ -15,7 +15,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     @Environment(\.self) var environment
     
     @Binding var isPresented: Bool
-
+    
     let content: () -> Sheet
     let shouldDismiss: (() -> Bool)?
     let onDismiss: (() -> Void)?
@@ -44,7 +44,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
 
 private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModifier  {
     @Environment(\.self) var environment
-
+    
     @Binding var item: Item?
     
     let onDismiss: (() -> Void)?

@@ -28,7 +28,7 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
                 return
             }
             
-            let contentWindow = CocoaHostingView(
+            let contentWindow = CocoaHostingWindow(
                 windowScene: windowScene,
                 rootView: content
             )
