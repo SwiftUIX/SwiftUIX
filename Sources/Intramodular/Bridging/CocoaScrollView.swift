@@ -26,22 +26,26 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     private let content: () -> Content
+    private let axes: Axis.Set
+    private let showsIndicators: Bool
     
-    var contentOffset: Binding<CGFloat>?
+    @Environment(\.initialContentAlignment) var initialContentAlignment
+    
+    private var contentOffset: Binding<CGFloat>? = nil
     
     private var alwaysBounceVertical: Bool = false
     private var alwaysBounceHorizontal: Bool = false
     private var isPagingEnabled: Bool = false
     private var isScrollEnabled: Bool = true
     private var isDirectionalLockEnabled: Bool = false
-    private var showsVerticalScrollIndicator: Bool = true
-    private var showsHorizontalScrollIndicator: Bool = true
     
     public init(
-        contentOffset: Binding<CGFloat>? = nil,
+        _ axes: Axis.Set = .vertical,
+        showsIndicators: Bool = true,
         @ViewBuilder content: @escaping () -> Content
     ) {
-        self.contentOffset = contentOffset
+        self.axes = axes
+        self.showsIndicators = showsIndicators
         self.content = content
     }
     
@@ -61,8 +65,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         #endif
         uiView.isScrollEnabled = isScrollEnabled
         uiView.isDirectionalLockEnabled = isDirectionalLockEnabled
-        uiView.showsVerticalScrollIndicator = showsVerticalScrollIndicator
-        uiView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator
+        uiView.showsVerticalScrollIndicator = showsIndicators && axes.contains(.vertical)
+        uiView.showsHorizontalScrollIndicator = showsIndicators && axes.contains(.horizontal)
         
         if uiView.subviews.isEmpty {
             uiView.addSubview(UIHostingView(rootView: content()))
@@ -71,15 +75,26 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         }
         
         let contentView = (uiView.subviews[0] as! UIHostingView<Content>)
+            
+        uiView.contentSize = contentView.sizeThatFits(
+            .init(
+                width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height,
+                height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
+            )
+        )
         
         contentView.frame.origin.x = uiView.contentSize.width / 2
         contentView.frame.origin.y = uiView.contentSize.height / 2
-        
-        uiView.contentSize = contentView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
     }
     
     public func makeCoordinator() -> Coordinator {
         Coordinator(base: self)
+    }
+}
+
+extension CocoaScrollView {
+    public func initialContentAlignment(_ alignment: Alignment) {
+        
     }
 }
 
