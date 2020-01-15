@@ -34,3 +34,10 @@ public struct Checkbox<Label: View>: View {
         isOn.wrappedValue.toggle()
     }
 }
+
+extension Checkbox where Label == EmptyView {
+    public init(isOn: Binding<Bool>) {
+        self.isOn = isOn
+        self.label = EmptyView()
+    }
+}

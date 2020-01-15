@@ -84,7 +84,10 @@ extension CocoaHostingController where Content == OpaqueView {
         _transitioningDelegate = presentation.style.transitioningDelegate
         modalPresentationStyle = .init(presentation.style)
         transitioningDelegate = _transitioningDelegate
-        view.backgroundColor = .clear
+        
+        if presentation.style != .automatic {
+            view.backgroundColor = .clear
+        }
     }
 }
 
