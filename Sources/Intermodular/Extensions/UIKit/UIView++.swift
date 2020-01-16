@@ -19,6 +19,17 @@ extension UIView {
         ])
     }
     
+    func constrainEdges(to other: UIView) {
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            leadingAnchor.constraint(equalTo: other.leadingAnchor),
+            trailingAnchor.constraint(equalTo: other.trailingAnchor),
+            topAnchor.constraint(equalTo: other.topAnchor),
+            bottomAnchor.constraint(equalTo: other.bottomAnchor)
+        ])
+    }
+    
     func constrainSubview(_ subview: UIView) {
         if subview.superview == nil {
             addSubview(subview)
@@ -27,8 +38,15 @@ extension UIView {
         subview.constrain(to: self)
     }
     
-    func
-        constrainEdges(to guide: UILayoutGuide) {
+    func constrainSubviewEdges(_ subview: UIView) {
+        if subview.superview == nil {
+            addSubview(subview)
+        }
+        
+        subview.constrainEdges(to: self)
+    }
+    
+    func constrainEdges(to guide: UILayoutGuide) {
         if superview == nil {
             guide.owningView?.addSubview(self)
         }

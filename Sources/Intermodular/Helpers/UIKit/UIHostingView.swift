@@ -37,11 +37,15 @@ open class UIHostingView<Content: View>: UIView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         
-        rootViewHostingController.view.frame = self.bounds
+        rootViewHostingController.view.frame = bounds
     }
     
     override open func sizeThatFits(_ size: CGSize) -> CGSize {
         rootViewHostingController.sizeThatFits(in: size)
+    }
+    
+    override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        rootViewHostingController.sizeThatFits(in: targetSize)
     }
     
     override open func systemLayoutSizeFitting(

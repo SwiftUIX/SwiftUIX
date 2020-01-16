@@ -14,6 +14,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     public class Coordinator: NSObject, UIScrollViewDelegate {
         private let base: CocoaScrollView
         
+        var isInitialContentAlignmentSet: Bool = false
+        
         init(base: CocoaScrollView) {
             self.base = base
         }
@@ -68,23 +70,33 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         uiView.showsVerticalScrollIndicator = showsIndicators && axes.contains(.vertical)
         uiView.showsHorizontalScrollIndicator = showsIndicators && axes.contains(.horizontal)
         
+        let contentView: UIHostingView<Content>
+        
         if uiView.subviews.isEmpty {
-            uiView.addSubview(UIHostingView(rootView: content()))
+            contentView = UIHostingView(rootView: content())
+            
+            uiView.addSubview(contentView)
         } else {
-            (uiView.subviews[0] as! UIHostingView<Content>).rootView = content()
+            contentView = (uiView.subviews[0] as! UIHostingView<Content>)
+            
+            contentView.rootView = content()
         }
         
-        let contentView = (uiView.subviews[0] as! UIHostingView<Content>)
-        
-        uiView.contentSize = contentView.sizeThatFits(
+        let contentSize = contentView.sizeThatFits(
             .init(
-                width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height,
+                width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.width,
                 height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
             )
         )
         
-        contentView.frame.origin.x = uiView.contentSize.width / 2
-        contentView.frame.origin.y = uiView.contentSize.height / 2
+        contentView.frame.size = contentSize
+        uiView.contentSize = contentSize
+        
+        if !context.coordinator.isInitialContentAlignmentSet {
+            uiView.setContentAlignment(initialContentAlignment, animated: false)
+            
+            context.coordinator.isInitialContentAlignmentSet = true
+        }
     }
     
     public func makeCoordinator() -> Coordinator {
