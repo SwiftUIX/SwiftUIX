@@ -13,6 +13,20 @@ public class CocoaPresentationCoordinator: NSObject {
     public private(set) weak var presentingCoordinator: CocoaPresentationCoordinator?
     public private(set) var presentedCoordinator: CocoaPresentationCoordinator?
     
+    var topMostCoordinator: CocoaPresentationCoordinator {
+        var coordinator = self
+        
+        while let nextCoordinator = coordinator.presentedCoordinator {
+            coordinator = nextCoordinator
+        }
+        
+        return coordinator
+    }
+    
+    var topMostPresentedCoordinator: CocoaPresentationCoordinator? {
+        presentedCoordinator?.topMostCoordinator
+    }
+    
     var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
@@ -21,6 +35,10 @@ public class CocoaPresentationCoordinator: NSObject {
     override init() {
         self.presentation = nil
         self.presentingCoordinator = nil
+        
+        super.init()
+     
+        self.presentingCoordinator = self
     }
     
     init(
@@ -61,31 +79,8 @@ public class CocoaPresentationCoordinator: NSObject {
             completion: completion
         )
     }
-}
-
-// MARK: - Protocol Implementations -
-
-extension CocoaPresentationCoordinator: DynamicViewPresenter {
-    public var isPresented: Bool {
-        return presentedCoordinator != nil
-    }
     
-    public func present<V: View>(
-        _ view: V,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
-    ) {
-        (presentedCoordinator ?? self).present(CocoaPresentation(
-            content: { view },
-            shouldDismiss: { true },
-            onDismiss: onDismiss,
-            resetBinding: { },
-            style: style,
-            environment: nil
-        ))
-    }
-    
-    public func dismiss() {
+    func dismissPresented() {
         guard
             let viewController = viewController,
             let presentedCoordinator = presentedCoordinator,
@@ -101,6 +96,37 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
     }
     
+    func dismissSelf() {
+        presentingCoordinator?.dismissPresented()
+    }
+}
+
+// MARK: - Protocol Implementations -
+
+extension CocoaPresentationCoordinator: DynamicViewPresenter {
+    public var isPresented: Bool {
+        return presentedCoordinator != nil
+    }
+    
+    public func present<V: View>(
+        _ view: V,
+        onDismiss: (() -> Void)?,
+        style: ModalViewPresentationStyle
+    ) {
+        topMostCoordinator.present(CocoaPresentation(
+            content: { view },
+            shouldDismiss: { true },
+            onDismiss: onDismiss,
+            resetBinding: { },
+            style: style,
+            environment: nil
+        ))
+    }
+    
+    public func dismiss() {
+        topMostPresentedCoordinator?.dismissSelf()
+    }
+    
     public func dismiss(viewNamed name: ViewName) {
         var coordinator = self
         
@@ -112,10 +138,6 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 coordinator = presentedCoordinator
             }
         }
-    }
-    
-    public func dismissSelf() {
-        presentingCoordinator?.dismiss()
     }
 }
 
