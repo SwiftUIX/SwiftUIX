@@ -8,12 +8,11 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
-    let presentation: CocoaPresentation?
-    let presentationCoordinator: CocoaPresentationCoordinator
-    let environment: EnvironmentValues?
+    private let presentation: CocoaPresentation?
+    private let _transitioningDelegate: UIViewControllerTransitioningDelegate?
     
-    var _transitioningDelegate: UIViewControllerTransitioningDelegate?
-    
+    public let presentationCoordinator: CocoaPresentationCoordinator
+
     public override var description: String {
         if let name = rootViewContentName {
             return String(describing: name)
@@ -37,27 +36,39 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     init(
         rootView: Content,
         presentation: CocoaPresentation?,
-        presentationCoordinator: CocoaPresentationCoordinator,
-        environment: EnvironmentValues?
+        presentationCoordinator: CocoaPresentationCoordinator
     ) {
         self.presentation = presentation
         self.presentationCoordinator = presentationCoordinator
-        self.environment = environment
         
+        _transitioningDelegate = presentation?.style.transitioningDelegate
+
         super.init(
             rootView: CocoaHostingControllerContent(
                 content: rootView,
                 presentation: presentation,
-                presentationCoordinator: presentationCoordinator,
-                environment: environment
+                presentationCoordinator: presentationCoordinator
             )
         )
         
         presentationCoordinator.viewController = self
+
+        if let presentation = presentation {
+            modalPresentationStyle = .init(presentation.style)
+            transitioningDelegate = _transitioningDelegate
+            
+            if presentation.style != .automatic {
+                view.backgroundColor = .clear
+            }
+        }
     }
     
     public convenience init(rootView: Content) {
-        self.init(rootView: rootView, presentation: nil, presentationCoordinator: .init(), environment: nil)
+        self.init(
+            rootView: rootView,
+            presentation: nil,
+            presentationCoordinator: .init()
+        )
     }
     
     public convenience init(@ViewBuilder rootView: () -> Content) {
@@ -77,17 +88,8 @@ extension CocoaHostingController where Content == OpaqueView {
         self.init(
             rootView: presentation.content(),
             presentation: presentation,
-            presentationCoordinator: presentationCoordinator,
-            environment: presentation.environment
+            presentationCoordinator: presentationCoordinator
         )
-        
-        _transitioningDelegate = presentation.style.transitioningDelegate
-        modalPresentationStyle = .init(presentation.style)
-        transitioningDelegate = _transitioningDelegate
-        
-        if presentation.style != .automatic {
-            view.backgroundColor = .clear
-        }
     }
 }
 

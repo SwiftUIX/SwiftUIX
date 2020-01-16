@@ -9,8 +9,7 @@ public protocol DynamicViewPresenter: PresentationManager {
     func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        environment: EnvironmentValues?
+        style: ModalViewPresentationStyle
     )
     
     func dismiss(viewNamed _: ViewName)
@@ -21,15 +20,12 @@ public protocol DynamicViewPresenter: PresentationManager {
 extension DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        environment: EnvironmentValues?
+        onDismiss: (() -> Void)?
     ) {
         present(
             view,
             onDismiss: onDismiss,
-            style: .automatic,
-            environment: environment
+            style: .automatic
         )
     }
     

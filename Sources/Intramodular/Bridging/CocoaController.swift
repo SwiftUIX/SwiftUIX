@@ -5,17 +5,11 @@
 import Swift
 import SwiftUI
 
-public protocol opaque_CocoaController {
-    func present(
-        _ presentation: CocoaPresentation,
-        animated: Bool,
-        completion: @escaping () -> ()
-    )
-}
-
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol CocoaController: opaque_CocoaController, UIViewController {
+public protocol opaque_CocoaController {
+    var presentationCoordinator: CocoaPresentationCoordinator { get }
+    
     func present(
         _ presentation: CocoaPresentation,
         animated: Bool,
@@ -23,14 +17,8 @@ public protocol CocoaController: opaque_CocoaController, UIViewController {
     )
 }
 
-#elseif os(macOS)
-
-public protocol CocoaController: opaque_CocoaController, NSViewController {
-    func present(
-        _ presentation: CocoaPresentation,
-        animated: Bool,
-        completion: @escaping () -> ()
-    )
+public protocol CocoaController: opaque_CocoaController, UIViewController {
+    
 }
 
 #endif

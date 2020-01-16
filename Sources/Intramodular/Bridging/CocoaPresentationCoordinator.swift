@@ -7,13 +7,13 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class CocoaPresentationCoordinator: NSObject {
+public class CocoaPresentationCoordinator: NSObject {
     private let presentation: CocoaPresentation?
-    
-    private weak var presentingCoordinator: CocoaPresentationCoordinator?
-    
+
+    public private(set) weak var presentingCoordinator: CocoaPresentationCoordinator?
+    public private(set) var presentedCoordinator: CocoaPresentationCoordinator?
+
     var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
-    var presentedCoordinator: CocoaPresentationCoordinator?
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     weak var viewController: UIViewController?
@@ -37,9 +37,7 @@ class CocoaPresentationCoordinator: NSObject {
         completion: @escaping () -> () = { }
     ) {
         if let viewController = viewController?.presentedViewController as? CocoaHostingController<OpaqueView>, viewController.modalViewPresentationStyle == presentation.style {
-            viewController.rootView.content = presentation.content()
-            viewController.rootView.environment = presentation.environment
-
+            viewController.rootView.content = presentation.content()            
             return
         }
         
@@ -75,8 +73,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        environment: EnvironmentValues?
+        style: ModalViewPresentationStyle
     ) {
         present(CocoaPresentation(
             content: { view },
@@ -84,7 +81,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             onDismiss: onDismiss,
             resetBinding: { },
             style: style,
-            environment: environment
+            environment: nil
         ))
     }
     
@@ -123,7 +120,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
 }
 
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+    public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         if let presentation = presentation {
             return .init(presentation.style)
         } else {
@@ -131,21 +128,21 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
         }
     }
     
-    func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
+    public func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
         presentation?.shouldDismiss() ?? true
     }
     
-    func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
+    public func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
         for callback in onDidAttemptToDismiss {
             callback.action()
         }
     }
     
-    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+    public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         
     }
     
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         presentation?.onDismiss?()
     }
 }

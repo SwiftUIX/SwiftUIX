@@ -5,8 +5,6 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 public struct CocoaPresentation: Equatable, Identifiable {
     public let id = UUID()
     
@@ -75,5 +73,3 @@ public extension View {
         return preference(key: CocoaPresentation.IsModalInPresentationPreferenceKey.self, value: value)
     }
 }
-
-#endif

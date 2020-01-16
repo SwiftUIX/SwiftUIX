@@ -72,7 +72,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             Button(action: present, label: { label }).sheet(
                 isPresented: $isPresented,
                 onDismiss: { self.isPresented = false; self.onDismiss?() },
-                content: { self.destination }
+                content: { self.destination() }
             )
             
             #endif

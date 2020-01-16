@@ -34,7 +34,7 @@ public struct OpaqueView: CustomStringConvertible, View {
     }
     
     public var body: some View {
-        base.environment(environment)
+        base
     }
 }
 
