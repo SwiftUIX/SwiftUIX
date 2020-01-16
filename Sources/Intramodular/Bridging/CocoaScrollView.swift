@@ -75,7 +75,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         }
         
         let contentView = (uiView.subviews[0] as! UIHostingView<Content>)
-            
+        
         uiView.contentSize = contentView.sizeThatFits(
             .init(
                 width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height,
@@ -89,12 +89,6 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     
     public func makeCoordinator() -> Coordinator {
         Coordinator(base: self)
-    }
-}
-
-extension CocoaScrollView {
-    public func initialContentAlignment(_ alignment: Alignment) {
-        
     }
 }
 

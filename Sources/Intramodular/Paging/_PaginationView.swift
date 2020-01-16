@@ -151,9 +151,17 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         result.dataSource = context.coordinator
         result.delegate = context.coordinator
+                
+        result.setViewControllers(
+            [children[currentPageIndex]],
+            direction: .forward,
+            animated: true
+        )
         
+        result.pageControl?.tintColor = Color.accentColor.toUIColor()
+
         progressionController = _ProgressionController(base: result)
-        
+
         return result
     }
     
@@ -163,12 +171,6 @@ extension _PaginationView: UIViewControllerRepresentable {
         }
         
         uiViewController.pageControl?.tintColor = Color.accentColor.toUIColor()
-        
-        uiViewController.setViewControllers(
-            [children[currentPageIndex]],
-            direction: .forward,
-            animated: true
-        )
     }
     
     func makeCoordinator() -> Coordinator {
