@@ -75,7 +75,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         onDismiss: (() -> Void)?,
         style: ModalViewPresentationStyle
     ) {
-        present(CocoaPresentation(
+        (presentedCoordinator ?? self).present(CocoaPresentation(
             content: { view },
             shouldDismiss: { true },
             onDismiss: onDismiss,
@@ -144,6 +144,8 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         presentation?.onDismiss?()
+        
+        presentingCoordinator?.presentedCoordinator = nil
     }
 }
 
