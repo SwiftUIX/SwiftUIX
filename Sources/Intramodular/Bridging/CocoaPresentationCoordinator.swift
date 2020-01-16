@@ -9,10 +9,10 @@ import SwiftUI
 
 public class CocoaPresentationCoordinator: NSObject {
     private let presentation: CocoaPresentation?
-
+    
     public private(set) weak var presentingCoordinator: CocoaPresentationCoordinator?
     public private(set) var presentedCoordinator: CocoaPresentationCoordinator?
-
+    
     var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
@@ -37,7 +37,7 @@ public class CocoaPresentationCoordinator: NSObject {
         completion: @escaping () -> () = { }
     ) {
         if let viewController = viewController?.presentedViewController as? CocoaHostingController<OpaqueView>, viewController.modalViewPresentationStyle == presentation.style {
-            viewController.rootView.content = presentation.content()            
+            viewController.rootView.content = presentation.content()
             return
         }
         
