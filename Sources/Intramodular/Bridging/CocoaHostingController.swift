@@ -30,7 +30,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
     
     public var rootViewContentName: ViewName? {
-        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? OpaqueView)?.name
+        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? AnyPresentationView)?.name
     }
     
     init(
@@ -80,7 +80,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
 }
 
-extension CocoaHostingController where Content == OpaqueView {
+extension CocoaHostingController where Content == AnyPresentationView {
     convenience init(
         presentation: CocoaPresentation,
         presentationCoordinator: CocoaPresentationCoordinator

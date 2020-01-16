@@ -36,7 +36,7 @@ public class CocoaPresentationCoordinator: NSObject {
         animated: Bool = true,
         completion: @escaping () -> () = { }
     ) {
-        if let viewController = viewController?.presentedViewController as? CocoaHostingController<OpaqueView>, viewController.modalViewPresentationStyle == presentation.style {
+        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyPresentationView>, viewController.modalViewPresentationStyle == presentation.style {
             viewController.rootView.content = presentation.content()
             return
         }
@@ -105,7 +105,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         var coordinator = self
         
         while let presentedCoordinator = coordinator.presentedCoordinator {
-            if (presentedCoordinator.viewController as? CocoaHostingController<OpaqueView>)?.rootViewContentName == name {
+            if (presentedCoordinator.viewController as? CocoaHostingController<AnyPresentationView>)?.rootViewContentName == name {
                 presentedCoordinator.dismissSelf()
                 break
             } else {

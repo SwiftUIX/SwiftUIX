@@ -8,7 +8,7 @@ import SwiftUI
 public struct CocoaPresentation: Equatable, Identifiable {
     public let id = UUID()
     
-    let content: () -> OpaqueView
+    let content: () -> AnyPresentationView
     let shouldDismiss: () -> Bool
     let onDismiss: (() -> Void)?
     let resetBinding: () -> ()
