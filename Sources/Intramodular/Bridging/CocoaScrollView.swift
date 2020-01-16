@@ -72,14 +72,13 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         
         let contentView: UIHostingView<Content>
         
-        if uiView.subviews.isEmpty {
+        if let first = uiView.subviews.compactMap({ $0 as? UIHostingView<Content> }).first {
+            contentView = first
+            contentView.rootView = content()
+        } else {
             contentView = UIHostingView(rootView: content())
             
             uiView.addSubview(contentView)
-        } else {
-            contentView = (uiView.subviews[0] as! UIHostingView<Content>)
-            
-            contentView.rootView = content()
         }
         
         let contentSize = contentView.sizeThatFits(
@@ -93,9 +92,11 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         uiView.contentSize = contentSize
         
         if !context.coordinator.isInitialContentAlignmentSet {
-            uiView.setContentAlignment(initialContentAlignment, animated: false)
-            
-            context.coordinator.isInitialContentAlignmentSet = true
+            if contentSize != .zero && uiView.frame.size != .zero  {
+                uiView.setContentAlignment(initialContentAlignment, animated: false)
+                
+                context.coordinator.isInitialContentAlignmentSet = true
+            }
         }
     }
     
