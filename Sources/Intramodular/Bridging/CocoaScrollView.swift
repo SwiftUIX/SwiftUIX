@@ -21,9 +21,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         }
         
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            DispatchQueue.main.async {
-                self.base.contentOffset?.wrappedValue = scrollView.contentOffset.y
-            }
+            base.onPercentContentOffsetChange(scrollView.percentContentOffset)
+            scrollView.contentAlignment.map(base.onContentAlignmentChange)
         }
     }
     
@@ -33,13 +32,14 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
     
-    private var contentOffset: Binding<CGFloat>? = nil
-    
     private var alwaysBounceVertical: Bool = false
     private var alwaysBounceHorizontal: Bool = false
     private var isPagingEnabled: Bool = false
     private var isScrollEnabled: Bool = true
     private var isDirectionalLockEnabled: Bool = false
+    
+    private var onPercentContentOffsetChange: (CGPoint) -> () = { _ in }
+    private var onContentAlignmentChange: (Alignment) -> () = { _ in }
     
     public init(
         _ axes: Axis.Set = .vertical,
@@ -102,6 +102,20 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     
     public func makeCoordinator() -> Coordinator {
         Coordinator(base: self)
+    }
+}
+
+extension CocoaScrollView {
+    public func onPercentContentOffsetChange(_ body: @escaping (CGPoint) -> ()) -> CocoaScrollView {
+        then {
+            $0.onPercentContentOffsetChange = body
+        }
+    }
+    
+    public func onContentAlignmentChange(_ body: @escaping (Alignment) -> ()) -> CocoaScrollView {
+        then {
+            $0.onContentAlignmentChange = body
+        }
     }
 }
 

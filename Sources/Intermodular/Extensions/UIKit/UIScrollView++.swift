@@ -5,10 +5,50 @@
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
+import SwiftUI
 import UIKit
 
 extension UIScrollView {
+    var percentContentOffset: CGPoint {
+        return .init(
+            x: contentOffset.y / (contentSize.height - frame.height),
+            y: contentOffset.x / (contentSize.width - frame.height)
+        )
+    }
+}
+
+extension UIScrollView {
+    var contentAlignment: Alignment? {
+        switch contentOffset {
+            case contentOffset(for: .center):
+                return .center
+            case contentOffset(for: .leading):
+                return .leading
+            case contentOffset(for: .trailing):
+                return .trailing
+            case contentOffset(for: .top):
+                return .top
+            case contentOffset(for: .bottom):
+                return .bottom
+            case contentOffset(for: .topLeading):
+                return .topLeading
+            case contentOffset(for: .topTrailing):
+                return .topTrailing
+            case contentOffset(for: .bottomLeading):
+                return .topTrailing
+            case contentOffset(for: .bottomTrailing):
+                return .topTrailing
+            
+            default:
+                return nil
+        }
+    }
+    
     func setContentAlignment(_ alignment: Alignment, animated: Bool) {
+        setContentOffset(contentOffset(for: alignment), animated: animated)
+    }
+    
+    private func contentOffset(for alignment: Alignment) -> CGPoint {
         var offset: CGPoint = .zero
         
         switch alignment.horizontal {
@@ -33,7 +73,7 @@ extension UIScrollView {
                 fatalError()
         }
         
-        setContentOffset(offset, animated: animated)
+        return offset
     }
 }
 
