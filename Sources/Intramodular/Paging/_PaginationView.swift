@@ -137,7 +137,11 @@ extension _PaginationView: UIViewControllerRepresentable {
         }
         
         @objc func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-            return currentPageIndex
+            guard let controller = pageViewController.viewControllers?.first else {
+                return currentPageIndex
+            }
+            
+            return parent.children.firstIndex(of: controller) ?? currentPageIndex
         }
     }
     
