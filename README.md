@@ -3,6 +3,18 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
+# Why
+
+This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible - and then some more! 
+
+Ports include but are not limited to:
+
+- `UIActivityIndicatorView` (via `ActivityIndicator`)
+- `UIPageViewController` (via `PaginationView`)
+- `UIScrollView` (via `CocoaScrollView`)
+- `UITextField` (via `CocoaTextField`)
+- `UITextView` (via `TextView`)
+
 # Requirements 
 
 - iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
