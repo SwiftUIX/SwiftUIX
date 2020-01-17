@@ -5,7 +5,9 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
 # Why
 
-This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible - and then some more! 
+The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
+
+This project is also **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
 Ports include but are not limited to:
 
