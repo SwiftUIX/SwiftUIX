@@ -77,17 +77,21 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             contentView.rootView = content()
         } else {
             contentView = UIHostingView(rootView: content())
-            
             uiView.addSubview(contentView)
         }
         
-        let contentSize = contentView.sizeThatFits(
-            .init(
-                width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.width,
-                height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
-            )
+        let maximumContentSize: CGSize = .init(
+            width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.width,
+            height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
         )
         
+        let proposedContentSize = contentView.sizeThatFits(maximumContentSize)
+        
+        let contentSize = CGSize(
+            width: min(proposedContentSize.width, maximumContentSize.width),
+            height: min(proposedContentSize.height, maximumContentSize.height)
+        )
+            
         contentView.frame.size = contentSize
         uiView.contentSize = contentSize
         
