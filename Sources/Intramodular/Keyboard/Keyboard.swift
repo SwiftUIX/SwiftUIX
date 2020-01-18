@@ -149,7 +149,7 @@ struct RemoveIfKeyboardActive: ViewModifier {
             width: keyboard.isShowing ? 0 : nil,
             height: keyboard.isShowing ? 0 : nil,
             alignment: .center
-        )
+        ).clipped()
     }
 }
 
@@ -165,7 +165,7 @@ struct AddIfKeyboardActive: ViewModifier {
             width: keyboard.isShowing ? nil : 0,
             height: keyboard.isShowing ? nil : 0,
             alignment: .center
-        )
+        ).clipped()
     }
 }
 
