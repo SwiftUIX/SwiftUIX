@@ -5,14 +5,20 @@
 import Swift
 import SwiftUI
 
-/// A view backed by some model type.
+/// A view associated with some model type.
 public protocol ModelView: View {
     associatedtype Model
     
     init(_: Model)
 }
 
-public protocol ModelMutatingView: ModelView {
+/// A view that delivers a model.
+public protocol SetModelView: ModelView {
+    init(_ binding: SetBinding<Model>)
+}
+
+/// A view that mutates a model.
+public protocol MutateModelView: ModelView {
     typealias ModelBinding = Binding<Model>
     
     init(_: Binding<Model>)
@@ -20,7 +26,7 @@ public protocol ModelMutatingView: ModelView {
 
 // MARK: - Implementation -
 
-extension ModelMutatingView {
+extension MutateModelView {
     public init(_ model: Model) {
         self.init(.constant(model))
     }
