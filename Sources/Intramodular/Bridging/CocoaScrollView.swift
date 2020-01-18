@@ -26,7 +26,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         }
     }
     
-    private let content: () -> Content
+    private let content: Content
     private let axes: Axis.Set
     private let showsIndicators: Bool
     
@@ -44,11 +44,11 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     public init(
         _ axes: Axis.Set = .vertical,
         showsIndicators: Bool = true,
-        @ViewBuilder content: @escaping () -> Content
+        @ViewBuilder content: () -> Content
     ) {
         self.axes = axes
         self.showsIndicators = showsIndicators
-        self.content = content
+        self.content = content()
     }
     
     public func makeUIView(context: Context) -> UIViewType {
@@ -74,9 +74,9 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         
         if let first = uiView.subviews.compactMap({ $0 as? UIHostingView<Content> }).first {
             contentView = first
-            contentView.rootView = content()
+            contentView.rootView = content
         } else {
-            contentView = UIHostingView(rootView: content())
+            contentView = UIHostingView(rootView: content)
             uiView.addSubview(contentView)
         }
         
@@ -85,13 +85,18 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
         )
         
+        let oldContentSize = contentView.frame.size
         let proposedContentSize = contentView.sizeThatFits(maximumContentSize)
         
         let contentSize = CGSize(
             width: min(proposedContentSize.width, maximumContentSize.width),
             height: min(proposedContentSize.height, maximumContentSize.height)
         )
-            
+        
+        guard oldContentSize != contentSize else {
+            return
+        }
+        
         contentView.frame.size = contentSize
         uiView.contentSize = contentSize
         
