@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class UIHostingController_ClearBackground<Content: View>: UIHostingController<Content> {
+class _UIHostingController<Content: View>: UIHostingController<Content> {
     override open func viewDidLoad() {
         super.viewDidLoad()
         

@@ -22,7 +22,7 @@ public struct PaginationView<Page: View>: View {
         axis: Axis = .horizontal,
         pageIndicatorAlignment: Alignment? = nil
     ) {
-        self.children = pages.map(UIHostingController_ClearBackground.init)
+        self.children = pages.map(_UIHostingController.init)
         self.axis = axis
         
         switch axis {
