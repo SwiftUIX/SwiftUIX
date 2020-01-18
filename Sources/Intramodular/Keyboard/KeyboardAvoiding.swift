@@ -7,10 +7,14 @@
 import Combine
 import SwiftUI
 
-public struct KeyboardAvoiding: ViewModifier {
-    @State private var keyboardHeight: CGFloat = 0
+private struct KeyboardAvoiding: ViewModifier {
+    @State var keyboardHeight: CGFloat = 0
     
-    public var keyBoardHeightPublisher: Publishers.Merge<Publishers.CompactMap<NotificationCenter.Publisher, CGFloat>, Publishers.Map<NotificationCenter.Publisher, CGFloat>> {
+    var isActive: Bool {
+        keyboardHeight != 0
+    }
+    
+    var keyBoardHeightPublisher: Publishers.Merge<Publishers.CompactMap<NotificationCenter.Publisher, CGFloat>, Publishers.Map<NotificationCenter.Publisher, CGFloat>> {
         Publishers.Merge(
             NotificationCenter
                 .default
@@ -25,11 +29,12 @@ public struct KeyboardAvoiding: ViewModifier {
         )
     }
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         content
             .padding(.bottom, keyboardHeight)
-            .animation(Animation.spring(response: 0.4, dampingFraction: 0.9, blendDuration: 1.0))
+            .animation(.spring())
             .onReceive(keyBoardHeightPublisher, perform: { self.keyboardHeight = $0 })
+            .edgesIgnoringSafeArea(isActive ? [.bottom] : [])
     }
 }
 

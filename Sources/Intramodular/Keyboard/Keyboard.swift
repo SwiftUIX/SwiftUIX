@@ -145,13 +145,11 @@ struct RemoveIfKeyboardActive: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        Group {
-            if keyboard.isShowing {
-                EmptyView()
-            } else {
-                content
-            }
-        }
+        content.frame(
+            width: keyboard.isShowing ? 0 : nil,
+            height: keyboard.isShowing ? 0 : nil,
+            alignment: .center
+        )
     }
 }
 
@@ -163,13 +161,11 @@ struct AddIfKeyboardActive: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        Group {
-            if keyboard.isShowing {
-                content
-            } else {
-                EmptyView()
-            }
-        }
+        content.frame(
+            width: keyboard.isShowing ? nil : 0,
+            height: keyboard.isShowing ? nil : 0,
+            alignment: .center
+        )
     }
 }
 
