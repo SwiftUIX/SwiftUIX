@@ -13,7 +13,9 @@ public protocol ModelView: View {
 }
 
 /// A view that delivers a model.
-public protocol SetModelView: ModelView {
+public protocol SetModelView {
+    associatedtype Model
+    
     init(_ binding: SetBinding<Model>)
 }
 
