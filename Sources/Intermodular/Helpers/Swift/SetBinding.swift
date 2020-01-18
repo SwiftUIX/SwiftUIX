@@ -6,21 +6,31 @@ import Swift
 import SwiftUI
 
 public struct SetBinding<Value> {
-    private let setter: (Value) -> ()
+    private let set: (Value) -> ()
     
-    public init(setter: @escaping (Value) -> ()) {
-        self.setter = setter
+    public init(set: @escaping (Value) -> ()) {
+        self.set = set
     }
     
     public var projectedValue: Binding<Value> {
         .init(
             get: { fatalError() },
-            set: setter
+            set: set
         )
     }
     
     public func set(_ value: Value) {
-        setter(value)
+        self.set(value)
     }
-    
+}
+
+// MARK: - Helpers -
+
+extension Binding {
+    public init(set: SetBinding<Value>, defaultValue: Value) {
+        self.init(
+            get: { defaultValue },
+            set: { set.set($0) }
+        )
+    }
 }

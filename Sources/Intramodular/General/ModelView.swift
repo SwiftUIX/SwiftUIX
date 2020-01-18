@@ -33,3 +33,11 @@ extension MutateModelView {
         self.init(.constant(model))
     }
 }
+
+// MARK: - Extensions -
+
+extension SetModelView {
+    public init(_ receive: @escaping (Model) -> ()) {
+        self.init(.init(set: receive))
+    }
+}

@@ -13,7 +13,7 @@ public protocol opaque_CocoaController {
     func present(
         _ presentation: CocoaPresentation,
         animated: Bool,
-        completion: @escaping () -> ()
+        completion: (() -> Void)?
     )
 }
 

@@ -99,7 +99,7 @@ extension CocoaHostingController: CocoaController {
     open func present(
         _ presentation: CocoaPresentation,
         animated: Bool,
-        completion: @escaping () -> () = { }
+        completion: (() -> Void)? 
     ) {
         presentationCoordinator.present(
             presentation,

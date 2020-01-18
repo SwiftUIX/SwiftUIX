@@ -37,7 +37,7 @@ public class CocoaPresentationCoordinator: NSObject {
         self.presentingCoordinator = nil
         
         super.init()
-     
+        
         self.presentingCoordinator = self
     }
     
@@ -52,7 +52,7 @@ public class CocoaPresentationCoordinator: NSObject {
     func present(
         _ presentation: CocoaPresentation,
         animated: Bool = true,
-        completion: @escaping () -> () = { }
+        completion: (() -> Void)? = nil
     ) {
         if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyPresentationView>, viewController.modalViewPresentationStyle == presentation.style {
             viewController.rootView.content = presentation.content()
@@ -80,7 +80,7 @@ public class CocoaPresentationCoordinator: NSObject {
         )
     }
     
-    func dismissPresented() {
+    func dismissPresented(completion: (() -> Void)? = nil) {
         guard
             let viewController = viewController,
             let presentedCoordinator = presentedCoordinator,
@@ -93,11 +93,12 @@ public class CocoaPresentationCoordinator: NSObject {
         viewController.dismiss(animated: true) {
             presentation.onDismiss?()
             self.presentedCoordinator = nil
+            completion?()
         }
     }
     
-    func dismissSelf() {
-        presentingCoordinator?.dismissPresented()
+    func dismissSelf(completion: (() -> Void)? = nil) {
+        presentingCoordinator?.dismissPresented(completion: completion)
     }
 }
 
@@ -111,7 +112,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle,
+        completion: (() -> Void)?
     ) {
         topMostCoordinator.present(CocoaPresentation(
             content: { view },
@@ -120,13 +122,17 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             resetBinding: { },
             style: style,
             environment: nil
-        ))
+        ), completion: completion)
     }
     
+    public func dismiss(completion: (() -> Void)?) {
+        topMostPresentedCoordinator?.dismissSelf(completion: completion)
+    }
+
     public func dismiss() {
-        topMostPresentedCoordinator?.dismissSelf()
+        dismiss(completion: nil)
     }
-    
+
     public func dismiss(viewNamed name: ViewName) {
         var coordinator = self
         

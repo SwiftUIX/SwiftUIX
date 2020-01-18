@@ -11,7 +11,7 @@ import UIKit
 private var presentationCoordinatorKey: Void = ()
 
 extension UIViewController: DynamicViewPresenter {
-    private var objc_associated_presentationCoordinator: CocoaPresentationCoordinator {
+    public var objc_associated_presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = (self as? opaque_CocoaController)?.presentationCoordinator {
             return coordinator
         }
@@ -19,7 +19,7 @@ extension UIViewController: DynamicViewPresenter {
         if let coordinator = objc_getAssociatedObject(self, &presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
         } else {
-            let coordinator = CocoaPresentationCoordinator()
+            let coordinator = CocoaPresentationCoordinator(presentingCoordinator: presentingViewController?.objc_associated_presentationCoordinator)
             
             coordinator.viewController = self
             
@@ -33,19 +33,25 @@ extension UIViewController: DynamicViewPresenter {
         objc_associated_presentationCoordinator.isPresented
     }
     
-    public func dismiss() {
-        objc_associated_presentationCoordinator.dismiss()
+    public func dismiss(completion: (() -> Void)?) {
+        objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
     
+    public func dismiss() {
+        dismiss(completion: nil)
+    }
+
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle,
+        completion: (() -> Void)?
     ) {
         objc_associated_presentationCoordinator.present(
             view,
             onDismiss: onDismiss,
-            style: style
+            style: style,
+            completion: completion
         )
     }
     

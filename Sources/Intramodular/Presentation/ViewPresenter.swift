@@ -9,15 +9,30 @@ public protocol DynamicViewPresenter: PresentationManager {
     func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle,
+        completion: (() -> Void)?
     )
     
+    func dismiss(completion: (() -> Void)?)
     func dismiss(viewNamed _: ViewName)
 }
 
 // MARK: - Extensions -
 
 extension DynamicViewPresenter {
+    func present<V: View>(
+        _ view: V,
+        onDismiss: (() -> Void)?,
+        style: ModalViewPresentationStyle
+    ) {
+        present(
+            view,
+            onDismiss: onDismiss,
+            style: style,
+            completion: nil
+        )
+    }
+    
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?
