@@ -11,6 +11,14 @@ public protocol PresentationManager: ViewInteractor {
     func dismiss()
 }
 
+// MARK: - Implementation -
+
+extension PresentationManager where Self: DynamicViewPresenter {
+    public func dismiss() {
+        dismiss(completion: nil)
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey {

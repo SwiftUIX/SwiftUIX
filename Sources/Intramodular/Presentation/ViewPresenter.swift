@@ -43,7 +43,7 @@ extension DynamicViewPresenter {
             style: .automatic
         )
     }
-    
+        
     public func dismiss<H: Hashable>(viewNamed name: H) {
         dismiss(viewNamed: .init(name))
     }
