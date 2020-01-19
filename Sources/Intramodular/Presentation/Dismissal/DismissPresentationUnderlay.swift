@@ -19,15 +19,13 @@ public struct DismissPresentationUnderlay<Content: View>: View {
     
     public var body: some View {
         GeometryReader { proxy in
-            ZStack {
-                self.content
+            self.content
+        }
+        .background(
+            ClearFillView().onTapGesture {
+                self.presentationManager.dismiss()
             }
-        }
-        .edgesIgnoringSafeArea([.all])
-        .contentShape(Rectangle())
-        .onTapGesture {
-            self.presentationManager.dismiss()
-        }
+        )
     }
 }
 

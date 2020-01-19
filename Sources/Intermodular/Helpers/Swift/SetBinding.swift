@@ -5,11 +5,20 @@
 import Swift
 import SwiftUI
 
+@propertyWrapper
 public struct SetBinding<Value> {
     private let set: (Value) -> ()
     
     public init(set: @escaping (Value) -> ()) {
         self.set = set
+    }
+    
+    public var wrappedValue: Value {
+        get {
+            fatalError()
+        } set {
+            set(newValue)
+        }
     }
     
     public var projectedValue: Binding<Value> {

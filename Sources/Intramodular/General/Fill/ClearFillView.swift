@@ -12,6 +12,9 @@ public struct ClearFillView: View {
     }
     
     public var body: some View {
-        Rectangle().fill(Color.clear)
+        GeometryReader {
+            _ in Color.clear
+        }
+        .contentShape(Rectangle())
     }
 }

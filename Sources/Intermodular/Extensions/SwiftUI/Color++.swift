@@ -6,6 +6,12 @@ import Swift
 import SwiftUI
 
 extension Color {
+    public static var almostClear: Color {
+        Color.black.opacity(0.0001)
+    }
+}
+
+extension Color {
     /// A color for placeholder text in controls or text fields or text views.
     public static var placeholderText: Color {
         #if os(iOS) || os(macOS) || os(tvOS)
