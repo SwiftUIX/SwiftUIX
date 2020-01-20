@@ -24,7 +24,7 @@ extension View {
 extension View {
     @inlinable
     public func backgroundColor(_ color: Color) -> some View {
-        background(color)
+        background(color.edgesIgnoringSafeArea(.all))
     }
     
     public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {

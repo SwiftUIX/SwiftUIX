@@ -40,7 +40,7 @@ extension UIViewController: DynamicViewPresenter {
     public func dismiss() {
         dismiss(completion: nil)
     }
-
+    
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)?,

@@ -20,6 +20,14 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             self.base = base
         }
         
+        @objc public func refreshChanged(_ control: UIRefreshControl) {
+            base.onRefresh?()
+            
+            if let isRefreshing = base.isRefreshing, !isRefreshing {
+                control.endRefreshing()
+            }
+        }
+        
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             base.onPercentContentOffsetChange(scrollView.percentContentOffset)
             scrollView.contentAlignment.map(base.onContentAlignmentChange)
@@ -40,6 +48,9 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     
     private var onPercentContentOffsetChange: (CGPoint) -> () = { _ in }
     private var onContentAlignmentChange: (Alignment) -> () = { _ in }
+    
+    private var onRefresh: (() -> Void)?
+    private var isRefreshing: Bool?
     
     public init(
         _ axes: Axis.Set = .vertical,
@@ -106,6 +117,37 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
                 
                 context.coordinator.isInitialContentAlignmentSet = true
             }
+        } else {
+            if contentSize != oldContentSize {
+                uiView.contentOffset.x += contentSize.width - oldContentSize.width
+                uiView.contentOffset.y += contentSize.height - oldContentSize.height
+            }
+        }
+        
+        if onRefresh != nil {
+            let refreshControl: UIRefreshControl
+            
+            if let _refreshControl = uiView.refreshControl {
+                refreshControl = _refreshControl
+            } else {
+                refreshControl = UIRefreshControl()
+                
+                refreshControl.addTarget(
+                    context.coordinator,
+                    action: #selector(Coordinator.refreshChanged),
+                    for: .valueChanged
+                )
+                
+                uiView.refreshControl = refreshControl
+            }
+            
+            if let isRefreshing = isRefreshing {
+                if isRefreshing {
+                    refreshControl.beginRefreshing()
+                } else {
+                    refreshControl.endRefreshing()
+                }
+            }
         }
     }
     
@@ -115,16 +157,22 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
 }
 
 extension CocoaScrollView {
-    public func onPercentContentOffsetChange(_ body: @escaping (CGPoint) -> ()) -> CocoaScrollView {
-        then {
-            $0.onPercentContentOffsetChange = body
-        }
+    public func onPercentContentOffsetChange(_ body: @escaping (CGPoint) -> ()) -> Self {
+        then({ $0.onPercentContentOffsetChange = body })
     }
     
-    public func onContentAlignmentChange(_ body: @escaping (Alignment) -> ()) -> CocoaScrollView {
-        then {
-            $0.onContentAlignmentChange = body
-        }
+    public func onContentAlignmentChange(_ body: @escaping (Alignment) -> ()) -> Self {
+        then({ $0.onContentAlignmentChange = body })
+    }
+}
+
+extension CocoaScrollView {
+    public func onRefresh(_ body: @escaping () -> ()) -> Self {
+        then({ $0.onRefresh = body })
+    }
+    
+    public func isRefreshing(_ isRefreshing: Bool) -> Self {
+        then({ $0.isRefreshing = isRefreshing })
     }
 }
 
