@@ -12,11 +12,13 @@ public protocol opaque_ActionButton: opaque_ActionTriggerView {
 /// A button whose primary action can be modified even after construction.
 public struct ActionButton<Label: View>: opaque_ActionButton, ActionTriggerView {
     private let label: Label
-    private var actionList: [() -> ()] = []
+    private var actions: Actions
     
     public init(action: @escaping () -> Void, @ViewBuilder label: () -> Label) {
         self.label = label()
-        self.actionList.append(action)
+        self.actions = .init()
+        
+        self.actions.insert(action)
     }
     
     public var body: some View {
@@ -26,12 +28,12 @@ public struct ActionButton<Label: View>: opaque_ActionButton, ActionTriggerView 
     }
     
     private func performActionList() {
-        actionList.forEach({ $0() })
+        actions.perform()
     }
     
     public func onPrimaryTrigger(perform action: @escaping () -> ()) -> ActionButton {
         then {
-            $0.actionList.append(action)
+            $0.actions.insert(action)
         }
     }
 }
