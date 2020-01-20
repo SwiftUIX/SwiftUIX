@@ -22,18 +22,10 @@ public struct ActionButton<Label: View>: opaque_ActionButton, ActionTriggerView 
     }
     
     public var body: some View {
-        Button(action: performActionList) {
-            label
-        }
-    }
-    
-    private func performActionList() {
-        actions.perform()
+        Button(action: { self.actions.perform() }, label: { label })
     }
     
     public func onPrimaryTrigger(perform action: @escaping () -> ()) -> ActionButton {
-        then {
-            $0.actions.insert(action)
-        }
+        then({ $0.actions.insert(action) })
     }
 }
