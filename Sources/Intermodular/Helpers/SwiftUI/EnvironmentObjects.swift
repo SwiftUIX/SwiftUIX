@@ -18,6 +18,12 @@ public struct EnvironmentObjects {
         
     }
     
+    public init<B: ObservableObject>(_ bindable: B) {
+        self.init()
+        
+        append(bindable)
+    }
+    
     public mutating func append<B: ObservableObject>(_ bindable: B) {
         descriptionObjects.append(bindable)
         
@@ -88,5 +94,9 @@ extension View {
                     })
             }
         }
+    }
+    
+    public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) -> some View {
+        insertEnvironmentObjects(.init(bindable))
     }
 }
