@@ -16,12 +16,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     private let destination: () -> Destination
+    private let destinationName: ViewName?
     private let label: Label
     private let onDismiss: (() -> ())?
     
-    @State private var isPresented: Bool = false
-    
     @Environment(\.dynamicViewPresenter) private var dynamicViewPresenter
+    @Environment(\.environmentObjects) private var environmentObjects
+    
+    @State private var isPresented: Bool = false
     
     private var mechanism: PresentationMechanism {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -37,6 +39,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         @ViewBuilder label: () -> Label
     ) {
         self.destination = destination
+        self.destinationName = nil
         self.label = label()
         self.onDismiss = onDismiss
     }
@@ -55,25 +58,31 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             if mechanism == .system {
                 Button(action: present, label: { label }).sheet(
                     isPresented: $isPresented,
-                    onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    content: self.destination
-                )
+                    onDismiss: { self.isPresented = false; self.onDismiss?() }
+                ) {
+                    self.destination()
+                        .insertEnvironmentObjects(self.environmentObjects)
+                }
             } else if mechanism == .custom {
                 Button(action: present, label: { label }).cocoaPresentation(
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    style: .automatic,
-                    content: self.destination
-                )
+                    style: .automatic
+                ) {
+                    self.destination()
+                        .insertEnvironmentObjects(self.environmentObjects)
+                }
             }
             
             #else
             
             Button(action: present, label: { label }).sheet(
                 isPresented: $isPresented,
-                onDismiss: { self.isPresented = false; self.onDismiss?() },
-                content: { self.destination() }
-            )
+                onDismiss: { self.isPresented = false; self.onDismiss?() }
+            ) {
+                self.destination()
+                    .insertEnvironmentObjects(self.environmentObjects)
+            }
             
             #endif
         }

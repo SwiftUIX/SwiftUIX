@@ -57,15 +57,35 @@ extension EnvironmentObjects: CustomStringConvertible {
     }
 }
 
+extension EnvironmentObjects {
+    struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        static let defaultValue = EnvironmentObjects()
+    }
+}
+
+extension EnvironmentValues {
+    public var environmentObjects: EnvironmentObjects {
+        get {
+            self[EnvironmentObjects.EnvironmentKey]
+        } set {
+            self[EnvironmentObjects.EnvironmentKey] = newValue
+        }
+    }
+}
+
 // MARK: - Helpers -
 
 extension View {
-    public func environmentObjects(_ objects: EnvironmentObjects) -> some View {
+    public func insertEnvironmentObjects(_ objects: EnvironmentObjects) -> some View {
         Group {
             if objects.isEmpty {
                 self
             } else {
-                objects.transform(eraseToAnyView())
+                objects
+                    .transform(eraseToAnyView())
+                    .transformEnvironment(\.environmentObjects, transform: {
+                        $0.append(contentsOf: objects)
+                    })
             }
         }
     }
