@@ -142,6 +142,18 @@ public struct SwitchOverCaseDefaultView<PreviousCase: SwitchOverCaseView, Conten
 extension SwitchOverCaseView {
     /// Handles a case in a `switch` control flow.
     public func `case`<Content: View>(
+        predicate: @escaping (Data) -> Bool,
+        @ViewBuilder content: () -> Content
+    ) -> SwitchOverCaseNextView<Self, Content> {
+        return .init(
+            previous: self,
+            predicate: predicate,
+            content: content
+        )
+    }
+
+    /// Handles a case in a `switch` control flow.
+    public func `case`<Content: View>(
         _ comparate: Data,
         predicate: @escaping (Data) -> Bool,
         @ViewBuilder content: () -> Content
