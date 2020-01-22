@@ -12,13 +12,9 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     private let _transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     public let presentationCoordinator: CocoaPresentationCoordinator
-
+    
     public override var description: String {
-        if let name = rootViewContentName {
-            return String(describing: name)
-        } else {
-            return super.description
-        }
+        rootViewName.map(String.init(describing:)) ?? super.description
     }
     
     public var rootViewContent: Content {
@@ -29,8 +25,8 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         }
     }
     
-    public var rootViewContentName: ViewName? {
-        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? AnyPresentationView)?.name
+    public var rootViewName: ViewName? {
+        (rootViewContent as? opaque_NamedView)?.name ?? (rootViewContent as? AnyPresentationView)?.name ?? presentation?.contentName
     }
     
     init(
@@ -42,7 +38,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         self.presentationCoordinator = presentationCoordinator
         
         _transitioningDelegate = presentation?.style.transitioningDelegate
-
+        
         super.init(
             rootView: CocoaHostingControllerContent(
                 content: rootView,
@@ -52,7 +48,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         )
         
         presentationCoordinator.viewController = self
-
+        
         if let presentation = presentation {
             modalPresentationStyle = .init(presentation.style)
             transitioningDelegate = _transitioningDelegate
@@ -99,7 +95,7 @@ extension CocoaHostingController: CocoaController {
     open func present(
         _ presentation: CocoaPresentation,
         animated: Bool,
-        completion: (() -> Void)? 
+        completion: (() -> Void)?
     ) {
         presentationCoordinator.present(
             presentation,

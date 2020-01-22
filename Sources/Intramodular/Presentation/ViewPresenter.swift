@@ -15,7 +15,7 @@ public protocol DynamicViewPresenter: PresentationManager {
     )
     
     func dismiss(completion: (() -> Void)?)
-    func dismiss(viewNamed _: ViewName)
+    func dismissView(named _: ViewName)
 }
 
 // MARK: - Extensions -
@@ -46,9 +46,9 @@ extension DynamicViewPresenter {
             style: .automatic
         )
     }
-        
-    public func dismiss<H: Hashable>(viewNamed name: H) {
-        dismiss(viewNamed: .init(name))
+    
+    public func dismissView<H: Hashable>(named name: H) {
+        dismissView(named: .init(name))
     }
 }
 

@@ -106,7 +106,11 @@ public class CocoaPresentationCoordinator: NSObject {
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public var isPresented: Bool {
-        return presentedCoordinator != nil
+        return topMostPresentedCoordinator != nil
+    }
+    
+    public var presentedViewName: ViewName? {
+        topMostPresentedCoordinator?.presentation?.contentName
     }
     
     public func present<V: View>(
@@ -130,21 +134,21 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func dismiss(completion: (() -> Void)?) {
         topMostPresentedCoordinator?.dismissSelf(completion: completion)
     }
-
+    
     public func dismiss() {
         dismiss(completion: nil)
     }
-
-    public func dismiss(viewNamed name: ViewName) {
+    
+    public func dismissView(named name: ViewName) {
         var coordinator = self
         
         while let presentedCoordinator = coordinator.presentedCoordinator {
-            if (presentedCoordinator.viewController as? CocoaHostingController<AnyPresentationView>)?.rootViewContentName == name {
+            if presentedCoordinator.viewController?.presentedViewName == name {
                 presentedCoordinator.dismissSelf()
                 break
-            } else {
-                coordinator = presentedCoordinator
             }
+            
+            coordinator = presentedCoordinator
         }
     }
 }
