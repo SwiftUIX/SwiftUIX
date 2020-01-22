@@ -43,12 +43,14 @@ extension UIViewController: DynamicViewPresenter {
     
     public func present<V: View>(
         _ view: V,
+        named viewName: ViewName? = nil,
         onDismiss: (() -> Void)?,
         style: ModalViewPresentationStyle,
         completion: (() -> Void)?
     ) {
         objc_associated_presentationCoordinator.present(
             view,
+            named: viewName,
             onDismiss: onDismiss,
             style: style,
             completion: completion

@@ -8,6 +8,7 @@ import SwiftUI
 public protocol DynamicViewPresenter: PresentationManager {
     func present<V: View>(
         _ view: V,
+        named _: ViewName?,
         onDismiss: (() -> Void)?,
         style: ModalViewPresentationStyle,
         completion: (() -> Void)?
@@ -22,11 +23,13 @@ public protocol DynamicViewPresenter: PresentationManager {
 extension DynamicViewPresenter {
     func present<V: View>(
         _ view: V,
+        named name: ViewName? = nil,
         onDismiss: (() -> Void)?,
         style: ModalViewPresentationStyle
     ) {
         present(
             view,
+            named: name,
             onDismiss: onDismiss,
             style: style,
             completion: nil

@@ -9,6 +9,7 @@ public struct CocoaPresentation: Equatable, Identifiable {
     public let id = UUID()
     
     let content: () -> AnyPresentationView
+    let contentName: ViewName?
     let shouldDismiss: () -> Bool
     let onDismiss: (() -> Void)?
     let resetBinding: () -> ()
@@ -17,6 +18,7 @@ public struct CocoaPresentation: Equatable, Identifiable {
     
     public init<V: View>(
         content: @escaping () -> V,
+        contentName: ViewName?,
         shouldDismiss: @escaping () -> Bool,
         onDismiss: (() -> Void)?,
         resetBinding: @escaping () -> (),
@@ -24,6 +26,7 @@ public struct CocoaPresentation: Equatable, Identifiable {
         environment: EnvironmentValues?
     ) {
         self.content = { .init(content()) }
+        self.contentName = contentName
         self.shouldDismiss = shouldDismiss
         self.onDismiss = onDismiss
         self.style = style

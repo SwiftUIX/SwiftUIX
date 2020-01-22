@@ -65,6 +65,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 }
             } else if mechanism == .custom {
                 Button(action: present, label: { label }).cocoaPresentation(
+                    named: destinationName,
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
                     style: .automatic

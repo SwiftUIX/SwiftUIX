@@ -111,12 +111,14 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     
     public func present<V: View>(
         _ view: V,
+        named viewName: ViewName? = nil,
         onDismiss: (() -> Void)?,
         style: ModalViewPresentationStyle,
         completion: (() -> Void)?
     ) {
         topMostCoordinator.present(CocoaPresentation(
             content: { view },
+            contentName: viewName,
             shouldDismiss: { true },
             onDismiss: onDismiss,
             resetBinding: { },

@@ -17,6 +17,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     @Binding var isPresented: Bool
     
     let content: () -> Sheet
+    let contentName: ViewName?
     let shouldDismiss: (() -> Bool)?
     let onDismiss: (() -> Void)?
     let style: ModalViewPresentationStyle
@@ -24,6 +25,7 @@ private struct CocoaPresentationIsPresented<Sheet: View>: ViewModifier {
     func sheet() -> CocoaPresentation {
         .init(
             content: { self.content() },
+            contentName: contentName,
             shouldDismiss: shouldDismiss ?? { true },
             onDismiss: onDismiss,
             resetBinding: { self.isPresented = false },
@@ -50,10 +52,12 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
     let onDismiss: (() -> Void)?
     let style: ModalViewPresentationStyle
     let content: (Item) -> Sheet
+    let contentName: (Item) -> ViewName?
     
     func presentation(for item: Item) -> CocoaPresentation {
         CocoaPresentation(
-            content: { AnyView(self.content(item)) },
+            content: { self.content(item) },
+            contentName: self.contentName(item),
             shouldDismiss: { self.item?.id != item.id },
             onDismiss: onDismiss,
             resetBinding: { self.item = nil },
@@ -72,6 +76,7 @@ private struct CocoaPresentationItem<Item: Identifiable, Sheet: View>: ViewModif
 
 extension View {
     public func cocoaPresentation<Content>(
+        named contentName: ViewName? = nil,
         isPresented: Binding<Bool>,
         onDismiss: (() -> Void)? = nil,
         style: ModalViewPresentationStyle,
@@ -81,6 +86,7 @@ extension View {
             CocoaPresentationIsPresented(
                 isPresented: isPresented,
                 content: content,
+                contentName: contentName,
                 shouldDismiss: nil,
                 onDismiss: onDismiss,
                 style: style
@@ -89,6 +95,7 @@ extension View {
     }
     
     public func cocoaPresentation<Item, Content>(
+        named contentName: @escaping (Item) -> ViewName? = { _ in nil },
         item: Binding<Item?>,
         onDismiss: (() -> Void)? = nil,
         style: ModalViewPresentationStyle,
@@ -99,7 +106,8 @@ extension View {
                 item: item,
                 onDismiss: onDismiss,
                 style: style,
-                content: content
+                content: content,
+                contentName: contentName
             )
         )
     }
