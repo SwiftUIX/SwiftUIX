@@ -114,36 +114,24 @@ extension Keyboard {
 // MARK: - Helpers -
 
 struct HiddenIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard
-    
-    init() {
-        keyboard = .main
-    }
-    
+    @ObservedObject var keyboard: Keyboard = .main
+
     func body(content: Content) -> some View {
         content.hidden(keyboard.isShowing)
     }
 }
 
 struct VisibleIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard
-    
-    init() {
-        keyboard = .main
-    }
-    
+    @ObservedObject var keyboard: Keyboard = .main
+        
     func body(content: Content) -> some View {
         content.hidden(!keyboard.isShowing)
     }
 }
 
 struct RemoveIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard
-    
-    init() {
-        keyboard = .main
-    }
-    
+    @ObservedObject var keyboard: Keyboard = .main
+        
     func body(content: Content) -> some View {
         content.frame(
             width: keyboard.isShowing ? 0 : nil,
@@ -154,12 +142,8 @@ struct RemoveIfKeyboardActive: ViewModifier {
 }
 
 struct AddIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard
-    
-    init() {
-        keyboard = .main
-    }
-    
+    @ObservedObject var keyboard: Keyboard = .main
+
     func body(content: Content) -> some View {
         content.frame(
             width: keyboard.isShowing ? nil : 0,

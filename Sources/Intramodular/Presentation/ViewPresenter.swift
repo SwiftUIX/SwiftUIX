@@ -21,11 +21,11 @@ public protocol DynamicViewPresenter: PresentationManager {
 // MARK: - Extensions -
 
 extension DynamicViewPresenter {
-    func present<V: View>(
+    public func present<V: View>(
         _ view: V,
         named name: ViewName? = nil,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle
+        onDismiss: (() -> Void)? = nil,
+        style: ModalViewPresentationStyle = .automatic
     ) {
         present(
             view,
@@ -35,18 +35,7 @@ extension DynamicViewPresenter {
             completion: nil
         )
     }
-    
-    public func present<V: View>(
-        _ view: V,
-        onDismiss: (() -> Void)?
-    ) {
-        present(
-            view,
-            onDismiss: onDismiss,
-            style: .automatic
-        )
-    }
-    
+        
     public func dismissView<H: Hashable>(named name: H) {
         dismissView(named: .init(name))
     }

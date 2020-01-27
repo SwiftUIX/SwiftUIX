@@ -53,9 +53,9 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     public init(wrappedValue value: ObjectType?) {
         self._wrappedValue = .init(base: value)
     }
-    
+        
     public init() {
-        self._wrappedValue = .init()
+        self.init(wrappedValue: nil)
     }
     
     public mutating func update() {
