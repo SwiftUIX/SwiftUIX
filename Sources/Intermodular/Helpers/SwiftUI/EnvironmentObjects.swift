@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 public struct EnvironmentObjects {
+    fileprivate var environmentValuesTransforms: [(inout EnvironmentValues) -> Void] = []
     fileprivate var descriptionObjects: [Any] = []
     fileprivate var environmentTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
     fileprivate var otherTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
@@ -22,6 +23,10 @@ public struct EnvironmentObjects {
         self.init()
         
         append(bindable)
+    }
+    
+    public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
+        environmentValuesTransforms.append(transform)
     }
     
     public mutating func append<B: ObservableObject>(_ bindable: B) {
@@ -50,6 +55,10 @@ public struct EnvironmentObjects {
         
         view = environmentTransforms.values.reduce(view, { view, transform in transform(view) })
         view = otherTransforms.values.reduce(view, { view, transform in transform(view) })
+        view = view.transformEnvironment(\.self) { (environment: inout EnvironmentValues) in
+            self.environmentValuesTransforms.forEach({ $0(&environment) })
+        }
+        .eraseToAnyView()
         
         return view
     }
