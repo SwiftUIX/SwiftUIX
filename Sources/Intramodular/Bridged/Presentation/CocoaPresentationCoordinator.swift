@@ -135,16 +135,15 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         topMostPresentedCoordinator?.dismissSelf(completion: completion)
     }
     
-    public func dismiss() {
-        dismiss(completion: nil)
-    }
-    
-    public func dismissView(named name: ViewName) {
+    public func dismissView(
+        named name: ViewName,
+        completion: (() -> Void)? = nil
+    ) {
         var coordinator: CocoaPresentationCoordinator? = presentingCoordinator ?? self
         
         while let presentedCoordinator = coordinator {
             if presentedCoordinator.presentedViewName == name {
-                presentedCoordinator.dismissSelf()
+                presentedCoordinator.dismissSelf(completion: completion)
                 break
             }
             

@@ -21,7 +21,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     private let onDismiss: (() -> ())?
     
     @Environment(\.dynamicViewPresenter) private var dynamicViewPresenter
-    @Environment(\.environmentObjects) private var environmentObjects
+    @Environment(\.environmentBuilder) private var environmentBuilder
     
     @State private var isPresented: Bool = false
     
@@ -61,7 +61,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     onDismiss: { self.isPresented = false; self.onDismiss?() }
                 ) {
                     self.destination()
-                        .insertEnvironmentObjects(self.environmentObjects)
+                        .mergeEnvironmentBuilder(self.environmentBuilder)
                 }
             } else if mechanism == .custom {
                 Button(action: present, label: { label }).cocoaPresentation(
@@ -71,7 +71,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     style: .automatic
                 ) {
                     self.destination()
-                        .insertEnvironmentObjects(self.environmentObjects)
+                        .mergeEnvironmentBuilder(self.environmentBuilder)
                 }
             }
             
@@ -82,7 +82,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 onDismiss: { self.isPresented = false; self.onDismiss?() }
             ) {
                 self.destination()
-                    .insertEnvironmentObjects(self.environmentObjects)
+                    .mergeEnvironmentBuilder(self.environmentBuilder)
             }
             
             #endif

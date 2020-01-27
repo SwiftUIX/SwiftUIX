@@ -61,8 +61,11 @@ extension UIViewController: DynamicViewPresenter {
         )
     }
     
-    public func dismissView(named name: ViewName) {
-        objc_associated_presentationCoordinator.dismissView(named: name)
+    public func dismissView(
+        named name: ViewName,
+        completion: (() -> Void)?
+    ) {
+        objc_associated_presentationCoordinator.dismissView(named: name, completion: completion)
     }
 }
 
