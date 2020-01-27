@@ -8,6 +8,7 @@ import SwiftUI
 public struct EnvironmentBuilder {
     fileprivate var descriptionObjects: [Any] = []
     
+    fileprivate var viewName: ViewName?
     fileprivate var environmentValuesTransforms: [(inout EnvironmentValues) -> Void] = []
     fileprivate var environmentTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
     fileprivate var otherTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
@@ -18,6 +19,10 @@ public struct EnvironmentBuilder {
     
     public init() {
         
+    }
+    
+    public mutating func setViewName(_ name: ViewName) {
+        viewName = name
     }
     
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {

@@ -10,31 +10,37 @@ import SwiftUI
 public struct AnyPresentationView: CustomStringConvertible, View {
     private let base: AnyView
     private let baseType: ObjectIdentifier
-    private let environment: EnvironmentValues?
     
-    public let name: ViewName?
+    private var environment: EnvironmentBuilder
     
     public var description: String {
-        if let name = name {
+        if let name = (body as? opaque_NamedView)?.name {
             return "\(name) (\(base)"
         } else {
             return String(describing: base)
         }
     }
     
-    public init<V: View>(_ view: V, environment: EnvironmentValues? = nil) {
+    public init<V: View>(_ view: V) {
         if let view = view as? AnyPresentationView {
             self = view
         } else {
             self.base = view.eraseToAnyView()
             self.baseType = .init(type(of: view))
-            self.name = (view as? opaque_NamedView)?.name
-            self.environment = environment
+            self.environment = .init()
         }
     }
     
     public var body: some View {
-        base
+        base.mergeEnvironmentBuilder(environment)
+    }
+}
+
+extension AnyPresentationView {
+    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> AnyPresentationView {
+        then {
+            $0.environment.merge(builder)
+        }
     }
 }
 
