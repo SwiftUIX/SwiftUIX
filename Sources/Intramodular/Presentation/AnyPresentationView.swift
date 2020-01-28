@@ -7,23 +7,10 @@ import Swift
 import SwiftUI
 
 /// A type-erased `View` suitable for presentation purposes.
-public struct AnyPresentationView: CustomStringConvertible, View {
+public struct AnyPresentationView: View {
     private let base: AnyView
     private let baseType: ObjectIdentifier
-    
     private var environment: EnvironmentBuilder
-    
-    var _name: ViewName? {
-        return (body as? opaque_NamedView)?.name
-    }
-    
-    public var description: String {
-        if let name = _name {
-            return "\(name) (\(base)"
-        } else {
-            return String(describing: base)
-        }
-    }
     
     public init<V: View>(_ view: V) {
         if let view = view as? AnyPresentationView {
@@ -32,10 +19,6 @@ public struct AnyPresentationView: CustomStringConvertible, View {
             self.base = view.eraseToAnyView()
             self.baseType = .init(type(of: view))
             self.environment = .init()
-            
-            if let viewName = (view as? opaque_NamedView)?.name {
-                self.environment.setViewName(viewName)
-            }
         }
     }
     

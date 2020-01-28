@@ -29,7 +29,6 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         nil
             ?? presentation?.contentName
             ?? (rootViewContent as? opaque_NamedView)?.name
-            ?? (rootViewContent as? AnyPresentationView)?._name
     }
     
     init(

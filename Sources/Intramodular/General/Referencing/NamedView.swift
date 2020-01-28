@@ -26,9 +26,6 @@ public struct NamedView<V: View>: opaque_NamedView, View {
         ) {
             [.init(name: self.name, bounds: $0)]
         }
-        .transformEnvironment(\.environmentBuilder) {
-            $0.setViewName(self.name)
-        }
     }
 }
 
