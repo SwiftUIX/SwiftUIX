@@ -26,7 +26,10 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
     
     public var rootViewName: ViewName? {
-        (rootViewContent as? opaque_NamedView)?.name ?? presentation?.contentName
+        nil
+            ?? presentation?.contentName
+            ?? (rootViewContent as? opaque_NamedView)?.name
+            ?? (rootViewContent as? AnyPresentationView)?._name
     }
     
     init(

@@ -110,7 +110,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public var presentedViewName: ViewName? {
-        presentedCoordinator?.presentation?.contentName
+        presentedCoordinator?.presentation?.contentName ?? (viewController as? opaque_CocoaController)?.rootViewName
     }
     
     public func present<V: View>(

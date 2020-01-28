@@ -39,3 +39,15 @@ extension Optional {
         .init(self, content: content)
     }
 }
+
+extension View {
+    public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
+        Group {
+            if value != nil {
+                transform(value!, self)
+            } else {
+                self
+            }
+        }
+    }
+}

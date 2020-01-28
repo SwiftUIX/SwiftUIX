@@ -13,8 +13,12 @@ public struct AnyPresentationView: CustomStringConvertible, View {
     
     private var environment: EnvironmentBuilder
     
+    var _name: ViewName? {
+        return (body as? opaque_NamedView)?.name
+    }
+    
     public var description: String {
-        if let name = (body as? opaque_NamedView)?.name {
+        if let name = _name {
             return "\(name) (\(base)"
         } else {
             return String(describing: base)
@@ -28,6 +32,10 @@ public struct AnyPresentationView: CustomStringConvertible, View {
             self.base = view.eraseToAnyView()
             self.baseType = .init(type(of: view))
             self.environment = .init()
+            
+            if let viewName = (view as? opaque_NamedView)?.name {
+                self.environment.setViewName(viewName)
+            }
         }
     }
     
