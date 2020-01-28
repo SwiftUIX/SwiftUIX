@@ -29,10 +29,14 @@ extension UIViewController: DynamicViewPresenter {
         }
     }
     
-    public var isPresented: Bool {
-        objc_associated_presentationCoordinator.isPresented
+    public var presenting: DynamicViewPresenter? {
+        objc_associated_presentationCoordinator.presenting
     }
     
+    public var presented: DynamicViewPresenter? {
+        objc_associated_presentationCoordinator.presented
+    }
+
     public var presentedViewName: ViewName? {
         objc_associated_presentationCoordinator.presentedViewName
     }
@@ -40,11 +44,7 @@ extension UIViewController: DynamicViewPresenter {
     public func dismiss(completion: (() -> Void)?) {
         objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
-    
-    public func dismiss() {
-        dismiss(completion: nil)
-    }
-    
+        
     public func present<V: View>(
         _ view: V,
         named viewName: ViewName? = nil,

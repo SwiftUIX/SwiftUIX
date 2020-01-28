@@ -19,7 +19,7 @@ public struct CocoaPresentationMode: PresentationModeProtocol {
     }
     
     public func dismiss() {
-        coordinator?.dismissSelf()
+        coordinator?.presentingCoordinator?.dismiss()
     }
 }
 

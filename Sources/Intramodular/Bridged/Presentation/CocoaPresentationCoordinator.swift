@@ -79,32 +79,19 @@ public class CocoaPresentationCoordinator: NSObject {
             completion: completion
         )
     }
-    
-    func dismissPresented(completion: (() -> Void)? = nil) {
-        guard
-            let viewController = viewController,
-            let presentedCoordinator = presentedCoordinator,
-            let presentation = presentedCoordinator.presentation,
-            viewController.presentedViewController != nil,
-            presentation.shouldDismiss() else {
-                return
-        }
-        
-        viewController.dismiss(animated: true) {
-            presentation.onDismiss?()
-            self.presentedCoordinator = nil
-            completion?()
-        }
-    }
-    
-    func dismissSelf(completion: (() -> Void)? = nil) {
-        presentingCoordinator?.dismissPresented(completion: completion)
-    }
 }
 
 // MARK: - Protocol Implementations -
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
+    public var presenting: DynamicViewPresenter? {
+        presentingCoordinator
+    }
+    
+    public var presented: DynamicViewPresenter? {
+        presentedCoordinator
+    }
+    
     public var isPresented: Bool {
         return presentedCoordinator != nil
     }
@@ -131,10 +118,23 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         ), completion: completion)
     }
     
-    public func dismiss(completion: (() -> Void)?) {
-        topMostPresentedCoordinator?.dismissSelf(completion: completion)
+    public func dismiss(completion: (() -> Void)? = nil) {
+        guard
+            let viewController = viewController,
+            let presentedCoordinator = presentedCoordinator,
+            let presentation = presentedCoordinator.presentation,
+            viewController.presentedViewController != nil,
+            presentation.shouldDismiss() else {
+                return
+        }
+        
+        viewController.dismiss(animated: true) {
+            presentation.onDismiss?()
+            self.presentedCoordinator = nil
+            completion?()
+        }
     }
-    
+        
     public func dismissView(
         named name: ViewName,
         completion: (() -> Void)? = nil
