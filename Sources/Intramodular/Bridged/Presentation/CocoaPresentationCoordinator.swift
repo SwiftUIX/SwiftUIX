@@ -143,7 +143,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         while let presentedCoordinator = coordinator {
             if presentedCoordinator.presentedViewName == name {
-                presentedCoordinator.dismissSelf(completion: completion)
+                presentedCoordinator.dismiss(completion: completion)
                 break
             }
             
