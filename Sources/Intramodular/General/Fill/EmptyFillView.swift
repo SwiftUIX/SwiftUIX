@@ -10,8 +10,11 @@ public struct EmptyFillView: View {
     public init() {
         
     }
-
+    
     public var body: some View {
-        GeometryReader { _ in EmptyView() }
+        GeometryReader { _ in
+            EmptyView()
+        }
+        .contentShape(Rectangle())
     }
 }

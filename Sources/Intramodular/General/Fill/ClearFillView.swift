@@ -12,8 +12,8 @@ public struct ClearFillView: View {
     }
     
     public var body: some View {
-        GeometryReader {
-            _ in Color.clear
+        GeometryReader { _ in
+            Color.clear
         }
         .contentShape(Rectangle())
     }
