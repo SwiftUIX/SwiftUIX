@@ -11,8 +11,8 @@ import UIKit
 extension UIScrollView {
     var percentContentOffset: CGPoint {
         return .init(
-            x: contentOffset.y / (contentSize.height - frame.height),
-            y: contentOffset.x / (contentSize.width - frame.height)
+            x: contentOffset.x / (contentSize.width - frame.width),
+            y: contentOffset.y / (contentSize.height - frame.height)
         )
     }
 }
