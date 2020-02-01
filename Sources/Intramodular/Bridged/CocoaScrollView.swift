@@ -119,8 +119,19 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             }
         } else {
             if contentSize != oldContentSize {
-                uiView.contentOffset.x += contentSize.width - oldContentSize.width
-                uiView.contentOffset.y += contentSize.height - oldContentSize.height
+                var newContentOffset = uiView.contentOffset
+                
+                if initialContentAlignment.horizontal == .trailing {
+                    newContentOffset.x += contentSize.width - oldContentSize.width
+                }
+                
+                if initialContentAlignment.vertical == .bottom {
+                    newContentOffset.y += contentSize.height - oldContentSize.height
+                }
+                
+                if newContentOffset != uiView.contentOffset {
+                    uiView.setContentOffset(newContentOffset, animated: false)
+                }
             }
         }
         
