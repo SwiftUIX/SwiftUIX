@@ -17,7 +17,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
   spec.source = { :git => "https://github.com/SwiftUIX/SwiftUIX.git", :tag => "#{spec.version}" }
 
-  spec.source_files  = "Sources"
+  spec.source_files  = "Sources/**/*.{swift}"
   spec.swift_version = "5.1"
   spec.framework  = "SwiftUI"
 end
