@@ -9,6 +9,13 @@ import SwiftUI
 import UIKit
 
 extension UIScrollView {
+    var bottomTrailingContentOffset: CGPoint {
+        return .init(
+            x: contentSize.width - contentOffset.x,
+            y: contentSize.height - contentOffset.y
+        )
+    }
+    
     var percentContentOffset: CGPoint {
         return .init(
             x: contentOffset.x / (contentSize.width - frame.width),
