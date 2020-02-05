@@ -11,6 +11,37 @@ extension Color {
     private func toUIColor0() -> UIColor? {
         switch self {
             case .clear:
+                return .clear
+            case .black:
+                return .black
+            case .white:
+                return .white
+            case .gray:
+                return .systemGray
+            case .red:
+                return .systemRed
+            case .green:
+                return .systemGreen
+            case .blue:
+                return .systemBlue
+            case .orange:
+                return .systemOrange
+            case .yellow:
+                return .systemYellow
+            case .pink:
+                return .systemPink
+            case .primary:
+                return .label // FIXME?
+            case .secondary:
+                return .secondaryLabel // FIXME?
+            default:
+                return nil
+        }
+    }
+    
+    private func toUIColor1() -> UIColor? {
+        switch self {
+            case .clear:
                 return UIColor.clear
             case .black:
                 return UIColor.black
@@ -41,7 +72,7 @@ extension Color {
         }
     }
     
-    private func toUIColor1() -> UIColor? {
+    private func toUIColor2() -> UIColor? {
         let children = Mirror(reflecting: self).children
         let _provider = children.filter { $0.label == "provider" }.first
         
@@ -68,13 +99,10 @@ extension Color {
     }
     
     public func toUIColor() -> UIColor? {
-        if let color = toUIColor0() {
-            return color
-        } else if let color = toUIColor1() {
-            return color
-        } else {
-            return nil
-        }
+        nil
+            ?? toUIColor0()
+            ?? toUIColor1()
+            ?? toUIColor2()
     }
 }
 
