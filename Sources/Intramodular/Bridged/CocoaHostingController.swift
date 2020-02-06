@@ -8,8 +8,6 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
-    private let presentation: AnyModalPresentation?
-    
     public let presentationCoordinator: CocoaPresentationCoordinator
     
     public override var description: String {
@@ -26,7 +24,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     public var rootViewName: ViewName? {
         nil
-            ?? presentation?.contentName
+            ?? rootView.presentation?.contentName
             ?? (rootViewContent as? opaque_NamedView)?.name
     }
     
@@ -35,7 +33,6 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         presentation: AnyModalPresentation?,
         presentationCoordinator: CocoaPresentationCoordinator
     ) {
-        self.presentation = presentation
         self.presentationCoordinator = presentationCoordinator
         
         super.init(
@@ -50,6 +47,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         
         if let presentation = presentation {
             modalPresentationStyle = .init(presentation.presentationStyle)
+            transitioningDelegate = presentation.presentationStyle.transitioningDelegate
             
             if presentation.presentationStyle != .automatic {
                 view.backgroundColor = .clear
