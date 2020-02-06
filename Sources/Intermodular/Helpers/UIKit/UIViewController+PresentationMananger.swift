@@ -41,29 +41,17 @@ extension UIViewController: DynamicViewPresenter {
         objc_associated_presentationCoordinator.presentedViewName
     }
     
-    public func dismiss(completion: (() -> Void)?) {
+    public func dismiss(completion: @escaping () -> Void) {
         objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
         
-    public func present<V: View>(
-        _ view: V,
-        named viewName: ViewName? = nil,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        completion: (() -> Void)?
-    ) {
-        objc_associated_presentationCoordinator.present(
-            view,
-            named: viewName,
-            onDismiss: onDismiss,
-            style: style,
-            completion: completion
-        )
+    public func present(_ presentation: AnyModalPresentation) {
+        objc_associated_presentationCoordinator.present(presentation)
     }
     
     public func dismissView(
         named name: ViewName,
-        completion: (() -> Void)?
+        completion: @escaping () -> Void
     ) {
         objc_associated_presentationCoordinator.dismissView(named: name, completion: completion)
     }

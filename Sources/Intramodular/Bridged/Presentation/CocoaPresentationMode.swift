@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CocoaPresentationMode: PresentationModeProtocol {
+public struct CocoaPresentationMode: PresentationManager {
     var coordinator: CocoaPresentationCoordinator?
     
     public var isPresented: Bool {

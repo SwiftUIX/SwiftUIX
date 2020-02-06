@@ -67,7 +67,7 @@ extension ModalViewPresentationStyle {
         source: Alignment,
         destination: Alignment
     ) -> Self {
-        .custom(CocoaAlignHostingTransitioningDelegate<AnyPresentationView>(source: source, destination: destination))
+        .custom(CocoaAlignHostingTransitioningDelegate<EnvironmentalAnyView>(source: source, destination: destination))
     }
     
     public static func align(

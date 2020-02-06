@@ -6,14 +6,13 @@ import Combine
 import Swift
 import SwiftUI
 
-/// A type-erased `View` suitable for presentation purposes.
-public struct AnyPresentationView: View {
+public struct EnvironmentalAnyView: View {
     private let base: AnyView
     private let baseType: ObjectIdentifier
     private var environment: EnvironmentBuilder
     
     public init<V: View>(_ view: V) {
-        if let view = view as? AnyPresentationView {
+        if let view = view as? EnvironmentalAnyView {
             self = view
         } else {
             self.base = view.eraseToAnyView()
@@ -27,18 +26,8 @@ public struct AnyPresentationView: View {
     }
 }
 
-extension AnyPresentationView {
-    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> AnyPresentationView {
-        then {
-            $0.environment.merge(builder)
-        }
-    }
-}
-
-// MARK: - API -
-
-extension View {
-    public func eraseToAnyPresentationView() -> AnyPresentationView {
-        return .init(self)
+extension EnvironmentalAnyView {
+    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> Self {
+        then({ $0.environment.merge(builder) })
     }
 }

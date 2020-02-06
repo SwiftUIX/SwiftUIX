@@ -15,7 +15,7 @@ public protocol PresentationManager: ViewInteractor {
 
 extension PresentationManager where Self: DynamicViewPresenter {
     public func dismiss() {
-        dismiss(completion: nil)
+        dismiss(completion: { })
     }
 }
 

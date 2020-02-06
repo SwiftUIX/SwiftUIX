@@ -8,8 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
-    private let presentation: CocoaPresentation?
-    private let _transitioningDelegate: UIViewControllerTransitioningDelegate?
+    private let presentation: AnyModalPresentation?
     
     public let presentationCoordinator: CocoaPresentationCoordinator
     
@@ -33,13 +32,11 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     init(
         rootView: Content,
-        presentation: CocoaPresentation?,
+        presentation: AnyModalPresentation?,
         presentationCoordinator: CocoaPresentationCoordinator
     ) {
         self.presentation = presentation
         self.presentationCoordinator = presentationCoordinator
-        
-        _transitioningDelegate = presentation?.style.transitioningDelegate
         
         super.init(
             rootView: CocoaHostingControllerContent(
@@ -52,10 +49,9 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         presentationCoordinator.viewController = self
         
         if let presentation = presentation {
-            modalPresentationStyle = .init(presentation.style)
-            transitioningDelegate = _transitioningDelegate
+            modalPresentationStyle = .init(presentation.presentationStyle)
             
-            if presentation.style != .automatic {
+            if presentation.presentationStyle != .automatic {
                 view.backgroundColor = .clear
             }
         }
@@ -78,31 +74,15 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     }
 }
 
-extension CocoaHostingController where Content == AnyPresentationView {
+extension CocoaHostingController where Content == EnvironmentalAnyView {
     convenience init(
-        presentation: CocoaPresentation,
+        presentation: AnyModalPresentation,
         presentationCoordinator: CocoaPresentationCoordinator
     ) {
         self.init(
             rootView: presentation.content(),
             presentation: presentation,
             presentationCoordinator: presentationCoordinator
-        )
-    }
-}
-
-// MARK: - Protocol Implementations -
-
-extension CocoaHostingController: CocoaController {
-    open func present(
-        _ presentation: CocoaPresentation,
-        animated: Bool,
-        completion: (() -> Void)?
-    ) {
-        presentationCoordinator.present(
-            presentation,
-            animated: animated,
-            completion: completion
         )
     }
 }

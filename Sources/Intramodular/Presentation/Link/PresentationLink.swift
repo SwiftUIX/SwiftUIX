@@ -68,7 +68,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     named: destinationName,
                     isPresented: $isPresented,
                     onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    style: .automatic
+                    presentationStyle: .automatic
                 ) {
                     self.destination()
                         .mergeEnvironmentBuilder(self.environmentBuilder)

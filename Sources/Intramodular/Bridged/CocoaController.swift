@@ -12,11 +12,7 @@ public protocol opaque_CocoaController {
     
     var presentationCoordinator: CocoaPresentationCoordinator { get }
     
-    func present(
-        _ presentation: CocoaPresentation,
-        animated: Bool,
-        completion: (() -> Void)?
-    )
+    func present(_ presentation: AnyModalPresentation)
 }
 
 public protocol CocoaController: opaque_CocoaController, UIViewController {

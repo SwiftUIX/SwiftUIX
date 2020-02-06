@@ -9,16 +9,10 @@ public protocol DynamicViewPresenter: PresentationManager {
     var presenting: DynamicViewPresenter? { get }
     var presented: DynamicViewPresenter? { get }
     
-    func present<V: View>(
-        _ view: V,
-        named _: ViewName?,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        completion: (() -> Void)?
-    )
+    func present(_ presentation: AnyModalPresentation)
     
-    func dismiss(completion: (() -> Void)?)
-    func dismissView(named _: ViewName, completion: (() -> Void)?)
+    func dismiss(completion: @escaping () -> Void)
+    func dismissView(named _: ViewName, completion: @escaping () -> Void)
 }
 
 // MARK: - Implementation -
@@ -37,28 +31,33 @@ extension DynamicViewPresenter {
     public var isPresented: Bool {
         return presented != nil
     }
-
+    
     public func present<V: View>(
         _ view: V,
         named name: ViewName? = nil,
-        onDismiss: (() -> Void)? = nil,
-        style: ModalViewPresentationStyle = .automatic
+        onDismiss: @escaping () -> Void = { },
+        presentationStyle: ModalViewPresentationStyle = .automatic,
+        completion: @escaping () -> () = { }
     ) {
         present(
-            view,
-            named: name,
-            onDismiss: onDismiss,
-            style: style,
-            completion: nil
+            .init(
+                content: { view },
+                contentName: name,
+                completion: completion,
+                shouldDismiss: { true },
+                onDismiss: onDismiss,
+                resetBinding: { },
+                presentationStyle: presentationStyle
+            )
         )
     }
-        
+    
     public func dismissTopmost() {
         topmostPresented?.presenting?.dismiss()
     }
     
     public func dismissView<H: Hashable>(named name: H) {
-        dismissView(named: .init(name), completion: nil)
+        dismissView(named: .init(name), completion: { })
     }
 }
 

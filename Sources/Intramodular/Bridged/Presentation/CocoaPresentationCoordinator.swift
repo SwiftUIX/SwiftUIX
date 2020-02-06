@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class CocoaPresentationCoordinator: NSObject {
-    private let presentation: CocoaPresentation?
+    private let presentation: AnyModalPresentation?
     
     public private(set) weak var presentingCoordinator: CocoaPresentationCoordinator?
     public private(set) var presentedCoordinator: CocoaPresentationCoordinator?
@@ -27,7 +27,7 @@ public class CocoaPresentationCoordinator: NSObject {
         presentedCoordinator?.topMostCoordinator
     }
     
-    var onDidAttemptToDismiss: [CocoaPresentation.DidAttemptToDismissCallback] = []
+    var onDidAttemptToDismiss: [AnyModalPresentation.DidAttemptToDismissCallback] = []
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     weak var viewController: UIViewController?
@@ -42,48 +42,17 @@ public class CocoaPresentationCoordinator: NSObject {
     }
     
     init(
-        presentation: CocoaPresentation? = nil,
+        presentation: AnyModalPresentation? = nil,
         presentingCoordinator: CocoaPresentationCoordinator? = nil
     ) {
         self.presentation = presentation
         self.presentingCoordinator = presentingCoordinator
     }
-    
-    func present(
-        _ presentation: CocoaPresentation,
-        animated: Bool = true,
-        completion: (() -> Void)? = nil
-    ) {
-        if let viewController = viewController?.presentedViewController as? CocoaHostingController<AnyPresentationView>, viewController.modalViewPresentationStyle == presentation.style {
-            viewController.rootView.content = presentation.content()
-            return
-        }
-        
-        let presentationCoordinator = CocoaPresentationCoordinator(
-            presentation: presentation,
-            presentingCoordinator: self
-        )
-        
-        let viewControllerToBePresented = CocoaHostingController(
-            presentation: presentation,
-            presentationCoordinator: presentationCoordinator
-        )
-        
-        presentedCoordinator = presentationCoordinator
-        
-        viewControllerToBePresented.presentationController?.delegate = presentationCoordinator
-        
-        self.viewController?.present(
-            viewControllerToBePresented,
-            animated: animated,
-            completion: completion
-        )
-    }
 }
 
 // MARK: - Protocol Implementations -
 
-extension CocoaPresentationCoordinator: DynamicViewPresenter {
+extension CocoaPresentationCoordinator: DynamicViewPresenter, PresentationModeProtocol {
     public var presenting: DynamicViewPresenter? {
         presentingCoordinator
     }
@@ -100,25 +69,34 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentedCoordinator?.presentation?.contentName ?? (viewController as? opaque_CocoaController)?.rootViewName
     }
     
-    public func present<V: View>(
-        _ view: V,
-        named viewName: ViewName? = nil,
-        onDismiss: (() -> Void)?,
-        style: ModalViewPresentationStyle,
-        completion: (() -> Void)?
-    ) {
-        topMostCoordinator.present(CocoaPresentation(
-            content: { view },
-            contentName: viewName,
-            shouldDismiss: { true },
-            onDismiss: onDismiss,
-            resetBinding: { },
-            style: style,
-            environment: nil
-        ), completion: completion)
+    public func present(_ modal: AnyModalPresentation) {
+        if let viewController = viewController?.presentedViewController as? CocoaHostingController<EnvironmentalAnyView>, viewController.modalViewPresentationStyle == modal.presentationStyle {
+            viewController.rootView.content = modal.content()
+            return
+        }
+        
+        let presentationCoordinator = CocoaPresentationCoordinator(
+            presentation: presentation,
+            presentingCoordinator: self
+        )
+        
+        let viewControllerToBePresented = CocoaHostingController(
+            presentation: modal,
+            presentationCoordinator: presentationCoordinator
+        )
+        
+        presentedCoordinator = presentationCoordinator
+        
+        viewControllerToBePresented.presentationController?.delegate = presentationCoordinator
+        
+        self.viewController?.present(
+            viewControllerToBePresented,
+            animated: modal.animated,
+            completion: modal.completion
+        )
     }
     
-    public func dismiss(completion: (() -> Void)? = nil) {
+    public func dismiss(completion: @escaping () -> Void) {
         guard
             let viewController = viewController,
             let presentedCoordinator = presentedCoordinator,
@@ -129,15 +107,15 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
         
         viewController.dismiss(animated: true) {
-            presentation.onDismiss?()
+            presentation.onDismiss()
             self.presentedCoordinator = nil
-            completion?()
+            completion()
         }
     }
-        
+    
     public func dismissView(
         named name: ViewName,
-        completion: (() -> Void)? = nil
+        completion: @escaping () -> Void
     ) {
         var coordinator: CocoaPresentationCoordinator? = presentingCoordinator ?? self
         
@@ -155,7 +133,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         if let presentation = presentation {
-            return .init(presentation.style)
+            return .init(presentation.presentationStyle)
         } else {
             return .automatic
         }
@@ -176,7 +154,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        presentation?.onDismiss?()
+        presentation?.onDismiss()
         
         presentingCoordinator?.presentedCoordinator = nil
     }
