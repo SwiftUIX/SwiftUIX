@@ -13,7 +13,8 @@ public struct PageControl {
     public let numberOfPages: Int
     public let currentPage: Binding<Int>
     
-    @Environment(\.tintColor) private var tintColor
+    @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
+    @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
     
     public init(numberOfPages: Int, currentPage: Binding<Int>) {
         self.numberOfPages = numberOfPages
@@ -52,12 +53,55 @@ extension PageControl: UIViewRepresentable {
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.currentPage = currentPage.wrappedValue
+        uiView.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor3()
         uiView.numberOfPages = numberOfPages
-        uiView.tintColor = tintColor?.toUIColor()
+        uiView.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
     }
     
     public func makeCoordinator() -> Coordinator {
         .init(self)
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension PageControl {
+    struct TintColorEnvironmentKey: EnvironmentKey {
+        static let defaultValue: Color? = nil
+    }
+    
+    struct CurrentTintColorEnvironmentKey: EnvironmentKey {
+        static let defaultValue: Color? = nil
+    }
+}
+
+extension EnvironmentValues {
+    public var pageIndicatorTintColor: Color? {
+        get {
+            self[PageControl.TintColorEnvironmentKey]
+        } set {
+            self[PageControl.TintColorEnvironmentKey] = newValue
+        }
+    }
+    
+    public var currentPageIndicatorTintColor: Color? {
+        get {
+            self[PageControl.CurrentTintColorEnvironmentKey]
+        } set {
+            self[PageControl.CurrentTintColorEnvironmentKey] = newValue
+        }
+    }
+}
+
+// MARK: - API -
+
+extension View {
+    public func pageIndicatorTintColor(_ color: Color) -> some View {
+        environment(\.pageIndicatorTintColor, color)
+    }
+    
+    public func currentPageIndicatorTintColor(_ color: Color) -> some View {
+        environment(\.currentPageIndicatorTintColor, color)
     }
 }
 

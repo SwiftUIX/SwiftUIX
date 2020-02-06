@@ -17,8 +17,9 @@ struct _PaginationView {
     @Binding private var currentPageIndex: Int
     @Binding private var progressionController: ProgressionController?
     
-    @Environment(\.tintColor) private var tintColor
-    
+    @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
+    @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
+
     init(
         children: [UIViewController],
         axis: Axis,
@@ -173,8 +174,9 @@ extension _PaginationView: UIViewControllerRepresentable {
         if let coordinator = context.coordinator as? _Coordinator_Default_UIPageControl {
             coordinator.currentPageIndex = currentPageIndex
         }
-        
-        uiViewController.pageControl?.tintColor = tintColor?.toUIColor()
+
+        uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
+        uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
     }
     
     func makeCoordinator() -> Coordinator {
