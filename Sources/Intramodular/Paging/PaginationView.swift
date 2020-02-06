@@ -25,11 +25,15 @@ public struct PaginationView<Page: View>: View {
         self.children = pages.map(_UIHostingController.init)
         self.axis = axis
         
-        switch axis {
-            case .horizontal:
-                self.pageIndicatorAlignment = .center
-            case .vertical:
-                self.pageIndicatorAlignment = .leading
+        if let pageIndicatorAlignment = pageIndicatorAlignment {
+            self.pageIndicatorAlignment = pageIndicatorAlignment
+        } else {
+            switch axis {
+                case .horizontal:
+                    self.pageIndicatorAlignment = .center
+                case .vertical:
+                    self.pageIndicatorAlignment = .leading
+            }
         }
     }
     
