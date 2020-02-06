@@ -48,17 +48,17 @@ extension Color {
             case .white:
                 return UIColor.white
             case .gray:
-                return UIColor.gray
+                return UIColor.systemGray
             case .red:
-                return UIColor.red
+                return UIColor.systemRed
             case .green:
-                return UIColor.green
+                return UIColor.systemGreen
             case .blue:
-                return UIColor.blue
+                return UIColor.systemBlue
             case .orange:
-                return UIColor.orange
+                return UIColor.systemOrange
             case .yellow:
-                return UIColor.yellow
+                return UIColor.systemYellow
             case .pink:
                 return UIColor.systemPink
             case .purple:
@@ -98,11 +98,45 @@ extension Color {
         return UIColor(hexadecimal: hexString.trimmingCharacters(in: .newlines))
     }
     
+    public func toUIColor3() -> UIColor? {
+        switch description {
+            case "clear":
+                return UIColor.clear
+            case "black":
+                return UIColor.black
+            case "white":
+                return UIColor.white
+            case "gray":
+                return UIColor.systemGray
+            case "red":
+                return UIColor.systemRed
+            case "green":
+                return UIColor.systemGreen
+            case "blue":
+                return UIColor.systemBlue
+            case "orange":
+                return UIColor.systemOrange
+            case "yellow":
+                return UIColor.systemYellow
+            case "pink":
+                return UIColor.systemPink
+            case "purple":
+                return UIColor.systemPurple
+            case "primary":
+                return UIColor.label
+            case "secondary":
+                return UIColor.secondaryLabel
+            default:
+                return nil
+        }
+    }
+    
     public func toUIColor() -> UIColor? {
         nil
             ?? toUIColor0()
             ?? toUIColor1()
             ?? toUIColor2()
+            ?? toUIColor3()
     }
 }
 
