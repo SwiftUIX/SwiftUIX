@@ -13,6 +13,8 @@ public struct PageControl {
     public let numberOfPages: Int
     public let currentPage: Binding<Int>
     
+    @Environment(\.tintColor) private var tintColor
+    
     public init(numberOfPages: Int, currentPage: Binding<Int>) {
         self.numberOfPages = numberOfPages
         self.currentPage = currentPage
@@ -39,9 +41,6 @@ extension PageControl: UIViewRepresentable {
     public func makeUIView(context: Context) -> UIViewType {
         let uiView = UIPageControl()
         
-        uiView.numberOfPages = numberOfPages
-        uiView.tintColor = Color.accentColor.toUIColor()
-        
         uiView.addTarget(
             context.coordinator,
             action: #selector(Coordinator.updateCurrentPage(sender:)),
@@ -54,6 +53,7 @@ extension PageControl: UIViewRepresentable {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.currentPage = currentPage.wrappedValue
         uiView.numberOfPages = numberOfPages
+        uiView.tintColor = tintColor?.toUIColor()
     }
     
     public func makeCoordinator() -> Coordinator {
