@@ -15,10 +15,11 @@ struct _PaginationView<Page: View> {
     private let transitionStyle: UIPageViewController.TransitionStyle
     private let showsIndicators: Bool
     private let pageIndicatorAlignment: Alignment
-    
+        
     @Binding private var currentPageIndex: Int
     @Binding private var progressionController: ProgressionController?
     
+    @Environment(\.isScrollEnabled) private var isScrollEnabled
     @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
     @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
     
@@ -71,6 +72,7 @@ extension _PaginationView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.isScrollEnabled = isScrollEnabled
         uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
         uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
         uiViewController.pages = pages
