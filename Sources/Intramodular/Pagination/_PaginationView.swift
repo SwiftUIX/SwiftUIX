@@ -12,6 +12,7 @@ import UIKit
 struct _PaginationView {
     private let children: [UIViewController]
     private let axis: Axis
+    private let transitionStyle: UIPageViewController.TransitionStyle
     private let pageIndicatorAlignment: Alignment
     
     @Binding private var currentPageIndex: Int
@@ -23,12 +24,14 @@ struct _PaginationView {
     init(
         children: [UIViewController],
         axis: Axis,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment,
         currentPageIndex: Binding<Int>,
         progressionController: Binding<ProgressionController?>
     ) {
         self.children = children
         self.axis = axis
+        self.transitionStyle = transitionStyle
         self.pageIndicatorAlignment = pageIndicatorAlignment
         self._currentPageIndex = currentPageIndex
         self._progressionController = progressionController
@@ -150,7 +153,7 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIPageViewController {
         let result = UIPageViewController(
-            transitionStyle: .scroll,
+            transitionStyle: transitionStyle,
             navigationOrientation: axis == .horizontal
                 ? .horizontal
                 : .vertical

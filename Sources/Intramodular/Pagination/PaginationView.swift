@@ -12,7 +12,9 @@ import UIKit
 public struct PaginationView<Page: View>: View {
     private let children: [UIHostingController<Page>]
     private let axis: Axis
+    private let transitionStyle: UIPageViewController.TransitionStyle
     private let pageIndicatorAlignment: Alignment
+    private let showsIndicators: Bool
     
     @State private var currentPageIndex = 0
     @DelayedState private var progressionController: ProgressionController?
@@ -20,10 +22,13 @@ public struct PaginationView<Page: View>: View {
     public init(
         pages: [Page],
         axis: Axis = .horizontal,
-        pageIndicatorAlignment: Alignment? = nil
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        pageIndicatorAlignment: Alignment? = nil,
+        showsIndicators: Bool = true
     ) {
         self.children = pages.map(_UIHostingController.init)
         self.axis = axis
+        self.transitionStyle = transitionStyle
         
         if let pageIndicatorAlignment = pageIndicatorAlignment {
             self.pageIndicatorAlignment = pageIndicatorAlignment
@@ -35,17 +40,23 @@ public struct PaginationView<Page: View>: View {
                     self.pageIndicatorAlignment = .leading
             }
         }
+        
+        self.showsIndicators = showsIndicators
     }
     
     public init(
         axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment? = nil,
+        showsIndicators: Bool = true,
         @ArrayBuilder<Page> content: () -> [Page]
     ) {
         self.init(
             pages: content(),
             axis: axis,
-            pageIndicatorAlignment: pageIndicatorAlignment
+            transitionStyle: transitionStyle,
+            pageIndicatorAlignment: pageIndicatorAlignment,
+            showsIndicators: showsIndicators
         )
     }
     
@@ -54,20 +65,22 @@ public struct PaginationView<Page: View>: View {
             _PaginationView(
                 children: children,
                 axis: axis,
+                transitionStyle: transitionStyle,
                 pageIndicatorAlignment: pageIndicatorAlignment,
                 currentPageIndex: $currentPageIndex,
                 progressionController: $progressionController
             )
-            
-            if axis == .vertical || pageIndicatorAlignment != .center {
-                PageControl(
-                    numberOfPages: children.count,
-                    currentPage: $currentPageIndex
-                ).rotationEffect(
-                    axis == .vertical
-                        ? .init(degrees: 90)
-                        : .init(degrees: 0)
-                )
+            if showsIndicators {
+                if axis == .vertical || pageIndicatorAlignment != .center {
+                    PageControl(
+                        numberOfPages: children.count,
+                        currentPage: $currentPageIndex
+                    ).rotationEffect(
+                        axis == .vertical
+                            ? .init(degrees: 90)
+                            : .init(degrees: 0)
+                    )
+                }
             }
         }
         .environment(\.progressionController, progressionController)
