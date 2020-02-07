@@ -153,7 +153,7 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIPageViewController {
         let result = UIPageViewController(
-            transitionStyle: .scroll,
+            transitionStyle: transitionStyle,
             navigationOrientation: axis == .horizontal
                 ? .horizontal
                 : .vertical
