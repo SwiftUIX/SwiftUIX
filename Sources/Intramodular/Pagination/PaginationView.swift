@@ -17,16 +17,19 @@ public struct PaginationView<Page: View>: View {
     private let showsIndicators: Bool
     
     @State private var currentPageIndex = 0
+    
     @DelayedState private var progressionController: ProgressionController?
     
     public init(
         pages: [Page],
+        initialPageIndex: Int = 0,
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment? = nil,
         showsIndicators: Bool = true
     ) {
         self.pages = pages
+        self.currentPageIndex = initialPageIndex
         self.axis = axis
         self.transitionStyle = transitionStyle
         
@@ -84,6 +87,23 @@ public struct PaginationView<Page: View>: View {
             }
         }
         .environment(\.progressionController, progressionController)
+    }
+}
+
+extension PaginationView where Page == AnyView {
+    public init<V: View & ViewListMaker>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        pageIndicatorAlignment: Alignment? = nil,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> V
+    ) {
+        self.init(
+            pages: content().makeViewList(),
+            transitionStyle: transitionStyle,
+            pageIndicatorAlignment: pageIndicatorAlignment,
+            showsIndicators: showsIndicators
+        )
     }
 }
 

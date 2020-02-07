@@ -14,3 +14,13 @@ extension opaque_View where Self: View {
         .init(self)
     }
 }
+
+// MARK: - Concrete Implementations -=
+
+extension Text: opaque_View {
+    
+}
+
+extension VStack: opaque_View {
+    
+}
