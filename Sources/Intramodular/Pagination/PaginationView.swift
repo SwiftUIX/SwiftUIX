@@ -29,7 +29,6 @@ public struct PaginationView<Page: View>: View {
         showsIndicators: Bool = true
     ) {
         self.pages = pages
-        self.currentPageIndex = initialPageIndex
         self.axis = axis
         self.transitionStyle = transitionStyle
         
@@ -45,10 +44,13 @@ public struct PaginationView<Page: View>: View {
         }
         
         self.showsIndicators = showsIndicators
+        
+        self.currentPageIndex = initialPageIndex
     }
     
     public init(
         axis: Axis = .horizontal,
+        initialPageIndex: Int = 0,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment? = nil,
         showsIndicators: Bool = true,
@@ -56,6 +58,7 @@ public struct PaginationView<Page: View>: View {
     ) {
         self.init(
             pages: content(),
+            initialPageIndex: initialPageIndex,
             axis: axis,
             transitionStyle: transitionStyle,
             pageIndicatorAlignment: pageIndicatorAlignment,
@@ -92,6 +95,7 @@ public struct PaginationView<Page: View>: View {
 
 extension PaginationView where Page == AnyView {
     public init<V: View & ViewListMaker>(
+        initialPageIndex: Int = 0,
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment? = nil,
@@ -100,6 +104,7 @@ extension PaginationView where Page == AnyView {
     ) {
         self.init(
             pages: content().makeViewList(),
+            initialPageIndex: initialPageIndex,
             transitionStyle: transitionStyle,
             pageIndicatorAlignment: pageIndicatorAlignment,
             showsIndicators: showsIndicators
