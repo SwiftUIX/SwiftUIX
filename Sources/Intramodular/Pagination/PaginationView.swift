@@ -72,17 +72,15 @@ public struct PaginationView<Page: View>: View {
                 progressionController: $progressionController
             )
             
-            if showsIndicators {
-                if axis == .vertical || pageIndicatorAlignment != .center {
-                    PageControl(
-                        numberOfPages: pages.count,
-                        currentPage: $currentPageIndex
-                    ).rotationEffect(
-                        axis == .vertical
-                            ? .init(degrees: 90)
-                            : .init(degrees: 0)
-                    )
-                }
+            if showsIndicators && axis == .vertical || pageIndicatorAlignment != .center {
+                PageControl(
+                    numberOfPages: pages.count,
+                    currentPage: $currentPageIndex
+                ).rotationEffect(
+                    axis == .vertical
+                        ? .init(degrees: 90)
+                        : .init(degrees: 0)
+                )
             }
         }
         .environment(\.progressionController, progressionController)

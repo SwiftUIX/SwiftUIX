@@ -56,8 +56,8 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         result.pages = pages
         
-        result.dataSource = context.coordinator as! UIPageViewControllerDataSource
-        result.delegate = context.coordinator as! UIPageViewControllerDelegate
+        result.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
+        result.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
         
         result.setViewControllers(
             [result.allViewControllers[currentPageIndex]],
