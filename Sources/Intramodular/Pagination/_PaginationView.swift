@@ -15,6 +15,7 @@ struct _PaginationView<Page: View> {
     private let transitionStyle: UIPageViewController.TransitionStyle
     private let showsIndicators: Bool
     private let pageIndicatorAlignment: Alignment
+    private let initialPageIndex: Int?
         
     @Binding private var currentPageIndex: Int
     @Binding private var progressionController: ProgressionController?
@@ -30,6 +31,7 @@ struct _PaginationView<Page: View> {
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool,
         pageIndicatorAlignment: Alignment,
+        initialPageIndex: Int?,
         currentPageIndex: Binding<Int>,
         progressionController: Binding<ProgressionController?>
     ) {
@@ -38,6 +40,7 @@ struct _PaginationView<Page: View> {
         self.transitionStyle = transitionStyle
         self.showsIndicators = showsIndicators
         self.pageIndicatorAlignment = pageIndicatorAlignment
+        self.initialPageIndex = initialPageIndex
         self._currentPageIndex = currentPageIndex
         self._progressionController = progressionController
     }
@@ -61,8 +64,12 @@ extension _PaginationView: UIViewControllerRepresentable {
         result.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
         result.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
         
+        if let initialPageIndex = initialPageIndex {
+            currentPageIndex = initialPageIndex
+        }
+        
         result.setViewControllers(
-            [result.allViewControllers[currentPageIndex]],
+            [result.allViewControllers[initialPageIndex ?? currentPageIndex]],
             direction: .forward,
             animated: true
         )
