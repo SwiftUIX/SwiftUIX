@@ -46,13 +46,17 @@ public struct PaginationView<Page: View>: View {
     
     public init(
         axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         pageIndicatorAlignment: Alignment? = nil,
+        showsIndicators: Bool = true,
         @ArrayBuilder<Page> content: () -> [Page]
     ) {
         self.init(
             pages: content(),
             axis: axis,
-            pageIndicatorAlignment: pageIndicatorAlignment
+            transitionStyle: transitionStyle,
+            pageIndicatorAlignment: pageIndicatorAlignment,
+            showsIndicators: showsIndicators
         )
     }
     
