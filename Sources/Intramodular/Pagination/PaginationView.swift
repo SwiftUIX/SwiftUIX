@@ -10,7 +10,7 @@ import UIKit
 
 /// A view that paginates its children along a given axis.
 public struct PaginationView<Page: View>: View {
-    private let children: [UIHostingController<Page>]
+    private let pages: [Page]
     private let axis: Axis
     private let transitionStyle: UIPageViewController.TransitionStyle
     private let pageIndicatorAlignment: Alignment
@@ -26,7 +26,7 @@ public struct PaginationView<Page: View>: View {
         pageIndicatorAlignment: Alignment? = nil,
         showsIndicators: Bool = true
     ) {
-        self.children = pages.map(_UIHostingController.init)
+        self.pages = pages
         self.axis = axis
         self.transitionStyle = transitionStyle
         
@@ -63,17 +63,19 @@ public struct PaginationView<Page: View>: View {
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             _PaginationView(
-                children: children,
+                pages: pages,
                 axis: axis,
                 transitionStyle: transitionStyle,
+                showsIndicators: showsIndicators,
                 pageIndicatorAlignment: pageIndicatorAlignment,
                 currentPageIndex: $currentPageIndex,
                 progressionController: $progressionController
             )
+            
             if showsIndicators {
                 if axis == .vertical || pageIndicatorAlignment != .center {
                     PageControl(
-                        numberOfPages: children.count,
+                        numberOfPages: pages.count,
                         currentPage: $currentPageIndex
                     ).rotationEffect(
                         axis == .vertical
