@@ -32,7 +32,7 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
             label.configure(with: attributedText)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
-                label.sizeToFit()
+                self.label.sizeToFit()
             }
         }
     }
