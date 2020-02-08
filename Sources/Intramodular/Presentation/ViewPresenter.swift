@@ -28,6 +28,10 @@ extension DynamicViewPresenter {
         return presented
     }
     
+    public var topmostPresenter: DynamicViewPresenter {
+        topmostPresented ?? self
+    }
+    
     public var isPresented: Bool {
         return presented != nil
     }
@@ -52,8 +56,24 @@ extension DynamicViewPresenter {
         )
     }
     
+    public func presentOnTop<V: View>(
+        _ view: V,
+        named name: ViewName? = nil,
+        onDismiss: @escaping () -> Void = { },
+        presentationStyle: ModalViewPresentationStyle = .automatic,
+        completion: @escaping () -> () = { }
+    ) {
+        topmostPresenter.present(
+            view,
+            named: name,
+            onDismiss: onDismiss,
+            presentationStyle: presentationStyle,
+            completion: completion
+        )
+    }
+    
     public func dismissTopmost() {
-        topmostPresented?.presenting?.dismiss()
+        topmostPresenter.presenting?.dismiss()
     }
     
     public func dismissView<H: Hashable>(named name: H) {

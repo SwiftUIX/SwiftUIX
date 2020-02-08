@@ -40,9 +40,10 @@ public struct SearchBar: UIViewRepresentable {
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.searchBarStyle = searchBarStyle
-        uiView.showsCancelButton = showsCancelButton
         uiView.text = text
         uiView.tintColor = Color.accentColor.toUIColor()
+        
+        uiView.setShowsCancelButton(showsCancelButton, animated: true)
     }
     
     public class Coordinator: NSObject, UISearchBarDelegate {
