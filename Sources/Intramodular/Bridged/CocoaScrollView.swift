@@ -20,6 +20,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             self.base = base
         }
         
+        #if !os(tvOS)
+        
         @objc public func refreshChanged(_ control: UIRefreshControl) {
             base.onRefresh?()
             
@@ -27,6 +29,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
                 control.endRefreshing()
             }
         }
+        
+        #endif
         
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             base.onPercentContentOffsetChange(scrollView.percentContentOffset)
@@ -135,6 +139,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             }
         }
         
+        #if !os(tvOS)
+        
         if onRefresh != nil {
             let refreshControl: UIRefreshControl
             
@@ -160,6 +166,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
                 }
             }
         }
+        
+        #endif
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -177,6 +185,8 @@ extension CocoaScrollView {
     }
 }
 
+#if !os(tvOS)
+
 extension CocoaScrollView {
     public func onRefresh(_ body: @escaping () -> ()) -> Self {
         then({ $0.onRefresh = body })
@@ -186,5 +196,7 @@ extension CocoaScrollView {
         then({ $0.isRefreshing = isRefreshing })
     }
 }
+
+#endif
 
 #endif
