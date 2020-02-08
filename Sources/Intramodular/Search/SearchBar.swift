@@ -12,10 +12,13 @@ public struct SearchBar: UIViewRepresentable {
     
     @Binding fileprivate var text: String
     
-    private let onEditingChanged: (Bool) -> ()
-    private let onCommit: () -> ()
+    private let onEditingChanged: (Bool) -> Void
+    private let onCommit: () -> Void
     
-    private var searchBarStyle: UISearchBar.Style = .default
+    private var searchBarStyle: UISearchBar.Style = .minimal
+    
+    private var showsCancelButton: Bool = false
+    private var onCancel: () -> Void = { }
     
     public init(
         text: Binding<String>,
@@ -32,17 +35,12 @@ public struct SearchBar: UIViewRepresentable {
         
         uiView.delegate = context.coordinator
         
-        configureUIView(uiView, context: context)
-        
         return uiView
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        configureUIView(uiView, context: context)
-    }
-
-    public func configureUIView(_ uiView: UIViewType, context: Context) {
         uiView.searchBarStyle = searchBarStyle
+        uiView.showsCancelButton = showsCancelButton
         uiView.text = text
         uiView.tintColor = Color.accentColor.toUIColor()
     }
@@ -66,6 +64,13 @@ public struct SearchBar: UIViewRepresentable {
         
         public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
             base.onEditingChanged(false)
+        }
+        
+        public func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+            base.onCancel()
+        }
+        
+        public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
             base.onCommit()
         }
     }
@@ -76,8 +81,16 @@ public struct SearchBar: UIViewRepresentable {
 }
 
 extension SearchBar {
+    public func showsCancelButton(_ shows: Bool) -> Self {
+        then({ $0.showsCancelButton = showsCancelButton })
+    }
+    
+    public func onCancel(perform action: @escaping () -> Void) -> Self {
+        then({ $0.onCancel = action })
+    }
+    
     public func searchBarStyle(_ searchBarStyle: UISearchBar.Style) -> Self {
-        then { $0.searchBarStyle = searchBarStyle }
+        then({ $0.searchBarStyle = searchBarStyle })
     }
 }
 
