@@ -11,11 +11,9 @@ public final class OptionalObservableObject<ObjectType: ObservableObject>: Obser
     
     public fileprivate(set) var base: ObjectType? {
         didSet {
-            if let base = base {
-                baseSubscription = base.objectWillChange.sink(receiveValue: { [weak self] _ in
-                    self?.objectWillChange.send()
-                })
-            }
+            baseSubscription = base?.objectWillChange.sink(receiveValue: { [unowned self] _ in
+                self.objectWillChange.send()
+            })
         }
     }
     
@@ -53,7 +51,7 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     public init(wrappedValue value: ObjectType?) {
         self._wrappedValue = .init(base: value)
     }
-        
+    
     public init() {
         self.init(wrappedValue: nil)
     }
