@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Dispatch
 import Swift
 import SwiftUI
 
@@ -29,6 +30,10 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
         
         func configure(with attributedText: AttributedText) {
             label.configure(with: attributedText)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
+                label.sizeToFit()
+            }
         }
     }
 
