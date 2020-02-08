@@ -28,15 +28,16 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
             super.init(coder: coder)
         }
         
-        func configure(with attributedText: AttributedText) {
-            label.configure(with: attributedText)
+        override public func layoutSubviews() {
+            super.layoutSubviews()
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
-                self.label.sizeToFit()
-            }
+            label.preferredMaxLayoutWidth = frame.width
+        }
+        
+        func configure(with attributedText: AttributedText) {                label.configure(with: attributedText)
         }
     }
-
+    
     public let content: NSAttributedString
     
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
