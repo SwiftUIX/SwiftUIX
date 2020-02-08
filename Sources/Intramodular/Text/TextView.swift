@@ -15,7 +15,7 @@ public struct TextView<Label: View>: View {
     
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
-    
+
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
             label.hidden(!text.isEmpty)
@@ -30,11 +30,13 @@ public struct TextView<Label: View>: View {
 }
 
 fileprivate struct _TextView {
-    @Binding var text: String
+    @Binding private var text: String
     
-    var onEditingChanged: (Bool) -> Void
-    var onCommit: () -> Void
+    private var onEditingChanged: (Bool) -> Void
+    private var onCommit: () -> Void
     
+    @Environment(\.isScrollEnabled) private var isScrollEnabled
+
     init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -99,30 +101,23 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> _UITextView {
-        let view = _UITextView()
-        
-        view.backgroundColor = nil
-        view.isSelectable = true
-        view.text = text
-        
-        if let font = context.environment.font {
-            view.font = font.toUIFont()
-        } else {
-            view.font = .preferredFont(forTextStyle: .body)
+       _UITextView().then {
+            $0.delegate = context.coordinator
         }
-        
-        view.textContainerInset = .zero
-        view.delegate = context.coordinator
-        
-        return view
     }
     
-    func updateUIView(_ textView: _UITextView, context: Context) {
-        if let font = context.environment.font, font.toUIFont() != textView.font {
-            textView.font = font.toUIFont()
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        if let font = context.environment.font {
+            uiView.font = font.toUIFont()
+        } else {
+            uiView.font = .preferredFont(forTextStyle: .body)
         }
-        
-        textView.text = text
+
+        uiView.backgroundColor = nil
+        uiView.isScrollEnabled = isScrollEnabled
+        uiView.isSelectable = true
+        uiView.text = text
+        uiView.textContainerInset = .zero
     }
 }
 

@@ -8,8 +8,30 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct AttributedText: AppKitOrUIKitViewRepresentable {
-    public typealias AppKitOrUIKitViewType = AppKitOrUIKitLabel
-    
+    public class AppKitOrUIKitViewType: AppKitOrUIKitView {
+        private var label = AppKitOrUIKitLabel()
+        
+        public init() {
+            super.init(frame: .zero)
+            
+            self.addSubview(label)
+            
+            #if os(macOS)
+            label.autoresizingMask = [.width, .height]
+            #else
+            label.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            #endif
+        }
+        
+        public required init?(coder: NSCoder) {
+            super.init(coder: coder)
+        }
+        
+        func configure(with attributedText: AttributedText) {
+            label.configure(with: attributedText)
+        }
+    }
+
     public let content: NSAttributedString
     
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
@@ -26,8 +48,12 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
         self.content = content
     }
     
+    public init<S: StringProtocol>(_ content: S) {
+        self.init(NSAttributedString(string: String(content)))
+    }
+    
     public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
-        AppKitOrUIKitViewType().then({ $0.configure(with: self) })
+        AppKitOrUIKitViewType()
     }
     
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
