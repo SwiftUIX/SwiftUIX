@@ -28,7 +28,7 @@ public struct AnyModalPresentation: Identifiable {
         shouldDismiss: @escaping () -> Bool,
         onDismiss: @escaping () -> Void,
         resetBinding: @escaping () -> (),
-        animated: Bool = false,
+        animated: Bool = true,
         presentationStyle: ModalViewPresentationStyle,
         environmentBuilder: EnvironmentBuilder = .init()
     ) {
