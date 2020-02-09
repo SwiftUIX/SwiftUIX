@@ -9,6 +9,7 @@ import SwiftUI
 
 /// A SwiftUI port of `UIScrollView`.
 public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
+    public typealias Offset = ScrollView<Content>.Offset
     public typealias UIViewType = UIScrollView
     
     public class Coordinator: NSObject, UIScrollViewDelegate {
@@ -33,8 +34,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         #endif
         
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            base.onPercentContentOffsetChange(scrollView.percentContentOffset)
-            scrollView.contentAlignment.map(base.onContentAlignmentChange)
+            base.onOffsetChange(scrollView.contentOffset(forContentType: Content.self))
         }
     }
     
@@ -50,9 +50,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     private var isScrollEnabled: Bool = true
     private var isDirectionalLockEnabled: Bool = false
     
-    private var onPercentContentOffsetChange: (CGPoint) -> () = { _ in }
-    private var onContentAlignmentChange: (Alignment) -> () = { _ in }
-    
+    private var onOffsetChange: (ScrollView<Content>.Offset) -> () = { _ in }
+        
     private var onRefresh: (() -> Void)?
     private var isRefreshing: Bool?
     
@@ -120,7 +119,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         
         if !context.coordinator.isInitialContentAlignmentSet {
             if contentSize != .zero && uiView.frame.size != .zero  {
-                uiView.setContentAlignment(initialContentAlignment, animated: false)
+                uiView.setContentAlignment(initialContentAlignment)
                 
                 context.coordinator.isInitialContentAlignmentSet = true
             }
@@ -179,12 +178,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
 }
 
 extension CocoaScrollView {
-    public func onPercentContentOffsetChange(_ body: @escaping (CGPoint) -> ()) -> Self {
-        then({ $0.onPercentContentOffsetChange = body })
-    }
-    
-    public func onContentAlignmentChange(_ body: @escaping (Alignment) -> ()) -> Self {
-        then({ $0.onContentAlignmentChange = body })
+    public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
+        then({ $0.onOffsetChange = body })
     }
 }
 
