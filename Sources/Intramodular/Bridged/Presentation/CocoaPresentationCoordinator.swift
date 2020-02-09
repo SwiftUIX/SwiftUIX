@@ -32,27 +32,26 @@ public class CocoaPresentationCoordinator: NSObject {
     
     weak var viewController: UIViewController?
     
-    override init() {
-        self.presentation = nil
-        self.presentingCoordinator = nil
-        
-        super.init()
-        
-        self.presentingCoordinator = self
-    }
-    
     init(
-        presentation: AnyModalPresentation? = nil,
-        presentingCoordinator: CocoaPresentationCoordinator? = nil
+        presentation: AnyModalPresentation,
+        presentingCoordinator: CocoaPresentationCoordinator
     ) {
         self.presentation = presentation
         self.presentingCoordinator = presentingCoordinator
+    }
+    
+    init(parent: CocoaPresentationCoordinator?) {
+        self.presentation = nil
+
+        super.init()
+        
+        presentingCoordinator = parent ?? self
     }
 }
 
 // MARK: - Protocol Implementations -
 
-extension CocoaPresentationCoordinator: DynamicViewPresenter, PresentationModeProtocol {
+extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public var presenting: DynamicViewPresenter? {
         presentingCoordinator
     }
@@ -70,27 +69,21 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter, PresentationModePr
     }
     
     public func present(_ modal: AnyModalPresentation) {
-        if let viewController = viewController?.presentedViewController as? CocoaHostingController<EnvironmentalAnyView>, viewController.modalViewPresentationStyle == modal.presentationStyle {
-            viewController.rootView.content = modal.content()
+        if let viewController = viewController?.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.presentationStyle {
+            viewController.rootView.content.presentation = modal
             return
         }
         
-        let presentationCoordinator = CocoaPresentationCoordinator(
-            presentation: presentation,
-            presentingCoordinator: self
-        )
-        
-        let viewControllerToBePresented = CocoaHostingController(
-            presentation: modal,
-            presentationCoordinator: presentationCoordinator
-        )
-        
-        presentedCoordinator = presentationCoordinator
-        
-        viewControllerToBePresented.presentationController?.delegate = presentationCoordinator
-        
-        self.viewController?.present(
-            viewControllerToBePresented,
+        viewController?.present(
+            CocoaPresentationHostingController(
+                presentation: modal,
+                coordinator: .init(
+                    presentation: modal,
+                    presentingCoordinator: self
+                )
+            ).then {
+                presentedCoordinator = $0.presentationCoordinator
+            },
             animated: modal.animated,
             completion: modal.completion
         )
@@ -111,6 +104,10 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter, PresentationModePr
             self.presentedCoordinator = nil
             completion()
         }
+    }
+    
+    public func dismiss() {
+        dismiss(completion: { })
     }
     
     public func dismissView(

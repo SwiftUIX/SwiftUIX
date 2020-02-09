@@ -25,8 +25,8 @@ class CocoaAlignHostingTransitionAnimator: NSObject, UIViewControllerAnimatedTra
     ) {
         let containerView = transitionContext.containerView
         
-        let from = transitionContext.viewController(forKey: .from) as! CocoaHostingController<EnvironmentalAnyView>
-        let to = transitionContext.viewController(forKey: .to) as! CocoaHostingController<EnvironmentalAnyView>
+        let from = transitionContext.viewController(forKey: .from) as! AppKitOrUIKitHostingControllerProtocol
+        let to = transitionContext.viewController(forKey: .to) as! AppKitOrUIKitHostingControllerProtocol
         
         let transitionDuration = self.transitionDuration(using: transitionContext)
         

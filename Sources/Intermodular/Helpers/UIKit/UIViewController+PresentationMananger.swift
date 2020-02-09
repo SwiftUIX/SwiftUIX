@@ -19,7 +19,7 @@ extension UIViewController: DynamicViewPresenter {
         if let coordinator = objc_getAssociatedObject(self, &presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
         } else {
-            let coordinator = CocoaPresentationCoordinator(presentingCoordinator: presentingViewController?.objc_associated_presentationCoordinator)
+            let coordinator = CocoaPresentationCoordinator(parent: presentingViewController?.objc_associated_presentationCoordinator)
             
             coordinator.viewController = self
             
@@ -45,6 +45,10 @@ extension UIViewController: DynamicViewPresenter {
         objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
         
+    public func dismiss() {
+        dismiss(completion: { })
+    }
+
     public func present(_ presentation: AnyModalPresentation) {
         objc_associated_presentationCoordinator.present(presentation)
     }

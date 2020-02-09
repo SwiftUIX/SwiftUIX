@@ -13,8 +13,8 @@ class CocoaAlignHostingPresentationController<Content: View>: UIPresentationCont
     let destination: Alignment
     var dismissalInteractionController: CocoaAlignModalTransition
     
-    var _presentedViewController: CocoaHostingController<Content> {
-        (presentedViewController as! CocoaHostingController<Content>)
+    var _presentedViewController: AppKitOrUIKitHostingControllerProtocol {
+        presentedViewController as! AppKitOrUIKitHostingControllerProtocol
     }
     
     override var frameOfPresentedViewInContainerView: CGRect {
