@@ -10,8 +10,8 @@ import SwiftUI
 public class CocoaPresentationCoordinator: NSObject {
     private let presentation: AnyModalPresentation?
     
-    public private(set) weak var presentingCoordinator: CocoaPresentationCoordinator?
-    public private(set) var presentedCoordinator: CocoaPresentationCoordinator?
+    weak var presentingCoordinator: CocoaPresentationCoordinator?
+    var presentedCoordinator: CocoaPresentationCoordinator?
     
     var topMostCoordinator: CocoaPresentationCoordinator {
         var coordinator = self
@@ -103,26 +103,6 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             presentation.onDismiss()
             self.presentedCoordinator = nil
             completion()
-        }
-    }
-    
-    public func dismiss() {
-        dismiss(completion: { })
-    }
-    
-    public func dismissView(
-        named name: ViewName,
-        completion: @escaping () -> Void
-    ) {
-        var coordinator: CocoaPresentationCoordinator? = presentingCoordinator ?? self
-        
-        while let presentedCoordinator = coordinator {
-            if presentedCoordinator.presentedViewName == name {
-                presentedCoordinator.dismiss(completion: completion)
-                break
-            }
-            
-            coordinator = coordinator?.presentedCoordinator
         }
     }
 }

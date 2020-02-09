@@ -8,6 +8,7 @@ import SwiftUI
 public protocol DynamicViewPresenter: PresentationManager {
     var presenting: DynamicViewPresenter? { get }
     var presented: DynamicViewPresenter? { get }
+    var presentedViewName: ViewName? { get }
     
     func present(_ presentation: AnyModalPresentation)
     
@@ -35,7 +36,9 @@ extension DynamicViewPresenter {
     public var isPresented: Bool {
         return presented != nil
     }
-    
+}
+
+extension DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         named name: ViewName? = nil,
@@ -71,9 +74,31 @@ extension DynamicViewPresenter {
             completion: completion
         )
     }
+}
+
+extension DynamicViewPresenter {
+    public func dismiss() {
+        dismiss(completion: { })
+    }
     
     public func dismissTopmost() {
         topmostPresenter.presenting?.dismiss()
+    }
+    
+    public func dismissView(
+        named name: ViewName,
+        completion: @escaping () -> Void
+    ) {
+        var presenter: DynamicViewPresenter? = presenting ?? self
+        
+        while let presented = presenter {
+            if presented.presentedViewName == name {
+                presented.dismiss(completion: completion)
+                break
+            }
+            
+            presenter = presented.presented
+        }
     }
     
     public func dismissView<H: Hashable>(named name: H) {

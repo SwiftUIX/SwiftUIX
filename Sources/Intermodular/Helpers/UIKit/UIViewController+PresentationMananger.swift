@@ -45,10 +45,6 @@ extension UIViewController: DynamicViewPresenter {
         objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
         
-    public func dismiss() {
-        dismiss(completion: { })
-    }
-
     public func present(_ presentation: AnyModalPresentation) {
         objc_associated_presentationCoordinator.present(presentation)
     }

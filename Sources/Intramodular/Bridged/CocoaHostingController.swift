@@ -40,6 +40,12 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override open func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        
+        presentationCoordinator.presentingCoordinator = parent?.objc_associated_presentationCoordinator
+    }
 }
 
 #endif
