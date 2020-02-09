@@ -48,6 +48,12 @@ extension View {
             $0.isTranslucent = isTranslucent
         }
     }
+    
+    public func navigationBarColor(_ color: Color) -> some View {
+        configureCocoaNavigationBar {
+            $0.backgroundColor = color.toUIColor()
+        }
+    }
 }
 
 #endif

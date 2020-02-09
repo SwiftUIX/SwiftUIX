@@ -26,6 +26,8 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         
         super.init(rootView: .init(content: rootView))
         
+        self.rootView.parent = self
+        
         presentationCoordinator.viewController = self
     }
     

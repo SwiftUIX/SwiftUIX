@@ -115,6 +115,9 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         contentView.frame.size = contentSize
         uiView.contentSize = contentSize
         
+        uiView.frame.size.width = min(uiView.frame.size.width, uiView.contentSize.width)
+        uiView.frame.size.height = min(uiView.frame.size.height, uiView.contentSize.height)
+        
         if !context.coordinator.isInitialContentAlignmentSet {
             if contentSize != .zero && uiView.frame.size != .zero  {
                 uiView.setContentAlignment(initialContentAlignment, animated: false)
