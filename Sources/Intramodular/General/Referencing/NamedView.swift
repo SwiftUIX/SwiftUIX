@@ -14,6 +14,14 @@ public protocol NamedView: opaque_NamedView, View {
     
 }
 
+// MARK: - Implementation -
+
+extension NamedView {
+    public var name: ViewName {
+        .init(Self.self)
+    }
+}
+
 extension NamedView where Body: NamedView {
     public var name: ViewName {
         body.name

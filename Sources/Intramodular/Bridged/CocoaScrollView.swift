@@ -43,11 +43,11 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     private let showsIndicators: Bool
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
-    
+    @Environment(\.isScrollEnabled) var isScrollEnabled
+
     private var alwaysBounceVertical: Bool = false
     private var alwaysBounceHorizontal: Bool = false
     private var isPagingEnabled: Bool = false
-    private var isScrollEnabled: Bool = true
     private var isDirectionalLockEnabled: Bool = false
     
     private var onOffsetChange: (ScrollView<Content>.Offset) -> () = { _ in }
@@ -119,7 +119,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         
         if !context.coordinator.isInitialContentAlignmentSet {
             if contentSize != .zero && uiView.frame.size != .zero  {
-                uiView.setContentAlignment(initialContentAlignment)
+                uiView.setContentAlignment(initialContentAlignment, animated: false)
                 
                 context.coordinator.isInitialContentAlignmentSet = true
             }

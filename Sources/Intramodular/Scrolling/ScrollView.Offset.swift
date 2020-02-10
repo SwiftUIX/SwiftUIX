@@ -110,16 +110,16 @@ extension UIScrollView {
         .init(containerBounds: bounds, contentSize: contentSize, contentOffset: contentOffset)
     }
     
-    func setContentOffset<Content: View>(_ offset: ScrollView<Content>.Offset) {
-        setContentOffset(offset.contentOffset, animated: true)
+    func setContentOffset<Content: View>(_ offset: ScrollView<Content>.Offset, animated: Bool) {
+        setContentOffset(offset.contentOffset, animated: animated)
     }
     
-    func setContentAlignment(_ alignment: Alignment) {
+    func setContentAlignment(_ alignment: Alignment, animated: Bool) {
         var offset = contentOffset(forContentType: AnyView.self)
         
         offset.setContentAlignment(alignment)
         
-        setContentOffset(offset)
+        setContentOffset(offset, animated: animated)
     }
 }
 

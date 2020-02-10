@@ -14,7 +14,7 @@ public struct ViewName: CustomStringConvertible, Hashable {
     public var description: String {
         return base.description
     }
-    
+        
     public init<H: Hashable>(_ base: H) {
         if let base = base as? ViewName {
             self = base
@@ -22,6 +22,10 @@ public struct ViewName: CustomStringConvertible, Hashable {
             self.baseType = .init(type(of: base))
             self.base = .init(base)
         }
+    }
+    
+    public init<V: View>(_ type: V.Type) {
+        self.init(ObjectIdentifier(type))
     }
 }
 
