@@ -21,9 +21,20 @@ extension UIViewController: DynamicViewPresenter {
         } else {
             let coordinator = CocoaPresentationCoordinator(parent: presentingViewController?.objc_associated_presentationCoordinator)
             
+            objc_setAssociatedObject(self, &presentationCoordinatorKey, coordinator, .OBJC_ASSOCIATION_RETAIN)
+            
             coordinator.viewController = self
             
-            objc_setAssociatedObject(self, &presentationCoordinatorKey, coordinator, .OBJC_ASSOCIATION_RETAIN)
+            coordinator.presentedCoordinator = presentedViewController.map { viewController in
+                CocoaPresentationCoordinator(parent: coordinator).then {
+                    $0.viewController = viewController
+                }
+            }
+            
+            _ = coordinator
+                .presentedCoordinator?
+                .viewController?
+                .objc_associated_presentationCoordinator // HACK
             
             return coordinator
         }
@@ -36,7 +47,7 @@ extension UIViewController: DynamicViewPresenter {
     public var presented: DynamicViewPresenter? {
         objc_associated_presentationCoordinator.presented
     }
-
+    
     public var presentedViewName: ViewName? {
         objc_associated_presentationCoordinator.presentedViewName
     }
@@ -44,7 +55,7 @@ extension UIViewController: DynamicViewPresenter {
     public func dismiss(completion: @escaping () -> Void) {
         objc_associated_presentationCoordinator.dismiss(completion: completion)
     }
-        
+    
     public func present(_ presentation: AnyModalPresentation) {
         objc_associated_presentationCoordinator.present(presentation)
     }
