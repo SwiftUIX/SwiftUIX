@@ -13,10 +13,11 @@ struct _PaginationView<Page: View> {
     private let pages: [Page]
     private let axis: Axis
     private let transitionStyle: UIPageViewController.TransitionStyle
+    private let infiniteScroll: Bool = false
     private let showsIndicators: Bool
     private let pageIndicatorAlignment: Alignment
     private let initialPageIndex: Int?
-        
+    
     @Binding private var currentPageIndex: Int
     @Binding private var progressionController: ProgressionController?
     
@@ -121,7 +122,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! _UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
-                        ? pageViewController.allViewControllers.last
+                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
                         : pageViewController.allViewControllers[$0 - 1]
                 })
         }
@@ -137,7 +138,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! _UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
-                        ? pageViewController.allViewControllers.first
+                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
@@ -175,7 +176,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! _UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
-                        ? pageViewController.allViewControllers.last
+                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
                         : pageViewController.allViewControllers[$0 - 1]
                 })
         }
@@ -191,11 +192,11 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! _UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
-                        ? pageViewController.allViewControllers.first
+                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
-        
+
         func pageViewController(
             _ pageViewController: UIPageViewController,
             didFinishAnimating _: Bool,
