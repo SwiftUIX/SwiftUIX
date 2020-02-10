@@ -30,15 +30,15 @@ public struct CocoaPresentationHostingControllerContent: View  {
                 } else {
                     self.coordinator.dismiss()
                 }
-        }
-        .onPreferenceChange(AnyModalPresentation.DidAttemptToDismissKey.self) { value in
-            self.coordinator.onDidAttemptToDismiss = value
-        }
-        .onPreferenceChange(AnyModalPresentation.IsActivePreferenceKey.self) { value in
-            self.coordinator.viewController?.isModalInPresentation = value ?? false
-        }
-        .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
-        .preference(key: AnyModalPresentation.IsActivePreferenceKey.self, value: nil)
+            }
+            .onPreferenceChange(AnyModalPresentation.DidAttemptToDismissKey.self) { value in
+                self.coordinator.onDidAttemptToDismiss = value
+            }
+            .onPreferenceChange(AnyModalPresentation.IsActivePreferenceKey.self) { value in
+                self.coordinator.viewController?.isModalInPresentation = value ?? false
+            }
+            .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
+            .preference(key: AnyModalPresentation.IsActivePreferenceKey.self, value: nil)
     }
 }
 
