@@ -7,6 +7,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+struct CocoaPresentationCoordinatorAttacher: ViewModifier {
+    let coordinator: CocoaPresentationCoordinator
+    
+    func body(content: Content) -> some View {
+        content.modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
+    }
+}
+
 final class CocoaPresentationPreferenceKey: TakeLastPreferenceKey<AnyModalPresentation> {
     
 }
