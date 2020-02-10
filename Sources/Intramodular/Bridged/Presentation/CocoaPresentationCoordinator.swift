@@ -38,11 +38,15 @@ public class CocoaPresentationCoordinator: NSObject {
     ) {
         self.presentation = presentation
         self.presentingCoordinator = presentingCoordinator
+        
+        super.init()
+        
+        presentingCoordinator.presentedCoordinator = self
     }
     
     init(parent: CocoaPresentationCoordinator?) {
         self.presentation = nil
-
+        
         super.init()
         
         presentingCoordinator = parent ?? self
@@ -74,7 +78,11 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        viewController?.present(
+        guard let viewController = viewController else {
+            return assertionFailure()
+        }
+        
+        viewController.present(
             CocoaPresentationHostingController(
                 presentation: modal,
                 coordinator: .init(
