@@ -18,7 +18,7 @@ public struct EnvironmentBuilder {
     public init() {
         
     }
-        
+    
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
         environmentValuesTransforms.append(transform)
     }
@@ -77,6 +77,16 @@ extension EnvironmentBuilder {
 
 extension View {
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
+        Group {
+            if builder.isEmpty {
+                self
+            } else {
+                _mergeEnvironmentBuilder(builder)
+            }
+        }
+    }
+    
+    private func _mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
         var view = eraseToAnyView()
         
         view = builder.environmentObjectTransforms.values.reduce(view, { view, transform in transform(view) })

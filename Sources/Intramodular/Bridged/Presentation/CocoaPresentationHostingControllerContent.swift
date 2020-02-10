@@ -22,7 +22,7 @@ public struct CocoaPresentationHostingControllerContent: View  {
     
     public var body: some View {
         presentation.content()
-            .environment(\.dynamicViewPresenter, coordinator.presentingCoordinator)
+            .environment(\.dynamicViewPresenter, coordinator.presentingCoordinator ?? coordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
             .onPreferenceChange(CocoaPresentationPreferenceKey.self) { presentation in
                 if let presentation = presentation {

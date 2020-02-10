@@ -10,15 +10,16 @@ import SwiftUI
 public struct CocoaHostingControllerContent<Content: View>: View  {
     var content: Content
     
-    weak var parent: CocoaHostingController<Content>?
+    let presentationCoordinator: CocoaPresentationCoordinator
     
-    init(content: Content) {
+    init(content: Content, presentationCoordinator: CocoaPresentationCoordinator) {
         self.content = content
+        self.presentationCoordinator = presentationCoordinator
     }
     
     public var body: some View {
         content
-            .environment(\.dynamicViewPresenter, parent)
+            .environment(\.dynamicViewPresenter, presentationCoordinator)
     }
 }
 

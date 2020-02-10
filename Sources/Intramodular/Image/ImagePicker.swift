@@ -20,6 +20,11 @@ public struct ImagePicker: UIViewControllerRepresentable {
         self.encoding = encoding
     }
     
+    public init(data: SetBinding<Data?>, encoding: Image.Encoding) {
+        self._data = .init(set: data, defaultValue: nil)
+        self.encoding = encoding
+    }
+    
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         UIImagePickerController().then {
             $0.allowsEditing = allowsEditing
