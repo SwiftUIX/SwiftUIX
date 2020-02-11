@@ -11,21 +11,22 @@ public struct ViewName: CustomStringConvertible, Hashable {
     private let baseType: ObjectIdentifier
     private let base: AnyHashable
     
-    public var description: String {
-        return base.description
-    }
-        
+    public let description: String
+    
     public init<H: Hashable>(_ base: H) {
         if let base = base as? ViewName {
             self = base
         } else {
             self.baseType = .init(type(of: base))
             self.base = .init(base)
+            self.description = String(describing: base)
         }
     }
     
     public init<V: View>(_ type: V.Type) {
-        self.init(ObjectIdentifier(type))
+        self.baseType = .init(type)
+        self.base = baseType
+        self.description = String(describing: base)
     }
 }
 

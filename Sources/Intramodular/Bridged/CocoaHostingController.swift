@@ -7,8 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>> {
+open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
     public let presentationCoordinator: CocoaPresentationCoordinator
+    
+    public var rootViewName: ViewName? {
+        (rootView as? opaque_NamedView)?.name
+    }
     
     public var rootViewContent: Content {
         get {
@@ -39,12 +43,6 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override open func didMove(toParent parent: UIViewController?) {
-        super.didMove(toParent: parent)
-        
-        presentationCoordinator.presentingCoordinator = parent?.objc_associated_presentationCoordinator
     }
 }
 

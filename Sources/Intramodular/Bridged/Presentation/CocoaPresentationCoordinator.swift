@@ -10,6 +10,14 @@ import SwiftUI
 public class CocoaPresentationCoordinator: NSObject {
     private let presentation: AnyModalPresentation?
     
+    public override var description: String {
+        if let name = presentedViewName {
+            return "Bridged Presentation Coordinator (" + name.description + ")"
+        } else {
+            return "Bridged Presentation Coordinator"
+        }
+    }
+
     weak var presentingCoordinator: CocoaPresentationCoordinator?
     var presentedCoordinator: CocoaPresentationCoordinator?
     

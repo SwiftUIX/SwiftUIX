@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 open class CocoaPresentationHostingController: CocoaHostingController<CocoaPresentationHostingControllerContent> {
-    public var rootViewName: ViewName? {
+    public override var rootViewName: ViewName? {
         nil
             ?? rootViewContent.presentation.contentName
             ?? (rootViewContent.presentation.content() as? opaque_NamedView)?.name
