@@ -34,7 +34,7 @@ public class CocoaPresentationCoordinator: NSObject {
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     private weak var viewController: UIViewController!
-        
+    
     public init(
         presentation: AnyModalPresentation? = nil,
         viewController: UIViewController? = nil
@@ -97,7 +97,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         )
     }
     
-    public func dismiss(completion: @escaping () -> Void) {
+    private func dismiss(animated: Bool, completion: @escaping () -> Void) {
         guard isPresenting else {
             return
         }
@@ -110,11 +110,23 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        viewController.dismiss(animated: true) {
-            self.presentation?.onDismiss()
-            
-            completion()
+        if viewController.presentedViewController != nil {
+            viewController.dismiss(animated: true) {
+                self.presentation?.onDismiss()
+                
+                completion()
+            }
+        } else if let navigationController = viewController.navigationController {
+            navigationController.popToViewController(viewController, animated: animated) {
+                self.presentation?.onDismiss()
+                
+                completion()
+            }
         }
+    }
+    
+    public func dismiss(completion: @escaping () -> Void) {
+        dismiss(animated: true, completion: completion)
     }
 }
 
