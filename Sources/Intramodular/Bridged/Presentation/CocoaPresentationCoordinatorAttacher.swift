@@ -13,6 +13,7 @@ struct CocoaPresentationCoordinatorAttacher: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.dynamicViewPresenter, coordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
             .onPreferenceChange(CocoaPresentationPreferenceKey.self) { presentation in
                 if let presentation = presentation {
                     self.coordinator.present(presentation)
@@ -24,7 +25,7 @@ struct CocoaPresentationCoordinatorAttacher: ViewModifier {
                 self.coordinator.onDidAttemptToDismiss = value
             }
             .onPreferenceChange(AnyModalPresentation.IsActivePreferenceKey.self) { value in
-                self.coordinator.viewController?.isModalInPresentation = value ?? false
+                self.coordinator.setIsInActivePresentation(value ?? false)
             }
             .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
             .preference(key: AnyModalPresentation.IsActivePreferenceKey.self, value: nil)

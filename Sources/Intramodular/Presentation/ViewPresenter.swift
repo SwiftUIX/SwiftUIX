@@ -33,7 +33,7 @@ extension DynamicViewPresenter {
         topmostPresented ?? self
     }
     
-    public var isPresented: Bool {
+    public var isPresenting: Bool {
         return presented != nil
     }
 }

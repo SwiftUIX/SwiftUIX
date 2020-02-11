@@ -30,11 +30,11 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         
         super.init(rootView: .init(content: rootView, presentationCoordinator: presentationCoordinator))
         
-        presentationCoordinator.viewController = self
+        presentationCoordinator.setViewController(self)
     }
     
     public convenience init(rootView: Content) {
-        self.init(rootView: rootView, presentationCoordinator: .init(parent: nil))
+        self.init(rootView: rootView, presentationCoordinator: .init())
     }
     
     public convenience init(@ViewBuilder rootView: () -> Content) {

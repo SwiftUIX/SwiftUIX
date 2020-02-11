@@ -8,56 +8,43 @@ import Swift
 import SwiftUI
 import UIKit
 
-private var presentationCoordinatorKey: Void = ()
+private var runtimePresentationCoordinatorKey: Void = ()
 
 extension UIViewController: DynamicViewPresenter {
-    private var objc_associated_presentationCoordinator: CocoaPresentationCoordinator {
+    var runtimePresentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = (self as? opaque_CocoaController)?.presentationCoordinator {
             return coordinator
         }
         
-        if let coordinator = objc_getAssociatedObject(self, &presentationCoordinatorKey) {
+        if let coordinator = objc_getAssociatedObject(self, &runtimePresentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
         } else {
-            let coordinator = CocoaPresentationCoordinator(parent: presentingViewController?.objc_associated_presentationCoordinator)
+            let coordinator = CocoaPresentationCoordinator(viewController: self)
             
-            objc_setAssociatedObject(self, &presentationCoordinatorKey, coordinator, .OBJC_ASSOCIATION_RETAIN)
-            
-            coordinator.viewController = self
-            
-            coordinator.presentedCoordinator = presentedViewController.map { viewController in
-                CocoaPresentationCoordinator(parent: coordinator).then {
-                    $0.viewController = viewController
-                }
-            }
-            
-            _ = coordinator
-                .presentedCoordinator?
-                .viewController?
-                .objc_associated_presentationCoordinator // HACK
+            objc_setAssociatedObject(self, &runtimePresentationCoordinatorKey, coordinator, .OBJC_ASSOCIATION_RETAIN)
             
             return coordinator
         }
     }
     
     public var presenting: DynamicViewPresenter? {
-        objc_associated_presentationCoordinator.presenting
+        runtimePresentationCoordinator.presenting
     }
     
     public var presented: DynamicViewPresenter? {
-        objc_associated_presentationCoordinator.presented
+        runtimePresentationCoordinator.presented
     }
     
     public var presentedViewName: ViewName? {
-        objc_associated_presentationCoordinator.presentedViewName
+        runtimePresentationCoordinator.presentedViewName
     }
     
     public func dismiss(completion: @escaping () -> Void) {
-        objc_associated_presentationCoordinator.dismiss(completion: completion)
+        runtimePresentationCoordinator.dismiss(completion: completion)
     }
     
     public func present(_ presentation: AnyModalPresentation) {
-        objc_associated_presentationCoordinator.present(presentation)
+        runtimePresentationCoordinator.present(presentation)
     }
 }
 

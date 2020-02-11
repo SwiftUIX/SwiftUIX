@@ -10,8 +10,8 @@ import SwiftUI
 public struct CocoaPresentationMode: PresentationManager {
     var coordinator: CocoaPresentationCoordinator?
     
-    public var isPresented: Bool {
-        coordinator?.viewController != nil
+    public var isPresenting: Bool {
+        coordinator != nil
     }
     
     init(coordinator: CocoaPresentationCoordinator? = nil) {
