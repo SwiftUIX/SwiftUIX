@@ -13,6 +13,6 @@ open class TakeLastPreferenceKey<T>: PreferenceKey {
     }
     
     public static func reduce(value: inout Value, nextValue: () -> Value) {
-        value = nextValue() ?? value
+        value = nextValue()
     }
 }

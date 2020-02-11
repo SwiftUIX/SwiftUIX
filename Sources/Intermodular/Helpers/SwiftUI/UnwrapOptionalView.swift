@@ -21,6 +21,10 @@ public struct UnwrapOptionalView<Value, Content: View>: View {
         self ?? view()
     }
     
+    public func `else`<V: View>(_ view: V) -> some View {
+        self ?? view
+    }
+    
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
         Group {
             if lhs.content == nil {

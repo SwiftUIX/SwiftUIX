@@ -22,13 +22,13 @@ fileprivate struct NavigationViewConfigurator: UIViewControllerRepresentable {
 }
 
 extension View {
-    private func configureCocoaNavigationController(
+    fileprivate func configureCocoaNavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
         background(NavigationViewConfigurator(configure: configure))
     }
     
-    private func configureCocoaNavigationBar(
+    fileprivate func configureCocoaNavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
         configureCocoaNavigationController {
@@ -53,6 +53,41 @@ extension View {
         configureCocoaNavigationBar {
             $0.backgroundColor = color.toUIColor()
         }
+    }
+}
+
+final class IsNavigationBarVisibilePreferenceKey: TakeLastPreferenceKey<Bool> {
+    
+}
+
+struct NavigationBarVisibilityModifier: ViewModifier {
+    @State private var isVisible: Bool?
+    
+    func body(content: Content) -> some View {
+        isVisible.ifSome { isVisible in
+            content
+                .navigationBarHidden(!isVisible)
+                .configureCocoaNavigationController({ controller in
+                    DispatchQueue.main.async {
+                        controller.isNavigationBarHidden = !isVisible
+                    }
+                })
+        }.else(content).onPreferenceChange(IsNavigationBarVisibilePreferenceKey.self) {
+            self.isVisible = $0
+        }
+    }
+}
+
+extension View {
+    public func hideNavigationBar() -> some View {
+        preference(key: IsNavigationBarVisibilePreferenceKey.self, value: false)
+            .modifier(NavigationBarVisibilityModifier())
+    }
+    
+    public func showNavigationBar() -> some View {
+        preference(key: IsNavigationBarVisibilePreferenceKey.self, value: true)
+            .modifier(NavigationBarVisibilityModifier())
+        
     }
 }
 
