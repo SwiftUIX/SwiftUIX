@@ -34,20 +34,26 @@ extension UIResponder {
 }
 
 extension UIResponder {
-    open var nearestViewController: UIViewController? {
-        return nearestResponder(ofKind: UIViewController.self)
+    @objc open var nearestViewController: UIViewController? {
+        nearestResponder(ofKind: UIViewController.self)
     }
     
-    open var furthestViewController: UIViewController? {
-        return furthestResponder(ofKind: UIViewController.self)
+    @objc open var furthestViewController: UIViewController? {
+        furthestResponder(ofKind: UIViewController.self)
     }
     
-    open var nearestNavigationController: UINavigationController? {
-        return nearestResponder(ofKind: UINavigationController.self)
+    @objc open var nearestNavigationController: UINavigationController? {
+        nearestResponder(ofKind: UINavigationController.self)
     }
     
-    open var furthestNavigationController: UINavigationController? {
-        return furthestResponder(ofKind: UINavigationController.self)
+    @objc open var furthestNavigationController: UINavigationController? {
+        furthestResponder(ofKind: UINavigationController.self)
+    }
+}
+
+extension UIViewController {
+    override open var nearestNavigationController: UINavigationController? {
+        navigationController ??  nearestResponder(ofKind: UINavigationController.self)
     }
 }
 
