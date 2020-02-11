@@ -7,23 +7,17 @@ import Swift
 import SwiftUI
 
 @propertyWrapper
-public struct DelayedState<Value>: DynamicProperty {
-    @State private var _wrappedValue: Value
+public struct LazyState<Value>: DynamicProperty {
+    private let initialWrappedValue: () -> Value
+    
+    private var _cachedWrappedValue: Value?
+    
+    @State private var _wrappedValue: Value? = nil
     
     /// The current state value.
     public var wrappedValue: Value {
         get {
-            _wrappedValue
-        } nonmutating set {
-            DispatchQueue.main.async {
-                self._wrappedValue = newValue
-            }
-        }
-    }
-    
-    public var unsafelyUnwrapped: Value {
-        get {
-            _wrappedValue
+            _wrappedValue ?? _cachedWrappedValue ?? initialWrappedValue()
         } nonmutating set {
             _wrappedValue = newValue
         }
@@ -38,11 +32,17 @@ public struct DelayedState<Value>: DynamicProperty {
     }
     
     /// Initialize with the provided initial value.
-    public init(wrappedValue value: Value) {
-        self.__wrappedValue = .init(initialValue: value)
+    public init(initial: @escaping () -> Value) {
+        self.initialWrappedValue = initial
     }
     
     public mutating func update() {
-        self.__wrappedValue.update()
+        guard _cachedWrappedValue == nil else {
+            return
+        }
+        
+        let value = initialWrappedValue()
+                
+        _cachedWrappedValue = value
     }
 }
