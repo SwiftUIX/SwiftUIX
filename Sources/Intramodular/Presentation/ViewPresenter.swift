@@ -81,6 +81,10 @@ extension DynamicViewPresenter {
         dismiss(completion: { })
     }
     
+    public func dismissSelf() {
+        presenting?.dismiss()
+    }
+    
     public func dismissTopmost() {
         topmostPresenter.presenting?.dismiss()
     }
