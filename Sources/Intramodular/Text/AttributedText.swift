@@ -28,11 +28,13 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
             super.init(coder: coder)
         }
         
+        #if !os(macOS)
         override public func layoutSubviews() {
             super.layoutSubviews()
             
             label.preferredMaxLayoutWidth = frame.width
         }
+        #endif
         
         func configure(with attributedText: AttributedText) {                label.configure(with: attributedText)
         }

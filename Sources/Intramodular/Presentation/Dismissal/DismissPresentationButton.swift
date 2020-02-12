@@ -27,6 +27,8 @@ public struct DismissPresentationButton<Label: View>: View {
     }
 }
 
+#if !os(macOS)
+
 extension DismissPresentationButton where Label == Image {
     public init(action: (() -> ())? = nil) {
         self.init(action: action) {
@@ -34,3 +36,5 @@ extension DismissPresentationButton where Label == Image {
         }
     }
 }
+
+#endif

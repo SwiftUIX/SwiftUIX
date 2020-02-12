@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if !os(macOS)
+
 /// A checkbox control.
 public struct Checkbox<Label: View>: View {
     /// A view that describes the effect of toggling `isOn`.
@@ -41,3 +43,5 @@ extension Checkbox where Label == EmptyView {
         self.label = EmptyView()
     }
 }
+
+#endif

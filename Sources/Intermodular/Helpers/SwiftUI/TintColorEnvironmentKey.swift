@@ -23,7 +23,6 @@ extension EnvironmentValues {
 
 extension View {
     public func tintColor(_ color: Color) -> some View {
-        accentColor(color)
-            .environment(\.tintColor, color)
+        environment(\.tintColor, color)
     }
 }
