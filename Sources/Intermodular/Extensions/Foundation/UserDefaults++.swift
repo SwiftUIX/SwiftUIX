@@ -27,6 +27,14 @@ extension UserDefaults {
             setValue(try PropertyListEncoder().encode(value), forKey: key)
         }
     }
+    
+    public func encode<Value: Codable>(_ value: Value?, forKey key: String) throws {
+        if let value = value {
+           try encode(value, forKey: key)
+        } else {
+            removeObject(forKey: key)
+        }
+    }
 }
 
 // MARK: - Helpers-
