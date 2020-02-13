@@ -125,3 +125,45 @@ extension EnvironmentValues {
         }
     }
 }
+
+// MARK: - Concrete Implementations -
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension UIViewController: DynamicViewPresenter {
+    private static var presentationCoordinatorKey: Void = ()
+    
+    @objc open var presentationCoordinator: CocoaPresentationCoordinator {
+        if let coordinator = objc_getAssociatedObject(self, &UIViewController.presentationCoordinatorKey) {
+            return coordinator as! CocoaPresentationCoordinator
+        } else {
+            let coordinator = CocoaPresentationCoordinator(viewController: self)
+            
+            objc_setAssociatedObject(self, &UIViewController.presentationCoordinatorKey, coordinator, .OBJC_ASSOCIATION_RETAIN)
+            
+            return coordinator
+        }
+    }
+    
+    public var presenting: DynamicViewPresenter? {
+        presentationCoordinator.presenting
+    }
+    
+    public var presented: DynamicViewPresenter? {
+        presentationCoordinator.presented
+    }
+    
+    public var presentedViewName: ViewName? {
+        presentationCoordinator.presentedViewName
+    }
+    
+    public func dismiss(completion: @escaping () -> Void) {
+        presentationCoordinator.dismiss(completion: completion)
+    }
+    
+    public func present(_ presentation: AnyModalPresentation) {
+        presentationCoordinator.present(presentation)
+    }
+}
+
+#endif

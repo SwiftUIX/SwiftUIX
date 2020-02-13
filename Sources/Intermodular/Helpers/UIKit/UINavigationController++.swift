@@ -8,7 +8,7 @@ import SwiftUI
 import UIKit
 
 extension UINavigationController {
-    public func viewController(before viewController: UIViewController) -> UIViewController? {
+    func viewController(before viewController: UIViewController) -> UIViewController? {
         guard let index = viewControllers.firstIndex(of: viewController) else {
             return nil
         }
@@ -20,7 +20,7 @@ extension UINavigationController {
         }
     }
     
-    public func viewController(after viewController: UIViewController) -> UIViewController? {
+    func viewController(after viewController: UIViewController) -> UIViewController? {
         guard let index = viewControllers.firstIndex(of: viewController) else {
             return nil
         }

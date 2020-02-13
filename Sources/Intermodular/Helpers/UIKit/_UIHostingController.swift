@@ -20,7 +20,7 @@ class _UIHostingController<Content: View>: UIHostingController<Content> {
         
         view.backgroundColor = .clear
     }
-
+    
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
