@@ -7,14 +7,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class CocoaPresentationCoordinator: NSObject {
+@objc public class CocoaPresentationCoordinator: NSObject {
     private let presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
         if let presentingViewController = viewController.presentingViewController {
-            return presentingViewController.runtimePresentationCoordinator
+            return presentingViewController.presentationCoordinator
         } else if let navigationController = viewController.navigationController {
-            return navigationController.viewController(before: viewController)?.runtimePresentationCoordinator
+            return navigationController.viewController(before: viewController)?.presentationCoordinator
         } else {
             return nil
         }
@@ -22,9 +22,9 @@ public class CocoaPresentationCoordinator: NSObject {
     
     public var presentedCoordinator: CocoaPresentationCoordinator? {
         if let presentedViewController = viewController.presentedViewController {
-            return presentedViewController.runtimePresentationCoordinator
+            return presentedViewController.presentationCoordinator
         } else if let navigationController = viewController.navigationController {
-            return navigationController.viewController(after: viewController)?.runtimePresentationCoordinator
+            return navigationController.viewController(after: viewController)?.presentationCoordinator
         } else {
             return nil
         }
@@ -78,7 +78,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public var presentedViewName: ViewName? {
-        presentedCoordinator?.presentation?.contentName ?? (viewController as? opaque_CocoaController)?.rootViewName
+        presentedCoordinator?.presentation?.contentName
     }
     
     public func present(_ modal: AnyModalPresentation) {

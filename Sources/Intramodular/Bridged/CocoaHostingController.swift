@@ -8,7 +8,11 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
-    public let presentationCoordinator: CocoaPresentationCoordinator
+    public let _presentationCoordinator: CocoaPresentationCoordinator
+    
+    public override var presentationCoordinator: CocoaPresentationCoordinator {
+        return _presentationCoordinator
+    }
     
     public var rootViewName: ViewName? {
         (rootView as? opaque_NamedView)?.name
@@ -26,7 +30,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         rootView: Content,
         presentationCoordinator: CocoaPresentationCoordinator
     ) {
-        self.presentationCoordinator = presentationCoordinator
+        self._presentationCoordinator = presentationCoordinator
         
         super.init(rootView: .init(content: rootView, presentationCoordinator: presentationCoordinator))
         

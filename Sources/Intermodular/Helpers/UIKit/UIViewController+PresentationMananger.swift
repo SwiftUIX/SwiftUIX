@@ -11,11 +11,7 @@ import UIKit
 private var runtimePresentationCoordinatorKey: Void = ()
 
 extension UIViewController: DynamicViewPresenter {
-    var runtimePresentationCoordinator: CocoaPresentationCoordinator {
-        if let coordinator = (self as? opaque_CocoaController)?.presentationCoordinator {
-            return coordinator
-        }
-        
+    @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &runtimePresentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
         } else {
@@ -28,23 +24,23 @@ extension UIViewController: DynamicViewPresenter {
     }
     
     public var presenting: DynamicViewPresenter? {
-        runtimePresentationCoordinator.presenting
+        presentationCoordinator.presenting
     }
     
     public var presented: DynamicViewPresenter? {
-        runtimePresentationCoordinator.presented
+        presentationCoordinator.presented
     }
     
     public var presentedViewName: ViewName? {
-        runtimePresentationCoordinator.presentedViewName
+        presentationCoordinator.presentedViewName
     }
     
     public func dismiss(completion: @escaping () -> Void) {
-        runtimePresentationCoordinator.dismiss(completion: completion)
+        presentationCoordinator.dismiss(completion: completion)
     }
     
     public func present(_ presentation: AnyModalPresentation) {
-        runtimePresentationCoordinator.present(presentation)
+        presentationCoordinator.present(presentation)
     }
 }
 
