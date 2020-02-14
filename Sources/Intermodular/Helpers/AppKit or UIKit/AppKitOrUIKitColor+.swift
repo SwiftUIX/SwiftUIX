@@ -87,6 +87,17 @@ extension Color {
             return nil
         }
         
+        if String(describing: type(of: base)) == "NamedColor" {
+            let baseMirror = Mirror(reflecting: base)
+            
+            if let name = baseMirror.descendant("name") as? String {
+                let bundle = baseMirror.descendant("bundle") as? Bundle
+                if let color = UIColor(named: name, in: bundle, compatibleWith: nil) {
+                    return color
+                }
+            }
+        }
+        
         var baseValue: String = ""
         
         dump(base, to: &baseValue)
