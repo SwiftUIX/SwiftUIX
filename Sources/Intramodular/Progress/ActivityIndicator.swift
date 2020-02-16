@@ -35,13 +35,14 @@ extension ActivityIndicator: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.color = tintColor?.toUIColor()
-        
         if let style = style {
             uiView.style = .init(style)
         }
         
-        uiView.tintColor = tintColor?.toUIColor()
+        if #available(iOS 13.1, *) {
+            uiView.color = tintColor?.toUIColor()
+            uiView.tintColor = tintColor?.toUIColor()
+        }
         
         isAnimated ? uiView.startAnimating() : uiView.stopAnimating()
     }

@@ -51,7 +51,7 @@ struct _PaginationView<Page: View> {
 
 extension _PaginationView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIHostingPageViewController<Page>
-        
+    
     func makeUIViewController(context: Context) -> UIViewControllerType {
         let result = UIViewControllerType(
             transitionStyle: transitionStyle,
@@ -79,12 +79,15 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         return result
     }
-
+    
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.isPanGestureEnabled = isPanGestureEnabled
-        uiViewController.isScrollEnabled = isScrollEnabled
-        uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
-        uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
+        if #available(iOS 13.1, *) {
+            uiViewController.isPanGestureEnabled = isPanGestureEnabled
+            uiViewController.isScrollEnabled = isScrollEnabled
+            uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
+            uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
+        }
+        
         uiViewController.pages = pages
     }
     
@@ -142,7 +145,7 @@ extension _PaginationView {
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
-                
+        
         func pageViewController(
             _ pageViewController: UIPageViewController,
             didFinishAnimating _: Bool,
@@ -196,7 +199,7 @@ extension _PaginationView {
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
-
+        
         func pageViewController(
             _ pageViewController: UIPageViewController,
             didFinishAnimating _: Bool,
@@ -216,7 +219,7 @@ extension _PaginationView {
                     .map({ parent.currentPageIndex = $0 })
             }
         }
-
+        
         @objc func presentationCount(for pageViewController: UIPageViewController) -> Int {
             let pageViewController = pageViewController as! UIViewControllerType
             

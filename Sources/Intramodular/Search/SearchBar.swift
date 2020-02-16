@@ -19,7 +19,9 @@ public struct SearchBar: UIViewRepresentable {
     
     private var showsCancelButton: Bool = false
     private var onCancel: () -> Void = { }
-    
+
+    @Environment(\.tintColor) var tintColor
+
     public init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -41,7 +43,10 @@ public struct SearchBar: UIViewRepresentable {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         uiView.searchBarStyle = searchBarStyle
         uiView.text = text
-        uiView.tintColor = Color.accentColor.toUIColor()
+        
+        if #available(iOS 13.1, *) {
+            uiView.tintColor = tintColor?.toUIColor()
+        }
         
         uiView.setShowsCancelButton(showsCancelButton, animated: true)
     }
