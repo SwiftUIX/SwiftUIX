@@ -12,13 +12,17 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     
     let presentationCoordinator: CocoaPresentationCoordinator
     
+    @State var navigationController: UINavigationController?
+    
     init(content: Content, presentationCoordinator: CocoaPresentationCoordinator) {
         self.content = content
         self.presentationCoordinator = presentationCoordinator
     }
     
     public var body: some View {
-        content.modifier(CocoaPresentationCoordinatorAttacher(coordinator: presentationCoordinator))
+        content
+            .environment(\.navigator, navigationController)
+            .modifier(CocoaPresentationCoordinatorAttacher(coordinator: presentationCoordinator))
     }
 }
 

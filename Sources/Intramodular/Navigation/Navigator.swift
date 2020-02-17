@@ -28,3 +28,17 @@ extension EnvironmentValues {
         }
     }
 }
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension UINavigationController: Navigator {
+    public func push<V: View>(_ view: V) {
+        pushViewController(CocoaHostingController(rootView: view), animated: true)
+    }
+    
+    public func pop() {
+        popViewController(animated: true)
+    }
+}
+
+#endif
