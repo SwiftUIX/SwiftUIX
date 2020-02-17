@@ -24,10 +24,28 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
         override open func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             
-            takeSnapshot()
+            DispatchQueue.main.async {
+                self.takeSnapshot()
+            }
         }
         
         func takeSnapshot() {
+            guard view.superview != nil else {
+                return
+            }
+            
+            guard (view.layer.animationKeys() ?? []).count == 0 else {
+                return
+            }
+            
+            guard UIView.inheritedAnimationDuration == 0 else {
+                return
+            }
+            
+            guard view.frame.size.width >= 1 && view.frame.size.height >= 1 else {
+                return
+            }
+            
             UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, UIScreen.main.scale)
             
             defer {
@@ -36,7 +54,13 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
             
             view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
             
-            image.wrappedValue =  UIGraphicsGetImageFromCurrentImageContext()
+            let newImage = UIGraphicsGetImageFromCurrentImageContext()
+            
+            if image.wrappedValue?.pngData() == newImage?.pngData() {
+                
+            } else {
+                image.wrappedValue = newImage
+            }
         }
     }
     
@@ -57,7 +81,7 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.rootView = rootView
-
+        
         uiViewController.takeSnapshot()
     }
 }

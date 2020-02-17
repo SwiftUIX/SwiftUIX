@@ -30,4 +30,8 @@ extension EnvironmentalAnyView {
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> Self {
         then({ $0.environment.merge(builder) })
     }
+    
+    public mutating func mergeEnvironmentBuilderInPlace(_ builder: EnvironmentBuilder) {
+        self = mergeEnvironmentBuilder(builder)
+    }
 }

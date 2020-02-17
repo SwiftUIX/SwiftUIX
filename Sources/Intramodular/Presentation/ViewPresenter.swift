@@ -97,12 +97,13 @@ extension DynamicViewPresenter {
         
         while let presented = presenter {
             if presented.presentedViewName == name {
-                presented.dismiss(completion: completion)
-                break
+                return presented.dismiss(completion: completion)
             }
             
             presenter = presented.presented
         }
+        
+        completion()
     }
     
     public func dismissView<H: Hashable>(named name: H) {
