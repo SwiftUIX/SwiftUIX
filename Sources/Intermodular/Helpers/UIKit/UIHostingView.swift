@@ -24,7 +24,9 @@ open class UIHostingView<Content: View>: UIView {
         self.rootViewHostingController = _UIHostingController(rootView: rootView)
         
         super.init(frame: .zero)
-                
+        
+        rootViewHostingController.view.backgroundColor = .clear
+        
         addSubview(rootViewHostingController.view)
     }
     
