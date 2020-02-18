@@ -20,10 +20,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
         coordinator: CocoaPresentationCoordinator
     ) {
         super.init(
-            rootView: .init(
-                presentation: presentation,
-                coordinator: coordinator
-            ),
+            rootView: .init(presentation: presentation),
             presentationCoordinator: coordinator
         )
                 

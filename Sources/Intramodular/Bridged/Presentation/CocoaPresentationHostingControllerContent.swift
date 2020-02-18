@@ -10,19 +10,13 @@ import UIKit
 
 public struct CocoaPresentationHostingControllerContent: View  {
     var presentation: AnyModalPresentation
-    var coordinator: CocoaPresentationCoordinator
     
-    init(
-        presentation: AnyModalPresentation,
-        coordinator: CocoaPresentationCoordinator
-    ) {
+    init(presentation: AnyModalPresentation) {
         self.presentation = presentation
-        self.coordinator = coordinator
     }
     
     public var body: some View {
         presentation.content()
-            .modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
     }
 }
 

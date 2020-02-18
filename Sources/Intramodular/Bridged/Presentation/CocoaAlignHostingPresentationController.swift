@@ -18,7 +18,7 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         var body: some View {
             content
                 .environment(\.presentationTransitionType, transitionType)
-                .modifier(CocoaPresentationCoordinatorAttacher(coordinator: presentationCoordinator))
+                .attach(presentationCoordinator)
         }
     }
     

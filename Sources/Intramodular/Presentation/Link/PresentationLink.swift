@@ -55,24 +55,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         Group {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             
-            if mechanism == .system {
-                Button(action: present, label: { label }).sheet(
-                    isPresented: $isPresented,
-                    onDismiss: { self.isPresented = false; self.onDismiss?() }
-                ) {
-                    self.destination()
+            Button(action: present, label: { label }).sheet(
+                isPresented: $isPresented,
+                onDismiss: { self.isPresented = false; self.onDismiss?() }
+            ) {
+                CocoaHosted(
+                    rootView: self.destination()
                         .mergeEnvironmentBuilder(self.environmentBuilder)
-                }
-            } else if mechanism == .custom {
-                Button(action: present, label: { label }).cocoaPresentation(
-                    named: destinationName,
-                    isPresented: $isPresented,
-                    onDismiss: { self.isPresented = false; self.onDismiss?() },
-                    presentationStyle: .automatic
-                ) {
-                    self.destination()
-                        .mergeEnvironmentBuilder(self.environmentBuilder)
-                }
+                )
             }
             
             #else

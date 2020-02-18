@@ -30,7 +30,6 @@ import SwiftUI
         }
     }
     
-    var onDidAttemptToDismiss: [AnyModalPresentation.DidAttemptToDismissCallback] = []
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
     
     private weak var viewController: UIViewController!
@@ -143,18 +142,22 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
         presentation?.shouldDismiss() ?? true
     }
     
-    public func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
-        for callback in onDidAttemptToDismiss {
-            callback.action()
-        }
-    }
-    
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         presentation?.onDismiss()
+    }
+}
+
+// MARK: - Helpers -
+
+extension View {
+    func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
+        self
+            .environment(\.dynamicViewPresenter, coordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
     }
 }
 
