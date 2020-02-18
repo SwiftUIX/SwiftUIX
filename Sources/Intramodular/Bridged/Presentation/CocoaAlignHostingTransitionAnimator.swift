@@ -49,8 +49,6 @@ class CocoaAlignHostingTransitionAnimator: NSObject, UIViewControllerAnimatedTra
             
             to.view.frame = fromFrame
             
-            containerView.addSubview(to.view)
-            
             UIView.animate(withDuration: transitionDuration, animations: {
                 to.view.frame = toFrame
             }) { _ in

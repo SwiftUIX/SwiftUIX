@@ -8,13 +8,20 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaAlignHostingTransitioningDelegate<Content: View>: CocoaHostingControllerTransitioningDelegate<Content> {
+class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: CocoaHostingControllerTransitioningDelegate<Content> {
+    let background: Background
     let source: Alignment
     let destination: Alignment
     
     let dismissalInteractionController = CocoaAlignModalTransition()
     
-    init(source: Alignment, destination: Alignment) {
+    init(
+        background: Background,
+        source: Alignment,
+        destination: Alignment,
+        contentType: Content.Type = Content.self
+    ) {
+        self.background = background
         self.source = source
         self.destination = destination
     }
@@ -30,7 +37,7 @@ class CocoaAlignHostingTransitioningDelegate<Content: View>: CocoaHostingControl
             isPresenting: true
         )
     }
-
+    
     override func animationController(
         forDismissed dismissed: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
@@ -50,9 +57,10 @@ class CocoaAlignHostingTransitioningDelegate<Content: View>: CocoaHostingControl
         presenting: UIViewController?,
         source: UIViewController
     ) -> UIPresentationController? {
-        CocoaAlignHostingPresentationController<Content>(
+        CocoaAlignHostingPresentationController<Background, Content>(
             presented: presented,
             presenting: presenting,
+            background: background,
             source: self.source,
             destination: self.destination,
             dismissalInteractionController: dismissalInteractionController
@@ -67,7 +75,14 @@ extension ModalViewPresentationStyle {
         source: Alignment,
         destination: Alignment
     ) -> Self {
-        .custom(CocoaAlignHostingTransitioningDelegate<EnvironmentalAnyView>(source: source, destination: destination))
+        .custom(
+            CocoaAlignHostingTransitioningDelegate(
+                background: DefaultPresentationBackdropView(),
+                source: source,
+                destination: destination,
+                contentType: EnvironmentalAnyView.self
+            )
+        )
     }
     
     public static func align(
