@@ -51,10 +51,4 @@ extension UIResponder {
     }
 }
 
-extension UIViewController {
-    override open var nearestNavigationController: UINavigationController? {
-        navigationController ??  nearestResponder(ofKind: UINavigationController.self)
-    }
-}
-
 #endif

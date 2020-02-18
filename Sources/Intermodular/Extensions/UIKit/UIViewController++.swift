@@ -8,7 +8,28 @@ import Swift
 import UIKit
 
 extension UIViewController {
-    func findChild<T: UIViewController>(ofKind kind: T.Type) -> T? {
+    var topMostPresentedViewController: UIViewController? {
+        var topController = self
+        
+        while let newTopController = topController.presentedViewController {
+            topController = newTopController
+        }
+        
+        return topController
+    }
+    
+    var topMostViewController: UIViewController {
+        topMostPresentedViewController ?? self
+    }
+        
+    override open var nearestNavigationController: UINavigationController? {
+        nil
+            ?? navigationController
+            ?? nearestResponder(ofKind: UINavigationController.self)
+            ?? nearestChild(ofKind: UINavigationController.self)
+    }
+    
+    func nearestChild<T: UIViewController>(ofKind kind: T.Type) -> T? {
         guard !children.isEmpty else {
             return nil
         }
@@ -16,9 +37,13 @@ extension UIViewController {
         for child in children {
             if child.isKind(of: kind) {
                 return child as? T
-            } else if let result = child.findChild(ofKind: kind) {
+            } else if let result = child.nearestChild(ofKind: kind) {
                 return result
             }
+        }
+        
+        if let result = presentedViewController?.nearestChild(ofKind: kind) {
+            return result
         }
         
         return nil
