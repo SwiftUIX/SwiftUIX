@@ -77,7 +77,7 @@ extension ModalViewPresentationStyle {
     ) -> Self {
         .custom(
             CocoaAlignHostingTransitioningDelegate(
-                background: DefaultPresentationBackdropView(),
+                background: DefaultPresentationBackdrop(),
                 source: source,
                 destination: destination,
                 contentType: EnvironmentalAnyView.self

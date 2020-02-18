@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct CocoaPresentationCoordinatorAttacher: ViewModifier {
-    let coordinator: CocoaPresentationCoordinator
+    let coordinator: CocoaPresentationCoordinator?
     
     func body(content: Content) -> some View {
         content
@@ -16,16 +16,16 @@ struct CocoaPresentationCoordinatorAttacher: ViewModifier {
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
             .onPreferenceChange(CocoaPresentationPreferenceKey.self) { presentation in
                 if let presentation = presentation {
-                    self.coordinator.present(presentation)
+                    self.coordinator?.present(presentation)
                 } else {
-                    self.coordinator.dismiss()
+                    self.coordinator?.dismiss()
                 }
             }
             .onPreferenceChange(AnyModalPresentation.DidAttemptToDismissKey.self) { value in
-                self.coordinator.onDidAttemptToDismiss = value
+                self.coordinator?.onDidAttemptToDismiss = value
             }
             .onPreferenceChange(AnyModalPresentation.IsActivePreferenceKey.self) { value in
-                self.coordinator.setIsInActivePresentation(value ?? false)
+                self.coordinator?.setIsInActivePresentation(value ?? false)
             }
             .preference(key: CocoaPresentationPreferenceKey.self, value: nil)
             .preference(key: AnyModalPresentation.IsActivePreferenceKey.self, value: nil)

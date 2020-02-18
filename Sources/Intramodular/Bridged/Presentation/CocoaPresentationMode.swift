@@ -19,7 +19,7 @@ public struct CocoaPresentationMode: PresentationManager {
     }
     
     public func dismiss() {
-        coordinator?.presentingCoordinator?.dismiss()
+        coordinator?.dismissSelf()
     }
 }
 

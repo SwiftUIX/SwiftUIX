@@ -12,10 +12,13 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
     struct BackgroundContainer: View {
         let content: Background
         
+        var presentationCoordinator: CocoaPresentationCoordinator?
         var transitionType: PresentationTransitionType?
         
         var body: some View {
-            content.environment(\.presentationTransitionType, transitionType)
+            content
+                .environment(\.presentationTransitionType, transitionType)
+                .modifier(CocoaPresentationCoordinatorAttacher(coordinator: presentationCoordinator))
         }
     }
     
@@ -23,10 +26,10 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
     let source: Alignment
     let destination: Alignment
     
-    var _backgroundHostingView: UIHostingView<BackgroundContainer>?
+    var _backgroundHostingView: CocoaHostingView<BackgroundContainer>?
     
-    var backgroundHostingView: UIHostingView<BackgroundContainer> {
-        _backgroundHostingView ?? UIHostingView<BackgroundContainer>(rootView: .init(content: background)).then {
+    var backgroundHostingView: CocoaHostingView<BackgroundContainer> {
+        _backgroundHostingView ?? CocoaHostingView<BackgroundContainer>(rootView: .init(content: background)).then {
             $0.frame = .init(
                 origin: .zero,
                 size: containerView!.bounds.size
@@ -80,6 +83,7 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         if let containerView = containerView {
             containerView.addSubview(backgroundHostingView)
             
+            backgroundHostingView.rootView.presentationCoordinator = presentedViewController.presentationCoordinator
             backgroundHostingView.addSubview(presentedViewController.view)
         }
         
@@ -106,6 +110,7 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         if completed {
             delegate?.presentationControllerDidDismiss?(self)
             
+            backgroundHostingView.rootView.presentationCoordinator = nil
             backgroundHostingView.rootView.transitionType = .dismissalDidEnd
             backgroundHostingView.removeFromSuperview()
             

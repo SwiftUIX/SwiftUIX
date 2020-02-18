@@ -5,7 +5,8 @@
 import Swift
 import SwiftUI
 
-public struct DefaultPresentationBackdropView: View {
+public struct DefaultPresentationBackdrop: View {
+    @Environment(\.presentationManager) var presentationManager
     @Environment(\.presentationTransitionType) var presentationTransitionType
     
     @State var viewDidAppear = false
@@ -36,5 +37,10 @@ public struct DefaultPresentationBackdropView: View {
             .opacity(opacity)
             .onAppear { self.viewDidAppear = true }
             .animation(.default)
+            .onTapGesture(perform: dismiss)
+    }
+    
+    func dismiss() {
+        presentationManager.dismiss()
     }
 }
