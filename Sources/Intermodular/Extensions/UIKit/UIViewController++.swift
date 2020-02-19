@@ -34,10 +34,6 @@ extension UIViewController {
             return nil
         }
         
-        if isKind(of: kind) {
-            return .some(self as! T)
-        }
-        
         for child in children {
             if child.isKind(of: kind) {
                 return child as? T
