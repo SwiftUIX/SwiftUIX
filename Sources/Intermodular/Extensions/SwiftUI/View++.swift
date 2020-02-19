@@ -112,8 +112,8 @@ extension View {
 
 extension View {
     @inlinable
-    public func frame(_ size: CGSize, alignment: Alignment = .center) -> some View {
-        frame(width: size.width, height: size.height, alignment: alignment)
+    public func frame(_ size: CGSize?, alignment: Alignment = .center) -> some View {
+        frame(width: size?.width, height: size?.height, alignment: alignment)
     }
     
     @inlinable

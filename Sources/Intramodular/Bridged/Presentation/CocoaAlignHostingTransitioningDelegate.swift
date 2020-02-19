@@ -72,7 +72,7 @@ class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: C
 
 extension ModalViewPresentationStyle {
     public static func align(
-        source: Alignment,
+        source: Alignment = .bottom,
         destination: Alignment
     ) -> Self {
         .custom(
