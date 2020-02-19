@@ -21,7 +21,7 @@ extension UIViewController {
     var topMostViewController: UIViewController {
         topMostPresentedViewController ?? self
     }
-        
+    
     override open var nearestNavigationController: UINavigationController? {
         nil
             ?? nearestChild(ofKind: UINavigationController.self)
@@ -34,6 +34,10 @@ extension UIViewController {
             return nil
         }
         
+        if isKind(of: kind) {
+            return .some(self as! T)
+        }
+        
         for child in children {
             if child.isKind(of: kind) {
                 return child as? T
@@ -41,7 +45,7 @@ extension UIViewController {
                 return result
             }
         }
-        
+                
         if let result = presentedViewController?.nearestChild(ofKind: kind) {
             return result
         }
