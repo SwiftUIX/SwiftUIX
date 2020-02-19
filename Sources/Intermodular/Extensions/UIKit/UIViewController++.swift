@@ -24,9 +24,9 @@ extension UIViewController {
         
     override open var nearestNavigationController: UINavigationController? {
         nil
-            ?? navigationController
-            ?? nearestResponder(ofKind: UINavigationController.self)
             ?? nearestChild(ofKind: UINavigationController.self)
+            ?? nearestResponder(ofKind: UINavigationController.self)
+            ?? navigationController
     }
     
     func nearestChild<T: UIViewController>(ofKind kind: T.Type) -> T? {
