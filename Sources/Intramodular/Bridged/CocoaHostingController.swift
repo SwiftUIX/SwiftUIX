@@ -25,11 +25,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
             rootView.content = newValue
         }
     }
-    
-    public func setRootView(_ rootView: Content) {
-        self.rootViewContent = rootView
-    }
-    
+        
     init(
         rootView: Content,
         presentationCoordinator: CocoaPresentationCoordinator
@@ -51,28 +47,6 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-        
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        
-        updateRootView()
-    }
-    
-    override open func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        updateRootView()
-    }
-
-    override open func didMove(toParent parent: UIViewController?) {
-        super.didMove(toParent: parent)
-        
-        updateRootView()
-    }
-    
-    private func updateRootView() {
-
     }
 }
 

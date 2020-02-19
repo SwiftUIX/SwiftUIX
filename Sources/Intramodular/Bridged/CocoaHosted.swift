@@ -21,7 +21,21 @@ public struct CocoaHosted<Content: View>: UIViewControllerRepresentable {
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.setRootView(rootView)
+        uiViewController.rootViewContent = rootView
+    }
+}
+
+#else
+
+public struct CocoaHosted<Content: View>: View {
+    private let rootView: Content
+    
+    public init(rootView: Content) {
+        self.rootView = rootView
+    }
+    
+    public var body: some View {
+        rootView
     }
 }
 
