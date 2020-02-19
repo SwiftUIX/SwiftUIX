@@ -54,7 +54,8 @@ public struct ImagePicker: UIViewControllerRepresentable {
             _ picker: UIImagePickerController,
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
-            base.data = (info[UIImagePickerController.InfoKey.editedImage] as! UIImage).data(using: base.encoding)
+            let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
+            base.data = image?.data(using: base.encoding)
             
             base.presentationManager.dismiss()
         }
