@@ -23,6 +23,28 @@ extension View {
         }
     }
     
+    /// Configures the transparency of the navigation bar for this view.
+    ///
+    /// This modifier only takes effect when this view is inside of and visible
+    /// within a `NavigationView`.
+    ///
+    /// - Parameters:
+    ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
+    public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
+        configureCocoaNavigationBar { navigationBar in
+            DispatchQueue.main.async {
+                navigationBar.isDefaultTransparent = isTransparent
+            }
+        }
+    }
+    
+    /// Configures the color of the navigation bar for this view.
+    ///
+    /// This modifier only takes effect when this view is inside of and visible
+    /// within a `NavigationView`.
+    ///
+    /// - Parameters:
+    ///     - color: The color to use for the navigation bar.
     public func navigationBarColor(_ color: Color) -> some View {
         configureCocoaNavigationBar { navigationBar in
             DispatchQueue.main.async {
