@@ -13,7 +13,11 @@ public struct Actions {
     public init(_ value: [Action]) {
         self.value = value
     }
-    
+
+    public init(initial action: @escaping Action) {
+        self.init([action])
+    }
+
     public init() {
         self.init([])
     }
