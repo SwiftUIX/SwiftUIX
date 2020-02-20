@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaList<Data: RandomAccessCollection, RowContent: View>: UIViewControllerRepresentable where Data.Element: Identifiable {
-    public typealias UIViewControllerType = CocoaTableViewController<Data, RowContent>
+    public typealias UIViewControllerType = CocoaHostingTableViewController<Data, RowContent>
     
     private let data: Data
     private let rowContent: (Data.Element) -> RowContent
@@ -31,4 +31,3 @@ public struct CocoaList<Data: RandomAccessCollection, RowContent: View>: UIViewC
 }
 
 #endif
-

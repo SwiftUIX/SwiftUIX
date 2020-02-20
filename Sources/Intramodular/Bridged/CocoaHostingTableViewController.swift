@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class CocoaTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
+public class CocoaHostingTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
     var data: Data
     var rowContent: (Data.Element) -> RowContent
     
@@ -26,6 +26,8 @@ public class CocoaTableViewController<Data: RandomAccessCollection, RowContent: 
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Data Source -
+    
     override public func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
@@ -42,6 +44,22 @@ public class CocoaTableViewController<Data: RandomAccessCollection, RowContent: 
         cell.rowContent = rowContent(data[data.index(data.startIndex, offsetBy: indexPath.row)])
         
         return cell
+    }
+    
+    // MARK: - Delegate -
+    
+    override public func tableView(
+        _ tableView: UITableView,
+        shouldHighlightRowAt indexPath: IndexPath
+    ) -> Bool {
+        false
+    }
+    
+    override public func tableView(
+        _ tableView: UITableView,
+        willSelectRowAt indexPath: IndexPath
+    ) -> IndexPath? {
+        nil
     }
 }
 
