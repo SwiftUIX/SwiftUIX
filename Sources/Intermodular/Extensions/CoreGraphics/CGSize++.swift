@@ -6,6 +6,13 @@ import CoreGraphics
 import Swift
 
 extension CGSize {
+    public static var greatestFiniteSize: CGSize {
+        .init(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+    }
+    
     public var minimumDimensionLength: CGFloat {
         min(width, height)
     }
