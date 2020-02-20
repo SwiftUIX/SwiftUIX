@@ -17,3 +17,35 @@ extension ForEach where Content: View {
         }
     }
 }
+
+extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
+    public func interspaced() -> some View {
+        let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
+        
+        return ForEach<[ElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Spacer?)>>>(data) { pair in
+            Group {
+                self.content(pair.element)
+                
+                if pair.offset != data.count {
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Helpers -
+
+fileprivate struct ElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
+    let element: Element
+    let offset: Offset
+    
+    var id: Element.ID {
+        element.id
+    }
+    
+    init(element: Element, offset: Offset) {
+        self.element = element
+        self.offset = offset
+    }
+}
