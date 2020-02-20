@@ -8,16 +8,16 @@ import SwiftUI
 public struct Actions {
     public typealias Action = () -> Void
     
-    private var value: [Action] 
-        
+    private var value: [Action]
+    
     public init(_ value: [Action]) {
         self.value = value
     }
-
+    
     public init(initial action: @escaping Action) {
         self.init([action])
     }
-
+    
     public init() {
         self.init([])
     }

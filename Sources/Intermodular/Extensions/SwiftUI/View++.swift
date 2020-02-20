@@ -111,16 +111,34 @@ extension View {
 }
 
 extension View {
+    /// Positions this view within an invisible frame with the specified size.
+    ///
+    /// Use this method to specify a fixed size for a view's width,
+    /// height, or both. If you only specify one of the dimensions, the
+    /// resulting view assumes this view's sizing behavior in the other
+    /// dimension.
     @inlinable
     public func frame(_ size: CGSize?, alignment: Alignment = .center) -> some View {
         frame(width: size?.width, height: size?.height, alignment: alignment)
     }
     
+    /// Positions this view within an invisible frame with the specified size.
+    ///
+    /// Use this method to specify a fixed size for a view's width,
+    /// height, or both. If you only specify one of the dimensions, the
+    /// resulting view assumes this view's sizing behavior in the other
+    /// dimension.
     @inlinable
     public func frame(minimum size: CGSize?, alignment: Alignment = .center) -> some View {
         frame(minWidth: size?.width, minHeight: size?.height, alignment: alignment)
     }
     
+    /// Positions this view within an invisible frame with the specified size.
+    ///
+    /// Use this method to specify a fixed size for a view's width,
+    /// height, or both. If you only specify one of the dimensions, the
+    /// resulting view assumes this view's sizing behavior in the other
+    /// dimension.
     @inlinable
     public func frame(
         minimum minSize: CGSize?,
@@ -134,6 +152,12 @@ extension View {
             maxHeight: maxSize?.height,
             alignment: alignment
         )
+    }
+    
+    @inlinable
+    public func frameZeroClipped(_ isZeroClipped: Bool = true) -> some View {
+        frame(isZeroClipped ? CGSize.zero : nil)
+            .clipped()
     }
 }
 
