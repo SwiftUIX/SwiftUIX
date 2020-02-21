@@ -15,7 +15,7 @@ public struct TextView<Label: View>: View {
     
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
-
+    
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
             label.hidden(!text.isEmpty)
@@ -36,7 +36,7 @@ fileprivate struct _TextView {
     private var onCommit: () -> Void
     
     @Environment(\.isScrollEnabled) private var isScrollEnabled
-
+    
     init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -101,23 +101,35 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> _UITextView {
-       _UITextView().then {
+        _UITextView().then {
             $0.delegate = context.coordinator
         }
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
+        var cursorOffset: Int?
+        
+        // Record the current cursor offset.
+        if let selectedRange = uiView.selectedTextRange {
+            cursorOffset = uiView.offset(from: uiView.beginningOfDocument, to: selectedRange.start)
+        }
+        
         if let font = context.environment.font {
             uiView.font = font.toUIFont()
         } else {
             uiView.font = .preferredFont(forTextStyle: .body)
         }
-
+        
         uiView.backgroundColor = nil
         uiView.isScrollEnabled = isScrollEnabled
         uiView.isSelectable = true
         uiView.text = text
         uiView.textContainerInset = .zero
+        
+        // Reset the cursor offset if possible.
+        if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
+            uiView.selectedTextRange = textRange
+        }
     }
 }
 
