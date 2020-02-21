@@ -162,6 +162,28 @@ extension View {
 }
 
 extension View {
+    public func width(_ width: CGFloat?) -> some View {
+        frame(width: width)
+    }
+    
+    public func height(_ height: CGFloat?) -> some View {
+        frame(height: height)
+    }
+    
+    public func maxWidth(_ width: CGFloat?) -> some View {
+        frame(maxWidth: width)
+    }
+    
+    public func maxHeight(_ height: CGFloat?) -> some View {
+        frame(maxHeight: height)
+    }
+    
+    public func square(_ sideLength: CGFloat?) -> some View {
+        frame(width: sideLength, height: sideLength)
+    }
+}
+
+extension View {
     public func hidden(_ isHidden: Bool) -> some View {
         Group {
             if isHidden {
