@@ -157,6 +157,12 @@ extension _TextView: NSViewRepresentable {
         }
         
         func textDidBeginEditing(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else {
+                return
+            }
+            
+            view.text = textView.string
+            
             view.onEditingChanged(true)
         }
         
@@ -180,18 +186,18 @@ extension _TextView: NSViewRepresentable {
     }
     
     func makeNSView(context: Context) -> NSViewType {
-        let view = _NSTextView()
+        let nsView = _NSTextView()
         
-        view.backgroundColor = .clear
-        view.string = text
-        view.textContainerInset = .zero
-        view.delegate = context.coordinator
+        nsView.delegate = context.coordinator
         
-        return view
+        nsView.backgroundColor = .clear
+        nsView.textContainerInset = .zero
+        
+        return nsView
     }
     
-    func updateNSView(_ textView: NSViewType, context: Context) {
-        
+    func updateNSView(_ nsView: NSViewType, context: Context) {
+        nsView.string = text
     }
 }
 
