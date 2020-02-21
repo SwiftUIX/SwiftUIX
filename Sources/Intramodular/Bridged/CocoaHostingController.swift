@@ -25,7 +25,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
             rootView.content = newValue
         }
     }
-        
+    
     init(
         rootView: Content,
         presentationCoordinator: CocoaPresentationCoordinator

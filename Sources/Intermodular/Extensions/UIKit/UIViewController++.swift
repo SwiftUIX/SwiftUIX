@@ -8,42 +8,58 @@ import Swift
 import UIKit
 
 extension UIViewController {
-    var topMostPresentedViewController: UIViewController? {
-        var topController = self
-        
-        while let newTopController = topController.presentedViewController {
-            topController = newTopController
-        }
-        
-        return topController
-    }
-    
-    var topMostViewController: UIViewController {
-        topMostPresentedViewController ?? self
+    open var topmostNavigationController: UINavigationController? {
+        topmostViewController?.nearestNavigationController ?? nearestNavigationController
     }
     
     override open var nearestNavigationController: UINavigationController? {
         nil
             ?? nearestChild(ofKind: UINavigationController.self)
-            ?? nearestResponder(ofKind: UINavigationController.self)
             ?? navigationController
+            ?? nearestResponder(ofKind: UINavigationController.self)
+    }
+}
+
+extension UIViewController {
+    public var topmostPresentedViewController: UIViewController? {
+        presentedViewController?.topmostPresentedViewController ?? self
+    }
+    
+    public var topmostViewController: UIViewController? {
+        if let controller = (self as? UINavigationController)?.visibleViewController {
+            return controller.topmostViewController
+        } else if let controller = (self as? UITabBarController)?.selectedViewController {
+            return controller.topmostViewController
+        } else if let controller = presentedViewController {
+            return controller.topmostViewController
+        } else {
+            return self
+        }
     }
     
     func nearestChild<T: UIViewController>(ofKind kind: T.Type) -> T? {
-        guard !children.isEmpty else {
-            return nil
+        if let result = presentedViewController?.nearestChild(ofKind: kind) {
+            return result
         }
         
         for child in children {
+            if let child = (child as? UITabBarController)?.selectedViewController {
+                if let child = child.nearestChild(ofKind: kind) {
+                    return child
+                }
+            }
+            
+            if let child = (child as? UINavigationController)?.visibleViewController {
+                if let child = child.nearestChild(ofKind: kind) {
+                    return child
+                }
+            }
+            
             if child.isKind(of: kind) {
                 return child as? T
             } else if let result = child.nearestChild(ofKind: kind) {
                 return result
             }
-        }
-                
-        if let result = presentedViewController?.nearestChild(ofKind: kind) {
-            return result
         }
         
         return nil
