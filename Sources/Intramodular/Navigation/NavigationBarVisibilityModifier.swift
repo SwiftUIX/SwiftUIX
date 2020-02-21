@@ -7,37 +7,36 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-final class IsNavigationBarVisibile: TakeLastPreferenceKey<Bool> {
+final class IsNavigationBarVisible: TakeLastPreferenceKey<Bool> {
     
 }
 
-struct NavigationBarVisibilityModifier: ViewModifier {
-    @State private var isVisible: Bool?
+public struct NavigationBarVisibilityModifier: ViewModifier {
+    let isVisible: Bool?
     
-    func body(content: Content) -> some View {
-        isVisible.ifSome { isVisible in
-            content
-                .navigationBarHidden(!isVisible)
-                .configureCocoaNavigationController({ controller in
-                    DispatchQueue.main.async {
-                        controller.isNavigationBarHidden = !isVisible
+    public var isHidden: Bool {
+        !(isVisible ?? true)
+    }
+    
+    public func body(content: Content) -> some View {
+        content
+            .navigationBarHidden(self.isHidden)
+            .configureCocoaNavigationController({ controller in
+                if let isVisible = self.isVisible {
+                    if controller.isNavigationBarHidden != !isVisible {
+                        controller.setNavigationBarHidden(!isVisible, animated: true)
                     }
-                })
-        }.else(content).onPreferenceChange(IsNavigationBarVisibile.self) {
-            self.isVisible = $0
-        }
+                }
+            })
+            .preference(key: IsNavigationBarVisible.self, value: isVisible)
     }
 }
+
+// MARK: - API -
 
 extension View {
-    public func hideNavigationBar() -> some View {
-        preference(key: IsNavigationBarVisibile.self, value: false)
-            .modifier(NavigationBarVisibilityModifier())
-    }
-    
-    public func showNavigationBar() -> some View {
-        preference(key: IsNavigationBarVisibile.self, value: true)
-            .modifier(NavigationBarVisibilityModifier())
+    public func navigationBarVisible(_ isVisible: Bool) -> some View {
+        modifier(NavigationBarVisibilityModifier(isVisible: isVisible))
     }
 }
 

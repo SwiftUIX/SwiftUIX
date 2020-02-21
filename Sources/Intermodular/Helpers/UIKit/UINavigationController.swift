@@ -33,8 +33,14 @@ extension View {
     func configureCocoaNavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
-        configureCocoaNavigationController {
-            configure($0.navigationBar)
+        EnvironmentValueAccessView(\.isNavigationBarHidden) { isNavigationBarHidden in
+            self.configureCocoaNavigationController { navigationController in
+                if (isNavigationBarHidden ?? false) != true {
+                    DispatchQueue.main.async {
+                        configure(navigationController.navigationBar)
+                    }
+                }
+            }
         }
     }
 }

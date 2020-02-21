@@ -7,6 +7,34 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+public struct CustomNavigationView<Content: View>: View {
+    private let content: Content
+    
+    @State private var isNavigationBarVisible: Bool? = nil
+    
+    public var isNavigationBarHidden: Bool? {
+        guard let isNavigationBarVisible = isNavigationBarVisible else {
+            return nil
+        }
+        
+        return !isNavigationBarVisible
+    }
+        
+    public var body: some View {
+        NavigationView {
+            content
+                .onPreferenceChange(IsNavigationBarVisible.self, perform: {
+                    self.isNavigationBarVisible = $0
+                })
+                .environment(\.isNavigationBarHidden, isNavigationBarHidden)
+        }
+    }
+    
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+}
+
 extension View {
     /// Configures the translucency of the navigation bar for this view.
     ///
@@ -17,9 +45,7 @@ extension View {
     ///     - isTranslucent: A Boolean value that indicates whether the navigation bar is translucent.
     public func navigationBarIsTranslucent(_ isTranslucent: Bool) -> some View {
         configureCocoaNavigationBar { navigationBar in
-            DispatchQueue.main.async {
-                navigationBar.isTranslucent = isTranslucent
-            }
+            navigationBar.isTranslucent = isTranslucent
         }
     }
     
@@ -32,9 +58,7 @@ extension View {
     ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
     public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
         configureCocoaNavigationBar { navigationBar in
-            DispatchQueue.main.async {
-                navigationBar.isDefaultTransparent = isTransparent
-            }
+            navigationBar.isDefaultTransparent = isTransparent
         }
     }
     
@@ -47,9 +71,7 @@ extension View {
     ///     - color: The color to use for the navigation bar.
     public func navigationBarColor(_ color: Color) -> some View {
         configureCocoaNavigationBar { navigationBar in
-            DispatchQueue.main.async {
-                navigationBar.backgroundColor = color.toUIColor()
-            }
+            navigationBar.backgroundColor = color.toUIColor()
         }
     }
 }

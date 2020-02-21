@@ -71,7 +71,7 @@ class CocoaAlignHostingTransitionAnimator: NSObject, UIViewControllerAnimatedTra
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0.35
+        return 0.25
     }
 }
 

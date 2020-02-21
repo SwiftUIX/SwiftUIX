@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
     public func navigated() -> some View {
-        NavigationView {
+        CustomNavigationView {
             self
         }
     }
