@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// An interface that allows a child view to interact with its parent view..
 public protocol ViewInteractor {
     
 }

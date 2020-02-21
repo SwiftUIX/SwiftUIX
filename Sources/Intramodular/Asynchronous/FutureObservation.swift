@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+/// An observable object suitable for monitoring a `Future`.
 public final class FutureObservation<Output, Failure: Error>: ObservableObject, Subscriber {
     public typealias Input = Output
     

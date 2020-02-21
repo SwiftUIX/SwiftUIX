@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A modifier that controls a view's visibility.
 struct VisibilityModifier: ViewModifier {
     let isVisible: Bool
     

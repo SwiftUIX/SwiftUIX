@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A button that creates and stores an `AnyCancellable`.
 public struct AnyCancellableButton<Label: View>: View {
     private let action: () -> AnyCancellable
     private let label: Label
@@ -30,6 +31,8 @@ public struct AnyCancellableButton<Label: View>: View {
         cancellable = action()
     }
 }
+
+// MARK: - Protocol Implementations -
 
 extension AnyCancellableButton: ActionTriggerView {
     public func onPrimaryTrigger(perform action: @escaping () -> ()) -> Self {
