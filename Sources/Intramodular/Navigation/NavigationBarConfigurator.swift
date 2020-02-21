@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: UIViewControllerRepresentable {
     class UIViewControllerType: UIViewController {
         var leading: Leading {
@@ -60,6 +62,7 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                 return
             }
             
+            #if os(iOS) || targetEnvironment(macCatalyst)
             switch displayMode {
                 case .automatic:
                     parent.navigationItem.largeTitleDisplayMode = .automatic
@@ -70,6 +73,7 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                 @unknown default:
                     parent.navigationItem.largeTitleDisplayMode = .automatic
             }
+            #endif
             
             if parent.navigationItem.leftBarButtonItem == nil {
                 parent.navigationItem.leftBarButtonItem = .init(customView: UIHostingView(rootView: leading))
@@ -167,3 +171,5 @@ extension View {
         navigationBarItems(leading: EmptyView(), center: center, trailing: trailing, displayMode: displayMode)
     }
 }
+
+#endif

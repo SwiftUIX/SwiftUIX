@@ -33,11 +33,18 @@ public struct DefaultPresentationBackdrop: View {
     }
     
     public var body: some View {
-        Color.black
+        #if os(tvOS)
+        return Color.black
+            .opacity(opacity)
+            .onAppear { self.viewDidAppear = true }
+            .animation(.default)
+        #else
+        return Color.black
             .opacity(opacity)
             .onAppear { self.viewDidAppear = true }
             .animation(.default)
             .onTapGesture(perform: dismiss)
+        #endif
     }
     
     func dismiss() {
