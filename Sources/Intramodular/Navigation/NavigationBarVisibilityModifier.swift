@@ -11,24 +11,37 @@ final class IsNavigationBarVisible: TakeLastPreferenceKey<Bool> {
     
 }
 
-public struct NavigationBarVisibilityModifier: ViewModifier {
-    let isVisible: Bool?
+private struct NavigationBarVisibilityModifier: ViewModifier {
+    @Environment(\.isNavigationBarHidden) var isNavigationBarHidden
     
-    public var isHidden: Bool {
-        !(isVisible ?? true)
+    let isVisible: Bool
+    
+    @State var _isVisible: Bool? = nil
+    
+    var isHidden: Bool {
+        !(_isVisible ?? false)
     }
     
-    public func body(content: Content) -> some View {
-        content
-            .navigationBarHidden(self.isHidden)
-            .configureCocoaNavigationController({ controller in
-                if let isVisible = self.isVisible {
-                    if controller.isNavigationBarHidden != !isVisible {
-                        controller.setNavigationBarHidden(!isVisible, animated: true)
+    func body(content: Content) -> some View {
+        ZStack {
+            if isHidden {
+                ZeroSizeView()
+                    .navigationBarTitle("")
+            }
+            
+            content
+                .navigationBarHidden(isHidden)
+                .onAppear(perform: {
+                    DispatchQueue.main.async {
+                        self._isVisible = !self.isVisible
+                        
+                        DispatchQueue.main.async {
+                            self._isVisible = self.isVisible
+                        }
                     }
-                }
-            })
-            .preference(key: IsNavigationBarVisible.self, value: isVisible)
+                })
+                .preference(key: IsNavigationBarVisible.self, value: isVisible)
+        }
     }
 }
 
