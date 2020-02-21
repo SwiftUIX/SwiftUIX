@@ -75,12 +75,14 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
             }
             #endif
             
-            if parent.navigationItem.leftBarButtonItem == nil {
-                parent.navigationItem.leftBarButtonItem = .init(customView: UIHostingView(rootView: leading))
-            } else if let view = parent.navigationItem.leftBarButtonItem?.customView as? UIHostingView<Leading> {
-                view.rootView = leading
-            } else {
-                parent.navigationItem.leftBarButtonItem?.customView = UIHostingView(rootView: leading)
+            if !(leading is EmptyView) {
+                if parent.navigationItem.leftBarButtonItem == nil {
+                    parent.navigationItem.leftBarButtonItem = .init(customView: UIHostingView(rootView: leading))
+                } else if let view = parent.navigationItem.leftBarButtonItem?.customView as? UIHostingView<Leading> {
+                    view.rootView = leading
+                } else {
+                    parent.navigationItem.leftBarButtonItem?.customView = UIHostingView(rootView: leading)
+                }
             }
             
             if let view = parent.navigationItem.titleView as? UIHostingView<Center> {
@@ -89,12 +91,14 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                 parent.navigationItem.titleView = UIHostingView(rootView: center)
             }
             
-            if parent.navigationItem.rightBarButtonItem == nil {
-                parent.navigationItem.rightBarButtonItem = .init(customView: UIHostingView(rootView: trailing))
-            } else if let view = parent.navigationItem.rightBarButtonItem?.customView as? UIHostingView<Trailing> {
-                view.rootView = trailing
-            } else {
-                parent.navigationItem.rightBarButtonItem?.customView = UIHostingView(rootView: trailing)
+            if !(trailing is EmptyView) {
+                if parent.navigationItem.rightBarButtonItem == nil {
+                    parent.navigationItem.rightBarButtonItem = .init(customView: UIHostingView(rootView: trailing))
+                } else if let view = parent.navigationItem.rightBarButtonItem?.customView as? UIHostingView<Trailing> {
+                    view.rootView = trailing
+                } else {
+                    parent.navigationItem.rightBarButtonItem?.customView = UIHostingView(rootView: trailing)
+                }
             }
             
             parent.navigationItem.leftBarButtonItem?.customView?.sizeToFit()
