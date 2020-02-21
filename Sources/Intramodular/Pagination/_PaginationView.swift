@@ -122,7 +122,7 @@ extension _PaginationView {
             
             return pageViewController
                 .allViewControllers
-                .firstIndex(of: viewController as! _UIHostingController<Page>)
+                .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
                         ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
@@ -138,7 +138,7 @@ extension _PaginationView {
             
             return pageViewController
                 .allViewControllers
-                .firstIndex(of: viewController as! _UIHostingController<Page>)
+                .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
                         ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
@@ -161,7 +161,7 @@ extension _PaginationView {
             if let controller = pageViewController.viewControllers?.first {
                 pageViewController
                     .allViewControllers
-                    .firstIndex(of: controller as! _UIHostingController<Page>)
+                    .firstIndex(of: controller as! UIHostingController<Page>)
                     .map({ parent.currentPageIndex = $0 })
             }
         }
@@ -176,7 +176,7 @@ extension _PaginationView {
             
             return pageViewController
                 .allViewControllers
-                .firstIndex(of: viewController as! _UIHostingController<Page>)
+                .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
                         ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
@@ -192,7 +192,7 @@ extension _PaginationView {
             
             return pageViewController
                 .allViewControllers
-                .firstIndex(of: viewController as! _UIHostingController<Page>)
+                .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
                         ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
@@ -215,7 +215,7 @@ extension _PaginationView {
             if let controller = pageViewController.viewControllers?.first {
                 pageViewController
                     .allViewControllers
-                    .firstIndex(of: controller as! _UIHostingController<Page>)
+                    .firstIndex(of: controller as! UIHostingController<Page>)
                     .map({ parent.currentPageIndex = $0 })
             }
         }

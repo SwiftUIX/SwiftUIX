@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class CocoaHostingTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
+public class UIHostingTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
     var data: Data
     var rowContent: (Data.Element) -> RowContent
     
@@ -16,10 +16,11 @@ public class CocoaHostingTableViewController<Data: RandomAccessCollection, RowCo
         self.rowContent = rowContent
         
         super.init(style: .plain)
-        
-        tableView.register(CocoaHostingCell<RowContent>.self, forCellReuseIdentifier: .hostingCellIdentifier)
-        tableView.rowHeight = UITableView.automaticDimension
+
         tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
+        
+        tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingCellIdentifier)
     }
     
     required init?(coder: NSCoder) {
@@ -39,9 +40,9 @@ public class CocoaHostingTableViewController<Data: RandomAccessCollection, RowCo
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingCellIdentifier, for: indexPath) as! CocoaHostingCell<RowContent>
+        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingCellIdentifier, for: indexPath) as! UIHostingTableViewCell<RowContent>
         
-        cell.rowContent = rowContent(data[data.index(data.startIndex, offsetBy: indexPath.row)])
+        cell.content = rowContent(data[data.index(data.startIndex, offsetBy: indexPath.row)])
         
         return cell
     }

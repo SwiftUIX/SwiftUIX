@@ -7,23 +7,23 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class CocoaHostingCell<Content: View> : UITableViewCell {
-    var rowContentHostingController: UIHostingController<Content>?
+class UIHostingTableViewCell<Content: View> : UITableViewCell {
+    var contentHostingController: UIHostingController<Content>?
     
-    var rowContent: Content? {
+    var content: Content? {
         get {
-            rowContentHostingController?.rootView
+            contentHostingController?.rootView
         } set {
             guard let content = newValue else {
                 return
             }
             
-            if let rowContentHostingController = rowContentHostingController {
-                rowContentHostingController.rootView = content
+            if let contentHostingController = contentHostingController {
+                contentHostingController.rootView = content
             } else {
-                rowContentHostingController = UIHostingController(rootView: content)
+                contentHostingController = UIHostingController(rootView: content)
                 
-                let view = rowContentHostingController!.view!
+                let view = contentHostingController!.view!
                 let margins = contentView.layoutMarginsGuide
                 
                 view.translatesAutoresizingMaskIntoConstraints = false

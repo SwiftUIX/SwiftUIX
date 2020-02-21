@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class _UIHostingController<Content: View>: UIHostingController<Content> {
+class UITransparentHostingController<Content: View>: UIHostingController<Content> {
     override open func viewDidLoad() {
         super.viewDidLoad()
         

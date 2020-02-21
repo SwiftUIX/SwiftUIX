@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public final class CocoaHostingWindow<Content: View>: UIWindow {
+public final class UIHostingWindow<Content: View>: UIWindow {
     public let rootView: Content
     
     public init(windowScene: UIWindowScene, rootView: Content) {

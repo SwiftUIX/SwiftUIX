@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-fileprivate struct CocoaNavigationViewConfigurator: UIViewControllerRepresentable {
+fileprivate struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIViewController
     
     let configure: (UINavigationController) -> Void
@@ -27,7 +27,7 @@ extension View {
     func configureCocoaNavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
-        background(CocoaNavigationViewConfigurator(configure: configure))
+        background(UINavigationControllerConfigurator(configure: configure))
     }
     
     func configureCocoaNavigationBar(

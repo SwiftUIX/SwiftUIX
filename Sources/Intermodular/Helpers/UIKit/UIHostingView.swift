@@ -10,7 +10,7 @@ import UIKit
 
 /// A `UIView` subclass capable of hosting a SwiftUI view.
 open class UIHostingView<Content: View>: UIView {
-    private let rootViewHostingController: _UIHostingController<Content>
+    private let rootViewHostingController: UIHostingController<Content>
 
     public var rootView: Content {
         get {
@@ -21,7 +21,7 @@ open class UIHostingView<Content: View>: UIView {
     }
     
     public required init(rootView: Content) {
-        self.rootViewHostingController = _UIHostingController(rootView: rootView)
+        self.rootViewHostingController = UIHostingController(rootView: rootView)
         
         super.init(frame: .zero)
         
