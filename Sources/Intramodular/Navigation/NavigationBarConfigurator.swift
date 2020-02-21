@@ -85,10 +85,12 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                 }
             }
             
-            if let view = parent.navigationItem.titleView as? UIHostingView<Center> {
-                view.rootView = center
-            } else {
-                parent.navigationItem.titleView = UIHostingView(rootView: center)
+            if !(center is EmptyView) {
+                if let view = parent.navigationItem.titleView as? UIHostingView<Center> {
+                    view.rootView = center
+                } else {
+                    parent.navigationItem.titleView = UIHostingView(rootView: center)
+                }
             }
             
             if !(trailing is EmptyView) {
