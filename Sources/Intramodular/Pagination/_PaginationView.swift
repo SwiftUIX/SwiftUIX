@@ -91,9 +91,21 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController.pages = pages
         
         if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
+            guard let currentPageIndexOfViewController = uiViewController.currentPageIndex else {
+                return assertionFailure()
+            }
+            
+            var direction: UIPageViewController.NavigationDirection
+            
+            if currentPageIndex < currentPageIndexOfViewController {
+                direction = .reverse
+            } else {
+                direction = .forward
+            }
+            
             uiViewController.setViewControllers(
                 [uiViewController.allViewControllers[currentPageIndex]],
-                direction: .forward,
+                direction: direction,
                 animated: true
             )
         }

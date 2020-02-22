@@ -24,6 +24,14 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
             }
         }
     }
+    
+    var currentPageIndex: Int? {
+        guard let currentViewController = viewControllers?.first else {
+            return nil
+        }
+        
+        return allViewControllers.firstIndex(of: currentViewController as! UIHostingController<Page>)
+    }
 }
 
 #endif
