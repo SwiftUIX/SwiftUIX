@@ -16,7 +16,7 @@ public struct SetBinding<Value> {
     public var wrappedValue: Value {
         get {
             fatalError()
-        } set {
+        } nonmutating set {
             set(newValue)
         }
     }

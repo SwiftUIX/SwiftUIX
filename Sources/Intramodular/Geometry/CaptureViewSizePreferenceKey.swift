@@ -10,7 +10,7 @@ private final class CaptureViewSizePreferenceKey: TakeLastPreferenceKey<CGSize> 
 }
 
 extension View {
-    public func captureSize(in binding: Binding<CGSize>) -> some View {
+    public func captureSize(in binding: SetBinding<CGSize>) -> some View {
         overlay(GeometryReader { proxy in
             Color.clear.preference(
                 key: CaptureViewSizePreferenceKey.self,
