@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-import SwiftUIX
+import SwiftUI
 
 fileprivate struct FontEnvironmentKeys {
     struct LargeTitle: EnvironmentKey {
