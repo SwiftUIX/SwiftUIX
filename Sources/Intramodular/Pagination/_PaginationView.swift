@@ -90,7 +90,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         uiViewController.pages = pages
         
-        if uiViewController.allViewControllers[currentPageIndex] === uiViewController.viewControllers?.first {
+        if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
             uiViewController.setViewControllers(
                 [uiViewController.allViewControllers[currentPageIndex]],
                 direction: .forward,
