@@ -5,12 +5,12 @@
 import Swift
 import SwiftUI
 
-struct TintColorEnvironmentKey: EnvironmentKey {
+private struct TintColorEnvironmentKey: EnvironmentKey {
     static let defaultValue: Color? = nil
 }
 
 extension EnvironmentValues {
-    var tintColor: Color? {
+    public var tintColor: Color? {
         get {
             self[TintColorEnvironmentKey]
         } set {
