@@ -92,12 +92,6 @@ extension _PaginationView: UIViewControllerRepresentable {
         
         if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
             if let currentPageIndexOfViewController = uiViewController.currentPageIndex {
-                uiViewController.setViewControllers(
-                    [uiViewController.allViewControllers[currentPageIndex]],
-                    direction: direction,
-                    animated: false
-                )
-            } else {
                 var direction: UIPageViewController.NavigationDirection
                 
                 if currentPageIndex < currentPageIndexOfViewController {
@@ -110,6 +104,12 @@ extension _PaginationView: UIViewControllerRepresentable {
                     [uiViewController.allViewControllers[currentPageIndex]],
                     direction: direction,
                     animated: true
+                )
+            } else {
+                uiViewController.setViewControllers(
+                    [uiViewController.allViewControllers[currentPageIndex]],
+                    direction: .forward,
+                    animated: false
                 )
             }
         }
