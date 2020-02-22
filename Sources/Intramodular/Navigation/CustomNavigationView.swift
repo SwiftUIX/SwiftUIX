@@ -35,6 +35,10 @@ public struct CustomNavigationView<Content: View>: View {
     }
 }
 
+final class IsNavigationBarVisible: TakeLastPreferenceKey<Bool> {
+    
+}
+
 extension View {
     /// Configures the translucency of the navigation bar for this view.
     ///
@@ -44,7 +48,7 @@ extension View {
     /// - Parameters:
     ///     - isTranslucent: A Boolean value that indicates whether the navigation bar is translucent.
     public func navigationBarIsTranslucent(_ isTranslucent: Bool) -> some View {
-        configureCocoaNavigationBar { navigationBar in
+        configureUINavigationBar { navigationBar in
             navigationBar.isTranslucent = isTranslucent
         }
     }
@@ -57,7 +61,7 @@ extension View {
     /// - Parameters:
     ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
     public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
-        configureCocoaNavigationBar { navigationBar in
+        configureUINavigationBar { navigationBar in
             navigationBar.isDefaultTransparent = isTransparent
         }
     }
@@ -70,7 +74,7 @@ extension View {
     /// - Parameters:
     ///     - color: The color to use for the navigation bar.
     public func navigationBarColor(_ color: Color) -> some View {
-        configureCocoaNavigationBar { navigationBar in
+        configureUINavigationBar { navigationBar in
             navigationBar.backgroundColor = color.toUIColor()
         }
     }

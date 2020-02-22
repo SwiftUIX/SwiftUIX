@@ -17,29 +17,25 @@ fileprivate struct UINavigationControllerConfigurator: UIViewControllerRepresent
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.navigationController.map(configure)
+        uiViewController.nearestNavigationController.map(configure)
     }
 }
 
 // MARK: - API -
 
 extension View {
-    func configureCocoaNavigationController(
+    func configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
         background(UINavigationControllerConfigurator(configure: configure))
     }
     
-    func configureCocoaNavigationBar(
+    func configureUINavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
-        EnvironmentValueAccessView(\.isNavigationBarHidden) { isNavigationBarHidden in
-            self.configureCocoaNavigationController { navigationController in
-                if (isNavigationBarHidden ?? false) != true {
-                    DispatchQueue.main.async {
-                        configure(navigationController.navigationBar)
-                    }
-                }
+        configureUINavigationController { navigationController in
+            DispatchQueue.main.async {
+                configure(navigationController.navigationBar)
             }
         }
     }

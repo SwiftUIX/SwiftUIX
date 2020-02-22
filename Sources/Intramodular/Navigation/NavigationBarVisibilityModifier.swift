@@ -7,40 +7,25 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-final class IsNavigationBarVisible: TakeLastPreferenceKey<Bool> {
-    
-}
-
-private struct NavigationBarVisibilityModifier: ViewModifier {
-    @Environment(\.isNavigationBarHidden) var isNavigationBarHidden
-    
-    let isVisible: Bool
-    
-    @State var _isVisible: Bool? = nil
-    
-    var isHidden: Bool {
-        !(_isVisible ?? false)
-    }
-    
+private struct HideNavigationBar: ViewModifier {
+    @State var isNavigationBarHidden = false
+        
     func body(content: Content) -> some View {
         ZStack {
-            if isHidden {
+            if isNavigationBarHidden {
                 ZeroSizeView()
                     .navigationBarTitle("")
             }
             
             content
-                .navigationBarHidden(isHidden)
+                .navigationBarHidden(isNavigationBarHidden)
                 .onAppear(perform: {
-                    DispatchQueue.main.async {
-                        self._isVisible = !self.isVisible
-                        
-                        DispatchQueue.main.async {
-                            self._isVisible = self.isVisible
-                        }
-                    }
+                    self.isNavigationBarHidden = true
                 })
-                .preference(key: IsNavigationBarVisible.self, value: isVisible)
+                .onDisappear(perform: {
+                    self.isNavigationBarHidden = false
+                })
+                .preference(key: IsNavigationBarVisible.self, value: !isNavigationBarHidden)
         }
     }
 }
@@ -48,8 +33,8 @@ private struct NavigationBarVisibilityModifier: ViewModifier {
 // MARK: - API -
 
 extension View {
-    public func navigationBarVisible(_ isVisible: Bool) -> some View {
-        modifier(NavigationBarVisibilityModifier(isVisible: isVisible))
+    public func hideNavigationBar() -> some View {
+        modifier(HideNavigationBar())
     }
 }
 

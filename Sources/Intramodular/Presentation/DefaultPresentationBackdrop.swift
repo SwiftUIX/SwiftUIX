@@ -41,6 +41,7 @@ public struct DefaultPresentationBackdrop: View {
         #else
         return Color.black
             .opacity(opacity)
+            .edgesIgnoringSafeArea(.all)
             .onAppear { self.viewDidAppear = true }
             .animation(.default)
             .onTapGesture(perform: dismiss)
