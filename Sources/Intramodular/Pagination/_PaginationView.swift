@@ -53,65 +53,89 @@ extension _PaginationView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIHostingPageViewController<Page>
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
-        let result = UIViewControllerType(
+        let uiViewController = UIViewControllerType(
             transitionStyle: transitionStyle,
             navigationOrientation: axis == .horizontal
                 ? .horizontal
                 : .vertical
         )
         
-        result.pages = pages
-        
-        result.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
-        result.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
+        uiViewController.pages = pages
+            
+        uiViewController.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
+        uiViewController.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
+
+        guard !pages.isEmpty else {
+            return uiViewController
+        }
         
         if let initialPageIndex = initialPageIndex {
             currentPageIndex = initialPageIndex
         }
+
+        if uiViewController.pages.indices.contains(currentPageIndex) {
+            uiViewController.setViewControllers(
+                [uiViewController.allViewControllers[initialPageIndex ?? currentPageIndex]],
+                direction: .forward,
+                animated: true
+            )
+        } else {
+            uiViewController.setViewControllers(
+                [uiViewController.allViewControllers.first!],
+                direction: .forward,
+                animated: false
+            )
+            
+            currentPageIndex = 0
+        }
+
+        progressionController = _ProgressionController(base: uiViewController)
         
-        result.setViewControllers(
-            [result.allViewControllers[initialPageIndex ?? currentPageIndex]],
-            direction: .forward,
-            animated: true
-        )
-        
-        progressionController = _ProgressionController(base: result)
-        
-        return result
+        return uiViewController
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.pages = pages
+        
+        if uiViewController.pages.indices.contains(currentPageIndex) {
+            if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
+                if let currentPageIndexOfViewController = uiViewController.currentPageIndex {
+                    var direction: UIPageViewController.NavigationDirection
+                    
+                    if currentPageIndex < currentPageIndexOfViewController {
+                        direction = .reverse
+                    } else {
+                        direction = .forward
+                    }
+                    
+                    uiViewController.setViewControllers(
+                        [uiViewController.allViewControllers[currentPageIndex]],
+                        direction: direction,
+                        animated: true
+                    )
+                } else {
+                    uiViewController.setViewControllers(
+                        [uiViewController.allViewControllers[currentPageIndex]],
+                        direction: .forward,
+                        animated: false
+                    )
+                }
+            }
+        } else {
+            uiViewController.setViewControllers(
+                [uiViewController.allViewControllers.first!],
+                direction: .forward,
+                animated: false
+            )
+            
+            currentPageIndex = 0
+        }
+        
         if #available(iOS 13.1, *) {
             uiViewController.isPanGestureEnabled = isPanGestureEnabled
             uiViewController.isScrollEnabled = isScrollEnabled
             uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
             uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
-        }
-        
-        uiViewController.pages = pages
-        
-        if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
-            if let currentPageIndexOfViewController = uiViewController.currentPageIndex {
-                var direction: UIPageViewController.NavigationDirection
-                
-                if currentPageIndex < currentPageIndexOfViewController {
-                    direction = .reverse
-                } else {
-                    direction = .forward
-                }
-                
-                uiViewController.setViewControllers(
-                    [uiViewController.allViewControllers[currentPageIndex]],
-                    direction: direction,
-                    animated: true
-                )
-            } else {
-                uiViewController.setViewControllers(
-                    [uiViewController.allViewControllers[currentPageIndex]],
-                    direction: .forward,
-                    animated: false
-                )
-            }
         }
     }
     
