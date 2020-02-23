@@ -12,48 +12,14 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     public typealias Offset = ScrollView<Content>.Offset
     public typealias UIViewType = UIScrollView
     
-    public class Coordinator: NSObject, UIScrollViewDelegate {
-        private let base: CocoaScrollView
-        
-        var isInitialContentAlignmentSet: Bool = false
-        
-        init(base: CocoaScrollView) {
-            self.base = base
-        }
-        
-        #if !os(tvOS)
-        
-        @objc public func refreshChanged(_ control: UIRefreshControl) {
-            base.onRefresh?()
-            
-            if let isRefreshing = base.isRefreshing, !isRefreshing {
-                control.endRefreshing()
-            }
-        }
-        
-        #endif
-        
-        public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            base.onOffsetChange(scrollView.contentOffset(forContentType: Content.self))
-        }
-    }
-    
     private let content: Content
     private let axes: Axis.Set
     private let showsIndicators: Bool
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
     @Environment(\.isScrollEnabled) var isScrollEnabled
-
-    private var alwaysBounceVertical: Bool = false
-    private var alwaysBounceHorizontal: Bool = false
-    private var isPagingEnabled: Bool = false
-    private var isDirectionalLockEnabled: Bool = false
     
-    private var onOffsetChange: (ScrollView<Content>.Offset) -> () = { _ in }
-        
-    private var onRefresh: (() -> Void)?
-    private var isRefreshing: Bool?
+    private var configuration = CocoaScrollViewConfiguration<Content>()
     
     public init(
         _ axes: Axis.Set = .vertical,
@@ -74,15 +40,23 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        uiView.alwaysBounceVertical = alwaysBounceVertical
-        uiView.alwaysBounceHorizontal = alwaysBounceHorizontal
-        #if os(iOS) || targetEnvironment(macCatalyst)
-        uiView.isPagingEnabled = isPagingEnabled
-        #endif
         uiView.isScrollEnabled = isScrollEnabled
-        uiView.isDirectionalLockEnabled = isDirectionalLockEnabled
         uiView.showsVerticalScrollIndicator = showsIndicators && axes.contains(.vertical)
         uiView.showsHorizontalScrollIndicator = showsIndicators && axes.contains(.horizontal)
+        
+        var configuration = self.configuration
+        
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        configuration.setupRefreshControl = {
+            $0.addTarget(
+                context.coordinator,
+                action: #selector(Coordinator.refreshChanged),
+                for: .valueChanged
+            )
+        }
+        #endif
+        
+        uiView.configure(with: configuration)
         
         let contentView: UIHostingView<Content>
         
@@ -140,36 +114,6 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
                 }
             }
         }
-        
-        #if !os(tvOS)
-        
-        if onRefresh != nil {
-            let refreshControl: UIRefreshControl
-            
-            if let _refreshControl = uiView.refreshControl {
-                refreshControl = _refreshControl
-            } else {
-                refreshControl = UIRefreshControl()
-                
-                refreshControl.addTarget(
-                    context.coordinator,
-                    action: #selector(Coordinator.refreshChanged),
-                    for: .valueChanged
-                )
-                
-                uiView.refreshControl = refreshControl
-            }
-            
-            if let isRefreshing = isRefreshing {
-                if isRefreshing {
-                    refreshControl.beginRefreshing()
-                } else {
-                    refreshControl.endRefreshing()
-                }
-            }
-        }
-        
-        #endif
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -178,23 +122,45 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
 }
 
 extension CocoaScrollView {
-    public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
-        then({ $0.onOffsetChange = body })
+    public class Coordinator: NSObject, UIScrollViewDelegate {
+        private let base: CocoaScrollView
+        
+        var isInitialContentAlignmentSet: Bool = false
+        
+        init(base: CocoaScrollView) {
+            self.base = base
+        }
+        
+        @available(tvOS, unavailable)
+        @objc public func refreshChanged(_ control: UIRefreshControl) {
+            control.refreshChanged(with: base.configuration)
+        }
+        
+        public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            base.configuration.onOffsetChange(
+                scrollView.contentOffset(forContentType: Content.self)
+            )
+        }
     }
 }
 
-#if !os(tvOS)
+// MARK: - API -
 
 extension CocoaScrollView {
+    public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
+        then({ $0.configuration.onOffsetChange = body })
+    }
+}
+
+@available(tvOS, unavailable)
+extension CocoaScrollView {
     public func onRefresh(_ body: @escaping () -> ()) -> Self {
-        then({ $0.onRefresh = body })
+        then({ $0.configuration.onRefresh = body })
     }
     
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
-        then({ $0.isRefreshing = isRefreshing })
+        then({ $0.configuration.isRefreshing = isRefreshing })
     }
 }
-
-#endif
 
 #endif

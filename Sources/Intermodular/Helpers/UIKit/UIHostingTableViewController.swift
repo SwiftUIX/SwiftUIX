@@ -10,13 +10,28 @@ import SwiftUI
 public class UIHostingTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
     var data: Data
     var rowContent: (Data.Element) -> RowContent
+    var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
+        didSet {
+            #if os(iOS) || targetEnvironment(macCatalyst)
+            scrollViewConfiguration.setupRefreshControl = {
+                $0.addTarget(
+                    self,
+                    action: #selector(self.refreshChanged),
+                    for: .valueChanged
+                )
+            }
+            #endif
+            
+            tableView?.configure(with: scrollViewConfiguration)
+        }
+    }
     
     init(data: Data, rowContent: @escaping (Data.Element) -> RowContent) {
         self.data = data
         self.rowContent = rowContent
         
         super.init(style: .plain)
-
+        
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
         
@@ -26,8 +41,6 @@ public class UIHostingTableViewController<Data: RandomAccessCollection, RowConte
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Data Source -
     
     override public func tableView(
         _ tableView: UITableView,
@@ -47,7 +60,11 @@ public class UIHostingTableViewController<Data: RandomAccessCollection, RowConte
         return cell
     }
     
-    // MARK: - Delegate -
+    override public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollViewConfiguration.onOffsetChange(
+            scrollView.contentOffset(forContentType: AnyView.self)
+        )
+    }
     
     override public func tableView(
         _ tableView: UITableView,
@@ -61,6 +78,11 @@ public class UIHostingTableViewController<Data: RandomAccessCollection, RowConte
         willSelectRowAt indexPath: IndexPath
     ) -> IndexPath? {
         nil
+    }
+    
+    @available(tvOS, unavailable)
+    @objc public func refreshChanged(_ control: UIRefreshControl) {
+        control.refreshChanged(with: scrollViewConfiguration)
     }
 }
 
