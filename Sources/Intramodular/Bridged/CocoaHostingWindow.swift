@@ -24,6 +24,7 @@ public final class UIHostingWindow<Content: View>: UIWindow {
         super.init(windowScene: windowScene)
         
         rootViewController = CocoaHostingController(rootView: rootView)
+        rootViewController!.view.backgroundColor = .clear
     }
     
     public convenience init(

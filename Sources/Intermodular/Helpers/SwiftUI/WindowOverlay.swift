@@ -11,16 +11,12 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
     typealias Context = UIViewControllerRepresentableContext<Self>
     
     class UIViewControllerType: UIViewController {
-        var content: Content {
-            didSet {
-                updateWindow()
-            }
-        }
+        var content: Content
+        var isKeyAndVisible: Bool
         
         var contentWindow: UIHostingWindow<Content>?
-        var isKeyAndVisible: Binding<Bool>
         
-        init(content: Content, isKeyAndVisible: Binding<Bool>) {
+        init(content: Content, isKeyAndVisible: Bool) {
             self.content = content
             self.isKeyAndVisible = isKeyAndVisible
             
@@ -28,14 +24,12 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
         }
         
         func updateWindow() {
-            let isVisible = isKeyAndVisible.wrappedValue
-            
-            if isVisible {
+            if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible {
+                return
+            }
+
+            if isKeyAndVisible {
                 guard let window = view?.window, let windowScene = window.windowScene else {
-                    return
-                }
-                
-                if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
                     return
                 }
                 
@@ -46,15 +40,16 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
                     self.contentWindow = $0
                 }
                 
-                contentWindow.isUserInteractionEnabled = true
                 contentWindow.rootView = content
-                contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
-                contentWindow.windowScene = view.window?.windowScene
+                
                 contentWindow.isHidden = false
+                contentWindow.isUserInteractionEnabled = true
+                contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
+                
                 contentWindow.makeKeyAndVisible()
             } else {
                 contentWindow?.isHidden = true
-                contentWindow?.windowScene = nil
+                contentWindow?.isUserInteractionEnabled = false
             }
         }
         
@@ -78,11 +73,14 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
     }
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(content: content, isKeyAndVisible: isKeyAndVisible)
+        .init(content: content, isKeyAndVisible: isKeyAndVisible.wrappedValue)
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.isKeyAndVisible = isKeyAndVisible.wrappedValue
         uiViewController.content = content
+        
+        uiViewController.updateWindow()
     }
 }
 
