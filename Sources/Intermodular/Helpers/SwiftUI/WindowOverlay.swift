@@ -7,51 +7,54 @@
 import Swift
 import SwiftUI
 
-fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControllerRepresentable {
+fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
     typealias Context = UIViewControllerRepresentableContext<Self>
-    typealias UIViewControllerType = _UIHostingController
     
-    class _UIHostingController: UIHostingController<RootView> {
-        let content: Content
-        var contentWindow: UIWindow?
+    class UIViewControllerType: UIViewController {
+        var content: Content {
+            didSet {
+                updateWindow()
+            }
+        }
+        
+        var contentWindow: UIHostingWindow<Content>?
         var isKeyAndVisible: Binding<Bool>
         
-        init(rootView: RootView, content: Content, isKeyAndVisible: Binding<Bool>) {
+        init(content: Content, isKeyAndVisible: Binding<Bool>) {
             self.content = content
             self.isKeyAndVisible = isKeyAndVisible
             
-            super.init(rootView: rootView)
+            super.init(nibName: nil, bundle: nil)
         }
         
-        func setupContentWindowIfNecessary() {
-            guard contentWindow == nil, let window = view?.window, let windowScene = window.windowScene else {
-                return
-            }
+        func updateWindow() {
+            let isVisible = isKeyAndVisible.wrappedValue
             
-            let contentWindow = UIHostingWindow(
-                windowScene: windowScene,
-                rootView: content
-            )
-            
-            contentWindow.isUserInteractionEnabled = true
-            contentWindow.rootViewController?.view.backgroundColor = .clear
-            contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
-            
-            self.contentWindow = contentWindow
-            
-            setContentWindowVisibility()
-        }
-        
-        func setContentWindowVisibility() {
-            guard let contentWindow = contentWindow else {
-                return
-            }
-            
-            if isKeyAndVisible.wrappedValue {
+            if isVisible {
+                guard let window = view?.window, let windowScene = window.windowScene else {
+                    return
+                }
+                
+                if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
+                    return
+                }
+                
+                let contentWindow = self.contentWindow ?? UIHostingWindow(
+                    windowScene: windowScene,
+                    rootView: content
+                ).then {
+                    self.contentWindow = $0
+                }
+                
+                contentWindow.isUserInteractionEnabled = true
+                contentWindow.rootView = content
+                contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
+                contentWindow.windowScene = view.window?.windowScene
                 contentWindow.isHidden = false
                 contentWindow.makeKeyAndVisible()
             } else {
-                contentWindow.isHidden = true
+                contentWindow?.isHidden = true
+                contentWindow?.windowScene = nil
             }
         }
         
@@ -62,32 +65,24 @@ fileprivate struct WindowOverlay<RootView: View, Content: View>: UIViewControlle
         override fileprivate func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
-            setupContentWindowIfNecessary()
+            updateWindow()
         }
     }
     
-    private let rootView: RootView
     private let content: Content
     private let isKeyAndVisible: Binding<Bool>
     
-    init(rootView: RootView, content: Content, isKeyAndVisible: Binding<Bool>) {
-        self.rootView = rootView
+    init(content: Content, isKeyAndVisible: Binding<Bool>) {
         self.content = content
         self.isKeyAndVisible = isKeyAndVisible
     }
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(rootView: rootView, content: content, isKeyAndVisible: isKeyAndVisible)
+        .init(content: content, isKeyAndVisible: isKeyAndVisible)
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.rootView = rootView
-        
-        uiViewController.setContentWindowVisibility()
-    }
-    
-    static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
-        uiViewController.contentWindow?.isHidden = true
+        uiViewController.content = content
     }
 }
 
@@ -98,7 +93,7 @@ extension View {
         isKeyAndVisible: Binding<Bool>,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
-        WindowOverlay(rootView: self, content: content(), isKeyAndVisible: isKeyAndVisible)
+        background(WindowOverlay(content: content(), isKeyAndVisible: isKeyAndVisible))
     }
 }
 

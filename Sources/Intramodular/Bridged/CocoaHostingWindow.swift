@@ -8,11 +8,19 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public final class UIHostingWindow<Content: View>: UIWindow {
-    public let rootView: Content
+    public var rootHostingViewController: CocoaHostingController<Content> {
+        rootViewController as! CocoaHostingController<Content>
+    }
+    
+    public var rootView: Content {
+        get {
+            rootHostingViewController.rootViewContent
+        } set {
+            rootHostingViewController.rootViewContent = newValue
+        }
+    }
     
     public init(windowScene: UIWindowScene, rootView: Content) {
-        self.rootView = rootView
-        
         super.init(windowScene: windowScene)
         
         rootViewController = CocoaHostingController(rootView: rootView)

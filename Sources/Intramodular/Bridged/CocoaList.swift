@@ -15,6 +15,9 @@ public struct CocoaList<Data: RandomAccessCollection, RowContent: View>: UIViewC
     private let rowContent: (Data.Element) -> RowContent
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
+    @Environment(\.initialContentAlignment) var initialContentAlignment
+    @Environment(\.isScrollEnabled) var isScrollEnabled
+
     public init(_ data: Data, rowContent: @escaping (Data.Element) -> RowContent) {
         self.data = data
         self.rowContent = rowContent
@@ -29,6 +32,8 @@ public struct CocoaList<Data: RandomAccessCollection, RowContent: View>: UIViewC
         uiViewController.rowContent = rowContent
         uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
+        uiViewController.tableView.isScrollEnabled = isScrollEnabled
+
         uiViewController.tableView.reloadData()
     }
 }
