@@ -31,6 +31,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     public init(
         _ data: Data,
+        style: UITableView.Style,
         sectionHeader: @escaping (SectionModel) -> SectionHeader,
         sectionFooter: @escaping (SectionModel) -> SectionFooter,
         rowContent: @escaping (Item) -> RowContent
@@ -40,7 +41,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         self.sectionFooter = sectionFooter
         self.rowContent = rowContent
         
-        super.init(style: .plain)
+        super.init(style: style)
         
         tableView.estimatedSectionHeaderHeight = UITableView.automaticDimension
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
@@ -49,8 +50,8 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         tableView.sectionFooterHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
         
-        tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forCellReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
-        tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forCellReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
         tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
     }
     

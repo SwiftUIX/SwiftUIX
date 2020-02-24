@@ -32,6 +32,10 @@ extension ListSection where Model == Never {
         self._model = nil
         self.items = items
     }
+    
+    public init<C: Collection>(items: C) where C.Element == Item {
+        self.init(items: Array(items))
+    }
 }
 
 // MARK: - Helpers -

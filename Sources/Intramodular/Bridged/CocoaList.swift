@@ -16,6 +16,7 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     private let sectionFooter: (SectionModel) -> SectionFooter
     private let rowContent: (Item) -> RowContent
     
+    private var style: UITableView.Style = .plain
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
@@ -36,6 +37,7 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(
             data,
+            style: style,
             sectionHeader: sectionHeader,
             sectionFooter: sectionFooter,
             rowContent: rowContent
@@ -52,6 +54,60 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
         
         uiViewController.tableView.reloadData()
+    }
+}
+
+extension CocoaList {
+    public init<_Item: Hashable>(
+        _ data: Data,
+        sectionHeader: @escaping (SectionModel) -> SectionHeader,
+        sectionFooter: @escaping (SectionModel) -> SectionFooter,
+        rowContent: @escaping (_Item) -> RowContent
+    ) where Item == HashIdentifiableValue<_Item> {
+        self.data = data
+        self.sectionHeader = sectionHeader
+        self.sectionFooter = sectionFooter
+        self.rowContent = { rowContent($0.value) }
+    }
+}
+
+extension CocoaList where Data: RangeReplaceableCollection, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
+    public init<Items: RandomAccessCollection>(
+        _ items: Items,
+        @ViewBuilder rowContent: @escaping (Item) -> RowContent
+    ) where Items.Element == Item {
+        var data = Data.init()
+        
+        data.append(.init(items: items))
+        
+        self.init(
+            data,
+            sectionHeader: Never.produce,
+            sectionFooter: Never.produce,
+            rowContent: rowContent
+        )
+    }
+}
+
+extension CocoaList where Data == Array<ListSection<SectionModel, Item>>, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
+    public init<Items: RandomAccessCollection>(
+        _ items: Items,
+        @ViewBuilder rowContent: @escaping (Item) -> RowContent
+    ) where Items.Element == Item {
+        self.init(
+            [.init(items: items)],
+            sectionHeader: Never.produce,
+            sectionFooter: Never.produce,
+            rowContent: rowContent
+        )
+    }
+}
+
+// MARK: - API -
+
+extension CocoaList {
+    public func listStyle(_ style: UITableView.Style) -> Self {
+        then({ $0.style = style })
     }
 }
 

@@ -40,6 +40,10 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
         }
     }
     
+    override init(reuseIdentifier: String?) {
+        super.init(reuseIdentifier: reuseIdentifier)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
