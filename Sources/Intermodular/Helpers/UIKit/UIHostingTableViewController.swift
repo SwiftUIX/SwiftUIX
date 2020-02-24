@@ -7,9 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableViewController<Data: RandomAccessCollection, RowContent: View>: UITableViewController where Data.Element: Identifiable {
+public class UIHostingTableViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, Item> {
     var data: Data
-    var rowContent: (Data.Element) -> RowContent
+    var sectionHeader: (SectionModel) -> SectionHeader
+    var sectionFooter: (SectionModel) -> SectionFooter
+    var rowContent: (Item) -> RowContent
+    
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
             #if os(iOS) || targetEnvironment(macCatalyst)
@@ -26,36 +29,77 @@ public class UIHostingTableViewController<Data: RandomAccessCollection, RowConte
         }
     }
     
-    init(data: Data, rowContent: @escaping (Data.Element) -> RowContent) {
+    public init(
+        _ data: Data,
+        sectionHeader: @escaping (SectionModel) -> SectionHeader,
+        sectionFooter: @escaping (SectionModel) -> SectionFooter,
+        rowContent: @escaping (Item) -> RowContent
+    ) {
         self.data = data
+        self.sectionHeader = sectionHeader
+        self.sectionFooter = sectionFooter
         self.rowContent = rowContent
         
         super.init(style: .plain)
         
+        tableView.estimatedSectionHeaderHeight = UITableView.automaticDimension
+        tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.sectionFooterHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
         
-        tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingCellIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forCellReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forCellReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
+        tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override public func numberOfSections(in tableView: UITableView) -> Int {
+        data.count
+    }
+    
     override public func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        data.count
+        data[data.index(data.startIndex, offsetBy: section)].items.count
+    }
+    
+    override public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard SectionHeader.self != Never.self else {
+            return nil
+        }
+        
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionHeader>
+        
+        view.content = sectionHeader(data[data.index(data.startIndex, offsetBy: section)].model)
+        
+        return view
+    }
+    
+    override public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard SectionFooter.self != Never.self else {
+            return nil
+        }
+        
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionFooter>
+        
+        view.content = sectionFooter(data[data.index(data.startIndex, offsetBy: section)].model)
+        
+        return view
     }
     
     override public func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingCellIdentifier, for: indexPath) as! UIHostingTableViewCell<RowContent>
+        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier, for: indexPath) as! UIHostingTableViewCell<RowContent>
         
-        cell.content = rowContent(data[data.index(data.startIndex, offsetBy: indexPath.row)])
+        cell.content = rowContent(data[indexPath])
         
         return cell
     }

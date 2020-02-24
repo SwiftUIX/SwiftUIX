@@ -7,33 +7,50 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CocoaList<Data: RandomAccessCollection, RowContent: View>: UIViewControllerRepresentable where Data.Element: Identifiable {
+public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
     public typealias Offset = ScrollView<AnyView>.Offset
-    public typealias UIViewControllerType = UIHostingTableViewController<Data, RowContent>
+    public typealias UIViewControllerType = UIHostingTableViewController<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
     
     private let data: Data
-    private let rowContent: (Data.Element) -> RowContent
+    private let sectionHeader: (SectionModel) -> SectionHeader
+    private let sectionFooter: (SectionModel) -> SectionFooter
+    private let rowContent: (Item) -> RowContent
+    
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
     @Environment(\.isScrollEnabled) var isScrollEnabled
-
-    public init(_ data: Data, rowContent: @escaping (Data.Element) -> RowContent) {
+    
+    public init(
+        _ data: Data,
+        sectionHeader: @escaping (SectionModel) -> SectionHeader,
+        sectionFooter: @escaping (SectionModel) -> SectionFooter,
+        rowContent: @escaping (Item) -> RowContent
+    ) {
         self.data = data
+        self.sectionHeader = sectionHeader
+        self.sectionFooter = sectionFooter
         self.rowContent = rowContent
     }
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(data: data, rowContent: rowContent)
+        .init(
+            data,
+            sectionHeader: sectionHeader,
+            sectionFooter: sectionFooter,
+            rowContent: rowContent
+        )
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.data = data
+        uiViewController.sectionHeader = sectionHeader
+        uiViewController.sectionFooter = sectionFooter
         uiViewController.rowContent = rowContent
         uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
-
+        
         uiViewController.tableView.reloadData()
     }
 }

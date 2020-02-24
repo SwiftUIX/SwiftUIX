@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class UIHostingTableViewCell<Content: View> : UITableViewCell {
+class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFooterView {
     var contentHostingController: UIHostingController<Content>?
     
     var content: Content? {
@@ -39,10 +39,14 @@ class UIHostingTableViewCell<Content: View> : UITableViewCell {
             }
         }
     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension String {
-    static let hostingTableViewCellIdentifier = "UIHostingTableViewCell"
+    static let hostingTableViewHeaderFooterViewIdentifier = "UIHostingTableViewHeaderFooterView"
 }
 
 #endif
