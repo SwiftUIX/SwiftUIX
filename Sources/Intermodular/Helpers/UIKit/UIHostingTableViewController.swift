@@ -43,12 +43,15 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         super.init(style: style)
         
+        tableView.backgroundView = .init()
+        tableView.backgroundColor = .clear
+        tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.estimatedSectionHeaderHeight = UITableView.automaticDimension
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
         tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.sectionFooterHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
+        tableView.separatorInset = .zero
         
         tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
         tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
@@ -80,7 +83,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         view.backgroundColor = .clear // FIXME
         view.backgroundView = .init() // FIXME
         view.layoutMargins = .zero // FIXME
-
+        
         view.content = sectionHeader(data[data.index(data.startIndex, offsetBy: section)].model)
         
         return view
@@ -96,7 +99,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         view.backgroundColor = .clear // FIXME
         view.backgroundView = .init() // FIXME
         view.layoutMargins = .zero // FIXME
-
+        
         view.content = sectionFooter(data[data.index(data.startIndex, offsetBy: section)].model)
         
         return view
@@ -113,7 +116,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         cell.layoutMargins = .zero // FIXME
         cell.selectedBackgroundView = .init() // FIXME
         cell.separatorInset = .zero // FIXME
-
+        
         cell.content = rowContent(data[indexPath])
         
         return cell
