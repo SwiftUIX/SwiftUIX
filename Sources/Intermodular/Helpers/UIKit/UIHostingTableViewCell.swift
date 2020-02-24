@@ -24,17 +24,16 @@ class UIHostingTableViewCell<Content: View> : UITableViewCell {
                 contentHostingController = UIHostingController(rootView: content)
                 
                 let view = contentHostingController!.view!
-                let margins = contentView.layoutMarginsGuide
                 
                 view.translatesAutoresizingMaskIntoConstraints = false
                 
                 contentView.addSubview(view)
                 
                 NSLayoutConstraint.activate([
-                    view.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
-                    view.topAnchor.constraint(equalTo: margins.topAnchor),
-                    view.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
-                    view.bottomAnchor.constraint(equalTo: margins.bottomAnchor)
+                    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                    view.topAnchor.constraint(equalTo: contentView.topAnchor),
+                    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
                 ])
             }
         }

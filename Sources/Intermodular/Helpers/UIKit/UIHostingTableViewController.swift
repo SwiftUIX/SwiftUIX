@@ -50,8 +50,8 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         tableView.sectionFooterHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
         
-        tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
-        tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderFooterViewIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
+        tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
         tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
     }
     
@@ -75,8 +75,12 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             return nil
         }
         
-        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionHeader>
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionHeader>
         
+        view.backgroundColor = .clear // FIXME
+        view.backgroundView = .init() // FIXME
+        view.layoutMargins = .zero // FIXME
+
         view.content = sectionHeader(data[data.index(data.startIndex, offsetBy: section)].model)
         
         return view
@@ -87,8 +91,12 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             return nil
         }
         
-        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionFooter>
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionFooter>
         
+        view.backgroundColor = .clear // FIXME
+        view.backgroundView = .init() // FIXME
+        view.layoutMargins = .zero // FIXME
+
         view.content = sectionFooter(data[data.index(data.startIndex, offsetBy: section)].model)
         
         return view
@@ -100,6 +108,12 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     ) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier, for: indexPath) as! UIHostingTableViewCell<RowContent>
         
+        cell.backgroundColor = .clear // FIXME
+        cell.backgroundView = .init() // FIXME
+        cell.layoutMargins = .zero // FIXME
+        cell.selectedBackgroundView = .init() // FIXME
+        cell.separatorInset = .zero // FIXME
+
         cell.content = rowContent(data[indexPath])
         
         return cell
