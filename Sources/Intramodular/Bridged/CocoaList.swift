@@ -69,6 +69,30 @@ extension CocoaList {
         self.sectionFooter = sectionFooter
         self.rowContent = { rowContent($0.value) }
     }
+
+    public init<_SectionModel: Hashable, _Item: Hashable>(
+        _ data: Data,
+        sectionHeader: @escaping (_SectionModel) -> SectionHeader,
+        sectionFooter: @escaping (_SectionModel) -> SectionFooter,
+        rowContent: @escaping (_Item) -> RowContent
+    ) where SectionModel == HashIdentifiableValue<_SectionModel>, Item == HashIdentifiableValue<_Item> {
+        self.data = data
+        self.sectionHeader = { sectionHeader($0.value) }
+        self.sectionFooter = { sectionFooter($0.value) }
+        self.rowContent = { rowContent($0.value) }
+    }
+    
+    public init<_SectionModel: Hashable, _Item: Hashable>(
+        _ data: [ListSection<_SectionModel, _Item>],
+        sectionHeader: @escaping (_SectionModel) -> SectionHeader,
+        sectionFooter: @escaping (_SectionModel) -> SectionFooter,
+        rowContent: @escaping (_Item) -> RowContent
+    ) where Data == Array<ListSection<SectionModel, Item>>, SectionModel == HashIdentifiableValue<_SectionModel>, Item == HashIdentifiableValue<_Item> {
+        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
+        self.sectionHeader = { sectionHeader($0.value) }
+        self.sectionFooter = { sectionFooter($0.value) }
+        self.rowContent = { rowContent($0.value) }
+    }
 }
 
 extension CocoaList where Data: RangeReplaceableCollection, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
