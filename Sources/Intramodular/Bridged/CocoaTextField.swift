@@ -112,7 +112,7 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.autocapitalizationType = autocapitalization
         }
         
-        uiView.font = environmentFont?.toUIFont() ?? font
+        uiView.font = font ?? environmentFont?.toUIFont()
         
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
