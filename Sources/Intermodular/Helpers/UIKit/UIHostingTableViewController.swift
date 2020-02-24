@@ -13,6 +13,18 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (Item) -> RowContent
     
+    var _prototypeCell: UIHostingTableViewCell<RowContent>?
+    
+    var prototypeCell: UIHostingTableViewCell<RowContent> {
+        guard let _prototypeCell = _prototypeCell else {
+            self._prototypeCell = .some(tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<RowContent>)
+            
+            return self._prototypeCell!
+        }
+        
+        return _prototypeCell
+    }
+    
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
             #if os(iOS) || targetEnvironment(macCatalyst)
@@ -28,6 +40,8 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             tableView?.configure(with: scrollViewConfiguration)
         }
     }
+    
+    var isInitialContentAlignmentSet: Bool = false
     
     public init(
         _ data: Data,
@@ -105,6 +119,17 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         return view
     }
     
+    override public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        prototypeCell.content = rowContent(data[indexPath])
+        prototypeCell.bounds.size.width = tableView.bounds.width
+        prototypeCell.layoutIfNeeded()
+        
+        return prototypeCell
+            .contentHostingController!
+            .view
+            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height + 1
+    }
+    
     override public func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
@@ -118,7 +143,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         cell.separatorInset = .zero // FIXME
         
         cell.content = rowContent(data[indexPath])
-        
+                
         return cell
     }
     

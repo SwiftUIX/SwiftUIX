@@ -41,16 +41,22 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
             }
         }
     }
-        
-    override open func prepareForReuse() {
-        super.prepareForReuse()
-    }
+            
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override open func prepareForReuse() {
+        super.prepareForReuse()
+        
+        contentView.constraints.forEach(contentView.removeConstraint)
+        contentView.subviews.forEach({ $0.removeFromSuperview() })
+        
+        contentHostingController = nil
     }
 }
 

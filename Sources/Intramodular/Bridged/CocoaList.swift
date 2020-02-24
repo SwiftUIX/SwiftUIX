@@ -54,6 +54,14 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
         
         uiViewController.tableView.reloadData()
+        
+        if !uiViewController.isInitialContentAlignmentSet {
+            if uiViewController.tableView.contentSize != .zero && uiViewController.tableView.frame.size != .zero  {
+                uiViewController.tableView.setContentAlignment(initialContentAlignment, animated: false)
+                
+                uiViewController.isInitialContentAlignmentSet = true
+            }
+        }
     }
 }
 
