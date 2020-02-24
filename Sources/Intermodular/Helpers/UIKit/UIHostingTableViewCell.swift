@@ -25,6 +25,7 @@ class UIHostingTableViewCell<Content: View> : UITableViewCell {
                 
                 let view = contentHostingController!.view!
                 
+                view.backgroundColor = .clear
                 view.translatesAutoresizingMaskIntoConstraints = false
                 
                 contentView.addSubview(view)
@@ -35,6 +36,8 @@ class UIHostingTableViewCell<Content: View> : UITableViewCell {
                     view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
                     view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
                 ])
+                
+                contentView.backgroundColor = .clear
             }
         }
     }

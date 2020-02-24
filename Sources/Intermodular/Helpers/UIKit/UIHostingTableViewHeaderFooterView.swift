@@ -24,9 +24,10 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
                 contentHostingController = UIHostingController(rootView: content)
                 
                 let view = contentHostingController!.view!
-                
+
+                view.backgroundColor = .clear
                 view.translatesAutoresizingMaskIntoConstraints = false
-                                
+
                 contentView.addSubview(view)
 
                 NSLayoutConstraint.activate([
@@ -35,10 +36,15 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
                     view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
                     view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
                 ])
+                
+                contentView.backgroundColor = .clear
             }
         }
     }
         
+    override open func prepareForReuse() {
+        super.prepareForReuse()
+    }
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
     }
