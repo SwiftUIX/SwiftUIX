@@ -17,6 +17,7 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     private let rowContent: (Item) -> RowContent
     
     private var style: UITableView.Style = .plain
+    private var separatorStyle: UITableViewCell.SeparatorStyle = .singleLine
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
@@ -139,6 +140,10 @@ extension CocoaList where Data == Array<ListSection<SectionModel, Item>>, Sectio
 extension CocoaList {
     public func listStyle(_ style: UITableView.Style) -> Self {
         then({ $0.style = style })
+    }
+    
+    public func listSeparatorStyle(_ separatorStyle: UITableViewCell.SeparatorStyle) -> Self {
+        then({ $0.separatorStyle = separatorStyle })
     }
 }
 
