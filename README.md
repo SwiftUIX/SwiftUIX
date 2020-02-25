@@ -9,13 +9,14 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 This project is also **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
-Ports include but are not limited to:
-
-- `UIActivityIndicatorView` (via `ActivityIndicator`)
-- `UIPageViewController` (via `PaginationView`)
-- `UIScrollView` (via `CocoaScrollView`)
-- `UITextField` (via `CocoaTextField`)
-- `UITextView` (via `TextView`)
+| UIKit                      | SwiftUI      | SwiftUIX                     |
+| -------------------------- | ------------ | ---------------------------- |
+| `UIActivityIndicatorView`  | -            | `ActivityInidcator`          |
+| `UIPageViewController`     | -            | `PaginationView`             |
+| `UIScrollView`             | `ScrollView` | `CocoaScrollView`            |
+| `UITableView`              | `List`       | `CocoaList`                  |
+| `UITextField`              | `TextField`  | `CocoaTextField`             |
+| `UIModalPresentationStyle` | -            | `ModalViewPresentationStyle` |
 
 # Requirements 
 
