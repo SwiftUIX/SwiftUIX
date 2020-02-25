@@ -42,13 +42,20 @@ extension ListSection where Model == Never {
 
 extension ListSection: Equatable where Model: Equatable, Item: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.model == rhs.model && lhs.items == rhs.items
+        if Model.self == Never.self {
+            return lhs.items == rhs.items
+        } else {
+            return lhs.model == rhs.model && lhs.items == rhs.items
+        }
     }
 }
 
 extension ListSection: Hashable where Model: Hashable, Item: Hashable {
     public func hash(into hasher: inout Hasher ){
-        hasher.combine(model)
+        if Model.self != Never.self {
+            hasher.combine(model)
+        }
+        
         hasher.combine(items)
     }
 }
