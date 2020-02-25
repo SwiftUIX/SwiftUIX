@@ -13,18 +13,6 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (Item) -> RowContent
     
-    var _prototypeCell: UIHostingTableViewCell<RowContent>?
-    
-    var prototypeCell: UIHostingTableViewCell<RowContent> {
-        guard let _prototypeCell = _prototypeCell else {
-            self._prototypeCell = .some(tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<RowContent>)
-            
-            return self._prototypeCell!
-        }
-        
-        return _prototypeCell
-    }
-    
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
             #if os(iOS) || targetEnvironment(macCatalyst)
@@ -42,6 +30,19 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     }
     
     var isInitialContentAlignmentSet: Bool = false
+    
+    private var _rowContentHeightCache: [Item.ID: CGFloat] = [:]
+    private var _prototypeCell: UIHostingTableViewCell<Item, RowContent>?
+    
+    private var prototypeCell: UIHostingTableViewCell<Item, RowContent> {
+        guard let _prototypeCell = _prototypeCell else {
+            self._prototypeCell = .some(tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>)
+            
+            return self._prototypeCell!
+        }
+        
+        return _prototypeCell
+    }
     
     public init(
         _ data: Data,
@@ -68,12 +69,14 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
         tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
-        tableView.register(UIHostingTableViewCell<RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
+        tableView.register(UIHostingTableViewCell<Item, RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Data Source -
     
     override public func numberOfSections(in tableView: UITableView) -> Int {
         data.count
@@ -86,16 +89,14 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         data[data.index(data.startIndex, offsetBy: section)].items.count
     }
     
+    // MARK: - Delegate -
+    
     override public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard SectionHeader.self != Never.self else {
             return nil
         }
         
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionHeader>
-        
-        view.backgroundColor = .clear // FIXME
-        view.backgroundView = .init() // FIXME
-        view.layoutMargins = .zero // FIXME
         
         view.content = sectionHeader(data[data.index(data.startIndex, offsetBy: section)].model)
         
@@ -109,22 +110,30 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionFooter>
         
-        view.backgroundColor = .clear // FIXME
-        view.backgroundView = .init() // FIXME
-        view.layoutMargins = .zero // FIXME
-        
         view.content = sectionFooter(data[data.index(data.startIndex, offsetBy: section)].model)
         
         return view
     }
     
     override public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        prototypeCell.content = rowContent(data[indexPath])
+        let item = data[indexPath]
+        
+        if let cachedHeight = _rowContentHeightCache[item.id] {
+            return cachedHeight
+        }
+        
+        prototypeCell.parent = self
+        prototypeCell.item = data[indexPath]
+        prototypeCell.makeContent = rowContent
+        
+        prototypeCell.update()
         
         let height = prototypeCell
             .contentView
             .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
             .height
+        
+        _rowContentHeightCache[item.id] = height
         
         return max(1, height)
     }
@@ -133,9 +142,14 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<RowContent>
+        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>
         
-        cell.content = rowContent(data[indexPath])
+        cell.parent = self
+        cell.item = data[indexPath]
+        cell.makeContent = rowContent
+        cell.useAutoLayout = false
+        
+        cell.update()
         
         return cell
     }

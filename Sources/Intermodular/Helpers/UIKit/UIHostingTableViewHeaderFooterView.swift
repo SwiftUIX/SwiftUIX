@@ -24,12 +24,12 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
                 contentHostingController = UIHostingController(rootView: content)
                 
                 let view = contentHostingController!.view!
-
+                
                 view.backgroundColor = .clear
                 view.translatesAutoresizingMaskIntoConstraints = false
-
+                
                 contentView.addSubview(view)
-
+                
                 NSLayoutConstraint.activate([
                     view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
                     view.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -37,26 +37,18 @@ class UIHostingTableViewHeaderFooterView<Content: View> : UITableViewHeaderFoote
                     view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
                 ])
                 
-                contentView.backgroundColor = .clear
+                backgroundView = UIView()
+                backgroundView?.backgroundColor = .clear
             }
         }
     }
-            
+    
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override open func prepareForReuse() {
-        super.prepareForReuse()
-        
-        contentView.constraints.forEach(contentView.removeConstraint)
-        contentView.subviews.forEach({ $0.removeFromSuperview() })
-        
-        contentHostingController = nil
     }
 }
 

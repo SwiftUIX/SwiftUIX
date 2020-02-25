@@ -38,6 +38,21 @@ extension ListSection where Model == Never {
     }
 }
 
+// MARK: - Protocol Implementations -
+
+extension ListSection: Equatable where Model: Equatable, Item: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.model == rhs.model && lhs.items == rhs.items
+    }
+}
+
+extension ListSection: Hashable where Model: Hashable, Item: Hashable {
+    public func hash(into hasher: inout Hasher ){
+        hasher.combine(model)
+        hasher.combine(items)
+    }
+}
+
 // MARK: - Helpers -
 
 extension Collection  {
