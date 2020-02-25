@@ -92,6 +92,10 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     // MARK: - Delegate -
     
+    override public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        SectionHeader.self != Never.self ? UITableView.automaticDimension : 0
+    }
+    
     override public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard SectionHeader.self != Never.self else {
             return nil
@@ -104,6 +108,10 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         return view
     }
     
+    override public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        SectionFooter.self != Never.self ? UITableView.automaticDimension : 0
+    }
+
     override public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         guard SectionFooter.self != Never.self else {
             return nil
