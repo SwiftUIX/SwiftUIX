@@ -10,22 +10,18 @@ import SwiftUI
 public class UIHostingTableViewCell<Content: View> : UITableViewCell {
     var contentHostingController: UIHostingController<Content>?
     
-    var content: Content? {
+    var content: Content! {
         get {
             contentHostingController?.rootView
         } set {
-            guard let content = newValue else {
-                return
-            }
-            
             let _contentView: UIView
             
             if let contentHostingController = contentHostingController {
-                contentHostingController.rootView = content
+                contentHostingController.rootView = newValue
                 
                 _contentView = contentHostingController.view
             } else {
-                contentHostingController = UIHostingController(rootView: content)
+                contentHostingController = UIHostingController(rootView: newValue)
                 
                 _contentView = contentHostingController!.view!
                 
