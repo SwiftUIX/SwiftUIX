@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class UIHostingTableViewCell<Content: View> : UITableViewCell {
+public class UIHostingTableViewCell<Content: View> : UITableViewCell {
     var contentHostingController: UIHostingController<Content>?
     
     var content: Content? {
@@ -18,27 +18,39 @@ class UIHostingTableViewCell<Content: View> : UITableViewCell {
                 return
             }
             
+            let _contentView: UIView
+            
             if let contentHostingController = contentHostingController {
                 contentHostingController.rootView = content
+                
+                _contentView = contentHostingController.view
             } else {
                 contentHostingController = UIHostingController(rootView: content)
                 
-                let view = contentHostingController!.view!
+                _contentView = contentHostingController!.view!
                 
-                view.backgroundColor = .clear
-                view.translatesAutoresizingMaskIntoConstraints = false
+                _contentView.backgroundColor = .clear
+                _contentView.translatesAutoresizingMaskIntoConstraints = false
                 
-                contentView.addSubview(view)
+                contentView.addSubview(_contentView)
                 
                 NSLayoutConstraint.activate([
-                    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                    view.topAnchor.constraint(equalTo: contentView.topAnchor),
-                    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+                    _contentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                    _contentView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                    _contentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                    _contentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
                 ])
-                
-                contentView.backgroundColor = .clear
             }
+            
+            backgroundColor = .clear
+            backgroundView = .init()
+            contentView.backgroundColor = .clear
+            contentView.bounds.origin = .zero
+            layoutMargins = .zero
+            selectedBackgroundView = .init()
+            
+            _contentView.setNeedsLayout()
+            _contentView.layoutIfNeeded()
         }
     }
     

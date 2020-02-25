@@ -65,7 +65,6 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         tableView.rowHeight = UITableView.automaticDimension
         tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.sectionFooterHeight = UITableView.automaticDimension
-        tableView.separatorInset = .zero
         
         tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
         tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
@@ -121,29 +120,23 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     override public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         prototypeCell.content = rowContent(data[indexPath])
-        prototypeCell.bounds.size.width = tableView.bounds.width
-        prototypeCell.layoutIfNeeded()
         
-        return prototypeCell
-            .contentHostingController!
-            .view
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height + 1
+        let height = prototypeCell
+            .contentView
+            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .height
+        
+        return max(1, height)
     }
     
     override public func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier, for: indexPath) as! UIHostingTableViewCell<RowContent>
-        
-        cell.backgroundColor = .clear // FIXME
-        cell.backgroundView = .init() // FIXME
-        cell.layoutMargins = .zero // FIXME
-        cell.selectedBackgroundView = .init() // FIXME
-        cell.separatorInset = .zero // FIXME
+        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<RowContent>
         
         cell.content = rowContent(data[indexPath])
-                
+        
         return cell
     }
     
