@@ -72,6 +72,10 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
                     uiViewController.isInitialContentAlignmentSet = true
                 }
             } else if oldContentSize.minimumDimensionLength != 0 {
+                guard initialContentAlignment.horizontal == .trailing || initialContentAlignment.vertical == .bottom else {
+                    return
+                }
+                
                 uiViewController.tableView.invalidateIntrinsicContentSize()
                 uiViewController.tableView.setNeedsLayout()
                 uiViewController.tableView.layoutIfNeeded()

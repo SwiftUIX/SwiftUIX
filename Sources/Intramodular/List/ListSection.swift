@@ -35,7 +35,9 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
         
         var hasher = Hasher()
         
-        hasher.combine(model.id)
+        if Model.self != Never.self {
+            hasher.combine(model.id)
+        }
         
         items.forEach {
             hasher.combine($0.id)
@@ -66,8 +68,10 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
                 return false
             }
             
-            guard model.id == other.model.id else {
-                return false
+            if Model.self != Never.self {
+                guard model.id == other.model.id else {
+                    return false
+                }
             }
             
             for (item, otherItem) in zip(items, other.items) {
