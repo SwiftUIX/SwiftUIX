@@ -67,7 +67,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.sectionFooterHeight = UITableView.automaticDimension
         tableView.separatorInset = .zero
-
+        
         tableView.register(UIHostingTableViewHeaderFooterView<SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
         tableView.register(UIHostingTableViewHeaderFooterView<SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
         tableView.register(UIHostingTableViewCell<Item, RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
@@ -111,7 +111,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     override public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         SectionFooter.self != Never.self ? UITableView.automaticDimension : 0
     }
-
+    
     override public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         guard SectionFooter.self != Never.self else {
             return nil
@@ -156,10 +156,10 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         cell.parent = self
         cell.item = data[indexPath]
         cell.makeContent = rowContent
-        cell.useAutoLayout = false
+        cell.useAutoLayout = true
         
         cell.update()
-        
+                
         return cell
     }
     

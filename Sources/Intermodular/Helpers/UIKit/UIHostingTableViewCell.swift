@@ -13,7 +13,7 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
     var makeContent: ((Item) -> Content)!
     var useAutoLayout = true
     
-    private var contentHostingController: UIHostingController<AnyView>!
+    private var contentHostingController: UIViewController!
     
     var rootView: some View {
         self.makeContent(item).id(item.id)
@@ -36,7 +36,7 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
             layoutMargins = .zero
             selectedBackgroundView = .init()
             
-            contentHostingController = UIHostingController(rootView: rootView.eraseToAnyView())
+            contentHostingController = UIHostingController(rootView: rootView)
             contentHostingController.view.backgroundColor = .clear
             
             if useAutoLayout {
@@ -57,11 +57,11 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
                 ])
             }
         } else {
-            contentHostingController.rootView = rootView.eraseToAnyView()
+            (contentHostingController as? UIHostingController)?.rootView = rootView
         }
         
         if !useAutoLayout {
-            contentHostingController.view.frame.size.width = frame.width
+            contentHostingController.view.frame.size.width = bounds.width // FIXME!
             contentHostingController.view.frame.size.height = contentHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
         }
     }

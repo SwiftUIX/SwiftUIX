@@ -6,14 +6,11 @@ import Swift
 import SwiftUI
 
 public struct ListSection<Model, Item> {
-    private var _model: Model!
+    private let _hashValue: Int?
+    private let _model: Model!
     
     public var model: Model {
-        get {
-            _model
-        } set {
-            _model = newValue
-        }
+        _model
     }
     
     public let items: [Item]
@@ -22,19 +19,65 @@ public struct ListSection<Model, Item> {
         model: Model,
         items: [Item]
     ) {
+        self._hashValue = nil
         self._model = model
         self.items = items
     }
 }
 
+extension ListSection where Model: Identifiable, Item: Identifiable {
+    public init(
+        model: Model,
+        items: [Item]
+    ) {
+        self._model = model
+        self.items = items
+        
+        var hasher = Hasher()
+        
+        hasher.combine(model.id)
+        
+        items.forEach {
+            hasher.combine($0.id)
+        }
+        
+        self._hashValue = hasher.finalize()
+    }
+}
+
 extension ListSection where Model == Never {
     public init(items: [Item]) {
+        self._hashValue = nil
         self._model = nil
         self.items = items
     }
     
     public init<C: Collection>(items: C) where C.Element == Item {
         self.init(items: Array(items))
+    }
+}
+
+extension ListSection where Model: Identifiable, Item: Identifiable {
+    public func isIdentical(to other: Self) -> Bool {
+        if let hashValue = _hashValue, let otherHashValue = other._hashValue {
+            return hashValue == otherHashValue
+        } else {
+            guard items.count == other.items.count else {
+                return false
+            }
+            
+            guard model.id == other.model.id else {
+                return false
+            }
+            
+            for (item, otherItem) in zip(items, other.items) {
+                guard item.id == otherItem.id else {
+                    return false
+                }
+            }
+            
+            return true
+        }
     }
 }
 
@@ -51,7 +94,7 @@ extension ListSection: Equatable where Model: Equatable, Item: Equatable {
 }
 
 extension ListSection: Hashable where Model: Hashable, Item: Hashable {
-    public func hash(into hasher: inout Hasher ){
+    public func hash(into hasher: inout Hasher) {
         if Model.self != Never.self {
             hasher.combine(model)
         }
@@ -73,5 +116,18 @@ extension Collection  {
             return self[sectionIndex].items[rowIndex]
         }
     }
+    
+    public func isIdentical<SectionModel: Identifiable, Item: Identifiable>(to other: Self) -> Bool where Element == ListSection<SectionModel, Item> {
+        guard count == other.count else {
+            return false
+        }
+        
+        for (element, otherElement) in zip(self, other) {
+            guard element.isIdentical(to: otherElement) else {
+                return false
+            }
+        }
+        
+        return true
+    }
 }
-
