@@ -10,7 +10,7 @@ public class Screen: ObservableObject {
     public static let main = Screen()
     
     private let notificationCenter = NotificationCenter.default
-        
+    
     public var bounds: CGRect  {
         #if os(iOS) || os(tvOS)
         return UIScreen.main.bounds
@@ -30,11 +30,11 @@ public class Screen: ObservableObject {
         return WKInterfaceDevice.current().screenScale
         #endif
     }
-
+    
     var orientationObserver: NSObjectProtocol?
     
     private init() {
-        #if os(iOS) 
+        #if os(iOS)
         orientationObserver = notificationCenter.addObserver(
             forName: UIDevice.orientationDidChangeNotification,
             object: nil,
@@ -48,5 +48,15 @@ public class Screen: ObservableObject {
     
     deinit {
         orientationObserver.map(notificationCenter.removeObserver(_:))
+    }
+}
+
+extension EnvironmentValues {
+    public var screen: Screen {
+        get {
+            self[DefaultEnvironmentKey<Screen>] ?? .main
+        } set {
+            self[DefaultEnvironmentKey<Screen>] = newValue
+        }
     }
 }

@@ -46,59 +46,24 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        let oldContentSize = uiViewController.tableView.contentSize
-        let isDirty = uiViewController.data.isIdentical(to: data)
+        let isDirty = !uiViewController.data.isIdentical(to: data)
+        
+        if !uiViewController.isDataDirty {
+            uiViewController.isDataDirty = isDirty
+        }
         
         uiViewController.data = data
         uiViewController.sectionHeader = sectionHeader
         uiViewController.sectionFooter = sectionFooter
         uiViewController.rowContent = rowContent
+        
+        uiViewController.initialContentAlignment = initialContentAlignment
         uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
         uiViewController.tableView.separatorStyle = separatorStyle
         
-        uiViewController.tableView.reloadData()
-        
-        if isDirty {
-            if !uiViewController.isInitialContentAlignmentSet {
-                uiViewController.tableView.invalidateIntrinsicContentSize()
-                uiViewController.tableView.setNeedsLayout()
-                uiViewController.tableView.layoutIfNeeded()
-                
-                if uiViewController.tableView.contentSize.minimumDimensionLength != .zero && uiViewController.tableView.frame.minimumDimensionLength != .zero  {
-                    uiViewController.tableView.setContentAlignment(initialContentAlignment, animated: false)
-                    
-                    uiViewController.isInitialContentAlignmentSet = true
-                }
-            } else if oldContentSize.minimumDimensionLength != 0 {
-                guard initialContentAlignment.horizontal == .trailing || initialContentAlignment.vertical == .bottom else {
-                    return
-                }
-                
-                uiViewController.tableView.invalidateIntrinsicContentSize()
-                uiViewController.tableView.setNeedsLayout()
-                uiViewController.tableView.layoutIfNeeded()
-                
-                let contentSize = uiViewController.tableView.contentSize
-                
-                if contentSize != oldContentSize {
-                    var newContentOffset = uiViewController.tableView.contentOffset
-                    
-                    if initialContentAlignment.horizontal == .trailing {
-                        newContentOffset.x += contentSize.width - oldContentSize.width
-                    }
-                    
-                    if initialContentAlignment.vertical == .bottom {
-                        newContentOffset.y += contentSize.height - oldContentSize.height
-                    }
-                    
-                    if newContentOffset != uiViewController.tableView.contentOffset {
-                        uiViewController.tableView.setContentOffset(newContentOffset, animated: false)
-                    }
-                }
-            }
-        }
+        uiViewController.reloadData()
     }
 }
 

@@ -30,7 +30,7 @@ extension UserDefaults {
     
     public func encode<Value: Codable>(_ value: Value?, forKey key: String) throws {
         if let value = value {
-           try encode(value, forKey: key)
+            try encode(value, forKey: key)
         } else {
             removeObject(forKey: key)
         }
