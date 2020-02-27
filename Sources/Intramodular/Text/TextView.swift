@@ -86,8 +86,6 @@ extension _TextView: UIViewRepresentable {
         
         func textViewDidChange(_ textView: UITextView) {
             view.text = textView.text
-            
-            view.onEditingChanged(true)
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
@@ -172,12 +170,11 @@ extension _TextView: NSViewRepresentable {
             }
             
             view.text = textView.string
-            
-            view.onEditingChanged(true)
         }
         
         func textDidEndEditing(_ notification: Notification) {
-            view.onEditingChanged(true)
+            view.onEditingChanged(false)
+            view.onCommit()
         }
     }
     

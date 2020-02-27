@@ -78,6 +78,10 @@ public struct _CocoaTextField: UIViewRepresentable {
             self.base = base
         }
         
+        public func textFieldDidBeginEditing(_ textField: UITextField) {
+            base.onEditingChanged(true)
+        }
+        
         public func textFieldDidChangeSelection(_ textField: UITextField) {
             base.text = textField.text ?? ""
         }

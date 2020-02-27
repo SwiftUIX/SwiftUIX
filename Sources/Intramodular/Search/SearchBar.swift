@@ -65,8 +65,6 @@ public struct SearchBar: UIViewRepresentable {
         
         public func searchBar(_ searchBar: UIViewType, textDidChange searchText: String) {
             base.text = searchText
-            
-            base.onEditingChanged(true)
         }
         
         public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
