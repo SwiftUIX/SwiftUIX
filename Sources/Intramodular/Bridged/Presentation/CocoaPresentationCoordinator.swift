@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-@objc public class CocoaPresentationCoordinator: NSObject {
+@objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     private let presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
@@ -91,9 +91,12 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 presentation: modal,
                 coordinator: .init(presentation: modal)
             ),
-            animated: modal.animated,
-            completion: modal.completion
-        )
+            animated: modal.animated
+        ) {
+            modal.completion()
+            
+            self.objectWillChange.send()
+        }
     }
     
     private func dismiss(animated: Bool, completion: @escaping () -> Void) {
@@ -143,21 +146,35 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-        
+        objectWillChange.send()
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         presentation?.onDismiss()
+        
+        presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
     }
 }
 
 // MARK: - Helpers -
 
-extension View {
-    func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
-        self
+struct CocoaPresentationCoordinatorAttacher: ViewModifier {
+    @ObservedObject var coordinator: CocoaPresentationCoordinator
+    
+    func body(content: Content) -> some View {
+        content
             .environment(\.dynamicViewPresenter, coordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
+    }
+}
+
+extension View {
+    func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
+        coordinator.ifSome { coordinator in
+            modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
+        }.else {
+            self
+        }
     }
 }
 
