@@ -158,19 +158,10 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
 
 // MARK: - Helpers -
 
-struct CocoaPresentationCoordinatorAttacher: ViewModifier {
-    var coordinator: CocoaPresentationCoordinator?
-    
-    func body(content: Content) -> some View {
-        content
-            .environment(\.dynamicViewPresenter, coordinator)
-            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
-    }
-}
-
 extension View {
     func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
-        modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
+        environment(\.dynamicViewPresenter, coordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
     }
 }
 

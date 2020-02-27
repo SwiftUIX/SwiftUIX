@@ -160,11 +160,13 @@ public struct _CocoaTextField: UIViewRepresentable {
         uiView.text = text
         uiView.textAlignment = .init(textAlignment)
         
-        if let isFirstResponder = isFirstResponder, uiView.window != nil {
-            if isFirstResponder && !uiView.isFirstResponder {
-                uiView.becomeFirstResponder()
-            } else if !isFirstResponder && uiView.isFirstResponder {
-                uiView.resignFirstResponder()
+        DispatchQueue.main.async {
+            if let isFirstResponder = self.isFirstResponder, uiView.window != nil {
+                if isFirstResponder && !uiView.isFirstResponder {
+                    uiView.becomeFirstResponder()
+                } else if !isFirstResponder && uiView.isFirstResponder {
+                    uiView.resignFirstResponder()
+                }
             }
         }
     }
