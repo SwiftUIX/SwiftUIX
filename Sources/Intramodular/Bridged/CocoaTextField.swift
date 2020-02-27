@@ -25,7 +25,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var textAlignment: TextAlignment = .leading
     
     @Environment(\.font) var environmentFont
-
+    
     public var body: some View {
         return ZStack(alignment: .topLeading) {
             if placeholder == nil {
@@ -99,7 +99,9 @@ public struct _CocoaTextField: UIViewRepresentable {
             return true
         }
         
-        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {            
+        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            textField.resignFirstResponder()
+            
             return true
         }
     }
@@ -161,7 +163,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         if let isFirstResponder = isFirstResponder, uiView.window != nil {
             if isFirstResponder && !uiView.isFirstResponder {
                 uiView.becomeFirstResponder()
-            } else if uiView.isFirstResponder {
+            } else if !isFirstResponder && uiView.isFirstResponder {
                 uiView.resignFirstResponder()
             }
         }

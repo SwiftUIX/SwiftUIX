@@ -159,7 +159,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
 // MARK: - Helpers -
 
 struct CocoaPresentationCoordinatorAttacher: ViewModifier {
-    @ObservedObject var coordinator: CocoaPresentationCoordinator
+    var coordinator: CocoaPresentationCoordinator?
     
     func body(content: Content) -> some View {
         content
@@ -170,11 +170,7 @@ struct CocoaPresentationCoordinatorAttacher: ViewModifier {
 
 extension View {
     func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
-        coordinator.ifSome { coordinator in
-            modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
-        }.else {
-            self
-        }
+        modifier(CocoaPresentationCoordinatorAttacher(coordinator: coordinator))
     }
 }
 

@@ -390,11 +390,11 @@ extension UIHostingTableViewController {
             self.tableView.layer.removeAllAnimations()
             self.tableView.contentOffset = newContentOffset
             
-            DispatchQueue.main.async {
-                self.tableView.contentOffset = newContentOffset
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.contentOffset = newContentOffset
                 
-                self.lastContentOffset = nil
-                self.isDataDirty = false
+                self?.lastContentOffset = nil
+                self?.isDataDirty = false
             }
         }
     }
