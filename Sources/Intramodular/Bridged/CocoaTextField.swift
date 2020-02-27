@@ -99,7 +99,8 @@ public struct _CocoaTextField: UIViewRepresentable {
             return true
         }
         
-        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {            base.onCommit()
+        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            base.onCommit()
             
             return true
         }
