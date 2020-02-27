@@ -24,10 +24,14 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var placeholder: String?
     private var textAlignment: TextAlignment = .leading
     
+    @Environment(\.font) var environmentFont
+
     public var body: some View {
         return ZStack(alignment: .topLeading) {
             if placeholder == nil {
-                label.opacity(text.wrappedValue.isEmpty ? 1.0 : 0.0)
+                label
+                    .font(font.map(Font.init) ?? environmentFont)
+                    .opacity(text.wrappedValue.isEmpty ? 1.0 : 0.0)
             }
             
             _CocoaTextField(
@@ -248,7 +252,10 @@ extension CocoaTextField where Label == Text {
     }
     
     public func placeholder(_ placeholder: String) -> Self {
-        then({ $0.label = Text(placeholder).kerning(kerning) })
+        then {
+            $0.label = Text(placeholder).kerning(kerning)
+            $0.placeholder = placeholder
+        }
     }
 }
 
