@@ -40,6 +40,8 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        let coordinator = context.coordinator
+        
         uiView.isScrollEnabled = isScrollEnabled
         uiView.showsVerticalScrollIndicator = showsIndicators && axes.contains(.vertical)
         uiView.showsHorizontalScrollIndicator = showsIndicators && axes.contains(.horizontal)
@@ -47,9 +49,13 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         var configuration = self.configuration
         
         #if os(iOS) || targetEnvironment(macCatalyst)
-        configuration.setupRefreshControl = {
+        configuration.setupRefreshControl = { [weak coordinator] in
+            guard let coordinator = coordinator else {
+                return
+            }
+            
             $0.addTarget(
-                context.coordinator,
+                coordinator,
                 action: #selector(Coordinator.refreshChanged),
                 for: .valueChanged
             )

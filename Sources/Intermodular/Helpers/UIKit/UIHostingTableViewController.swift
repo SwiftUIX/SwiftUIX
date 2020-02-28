@@ -17,7 +17,7 @@ public class UIHostingTableView: UITableView {
             super.contentOffset =  newValue
         }
     }
-
+    
     override public var contentOffset: CGPoint {
         get {
             super.contentOffset
@@ -48,7 +48,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
             #if os(iOS) || targetEnvironment(macCatalyst)
-            scrollViewConfiguration.setupRefreshControl = {
+            scrollViewConfiguration.setupRefreshControl = { [weak self] in
+                guard let `self` = self else  {
+                    return
+                }
+                
                 $0.addTarget(
                     self,
                     action: #selector(self.refreshChanged),
