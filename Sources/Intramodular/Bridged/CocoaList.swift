@@ -48,8 +48,8 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         let isDirty = !uiViewController.data.isIdentical(to: data)
         
-        if !uiViewController.isDataDirty {
-            uiViewController.isDataDirty = isDirty
+        if isDirty {
+            uiViewController.isDataDirty = true
         }
         
         uiViewController.data = data
