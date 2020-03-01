@@ -16,9 +16,11 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         var transitionType: PresentationTransitionType?
         
         var body: some View {
-            content
-                .environment(\.presentationTransitionType, transitionType)
-                .attach(presentationCoordinator)
+            CocoaHostingControllerContent(
+                content: content
+                    .environment(\.presentationTransitionType, transitionType),
+                presentationCoordinator: presentationCoordinator
+            )
         }
     }
     

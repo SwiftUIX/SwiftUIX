@@ -50,7 +50,7 @@ import SwiftUI
         self.viewController = viewController
     }
     
-    func setIsInActivePresentation(_ isActive: Bool) {
+    func setIsInPresentation(_ isActive: Bool) {
         viewController.isModalInPresentation = isActive
     }
 }
@@ -158,10 +158,19 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
 
 // MARK: - Helpers -
 
-extension View {
-    func attach(_ coordinator: CocoaPresentationCoordinator?) -> some View {
-        environment(\.dynamicViewPresenter, coordinator)
-            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
+extension CocoaPresentationCoordinator {
+    struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        static let defaultValue: CocoaPresentationCoordinator? = nil
+    }
+}
+
+extension EnvironmentValues {
+    public var cocoaPresentationCoordinator: CocoaPresentationCoordinator? {
+        get {
+            self[CocoaPresentationCoordinator.EnvironmentKey]
+        } set {
+            self[CocoaPresentationCoordinator.EnvironmentKey] = newValue
+        }
     }
 }
 

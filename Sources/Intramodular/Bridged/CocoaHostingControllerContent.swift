@@ -10,16 +10,18 @@ import SwiftUI
 public struct CocoaHostingControllerContent<Content: View>: View  {
     var content: Content
     
-    let presentationCoordinator: CocoaPresentationCoordinator
+    var presentationCoordinator: CocoaPresentationCoordinator?
     
-    init(content: Content, presentationCoordinator: CocoaPresentationCoordinator) {
+    init(content: Content, presentationCoordinator: CocoaPresentationCoordinator?) {
         self.content = content
         self.presentationCoordinator = presentationCoordinator
     }
     
     public var body: some View {
-        content.attach(presentationCoordinator)
-        
+        content
+            .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
+            .environment(\.dynamicViewPresenter, presentationCoordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))
     }
 }
 

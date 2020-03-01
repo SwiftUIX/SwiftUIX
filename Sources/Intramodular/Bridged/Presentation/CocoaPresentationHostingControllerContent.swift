@@ -8,7 +8,9 @@ import Swift
 import SwiftUI
 import UIKit
 
-public struct CocoaPresentationHostingControllerContent: View  {
+public struct CocoaPresentationHostingControllerContent: View {
+    @Environment(\.cocoaPresentationCoordinator) var coordinator
+    
     var presentation: AnyModalPresentation
     
     init(presentation: AnyModalPresentation) {
@@ -16,7 +18,11 @@ public struct CocoaPresentationHostingControllerContent: View  {
     }
     
     public var body: some View {
-        presentation.content()
+        presentation
+            .content()
+            .onPreferenceChange(IsModalInPresentation.self, perform: {
+                self.coordinator?.setIsInPresentation($0)
+            })
     }
 }
 
