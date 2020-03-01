@@ -26,9 +26,8 @@ public struct VisualEffectView<Content: View>: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        let hostingView = uiView.contentView.subviews.first as! UIHostingView<Content>
-        
-        hostingView.rootView = rootView
+        (uiView.contentView.subviews.first as! UIHostingView<Content>).rootView = rootView
+        uiView.effect = effect
     }
 }
 
