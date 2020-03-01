@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 public struct ListSection<Model, Item> {
-    private let _hashValue: Int?
+    private let _id: Int?
     private let _model: Model!
     
     public var model: Model {
@@ -19,7 +19,7 @@ public struct ListSection<Model, Item> {
         model: Model,
         items: [Item]
     ) {
-        self._hashValue = nil
+        self._id = nil
         self._model = model
         self.items = items
     }
@@ -43,13 +43,13 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
             hasher.combine($0.id)
         }
         
-        self._hashValue = hasher.finalize()
+        self._id = hasher.finalize()
     }
 }
 
 extension ListSection where Model == Never {
     public init(items: [Item]) {
-        self._hashValue = nil
+        self._id = nil
         self._model = nil
         self.items = items
     }
@@ -61,8 +61,8 @@ extension ListSection where Model == Never {
 
 extension ListSection where Model: Identifiable, Item: Identifiable {
     public func isIdentical(to other: Self) -> Bool {
-        if let hashValue = _hashValue, let otherHashValue = other._hashValue {
-            return hashValue == otherHashValue
+        if let id = _id, let otherId = other._id {
+            return id == otherId
         } else {
             guard items.count == other.items.count else {
                 return false
@@ -104,6 +104,20 @@ extension ListSection: Hashable where Model: Hashable, Item: Hashable {
         }
         
         hasher.combine(items)
+    }
+}
+
+extension ListSection: Identifiable where Model: Identifiable, Item: Identifiable {
+    public var id: Int {
+        var hasher = Hasher()
+        
+        if Model.self != Never.self {
+            hasher.combine(model.id)
+        }
+        
+        items.forEach({ hasher.combine($0.id) })
+        
+        return hasher.finalize()
     }
 }
 
