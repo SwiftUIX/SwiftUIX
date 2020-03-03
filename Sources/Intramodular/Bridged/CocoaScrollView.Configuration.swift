@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceVertical: Bool = false
     var alwaysBounceHorizontal: Bool = false
@@ -18,10 +20,9 @@ struct CocoaScrollViewConfiguration<Content: View> {
     var setupRefreshControl: ((UIRefreshControl) -> Void)?
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if !os(tvOS)
 
 extension UIRefreshControl {
-    @available(tvOS, unavailable)
     func refreshChanged<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
@@ -32,6 +33,8 @@ extension UIRefreshControl {
         }
     }
 }
+
+#endif
 
 extension UIScrollView {
     func configure<Content: View>(

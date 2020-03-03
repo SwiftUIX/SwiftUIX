@@ -17,7 +17,11 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     private let rowContent: (Item) -> RowContent
     
     private var style: UITableView.Style = .plain
+    
+    #if !os(tvOS)
     private var separatorStyle: UITableViewCell.SeparatorStyle = .singleLine
+    #endif
+    
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
     @Environment(\.initialContentAlignment) var initialContentAlignment
@@ -61,7 +65,10 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
+        
+        #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
+        #endif
         
         uiViewController.reloadData()
     }
@@ -144,9 +151,11 @@ extension CocoaList {
         then({ $0.style = style })
     }
     
+    #if !os(tvOS)
     public func listSeparatorStyle(_ separatorStyle: UITableViewCell.SeparatorStyle) -> Self {
         then({ $0.separatorStyle = separatorStyle })
     }
+    #endif
 }
 
 extension CocoaList {

@@ -99,7 +99,6 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     var isInitialContentAlignmentSet: Bool = false
     var lastContentOffset: CGPoint? = nil
-    var lastFlippedContentOffset: CGPoint? = nil
     
     var isContentOffsetDirty: Bool = false {
         didSet {
@@ -109,7 +108,6 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             
             if isContentOffsetDirty {
                 lastContentOffset = tableView.contentOffset
-                lastFlippedContentOffset = tableView.flippedContentOffset
             } else {
                 lastContentOffset = nil
             }
@@ -371,10 +369,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         nil
     }
     
-    @available(tvOS, unavailable)
+    #if !os(tvOS)
     @objc public func refreshChanged(_ control: UIRefreshControl) {
         control.refreshChanged(with: scrollViewConfiguration)
     }
+    #endif
 }
 
 extension UIHostingTableViewController {
@@ -441,14 +440,24 @@ extension UIHostingTableViewController {
             isInitialContentAlignmentSet = true
             isContentOffsetDirty = false
         } else {
-            guard let lastFlippedContentOffset = lastFlippedContentOffset, oldContentSize.minimumDimensionLength != .zero else {
+            guard let lastContentOffset = lastContentOffset, oldContentSize.minimumDimensionLength != .zero else {
                 return
             }
             
-            self.tableView.flippedContentOffset = lastFlippedContentOffset
+            var newContentOffset = lastContentOffset
+            
+            if initialContentAlignment.horizontal == .trailing {
+                newContentOffset.x += newContentSize.width - oldContentSize.width
+            }
+            
+            if initialContentAlignment.vertical == .bottom {
+                newContentOffset.y += newContentSize.height - oldContentSize.height
+            }
+            
+            self.tableView.contentOffset = newContentOffset
             
             DispatchQueue.main.async { [weak self] in
-                self?.tableView.flippedContentOffset = lastFlippedContentOffset
+                self?.tableView.contentOffset = newContentOffset
                 
                 DispatchQueue.main.async { [weak self] in
                     self?.isContentOffsetDirty = false

@@ -137,10 +137,11 @@ extension CocoaScrollView {
             self.base = base
         }
         
-        @available(tvOS, unavailable)
+        #if !os(tvOS)
         @objc public func refreshChanged(_ control: UIRefreshControl) {
             control.refreshChanged(with: base.configuration)
         }
+        #endif
         
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             base.configuration.onOffsetChange(

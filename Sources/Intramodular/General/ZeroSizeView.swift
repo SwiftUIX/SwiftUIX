@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 import Swift
 import SwiftUI
 
@@ -20,3 +22,5 @@ public struct ZeroSizeView: AppKitOrUIKitViewRepresentable {
         
     }
 }
+
+#endif
