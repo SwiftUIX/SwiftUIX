@@ -5,7 +5,7 @@
 import SwiftUI
 
 extension ScrollView {
-    public struct Offset {
+    public struct ContentOffset {
         public enum Origin {
             case topLeading
             case bottomTrailing
@@ -17,7 +17,7 @@ extension ScrollView {
     }
 }
 
-extension ScrollView.Offset {
+extension ScrollView.ContentOffset {
     public var absoluteContentAlignment: Alignment? {
         switch contentOffset {
             case contentOffset(for: .center):
@@ -69,7 +69,7 @@ extension ScrollView.Offset {
     }
 }
 
-extension ScrollView.Offset {
+extension ScrollView.ContentOffset {
     private func contentOffset(for alignment: Alignment) -> CGPoint {
         var offset: CGPoint = .zero
         
@@ -106,11 +106,11 @@ extension ScrollView.Offset {
 extension UIScrollView {
     func contentOffset<Content: View>(
         forContentType type: Content.Type
-    ) -> ScrollView<Content>.Offset {
+    ) -> ScrollView<Content>.ContentOffset {
         .init(containerBounds: bounds, contentSize: contentSize, contentOffset: contentOffset)
     }
     
-    func setContentOffset<Content: View>(_ offset: ScrollView<Content>.Offset, animated: Bool) {
+    func setContentOffset<Content: View>(_ offset: ScrollView<Content>.ContentOffset, animated: Bool) {
         setContentOffset(offset.contentOffset, animated: animated)
     }
     

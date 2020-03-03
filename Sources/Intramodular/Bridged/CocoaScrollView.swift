@@ -9,7 +9,7 @@ import SwiftUI
 
 /// A SwiftUI port of `UIScrollView`.
 public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
-    public typealias Offset = ScrollView<Content>.Offset
+    public typealias Offset = ScrollView<Content>.ContentOffset
     public typealias UIViewType = UIScrollView
     
     private let content: Content

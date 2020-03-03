@@ -10,7 +10,7 @@ struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceHorizontal: Bool = false
     var isPagingEnabled: Bool = false
     var isDirectionalLockEnabled: Bool = false
-    var onOffsetChange: (ScrollView<Content>.Offset) -> () = { _ in }
+    var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in }
     var onRefresh: (() -> Void)?
     var isRefreshing: Bool?
     
