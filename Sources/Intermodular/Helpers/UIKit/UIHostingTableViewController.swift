@@ -7,38 +7,6 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableView: UITableView {
-    var isContentOffsetDirty: Bool = false
-    
-    var _super_contentOffset: CGPoint {
-        get {
-            super.contentOffset
-        } set {
-            super.contentOffset =  newValue
-        }
-    }
-    
-    override public var contentOffset: CGPoint {
-        get {
-            super.contentOffset
-        } set {
-            guard !isContentOffsetDirty else {
-                return
-            }
-            
-            super.contentOffset =  newValue
-        }
-    }
-    
-    override public func setContentOffset(_ contentOffset: CGPoint, animated: Bool) {
-        guard !isContentOffsetDirty else {
-            return
-        }
-        
-        super.setContentOffset(contentOffset, animated: animated)
-    }
-}
-
 public class UIHostingTableViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, Item> {
     var data: Data
     var sectionHeader: (SectionModel) -> SectionHeader
@@ -64,17 +32,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             tableView?.configure(with: scrollViewConfiguration)
         }
     }
-    
-    var isContentOffsetCorrectionEnabled: Bool {
-        if initialContentAlignment.horizontal == .trailing || initialContentAlignment.vertical == .bottom {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    var isObservingContentSize: Bool = false
-    
+        
     var initialContentAlignment: Alignment! {
         didSet {
             guard oldValue != initialContentAlignment else {
@@ -98,17 +56,27 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     }
     
     var isInitialContentAlignmentSet: Bool = false
+    
+    var isContentOffsetCorrectionEnabled: Bool {
+        if initialContentAlignment.horizontal == .trailing || initialContentAlignment.vertical == .bottom {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    var isObservingContentSize: Bool = false
+
+    var lastContentSize: CGSize? = nil
     var lastContentOffset: CGPoint? = nil
     
     var isContentOffsetDirty: Bool = false {
         didSet {
-            guard oldValue != isContentOffsetDirty else {
-                return
-            }
-            
             if isContentOffsetDirty {
+                lastContentSize = tableView.contentSize
                 lastContentOffset = tableView.contentOffset
             } else {
+                lastContentSize = nil
                 lastContentOffset = nil
             }
         }
@@ -369,11 +337,24 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         nil
     }
     
-    #if !os(tvOS)
+    @available(tvOS, unavailable)
     @objc public func refreshChanged(_ control: UIRefreshControl) {
         control.refreshChanged(with: scrollViewConfiguration)
     }
-    #endif
+    
+    override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        if let lastContentSize = lastContentSize {
+            if initialContentAlignment.horizontal == .trailing {
+                tableView.contentOffset.x += tableView.contentSize.width - lastContentSize.width
+            }
+            
+            if initialContentAlignment.vertical == .bottom {
+                tableView.contentOffset.y += tableView.contentSize.height - lastContentSize.height
+            }
+        }
+    }
 }
 
 extension UIHostingTableViewController {
@@ -434,6 +415,10 @@ extension UIHostingTableViewController {
             return
         }
         
+        defer {
+            lastContentSize = newContentSize
+        }
+        
         if !isInitialContentAlignmentSet {
             tableView.setContentAlignment(initialContentAlignment, animated: false)
             
@@ -454,14 +439,12 @@ extension UIHostingTableViewController {
                 newContentOffset.y += newContentSize.height - oldContentSize.height
             }
             
-            self.tableView.contentOffset = newContentOffset
+            tableView.contentOffset = newContentOffset
+            
+            self.lastContentOffset = tableView.contentOffset
             
             DispatchQueue.main.async { [weak self] in
-                self?.tableView.contentOffset = newContentOffset
-                
-                DispatchQueue.main.async { [weak self] in
-                    self?.isContentOffsetDirty = false
-                }
+                self?.isContentOffsetDirty = false
             }
         }
     }
