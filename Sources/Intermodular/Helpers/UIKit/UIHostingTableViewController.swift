@@ -99,11 +99,17 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     var isInitialContentAlignmentSet: Bool = false
     var lastContentOffset: CGPoint? = nil
+    var lastFlippedContentOffset: CGPoint? = nil
     
     var isContentOffsetDirty: Bool = false {
         didSet {
+            guard oldValue != isContentOffsetDirty else {
+                return
+            }
+            
             if isContentOffsetDirty {
                 lastContentOffset = tableView.contentOffset
+                lastFlippedContentOffset = tableView.flippedContentOffset
             } else {
                 lastContentOffset = nil
             }
@@ -241,7 +247,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         return max(1, height)
     }
-        
+    
     override public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard SectionHeader.self != Never.self else {
             return nil
@@ -284,7 +290,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         return max(1, height)
     }
-
+    
     override public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         guard SectionFooter.self != Never.self else {
             return nil
@@ -435,25 +441,18 @@ extension UIHostingTableViewController {
             isInitialContentAlignmentSet = true
             isContentOffsetDirty = false
         } else {
-            guard let lastContentOffset = lastContentOffset, oldContentSize.minimumDimensionLength != .zero else {
+            guard let lastFlippedContentOffset = lastFlippedContentOffset, oldContentSize.minimumDimensionLength != .zero else {
                 return
             }
             
-            var newContentOffset = lastContentOffset
-            
-            if initialContentAlignment.horizontal == .trailing {
-                newContentOffset.x += newContentSize.width - oldContentSize.width
-            }
-            
-            if initialContentAlignment.vertical == .bottom {
-                newContentOffset.y += newContentSize.height - oldContentSize.height
-            }
-            
-            self.tableView.contentOffset = newContentOffset
+            self.tableView.flippedContentOffset = lastFlippedContentOffset
             
             DispatchQueue.main.async { [weak self] in
-                self?.tableView.contentOffset = newContentOffset
-                self?.isContentOffsetDirty = false
+                self?.tableView.flippedContentOffset = lastFlippedContentOffset
+                
+                DispatchQueue.main.async { [weak self] in
+                    self?.isContentOffsetDirty = false
+                }
             }
         }
     }
