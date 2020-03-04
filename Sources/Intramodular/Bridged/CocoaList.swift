@@ -65,10 +65,11 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
         uiViewController.tableView.isScrollEnabled = isScrollEnabled
-        
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif
+        
+        uiViewController.tableView.configure(with: scrollViewConfiguration)
         
         uiViewController.reloadData()
     }
