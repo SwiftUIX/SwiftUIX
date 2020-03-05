@@ -441,10 +441,11 @@ extension UIHostingTableViewController {
             
             tableView.contentOffset = newContentOffset
             
-            self.lastContentOffset = tableView.contentOffset
+            self.lastContentOffset = newContentOffset
             
-            DispatchQueue.main.async { [weak self] in
-                self?.isContentOffsetDirty = false
+            DispatchQueue.main.async {
+                self.tableView.contentOffset = newContentOffset
+                self.isContentOffsetDirty = false
             }
         }
     }
