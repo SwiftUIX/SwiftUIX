@@ -62,6 +62,10 @@ public typealias AppKitOrUIKitView = UIView
 public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
 
+#elseif os(watchOS)
+
+public typealias AppKitOrUIKitImage = UIImage
+
 #endif
 
 // MARK: - Helpers -

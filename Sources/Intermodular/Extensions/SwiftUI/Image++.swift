@@ -11,6 +11,14 @@ extension Image {
         case jpeg(compressionQuality: CGFloat)
     }
     
+    public init(image: AppKitOrUIKitImage) {
+        #if os(macOS)
+        self.init(nsImage: image)
+        #else
+        self.init(uiImage: image)
+        #endif
+    }
+    
     /// Initializes and returns the image with the specified data.
     public init?(data: Data) {
         #if os(macOS)

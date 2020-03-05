@@ -337,10 +337,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         nil
     }
     
-    @available(tvOS, unavailable)
+    #if !os(tvOS)
     @objc public func refreshChanged(_ control: UIRefreshControl) {
         control.refreshChanged(with: scrollViewConfiguration)
     }
+    #endif
     
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
