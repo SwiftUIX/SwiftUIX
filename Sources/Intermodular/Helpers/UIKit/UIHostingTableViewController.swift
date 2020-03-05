@@ -392,9 +392,15 @@ extension UIHostingTableViewController {
     }
     
     func reloadData() {
-        if isDataDirty {
-            tableView.reloadData()
+        guard isDataDirty else {
+            tableView.beginUpdates()
+            tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [], with: .none)
+            tableView.endUpdates()
+            
+            return
         }
+
+        tableView.reloadData()
     }
 }
 
