@@ -19,6 +19,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var autocapitalization: UITextAutocapitalizationType?
     private var font: UIFont?
     private var inputAccessoryView: AnyView?
+    private var inputView: AnyView?
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
@@ -42,6 +43,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 autocapitalization: autocapitalization,
                 font: font,
                 inputAccessoryView: inputAccessoryView,
+                inputView: inputView,
                 kerning: kerning,
                 keyboardType: keyboardType,
                 placeholder: placeholder,
@@ -66,6 +68,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var autocapitalization: UITextAutocapitalizationType?
     var font: UIFont?
     var inputAccessoryView: AnyView?
+    var inputView: AnyView?
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
@@ -138,6 +141,17 @@ public struct _CocoaTextField: UIViewRepresentable {
             }
         } else {
             uiView.inputAccessoryView = nil
+        }
+
+        if let inputView = inputView {
+            if let _inputView = uiView.inputView as? UIHostingView<AnyView> {
+                _inputView.rootView = inputView
+            } else {
+                uiView.inputView = UIHostingView(rootView: inputView)
+                uiView.inputView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            }
+        } else {
+            uiView.inputView = nil
         }
         
         uiView.keyboardType = keyboardType
@@ -237,6 +251,10 @@ extension CocoaTextField {
         then({ $0.inputAccessoryView = .init(view) })
     }
     
+    public func inputView<InputView: View>(_ view: InputView) -> Self {
+        then({ $0.inputView = .init(view) })
+    }
+
     public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
         then({ $0.inputAccessoryView = .init(view()) })
     }
