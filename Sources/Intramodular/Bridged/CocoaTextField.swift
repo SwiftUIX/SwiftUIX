@@ -14,6 +14,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
     
+    private var isInitialFirstResponder: Bool?
     private var isFirstResponder: Bool?
     
     private var autocapitalization: UITextAutocapitalizationType?
@@ -39,6 +40,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 text: text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
+                isInitialFirstResponder: isInitialFirstResponder,
                 isFirstResponder: isFirstResponder,
                 autocapitalization: autocapitalization,
                 font: font,
@@ -56,15 +58,14 @@ public struct CocoaTextField<Label: View>: CocoaView {
 public struct _CocoaTextField: UIViewRepresentable {
     public typealias UIViewType = UITextField
     
+    @Environment(\.font) var environmentFont
+
     @Binding var text: String
     
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
-    
-    @Environment(\.font) var environmentFont
-    
+    var isInitialFirstResponder: Bool?
     var isFirstResponder: Bool?
-    
     var autocapitalization: UITextAutocapitalizationType?
     var font: UIFont?
     var inputAccessoryView: AnyView?
@@ -114,6 +115,10 @@ public struct _CocoaTextField: UIViewRepresentable {
         
         uiView.delegate = context.coordinator
         
+        if let isFirstResponder = isInitialFirstResponder, isFirstResponder {
+            uiView.becomeFirstResponder()
+        }
+        
         return uiView
     }
     
@@ -142,7 +147,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         } else {
             uiView.inputAccessoryView = nil
         }
-
+        
         if let inputView = inputView {
             if let _inputView = uiView.inputView as? UIHostingView<AnyView> {
                 _inputView.rootView = inputView
@@ -233,6 +238,10 @@ extension CocoaTextField where Label == Text {
 }
 
 extension CocoaTextField {
+    public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
+        then({ $0.isInitialFirstResponder = isInitialFirstResponder })
+    }
+    
     public func isFirstResponder(_ isFirstResponder: Bool) -> Self {
         then({ $0.isFirstResponder = isFirstResponder })
     }
@@ -254,7 +263,7 @@ extension CocoaTextField {
     public func inputView<InputView: View>(_ view: InputView) -> Self {
         then({ $0.inputView = .init(view) })
     }
-
+    
     public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
         then({ $0.inputAccessoryView = .init(view()) })
     }

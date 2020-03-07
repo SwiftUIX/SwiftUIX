@@ -64,6 +64,11 @@ public typealias AppKitOrUIKitWindow = UIWindow
 
 #elseif os(watchOS)
 
+import UIKit
+import WatchKit
+
+public typealias AppKitOrUIKitColor = UIColor
+public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitImage = UIImage
 
 #endif

@@ -8,6 +8,8 @@ import Combine
 import SwiftUI
 
 private struct KeyboardAvoiding: ViewModifier {
+    let animation: Animation?
+    
     @State var keyboardHeight: CGFloat = 0
     
     var isActive: Bool {
@@ -32,15 +34,15 @@ private struct KeyboardAvoiding: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(.bottom, keyboardHeight)
-            .animation(.spring())
+            .animation(animation)
             .onReceive(keyBoardHeightPublisher, perform: { self.keyboardHeight = $0 })
             .edgesIgnoringSafeArea(isActive ? [.bottom] : [])
     }
 }
 
 extension View {
-    public func keyboardAvoiding() -> some View {
-        modifier(KeyboardAvoiding())
+    public func keyboardAvoiding(animation: Animation = .spring()) -> some View {
+        modifier(KeyboardAvoiding(animation: animation))
     }
 }
 
