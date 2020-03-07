@@ -34,6 +34,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 label
                     .font(font.map(Font.init) ?? environmentFont)
                     .opacity(text.wrappedValue.isEmpty ? 1.0 : 0.0)
+                    .animation(nil)
             }
             
             _CocoaTextField(
