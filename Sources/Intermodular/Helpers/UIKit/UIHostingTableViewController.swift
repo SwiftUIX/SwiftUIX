@@ -270,6 +270,13 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         view.update()
         
+        let height = cell
+            .contentView
+            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .height
+
+        _rowContentHeightCache[cell.item.id] = height
+        
         return view
     }
     
