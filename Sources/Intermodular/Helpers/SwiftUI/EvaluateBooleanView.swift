@@ -46,9 +46,9 @@ extension Bool {
     public func ifFalse<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         Group {
             if self {
-                content()
-            } else {
                 EmptyView()
+            } else {
+                content()
             }
         }
     }
