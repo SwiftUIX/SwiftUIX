@@ -27,7 +27,7 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
             }
         }
         
-        var displayMode: NavigationBarItem.TitleDisplayMode {
+        var displayMode: NavigationBarItem.TitleDisplayMode? {
             didSet {
                 updateNavigationBar(parent: parent)
             }
@@ -37,7 +37,7 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
             leading: Leading,
             center: Center,
             trailing: Trailing,
-            displayMode: NavigationBarItem.TitleDisplayMode
+            displayMode: NavigationBarItem.TitleDisplayMode?
         ) {
             self.leading = leading
             self.center = center
@@ -63,15 +63,17 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
             }
             
             #if os(iOS) || targetEnvironment(macCatalyst)
-            switch displayMode {
-                case .automatic:
-                    parent.navigationItem.largeTitleDisplayMode = .automatic
-                case .inline:
-                    parent.navigationItem.largeTitleDisplayMode = .never
-                case .large:
-                    parent.navigationItem.largeTitleDisplayMode = .always
-                @unknown default:
-                    parent.navigationItem.largeTitleDisplayMode = .automatic
+            if let displayMode = displayMode {
+                switch displayMode {
+                    case .automatic:
+                        parent.navigationItem.largeTitleDisplayMode = .automatic
+                    case .inline:
+                        parent.navigationItem.largeTitleDisplayMode = .never
+                    case .large:
+                        parent.navigationItem.largeTitleDisplayMode = .always
+                    @unknown default:
+                        parent.navigationItem.largeTitleDisplayMode = .automatic
+                }
             }
             #endif
             
@@ -112,14 +114,13 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
     let leading: Leading
     let center: Center
     let trailing: Trailing
-    
-    let displayMode: NavigationBarItem.TitleDisplayMode
+    let displayMode: NavigationBarItem.TitleDisplayMode?
     
     init(
         leading: Leading,
         center: Center,
         trailing: Trailing,
-        displayMode: NavigationBarItem.TitleDisplayMode
+        displayMode: NavigationBarItem.TitleDisplayMode?
     ) {
         self.leading = leading
         self.center = center
@@ -149,7 +150,7 @@ extension View {
         leading: Leading,
         center: Center,
         trailing: Trailing,
-        displayMode: NavigationBarItem.TitleDisplayMode = .automatic
+        displayMode: NavigationBarItem.TitleDisplayMode? = .automatic
     ) -> some View {
         background(NavigationBarConfigurator(leading: leading, center: center, trailing: trailing, displayMode: displayMode))
     }

@@ -42,4 +42,14 @@ extension Bool {
     public func ifTrue<Content: View>(@ViewBuilder content: () -> Content) -> EvaluateBooleanView<Content> {
         .init(self, content: content)
     }
+    
+    public func ifFalse<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        Group {
+            if self {
+                content()
+            } else {
+                EmptyView()
+            }
+        }
+    }
 }
