@@ -99,7 +99,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
     }
     
-    public func dismiss(animated: Bool, completion: @escaping () -> Void) {
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
         guard isPresenting else {
             return
         }
@@ -113,16 +113,16 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
         
         if viewController.presentedViewController != nil {
-            viewController.dismiss(animated: true) {
+            viewController.dismiss(animated: animated) {
                 self.presentation?.onDismiss()
                 
-                completion()
+                completion?()
             }
         } else if let navigationController = viewController.navigationController {
             navigationController.popToViewController(viewController, animated: animated) {
                 self.presentation?.onDismiss()
                 
-                completion()
+                completion?()
             }
         }
     }

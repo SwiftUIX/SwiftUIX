@@ -12,7 +12,7 @@ public protocol DynamicViewPresenter: PresentationManager {
     
     func present(_ presentation: AnyModalPresentation)
     
-    func dismiss(animated: Bool, completion: @escaping () -> Void)
+    func dismiss(animated: Bool, completion: (() -> Void)?)
     func dismissView(named _: ViewName, completion: @escaping () -> Void)
 }
 
@@ -161,11 +161,7 @@ extension UIViewController: DynamicViewPresenter {
     public var presentedViewName: ViewName? {
         presentationCoordinator.presentedViewName
     }
-    
-    public func dismiss(animated: Bool, completion: @escaping () -> Void) {
-        presentationCoordinator.dismiss(animated: animated, completion: completion)
-    }
-    
+        
     public func present(_ presentation: AnyModalPresentation) {
         presentationCoordinator.present(presentation)
     }
