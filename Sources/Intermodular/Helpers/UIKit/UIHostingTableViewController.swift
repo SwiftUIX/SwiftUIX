@@ -393,11 +393,19 @@ extension UIHostingTableViewController {
     }
     
     func reloadData() {
+        let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+    
         guard isDataDirty else {
             tableView.beginUpdates()
-            tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [], with: .none)
-            tableView.endUpdates()
             
+            for indexPath in indexPathsForVisibleRows {
+                _rowContentHeightCache[data[indexPath].id] = nil
+            }
+
+            tableView.reloadRows(at: indexPathsForVisibleRows, with: .none)
+
+            tableView.endUpdates()
+
             return
         }
         
