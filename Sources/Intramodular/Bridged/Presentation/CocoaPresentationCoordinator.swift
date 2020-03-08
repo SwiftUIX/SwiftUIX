@@ -99,7 +99,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         }
     }
     
-    private func dismiss(animated: Bool, completion: @escaping () -> Void) {
+    public func dismiss(animated: Bool, completion: @escaping () -> Void) {
         guard isPresenting else {
             return
         }
@@ -125,10 +125,6 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 completion()
             }
         }
-    }
-    
-    public func dismiss(completion: @escaping () -> Void) {
-        dismiss(animated: true, completion: completion)
     }
 }
 
