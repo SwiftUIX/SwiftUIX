@@ -32,7 +32,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             tableView?.configure(with: scrollViewConfiguration)
         }
     }
-        
+    
     var initialContentAlignment: Alignment! {
         didSet {
             guard oldValue != initialContentAlignment else {
@@ -66,7 +66,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     }
     
     var isObservingContentSize: Bool = false
-
+    
     var lastContentSize: CGSize? = nil
     var lastContentOffset: CGPoint? = nil
     
@@ -270,13 +270,6 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         view.update()
         
-        let height = cell
-            .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-            .height
-
-        _rowContentHeightCache[cell.item.id] = height
-        
         return view
     }
     
@@ -407,7 +400,7 @@ extension UIHostingTableViewController {
             
             return
         }
-
+        
         tableView.reloadData()
     }
 }
