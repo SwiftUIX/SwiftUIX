@@ -26,12 +26,12 @@ class CocoaAlignHostingTransitionAnimator: NSObject, UIViewControllerAnimatedTra
         let containerView = transitionContext.containerView
         
         let from = transitionContext.viewController(forKey: .from)!
-        let to = transitionContext.viewController(forKey: .to) as! AppKitOrUIKitHostingControllerProtocol
+        let to = transitionContext.viewController(forKey: .to)!
         
         let transitionDuration = self.transitionDuration(using: transitionContext)
         
         if isPresenting {
-            let toSize = to.sizeThatFits(in: containerView.frame.size)
+            let toSize = (to as? AppKitOrUIKitHostingControllerProtocol)?.sizeThatFits(in: containerView.frame.size) ?? to.view.sizeThatFits(containerView.frame.size)
             
             let fromFrame = CGRect(
                 size: toSize,
