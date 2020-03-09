@@ -60,6 +60,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     public typealias UIViewType = UITextField
     
     @Environment(\.font) var environmentFont
+    @Environment(\.isEnabled) var isEnabled
 
     @Binding var text: String
     
@@ -160,6 +161,7 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.inputView = nil
         }
         
+        uiView.isUserInteractionEnabled = isEnabled
         uiView.keyboardType = keyboardType
         
         if let placeholder = placeholder {
