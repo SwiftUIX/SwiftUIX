@@ -21,10 +21,10 @@ struct _PaginationView<Page: View> {
     @Binding private var currentPageIndex: Int
     @Binding private var progressionController: ProgressionController?
     
-    @Environment(\.isTapGestureEnabled) private var isTapGestureEnabled
     @Environment(\.isEdgePanGestureEnabled) private var isEdgePanGestureEnabled
     @Environment(\.isPanGestureEnabled) private var isPanGestureEnabled
     @Environment(\.isScrollEnabled) private var isScrollEnabled
+    @Environment(\.isTapGestureEnabled) private var isTapGestureEnabled
     @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
     @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
     
@@ -63,10 +63,10 @@ extension _PaginationView: UIViewControllerRepresentable {
         )
         
         uiViewController.pages = pages
-            
+        
         uiViewController.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
         uiViewController.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
-
+        
         guard !pages.isEmpty else {
             return uiViewController
         }
@@ -74,7 +74,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         if let initialPageIndex = initialPageIndex {
             currentPageIndex = initialPageIndex
         }
-
+        
         if uiViewController.pages.indices.contains(currentPageIndex) {
             uiViewController.setViewControllers(
                 [uiViewController.allViewControllers[initialPageIndex ?? currentPageIndex]],
@@ -90,7 +90,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             
             currentPageIndex = 0
         }
-
+        
         progressionController = _ProgressionController(base: uiViewController)
         
         return uiViewController
@@ -136,8 +136,8 @@ extension _PaginationView: UIViewControllerRepresentable {
         if #available(iOS 13.1, *) {
             uiViewController.isEdgePanGestureEnabled = isEdgePanGestureEnabled
             uiViewController.isPanGestureEnabled = isPanGestureEnabled
-            uiViewController.isTapGestureEnabled = isTapGestureEnabled
             uiViewController.isScrollEnabled = isScrollEnabled
+            uiViewController.isTapGestureEnabled = isTapGestureEnabled
             uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
             uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
         }
