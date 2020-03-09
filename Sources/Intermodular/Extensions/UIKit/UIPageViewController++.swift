@@ -16,6 +16,22 @@ extension UIPageViewController {
         }
     }
     
+    var isTapGestureEnabled: Bool {
+        get {
+            gestureRecognizers.filter { $0 is UITapGestureRecognizer }.first?.isEnabled ?? true
+        } set {
+            gestureRecognizers.filter { $0 is UITapGestureRecognizer }.forEach { $0.isEnabled = newValue }
+        }
+    }
+    
+    var isEdgePanGestureEnabled: Bool {
+        get {
+            gestureRecognizers.filter { $0 is UIScreenEdgePanGestureRecognizer }.first?.isEnabled ?? true
+        } set {
+            gestureRecognizers.filter { $0 is UIScreenEdgePanGestureRecognizer }.forEach { $0.isEnabled = newValue }
+        }
+    }
+    
     var isScrollEnabled: Bool {
         get {
             view.subviews.compactMap({ $0 as? UIScrollView }).first?.isScrollEnabled ?? true
