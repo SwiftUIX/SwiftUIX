@@ -47,6 +47,7 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     @Environment(\.isEnabled) var isEnabled
     @Environment(\.lineLimit) var lineLimit
     @Environment(\.minimumScaleFactor) var minimumScaleFactor
+    @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
     
     #if os(macOS)
     @Environment(\.layoutDirection) var layoutDirection
@@ -73,13 +74,17 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
 
 extension AppKitOrUIKitLabel {
     func configure(with attributedText: AttributedText) {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
+        #endif
+        
         self.attributedText = attributedText.content
         self.minimumScaleFactor = attributedText.minimumScaleFactor
         self.numberOfLines = attributedText.lineLimit ?? 0
         
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
-        #endif
+        if let preferredMaximumLayoutWidth = attributedText.preferredMaximumLayoutWidth {
+            self.preferredMaxLayoutWidth = preferredMaximumLayoutWidth
+        }
         
         #if os(macOS)
         self.setAccessibilityEnabled(attributedText.accessibilityEnabled)
