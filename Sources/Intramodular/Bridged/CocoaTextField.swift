@@ -24,7 +24,6 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
-    private var textAlignment: TextAlignment = .leading
     
     @Environment(\.font) var environmentFont
     
@@ -49,8 +48,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 inputView: inputView,
                 kerning: kerning,
                 keyboardType: keyboardType,
-                placeholder: placeholder,
-                textAlignment: textAlignment
+                placeholder: placeholder
             )
         }
     }
@@ -61,7 +59,8 @@ public struct _CocoaTextField: UIViewRepresentable {
     
     @Environment(\.font) var environmentFont
     @Environment(\.isEnabled) var isEnabled
-
+    @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
+    
     @Binding var text: String
     
     var onEditingChanged: (Bool) -> Void
@@ -75,7 +74,6 @@ public struct _CocoaTextField: UIViewRepresentable {
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
-    var textAlignment: TextAlignment
     
     public class Coordinator: NSObject, UITextFieldDelegate {
         var base: _CocoaTextField
@@ -170,7 +168,7 @@ public struct _CocoaTextField: UIViewRepresentable {
                 attributes: [
                     .font: font as Any,
                     .paragraphStyle: NSMutableParagraphStyle().then {
-                        $0.alignment = .init(textAlignment)
+                        $0.alignment = .init(multilineTextAlignment)
                     }
                 ]
             )
@@ -180,7 +178,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         }
         
         uiView.text = text
-        uiView.textAlignment = .init(textAlignment)
+        uiView.textAlignment = .init(multilineTextAlignment)
         
         DispatchQueue.main.async {
             if let isFirstResponder = self.isFirstResponder, uiView.window != nil {
