@@ -18,20 +18,20 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var isFirstResponder: Bool?
     
     private var autocapitalization: UITextAutocapitalizationType?
-    private var font: UIFont?
+    private var uiFont: UIFont?
     private var inputAccessoryView: AnyView?
     private var inputView: AnyView?
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
     
-    @Environment(\.font) var environmentFont
+    @Environment(\.font) var font
     
     public var body: some View {
         return ZStack(alignment: .topLeading) {
             if placeholder == nil {
                 label
-                    .font(font.map(Font.init) ?? environmentFont)
+                    .font(uiFont.map(Font.init) ?? font)
                     .opacity(text.wrappedValue.isEmpty ? 1.0 : 0.0)
                     .animation(nil)
             }
@@ -43,7 +43,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 isInitialFirstResponder: isInitialFirstResponder,
                 isFirstResponder: isFirstResponder,
                 autocapitalization: autocapitalization,
-                font: font,
+                uiFont: uiFont,
                 inputAccessoryView: inputAccessoryView,
                 inputView: inputView,
                 kerning: kerning,
@@ -57,7 +57,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
 public struct _CocoaTextField: UIViewRepresentable {
     public typealias UIViewType = UITextField
     
-    @Environment(\.font) var environmentFont
+    @Environment(\.font) var font
     @Environment(\.isEnabled) var isEnabled
     @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
     
@@ -68,7 +68,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var isInitialFirstResponder: Bool?
     var isFirstResponder: Bool?
     var autocapitalization: UITextAutocapitalizationType?
-    var font: UIFont?
+    var uiFont: UIFont?
     var inputAccessoryView: AnyView?
     var inputView: AnyView?
     var kerning: CGFloat?
@@ -129,9 +129,7 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.autocapitalizationType = autocapitalization
         }
         
-        let font = self.font ?? environmentFont?.toUIFont()
-        
-        uiView.font = font
+        uiView.font = uiFont ?? font?.toUIFont()
         
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
@@ -253,8 +251,8 @@ extension CocoaTextField {
         then({ $0.autocapitalization = autocapitalization })
     }
     
-    public func font(_ font: UIFont) -> Self {
-        then({ $0.font = font })
+    public func font(_ uiFont: UIFont) -> Self {
+        then({ $0.uiFont = uiFont })
     }
     
     public func inputAccessoryView<InputAccessoryView: View>(_ view: InputAccessoryView) -> Self {
