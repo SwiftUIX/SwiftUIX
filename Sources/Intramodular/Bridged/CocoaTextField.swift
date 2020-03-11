@@ -278,6 +278,10 @@ extension CocoaTextField {
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
     }
+    
+    public func textAlignment(_ textAlignment: TextAlignment) -> Self {
+        then({ $0.textAlignment = textAlignment })
+    }
 }
 
 extension CocoaTextField where Label == Text {
