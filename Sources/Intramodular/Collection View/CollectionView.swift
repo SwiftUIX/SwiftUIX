@@ -8,7 +8,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CocoaCollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewRepresentable where Data.Element == ListSection<SectionModel, Item> {
+public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewRepresentable where Data.Element == ListSection<SectionModel, Item> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
     public typealias UIViewType = UIHostingCollectionView<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
     
@@ -67,7 +67,7 @@ public struct CocoaCollectionView<SectionModel: Identifiable, Item: Identifiable
     }
 }
 
-extension CocoaCollectionView {
+extension CollectionView {
     public init<_Item: Hashable>(
         _ data: Data,
         sectionHeader: @escaping (SectionModel) -> SectionHeader,
@@ -105,7 +105,7 @@ extension CocoaCollectionView {
     }
 }
 
-extension CocoaCollectionView where Data: RangeReplaceableCollection, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
+extension CollectionView where Data: RangeReplaceableCollection, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
     public init<Items: RandomAccessCollection>(
         _ items: Items,
         @ViewBuilder rowContent: @escaping (Item) -> RowContent
@@ -123,7 +123,7 @@ extension CocoaCollectionView where Data: RangeReplaceableCollection, SectionMod
     }
 }
 
-extension CocoaCollectionView where Data == Array<ListSection<SectionModel, Item>>, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
+extension CollectionView where Data == Array<ListSection<SectionModel, Item>>, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
     public init<Items: RandomAccessCollection>(
         _ items: Items,
         @ViewBuilder rowContent: @escaping (Item) -> RowContent
@@ -139,14 +139,14 @@ extension CocoaCollectionView where Data == Array<ListSection<SectionModel, Item
 
 // MARK: - API -
 
-extension CocoaCollectionView {
+extension CollectionView {
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })
     }
 }
 
 @available(tvOS, unavailable)
-extension CocoaCollectionView {
+extension CollectionView {
     public func onRefresh(_ body: @escaping () -> Void) -> Self {
         then({ $0.scrollViewConfiguration.onRefresh = body })
     }
