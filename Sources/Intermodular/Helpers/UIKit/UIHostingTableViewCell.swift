@@ -15,10 +15,23 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
     
     private var contentHostingController: UIViewController!
     
-    var rootView: some View {
+    private var rootView: some View {
         self.makeContent(item).id(item.id)
     }
     
+    override public func awakeFromNib() {
+        super.awakeFromNib()
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            contentView.leftAnchor.constraint(equalTo: leftAnchor),
+            contentView.rightAnchor.constraint(equalTo: rightAnchor),
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
+
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
@@ -26,7 +39,9 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+}
+
+extension UIHostingTableViewCell {
     func update() {
         if contentHostingController == nil {
             backgroundColor = .clear
@@ -66,6 +81,8 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
         }
     }
 }
+
+// MARK: - Helpers
 
 extension String {
     static let hostingTableViewCellIdentifier = "UIHostingTableViewCell"

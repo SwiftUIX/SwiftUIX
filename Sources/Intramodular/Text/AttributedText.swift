@@ -31,19 +31,21 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
         #if !os(macOS)
         override public func layoutSubviews() {
             super.layoutSubviews()
-            
-            label.preferredMaxLayoutWidth = frame.width
         }
         #endif
         
-        func configure(with attributedText: AttributedText) {                label.configure(with: attributedText)
+        func configure(with attributedText: AttributedText) {
+            label.configure(with: attributedText)
         }
     }
     
     public let content: NSAttributedString
     
+    fileprivate var uiFont: UIFont?
+    
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
     @Environment(\.allowsTightening) var allowsTightening
+    @Environment(\.font) var font
     @Environment(\.isEnabled) var isEnabled
     @Environment(\.lineLimit) var lineLimit
     @Environment(\.minimumScaleFactor) var minimumScaleFactor
@@ -70,6 +72,13 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     }
 }
 
+// MARK: - API -
+
+extension AttributedText {
+    public func font(_ uiFont: UIFont) -> AttributedText {
+        then({ $0.uiFont = uiFont })
+    }
+}
 // MARK: - Helpers -
 
 extension AppKitOrUIKitLabel {
@@ -78,7 +87,14 @@ extension AppKitOrUIKitLabel {
         self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
         #endif
         
-        self.attributedText = attributedText.content
+        if let uiFont = attributedText.uiFont ?? attributedText.font?.toUIFont() {
+            let string = NSMutableAttributedString(attributedString: attributedText.content)
+            
+            string.addAttribute(.font, value: uiFont, range: .init(location: 0, length: string.length))
+            self.attributedText = attributedText.content
+        } else {
+            self.attributedText = attributedText.content
+        }
         self.minimumScaleFactor = attributedText.minimumScaleFactor
         self.numberOfLines = attributedText.lineLimit ?? 0
         

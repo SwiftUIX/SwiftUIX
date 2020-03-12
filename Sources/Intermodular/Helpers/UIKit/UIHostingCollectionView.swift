@@ -49,7 +49,6 @@ public final class UIHostingCollectionView<SectionModel: Identifiable, Item: Ide
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
         
-        (collectionViewLayout as? UICollectionViewFlowLayout)
         cell.item = data[indexPath]
         cell.makeContent = rowContent
         

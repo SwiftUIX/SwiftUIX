@@ -219,10 +219,15 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             return nil
         }
         
+        let model = data[data.index(data.startIndex, offsetBy: section)].model
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewHeaderViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionModel, SectionHeader>
         
+        if let oldModelId = view.item?.id, model.id == oldModelId {
+            return view
+        }
+
         view.parent = self
-        view.item = data[data.index(data.startIndex, offsetBy: section)].model
+        view.item = model
         view.makeContent = sectionHeader
         
         view.update()
@@ -262,10 +267,15 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             return nil
         }
         
+        let model = data[data.index(data.startIndex, offsetBy: section)].model
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: .hostingTableViewFooterViewIdentifier) as! UIHostingTableViewHeaderFooterView<SectionModel, SectionFooter>
         
+        if let oldModelId = view.item?.id, model.id == oldModelId {
+            return view
+        }
+
         view.parent = self
-        view.item = data[data.index(data.startIndex, offsetBy: section)].model
+        view.item = model
         view.makeContent = sectionFooter
         
         view.update()
@@ -300,7 +310,12 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
+        let item =  data[indexPath]
         let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>
+            
+        if let oldItemID = cell.item?.id, item.id == oldItemID {
+            return cell
+        }
         
         cell.parent = self
         cell.item = data[indexPath]
