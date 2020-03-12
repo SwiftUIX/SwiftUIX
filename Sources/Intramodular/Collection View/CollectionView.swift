@@ -19,6 +19,7 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
     
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
+    @Environment(\.collectionViewLayout) var collectionViewLayout
     @Environment(\.initialContentAlignment) var initialContentAlignment
     @Environment(\.isScrollEnabled) var isScrollEnabled
     
@@ -37,10 +38,7 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
     public func makeUIView(context: Context) -> UIViewType {
         .init(
             data,
-            collectionViewLayout: UICollectionViewFlowLayout().then {
-                $0.itemSize = UICollectionViewFlowLayout.automaticSize
-                $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-            },
+            collectionViewLayout: collectionViewLayout._toUICollectionViewLayout(),
             sectionHeader: sectionHeader,
             sectionFooter: sectionFooter,
             rowContent: rowContent
