@@ -25,17 +25,11 @@ public struct IntrinsicGeometryReader<Content: View>: View {
     @DelayedState var frame: CGRect?
     
     public var body: some View {
-        Group {
-            self.content(.init(frame: self.frame))
-        }
-        .background(
+        self.content(.init(frame: self.frame)).background(
             GeometryReader { geometry in
-                ZStack {
-                    Color.clear.then { _ in
-                        self.frame = geometry.frame(in: .local)
-                    }
+                ZeroSizeView().then { _ in
+                    self.frame = geometry.frame(in: .local)
                 }
-                .frame(width: .infinity, height: .infinity)
             }
         )
     }
