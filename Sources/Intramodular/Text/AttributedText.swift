@@ -87,7 +87,6 @@ extension AppKitOrUIKitLabel {
             layoutIfNeeded()
         }
                 
-        setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultLow, for: .vertical)
