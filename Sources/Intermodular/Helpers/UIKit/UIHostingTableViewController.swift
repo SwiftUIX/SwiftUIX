@@ -206,7 +206,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         let height = prototypeSectionHeader
             .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
             .height
         
         _sectionHeaderContentHeightCache[model.id] = height
@@ -254,7 +254,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         let height = prototypeSectionFooter
             .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
             .height
         
         _sectionFooterContentHeightCache[model.id] = height
@@ -298,7 +298,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         let height = prototypeCell
             .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
             .height
         
         _rowContentHeightCache[item.id] = height
