@@ -107,12 +107,16 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
             if contentSize != oldContentSize {
                 var newContentOffset = uiView.contentOffset
                 
-                if initialContentAlignment.horizontal == .trailing {
-                    newContentOffset.x += contentSize.width - oldContentSize.width
+                if contentSize.width >= oldContentSize.width {
+                    if initialContentAlignment.horizontal == .trailing {
+                        newContentOffset.x += contentSize.width - oldContentSize.width
+                    }
                 }
                 
-                if initialContentAlignment.vertical == .bottom {
-                    newContentOffset.y += contentSize.height - oldContentSize.height
+                if contentSize.height >= oldContentSize.height {
+                    if initialContentAlignment.vertical == .bottom {
+                        newContentOffset.y += contentSize.height - oldContentSize.height
+                    }
                 }
                 
                 if newContentOffset != uiView.contentOffset {
