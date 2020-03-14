@@ -8,7 +8,14 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingTableViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, Item> {
-    var data: Data
+    var data: Data {
+        didSet {
+            if !data.isIdentical(to: oldValue) {
+                isDataDirty = true
+            }
+        }
+    }
+    
     var sectionHeader: (SectionModel) -> SectionHeader
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (Item) -> RowContent
@@ -225,7 +232,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         if let oldModelId = view.item?.id, model.id == oldModelId {
             return view
         }
-
+        
         view.parent = self
         view.item = model
         view.makeContent = sectionHeader
@@ -273,7 +280,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         if let oldModelId = view.item?.id, model.id == oldModelId {
             return view
         }
-
+        
         view.parent = self
         view.item = model
         view.makeContent = sectionFooter
@@ -290,7 +297,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             return cachedHeight
         }
         
-        prototypeCell.parent = self
+        prototypeCell.tableViewController = self
         prototypeCell.item = data[indexPath]
         prototypeCell.makeContent = rowContent
         
@@ -312,12 +319,13 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     ) -> UITableViewCell {
         let item =  data[indexPath]
         let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>
-            
+        
         if let oldItemID = cell.item?.id, item.id == oldItemID {
             return cell
         }
         
-        cell.parent = self
+        cell.tableViewController = self
+        cell.indexPath = indexPath
         cell.item = data[indexPath]
         cell.makeContent = rowContent
         
@@ -406,25 +414,29 @@ extension UIHostingTableViewController {
             return result
         }
     }
-    
-    func reloadData() {
-        let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
-    
+}
+
+extension UIHostingTableViewController {
+    public func reloadData() {
         guard isDataDirty else {
-            tableView.beginUpdates()
-            
-            for indexPath in indexPathsForVisibleRows {
-                _rowContentHeightCache[data[indexPath].id] = nil
-            }
-
-            tableView.reloadRows(at: indexPathsForVisibleRows, with: .none)
-
-            tableView.endUpdates()
-
-            return
+            return updateVisibleRows()
         }
         
         tableView.reloadData()
+    }
+    
+    private func updateVisibleRows() {
+        tableView.beginUpdates()
+        
+        for indexPath in indexPathsForVisibleRows ?? [] {
+            if let cell = tableView(tableView, cellForRowAt: indexPath) as? UIHostingTableViewCell<Item, RowContent> {
+                cell.update()
+            } else {
+                assertionFailure()
+            }
+        }
+        
+        tableView.endUpdates()
     }
 }
 

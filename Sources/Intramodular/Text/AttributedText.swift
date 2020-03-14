@@ -16,6 +16,7 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     fileprivate var uiFont: UIFont?
     
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
+    @Environment(\.adjustsFontSizeToFitWidth) var adjustsFontSizeToFitWidth
     @Environment(\.allowsTightening) var allowsTightening
     @Environment(\.font) var font
     @Environment(\.isEnabled) var isEnabled
@@ -60,6 +61,7 @@ extension AppKitOrUIKitLabel {
         self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
         #endif
         
+        self.adjustsFontSizeToFitWidth = attributedText.adjustsFontSizeToFitWidth
         self.lineBreakMode = attributedText.lineBreakMode
         self.minimumScaleFactor = attributedText.minimumScaleFactor
         self.numberOfLines = attributedText.lineLimit ?? 0
@@ -84,12 +86,18 @@ extension AppKitOrUIKitLabel {
             
             frame.size.width = min(frame.size.width, preferredMaximumLayoutWidth)
             
+            setNeedsLayout()
             layoutIfNeeded()
         }
                 
         setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultLow, for: .vertical)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.setNeedsLayout()
+            self.layoutIfNeeded()
+        }
     }
 }
 

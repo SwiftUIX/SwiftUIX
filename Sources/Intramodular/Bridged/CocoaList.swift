@@ -50,12 +50,6 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        let isDirty = !uiViewController.data.isIdentical(to: data)
-        
-        if isDirty {
-            uiViewController.isDataDirty = true
-        }
-        
         uiViewController.data = data
         uiViewController.sectionHeader = sectionHeader
         uiViewController.sectionFooter = sectionFooter
