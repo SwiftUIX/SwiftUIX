@@ -37,19 +37,13 @@ extension View {
 // MARK: - Concrete Implementations -
 
 public struct CollectionViewFlowLayout: CollectionViewLayout {
-    public let minimumLineSpacing: CGFloat?
-    public let minimumInteritemSpacing: CGFloat?
+    public let uiCollectionViewLayout: UICollectionViewFlowLayout
     
     public init(
         minimumLineSpacing: CGFloat? = nil,
         minimumInteritemSpacing: CGFloat? = nil
     ) {
-        self.minimumLineSpacing = minimumLineSpacing
-        self.minimumInteritemSpacing = minimumInteritemSpacing
-    }
-    
-    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
-        UICollectionViewFlowLayout().then {
+        self.uiCollectionViewLayout = UICollectionViewFlowLayout().then {
             if let minimumLineSpacing = minimumLineSpacing {
                 $0.minimumLineSpacing = minimumLineSpacing
             }
@@ -61,6 +55,10 @@ public struct CollectionViewFlowLayout: CollectionViewLayout {
             $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
             $0.itemSize = UICollectionViewFlowLayout.automaticSize
         }
+    }
+    
+    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
+        uiCollectionViewLayout
     }
 }
 

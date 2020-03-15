@@ -8,16 +8,14 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UICollectionViewCell {
+    var collectionViewController: UICollectionViewController!
+    var indexPath: IndexPath?
+    
     var item: Item!
     var makeContent: ((Item) -> Content)!
-    var useAutoLayout = true
     
-    private var contentHostingController: AppKitOrUIKitHostingControllerProtocol!
+    private var contentHostingController: UIHostingController<RootView>!
     private var isContentSizeCached = false
-    
-    private var rootView: some View {
-        self.makeContent(item).id(item.id)
-    }
     
     override public func awakeFromNib() {
         super.awakeFromNib()
@@ -50,6 +48,14 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         
         super.prepareForReuse()
     }
+    
+    public func reload() {
+        guard let indexPath = indexPath else {
+            return
+        }
+        
+        collectionViewController.collectionView.reloadItems(at: [indexPath])
+    }
 }
 
 extension UIHostingCollectionViewCell {
@@ -62,30 +68,51 @@ extension UIHostingCollectionViewCell {
             layoutMargins = .zero
             selectedBackgroundView = .init()
             
-            contentHostingController = UIHostingController(rootView: rootView)
+            contentHostingController = UIHostingController(rootView: RootView(uiCollectionViewCell: self))
             contentHostingController.view.backgroundColor = .clear
+            contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
             
-            if useAutoLayout {
-                contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-            }
-            
+            contentHostingController.willMove(toParent: collectionViewController)
+            collectionViewController.addChild(contentHostingController)
             contentView.addSubview(contentHostingController.view)
+            contentHostingController.didMove(toParent: collectionViewController)
             
-            if useAutoLayout {
-                NSLayoutConstraint.activate([
-                    contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                    contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-                    contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                    contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-                ])
-            }
+            NSLayoutConstraint.activate([
+                contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
+                contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            ])
         } else {
-            (contentHostingController as? UIHostingController)?.rootView = rootView
+            contentHostingController.rootView = RootView(uiCollectionViewCell: self)
+        }
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension UIHostingCollectionViewCell {
+    private struct RootView: View {
+        private struct _ListRowManager: ListRowManager {
+            unowned let uiCollectionViewCell: UIHostingCollectionViewCell<Item, Content>
+            
+            func _animate(_ action: () -> ()) {
+                /*uiCollectionViewCell.tableViewController.tableView.beginUpdates()
+                 action()
+                 uiCollectionViewCell.tableViewController.tableView.endUpdates()*/
+            }
+            
+            func _reload() {
+                uiCollectionViewCell.reload()
+            }
         }
         
-        if !useAutoLayout {
-            contentHostingController.view.frame.size.width = bounds.width // FIXME!
-            contentHostingController.view.frame.size.height = contentHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+        unowned let uiCollectionViewCell: UIHostingCollectionViewCell<Item, Content>
+        
+        var body: some View {
+            uiCollectionViewCell.makeContent(uiCollectionViewCell.item)
+                .environment(\.listRowManager, _ListRowManager(uiCollectionViewCell: uiCollectionViewCell))
+                .id(uiCollectionViewCell.item.id)
         }
     }
 }

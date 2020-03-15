@@ -7,9 +7,17 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public final class UIHostingCollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UICollectionView, UICollectionViewDataSource, UICollectionViewDelegate  where Data.Element == ListSection<SectionModel, Item> {
-    var _isDataDirty: Bool
-    var data: Data
+public final class UIHostingCollectionViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UICollectionViewController where Data.Element == ListSection<SectionModel, Item> {
+    private var _isDataDirty: Bool
+    
+    var data: Data {
+        didSet {
+            if !data.isIdentical(to: oldValue) {
+                _isDataDirty = true
+            }
+        }
+    }
+    
     var sectionHeader: (SectionModel) -> SectionHeader
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (Item) -> RowContent
@@ -30,25 +38,24 @@ public final class UIHostingCollectionView<SectionModel: Identifiable, Item: Ide
         self.sectionFooter = sectionFooter
         self.rowContent = rowContent
         
-        super.init(frame: .zero, collectionViewLayout: collectionViewLayout)
+        super.init(collectionViewLayout: collectionViewLayout)
         
-        dataSource = self
-        delegate = self
-        
-        register(UIHostingCollectionViewCell<Item, RowContent>.self, forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier)
+        collectionView.register(UIHostingCollectionViewCell<Item, RowContent>.self, forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         data[data.index(data.startIndex, offsetBy: section)].items.count
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    override public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
         
+        cell.collectionViewController = self
+        cell.indexPath = indexPath
         cell.item = data[indexPath]
         cell.makeContent = rowContent
         
@@ -57,9 +64,9 @@ public final class UIHostingCollectionView<SectionModel: Identifiable, Item: Ide
         return cell
     }
     
-    override public func reloadData() {
+    public func reloadData() {
         if _isDataDirty {
-            super.reloadData()
+            collectionView.reloadData()
             
             _isDataDirty = false
         }

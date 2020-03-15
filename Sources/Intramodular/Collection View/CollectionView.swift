@@ -8,9 +8,9 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewRepresentable where Data.Element == ListSection<SectionModel, Item> {
+public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
-    public typealias UIViewType = UIHostingCollectionView<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
+    public typealias UIViewControllerType = UIHostingCollectionViewController<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
     
     private let data: Data
     private let sectionHeader: (SectionModel) -> SectionHeader
@@ -35,7 +35,7 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
         self.rowContent = rowContent
     }
     
-    public func makeUIView(context: Context) -> UIViewType {
+    public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(
             data,
             collectionViewLayout: collectionViewLayout._toUICollectionViewLayout(),
@@ -45,23 +45,23 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
         )
     }
     
-    public func updateUIView(_ uiView: UIViewType, context: Context) {
-        let isDirty = !uiView.data.isIdentical(to: data)
+    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.data = data
+        uiViewController.sectionHeader = sectionHeader
+        uiViewController.sectionFooter = sectionFooter
+        uiViewController.rowContent = rowContent
         
-        if isDirty {
-            uiView._isDataDirty = true
+        uiViewController.collectionView.isScrollEnabled = isScrollEnabled
+        
+        uiViewController.collectionView.configure(with: scrollViewConfiguration)
+        
+        let newCollectionViewLayout = collectionViewLayout._toUICollectionViewLayout()
+        
+        if uiViewController.collectionViewLayout !== newCollectionViewLayout, uiViewController.collectionViewLayout != newCollectionViewLayout {
+            uiViewController.collectionView.setCollectionViewLayout(newCollectionViewLayout, animated: true)
         }
         
-        uiView.data = data
-        uiView.sectionHeader = sectionHeader
-        uiView.sectionFooter = sectionFooter
-        uiView.rowContent = rowContent
-        
-        uiView.isScrollEnabled = isScrollEnabled
-        
-        uiView.configure(with: scrollViewConfiguration)
-        
-        uiView.reloadData()
+        uiViewController.reloadData()
     }
 }
 

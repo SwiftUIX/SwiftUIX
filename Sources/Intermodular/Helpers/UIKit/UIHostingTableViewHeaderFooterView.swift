@@ -11,7 +11,6 @@ class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: Vi
     var parent: UITableViewController!
     var item: SectionModel!
     var makeContent: ((SectionModel) -> Content)!
-    var useAutoLayout = true
     
     private var contentHostingController: UIViewController!
     
@@ -37,31 +36,21 @@ class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: Vi
             
             contentHostingController = UIHostingController(rootView: rootView)
             contentHostingController.view.backgroundColor = .clear
-            
-            if useAutoLayout {
-                contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-            }
-            
+            contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
+
             contentHostingController.willMove(toParent: parent)
             parent.addChild(contentHostingController)
             contentView.addSubview(contentHostingController.view)
             contentHostingController.didMove(toParent: parent)
             
-            if useAutoLayout {
-                NSLayoutConstraint.activate([
-                    contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                    contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-                    contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                    contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-                ])
-            }
+            NSLayoutConstraint.activate([
+                contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
+                contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            ])
         } else {
             (contentHostingController as? UIHostingController)?.rootView = rootView
-        }
-        
-        if !useAutoLayout {
-            contentHostingController.view.frame.size.width = bounds.width // FIXME!
-            contentHostingController.view.frame.size.height = contentHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
         }
     }
 }

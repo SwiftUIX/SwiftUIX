@@ -8,10 +8,16 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingTableViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, Item> {
+    var _isDataDirty: Bool = false {
+        didSet {
+            isContentOffsetDirty = _isDataDirty
+        }
+    }
+
     var data: Data {
         didSet {
             if !data.isIdentical(to: oldValue) {
-                isDataDirty = true
+                _isDataDirty = true
             }
         }
     }
@@ -88,13 +94,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             }
         }
     }
-    
-    var isDataDirty: Bool = false {
-        didSet {
-            isContentOffsetDirty = isDataDirty
-        }
-    }
-    
+        
     var _estimatedContentSizeCache: CGSize?
     
     private var _sectionHeaderContentHeightCache: [SectionModel.ID: CGFloat] = [:]
@@ -418,7 +418,7 @@ extension UIHostingTableViewController {
 
 extension UIHostingTableViewController {
     public func reloadData() {
-        guard isDataDirty else {
+        guard _isDataDirty else {
             return updateVisibleRows()
         }
         

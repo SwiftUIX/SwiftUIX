@@ -7,48 +7,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol opaque_UIHostingTableViewCellProtocol {
-    func reload(with animation: UITableView.RowAnimation)
-}
-
 public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITableViewCell {
-    private struct RowManager: ListRowManager {
-        weak var uiTableViewCell: UIHostingTableViewCell<Item, Content>?
-        
-        func _reload() {
-            uiTableViewCell?.reload(with: .none)
-        }
-    }
-
-    private struct RootView: View {
-        let content: Content
-        let id: Item.ID
-        let rowManager: RowManager
-        
-        var body: some View {
-            content
-                .environment(\.listRowManager, rowManager)
-                .id(id)
-        }
-    }
-    
     var tableViewController: UITableViewController!
     var indexPath: IndexPath?
     
     var item: Item!
     var makeContent: ((Item) -> Content)!
     
-    var useAutoLayout = true
-    
     private var contentHostingController: UIHostingController<RootView>!
-    
-    private var rootView: RootView {
-        RootView(
-            content: makeContent(item),
-            id: item.id,
-            rowManager: RowManager(uiTableViewCell: self)
-        )
-    }
     
     override public func awakeFromNib() {
         super.awakeFromNib()
@@ -70,6 +36,14 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    public func reload(with animation: UITableView.RowAnimation) {
+        guard let indexPath = indexPath else {
+            return
+        }
+        
+        tableViewController.tableView.reloadRows(at: [indexPath], with: animation)
+    }
 }
 
 extension UIHostingTableViewCell {
@@ -82,33 +56,23 @@ extension UIHostingTableViewCell {
             layoutMargins = .zero
             selectedBackgroundView = .init()
             
-            contentHostingController = UIHostingController(rootView: rootView)
+            contentHostingController = UIHostingController(rootView: RootView(uiTableViewCell: self))
             contentHostingController.view.backgroundColor = .clear
-            
-            if useAutoLayout {
-                contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-            }
+            contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
             
             contentHostingController.willMove(toParent: tableViewController)
             tableViewController.addChild(contentHostingController)
             contentView.addSubview(contentHostingController.view)
             contentHostingController.didMove(toParent: tableViewController)
             
-            if useAutoLayout {
-                NSLayoutConstraint.activate([
-                    contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                    contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-                    contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                    contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-                ])
-            }
+            NSLayoutConstraint.activate([
+                contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
+                contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            ])
         } else {
-            contentHostingController.rootView = rootView
-        }
-        
-        if !useAutoLayout {
-            contentHostingController.view.frame.size.width = bounds.width // FIXME!
-            contentHostingController.view.frame.size.height = contentHostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+            contentHostingController.rootView = RootView(uiTableViewCell: self)
         }
     }
     
@@ -122,15 +86,31 @@ extension UIHostingTableViewCell {
     }
 }
 
-// MARK: - Protocol Implementations -
+// MARK: - Auxiliary Implementation -
 
-extension UIHostingTableViewCell: opaque_UIHostingTableViewCellProtocol {
-    public func reload(with animation: UITableView.RowAnimation) {
-        guard let indexPath = indexPath else {
-            return
+extension UIHostingTableViewCell {
+    private struct RootView: View {
+        private struct _ListRowManager: ListRowManager {
+            unowned let uiTableViewCell: UIHostingTableViewCell<Item, Content>
+            
+            func _animate(_ action: () -> ()) {
+                uiTableViewCell.tableViewController.tableView.beginUpdates()
+                action()
+                uiTableViewCell.tableViewController.tableView.endUpdates()
+            }
+            
+            func _reload() {
+                uiTableViewCell.reload(with: .none)
+            }
         }
         
-        tableViewController.tableView.reloadRows(at: [indexPath], with: animation)
+        unowned let uiTableViewCell: UIHostingTableViewCell<Item, Content>
+        
+        var body: some View {
+            uiTableViewCell.makeContent(uiTableViewCell.item)
+                .environment(\.listRowManager, _ListRowManager(uiTableViewCell: uiTableViewCell))
+                .id(uiTableViewCell.item.id)
+        }
     }
 }
 

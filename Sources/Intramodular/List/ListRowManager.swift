@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 public protocol ListRowManager {
+    func _animate(_ action: () -> ()) 
     func _reload() 
 }
 
