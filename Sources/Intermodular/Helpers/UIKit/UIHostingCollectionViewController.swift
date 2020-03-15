@@ -40,6 +40,11 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
         
         super.init(collectionViewLayout: collectionViewLayout)
         
+        
+        collectionView.backgroundColor = .clear
+        collectionView.backgroundView = UIView()
+        collectionView.backgroundView?.backgroundColor = .clear
+        
         collectionView.register(UIHostingCollectionViewCell<Item, RowContent>.self, forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier)
     }
     
