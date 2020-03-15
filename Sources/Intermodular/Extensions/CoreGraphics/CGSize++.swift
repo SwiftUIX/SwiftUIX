@@ -22,7 +22,7 @@ extension CGSize {
         max(width, height)
     }
     
-    public func dimensionLenght(for axis: Axis) -> CGFloat {
+    public func dimensionLength(for axis: Axis) -> CGFloat {
         switch axis {
             case .horizontal:
                 return width

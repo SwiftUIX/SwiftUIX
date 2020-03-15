@@ -53,8 +53,8 @@ public struct AutomaticAxisStack<Content: View>: View {
                     .fixedSize()
                     .background(GeometryReader { intrinsicGeometry in
                         ZeroSizeView().then { _ in
-                            if intrinsicGeometry.size.width > geometry.size.width {
-                                DispatchQueue.main.async {
+                            DispatchQueue.main.async {
+                                if intrinsicGeometry.size.dimensionLength(for: self.preferredAxis) > geometry.size.dimensionLength(for: self.preferredAxis) {
                                     self.intrinsicGeometrySize = intrinsicGeometry.size
                                     self.geometrySize = geometry.size
                                     self.wantsRealign = true
@@ -64,7 +64,7 @@ public struct AutomaticAxisStack<Content: View>: View {
                     })
                 }
                 .frame(
-                    minimum: intrinsicGeometrySize.dimensionLenght(for: preferredAxis),
+                    minimum: intrinsicGeometrySize.dimensionLength(for: preferredAxis),
                     axis: preferredAxis
                 )
             }
@@ -126,7 +126,7 @@ public struct VHStack<Content: View>: View {
     @inlinable
     public var body: some View {
         AutomaticAxisStack(
-            preferredAxis: .horizontal,
+            preferredAxis: .vertical,
             alignment: alignment,
             spacing: spacing,
             content: { content }

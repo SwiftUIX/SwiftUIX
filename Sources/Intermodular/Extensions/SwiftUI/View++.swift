@@ -111,12 +111,12 @@ extension View {
 }
 
 extension View {
-    public func frame(minimum dimensionLenght: CGFloat, axis: Axis) -> some View {
+    public func frame(minimum dimensionLength: CGFloat, axis: Axis) -> some View {
         switch axis {
             case .horizontal:
-                return frame(minWidth: dimensionLenght)
+                return frame(minWidth: dimensionLength)
             case .vertical:
-                return frame(minWidth: dimensionLenght)
+                return frame(minWidth: dimensionLength)
         }
     }
     
