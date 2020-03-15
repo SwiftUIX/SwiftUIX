@@ -9,8 +9,12 @@ import SwiftUI
 public struct IntrinsicGeometryProxy {
     public let frame: CGRect?
     
+    public var size: CGSize {
+        frame?.size ?? .zero
+    }
+    
     public var estimatedFrame: CGRect {
-        return frame ?? .zero
+        frame ?? .zero
     }
 }
 

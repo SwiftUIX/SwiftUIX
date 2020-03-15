@@ -6,6 +6,6 @@ import Swift
 import SwiftUI
 
 public enum LayoutOrientation {
-    case horizontal
-    case vertical
+    case portrait
+    case landscape
 }

@@ -111,6 +111,15 @@ extension View {
 }
 
 extension View {
+    public func frame(minimum dimensionLenght: CGFloat, axis: Axis) -> some View {
+        switch axis {
+            case .horizontal:
+                return frame(minWidth: dimensionLenght)
+            case .vertical:
+                return frame(minWidth: dimensionLenght)
+        }
+    }
+    
     /// Positions this view within an invisible frame with the specified size.
     ///
     /// Use this method to specify a fixed size for a view's width,

@@ -4,6 +4,7 @@
 
 import CoreGraphics
 import Swift
+import SwiftUI
 
 extension CGSize {
     public static var greatestFiniteSize: CGSize {
@@ -19,6 +20,15 @@ extension CGSize {
     
     public var maximumDimensionLength: CGFloat {
         max(width, height)
+    }
+    
+    public func dimensionLenght(for axis: Axis) -> CGFloat {
+        switch axis {
+            case .horizontal:
+                return width
+            case .vertical:
+                return height
+        }
     }
     
     public func anchorPoint(for alignment: Alignment) {
