@@ -120,7 +120,7 @@ public struct _CocoaTextField: UIViewRepresentable {
                 uiView.becomeFirstResponder()
             }
         }
-
+        
         return uiView
     }
     
