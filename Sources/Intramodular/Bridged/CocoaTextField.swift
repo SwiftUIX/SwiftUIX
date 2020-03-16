@@ -116,9 +116,11 @@ public struct _CocoaTextField: UIViewRepresentable {
         uiView.delegate = context.coordinator
         
         if let isFirstResponder = isInitialFirstResponder, isFirstResponder {
-            uiView.becomeFirstResponder()
+            DispatchQueue.main.async {
+                uiView.becomeFirstResponder()
+            }
         }
-        
+
         return uiView
     }
     
