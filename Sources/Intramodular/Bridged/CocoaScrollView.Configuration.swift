@@ -49,7 +49,7 @@ extension UIScrollView {
         
         #if !os(tvOS)
         
-        if configuration.onRefresh != nil {
+        if configuration.onRefresh != nil || configuration.isRefreshing != nil {
             let refreshControl = self.refreshControl ?? UIRefreshControl().then {
                 configuration.setupRefreshControl?($0)
                 

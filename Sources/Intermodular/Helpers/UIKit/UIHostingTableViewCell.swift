@@ -91,25 +91,33 @@ extension UIHostingTableViewCell {
 extension UIHostingTableViewCell {
     private struct RootView: View {
         private struct _ListRowManager: ListRowManager {
-            unowned let uiTableViewCell: UIHostingTableViewCell<Item, Content>
+            weak var uiTableViewCell: UIHostingTableViewCell<Item, Content>?
             
             func _animate(_ action: () -> ()) {
-                uiTableViewCell.tableViewController.tableView.beginUpdates()
+                uiTableViewCell?.tableViewController.tableView.beginUpdates()
                 action()
-                uiTableViewCell.tableViewController.tableView.endUpdates()
+                uiTableViewCell?.tableViewController.tableView.endUpdates()
             }
             
             func _reload() {
-                uiTableViewCell.reload(with: .none)
+                uiTableViewCell?.reload(with: .none)
             }
         }
+
+        private let item: Item
+        private let makeContent: (Item) -> Content
+        private let listRowManager: _ListRowManager
         
-        unowned let uiTableViewCell: UIHostingTableViewCell<Item, Content>
+        init(uiTableViewCell: UIHostingTableViewCell<Item, Content>) {
+            self.item = uiTableViewCell.item
+            self.makeContent = uiTableViewCell.makeContent
+            self.listRowManager = .init(uiTableViewCell: uiTableViewCell)
+        }
         
         var body: some View {
-            uiTableViewCell.makeContent(uiTableViewCell.item)
-                .environment(\.listRowManager, _ListRowManager(uiTableViewCell: uiTableViewCell))
-                .id(uiTableViewCell.item.id)
+            makeContent(item)
+                .environment(\.listRowManager, listRowManager)
+                .id(item.id)
         }
     }
 }
