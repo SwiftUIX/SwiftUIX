@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
@@ -20,6 +20,14 @@ public struct ZeroSizeView: AppKitOrUIKitViewRepresentable {
     
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         
+    }
+}
+
+#else
+
+public struct ZeroSizeView: View {
+    public var body: some View {
+        EmptyView() // FIXME!!
     }
 }
 

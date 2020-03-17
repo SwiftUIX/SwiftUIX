@@ -124,6 +124,7 @@ extension ListSection: Identifiable where Model: Identifiable, Item: Identifiabl
 // MARK: - Helpers -
 
 extension Collection  {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     subscript<SectionModel, Item>(_ indexPath: IndexPath) -> Item where Element == ListSection<SectionModel, Item> {
         get {
             let sectionIndex = index(startIndex, offsetBy: indexPath.section)
@@ -134,6 +135,7 @@ extension Collection  {
             return self[sectionIndex].items[rowIndex]
         }
     }
+    #endif
     
     public func isIdentical<SectionModel: Identifiable, Item: Identifiable>(to other: Self) -> Bool where Element == ListSection<SectionModel, Item> {
         guard count == other.count else {

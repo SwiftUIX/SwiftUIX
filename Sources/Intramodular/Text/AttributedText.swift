@@ -13,7 +13,9 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     
     public let content: NSAttributedString
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     fileprivate var uiFont: UIFont?
+    #endif
     
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
     @Environment(\.adjustsFontSizeToFitWidth) var adjustsFontSizeToFitWidth
@@ -48,11 +50,14 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
 
 // MARK: - API -
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AttributedText {
     public func font(_ uiFont: UIFont) -> AttributedText {
         then({ $0.uiFont = uiFont })
     }
 }
+#endif
+
 // MARK: - Helpers -
 
 extension AppKitOrUIKitLabel {
@@ -71,6 +76,7 @@ extension AppKitOrUIKitLabel {
         self.userInterfaceLayoutDirection = .init(attributedText.layoutDirection)
         #endif
         
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let uiFont = attributedText.uiFont {
             let string = NSMutableAttributedString(attributedString: attributedText.content)
             
@@ -80,24 +86,24 @@ extension AppKitOrUIKitLabel {
         } else {
             self.attributedText = attributedText.content
         }
+        #else
+        self.attributedText = attributedText.content
+        #endif
         
         if let preferredMaximumLayoutWidth = attributedText.preferredMaximumLayoutWidth, preferredMaxLayoutWidth != attributedText.preferredMaximumLayoutWidth {
             preferredMaxLayoutWidth = preferredMaximumLayoutWidth
             
             frame.size.width = min(frame.size.width, preferredMaximumLayoutWidth)
             
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             setNeedsLayout()
             layoutIfNeeded()
+            #endif
         }
-                
+        
         setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultLow, for: .vertical)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.setNeedsLayout()
-            self.layoutIfNeeded()
-        }
     }
 }
 

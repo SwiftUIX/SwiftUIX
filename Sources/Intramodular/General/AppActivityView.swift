@@ -10,15 +10,21 @@ import SwiftUI
 public struct AppActivityView: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIActivityViewController
     
-    private var activityItems: [Any]
+    private let activityItems: [Any]
+    private let applicationActivities: [UIActivity]?
+    
     private var excludedActivityTypes: [UIActivity.ActivityType] = []
     
-    public init(activityItems: [Any]) {
+    public init(
+        activityItems: [Any],
+        applicationActivities: [UIActivity]? = nil
+    ) {
         self.activityItems = activityItems
+        self.applicationActivities = applicationActivities
     }
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(activityItems: activityItems, applicationActivities: nil)
+        .init(activityItems: activityItems, applicationActivities: applicationActivities)
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
