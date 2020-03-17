@@ -18,7 +18,6 @@ public struct AutomaticAxisStack<Content: View>: View {
     @State private var geometrySize: CGSize = .zero
     @State private var wantsRealign: Bool = false
     
-    @inlinable
     public init(
         preferredAxis: Axis,
         alignment: Alignment = .center,
@@ -81,7 +80,6 @@ public struct HVStack<Content: View>: View {
     public let spacing: CGFloat?
     public let content: Content
     
-    @inlinable
     public init(
         alignment: Alignment = .center,
         spacing: CGFloat? = nil,
@@ -92,7 +90,6 @@ public struct HVStack<Content: View>: View {
         self.content = content()
     }
     
-    @inlinable
     public var body: some View {
         AutomaticAxisStack(
             preferredAxis: .horizontal,
@@ -112,7 +109,6 @@ public struct VHStack<Content: View>: View {
     public let spacing: CGFloat?
     public let content: Content
     
-    @inlinable
     public init(
         alignment: Alignment = .center,
         spacing: CGFloat? = nil,
@@ -123,7 +119,6 @@ public struct VHStack<Content: View>: View {
         self.content = content()
     }
     
-    @inlinable
     public var body: some View {
         AutomaticAxisStack(
             preferredAxis: .vertical,
