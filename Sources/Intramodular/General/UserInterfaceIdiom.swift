@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public enum UserInterfaceIdiom {
+public enum UserInterfaceIdiom: Hashable {
     case carPlay
     case mac
     case phone
@@ -15,7 +15,7 @@ public enum UserInterfaceIdiom {
     
     case unspecified
     
-    public static var current: Self {
+    public static var current: UserInterfaceIdiom {
         #if targetEnvironment(macCatalyst)
         return .mac
         #elseif os(iOS) || os(tvOS)
