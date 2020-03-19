@@ -11,7 +11,7 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 
 | UIKit                      | SwiftUI      | SwiftUIX                     |
 | -------------------------- | ------------ | ---------------------------- |
-| `UIActivityIndicatorView`  | -            | `ActivityInidcator`          |
+| `UIActivityIndicatorView`  | -            | `ActivityIndicator`          |
 | `UIPageViewController`     | -            | `PaginationView`             |
 | `UIScrollView`             | `ScrollView` | `CocoaScrollView`            |
 | `UITableView`              | `List`       | `CocoaList`                  |
