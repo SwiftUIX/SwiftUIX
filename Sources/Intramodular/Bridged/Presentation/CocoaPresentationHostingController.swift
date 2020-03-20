@@ -9,12 +9,6 @@ import SwiftUI
 import UIKit
 
 open class CocoaPresentationHostingController: CocoaHostingController<CocoaPresentationHostingControllerContent> {
-    public override var rootViewName: ViewName? {
-        nil
-            ?? rootViewContent.presentation.contentName
-            ?? (rootViewContent.presentation.content() as? opaque_NamedView)?.name
-    }
-    
     init(
         presentation: AnyModalPresentation,
         coordinator: CocoaPresentationCoordinator
@@ -23,12 +17,12 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
             rootView: .init(presentation: presentation),
             presentationCoordinator: coordinator
         )
-                
-        modalPresentationStyle = .init(presentation.presentationStyle)
-        presentationController?.delegate = coordinator
-        transitioningDelegate = presentation.presentationStyle.transitioningDelegate
         
-        if presentation.presentationStyle != .automatic {
+        modalPresentationStyle = .init(presentation.content.presentationStyle)
+        presentationController?.delegate = coordinator
+        transitioningDelegate = presentation.content.presentationStyle.transitioningDelegate
+        
+        if presentation.content.presentationStyle != .automatic {
             view.backgroundColor = .clear
         }
     }

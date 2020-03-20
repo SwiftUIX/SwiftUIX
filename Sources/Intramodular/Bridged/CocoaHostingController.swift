@@ -13,11 +13,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     public override var presentationCoordinator: CocoaPresentationCoordinator {
         return _presentationCoordinator
     }
-    
-    public var rootViewName: ViewName? {
-        (rootView as? opaque_NamedView)?.name
-    }
-    
+        
     public var rootViewContent: Content {
         get {
             rootView.content

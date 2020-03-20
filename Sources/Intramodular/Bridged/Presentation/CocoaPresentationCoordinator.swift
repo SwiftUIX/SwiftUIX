@@ -79,11 +79,11 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public var presentedViewName: ViewName? {
-        presentedCoordinator?.presentation?.contentName
+        presentedCoordinator?.presentation?.content.opaque_getViewName()
     }
     
     public func present(_ modal: AnyModalPresentation) {
-        if let viewController = viewController.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.presentationStyle {
+        if let viewController = viewController.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.content.presentationStyle {
             viewController.rootView.content.presentation = modal
             return
         }
@@ -93,9 +93,9 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 presentation: modal,
                 coordinator: .init(presentation: modal)
             ),
-            animated: modal.animated
+            animated: modal.content.isModalPresentationAnimated
         ) {
-            modal.completion()
+            modal.content.onPresent()
             
             self.objectWillChange.send()
         }
@@ -110,19 +110,19 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        if let presentation = presentation, !presentation.shouldDismiss() {
+        if let presentation = presentation, !presentation.content.isModalDismissable {
             return
         }
         
         if viewController.presentedViewController != nil {
             viewController.dismiss(animated: animated) {
-                self.presentation?.onDismiss()
+                self.presentation?.content.onDismiss()
                 
                 completion?()
             }
         } else if let navigationController = viewController.navigationController {
             navigationController.popToViewController(viewController, animated: animated) {
-                self.presentation?.onDismiss()
+                self.presentation?.content.onDismiss()
                 
                 completion?()
             }
@@ -133,14 +133,14 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         if let presentation = presentation {
-            return .init(presentation.presentationStyle)
+            return .init(presentation.content.presentationStyle)
         } else {
             return .automatic
         }
     }
     
     public func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
-        presentation?.shouldDismiss() ?? true
+        presentation?.content.isModalDismissable ?? true
     }
     
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
@@ -148,7 +148,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        presentation?.onDismiss()
+        presentation?.content.onDismiss()
         
         presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
     }

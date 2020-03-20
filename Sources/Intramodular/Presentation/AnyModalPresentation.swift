@@ -7,40 +7,33 @@ import Swift
 import SwiftUI
 
 public struct AnyModalPresentation: Identifiable {
+    
     public let id = UUID()
+    public let content: EnvironmentalAnyView
     
-    let content: () -> EnvironmentalAnyView
-    let contentName: ViewName?
-    
-    let completion: () -> ()
-    let shouldDismiss: () -> Bool
-    let onDismiss: () -> Void
     let resetBinding: () -> ()
     
-    let animated: Bool
-    let presentationStyle: ModalViewPresentationStyle
-    
-    init(_ view: EnvironmentalAnyView) {
-        fatalError()
+    init(_ content: EnvironmentalAnyView) {
+        self.content = content
+        self.resetBinding = { }
     }
     
     init<V: View>(
-        content: @escaping () -> V,
+        content: V,
         contentName: ViewName?,
-        completion: @escaping () -> () = { },
-        shouldDismiss: @escaping () -> Bool,
-        onDismiss: @escaping () -> Void,
-        resetBinding: @escaping () -> (),
-        animated: Bool = true,
-        presentationStyle: ModalViewPresentationStyle
+        presentationStyle: ModalViewPresentationStyle,
+        isModalDismissable: @escaping () -> Bool = { true },
+        onPresent: @escaping () -> Void = { },
+        onDismiss: @escaping () -> Void = { },
+        resetBinding: @escaping () -> ()
     ) {
-        self.content = { .init(content()) }
-        self.contentName = contentName
-        self.completion = completion
-        self.shouldDismiss = shouldDismiss
-        self.onDismiss = onDismiss
-        self.animated = animated
-        self.presentationStyle = presentationStyle
+        self.content = EnvironmentalAnyView(content)
+            .modalPresentationStyle(presentationStyle)
+            .isModalDismissable(isModalDismissable)
+            .onPresent(perform: onPresent)
+            .onDismiss(perform: onDismiss)
+            .name(contentName)
+        
         self.resetBinding = resetBinding
     }
 }

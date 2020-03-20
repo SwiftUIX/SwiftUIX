@@ -48,13 +48,12 @@ extension DynamicViewPresenter {
     ) {
         present(
             .init(
-                content: { view },
+                content: view,
                 contentName: name,
-                completion: completion,
-                shouldDismiss: { true },
+                presentationStyle: presentationStyle,
+                onPresent: completion,
                 onDismiss: onDismiss,
-                resetBinding: { },
-                presentationStyle: presentationStyle
+                resetBinding: { }
             )
         )
     }
