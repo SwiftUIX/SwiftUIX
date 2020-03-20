@@ -5,8 +5,8 @@
 import Swift
 import SwiftUI
 
-public protocol DynamicViewPresenter: PresentationManager {
-    var presenting: DynamicViewPresenter? { get }
+public protocol DynamicViewPresenter: DynamicViewPresentable, PresentationManager {
+    var presenter: DynamicViewPresenter? { get }
     var presented: DynamicViewPresenter? { get }
     var presentedViewName: ViewName? { get }
     
@@ -86,25 +86,25 @@ extension DynamicViewPresenter {
     }
     
     public func dismissSelf() {
-        presenting?.dismiss()
+        presenter?.dismiss()
     }
     
     public func dismissTopmost() {
-        topmostPresenter.presenting?.dismiss()
+        topmostPresenter.presenter?.dismiss()
     }
     
     public func dismissTopmost(
         animated: Bool = true,
         completion: @escaping () -> Void
     ) {
-        topmostPresenter.presenting?.dismiss(animated: animated, completion: completion)
+        topmostPresenter.presenter?.dismiss(animated: animated, completion: completion)
     }
     
     public func dismissView(
         named name: ViewName,
         completion: @escaping () -> Void
     ) {
-        var presenter: DynamicViewPresenter? = presenting ?? self
+        var presenter: DynamicViewPresenter? = self.presenter ?? self
         
         while let presented = presenter {
             if presented.presentedViewName == name {
@@ -157,10 +157,6 @@ extension UIViewController: DynamicViewPresenter {
         }
     }
     
-    public var presenting: DynamicViewPresenter? {
-        presentationCoordinator.presenting
-    }
-    
     public var presented: DynamicViewPresenter? {
         presentationCoordinator.presented
     }
@@ -168,7 +164,7 @@ extension UIViewController: DynamicViewPresenter {
     public var presentedViewName: ViewName? {
         presentationCoordinator.presentedViewName
     }
-        
+    
     public func present(_ presentation: AnyModalPresentation) {
         presentationCoordinator.present(presentation)
     }

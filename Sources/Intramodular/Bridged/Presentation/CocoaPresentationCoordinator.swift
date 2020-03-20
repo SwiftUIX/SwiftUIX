@@ -8,6 +8,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
+    public var environmentBuilder = EnvironmentBuilder()
+    
     private let presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
@@ -68,7 +70,7 @@ extension CocoaPresentationCoordinator {
 // MARK: - Protocol Implementations -
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
-    public var presenting: DynamicViewPresenter? {
+    public var presenter: DynamicViewPresenter? {
         presentingCoordinator
     }
     
