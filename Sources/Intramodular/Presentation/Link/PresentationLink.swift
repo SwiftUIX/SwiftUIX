@@ -32,7 +32,11 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         destination: @autoclosure @escaping () -> Destination,
         @ViewBuilder label: () -> Label
     ) {
-        self.init(destination: destination(), onDismiss: nil, label: label)
+        self.init(
+            destination: destination(),
+            onDismiss: nil,
+            label: label
+        )
     }
     
     public var body: some View {
