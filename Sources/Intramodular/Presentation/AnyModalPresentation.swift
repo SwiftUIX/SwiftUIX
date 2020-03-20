@@ -19,7 +19,10 @@ public struct AnyModalPresentation: Identifiable {
     
     let animated: Bool
     let presentationStyle: ModalViewPresentationStyle
-    let environmentBuilder: EnvironmentBuilder?
+    
+    init(_ view: EnvironmentalAnyView) {
+        fatalError()
+    }
     
     init<V: View>(
         content: @escaping () -> V,
@@ -29,8 +32,7 @@ public struct AnyModalPresentation: Identifiable {
         onDismiss: @escaping () -> Void,
         resetBinding: @escaping () -> (),
         animated: Bool = true,
-        presentationStyle: ModalViewPresentationStyle,
-        environmentBuilder: EnvironmentBuilder = .init()
+        presentationStyle: ModalViewPresentationStyle
     ) {
         self.content = { .init(content()) }
         self.contentName = contentName
@@ -40,7 +42,6 @@ public struct AnyModalPresentation: Identifiable {
         self.animated = animated
         self.presentationStyle = presentationStyle
         self.resetBinding = resetBinding
-        self.environmentBuilder = environmentBuilder
     }
 }
 

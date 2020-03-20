@@ -85,7 +85,7 @@ extension View {
             }
         }
     }
-        
+    
     private func _mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
         var view = eraseToAnyView()
         

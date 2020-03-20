@@ -6,21 +6,19 @@ import Swift
 import SwiftUI
 
 public protocol opaque_View {
+    func opaque_getViewName() -> ViewName?
+    
     func eraseToAnyView() -> AnyView
 }
 
+// MARK: - Implementation -
+
 extension opaque_View where Self: View {
+    public func opaque_getViewName() -> ViewName? {
+        nil
+    }
+    
     public func eraseToAnyView() -> AnyView {
         .init(self)
     }
-}
-
-// MARK: - Concrete Implementations -=
-
-extension Text: opaque_View {
-    
-}
-
-extension VStack: opaque_View {
-    
 }

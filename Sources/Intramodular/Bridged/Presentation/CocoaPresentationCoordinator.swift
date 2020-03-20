@@ -74,7 +74,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentingCoordinator
     }
     
-    public var presented: DynamicViewPresenter? {
+    public var presented: DynamicViewPresentable? {
         presentedCoordinator
     }
     
