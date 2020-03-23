@@ -76,6 +76,7 @@ extension View {
     public func navigationBarColor(_ color: Color) -> some View {
         configureUINavigationBar { navigationBar in
             navigationBar.backgroundColor = color.toUIColor()
+            navigationBar.barTintColor = color.toUIColor()
         }
     }
 }
