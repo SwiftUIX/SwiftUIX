@@ -2,7 +2,6 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Merge
 import SwiftUI
 
 public struct TryButton<Label: View>: View {

@@ -2,7 +2,6 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Merge
 import SwiftUI
 
 /// A view capable of capturing and managing errors.
