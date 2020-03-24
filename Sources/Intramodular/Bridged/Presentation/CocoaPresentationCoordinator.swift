@@ -152,6 +152,10 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
         
         presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
     }
+    
+    public func presentationControllerDidAttemptToDismiss(_ presentationController: UIPresentationController) {
+        
+    }
 }
 
 // MARK: - Helpers -
