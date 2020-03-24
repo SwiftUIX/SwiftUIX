@@ -25,7 +25,7 @@ public struct ErrorContextView<Content: View>: View {
 }
 
 extension View {
-    public func captureErrorContext() -> ErrorContextView<Self> {
+    public func manageErrorContext() -> ErrorContextView<Self> {
         .init(content: { self })
     }
 }

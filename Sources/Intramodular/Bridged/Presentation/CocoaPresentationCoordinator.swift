@@ -59,7 +59,7 @@ import SwiftUI
 
 extension CocoaPresentationCoordinator {
     public override var description: String {
-        if let name = presentedViewName {
+        if let name = name {
             return "Bridged Presentation Coordinator (" + name.description + ")"
         } else {
             return "Bridged Presentation Coordinator"
@@ -78,8 +78,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentedCoordinator
     }
     
-    public var presentedViewName: ViewName? {
-        presentedCoordinator?.presentation?.content.opaque_getViewName()
+    public var name: ViewName? {
+        presentation?.content.opaque_getViewName()
     }
     
     public func present(_ modal: AnyModalPresentation) {

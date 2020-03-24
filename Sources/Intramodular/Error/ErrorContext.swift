@@ -93,7 +93,7 @@ private final class ErrorContextEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    fileprivate var errorContext: ErrorContext {
+    public var errorContext: ErrorContext {
         get {
             self[ErrorContextEnvironmentKey]
         } set {

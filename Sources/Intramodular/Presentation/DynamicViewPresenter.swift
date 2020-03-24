@@ -6,14 +6,11 @@ import Swift
 import SwiftUI
 
 public protocol DynamicViewPresenter: DynamicViewPresentable, PresentationManager {
-    var presenter: DynamicViewPresenter? { get }
     var presented: DynamicViewPresentable? { get }
-    var presentedViewName: ViewName? { get }
     
     func present(_ presentation: AnyModalPresentation)
-    
+ 
     func dismiss(animated: Bool, completion: (() -> Void)?)
-    func dismissView(named _: ViewName, completion: @escaping () -> Void)
 }
 
 // MARK: - Implementation -
@@ -106,8 +103,10 @@ extension DynamicViewPresenter {
         var presenter: DynamicViewPresenter? = self.presenter ?? self
         
         while let presented = presenter {
-            if presented.presentedViewName == name {
-                return presented.dismiss(completion: completion)
+            if presented.name == name {
+                presented.presenter?.dismiss(completion: completion)
+                
+                return
             }
             
             presenter = presented.presented as? DynamicViewPresenter
@@ -160,12 +159,22 @@ extension UIViewController: DynamicViewPresenter {
         presentationCoordinator.presented
     }
     
-    public var presentedViewName: ViewName? {
-        presentationCoordinator.presentedViewName
+    public func present(_ presentation: AnyModalPresentation) {
+        presentationCoordinator.present(presentation)
+    }
+}
+
+extension UIWindow: DynamicViewPresenter {
+    public var presented: DynamicViewPresentable? {
+        rootViewController?.presented
     }
     
     public func present(_ presentation: AnyModalPresentation) {
-        presentationCoordinator.present(presentation)
+        rootViewController?.present(presentation)
+    }
+    
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
+        rootViewController?.dismiss(animated: animated, completion: completion)
     }
 }
 

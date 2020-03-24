@@ -7,7 +7,7 @@ import SwiftUI
 
 public protocol DynamicViewPresentable {
     var environmentBuilder: EnvironmentBuilder { get nonmutating set }
-    
+    var name: ViewName? { get }
     var presenter: DynamicViewPresenter? { get }
 }
 
@@ -30,6 +30,10 @@ extension DynamicViewPresentable {
 private var environmentBuilderKey: Void = ()
 
 extension UIView: DynamicViewPresentable {
+    public var name: ViewName? {
+        return nil
+    }
+    
     public var presenter: DynamicViewPresenter? {
         nearestViewController
     }
@@ -46,6 +50,10 @@ extension UIView: DynamicViewPresentable {
 extension UIViewController: DynamicViewPresentable {
     public var presenter: DynamicViewPresenter? {
         presentingViewController
+    }
+    
+    public var name: ViewName? {
+        presentationCoordinator.name
     }
     
     public var environmentBuilder: EnvironmentBuilder {
