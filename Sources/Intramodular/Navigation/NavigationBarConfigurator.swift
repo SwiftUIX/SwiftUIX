@@ -69,6 +69,8 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                         parent.navigationItem.leftBarButtonItem?.customView = UIHostingView(rootView: leading)
                     }
                 }
+            } else {
+                parent.navigationItem.leftBarButtonItem = nil
             }
             
             if let center = center {
@@ -79,9 +81,11 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                         parent.navigationItem.titleView = UIHostingView(rootView: center)
                     }
                 }
+            } else {
+                parent.navigationItem.titleView = nil
             }
             
-            if let trailing = trailing{
+            if let trailing = trailing {
                 if !(trailing is EmptyView) {
                     if parent.navigationItem.rightBarButtonItem == nil {
                         parent.navigationItem.rightBarButtonItem = .init(customView: UIHostingView(rootView: trailing))
@@ -91,6 +95,8 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
                         parent.navigationItem.rightBarButtonItem?.customView = UIHostingView(rootView: trailing)
                     }
                 }
+            } else {
+                parent.navigationItem.rightBarButtonItem = nil
             }
             
             parent.navigationItem.leftBarButtonItem?.customView?.sizeToFit()
