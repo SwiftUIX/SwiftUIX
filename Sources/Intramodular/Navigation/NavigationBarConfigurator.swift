@@ -148,11 +148,17 @@ extension View {
     
     public func navigationBarTitleView<V: View>(
         _ center: V,
-        displayMode: NavigationBarItem.TitleDisplayMode = .automatic
+        displayMode: NavigationBarItem.TitleDisplayMode
     ) -> some View {
         navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: displayMode)
     }
     
+    public func navigationBarTitleView<V: View>(
+        _ center: V
+    ) -> some View {
+        navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: .automatic)
+    }
+
     public func navigationBarItems<Center: View, Trailing: View>(
         center: Center,
         trailing: Trailing,

@@ -12,7 +12,7 @@ import UIKit
 
 extension FetchedResults {
     public subscript(_ indexSet: IndexSet) -> [Result] {
-        return indexSet.map({ self[$0] })
+        indexSet.map({ self[$0] })
     }
 }
 
