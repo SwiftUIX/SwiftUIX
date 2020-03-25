@@ -7,7 +7,6 @@ import Swift
 import SwiftUI
 
 public struct AnyModalPresentation: Identifiable {
-    
     public let id = UUID()
     public let content: EnvironmentalAnyView
     
