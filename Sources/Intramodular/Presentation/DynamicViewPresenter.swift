@@ -9,7 +9,7 @@ public protocol DynamicViewPresenter: DynamicViewPresentable, PresentationManage
     var presented: DynamicViewPresentable? { get }
     
     func present(_ presentation: AnyModalPresentation)
- 
+    
     func dismiss(animated: Bool, completion: (() -> Void)?)
 }
 
@@ -73,12 +73,12 @@ extension DynamicViewPresenter {
 }
 
 extension DynamicViewPresenter {
-    public func dismiss(completion: @escaping () -> Void) {
+    public func dismiss(completion: (() -> Void)?) {
         dismiss(animated: true, completion: completion)
     }
     
     public func dismiss() {
-        dismiss { }
+        dismiss(animated: true, completion: nil)
     }
     
     public func dismissSelf() {
@@ -98,7 +98,7 @@ extension DynamicViewPresenter {
     
     public func dismissView(
         named name: ViewName,
-        completion: @escaping () -> Void
+        completion: (() -> Void)?
     ) {
         var presenter: DynamicViewPresenter? = self.presenter ?? self
         
@@ -112,11 +112,11 @@ extension DynamicViewPresenter {
             presenter = presented.presented as? DynamicViewPresenter
         }
         
-        completion()
+        completion?()
     }
     
     public func dismissView<H: Hashable>(named name: H) {
-        dismissView(named: .init(name), completion: { })
+        dismissView(named: .init(name), completion: nil)
     }
 }
 
