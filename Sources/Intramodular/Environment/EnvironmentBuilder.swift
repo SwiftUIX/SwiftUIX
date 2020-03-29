@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// Builds an environment for a given view.
 public struct EnvironmentBuilder {
     fileprivate var descriptionObjects: [Any] = []
     
@@ -18,7 +19,9 @@ public struct EnvironmentBuilder {
     public init() {
         
     }
-    
+}
+
+extension EnvironmentBuilder {
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
         environmentValuesTransforms.append(transform)
     }
