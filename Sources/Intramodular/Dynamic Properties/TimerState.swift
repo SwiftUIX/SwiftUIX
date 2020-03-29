@@ -18,6 +18,8 @@ public struct TimerState: DynamicProperty {
     
     @State public private(set) var wrappedValue: Int = 0
     
+    /// - Parameters:
+    ///   - interval: The time interval on which to publish events. For example, a value of `0.5` publishes an event approximately every half-second.
     public init(interval: TimeInterval) {
         self.interval = interval
         self.timerPublisher = Timer.publish(every: interval, on: .main, in: .common)
