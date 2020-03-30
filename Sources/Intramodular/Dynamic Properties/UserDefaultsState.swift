@@ -42,8 +42,4 @@ public struct UserDefaultsState<Value: Codable>: DynamicProperty {
         
         __wrappedValue = .init(initialValue: try! defaults.decode(forKey: key, defaultValue: defaultValue))
     }
-    
-    public mutating func update() {
-        try! _wrappedValue = defaults.decode(forKey: key, defaultValue: defaultValue)
-    }
 }
