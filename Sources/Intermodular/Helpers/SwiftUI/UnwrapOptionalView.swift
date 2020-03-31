@@ -6,23 +6,16 @@ import Combine
 import Swift
 import SwiftUI
 
-public struct UnwrapOptionalView<Value, Content: View>: View {
+public struct UnwrapOptionalView<Content: View>: View {
     private let content: Content?
     
-    public init(_ value: Optional<Value>, @ViewBuilder content: (Value) -> Content) {
+    public init<Value>(_ value: Optional<Value>, @ViewBuilder content: (Value) -> Content) {
         self.content = value.map(content)
     }
     
+    @inline(never)
     public var body: some View {
         content ?? EmptyView()
-    }
-    
-    public func `else`<V: View>(@ViewBuilder _ view: () -> V) -> some View {
-        self ?? view()
-    }
-    
-    public func `else`<V: View>(_ view: V) -> some View {
-        self ?? view
     }
     
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
@@ -36,10 +29,22 @@ public struct UnwrapOptionalView<Value, Content: View>: View {
     }
 }
 
+extension UnwrapOptionalView {
+    @inline(never)
+    public func `else`<V: View>(@ViewBuilder _ view: () -> V) -> some View {
+        (self ?? view()).eraseToAnyView()
+    }
+    
+    @inline(never)
+    public func `else`<V: View>(_ view: V) -> some View {
+        (self ?? view).eraseToAnyView()
+    }
+}
+
 // MARK: - Helpers -
 
 extension Optional {
-    public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Wrapped, Content> {
+    public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Content> {
         .init(self, content: content)
     }
 }
