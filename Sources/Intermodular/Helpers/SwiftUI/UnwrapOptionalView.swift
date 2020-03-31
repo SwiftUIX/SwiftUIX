@@ -13,6 +13,7 @@ public struct UnwrapOptionalView<Content: View>: View {
         self.content = value.map(content)
     }
     
+    @_optimize(none)
     @inline(never)
     public var body: some View {
         content ?? EmptyView()
@@ -30,11 +31,13 @@ public struct UnwrapOptionalView<Content: View>: View {
 }
 
 extension UnwrapOptionalView {
+    @_optimize(none)
     @inline(never)
     public func `else`<V: View>(@ViewBuilder _ view: () -> V) -> some View {
         (self ?? view()).eraseToAnyView()
     }
     
+    @_optimize(none)
     @inline(never)
     public func `else`<V: View>(_ view: V) -> some View {
         (self ?? view).eraseToAnyView()
@@ -44,6 +47,8 @@ extension UnwrapOptionalView {
 // MARK: - Helpers -
 
 extension Optional {
+    @_optimize(none)
+    @inline(never)
     public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Content> {
         .init(self, content: content)
     }

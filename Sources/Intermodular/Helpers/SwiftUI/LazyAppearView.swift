@@ -11,11 +11,13 @@ public struct LazyAppearView<Body: View>: View {
     
     @DelayedState private var content: Body?
     
+    @_optimize(none)
     @inline(never)
     public init(destination: @escaping () -> Body) {
         self.destination = destination
     }
     
+    @_optimize(none)
     @inline(never)
     public var body: some View {
         Group {
