@@ -23,3 +23,9 @@ public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicPr
         self.__wrappedValue.update()
     }
 }
+
+extension View {
+    public func optionalEnvironmentObjecT<B: ObservableObject>(_ bindable: B?) -> some View {
+        bindable.map(environmentObject) ?? self
+    }
+}
