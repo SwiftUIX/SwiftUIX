@@ -25,7 +25,7 @@ public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicPr
 }
 
 extension View {
-    public func optionalEnvironmentObjecT<B: ObservableObject>(_ bindable: B?) -> some View {
+    public func optionalEnvironmentObject<B: ObservableObject>(_ bindable: B?) -> some View {
         bindable.map(environmentObject) ?? self
     }
 }

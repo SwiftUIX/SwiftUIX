@@ -35,3 +35,44 @@ extension Edge.Set {
         formUnion(.init(from: alignment.vertical))
     }
 }
+
+extension Edge.Set {
+    public var allHorizontal: [Edge] {
+        var result: [Edge] = []
+        
+        if contains(.leading) {
+            result.append(.leading)
+        }
+        
+        if contains(.trailing) {
+            result.append(.trailing)
+        }
+        
+        return result
+    }
+    
+    public var allVertical: [Edge] {
+        var result: [Edge] = []
+        
+        if contains(.top) {
+            result.append(.top)
+        }
+        
+        if contains(.bottom) {
+            result.append(.bottom)
+        }
+        
+        return result
+    }
+    
+    public func contains(_ axis: Axis) -> Bool {
+        switch axis {
+            case .horizontal: do {
+                return contains(.leading) || contains(.trailing)
+            }
+            case .vertical: do {
+                return contains(.top) || contains(.bottom)
+            }
+        }
+    }
+}
