@@ -47,6 +47,37 @@ public struct SwitchOverCaseFirstView<Data, Content: View>: SwitchOverCaseView {
         
         body = predicate(comparator) ? content() : nil
     }
+    
+    public init<Value>(
+        comparator: Data,
+        predicate: CasePathPredicate<Data, Value>,
+        content: () -> Content
+    ) {
+        self.comparator = comparator
+        self.predicate = predicate.boolPredicate
+        
+        if predicate.boolPredicate(comparator) {
+            body = content()
+        } else {
+            body = nil
+        }
+    }
+    
+    public init<Value>(
+        comparator: Data,
+        predicate: CasePathPredicate<Data, Value>,
+        content: (Value) -> Content
+    ) {
+        self.comparator = comparator
+        self.predicate = predicate.boolPredicate
+        
+        if let value = predicate.valuePredicate(comparator) {
+            body = content(value)
+        } else {
+            body = nil
+        }
+    }
+    
 }
 
 extension SwitchOverCaseFirstView where Data: Equatable {
@@ -103,6 +134,41 @@ public struct SwitchOverCaseNextView<PreviousCase: SwitchOverCaseView, Content: 
             self.body = ViewBuilder.buildEither(second: nil)
         }
     }
+    
+    public init<Value>(
+        previous: PreviousCase,
+        predicate: CasePathPredicate<Data, Value>,
+        content: () -> Content
+    ) {
+        self.previous = previous
+        self.predicate = predicate.boolPredicate
+        
+        if (previous.isAMatch || (previous.hasMatchedPreviously ?? false)) {
+            self.body = ViewBuilder.buildEither(first: previous)
+        } else if predicate.boolPredicate(previous.comparator) {
+            self.body = ViewBuilder.buildEither(second: content())
+        } else {
+            self.body = ViewBuilder.buildEither(second: nil)
+        }
+    }
+    
+    public init<Value>(
+        previous: PreviousCase,
+        predicate: CasePathPredicate<Data, Value>,
+        content: (Value) -> Content
+    ) {
+        self.previous = previous
+        self.predicate = predicate.boolPredicate
+        
+        if (previous.isAMatch || (previous.hasMatchedPreviously ?? false)) {
+            self.body = ViewBuilder.buildEither(first: previous)
+        } else if let value = predicate.valuePredicate(previous.comparator) {
+            self.body = ViewBuilder.buildEither(second: content(value))
+        } else {
+            self.body = ViewBuilder.buildEither(second: nil)
+        }
+    }
+    
 }
 
 extension SwitchOverCaseNextView where Data: Equatable {
@@ -151,14 +217,25 @@ extension SwitchOverCaseView {
             content: content
         )
     }
-
+    
     /// Handles a case in a `switch` control flow.
-    public func `case`<Content: View>(
-        _ comparate: Data,
-        predicate: @escaping (Data) -> Bool,
+    public func `case`<Content: View, Value>(
+        _ predicate: CasePathPredicate<Data, Value>,
         @ViewBuilder content: () -> Content
     ) -> SwitchOverCaseNextView<Self, Content> {
-        .init(
+        return .init(
+            previous: self,
+            predicate: predicate,
+            content: content
+        )
+    }
+    
+    /// Handles a case in a `switch` control flow.
+    public func `case`<Content: View, Value>(
+        _ predicate: CasePathPredicate<Data, Value>,
+        @ViewBuilder content: (Value) -> Content
+    ) -> SwitchOverCaseNextView<Self, Content> {
+        return .init(
             previous: self,
             predicate: predicate,
             content: content

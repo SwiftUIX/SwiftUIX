@@ -13,10 +13,13 @@ let package = Package(
     products: [
         .library(name: "SwiftUIX", targets: ["SwiftUIX"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/pointfreeco/swift-case-paths.git", from: "0.1.0")
+    ],
     targets: [
         .target(
             name: "SwiftUIX",
-            dependencies: [],
+            dependencies: [.product(name: "CasePaths", package: "CasePaths")],
             path: "Sources"
         ),
     ],
