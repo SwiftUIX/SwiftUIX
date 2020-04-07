@@ -25,6 +25,7 @@ public struct AxisStack<Content: View>: View {
         self.content = content()
     }
     
+    @inlinable
     public var body: some View {
         Group {
             if axis == .horizontal {

@@ -6,8 +6,11 @@ import Swift
 import SwiftUI
 
 public struct ResultView<SuccessView: View, FailureView: View, Success, Failure: Error>: View {
-    private let successView: SuccessView?
-    private let failureView: FailureView?
+    @usableFromInline
+    let successView: SuccessView?
+    
+    @usableFromInline
+    let failureView: FailureView?
     
     public init(
         _ result: Result<Success, Failure>,
@@ -24,6 +27,7 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
         }
     }
     
+    @inlinable
     public var body: some View {
         Group {
             if successView != nil {

@@ -28,3 +28,18 @@ public struct VerticalSpacer: View {
         
     }
 }
+
+extension View {
+    @inlinable
+    public func bottomTrailing() -> some View {
+        ZStack {
+            HStack {
+                Spacer()
+                VStack {
+                    Spacer()
+                    self
+                }
+            }
+        }
+    }
+}

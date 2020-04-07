@@ -7,7 +7,9 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: UIViewControllerRepresentable {
+@usableFromInline
+struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: UIViewControllerRepresentable {
+    @usableFromInline
     class UIViewControllerType: UIViewController {
         var leading: Leading? {
             didSet {
@@ -122,10 +124,12 @@ private struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: 
         self.displayMode = displayMode
     }
     
+    @usableFromInline
     func makeUIViewController(context: Context) -> UIViewControllerType {
         .init()
     }
     
+    @usableFromInline
     func updateUIViewController(_ viewController: UIViewControllerType, context: Context) {
         viewController.displayMode = displayMode
         viewController.leading = leading

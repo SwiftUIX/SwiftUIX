@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 extension View {
+    @inlinable
     public func then(_ body: (inout Self) -> Void) -> Self {
         var result = self
         
@@ -27,36 +28,26 @@ extension View {
         background(color.edgesIgnoringSafeArea(.all))
     }
     
+    @inlinable
     public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
         background(EmptyView().preference(key: K.self, value: value))
     }
 }
 
 extension View {
-    public func bottomTrailing() -> some View {
-        ZStack {
-            HStack {
-                Spacer()
-                VStack {
-                    Spacer()
-                    self
-                }
-            }
-        }
-    }
-}
-
-extension View {
+    @inlinable
     public func inset(_ point: CGPoint) -> some View {
         return offset(x: -point.x, y: -point.y)
     }
     
+    @inlinable
     public func offset(_ point: CGPoint) -> some View {
         return offset(x: point.x, y: point.y)
     }
 }
 
 extension View {
+    @inlinable
     public func relativeHeight(
         _ ratio: CGFloat,
         alignment: Alignment = .center
@@ -69,6 +60,7 @@ extension View {
         }
     }
     
+    @inlinable
     public func relativeWidth(
         _ ratio: CGFloat,
         alignment: Alignment = .center
@@ -81,6 +73,7 @@ extension View {
         }
     }
     
+    @inlinable
     public func relativeSize(
         width widthRatio: CGFloat,
         height heightRatio: CGFloat,
@@ -96,10 +89,12 @@ extension View {
     }
     
     /// Causes the view to fill into its superview.
+    @inlinable
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0)
     }
     
+    @inlinable
     public func fit() -> some View {
         GeometryReader { geometry in
             self.frame(
@@ -171,28 +166,34 @@ extension View {
 }
 
 extension View {
+    @inlinable
     public func width(_ width: CGFloat?) -> some View {
         frame(width: width)
     }
     
+    @inlinable
     public func height(_ height: CGFloat?) -> some View {
         frame(height: height)
     }
     
+    @inlinable
     public func maxWidth(_ width: CGFloat?) -> some View {
         frame(maxWidth: width)
     }
     
+    @inlinable
     public func maxHeight(_ height: CGFloat?) -> some View {
         frame(maxHeight: height)
     }
     
+    @inlinable
     public func square(_ sideLength: CGFloat?) -> some View {
         frame(width: sideLength, height: sideLength)
     }
 }
 
 extension View {
+    @inlinable
     public func hidden(_ isHidden: Bool) -> some View {
         Group {
             if isHidden {
@@ -208,11 +209,13 @@ extension View {
 
 extension View {
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")
+    @inlinable
     public func navigationBarTitle(_ title: String) -> some View {
         return self
     }
     
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")
+    @inlinable
     public func navigationBarItems<V: View>(trailing: V) -> some View {
         return self
     }
