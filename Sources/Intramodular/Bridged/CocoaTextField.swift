@@ -24,6 +24,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
+    private var borderStyle: UITextField.BorderStyle = .none
     
     @Environment(\.font) var font
     
@@ -48,7 +49,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 inputView: inputView,
                 kerning: kerning,
                 keyboardType: keyboardType,
-                placeholder: placeholder
+                placeholder: placeholder,
+                borderStyle: borderStyle
             )
         }
     }
@@ -74,6 +76,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
+    var borderStyle: UITextField.BorderStyle
     
     public class Coordinator: NSObject, UITextFieldDelegate {
         var base: _CocoaTextField
@@ -177,6 +180,8 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.placeholder = nil
         }
         
+        uiView.borderStyle = borderStyle
+        
         uiView.text = text
         uiView.textAlignment = .init(multilineTextAlignment)
         
@@ -275,6 +280,10 @@ extension CocoaTextField {
     
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
+    }
+    
+    public func borderStyle(_ borderStyle: UITextField.BorderStyle) -> Self {
+        then({ $0.borderStyle = borderStyle })
     }
 }
 
