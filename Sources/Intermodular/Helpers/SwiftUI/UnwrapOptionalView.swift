@@ -17,7 +17,7 @@ public struct UnwrapOptionalView<Content: View>: View {
     
     @inlinable
     public var body: some View {
-        content ?? EmptyView()
+        content
     }
     
     @inlinable
