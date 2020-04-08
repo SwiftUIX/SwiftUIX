@@ -5,10 +5,17 @@
 import Swift
 import SwiftUI
 
-struct _OnDragModifier<Content: View>: View {
-    let rootView: Content
-    let data: () -> NSItemProvider
+private struct _OnDragModifier<Content: View>: View {
+    private let rootView: Content
+    private let data: () -> NSItemProvider
     
+    @usableFromInline
+    init(rootView: Content, data: @escaping () -> NSItemProvider) {
+        self.rootView = rootView
+        self.data = data
+    }
+    
+    @usableFromInline
     var body: some View {
         if #available(iOS 13.4, *) {
             return rootView.onDrag(data)
@@ -19,6 +26,8 @@ struct _OnDragModifier<Content: View>: View {
 }
 
 extension View {
+    @_optimize(none)
+    @inline(never)
     public func onDragIfAvailable(_ data: @escaping () -> NSItemProvider) -> some View {
         if #available(iOS 13.4, *) {
             return ViewBuilder.buildEither(first: _OnDragModifier(rootView: self, data: data)) as _ConditionalContent<_OnDragModifier<Self>, Self>
