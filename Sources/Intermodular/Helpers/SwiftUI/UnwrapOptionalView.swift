@@ -54,6 +54,7 @@ extension Optional {
 }
 
 extension View {
+    @inlinable
     public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
         Group {
             if value != nil {

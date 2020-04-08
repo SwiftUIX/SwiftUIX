@@ -14,10 +14,12 @@ public protocol opaque_View {
 // MARK: - Implementation -
 
 extension opaque_View where Self: View {
+    @inlinable
     public func opaque_getViewName() -> ViewName? {
         nil
     }
     
+    @inlinable
     public func eraseToAnyView() -> AnyView {
         .init(self)
     }
