@@ -14,6 +14,10 @@ extension View {
     ///       the amount is the system default amount.
     ///     - sizeClass: The size class for which to inset this view.
     /// - Returns: A view that pads this view using edge the insets you specify.
+    @available(iOS 13.0, *)
+    @available(OSX, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
     public func padding(
         _ edges: Edge.Set,
         _ length: CGFloat? = nil,

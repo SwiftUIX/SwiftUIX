@@ -24,11 +24,10 @@ public struct ZeroSizeView: AppKitOrUIKitViewRepresentable {
 }
 
 #else
-
 public struct ZeroSizeView: View {
+    public init() {}
     public var body: some View {
         EmptyView() // FIXME!!
     }
 }
-
 #endif
