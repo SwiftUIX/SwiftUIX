@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
+
 public struct PopoverPresentationLink<Destination: View, Label: View>: PresentationLinkView {
     private let destination: () -> Destination
     private let label: Label
@@ -60,4 +61,5 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
         onDismiss?()
     }
 }
+
 #endif
