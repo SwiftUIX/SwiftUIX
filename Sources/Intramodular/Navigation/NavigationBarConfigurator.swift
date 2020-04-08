@@ -112,6 +112,7 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
     let trailing: Trailing
     let displayMode: NavigationBarItem.TitleDisplayMode?
     
+    @usableFromInline
     init(
         leading: Leading,
         center: Center,
@@ -139,6 +140,7 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
 }
 
 extension View {
+    @inlinable
     public func navigationBarItems<Leading: View, Center: View, Trailing: View>(
         leading: Leading,
         center: Center,
@@ -148,6 +150,7 @@ extension View {
         background(NavigationBarConfigurator(leading: leading, center: center, trailing: trailing, displayMode: displayMode))
     }
     
+    @inlinable
     public func navigationBarItems<Leading: View, Center: View>(
         leading: Leading,
         center: Center,
@@ -156,6 +159,7 @@ extension View {
         navigationBarItems(leading: leading, center: center, trailing: EmptyView(), displayMode: displayMode)
     }
     
+    @inlinable
     public func navigationBarTitleView<V: View>(
         _ center: V,
         displayMode: NavigationBarItem.TitleDisplayMode
@@ -163,12 +167,14 @@ extension View {
         navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: displayMode)
     }
     
+    @inlinable
     public func navigationBarTitleView<V: View>(
         _ center: V
     ) -> some View {
         navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: .automatic)
     }
 
+    @inlinable
     public func navigationBarItems<Center: View, Trailing: View>(
         center: Center,
         trailing: Trailing,
