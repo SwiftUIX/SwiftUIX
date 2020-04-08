@@ -7,18 +7,20 @@ import Swift
 import SwiftUI
 
 public struct UnwrapOptionalView<Content: View>: View {
-    private let content: Content?
+    @usableFromInline
+    let content: Content?
     
+    @inlinable
     public init<Value>(_ value: Optional<Value>, @ViewBuilder content: (Value) -> Content) {
         self.content = value.map(content)
     }
     
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public var body: some View {
         content ?? EmptyView()
     }
     
+    @inlinable
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
         Group {
             if lhs.content == nil {
@@ -31,30 +33,28 @@ public struct UnwrapOptionalView<Content: View>: View {
 }
 
 extension UnwrapOptionalView {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public func `else`<V: View>(@ViewBuilder _ view: () -> V) -> some View {
-        (self ?? view()).eraseToAnyView()
+        self ?? view()
     }
     
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public func `else`<V: View>(_ view: V) -> some View {
-        (self ?? view).eraseToAnyView()
+        self ?? view
     }
 }
 
 // MARK: - Helpers -
 
 extension Optional {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Content> {
         .init(self, content: content)
     }
 }
 
 extension View {
+    @inlinable
     public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
         Group {
             if value != nil {

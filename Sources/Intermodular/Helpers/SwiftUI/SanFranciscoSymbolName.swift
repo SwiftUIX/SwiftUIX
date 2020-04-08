@@ -1724,6 +1724,7 @@ public extension Image {
 #else
 
 public extension Image {
+    @inlinable
     init(systemName: SanFranciscoSymbolName) {
         self.init(systemName: systemName.rawValue)
     }

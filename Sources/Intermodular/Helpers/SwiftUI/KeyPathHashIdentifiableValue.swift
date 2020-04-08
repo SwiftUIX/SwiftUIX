@@ -9,6 +9,7 @@ public struct KeyPathHashIdentifiableValue<Value, Identifier: Hashable>: Identif
     public let value: Value
     public let keyPath: KeyPath<Value, Identifier>
     
+    @inlinable
     public var id: HashIdentifiableValue<Identifier> {
         value[keyPath: keyPath].hashIdentifiable
     }

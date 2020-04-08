@@ -34,7 +34,7 @@ extension Optional {
 }
 
 extension Optional where Wrapped: View {
-    @_optimize(none)
+    @inlinable
     public static func ?? <V: View>(lhs: Self, rhs: @autoclosure () -> V) -> _ConditionalContent<Self, V> {
         if let wrapped = lhs {
             return ViewBuilder.buildEither(first: wrapped)

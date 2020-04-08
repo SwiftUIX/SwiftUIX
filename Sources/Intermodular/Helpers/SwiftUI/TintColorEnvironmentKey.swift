@@ -22,6 +22,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    @inlinable
     public func tintColor(_ color: Color) -> some View {
         environment(\.tintColor, color)
     }
