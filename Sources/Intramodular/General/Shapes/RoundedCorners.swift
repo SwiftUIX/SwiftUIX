@@ -34,6 +34,7 @@ public struct RoundedCorners: Shape {
 #if canImport(UIKit)
 
 extension View {
+    @inlinable
     public func cornerRadius(_ corners: UIRectCorner, _ radius: CGFloat) -> some View {
         clipShape(RoundedCorners(radius: radius, corners: corners))
     }

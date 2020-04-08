@@ -106,6 +106,7 @@ extension View {
 }
 
 extension View {
+    @inlinable
     public func frame(minimum dimensionLength: CGFloat, axis: Axis) -> some View {
         switch axis {
             case .horizontal:

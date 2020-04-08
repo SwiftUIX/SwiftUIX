@@ -7,31 +7,39 @@ import SwiftUI
 
 /// Builds an environment for a given view.
 public struct EnvironmentBuilder {
-    fileprivate var descriptionObjects: [Any] = []
+    @usableFromInline
+    var descriptionObjects: [Any] = []
     
-    fileprivate var environmentValuesTransforms: [(inout EnvironmentValues) -> Void] = []
-    fileprivate var environmentObjectTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
+    @usableFromInline
+    var environmentValuesTransforms: [(inout EnvironmentValues) -> Void] = []
+    
+    @usableFromInline
+    var environmentObjectTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
     
     public var isEmpty: Bool {
         environmentObjectTransforms.isEmpty && environmentValuesTransforms.isEmpty
     }
     
+    @inlinable
     public init() {
         
     }
 }
 
 extension EnvironmentBuilder {
+    @inlinable
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
         environmentValuesTransforms.append(transform)
     }
     
+    @inlinable
     public mutating func insert<B: ObservableObject>(_ bindable: B) {
         descriptionObjects.append(bindable)
         
         environmentObjectTransforms[ObjectIdentifier(type(of: bindable))] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
     
+    @inlinable
     public mutating func merge(_ builder: EnvironmentBuilder) {
         environmentValuesTransforms.append(contentsOf: builder.environmentValuesTransforms)
         environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
@@ -79,6 +87,7 @@ extension EnvironmentBuilder {
 }
 
 extension View {
+    @inlinable
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
         Group {
             if builder.isEmpty {
@@ -89,7 +98,8 @@ extension View {
         }
     }
     
-    private func _mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
+    @inlinable
+    public func _mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
         var view = eraseToAnyView()
         
         view = builder.environmentObjectTransforms.values.reduce(view, { view, transform in transform(view) })

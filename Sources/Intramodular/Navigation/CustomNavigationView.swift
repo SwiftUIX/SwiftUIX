@@ -8,10 +8,13 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CustomNavigationView<Content: View>: View {
-    private let content: Content
+    @usableFromInline
+    let content: Content
     
-    @State private var isNavigationBarVisible: Bool? = nil
+    @usableFromInline
+    @State var isNavigationBarVisible: Bool? = nil
     
+    @inlinable
     public var isNavigationBarHidden: Bool? {
         guard let isNavigationBarVisible = isNavigationBarVisible else {
             return nil
@@ -30,6 +33,7 @@ public struct CustomNavigationView<Content: View>: View {
         }
     }
     
+    @inlinable
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
@@ -47,6 +51,7 @@ extension View {
     ///
     /// - Parameters:
     ///     - isTranslucent: A Boolean value that indicates whether the navigation bar is translucent.
+    @inlinable
     public func navigationBarIsTranslucent(_ isTranslucent: Bool) -> some View {
         configureUINavigationBar { navigationBar in
             navigationBar.isTranslucent = isTranslucent
@@ -60,6 +65,7 @@ extension View {
     ///
     /// - Parameters:
     ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
+    @inlinable
     public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
         configureUINavigationBar { navigationBar in
             navigationBar.isDefaultTransparent = isTransparent
@@ -73,6 +79,7 @@ extension View {
     ///
     /// - Parameters:
     ///     - color: The color to use for the navigation bar.
+    @inlinable
     public func navigationBarColor(_ color: Color) -> some View {
         configureUINavigationBar { navigationBar in
             navigationBar.backgroundColor = color.toUIColor()

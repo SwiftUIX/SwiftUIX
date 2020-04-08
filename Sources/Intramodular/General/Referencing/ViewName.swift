@@ -32,9 +32,15 @@ public struct ViewName: CustomStringConvertible, Hashable {
 
 // MARK: - Auxiliary Implementation -
 
-struct ViewNamePreferenceKeyValue {
+public struct _ViewNamePreferenceKeyValue {
     let name: ViewName
     let bounds: Anchor<CGRect>
+    
+    @usableFromInline
+    init(name: ViewName, bounds: Anchor<CGRect>) {
+        self.name = name
+        self.bounds = bounds
+    }
 }
 
 extension EnvironmentValues {

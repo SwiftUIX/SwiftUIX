@@ -10,19 +10,27 @@ import UIKit
 
 /// A view that paginates its children along a given axis.
 public struct PaginationView<Page: View>: View {
-    private let pages: [Page]
-    private let axis: Axis
-    private let transitionStyle: UIPageViewController.TransitionStyle
-    private let showsIndicators: Bool
+    @usableFromInline
+    let pages: [Page]
+    @usableFromInline
+    let axis: Axis
+    @usableFromInline
+    let transitionStyle: UIPageViewController.TransitionStyle
+    @usableFromInline
+    let showsIndicators: Bool
     
-    private var pageIndicatorAlignment: Alignment
-    private var initialPageIndex: Int?
-    private var currentPageIndex: Binding<Int>?
+    @usableFromInline
+    var pageIndicatorAlignment: Alignment
+    @usableFromInline
+    var initialPageIndex: Int?
+    @usableFromInline
+    var currentPageIndex: Binding<Int>?
     
     @State private var _currentPageIndex = 0
     
     @DelayedState private var progressionController: ProgressionController?
     
+    @inline(never)
     public init(
         pages: [Page],
         axis: Axis = .horizontal,
@@ -42,6 +50,7 @@ public struct PaginationView<Page: View>: View {
         }
     }
     
+    @inline(never)
     public init(
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
@@ -85,16 +94,19 @@ public struct PaginationView<Page: View>: View {
 }
 
 extension PaginationView {
+    @inlinable
     public func pageIndicatorAlignment(_ alignment: Alignment) -> Self {
         then({ $0.pageIndicatorAlignment = alignment })
     }
 }
 
 extension PaginationView {
+    @inlinable
     public func initialPageIndex(_ currentPageIndex: Binding<Int>) -> Self {
         then({ $0.initialPageIndex = initialPageIndex })
     }
     
+    @inlinable
     public func currentPageIndex(_ currentPageIndex: Binding<Int>) -> Self {
         then({ $0.currentPageIndex = currentPageIndex })
     }

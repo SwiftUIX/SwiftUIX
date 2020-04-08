@@ -31,6 +31,7 @@ public struct DraggabilityViewModifier: ViewModifier {
 // MARK: - Helpers -
 
 extension View {
+    @inlinable
     public func draggable() -> some View {
         return modifier(DraggabilityViewModifier())
     }

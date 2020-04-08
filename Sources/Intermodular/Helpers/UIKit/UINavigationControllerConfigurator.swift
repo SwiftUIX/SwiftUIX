@@ -7,10 +7,16 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-fileprivate struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
-    public typealias UIViewControllerType = UIViewController
+struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
+    typealias UIViewControllerType = UIViewController
     
+    @usableFromInline
     let configure: (UINavigationController) -> Void
+    
+    @usableFromInline
+    init(configure: @escaping (UINavigationController) -> Void) {
+        self.configure = configure
+    }
     
     func makeUIViewController(context: Context) -> UIViewController {
         UIViewControllerType()
@@ -24,12 +30,14 @@ fileprivate struct UINavigationControllerConfigurator: UIViewControllerRepresent
 // MARK: - API -
 
 extension View {
+    @usableFromInline
     func configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
         background(UINavigationControllerConfigurator(configure: configure))
     }
     
+    @usableFromInline
     func configureUINavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {

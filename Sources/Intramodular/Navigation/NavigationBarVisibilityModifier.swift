@@ -33,6 +33,7 @@ private struct HideNavigationBar: ViewModifier {
 // MARK: - API -
 
 extension View {
+    @inline(never)
     public func hideNavigationBar() -> some View {
         modifier(HideNavigationBar())
     }

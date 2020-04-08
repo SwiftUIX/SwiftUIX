@@ -22,6 +22,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    @inlinable
     public func initialContentAlignment(_ alignment: Alignment) -> some View {
         environment(\.initialContentAlignment, alignment)
     }

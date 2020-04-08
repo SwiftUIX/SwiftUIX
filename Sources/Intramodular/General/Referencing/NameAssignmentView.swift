@@ -11,14 +11,16 @@ public struct NameAssignmentView<Content: View>: NamedView {
     public let content: Content
     public let name: ViewName
     
-    fileprivate init(content: Content, name: ViewName) {
+    @usableFromInline
+    init(content: Content, name: ViewName) {
         self.content = content
         self.name = name
     }
     
+    @inlinable
     public var body: some View {
         content.environment(\.viewName, name).anchorPreference(
-            key: ArrayReducePreferenceKey<ViewNamePreferenceKeyValue>.self,
+            key: ArrayReducePreferenceKey<_ViewNamePreferenceKeyValue>.self,
             value: .bounds
         ) {
             [.init(name: self.name, bounds: $0)]
@@ -30,11 +32,13 @@ public struct NameAssignmentView<Content: View>: NamedView {
 
 extension View {
     /// Set a name for `self`.
+    @inlinable
     public func name(_ name: ViewName) -> NameAssignmentView<Self> {
         .init(content: self, name: name)
     }
     
     /// Set a name for `self`.
+    @inlinable
     public func name<H: Hashable>(_ name: H) -> NameAssignmentView<Self> {
         self.name(ViewName(name))
     }
