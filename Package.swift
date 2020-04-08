@@ -1,5 +1,4 @@
 // swift-tools-version:5.1
-
 import PackageDescription
 
 let package = Package(
@@ -13,14 +12,16 @@ let package = Package(
     products: [
         .library(name: "SwiftUIX", targets: ["SwiftUIX"])
     ],
-    dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-case-paths.git", from: "0.1.0")
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "SwiftUIX",
-            dependencies: [.product(name: "CasePaths", package: "CasePaths")],
+            dependencies: [],
             path: "Sources"
+        ),
+        .testTarget(
+            name: "SwiftUIXTests",
+            dependencies: ["SwiftUIX"]
         ),
     ],
     swiftLanguageVersions: [

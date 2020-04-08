@@ -3,7 +3,6 @@
 //
 
 import SwiftUI
-import CasePaths
 
 /// A view representing the start of a `switch` control flow.
 public struct SwitchOver<Data>: View {
@@ -70,7 +69,6 @@ extension SwitchOver {
     }
 }
 
-import CasePaths
 public struct CasePathPredicate<Root, Value> {
     private var path: CasePath<Root, Value>
     
