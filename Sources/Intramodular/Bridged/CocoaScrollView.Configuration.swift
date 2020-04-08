@@ -7,16 +7,24 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-struct CocoaScrollViewConfiguration<Content: View> {
+public struct CocoaScrollViewConfiguration<Content: View> {
+    @usableFromInline
     var alwaysBounceVertical: Bool = false
+    @usableFromInline
     var alwaysBounceHorizontal: Bool = false
+    @usableFromInline
     var isPagingEnabled: Bool = false
+    @usableFromInline
     var isDirectionalLockEnabled: Bool = false
+    @usableFromInline
     var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in }
+    @usableFromInline
     var onRefresh: (() -> Void)?
+    @usableFromInline
     var isRefreshing: Bool?
     
     @available(tvOS, unavailable)
+    @usableFromInline
     var setupRefreshControl: ((UIRefreshControl) -> Void)?
 }
 
