@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A view that unwraps an `Optional` to produce some content.
 public struct UnwrapOptionalView<Content: View>: View {
     @usableFromInline
     let content: Content?
