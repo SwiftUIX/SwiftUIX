@@ -8,6 +8,32 @@ import Swift
 import UIKit
 
 extension UIResponder {
+    var globalFrame: CGRect? {
+        guard let view = self as? UIView else {
+            return nil
+        }
+        
+        return view.superview?.convert(view.frame, to: nil)
+    }
+}
+
+extension UIResponder {
+    private static weak var _firstResponder: UIResponder?
+    
+    static var firstResponder: UIResponder? {
+        _firstResponder = nil
+        
+        UIApplication.shared.sendAction(#selector(UIResponder.acquireFirstResponder(_:)), to: nil, from: nil, for: nil)
+        
+        return _firstResponder
+    }
+    
+    @objc private func acquireFirstResponder(_ sender: Any) {
+        UIResponder._firstResponder = self
+    }
+}
+
+extension UIResponder {
     open func nearestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
         guard !isKind(of: kind) else {
             return (self as! Responder)

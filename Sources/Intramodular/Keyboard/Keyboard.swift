@@ -22,7 +22,7 @@ public final class Keyboard: ObservableObject {
     private var keyboardWillChangeFrameSubscription: AnyCancellable?
     private var keyboardDidChangeFrameSubscription: AnyCancellable?
     private var keyboardDidHideSubscription: AnyCancellable?
-
+    
     public init(notificationCenter: NotificationCenter = .default) {
         #if os(iOS) || targetEnvironment(macCatalyst)
         
@@ -37,7 +37,7 @@ public final class Keyboard: ObservableObject {
             .compactMap({ Keyboard.State(notification: $0, screen: .main) })
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
-
+        
         self.keyboardDidHideSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardDidHideNotification)
             .receive(on: DispatchQueue.main)
@@ -77,7 +77,7 @@ extension Keyboard {
         
         init?(notification: Notification, screen: Screen) {
             #if os(iOS) || targetEnvironment(macCatalyst)
-
+            
             guard
                 let userInfo = notification.userInfo,
                 let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
@@ -115,7 +115,7 @@ extension Keyboard {
 
 struct HiddenIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
-
+    
     func body(content: Content) -> some View {
         content.hidden(keyboard.isShowing)
     }
@@ -123,7 +123,7 @@ struct HiddenIfKeyboardActive: ViewModifier {
 
 struct VisibleIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
-        
+    
     func body(content: Content) -> some View {
         content.hidden(!keyboard.isShowing)
     }
@@ -131,7 +131,7 @@ struct VisibleIfKeyboardActive: ViewModifier {
 
 struct RemoveIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
-        
+    
     func body(content: Content) -> some View {
         content.frame(
             width: keyboard.isShowing ? 0 : nil,
@@ -143,7 +143,7 @@ struct RemoveIfKeyboardActive: ViewModifier {
 
 struct AddIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
-
+    
     func body(content: Content) -> some View {
         content.frame(
             width: keyboard.isShowing ? nil : 0,
