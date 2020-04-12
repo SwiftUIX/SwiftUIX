@@ -82,13 +82,15 @@ extension _PaginationView: UIViewControllerRepresentable {
                 animated: true
             )
         } else {
-            uiViewController.setViewControllers(
-                [uiViewController.allViewControllers.first!],
-                direction: .forward,
-                animated: false
-            )
-            
-            currentPageIndex = 0
+            if !uiViewController.allViewControllers.isEmpty {
+                uiViewController.setViewControllers(
+                    [uiViewController.allViewControllers.first!],
+                    direction: .forward,
+                    animated: false
+                )
+                
+                currentPageIndex = 0
+            }
         }
         
         progressionController = _ProgressionController(base: uiViewController)
@@ -124,13 +126,15 @@ extension _PaginationView: UIViewControllerRepresentable {
                 }
             }
         } else {
-            uiViewController.setViewControllers(
-                [uiViewController.allViewControllers.first!],
-                direction: .forward,
-                animated: false
-            )
-            
-            currentPageIndex = 0
+            if !uiViewController.allViewControllers.isEmpty {
+                uiViewController.setViewControllers(
+                    [uiViewController.allViewControllers.first!],
+                    direction: .forward,
+                    animated: false
+                )
+                
+                currentPageIndex = 0
+            }
         }
         
         if #available(iOS 13.1, *) {
