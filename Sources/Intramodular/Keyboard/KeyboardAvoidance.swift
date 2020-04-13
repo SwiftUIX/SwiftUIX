@@ -7,7 +7,8 @@
 import Combine
 import SwiftUI
 
-private struct AvoidKeyboard: ViewModifier {
+private struct KeyboardAvoidance: ViewModifier {
+    let isSimple: Bool
     let animation: Animation?
     
     @State var padding: CGFloat = 0
@@ -17,7 +18,11 @@ private struct AvoidKeyboard: ViewModifier {
             content
                 .padding(.bottom, self.padding)
                 .onReceive(self.keyboardHeightPublisher, perform: { keyboardHeight in
-                    self.padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
+                    if self.isSimple {
+                        self.padding = keyboardHeight > 0 ? keyboardHeight - geometry.safeAreaInsets.bottom : 0
+                    } else {
+                        self.padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
+                    }
                 })
                 .animation(self.animation)
         }
@@ -46,7 +51,15 @@ private struct AvoidKeyboard: ViewModifier {
 extension View {
     public func keyboardAvoiding(animation: Animation = .spring()) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
-        return modifier(AvoidKeyboard(animation: animation))
+        return modifier(KeyboardAvoidance(isSimple: false, animation: animation))
+        #else
+        return self
+        #endif
+    }
+    
+    public func keyboardPadding(animation: Animation = .spring()) -> some View {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return modifier(KeyboardAvoidance(isSimple: true, animation: animation))
         #else
         return self
         #endif
