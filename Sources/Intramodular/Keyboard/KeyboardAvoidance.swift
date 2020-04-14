@@ -57,6 +57,7 @@ extension View {
         #endif
     }
     
+    /// Pads this view with the active system height of the keyboard.
     public func keyboardPadding(animation: Animation = .spring()) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return modifier(KeyboardAvoidance(isSimple: true, animation: animation))
