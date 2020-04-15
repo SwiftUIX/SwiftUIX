@@ -9,7 +9,6 @@
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 public struct _HoverEffectViewModifier: ViewModifier {
-  
     public let hoverEffect: HoverEffect
     
     @inlinable
@@ -20,13 +19,12 @@ public struct _HoverEffectViewModifier: ViewModifier {
     @inlinable
     public func body(content: Content) -> some View {
         if #available(iOS 13.4, *) {
-          return content
-            .hoverEffect(.init(hoverEffect))
+            return content.hoverEffect(.init(hoverEffect))
         } else {
-          fatalError("Use View.hoverEffectIfAvailable instead.")
+            fatalError("Use View.hoverEffectIfAvailable instead.")
         }
     }
-  
+    
 }
 
 @available(iOS 13, *)
@@ -34,7 +32,6 @@ public struct _HoverEffectViewModifier: ViewModifier {
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 extension View {
-  
     @inlinable
     public func hoverEffectIfAvailable(_ effect: HoverEffect = .automatic) -> some View {
         typealias Content = _ConditionalContent<ModifiedContent<Self, _HoverEffectViewModifier>, Self>
@@ -44,9 +41,7 @@ extension View {
         } else {
             return ViewBuilder.buildEither(second: self) as Content
         }
-      
     }
-  
 }
 
 #endif
