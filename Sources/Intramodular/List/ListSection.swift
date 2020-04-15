@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A model suitable for representing sections of a list.
 public struct ListSection<Model, Item> {
     private let _id: Int?
     private let _model: Model!

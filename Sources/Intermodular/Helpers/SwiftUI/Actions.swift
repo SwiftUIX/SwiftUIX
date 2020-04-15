@@ -5,6 +5,26 @@
 import Swift
 import SwiftUI
 
+public struct Action: Hashable {
+    private var value: @convention(block) () -> Void
+    
+    public init(_ value: @escaping () -> Void) {
+        self.value = value
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        unsafeBitCast((value as AnyObject), to: UnsafeRawPointer.self).hash(into: &hasher)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        (lhs.value as AnyObject) === (rhs.value as AnyObject)
+    }
+    
+    public func perform() {
+        value()
+    }
+}
+
 public struct Actions {
     public typealias Action = () -> Void
     

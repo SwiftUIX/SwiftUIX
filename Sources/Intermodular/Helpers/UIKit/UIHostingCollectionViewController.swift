@@ -69,6 +69,30 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
         return cell
     }
     
+    override public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+        cell(for: indexPath)?.listRowPreferences?.isHighlightable ?? super.collectionView(collectionView, shouldHighlightItemAt: indexPath)
+    }
+    
+    override public func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        cell(for: indexPath)?.isHighlighted = true
+    }
+    
+    override public func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        cell(for: indexPath)?.isHighlighted = false
+    }
+    
+    override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        cell(for: indexPath)?.listRowPreferences?.onSelect?.perform()
+    }
+    
+    override public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        cell(for: indexPath)?.listRowPreferences?.onDeselect?.perform()
+    }
+    
+    public func cell(for indexPath: IndexPath) -> UIHostingCollectionViewCell<Item, RowContent>? {
+        collectionView.visibleCells.compactMap({ $0 as? UIHostingCollectionViewCell<Item, RowContent> }).first(where: { $0.indexPath == indexPath }) ?? collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
+    }
+    
     public func reloadData() {
         if _isDataDirty {
             collectionView.reloadData()

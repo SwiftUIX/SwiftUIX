@@ -5,7 +5,6 @@
 #if os(iOS)
 
 import Foundation
-import SwiftUIX
 import UIKit
 
 open class SceneDelegateBase<AppDelegate: UIApplicationDelegate>: UIResponder, UIWindowSceneDelegate {

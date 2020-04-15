@@ -6,8 +6,14 @@ import Swift
 import SwiftUI
 
 public protocol ListRowManager {
-    func _animate(_ action: () -> ()) 
-    func _reload() 
+    /// Whether the row is highlighted or not.
+    var isHighlighted: Bool { get }
+    
+    /// Animate and invoke `action`.
+    func _animate(_ action: () -> ())
+    
+    /// Trigger a reload.
+    func _reload()
 }
 
 // MARK: - Auxiliary Implementation -

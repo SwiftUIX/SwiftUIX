@@ -91,6 +91,10 @@ extension UIHostingTableViewCell {
 extension UIHostingTableViewCell {
     private struct RootView: View {
         private struct _ListRowManager: ListRowManager {
+            var isHighlighted: Bool {
+                false // FIXME!!!
+            }
+
             weak var uiTableViewCell: UIHostingTableViewCell<Item, Content>?
             
             func _animate(_ action: () -> ()) {

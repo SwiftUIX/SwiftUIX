@@ -17,6 +17,14 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
     private var contentHostingController: UIHostingController<RootView>!
     private var isContentSizeCached = false
     
+    var listRowPreferences: _ListRowPreferences?
+    
+    override public var isHighlighted: Bool {
+        didSet {
+            contentHostingController.rootView.manager.isHighlighted = isHighlighted
+        }
+    }
+    
     override public func awakeFromNib() {
         super.awakeFromNib()
         
@@ -45,6 +53,7 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
     
     override public func prepareForReuse() {
         isContentSizeCached = false
+        listRowPreferences = nil
         
         super.prepareForReuse()
     }
@@ -68,7 +77,7 @@ extension UIHostingCollectionViewCell {
             layoutMargins = .zero
             selectedBackgroundView = .init()
             
-            contentHostingController = UIHostingController(rootView: RootView(uiCollectionViewCell: self))
+            contentHostingController = UIHostingController(rootView: RootView(base: self))
             contentHostingController.view.backgroundColor = .clear
             contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
             
@@ -84,7 +93,7 @@ extension UIHostingCollectionViewCell {
                 contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
             ])
         } else {
-            contentHostingController.rootView = RootView(uiCollectionViewCell: self)
+            contentHostingController.rootView = RootView(base: self)
         }
     }
 }
@@ -93,26 +102,34 @@ extension UIHostingCollectionViewCell {
 
 extension UIHostingCollectionViewCell {
     private struct RootView: View {
-        private struct _ListRowManager: ListRowManager {
-            unowned let uiCollectionViewCell: UIHostingCollectionViewCell<Item, Content>
+        struct _ListRowManager: ListRowManager {
+            weak var base: UIHostingCollectionViewCell<Item, Content>?
             
+            var isHighlighted: Bool = false
+
             func _animate(_ action: () -> ()) {
-                /*uiCollectionViewCell.tableViewController.tableView.beginUpdates()
-                 action()
-                 uiCollectionViewCell.tableViewController.tableView.endUpdates()*/
+                // FIXME!!!
             }
             
             func _reload() {
-                uiCollectionViewCell.reload()
+                base?.reload()
             }
         }
         
-        unowned let uiCollectionViewCell: UIHostingCollectionViewCell<Item, Content>
+        var manager: _ListRowManager
+        
+        init(base: UIHostingCollectionViewCell<Item, Content>?) {
+            self.manager = .init(base: base)
+        }
         
         var body: some View {
-            uiCollectionViewCell.makeContent(uiCollectionViewCell.item)
-                .environment(\.listRowManager, _ListRowManager(uiCollectionViewCell: uiCollectionViewCell))
-                .id(uiCollectionViewCell.item.id)
+            manager.base.ifSome { base in
+                base
+                    .makeContent(base.item)
+                    .environment(\.listRowManager, manager)
+                    .onPreferenceChange(_ListRowPreferencesKey.self, perform: { base.listRowPreferences = $0 })
+                    .id(base.item.id)
+            }
         }
     }
 }
