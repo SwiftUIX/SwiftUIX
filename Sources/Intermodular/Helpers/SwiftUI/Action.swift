@@ -26,27 +26,33 @@ public struct Action: Hashable {
 }
 
 public struct Actions {
-    public typealias Action = () -> Void
-    
     private var value: [Action]
     
     public init(_ value: [Action]) {
         self.value = value
     }
     
-    public init(initial action: @escaping Action) {
+    public init(initial action: (Action)) {
         self.init([action])
+    }
+    
+    public init(initial action: @escaping () -> Void) {
+        self.init(initial: .init(action))
     }
     
     public init() {
         self.init([])
     }
     
-    public mutating func insert(_ action: @escaping Action) {
+    public mutating func insert(_ action: Action) {
         value.append(action)
     }
     
+    public mutating func insert(_ action: @escaping () -> Void) {
+        insert(.init(action))
+    }
+    
     public func perform() {
-        value.forEach({ $0() })
+        value.forEach({ $0.perform() })
     }
 }
