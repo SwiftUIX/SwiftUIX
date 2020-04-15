@@ -25,7 +25,7 @@ public struct Action: Hashable {
     }
 }
 
-public struct Actions {
+public struct Actions: Hashable {
     private var value: [Action]
     
     public init(_ value: [Action]) {
