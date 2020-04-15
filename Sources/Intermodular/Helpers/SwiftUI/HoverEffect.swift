@@ -4,6 +4,8 @@
 
 #if swift(>=5.2)
 
+import SwiftUI
+
 /// A type to mirror `SwiftUI.HoverEffect`, added for compatibility.
 @available(iOS 13, *)
 @available(tvOS, unavailable)
