@@ -94,6 +94,27 @@ public struct PaginationView<Page: View>: View {
 }
 
 extension PaginationView {
+    @inline(never)
+    public init<Data, ID>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder pages: () -> ForEach<Data, ID, Page>
+    ) {
+        let _pages = pages()
+        
+        self.init(
+            pages: _pages.data.map(_pages.content),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+}
+
+// MARK: - API -
+
+extension PaginationView {
     @inlinable
     public func pageIndicatorAlignment(_ alignment: Alignment) -> Self {
         then({ $0.pageIndicatorAlignment = alignment })
