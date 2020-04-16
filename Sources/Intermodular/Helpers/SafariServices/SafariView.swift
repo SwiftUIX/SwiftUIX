@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || targetEnvironment(macCatalyst)
+
 import SafariServices
 import SwiftUI
 
@@ -90,3 +92,5 @@ extension SafariView {
         }
     }
 }
+
+#endif
