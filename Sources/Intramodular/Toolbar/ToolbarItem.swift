@@ -48,6 +48,16 @@ public struct ToolbarItem {
         self.itemIdentifier = itemIdentifier
         self.content = content
     }
+    
+    #if os(macOS) || targetEnvironment(macCatalyst)
+    public init<Content: View>(
+        itemIdentifier: String,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.itemIdentifier = itemIdentifier
+        self.content = .view(content().eraseToAnyView())
+    }
+    #endif
 }
 
 extension ToolbarItem {
@@ -62,7 +72,9 @@ extension ToolbarItem {
         switch content {
             #if os(macOS)
             case let .view(view):
-                result.view = NSHostingView(rootView: view)
+                result.view = NSHostingView(rootView: view).then({
+                    $0.layout()
+                })
             case let .cocoaImage(image):
                 result.image = image
             case let .cocoaView(view):
