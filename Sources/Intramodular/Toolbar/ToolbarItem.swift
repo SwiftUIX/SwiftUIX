@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS) || os(iOS)
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 #if targetEnvironment(macCatalyst)
 import AppKit
@@ -48,7 +48,77 @@ public struct ToolbarItem {
         self.itemIdentifier = itemIdentifier
         self.content = content
     }
+}
+
+extension ToolbarItem {
+    static var targetAssociationKey: Void = ()
     
+    #if os(macOS) || targetEnvironment(macCatalyst)
+    
+    func toNSToolbarItem() -> NSToolbarItem {
+        var result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
+        let target = NSToolbarItem._ActionTarget(action: action)
+        
+        switch content {
+            #if os(macOS)
+            case let .view(view):
+                result.view = NSHostingView(rootView: view)
+            case let .cocoaImage(image):
+                result.image = image
+            case let .cocoaView(view):
+                result.view = view
+            #endif
+            
+            #if targetEnvironment(macCatalyst)
+            case let .systemSymbol(name):
+                result.image = AppKitOrUIKitImage(systemName: name.rawValue)
+            case let .systemItem(item): do {
+                result = NSToolbarItem(
+                    itemIdentifier: .init(rawValue: itemIdentifier),
+                    barButtonItem: UIBarButtonItem(
+                        barButtonSystemItem: item,
+                        target: target,
+                        action: #selector(NSToolbarItem._ActionTarget.performAction)
+                    )
+                )
+            }
+            #endif
+            
+            case .none:
+                break
+        }
+        
+        objc_setAssociatedObject(result, &ToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
+        
+        result.action = #selector(NSToolbarItem._ActionTarget.performAction)
+        result.isEnabled = true
+        result.target = target
+        
+        if let label = label {
+            result.label = label
+        }
+        
+        if let title = title {
+            result.title = title
+        }
+        
+        return result
+    }
+    
+    #endif
+}
+
+// MARK: - Protocol Implementations -
+
+extension ToolbarItem: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.itemIdentifier == rhs.itemIdentifier
+    }
+}
+
+// MARK: - API -
+
+extension ToolbarItem {
     public func content(_ content: Content) -> ToolbarItem {
         var result = self
         
@@ -90,99 +160,6 @@ public struct ToolbarItem {
     }
 }
 
-class NSToolbarItemTarget {
-    let action: () -> ()
-    
-    init(action: @escaping () -> ()) {
-        self.action = action
-    }
-    
-    @objc(performAction) func performAction() {
-        action()
-    }
-}
-
-extension ToolbarItem {
-    static var targetAssociationKey: Void = ()
-    
-    #if os(macOS) || targetEnvironment(macCatalyst)
-    
-    func toNSToolbarItem() -> NSToolbarItem {
-        var result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
-        
-        switch content {
-            #if os(macOS)
-            case let .view(view):
-                result.view = NSHostingView(rootView: view)
-            case let .cocoaImage(image):
-                result.image = image
-            case let .cocoaView(view):
-                result.view = view
-            #endif
-            
-            #if targetEnvironment(macCatalyst)
-            case let .systemSymbol(name):
-                result.image = AppKitOrUIKitImage(systemName: name.rawValue)
-            case let .systemItem(item): do {
-                result = NSToolbarItem(
-                    itemIdentifier: .init(rawValue: itemIdentifier),
-                    barButtonItem: UIBarButtonItem(
-                        barButtonSystemItem: item,
-                        target: self,
-                        action: Selector(String("FIXME"))
-                    )
-                )
-            }
-            #endif
-            
-            case .none:
-                break
-        }
-        
-        let target = NSToolbarItemTarget(action: action)
-        
-        objc_setAssociatedObject(result, &ToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
-        
-        result.action = #selector(NSToolbarItemTarget.performAction)
-        result.isEnabled = true
-        result.target = target
-        
-        if let label = label {
-            result.label = label
-        }
-        
-        if let title = title {
-            result.title = title
-        }
-        
-        return result
-    }
-    
-    #endif
-}
-
-// MARK: - Protocol Implementations -
-
-extension ToolbarItem: Equatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.itemIdentifier == rhs.itemIdentifier
-    }
-}
-
-// MARK: - Helpers-
-
-public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
-    public typealias Value = [ToolbarItem]
-    
-    public static var defaultValue: Value {
-        []
-    }
-    
-    public static func reduce(value: inout Value, nextValue: () -> Value) {
-        
-    }
-}
-
 extension View {
     #if os(macOS)
     public func toolbarItem(withIdentifier identifier: String) -> ToolbarItem {
@@ -197,3 +174,34 @@ extension View {
 
 #endif
 
+// MARK: - Auxiliary Implementation -
+
+public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
+    public typealias Value = [ToolbarItem]
+    
+    public static var defaultValue: Value {
+        []
+    }
+    
+    public static func reduce(value: inout Value, nextValue: () -> Value) {
+        
+    }
+}
+
+#if os(macOS) || targetEnvironment(macCatalyst)
+
+extension NSToolbarItem {
+    class _ActionTarget: NSObject {
+        private let action: () -> ()
+        
+        init(action: @escaping () -> ()) {
+            self.action = action
+        }
+        
+        @objc(performAction) func performAction() {
+            action()
+        }
+    }
+}
+
+#endif
