@@ -49,7 +49,7 @@ public struct ToolbarItem {
         self.content = content
     }
     
-    #if os(macOS) || targetEnvironment(macCatalyst)
+    #if os(macOS) 
     public init<Content: View>(
         itemIdentifier: String,
         @ViewBuilder content: () -> Content

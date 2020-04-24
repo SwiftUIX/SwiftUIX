@@ -56,3 +56,25 @@ public struct Actions: Hashable {
         value.forEach({ $0.perform() })
     }
 }
+
+// MARK: - Use -
+
+public struct PerformActionView: View {
+    private let action: Action
+    
+    public init(perform action: Action) {
+        self.action = action
+    }
+    
+    public init(perform action: @escaping () -> Void) {
+        self.action = .init(action)
+    }
+    
+    public var body: some View {
+        DispatchQueue.main.async {
+            self.action.perform()
+        }
+        
+        return AnyView(EmptyView())
+    }
+}
