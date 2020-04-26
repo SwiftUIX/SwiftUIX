@@ -78,7 +78,7 @@ public struct PaginationView<Page: View>: View {
                 progressionController: $progressionController
             )
             
-            if showsIndicators && axis == .vertical || pageIndicatorAlignment != .center {
+            if showsIndicators && (axis == .vertical || pageIndicatorAlignment != .center) {
                 PageControl(
                     numberOfPages: pages.count,
                     currentPage: currentPageIndex ?? $_currentPageIndex
