@@ -5,22 +5,20 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || targetEnvironment(macCatalyst)
-
-public struct SearchBar: UIViewRepresentable {
-    public typealias UIViewType = UISearchBar
-    
+public struct SearchBar {
     @Binding fileprivate var text: String
     
     private let onEditingChanged: (Bool) -> Void
     private let onCommit: () -> Void
     
     private var placeholder: String?
+    
+    #if os(iOS) || targetEnvironment(macCatalyst)
     private var searchBarStyle: UISearchBar.Style = .minimal
+    #endif
+    
     private var showsCancelButton: Bool = false
     private var onCancel: () -> Void = { }
-    
-    @Environment(\.tintColor) var tintColor
     
     public init(
         text: Binding<String>,
@@ -31,6 +29,12 @@ public struct SearchBar: UIViewRepresentable {
         self.onCommit = onCommit
         self.onEditingChanged = onEditingChanged
     }
+}
+
+#if os(iOS) || targetEnvironment(macCatalyst)
+
+extension SearchBar: UIViewRepresentable {
+    public typealias UIViewType = UISearchBar
     
     public func makeUIView(context: Context) -> UIViewType {
         let uiView = UIViewType()
@@ -41,19 +45,22 @@ public struct SearchBar: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        context.coordinator.base = self
+        
         uiView.placeholder = placeholder
         uiView.searchBarStyle = searchBarStyle
-        uiView.text = text
         
-        if #available(iOS 13.1, *) {
-            uiView.tintColor = tintColor?.toUIColor()
+        if uiView.text != text {
+            uiView.text = text
         }
+        
+        uiView.tintColor = context.environment.tintColor?.toUIColor()
         
         uiView.setShowsCancelButton(showsCancelButton, animated: true)
     }
     
     public class Coordinator: NSObject, UISearchBarDelegate {
-        let base: SearchBar
+        var base: SearchBar
         
         init(base: SearchBar) {
             self.base = base
@@ -85,15 +92,85 @@ public struct SearchBar: UIViewRepresentable {
     }
 }
 
+#elseif os(macOS)
+
+extension SearchBar: NSViewRepresentable {
+    public typealias NSViewType = NSSearchField
+    
+    public func makeNSView(context: Context) -> NSViewType {
+        let nsView = NSSearchField(string: placeholder ?? "")
+        
+        nsView.delegate = context.coordinator
+        nsView.target = context.coordinator
+        nsView.action = #selector(context.coordinator.performAction(_:))
+        
+        nsView.bezelStyle = .roundedBezel
+        nsView.cell?.sendsActionOnEndEditing = false
+        nsView.isBordered = false
+        nsView.isBezeled = true
+        
+        return nsView
+    }
+    
+    public func updateNSView(_ nsView: NSSearchField, context: Context) {
+        context.coordinator.base = self
+        
+        if nsView.stringValue != text {
+            nsView.stringValue = text
+        }
+    }
+    
+    final public class Coordinator: NSObject, NSSearchFieldDelegate {
+        var base: SearchBar
+        
+        init(base: SearchBar) {
+            self.base = base
+        }
+        
+        public func controlTextDidChange(_ notification: Notification) {
+            guard let textField = notification.object as? NSTextField else {
+                return
+            }
+            
+            base.text = textField.stringValue
+        }
+        
+        public func controlTextDidBeginEditing(_ notification: Notification) {
+            base.onEditingChanged(true)
+        }
+        
+        public func controlTextDidEndEditing(_ notification: Notification) {
+            base.onEditingChanged(false)
+        }
+        
+        @objc
+        fileprivate func performAction(_ sender: NSTextField?) {
+            base.onCommit()
+        }
+    }
+    
+    public func makeCoordinator() -> Coordinator {
+        Coordinator(base: self)
+    }
+}
+
+#endif
+
+// MARK: - API -
+
 extension SearchBar {
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
     }
+}
 
+#if os(iOS) || targetEnvironment(macCatalyst)
+
+extension SearchBar {
     public func searchBarStyle(_ searchBarStyle: UISearchBar.Style) -> Self {
         then({ $0.searchBarStyle = searchBarStyle })
     }
-
+    
     public func showsCancelButton(_ shows: Bool) -> Self {
         then({ $0.showsCancelButton = showsCancelButton })
     }
