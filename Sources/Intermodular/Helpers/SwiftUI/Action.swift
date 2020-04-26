@@ -57,7 +57,7 @@ public struct Actions: Hashable {
     }
 }
 
-// MARK: - Use -
+// MARK: - Usage -
 
 public struct PerformActionView: View {
     private let action: Action

@@ -8,8 +8,6 @@ import SwiftUI
 /// Builds an environment for a given view.
 public struct EnvironmentBuilder {
     @usableFromInline
-    var descriptionValues: [Any] = []
-    @usableFromInline
     var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
     @usableFromInline
     var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
@@ -31,28 +29,24 @@ extension EnvironmentBuilder {
             return
         }
         
-        descriptionValues.append("(&EnvironmentValues)")
-        
         environmentValuesTransforms[key] = transform
     }
-
+    
     @inlinable
     public mutating func transformEnvironment<Key: Hashable>(_ transform: @escaping (inout EnvironmentValues) -> Void, withKey key: Key) {
         transformEnvironment(transform, withKey: .init(key))
     }
-
+    
     @inlinable
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
         transformEnvironment(transform, withKey: UUID())
     }
-        
+    
     @inlinable
     public mutating func insert<B: ObservableObject>(_ bindable: B, withKey key: AnyHashable) {
         guard environmentObjectTransforms.index(forKey: key) == nil else {
             return
         }
-
-        descriptionValues.append(bindable)
         
         environmentObjectTransforms[key] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
@@ -61,7 +55,7 @@ extension EnvironmentBuilder {
     public mutating func insert<B: ObservableObject, Key: Hashable>(_ bindable: B, withKey key: Key) {
         insert(bindable, withKey: .init(key))
     }
-
+    
     @inlinable
     public mutating func insert<B: ObservableObject>(_ bindable: B) {
         insert(bindable, withKey: ObjectIdentifier(bindable))
@@ -69,18 +63,8 @@ extension EnvironmentBuilder {
     
     @inlinable
     public mutating func merge(_ builder: EnvironmentBuilder) {
-        descriptionValues.append(contentsOf: builder.descriptionValues)
-        
         environmentValuesTransforms.merge(builder.environmentValuesTransforms) { x, y in x }
         environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
-    }
-}
-
-// MARK: - Protocol Implementations -
-
-extension EnvironmentBuilder: CustomStringConvertible {
-    public var description: String {
-        return descriptionValues.description
     }
 }
 
