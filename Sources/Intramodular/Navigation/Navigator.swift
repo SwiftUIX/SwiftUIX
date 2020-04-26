@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public protocol Navigator {
+public protocol Navigator: DynamicViewPresenter {
     func push<V: View>(_: V)
     func pop()
 }

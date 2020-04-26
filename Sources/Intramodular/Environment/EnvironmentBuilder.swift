@@ -8,13 +8,11 @@ import SwiftUI
 /// Builds an environment for a given view.
 public struct EnvironmentBuilder {
     @usableFromInline
-    var descriptionObjects: [Any] = []
-    
+    var descriptionValues: [Any] = []
     @usableFromInline
-    var environmentValuesTransforms: [(inout EnvironmentValues) -> Void] = []
-    
+    var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
     @usableFromInline
-    var environmentObjectTransforms: [ObjectIdentifier: (AnyView) -> AnyView] = [:]
+    var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
     
     public var isEmpty: Bool {
         environmentObjectTransforms.isEmpty && environmentValuesTransforms.isEmpty
@@ -28,23 +26,53 @@ public struct EnvironmentBuilder {
 
 extension EnvironmentBuilder {
     @inlinable
+    public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void, withKey key: AnyHashable) {
+        guard environmentValuesTransforms.index(forKey: key) == nil else {
+            return
+        }
+        
+        descriptionValues.append("(&EnvironmentValues)")
+        
+        environmentValuesTransforms[key] = transform
+    }
+
+    @inlinable
+    public mutating func transformEnvironment<Key: Hashable>(_ transform: @escaping (inout EnvironmentValues) -> Void, withKey key: Key) {
+        transformEnvironment(transform, withKey: .init(key))
+    }
+
+    @inlinable
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
-        environmentValuesTransforms.append(transform)
+        transformEnvironment(transform, withKey: UUID())
+    }
+        
+    @inlinable
+    public mutating func insert<B: ObservableObject>(_ bindable: B, withKey key: AnyHashable) {
+        guard environmentObjectTransforms.index(forKey: key) == nil else {
+            return
+        }
+
+        descriptionValues.append(bindable)
+        
+        environmentObjectTransforms[key] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
     
     @inlinable
+    public mutating func insert<B: ObservableObject, Key: Hashable>(_ bindable: B, withKey key: Key) {
+        insert(bindable, withKey: .init(key))
+    }
+
+    @inlinable
     public mutating func insert<B: ObservableObject>(_ bindable: B) {
-        descriptionObjects.append(bindable)
-        
-        environmentObjectTransforms[ObjectIdentifier(type(of: bindable))] = { $0.environmentObject(bindable).eraseToAnyView() }
+        insert(bindable, withKey: ObjectIdentifier(bindable))
     }
     
     @inlinable
     public mutating func merge(_ builder: EnvironmentBuilder) {
-        environmentValuesTransforms.append(contentsOf: builder.environmentValuesTransforms)
-        environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
+        descriptionValues.append(contentsOf: builder.descriptionValues)
         
-        descriptionObjects.append(contentsOf: builder.descriptionObjects)
+        environmentValuesTransforms.merge(builder.environmentValuesTransforms) { x, y in x }
+        environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
     }
 }
 
@@ -52,25 +80,7 @@ extension EnvironmentBuilder {
 
 extension EnvironmentBuilder: CustomStringConvertible {
     public var description: String {
-        return descriptionObjects.description
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-extension EnvironmentBuilder {
-    struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        static let defaultValue = EnvironmentBuilder()
-    }
-}
-
-extension EnvironmentValues {
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            self[EnvironmentBuilder.EnvironmentKey]
-        } set {
-            self[EnvironmentBuilder.EnvironmentKey] = newValue
-        }
+        return descriptionValues.description
     }
 }
 
@@ -105,8 +115,26 @@ extension View {
         view = builder.environmentObjectTransforms.values.reduce(view, { view, transform in transform(view) })
         
         return view.transformEnvironment(\.self) { environment in
-            builder.environmentValuesTransforms.forEach({ $0(&environment) })
+            builder.environmentValuesTransforms.values.forEach({ $0(&environment) })
         }
         .transformEnvironment(\.environmentBuilder, transform: { $0.merge(builder) })
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentBuilder {
+    struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        static let defaultValue = EnvironmentBuilder()
+    }
+}
+
+extension EnvironmentValues {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            self[EnvironmentBuilder.EnvironmentKey]
+        } set {
+            self[EnvironmentBuilder.EnvironmentKey] = newValue
+        }
     }
 }
