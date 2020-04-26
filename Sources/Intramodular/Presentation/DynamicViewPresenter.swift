@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A type that manages view presentation.
-public protocol DynamicViewPresenter: DynamicViewPresentable, PresentationManager {
+public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider, PresentationManager {
     var presented: DynamicViewPresentable? { get }
     
     func present(_ presentation: AnyModalPresentation)
@@ -143,7 +143,7 @@ extension EnvironmentValues {
 
 extension UIViewController: DynamicViewPresenter {
     private static var presentationCoordinatorKey: Void = ()
-    
+        
     @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &UIViewController.presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
@@ -169,7 +169,7 @@ extension UIWindow: DynamicViewPresenter {
     public var presented: DynamicViewPresentable? {
         rootViewController?.presented
     }
-    
+        
     public func present(_ presentation: AnyModalPresentation) {
         rootViewController?.present(presentation)
     }

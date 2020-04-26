@@ -62,7 +62,11 @@ extension EnvironmentBuilder {
     }
     
     @inlinable
-    public mutating func merge(_ builder: EnvironmentBuilder) {
+    public mutating func merge(_ builder: EnvironmentBuilder?) {
+        guard let builder = builder else {
+            return
+        }
+        
         environmentValuesTransforms.merge(builder.environmentValuesTransforms) { x, y in x }
         environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
     }

@@ -18,6 +18,6 @@ public protocol NavigatableView: opaque_NavigatableView, View {
 
 extension NavigatableView {
     public var hidesBottomBarWhenPushed: Bool {
-        return true
+        false
     }
 }
