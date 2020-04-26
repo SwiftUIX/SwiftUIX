@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A specialized view for receiving search-related information from the user.
 public struct SearchBar {
     @Binding fileprivate var text: String
     
