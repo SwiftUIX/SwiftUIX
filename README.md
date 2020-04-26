@@ -15,6 +15,7 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | -------------------------- | ------------ | ---------------------------- |
 | `UIActivityIndicatorView`  | -            | `ActivityIndicator`          |
 | `UIPageViewController`     | -            | `PaginationView`             |
+| `UISearchBar`              | -            | `SearchBar`.                 |
 | `UIScrollView`             | `ScrollView` | `CocoaScrollView`            |
 | `UITableView`              | `List`       | `CocoaList`                  |
 | `UITextField`              | `TextField`  | `CocoaTextField`             |
