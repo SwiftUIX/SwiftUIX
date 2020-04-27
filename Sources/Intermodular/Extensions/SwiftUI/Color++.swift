@@ -142,7 +142,7 @@ extension Color {
     }
     
     public static var systemGroupedBackground: Color {
-        return .init(.systemBackground)
+        return .init(.systemGroupedBackground)
     }
     
     public static var secondarySystemGroupedBackground: Color {
