@@ -25,7 +25,7 @@ public protocol CheckboxStyle {
 // MARK: - API -
 
 extension View {
-    public func checkboxStyle<S: CheckboxStyle>(style: S) -> some View {
+    public func checkboxStyle<S: CheckboxStyle>(_ style: S) -> some View {
         environment(\._checkboxStyle, .init(style))
     }
 }
