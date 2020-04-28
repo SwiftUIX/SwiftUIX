@@ -5,8 +5,6 @@
 import Swift
 import SwiftUI
 
-#if !os(macOS)
-
 /// A checkbox control.
 public struct Checkbox<Label: View>: View {
     @Environment(\._checkboxStyle) var _checkboxStyle
@@ -61,5 +59,3 @@ public struct CircularCheckboxStyle: CheckboxStyle {
         }
     }
 }
-
-#endif

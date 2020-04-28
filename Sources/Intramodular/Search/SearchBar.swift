@@ -160,14 +160,13 @@ extension SearchBar: NSViewRepresentable {
 // MARK: - API -
 
 extension SearchBar {
+    #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
     }
-}
-
-#if os(iOS) || targetEnvironment(macCatalyst)
-
-extension SearchBar {
+    #endif
+    
+    #if os(iOS) || targetEnvironment(macCatalyst)
     public func searchBarStyle(_ searchBarStyle: UISearchBar.Style) -> Self {
         then({ $0.searchBarStyle = searchBarStyle })
     }
@@ -179,6 +178,5 @@ extension SearchBar {
     public func onCancel(perform action: @escaping () -> Void) -> Self {
         then({ $0.onCancel = action })
     }
+    #endif
 }
-
-#endif

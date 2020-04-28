@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if swift(>=5.2)
+#if (os(iOS) || os(macOS) || targetEnvironment(macCatalyst)) && swift(>=5.2)
 
 private struct _OnDragModifier<Content: View>: View {
     private let rootView: Content

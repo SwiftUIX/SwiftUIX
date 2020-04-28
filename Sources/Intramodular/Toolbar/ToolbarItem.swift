@@ -49,7 +49,7 @@ public struct ToolbarItem {
         self.content = content
     }
     
-    #if os(macOS) 
+    #if os(macOS)
     public init<Content: View>(
         itemIdentifier: String,
         @ViewBuilder content: () -> Content
@@ -184,8 +184,6 @@ extension View {
     }
 }
 
-#endif
-
 // MARK: - Auxiliary Implementation -
 
 public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
@@ -215,5 +213,7 @@ extension NSToolbarItem {
         }
     }
 }
+
+#endif
 
 #endif

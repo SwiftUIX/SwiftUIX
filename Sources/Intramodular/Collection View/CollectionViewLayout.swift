@@ -6,11 +6,13 @@ import Combine
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 /// A set of properties for determining whether to recompute the size of items or their position in the layout.
 public protocol CollectionViewLayout {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     func _toUICollectionViewLayout() -> UICollectionViewLayout
-    #else
+    #elseif os(macOS)
     func _toNSCollectionViewLayout() -> NSCollectionViewLayout
     #endif
 }
@@ -69,7 +71,7 @@ public struct CollectionViewFlowLayout: CollectionViewLayout {
     }
 }
 
-#else
+#elseif os(macOS)
 
 public struct CollectionViewFlowLayout: CollectionViewLayout {
     public let nsCollectionViewLayout: NSCollectionViewLayout
@@ -82,5 +84,7 @@ public struct CollectionViewFlowLayout: CollectionViewLayout {
         nsCollectionViewLayout
     }
 }
+
+#endif
 
 #endif
