@@ -37,6 +37,10 @@ extension Checkbox where Label == EmptyView {
 // MARK: - Auxiliary Implementation -
 
 public struct DefaultCheckboxStyle: CheckboxStyle {
+    public init() {
+        
+    }
+    
     public func makeBody(configuration: CheckboxStyleConfiguration) -> some View {
         HStack {
             configuration.label
@@ -49,6 +53,10 @@ public struct DefaultCheckboxStyle: CheckboxStyle {
 }
 
 public struct CircularCheckboxStyle: CheckboxStyle {
+    public init() {
+        
+    }
+    
     public func makeBody(configuration: CheckboxStyleConfiguration) -> some View {
         HStack {
             configuration.label
