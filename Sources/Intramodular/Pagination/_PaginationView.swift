@@ -137,6 +137,10 @@ extension _PaginationView: UIViewControllerRepresentable {
             }
         }
         
+        if uiViewController.pageControl?.currentPage != currentPageIndex {
+            uiViewController.pageControl?.currentPage = currentPageIndex
+        }
+        
         if #available(iOS 13.1, *) {
             uiViewController.isEdgePanGestureEnabled = isEdgePanGestureEnabled
             uiViewController.isPanGestureEnabled = isPanGestureEnabled
