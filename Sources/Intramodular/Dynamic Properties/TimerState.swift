@@ -12,8 +12,9 @@ public struct TimerState: DynamicProperty {
     private let interval: TimeInterval
     private let timerPublisher: Timer.TimerPublisher
     
-    private var timerConnection: Cancellable?
-    private var timerSubscription: AnyCancellable? = nil
+    @State var timerConnection: Cancellable?
+    @State var timerSubscription: AnyCancellable? = nil
+    
     private var updateWrappedValue = MutableHeapWrapper<() -> Void>({ })
     
     @State public private(set) var wrappedValue: Int = 0
@@ -27,9 +28,9 @@ public struct TimerState: DynamicProperty {
         
         let updateWrappedValue = self.updateWrappedValue
         
-        self.timerSubscription = timerPublisher.sink(receiveValue: { _ in
+        self._timerSubscription = .init(initialValue: timerPublisher.sink(receiveValue: { _ in
             updateWrappedValue.value()
-        })
+        }))
     }
     
     public mutating func update() {
@@ -38,7 +39,7 @@ public struct TimerState: DynamicProperty {
         updateWrappedValue.value = { _wrappedValue.wrappedValue += 1 }
         
         if timerConnection == nil {
-            timerConnection = timerPublisher.connect()
+            _timerConnection = .init(initialValue: timerPublisher.connect())
         }
     }
 }
