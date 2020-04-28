@@ -9,6 +9,8 @@ import SwiftUI
 
 /// A checkbox control.
 public struct Checkbox<Label: View>: View {
+    @Environment(\._checkboxStyle) var _checkboxStyle
+    
     /// A view that describes the effect of toggling `isOn`.
     public let label: Label
     
@@ -21,19 +23,9 @@ public struct Checkbox<Label: View>: View {
     }
     
     public var body: some View {
-        HStack {
-            label
-            
-            Button(action: toggle) {
-                isOn.wrappedValue
-                    ? Image(systemName: .checkmarkSquareFill)
-                    : Image(systemName: .checkmarkSquare)
-            }
+        Button(toggle: isOn) {
+            _checkboxStyle.makeBodyImpl(.init(label: label.eraseToAnyView(), isSelected: isOn.wrappedValue))
         }
-    }
-    
-    private func toggle() {
-        isOn.wrappedValue.toggle()
     }
 }
 
@@ -41,6 +33,32 @@ extension Checkbox where Label == EmptyView {
     public init(isOn: Binding<Bool>) {
         self.isOn = isOn
         self.label = EmptyView()
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+public struct DefaultCheckboxStyle: CheckboxStyle {
+    public func makeBody(configuration: CheckboxStyleConfiguration) -> some View {
+        HStack {
+            configuration.label
+            
+            configuration.isSelected
+                ? Image(systemName: .checkmarkSquareFill)
+                : Image(systemName: .checkmarkSquare)
+        }
+    }
+}
+
+public struct CircularCheckboxStyle: CheckboxStyle {
+    public func makeBody(configuration: CheckboxStyleConfiguration) -> some View {
+        HStack {
+            configuration.label
+            
+            configuration.isSelected
+                ? Image(systemName: .checkmarkCircleFill)
+                : Image(systemName: .checkmarkCircle)
+        }
     }
 }
 
