@@ -10,7 +10,7 @@ import SwiftUI
 /// A SwiftUI port of `UIScrollView`.
 public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     public typealias Offset = ScrollView<Content>.ContentOffset
-    public typealias UIViewType = UIScrollView
+    public typealias UIViewType = UIHostingScrollView<Content>
     
     private let content: Content
     private let axes: Axis.Set
@@ -32,15 +32,15 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     public func makeUIView(context: Context) -> UIViewType {
-        let uiView = UIScrollView()
-        
-        uiView.delegate = context.coordinator
-        
-        return uiView
+        UIHostingScrollView(rootView: content).then {
+            $0.delegate = context.coordinator
+        }
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         let coordinator = context.coordinator
+        
+        coordinator.base = self
         
         uiView.isScrollEnabled = isScrollEnabled
         uiView.showsVerticalScrollIndicator = showsIndicators && axes.contains(.vertical)
@@ -64,41 +64,37 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
         
         uiView.configure(with: configuration)
         
-        let contentView: UIHostingView<Content>
-        
-        if let first = uiView.subviews.compactMap({ $0 as? UIHostingView<Content> }).first {
-            contentView = first
-            contentView.rootView = content
-        } else {
-            contentView = UIHostingView(rootView: content)
-            uiView.addSubview(contentView)
-        }
+        uiView.rootView = content
         
         let maximumContentSize: CGSize = .init(
-            width: axes.contains(.horizontal) ? CGFloat.greatestFiniteMagnitude : uiView.frame.width,
-            height: axes.contains(.vertical) ? CGFloat.greatestFiniteMagnitude : uiView.frame.height
+            width: axes.contains(.horizontal)
+                ? CGFloat.greatestFiniteMagnitude
+                : uiView.frame.width,
+            height: axes.contains(.vertical)
+                ? CGFloat.greatestFiniteMagnitude
+                : uiView.frame.height
         )
         
-        let oldContentSize = contentView.frame.size
-        let proposedContentSize = contentView.sizeThatFits(maximumContentSize)
+        let oldContentSize = uiView.hostingContentView.frame.size
+        let proposedContentSize = uiView.hostingContentView.sizeThatFits(maximumContentSize)
         
         let contentSize = CGSize(
-            width: min(proposedContentSize.width, maximumContentSize.width),
-            height: min(proposedContentSize.height, maximumContentSize.height)
+            width: min(proposedContentSize.width, maximumContentSize.width != 0 ? maximumContentSize.width : proposedContentSize.width),
+            height: min(proposedContentSize.height, maximumContentSize.height != 0 ? maximumContentSize.height : proposedContentSize.height)
         )
         
         guard oldContentSize != contentSize else {
             return
         }
         
-        contentView.frame.size = contentSize
+        uiView.hostingContentView.frame.size = contentSize
         uiView.contentSize = contentSize
         
         uiView.frame.size.width = min(uiView.frame.size.width, uiView.contentSize.width)
         uiView.frame.size.height = min(uiView.frame.size.height, uiView.contentSize.height)
         
         if !context.coordinator.isInitialContentAlignmentSet {
-            if contentSize != .zero && uiView.frame.size != .zero  {
+            if contentSize != .zero && uiView.frame.size != .zero {
                 uiView.setContentAlignment(initialContentAlignment, animated: false)
                 
                 context.coordinator.isInitialContentAlignmentSet = true
@@ -133,7 +129,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
 
 extension CocoaScrollView {
     public class Coordinator: NSObject, UIScrollViewDelegate {
-        private let base: CocoaScrollView
+        fileprivate var base: CocoaScrollView
         
         var isInitialContentAlignmentSet: Bool = false
         
