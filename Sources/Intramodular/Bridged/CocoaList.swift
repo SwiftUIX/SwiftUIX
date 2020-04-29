@@ -31,9 +31,6 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
     @usableFromInline
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
-    @Environment(\.initialContentAlignment) var initialContentAlignment
-    @Environment(\.isScrollEnabled) var isScrollEnabled
-    
     public init(
         _ data: Data,
         sectionHeader: @escaping (SectionModel) -> SectionHeader,
@@ -62,15 +59,15 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.sectionFooter = sectionFooter
         uiViewController.rowContent = rowContent
         
-        uiViewController.initialContentAlignment = initialContentAlignment
-        uiViewController.scrollViewConfiguration = scrollViewConfiguration
+        uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
-        uiViewController.tableView.isScrollEnabled = isScrollEnabled
+        uiViewController.scrollViewConfiguration = scrollViewConfiguration
+        uiViewController.scrollViewConfiguration.initialContentAlignment = context.environment.initialContentAlignment
+        uiViewController.scrollViewConfiguration.isScrollEnabled = context.environment.isScrollEnabled
+        
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif
-        
-        uiViewController.tableView.configure(with: scrollViewConfiguration)
         
         uiViewController.reloadData()
     }

@@ -9,13 +9,22 @@ import SwiftUI
 
 public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
+    var initialContentAlignment: Alignment = .topLeading
+    @usableFromInline
+    var axes: Axis.Set = [.horizontal, .vertical]
+    
+    @usableFromInline
+    var showsIndicators: Bool = true
+    @usableFromInline
     var alwaysBounceVertical: Bool = false
     @usableFromInline
     var alwaysBounceHorizontal: Bool = false
     @usableFromInline
+    var isDirectionalLockEnabled: Bool = false
+    @usableFromInline
     var isPagingEnabled: Bool = false
     @usableFromInline
-    var isDirectionalLockEnabled: Bool = false
+    var isScrollEnabled: Bool = true
     @usableFromInline
     var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in }
     @usableFromInline
@@ -55,8 +64,9 @@ extension UIScrollView {
         isPagingEnabled = configuration.isPagingEnabled
         #endif
         
-        #if !os(tvOS)
+        isScrollEnabled = configuration.isScrollEnabled
         
+        #if !os(tvOS)
         if configuration.onRefresh != nil || configuration.isRefreshing != nil {
             let refreshControl = self.refreshControl ?? UIRefreshControl().then {
                 configuration.setupRefreshControl?($0)
@@ -72,7 +82,6 @@ extension UIScrollView {
                 }
             }
         }
-        
         #endif
     }
 }

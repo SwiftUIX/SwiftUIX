@@ -29,16 +29,18 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
             #if os(iOS) || targetEnvironment(macCatalyst)
-            scrollViewConfiguration.setupRefreshControl = { [weak self] in
-                guard let `self` = self else  {
-                    return
+            if scrollViewConfiguration.setupRefreshControl == nil {
+                scrollViewConfiguration.setupRefreshControl = { [weak self] in
+                    guard let `self` = self else  {
+                        return
+                    }
+                    
+                    $0.addTarget(
+                        self,
+                        action: #selector(self.refreshChanged),
+                        for: .valueChanged
+                    )
                 }
-                
-                $0.addTarget(
-                    self,
-                    action: #selector(self.refreshChanged),
-                    for: .valueChanged
-                )
             }
             #endif
             

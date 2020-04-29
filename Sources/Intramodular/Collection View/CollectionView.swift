@@ -51,8 +51,6 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
         uiViewController.sectionFooter = sectionFooter
         uiViewController.rowContent = rowContent
         
-        uiViewController.collectionView.isScrollEnabled = isScrollEnabled
-        
         uiViewController.collectionView.configure(with: scrollViewConfiguration)
         
         let newCollectionViewLayout = collectionViewLayout._toUICollectionViewLayout()
