@@ -19,6 +19,22 @@ extension ForEach where Content: View {
 }
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
+    public func interleave<Separator: View>(with separator: Separator) -> some View {
+        let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
+        
+        return ForEach<[ElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Separator?)>>>(data) { pair in
+            Group {
+                self.content(pair.element)
+                
+                if pair.offset != (data.count - 1) {
+                    separator
+                }
+            }
+        }
+    }
+}
+
+extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
     public func interdivided() -> some View {
         let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
         
