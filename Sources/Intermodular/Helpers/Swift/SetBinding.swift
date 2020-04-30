@@ -16,6 +16,11 @@ public struct SetBinding<Value> {
     }
     
     @inlinable
+    public init(_ binding: Binding<Value>) {
+        self.set = { binding.wrappedValue = $0 }
+    }
+    
+    @inlinable
     public var wrappedValue: Value {
         get {
             fatalError()

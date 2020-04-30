@@ -160,8 +160,20 @@ extension View {
     }
     
     @inlinable
-    public func frameZeroClipped(_ isZeroClipped: Bool = true) -> some View {
-        frame(isZeroClipped ? CGSize.zero : nil)
+    public func widthZeroClipped(_ clipped: Bool = true) -> some View {
+        width(clipped ? .zero : nil)
+            .clipped()
+    }
+    
+    @inlinable
+    public func heightZeroClipped(_ clipped: Bool = true) -> some View {
+        height(clipped ? .zero : nil)
+            .clipped()
+    }
+    
+    @inlinable
+    public func frameZeroClipped(_ clipped: Bool = true) -> some View {
+        frame(clipped ? .zero : nil)
             .clipped()
     }
 }
