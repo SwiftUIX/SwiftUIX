@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 
 /// An object representing the keyboard.
+@available(iOSApplicationExtension, unavailable)
 public final class Keyboard: ObservableObject {
     public static let main = Keyboard()
     
@@ -59,6 +60,7 @@ public final class Keyboard: ObservableObject {
     }
 }
 
+@available(iOSApplicationExtension, unavailable)
 extension Keyboard {
     public struct State {
         public static let `default` = State()
@@ -113,6 +115,7 @@ extension Keyboard {
 
 // MARK: - Helpers -
 
+@available(iOSApplicationExtension, unavailable)
 struct HiddenIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -121,6 +124,7 @@ struct HiddenIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(iOSApplicationExtension, unavailable)
 struct VisibleIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -129,6 +133,7 @@ struct VisibleIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(iOSApplicationExtension, unavailable)
 struct RemoveIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -141,6 +146,7 @@ struct RemoveIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(iOSApplicationExtension, unavailable)
 struct AddIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -153,6 +159,7 @@ struct AddIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(iOSApplicationExtension, unavailable)
 extension View {
     public func hiddenIfKeyboardActive() -> some View {
         modifier(HiddenIfKeyboardActive())
