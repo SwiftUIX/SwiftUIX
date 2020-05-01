@@ -12,6 +12,7 @@ extension UIApplication {
         windows.first(where: { $0.isKeyWindow })
     }
     
+    @available(iOSApplicationExtension, unavailable)
     public var topmostViewController: UIViewController? {
         UIApplication.shared.firstKeyWindow?.rootViewController?.topmostViewController
     }
