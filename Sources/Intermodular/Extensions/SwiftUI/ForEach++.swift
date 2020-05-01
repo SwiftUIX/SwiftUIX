@@ -16,6 +16,15 @@ extension ForEach where Content: View {
             rowContent($0.value)
         }
     }
+    
+    public init<Elements: RandomAccessCollection>(
+        enumerating data: Elements,
+        @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
+    ) where Data ==  [ElementOffsetPair<Elements.Element, Int>], ID == Elements.Element.ID {
+        self.init(data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })) {
+            rowContent($0.offset, $0.element)
+        }
+    }
 }
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
@@ -68,11 +77,11 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
 
 // MARK: - Helpers -
 
-fileprivate struct ElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
+public struct ElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
     let element: Element
     let offset: Offset
     
-    var id: Element.ID {
+    public var id: Element.ID {
         element.id
     }
     
