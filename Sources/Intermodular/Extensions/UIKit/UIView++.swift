@@ -8,6 +8,24 @@ import Swift
 import UIKit
 
 extension UIView {
+    func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
+        guard !subviews.isEmpty else {
+            return nil
+        }
+        
+        for subview in subviews {
+            if subview.isKind(of: kind) {
+                return subview as? T
+            } else if let result = subview.findSubview(ofKind: kind) {
+                return result
+            }
+        }
+        
+        return nil
+    }
+}
+
+extension UIView {
     func constrain(to other: UIView) {
         translatesAutoresizingMaskIntoConstraints = false
         
@@ -63,6 +81,18 @@ extension UIView {
 }
 
 extension UIView {
+    public func addSwipeGestureRecognizer(
+        for direction: UISwipeGestureRecognizer.Direction,
+        target: Any?,
+        action: Selector
+    ) {
+        addGestureRecognizer(UISwipeGestureRecognizer(target: target, action: action).then {
+            $0.direction = direction
+        })
+    }
+}
+
+extension UIView {
     func takeSnapshot() -> UIImage {
         let format = UIGraphicsImageRendererFormat.preferred()
         let renderer = UIGraphicsImageRenderer(bounds: bounds, format: format)
@@ -73,24 +103,6 @@ extension UIView {
         }
         
         return image
-    }
-}
-
-extension UIView {
-    func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
-        guard !subviews.isEmpty else {
-            return nil
-        }
-        
-        for subview in subviews {
-            if subview.isKind(of: kind) {
-                return subview as? T
-            } else if let result = subview.findSubview(ofKind: kind) {
-                return result
-            }
-        }
-        
-        return nil
     }
 }
 
