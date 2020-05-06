@@ -13,6 +13,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var text: Binding<String>
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
+    private var onDeleteBackward: () -> Void = { }
     
     private var isInitialFirstResponder: Bool?
     private var isFirstResponder: Bool?
@@ -41,6 +42,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 text: text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
+                onDeleteBackward: onDeleteBackward,
                 isInitialFirstResponder: isInitialFirstResponder,
                 isFirstResponder: isFirstResponder,
                 autocapitalization: autocapitalization,
@@ -67,6 +69,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
+    var onDeleteBackward: () -> Void
     var isInitialFirstResponder: Bool?
     var isFirstResponder: Bool?
     var autocapitalization: UITextAutocapitalizationType?
@@ -243,6 +246,12 @@ extension CocoaTextField where Label == Text {
 }
 
 extension CocoaTextField {
+    public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
+        then({ $0.onDeleteBackward = action })
+    }
+}
+
+extension CocoaTextField {
     public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
         then({ $0.isInitialFirstResponder = isInitialFirstResponder })
     }
@@ -260,7 +269,7 @@ extension CocoaTextField {
     public func borderStyle(_ borderStyle: UITextField.BorderStyle) -> Self {
         then({ $0.borderStyle = borderStyle })
     }
-
+    
     public func font(_ uiFont: UIFont) -> Self {
         then({ $0.uiFont = uiFont })
     }

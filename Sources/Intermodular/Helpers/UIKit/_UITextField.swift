@@ -15,6 +15,8 @@ final class _UITextField: UITextField {
         }
     }
     
+    var onDeleteBackward: () -> Void = { }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -27,6 +29,12 @@ final class _UITextField: UITextField {
     
     @objc func editingChanged() {
         updateTextAttributes()
+    }
+    
+    override func deleteBackward() {
+        super.deleteBackward()
+        
+        onDeleteBackward()
     }
     
     func updateTextAttributes() {
