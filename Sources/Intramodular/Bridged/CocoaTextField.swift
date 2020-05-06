@@ -59,7 +59,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
 }
 
 public struct _CocoaTextField: UIViewRepresentable {
-    public typealias UIViewType = UITextField
+    public typealias UIViewType = _UITextField
     
     @Environment(\.font) var font
     @Environment(\.isEnabled) var isEnabled
@@ -131,6 +131,8 @@ public struct _CocoaTextField: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        uiView.onDeleteBackward = onDeleteBackward
+        
         uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         if let autocapitalization = autocapitalization {

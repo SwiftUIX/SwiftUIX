@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-final class _UITextField: UITextField {
+public final class _UITextField: UITextField {
     var kerning: CGFloat? {
         didSet {
             updateTextAttributes()
@@ -31,7 +31,7 @@ final class _UITextField: UITextField {
         updateTextAttributes()
     }
     
-    override func deleteBackward() {
+    override public func deleteBackward() {
         super.deleteBackward()
         
         onDeleteBackward()
