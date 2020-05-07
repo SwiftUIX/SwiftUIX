@@ -35,6 +35,19 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     @available(tvOS, unavailable)
     @usableFromInline
     var setupRefreshControl: ((UIRefreshControl) -> Void)?
+    
+    mutating func update(from environment: EnvironmentValues) {
+        initialContentAlignment = environment.initialContentAlignment
+        isScrollEnabled = environment.isScrollEnabled
+    }
+    
+    func updating(from environment: EnvironmentValues) -> Self {
+        var result = self
+        
+        result.update(from: environment)
+        
+        return result
+    }
 }
 
 #if !os(tvOS)

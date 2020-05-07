@@ -32,12 +32,9 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        var configuration = self.configuration
+        uiView.isUserInteractionEnabled = context.environment.isEnabled
         
-        configuration.initialContentAlignment = context.environment.initialContentAlignment
-        configuration.isScrollEnabled = context.environment.isScrollEnabled
-        
-        uiView.configuration = configuration
+        uiView.configuration = configuration.updating(from: context.environment)
         uiView.rootView = content
     }
 }
