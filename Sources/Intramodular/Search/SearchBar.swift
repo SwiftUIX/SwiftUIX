@@ -172,7 +172,7 @@ extension SearchBar {
     }
     
     public func showsCancelButton(_ shows: Bool) -> Self {
-        then({ $0.showsCancelButton = showsCancelButton })
+        then({ $0.showsCancelButton = shows })
     }
     
     public func onCancel(perform action: @escaping () -> Void) -> Self {
