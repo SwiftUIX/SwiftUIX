@@ -171,8 +171,8 @@ extension SearchBar {
         then({ $0.searchBarStyle = searchBarStyle })
     }
     
-    public func showsCancelButton(_ shows: Bool) -> Self {
-        then({ $0.showsCancelButton = shows })
+    public func showsCancelButton(_ showsCancelButton: Bool) -> Self {
+        then({ $0.showsCancelButton = showsCancelButton })
     }
     
     public func onCancel(perform action: @escaping () -> Void) -> Self {
