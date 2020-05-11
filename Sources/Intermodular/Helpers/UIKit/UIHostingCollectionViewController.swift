@@ -50,6 +50,12 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
         fatalError("init(coder:) has not been implemented")
     }
     
+    override public func viewSafeAreaInsetsDidChange()  {
+        super.viewSafeAreaInsetsDidChange()
+
+        collectionViewLayout.invalidateLayout() /// WORKAROUND (for rotation animation)
+    }
+
     // MARK: - UICollectionViewDataSource -
     
     override public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
