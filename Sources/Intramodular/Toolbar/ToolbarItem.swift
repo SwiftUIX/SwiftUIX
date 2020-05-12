@@ -72,9 +72,7 @@ extension ToolbarItem {
         switch content {
             #if os(macOS)
             case let .view(view):
-                result.view = NSHostingView(rootView: view).then({
-                    $0.layout()
-                })
+                result.view = NSHostingView(rootView: view)
             case let .cocoaImage(image):
                 result.image = image
             case let .cocoaView(view):
