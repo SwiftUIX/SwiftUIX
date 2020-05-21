@@ -34,6 +34,16 @@ extension ErrorContext {
     public func reset() {
         errors = []
     }
+    
+    public func withCriticalScope(perform action: () throws -> Void) {
+        do {
+            try action()
+        } catch {
+            DispatchQueue.asyncOnMainIfNecessary {
+                self.add(error)
+            }
+        }
+    }
 }
 
 // MARK: - Protocol Implementation -

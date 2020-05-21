@@ -35,12 +35,14 @@ public struct ImagePicker: UIViewControllerRepresentable {
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        context.coordinator.base = self
+        
         uiViewController.allowsEditing = allowsEditing
         uiViewController.sourceType = sourceType
     }
     
     public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let base: ImagePicker
+        var base: ImagePicker
         
         init(base: ImagePicker) {
             self.base = base
@@ -73,6 +75,10 @@ public struct ImagePicker: UIViewControllerRepresentable {
 extension ImagePicker {
     public func allowsEditing(_ allowsEditing: Bool) -> Self {
         then({ $0.allowsEditing = allowsEditing })
+    }
+    
+    public func sourceType(_ sourceType: UIImagePickerController.SourceType) -> Self {
+        then({ $0.sourceType = sourceType })
     }
 }
 
