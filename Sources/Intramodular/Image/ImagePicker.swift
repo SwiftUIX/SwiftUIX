@@ -4,10 +4,12 @@
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+/// A SwiftUI port of `UIImagePickerController`.
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
     
     @Environment(\.presentationManager) var presentationManager
+    
     @Binding private var data: Data?
     
     private let encoding: Image.Encoding
