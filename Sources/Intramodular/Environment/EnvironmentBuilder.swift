@@ -10,6 +10,8 @@ public struct EnvironmentBuilder {
     @usableFromInline
     var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
     @usableFromInline
+    var environmentObjects: [AnyHashable: AnyObject] = [:]
+    @usableFromInline
     var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
     
     public var isEmpty: Bool {
@@ -48,6 +50,7 @@ extension EnvironmentBuilder {
             return
         }
         
+        environmentObjects[key] = bindable
         environmentObjectTransforms[key] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
     
@@ -68,6 +71,7 @@ extension EnvironmentBuilder {
         }
         
         environmentValuesTransforms.merge(builder.environmentValuesTransforms) { x, y in x }
+        environmentObjects.merge(builder.environmentObjects) { x, y in x }
         environmentObjectTransforms.merge(builder.environmentObjectTransforms) { x, y in x }
     }
 }
