@@ -36,6 +36,11 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
     var setupRefreshControl: ((UIRefreshControl) -> Void)?
     
+    @usableFromInline
+    var contentOffset: Binding<CGPoint>? = nil
+}
+
+extension CocoaScrollViewConfiguration {
     mutating func update(from environment: EnvironmentValues) {
         initialContentAlignment = environment.initialContentAlignment
         isScrollEnabled = environment.isScrollEnabled
@@ -96,6 +101,12 @@ extension UIScrollView {
             }
         }
         #endif
+        
+        if let contentOffset = configuration.contentOffset?.wrappedValue {
+            if self.contentOffset.ceil != contentOffset.ceil {
+                setContentOffset(contentOffset, animated: true)
+            }
+        }
     }
 }
 

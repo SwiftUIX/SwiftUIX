@@ -61,10 +61,8 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         
         uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
-        uiViewController.scrollViewConfiguration = scrollViewConfiguration
-        uiViewController.scrollViewConfiguration.initialContentAlignment = context.environment.initialContentAlignment
-        uiViewController.scrollViewConfiguration.isScrollEnabled = context.environment.isScrollEnabled
-        
+        uiViewController.scrollViewConfiguration = scrollViewConfiguration.updating(from: context.environment)
+
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif
@@ -163,6 +161,11 @@ extension CocoaList {
     @inlinable
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })
+    }
+    
+    @inlinable
+    public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
+        then({ $0.scrollViewConfiguration.contentOffset = contentOffset })
     }
 }
 

@@ -143,6 +143,8 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         configuration.onOffsetChange(
             scrollView.contentOffset(forContentType: Content.self)
         )
+        
+        configuration.contentOffset?.wrappedValue = contentOffset
     }
     
     public func scrollViewWillEndDragging(

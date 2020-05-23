@@ -49,6 +49,10 @@ extension CocoaScrollView {
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.configuration.onOffsetChange = body })
     }
+    
+    public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
+        then({ $0.configuration.contentOffset = contentOffset })
+    }
 }
 
 @available(tvOS, unavailable)
