@@ -7,6 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+/// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
     var initialContentAlignment: Alignment = .topLeading
@@ -75,16 +76,16 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
-		showsVerticalScrollIndicator = configuration.showsIndicators
-		showsHorizontalScrollIndicator = configuration.showsIndicators
         alwaysBounceVertical = configuration.alwaysBounceVertical
         alwaysBounceHorizontal = configuration.alwaysBounceHorizontal
         isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
+        isScrollEnabled = configuration.isScrollEnabled
+        showsVerticalScrollIndicator = configuration.showsIndicators
+        showsHorizontalScrollIndicator = configuration.showsIndicators
+        
         #if os(iOS) || targetEnvironment(macCatalyst)
         isPagingEnabled = configuration.isPagingEnabled
         #endif
-        
-        isScrollEnabled = configuration.isScrollEnabled
         
         #if !os(tvOS)
         if configuration.onRefresh != nil || configuration.isRefreshing != nil {
