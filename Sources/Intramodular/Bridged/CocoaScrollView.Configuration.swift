@@ -75,6 +75,8 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
+		showsVerticalScrollIndicator = configuration.showsIndicators
+		showsHorizontalScrollIndicator = configuration.showsIndicators
         alwaysBounceVertical = configuration.alwaysBounceVertical
         alwaysBounceHorizontal = configuration.alwaysBounceHorizontal
         isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
