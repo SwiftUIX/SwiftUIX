@@ -13,9 +13,9 @@ struct _PaginationView<Page: View> {
     private let pages: [Page]
     private let axis: Axis
     private let transitionStyle: UIPageViewController.TransitionStyle
-    private let cyclesPages: Bool = false
     private let showsIndicators: Bool
     private let pageIndicatorAlignment: Alignment
+    private let cyclesPages: Bool
     private let initialPageIndex: Int?
     
     @Binding fileprivate var currentPageIndex: Int
@@ -27,6 +27,7 @@ struct _PaginationView<Page: View> {
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool,
         pageIndicatorAlignment: Alignment,
+        cyclesPages: Bool,
         initialPageIndex: Int?,
         currentPageIndex: Binding<Int>,
         progressionController: Binding<ProgressionController?>
@@ -36,6 +37,7 @@ struct _PaginationView<Page: View> {
         self.transitionStyle = transitionStyle
         self.showsIndicators = showsIndicators
         self.pageIndicatorAlignment = pageIndicatorAlignment
+        self.cyclesPages = cyclesPages
         self.initialPageIndex = initialPageIndex
         self._currentPageIndex = currentPageIndex
         self._progressionController = progressionController

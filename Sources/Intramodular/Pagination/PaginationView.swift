@@ -22,6 +22,8 @@ public struct PaginationView<Page: View>: View {
     @usableFromInline
     var pageIndicatorAlignment: Alignment
     @usableFromInline
+    var cyclesPages: Bool = false
+    @usableFromInline
     var initialPageIndex: Int?
     @usableFromInline
     var currentPageIndex: Binding<Int>?
@@ -73,6 +75,7 @@ public struct PaginationView<Page: View>: View {
                 transitionStyle: transitionStyle,
                 showsIndicators: showsIndicators,
                 pageIndicatorAlignment: pageIndicatorAlignment,
+                cyclesPages: cyclesPages,
                 initialPageIndex: initialPageIndex,
                 currentPageIndex: currentPageIndex ?? $_currentPageIndex,
                 progressionController: $progressionController
@@ -119,11 +122,16 @@ extension PaginationView {
     public func pageIndicatorAlignment(_ alignment: Alignment) -> Self {
         then({ $0.pageIndicatorAlignment = alignment })
     }
+    
+    @inlinable
+    public func cyclesPages(_ cyclesPages: Bool) -> Self {
+        then({ $0.cyclesPages = cyclesPages })
+    }
 }
 
 extension PaginationView {
     @inlinable
-    public func initialPageIndex(_ currentPageIndex: Binding<Int>) -> Self {
+    public func initialPageIndex(_ initialPageIndex: Int) -> Self {
         then({ $0.initialPageIndex = initialPageIndex })
     }
     
