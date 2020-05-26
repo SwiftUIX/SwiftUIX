@@ -15,7 +15,7 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | --------------------------------------- | ------------ | --------------------------------------------- |
 | `UIActivityIndicatorView`               | -            | `ActivityIndicator`                           |
 | `UIBlurEffect`                          | -            | `BlurEffectView`                              |
-| `UICollectionView`                      | -            | `CollectionView                               |
+| `UICollectionView`                      | -            | `CollectionView`                              |
 | `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                     |
 | `UIImagePickerController`               | -            | `ImagePicker`                                 |
 | `UIPageViewController`                  | -            | `PaginationView`                              |
