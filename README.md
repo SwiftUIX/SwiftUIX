@@ -11,15 +11,24 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 This project is also **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
-| UIKit                      | SwiftUI      | SwiftUIX                     |
-| -------------------------- | ------------ | ---------------------------- |
-| `UIActivityIndicatorView`  | -            | `ActivityIndicator`          |
-| `UIPageViewController`     | -            | `PaginationView`             |
-| `UISearchBar`              | -            | `SearchBar`                  |
-| `UIScrollView`             | `ScrollView` | `CocoaScrollView`            |
-| `UITableView`              | `List`       | `CocoaList`                  |
-| `UITextField`              | `TextField`  | `CocoaTextField`             |
-| `UIModalPresentationStyle` | -            | `ModalViewPresentationStyle` |
+| UIKit                                   | SwiftUI      | SwiftUIX                                      |
+| --------------------------------------- | ------------ | --------------------------------------------- |
+| `UIActivityIndicatorView`               | -            | `ActivityIndicator`                           |
+| `UIBlurEffect`                          | -            | `BlurEffectView`                              |
+| `UICollectionView`                      | -            | `CollectionView                               |
+| `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                     |
+| `UIImagePickerController`               | -            | `ImagePicker`                                 |
+| `UIPageViewController`                  | -            | `PaginationView`                              |
+| `UIScreen`                              | -            | `Screen`                                      |
+| `UISearchBar`                           | -            | `SearchBar`                                   |
+| `UIScrollView`                          | `ScrollView` | `CocoaScrollView`                             |
+| `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                         |
+| `UITableView`                           | `List`       | `CocoaList`                                   |
+| `UITextField`                           | `TextField`  | `CocoaTextField`                              |
+| `UIModalPresentationStyle`              | -            | `ModalViewPresentationStyle`                  |
+| `UIViewControllerTransitioningDelegate` | -            | `CocoaHostingControllerTransitioningDelegate` |
+| `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
+| `UIWindow`                              | -            | `WindowOverlay`                               |
 
 # Requirements 
 
