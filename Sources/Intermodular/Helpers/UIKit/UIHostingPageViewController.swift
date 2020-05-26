@@ -32,6 +32,30 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         
         return allViewControllers.firstIndex(of: currentViewController as! UIHostingController<Page>)
     }
+    
+    var previousPageIndex: Int? {
+        guard let currentPageIndex = currentPageIndex else {
+            return nil
+        }
+        
+        guard currentPageIndex > 0 else {
+            return nil
+        }
+        
+        return currentPageIndex - 1
+    }
+    
+    var nextPageIndex: Int? {
+        guard let currentPageIndex = currentPageIndex else {
+            return nil
+        }
+        
+        guard currentPageIndex < (pages.count - 1) else {
+            return nil
+        }
+        
+        return currentPageIndex + 1
+    }
 }
 
 #endif

@@ -13,20 +13,13 @@ struct _PaginationView<Page: View> {
     private let pages: [Page]
     private let axis: Axis
     private let transitionStyle: UIPageViewController.TransitionStyle
-    private let infiniteScroll: Bool = false
+    private let cyclesPages: Bool = false
     private let showsIndicators: Bool
     private let pageIndicatorAlignment: Alignment
     private let initialPageIndex: Int?
     
-    @Binding private var currentPageIndex: Int
-    @Binding private var progressionController: ProgressionController?
-    
-    @Environment(\.isEdgePanGestureEnabled) private var isEdgePanGestureEnabled
-    @Environment(\.isPanGestureEnabled) private var isPanGestureEnabled
-    @Environment(\.isScrollEnabled) private var isScrollEnabled
-    @Environment(\.isTapGestureEnabled) private var isTapGestureEnabled
-    @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
-    @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
+    @Binding fileprivate var currentPageIndex: Int
+    @Binding fileprivate var progressionController: ProgressionController?
     
     init(
         pages: [Page],
@@ -93,7 +86,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             }
         }
         
-        progressionController = _ProgressionController(base: uiViewController)
+        progressionController = _ProgressionController(base: uiViewController, currentPageIndex: $currentPageIndex)
         
         return uiViewController
     }
@@ -141,14 +134,12 @@ extension _PaginationView: UIViewControllerRepresentable {
             uiViewController.pageControl?.currentPage = currentPageIndex
         }
         
-        if #available(iOS 13.1, *) {
-            uiViewController.isEdgePanGestureEnabled = isEdgePanGestureEnabled
-            uiViewController.isPanGestureEnabled = isPanGestureEnabled
-            uiViewController.isScrollEnabled = isScrollEnabled
-            uiViewController.isTapGestureEnabled = isTapGestureEnabled
-            uiViewController.pageControl?.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor()
-            uiViewController.pageControl?.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
-        }
+        uiViewController.isEdgePanGestureEnabled = context.environment.isEdgePanGestureEnabled
+        uiViewController.isPanGestureEnabled = context.environment.isPanGestureEnabled
+        uiViewController.isScrollEnabled = context.environment.isScrollEnabled
+        uiViewController.isTapGestureEnabled = context.environment.isTapGestureEnabled
+        uiViewController.pageControl?.currentPageIndicatorTintColor = context.environment.currentPageIndicatorTintColor?.toUIColor()
+        uiViewController.pageControl?.pageIndicatorTintColor = context.environment.pageIndicatorTintColor?.toUIColor()
     }
     
     func makeCoordinator() -> Coordinator {
@@ -185,7 +176,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
-                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
+                        ? (parent.cyclesPages ? pageViewController.allViewControllers.last : nil)
                         : pageViewController.allViewControllers[$0 - 1]
                 })
         }
@@ -201,7 +192,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
-                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
+                        ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
@@ -239,7 +230,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 == 0
-                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.last : nil)
+                        ? (parent.cyclesPages ? pageViewController.allViewControllers.last : nil)
                         : pageViewController.allViewControllers[$0 - 1]
                 })
         }
@@ -255,7 +246,7 @@ extension _PaginationView {
                 .firstIndex(of: viewController as! UIHostingController<Page>)
                 .flatMap({
                     $0 + 1 == pageViewController.allViewControllers.count
-                        ? (parent.infiniteScroll ? pageViewController.allViewControllers.first : nil)
+                        ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
                         : pageViewController.allViewControllers[$0 + 1]
                 })
         }
@@ -287,22 +278,16 @@ extension _PaginationView {
         }
         
         @objc func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-            let pageViewController = pageViewController as! UIViewControllerType
-            
-            guard let controller = pageViewController.allViewControllers.first else {
-                return parent.currentPageIndex
-            }
-            
-            return pageViewController
-                .allViewControllers
-                .firstIndex(of: controller) ?? parent.currentPageIndex
+            (pageViewController as? UIHostingPageViewController<Page>)?.currentPageIndex ?? 0
         }
     }
 }
 
 extension _PaginationView {
     struct _ProgressionController: ProgressionController {
-        weak var base: UIPageViewController?
+        weak var base: UIHostingPageViewController<Page>?
+        
+        var currentPageIndex: Binding<Int>
         
         func moveToNext() {
             guard
@@ -313,8 +298,16 @@ extension _PaginationView {
                 else {
                     return
             }
-            
-            base.setViewControllers([nextViewController], direction: .forward, animated: true)
+                        
+            base.setViewControllers([nextViewController], direction: .forward, animated: true) { finished in
+                guard finished else {
+                    return
+                }
+                
+                if let currentPageIndex = base.currentPageIndex {
+                    self.currentPageIndex.wrappedValue = currentPageIndex
+                }
+            }
         }
         
         func moveToPrevious() {
@@ -326,8 +319,16 @@ extension _PaginationView {
                 else {
                     return
             }
-            
-            base.setViewControllers([previousViewController], direction: .reverse, animated: true)
+                                    
+            base.setViewControllers([previousViewController], direction: .reverse, animated: true) { finished in
+                guard finished else {
+                    return
+                }
+                
+                if let currentPageIndex = base.currentPageIndex {
+                    self.currentPageIndex.wrappedValue = currentPageIndex
+                }
+            }
         }
     }
 }
