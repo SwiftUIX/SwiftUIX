@@ -14,6 +14,7 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | UIKit                                   | SwiftUI      | SwiftUIX                                      |
 | --------------------------------------- | ------------ | --------------------------------------------- |
 | `UIActivityIndicatorView`               | -            | `ActivityIndicator`                           |
+| `UIActivityView`                        | -            | `ShareSheet` or `.shareSheet`                 |
 | `UIBlurEffect`                          | -            | `BlurEffectView`                              |
 | `UICollectionView`                      | -            | `CollectionView`                              |
 | `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                     |
@@ -29,7 +30,6 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | `UIViewControllerTransitioningDelegate` | -            | `CocoaHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
 | `UIWindow`                              | -            | `WindowOverlay`                               |
-| `UIActivityView`                        | -            | `ShareSheet` or `.shareSheet`                 |
 
 # Requirements
 
