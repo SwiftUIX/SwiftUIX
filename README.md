@@ -7,7 +7,7 @@ Documentation is a currently a work-in-progress!
 
 # Why
 
-The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
+The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI.
 
 This project is also **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
@@ -29,10 +29,11 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | `UIViewControllerTransitioningDelegate` | -            | `CocoaHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
 | `UIWindow`                              | -            | `WindowOverlay`                               |
+| `UIActivityView`                        | -            | `ShareSheet` or `.shareSheet`                 |
 
-# Requirements 
+# Requirements
 
-- iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
+- iOS 13, macOS 10.15, tvOS 13, or watchOS 6
 - Swift 5.1
 - Xcode 11
 
@@ -49,7 +50,7 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 
 # Usage
 
-SwiftUIX's documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
+SwiftUIX's documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
 
 # Contributing
 
@@ -63,6 +64,6 @@ SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
 
 SwiftUIX is a project of [@vmanot](https://github.com/vmanot).
 
-# Support 
+# Support
 
 SwiftUIX is and will always be free and open. Maintaining SwiftUIX, however, is a time-consuming endeavour. If you're reliant on SwiftUIX for your app/project and would like to see it grow, consider contributing/donating as way to help.
