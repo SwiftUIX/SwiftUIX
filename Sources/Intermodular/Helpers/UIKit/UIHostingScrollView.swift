@@ -45,6 +45,14 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         }
     }
     
+    var _isPagingEnabled: Bool {
+        #if os(tvOS)
+        return false
+        #else
+        return isPagingEnabled
+        #endif
+    }
+    
     public init(rootView: Content) {
         hostingContentView = UIHostingView(rootView: _UIHostingScrollViewRootView(base: nil, content: rootView))
         
@@ -81,7 +89,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         
         let oldContentSize = hostingContentView.frame.size
         let proposedContentSize = hostingContentView.sizeThatFits(maximumContentSize)
-                
+        
         let contentSize = CGSize(
             width: min(proposedContentSize.width, maximumContentSize.width != 0 ? maximumContentSize.width : proposedContentSize.width),
             height: min(proposedContentSize.height, maximumContentSize.height != 0 ? maximumContentSize.height : proposedContentSize.height)
@@ -189,7 +197,7 @@ struct _UIHostingScrollViewRootView<Content: View>: View {
     
     var body: some View {
         Group {
-            if base?.isPagingEnabled ?? false {
+            if base?._isPagingEnabled ?? false {
                 content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
                     self.base?.pages = page
                 })

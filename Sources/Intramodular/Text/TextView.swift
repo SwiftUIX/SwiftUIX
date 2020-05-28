@@ -18,8 +18,10 @@ public struct TextView<Label: View>: View {
     
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            label.hidden(!text.isEmpty)
-            
+            label
+                .visible(text.isEmpty)
+                .animation(.none)
+
             _TextView(
                 text: $text,
                 onEditingChanged: onEditingChanged,

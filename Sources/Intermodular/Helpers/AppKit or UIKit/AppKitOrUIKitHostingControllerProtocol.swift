@@ -35,6 +35,8 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 
 #endif
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 extension AppKitOrUIKitHostingControllerProtocol {
     func sizeThatFits(
         in size: OptionalDimensions,
@@ -74,3 +76,5 @@ extension AppKitOrUIKitHostingControllerProtocol {
         return desiredSize.clamping(to: maximumSize)
     }
 }
+
+#endif
