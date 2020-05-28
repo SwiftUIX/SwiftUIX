@@ -7,7 +7,10 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+@usableFromInline
 struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
+    
+    @usableFromInline
     typealias UIViewControllerType = UIViewController
     
     @usableFromInline
@@ -18,10 +21,12 @@ struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
         self.configure = configure
     }
     
+    @usableFromInline
     func makeUIViewController(context: Context) -> UIViewController {
         UIViewControllerType()
     }
     
+    @usableFromInline
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.nearestNavigationController.map(configure)
     }
@@ -30,14 +35,14 @@ struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
 // MARK: - API -
 
 extension View {
-    @usableFromInline
+    @inlinable
     func configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
         background(UINavigationControllerConfigurator(configure: configure))
     }
     
-    @usableFromInline
+    @inlinable
     func configureUINavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
@@ -46,6 +51,7 @@ extension View {
                 configure(navigationController.navigationBar)
             }
         }
+//        .eraseToAnyView()
     }
 }
 
