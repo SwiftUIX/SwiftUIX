@@ -14,6 +14,7 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 | UIKit                                   | SwiftUI      | SwiftUIX                                      |
 | --------------------------------------- | ------------ | --------------------------------------------- |
 | `UIActivityIndicatorView`               | -            | `ActivityIndicator`                           |
+| `UIActivityViewController`              | -            | `AppActivityView`                             |
 | `UIBlurEffect`                          | -            | `BlurEffectView`                              |
 | `UICollectionView`                      | -            | `CollectionView`                              |
 | `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                     |
