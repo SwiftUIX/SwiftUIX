@@ -11,7 +11,6 @@ import UIKit
 /// A modifier that can be applied to a view, exposing access to the parent `UIViewController`.
 @usableFromInline
 struct UIViewControllerConfigurator: UIViewControllerRepresentable {
-    
     @usableFromInline
     struct Configuration {
         @usableFromInline
@@ -94,7 +93,6 @@ extension View {
         _ transform: (inout UIViewControllerConfigurator.Configuration) -> Void
     ) -> some View {
         background(UIViewControllerConfigurator().configure(transform))
-//            .eraseToAnyView()
     }
 }
 

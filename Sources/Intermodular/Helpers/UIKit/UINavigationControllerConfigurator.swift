@@ -9,7 +9,6 @@ import SwiftUI
 
 @usableFromInline
 struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
-    
     @usableFromInline
     typealias UIViewControllerType = UIViewController
     
@@ -51,7 +50,6 @@ extension View {
                 configure(navigationController.navigationBar)
             }
         }
-//        .eraseToAnyView()
     }
 }
 
