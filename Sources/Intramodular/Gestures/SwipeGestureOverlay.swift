@@ -6,12 +6,21 @@ import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+@usableFromInline
 struct SwipeGestureOverlay: UIViewRepresentable {
-    private let onSwipeUp: Action
-    private let onSwipeLeft: Action
-    private let onSwipeDown: Action
-    private let onSwipeRight: Action
+    @usableFromInline
+    let onSwipeUp: Action
     
+    @usableFromInline
+    let onSwipeLeft: Action
+    
+    @usableFromInline
+    let onSwipeDown: Action
+    
+    @usableFromInline
+    let onSwipeRight: Action
+    
+    @inlinable
     init(
         onSwipeUp: Action,
         onSwipeLeft: Action,
@@ -24,6 +33,7 @@ struct SwipeGestureOverlay: UIViewRepresentable {
         self.onSwipeDown = onSwipeDown
     }
     
+    @inlinable
     public func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: .zero)
         
@@ -56,34 +66,42 @@ struct SwipeGestureOverlay: UIViewRepresentable {
         return view
     }
     
+    @inlinable
     public func updateUIView(_ uiView: UIView, context: Context) {
         context.coordinator.base = self
     }
     
+    @usableFromInline
     class Coordinator: NSObject {
-        fileprivate var base: SwipeGestureOverlay
+        @usableFromInline
+        var base: SwipeGestureOverlay
         
         public init(base: SwipeGestureOverlay) {
             self.base = base
         }
         
-        @objc fileprivate func didSwipeUp() {
+        @usableFromInline
+        @objc func didSwipeUp() {
             base.onSwipeUp.perform()
         }
         
-        @objc fileprivate func didSwipeLeft() {
+        @usableFromInline
+        @objc func didSwipeLeft() {
             base.onSwipeLeft.perform()
         }
         
-        @objc fileprivate func didSwipeDown() {
+        @usableFromInline
+        @objc func didSwipeDown() {
             base.onSwipeDown.perform()
         }
         
-        @objc fileprivate func didSwipeRight() {
+        @usableFromInline
+        @objc func didSwipeRight() {
             base.onSwipeRight.perform()
         }
     }
     
+    @usableFromInline
     func makeCoordinator() -> Coordinator {
         .init(base: self)
     }
@@ -92,6 +110,7 @@ struct SwipeGestureOverlay: UIViewRepresentable {
 // MARK: - API -
 
 extension View {
+    @inlinable
     public func onSwipeGestures(
         onSwipeUp: @escaping () -> Void = {},
         onSwipeLeft: @escaping () -> Void = {},
@@ -108,6 +127,7 @@ extension View {
         )
     }
     
+    @inlinable
     public func onSwipeUpGesture(
         perform action: @escaping () -> Void
     ) -> some View {

@@ -9,28 +9,41 @@ import SwiftUI
 import UIKit
 
 /// A modifier that can be applied to a view, exposing access to the parent `UIViewController`.
+@usableFromInline
 struct UIViewControllerConfigurator: UIViewControllerRepresentable {
+    @usableFromInline
     struct Configuration {
+        @usableFromInline
         var hidesBottomBarWhenPushed: Bool?
+        
+        @usableFromInline
+        init() {
+            
+        }
     }
     
+    @usableFromInline
     class UIViewControllerType: UIViewController {
+        @usableFromInline
         var configuration: Configuration {
             didSet {
                 parent?.configure(with: configuration)
             }
         }
         
+        @usableFromInline
         init(configuration: Configuration) {
             self.configuration = configuration
             
             super.init(nibName: nil, bundle: nil)
         }
         
+        @usableFromInline
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
+        @usableFromInline
         override func didMove(toParent parent: UIViewController?) {
             parent?.configure(with: configuration)
             
@@ -38,20 +51,25 @@ struct UIViewControllerConfigurator: UIViewControllerRepresentable {
         }
     }
     
+    @usableFromInline
     var configuration: Configuration
     
+    @usableFromInline
     init(configuration: Configuration = .init()) {
         self.configuration = configuration
     }
     
+    @usableFromInline
     func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(configuration: configuration)
     }
     
+    @usableFromInline
     func updateUIViewController(_ viewController: UIViewControllerType, context: Context) {
         viewController.configuration = configuration
     }
     
+    @usableFromInline
     func configure(_ transform: (inout Configuration) -> Void) -> Self {
         then({ transform(&$0.configuration) })
     }
@@ -70,9 +88,10 @@ fileprivate extension UIViewController {
     }
 }
 
-fileprivate extension View {
+extension View {
     /// Configures this view's parent `UIViewController`.
-    private func configureUIViewController(
+    @inlinable
+    func configureUIViewController(
         _ transform: (inout UIViewControllerConfigurator.Configuration) -> Void
     ) -> some View {
         background(UIViewControllerConfigurator().configure(transform))
