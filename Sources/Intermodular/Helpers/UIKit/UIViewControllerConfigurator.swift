@@ -11,6 +11,7 @@ import UIKit
 /// A modifier that can be applied to a view, exposing access to the parent `UIViewController`.
 @usableFromInline
 struct UIViewControllerConfigurator: UIViewControllerRepresentable {
+    
     @usableFromInline
     struct Configuration {
         @usableFromInline
@@ -24,26 +25,22 @@ struct UIViewControllerConfigurator: UIViewControllerRepresentable {
     
     @usableFromInline
     class UIViewControllerType: UIViewController {
-        @usableFromInline
         var configuration: Configuration {
             didSet {
                 parent?.configure(with: configuration)
             }
         }
         
-        @usableFromInline
         init(configuration: Configuration) {
             self.configuration = configuration
             
             super.init(nibName: nil, bundle: nil)
         }
         
-        @usableFromInline
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
-        @usableFromInline
         override func didMove(toParent parent: UIViewController?) {
             parent?.configure(with: configuration)
             
@@ -77,8 +74,9 @@ struct UIViewControllerConfigurator: UIViewControllerRepresentable {
 
 // MARK: - Auxiliary Implementation -
 
-fileprivate extension UIViewController {
+extension UIViewController {
     /// Configures this view controller with a given configuration.
+    @inlinable
     func configure(with configuration: UIViewControllerConfigurator.Configuration) {
         #if os(iOS) || targetEnvironment(macCatalyst)
         if let newValue = configuration.hidesBottomBarWhenPushed {
@@ -88,6 +86,7 @@ fileprivate extension UIViewController {
     }
 }
 
+
 extension View {
     /// Configures this view's parent `UIViewController`.
     @inlinable
@@ -95,6 +94,7 @@ extension View {
         _ transform: (inout UIViewControllerConfigurator.Configuration) -> Void
     ) -> some View {
         background(UIViewControllerConfigurator().configure(transform))
+//            .eraseToAnyView()
     }
 }
 
@@ -103,6 +103,7 @@ extension View {
 extension View {
     /// Sets whether the bottom bar is hidden when this view is pushed.
     @available(tvOS, unavailable)
+    @inlinable
     public func hidesBottomBarWhenPushed(_ newValue: Bool) -> some View {
         configureUIViewController {
             $0.hidesBottomBarWhenPushed = newValue
