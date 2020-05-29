@@ -16,6 +16,7 @@ public final class Keyboard: ObservableObject {
     
     @Published public var state: State = .default
     
+    /// A Boolean value that determines whether the keyboard is showing on-screen.
     public var isShowing: Bool {
         state.height.map({ $0 != 0 }) ?? false
     }
@@ -47,12 +48,14 @@ public final class Keyboard: ObservableObject {
         #endif
     }
     
+    /// Dismiss the software keyboard presented on-screen.
     public func dismiss() {
         if isShowing {
             UIApplication.shared.firstKeyWindow?.endEditing(true)
         }
     }
     
+    /// Dismiss the software keyboard presented on-screen.
     public class func dismiss() {
         if Keyboard.main.isShowing {
             UIApplication.shared.firstKeyWindow?.endEditing(true)

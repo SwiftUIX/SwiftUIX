@@ -23,9 +23,15 @@ public struct ObservedPublisher<P: Publisher>: DynamicProperty where P.Failure =
         
         let updateWrappedValue = self.updateWrappedValue
         
-        self._subscription = .init(initialValue: publisher.sink(receiveValue: {
-            updateWrappedValue.value($0)
-        }))
+        self._subscription = .init(
+            initialValue: Publishers.Concatenate(
+                prefix: Just(initial)
+                    .delay(for: .nanoseconds(1), scheduler: RunLoop.main),
+                suffix: publisher
+            ).sink(receiveValue: {
+                updateWrappedValue.value($0)
+            })
+        )
     }
     
     public mutating func update() {

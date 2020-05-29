@@ -10,12 +10,17 @@ public struct ImagePicker: UIViewControllerRepresentable {
     
     @Environment(\.presentationManager) var presentationManager
     
-    @Binding private var data: Data?
+    @usableFromInline
+    @Binding var data: Data?
     
-    private let encoding: Image.Encoding
+    @usableFromInline
+    let encoding: Image.Encoding
     
-    private var allowsEditing = false
-    private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @usableFromInline
+    var allowsEditing = false
+    
+    @usableFromInline
+    var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
     public init(data: Binding<Data?>, encoding: Image.Encoding) {
         self._data = data
@@ -75,10 +80,12 @@ public struct ImagePicker: UIViewControllerRepresentable {
 }
 
 extension ImagePicker {
+    @inlinable
     public func allowsEditing(_ allowsEditing: Bool) -> Self {
         then({ $0.allowsEditing = allowsEditing })
     }
     
+    @inlinable
     public func sourceType(_ sourceType: UIImagePickerController.SourceType) -> Self {
         then({ $0.sourceType = sourceType })
     }
@@ -87,7 +94,8 @@ extension ImagePicker {
 // MARK: - Helpers -
 
 extension UIImage {
-    public func data(using encoding: Image.Encoding) -> Data? {
+    @inlinable
+    func data(using encoding: Image.Encoding) -> Data? {
         switch encoding {
             case .png:
                 return pngData()
