@@ -3,7 +3,7 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
-Documentation is a currently a work-in-progress!
+All documentation is hosted [on the project wiki here](https://github.com/SwiftUIX/SwiftUIX/wiki). Documentation is a currently a **work-in-progress**. Volunteers needed! 
 
 # Why
 
