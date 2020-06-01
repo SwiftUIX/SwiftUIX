@@ -11,9 +11,8 @@ import SwiftUI
 public struct ObservableState<Value>: DynamicProperty {
     public typealias ValueChange = (oldValue: Value, newValue: Value)
     
-    private var _willChange: PassthroughSubject<ValueChange, Never>
-    private var _didChange: PassthroughSubject<ValueChange, Never>
-    
+    @State private var _willChange: PassthroughSubject<ValueChange, Never>
+    @State private var _didChange: PassthroughSubject<ValueChange, Never>
     @State private var _wrappedValue: (previous: Value?, current: Value)
     
     /// An observable stream of value changes, before they happen.
@@ -50,11 +49,11 @@ public struct ObservableState<Value>: DynamicProperty {
             set: { self.wrappedValue = $0 }
         )
     }
-
+    
     /// Initialize with the provided initial value.
     public init(wrappedValue value: Value) {
-        self._willChange = .init()
-        self._didChange = .init()
+        self.__willChange = .init(initialValue: .init())
+        self.__didChange = .init(initialValue: .init())
         self.__wrappedValue = .init(initialValue: (nil, value))
     }
     
