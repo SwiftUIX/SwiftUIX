@@ -6,17 +6,21 @@ import Swift
 import SwiftUI
 
 public protocol opaque_ModalPresentationView: opaque_View {
+    var preferredSourceViewName: ViewName? { get }
     var presentationEnvironmentBuilder: EnvironmentBuilder? { get }
     var presentationStyle: ModalViewPresentationStyle { get }
     var isModalPresentationAnimated: Bool { get }
     var isModalDismissable: Bool { get }
-
+    
     func onPresent()
     func onDismiss()
 }
 
 /// A view that is configured for modal presentation.
 public protocol ModalPresentationView: opaque_ModalPresentationView, View {
+    /// The preferred source view for the modal presentation.
+    var preferredSourceViewName: ViewName? { get }
+    
     /// The environment to build for the modal presentation.
     var presentationEnvironmentBuilder: EnvironmentBuilder? { get }
     
@@ -36,6 +40,10 @@ public protocol ModalPresentationView: opaque_ModalPresentationView, View {
 // MARK: - Implementation -
 
 extension ModalPresentationView {
+    public var preferredSourceViewName: ViewName? {
+        nil
+    }
+    
     public var presentationEnvironmentBuilder: EnvironmentBuilder? {
         presentationEnvironmentBuilder
     }
@@ -45,11 +53,11 @@ extension ModalPresentationView {
     }
     
     public var isModalPresentationAnimated: Bool {
-        return true
+        true
     }
     
     public var isModalDismissable: Bool {
-        return true
+        true
     }
     
     public func onPresent() {

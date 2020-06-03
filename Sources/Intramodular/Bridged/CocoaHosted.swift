@@ -16,6 +16,10 @@ public struct CocoaHosted<Content: View>: UIViewControllerRepresentable {
         self.rootView = rootView
     }
     
+    public init(@ViewBuilder rootView: () -> Content) {
+        self.rootView = rootView()
+    }
+    
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(rootView: rootView)
     }
@@ -34,6 +38,10 @@ public struct CocoaHosted<Content: View>: View {
         self.rootView = rootView
     }
     
+    public init(@ViewBuilder rootView: () -> Content) {
+        self.rootView = rootView()
+    }
+
     public var body: some View {
         rootView
     }

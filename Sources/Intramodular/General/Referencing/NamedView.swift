@@ -21,9 +21,3 @@ extension NamedView {
         .init(Self.self)
     }
 }
-
-extension NamedView where Body: NamedView {
-    public var name: ViewName {
-        body.name
-    }
-}

@@ -45,6 +45,10 @@ extension EnvironmentalAnyView: opaque_View {
 }
 
 extension EnvironmentalAnyView: ModalPresentationView {
+    public var preferredSourceViewName: ViewName? {
+        (base as? opaque_ModalPresentationView)?.preferredSourceViewName
+    }
+    
     public var presentationEnvironmentBuilder: EnvironmentBuilder? {
         (base as? opaque_ModalPresentationView)?.presentationEnvironmentBuilder
     }

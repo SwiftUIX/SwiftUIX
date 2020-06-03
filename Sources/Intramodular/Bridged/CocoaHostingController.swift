@@ -10,7 +10,7 @@ import SwiftUI
 open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
     public let _presentationCoordinator: CocoaPresentationCoordinator
     
-    public override var presentationCoordinator: CocoaPresentationCoordinator {
+    override public var presentationCoordinator: CocoaPresentationCoordinator {
         return _presentationCoordinator
     }
     
@@ -22,15 +22,23 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         }
     }
     
+    public var subviewDescriptions: [ViewDescription] = []
+    
     init(
         rootView: Content,
         presentationCoordinator: CocoaPresentationCoordinator
     ) {
         self._presentationCoordinator = presentationCoordinator
         
-        super.init(rootView: .init(content: rootView, presentationCoordinator: presentationCoordinator))
+        super.init(rootView: .init(
+            parent: nil,
+            content: rootView,
+            presentationCoordinator: presentationCoordinator)
+        )
         
         presentationCoordinator.setViewController(self)
+        
+        self.rootView.parent = self
         
         if let rootView = rootView as? EnvironmentalAnyView {
             #if os(iOS) || targetEnvironment(macCatalyst)
@@ -54,6 +62,10 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    public func description(for name: ViewName) -> ViewDescription? {
+        subviewDescriptions.first(where: { $0.name ~= name })
     }
 }
 

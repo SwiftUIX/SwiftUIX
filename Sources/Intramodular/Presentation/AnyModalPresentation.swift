@@ -21,20 +21,34 @@ public struct AnyModalPresentation: Identifiable {
     init<V: View>(
         content: V,
         contentName: ViewName?,
-        presentationStyle: ModalViewPresentationStyle,
-        isModalDismissable: @escaping () -> Bool = { true },
-        onPresent: @escaping () -> Void = { },
-        onDismiss: @escaping () -> Void = { },
+        presentationStyle: ModalViewPresentationStyle? = nil,
+        isModalDismissable: (() -> Bool)? = nil,
+        onPresent: (() -> Void)? = nil,
+        onDismiss: (() -> Void)? = nil,
         resetBinding: @escaping () -> ()
     ) {
         self.content = EnvironmentalAnyView(content)
-            .modalPresentationStyle(presentationStyle)
-            .isModalDismissable(isModalDismissable)
-            .onPresent(perform: onPresent)
-            .onDismiss(perform: onDismiss)
-            .name(contentName)
-        
         self.resetBinding = resetBinding
+        
+        if let presentationStyle = presentationStyle {
+            self.content = self.content.modalPresentationStyle(presentationStyle)
+        }
+        
+        if let isModalDismissable = isModalDismissable {
+            self.content = self.content.isModalDismissable(isModalDismissable)
+        }
+        
+        if let onPresent = onPresent {
+            self.content = self.content.onPresent(perform: onPresent)
+        }
+        
+        if let onDismiss = onDismiss {
+            self.content = self.content.onPresent(perform: onDismiss)
+        }
+        
+        if let name = contentName {
+            self.content = self.content.name(name)
+        }
     }
 }
 

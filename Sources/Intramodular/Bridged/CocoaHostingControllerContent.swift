@@ -8,11 +8,16 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaHostingControllerContent<Content: View>: View  {
-    var content: Content
+    weak var parent: CocoaController?
     
+    var content: Content
     var presentationCoordinator: CocoaPresentationCoordinator?
     
-    init(content: Content, presentationCoordinator: CocoaPresentationCoordinator?) {
+    init(
+        parent: CocoaController?,
+        content: Content,
+        presentationCoordinator: CocoaPresentationCoordinator?
+    ) {
         self.content = content
         self.presentationCoordinator = presentationCoordinator
     }
@@ -22,6 +27,11 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
             .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
             .environment(\.dynamicViewPresenter, presentationCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))
+            .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
+                if let parent = self.parent as? CocoaHostingController<EnvironmentalAnyView> {
+                    parent.subviewDescriptions = $0
+                }
+            })
     }
 }
 

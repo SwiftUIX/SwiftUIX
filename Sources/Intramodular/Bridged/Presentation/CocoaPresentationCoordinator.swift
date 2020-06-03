@@ -12,6 +12,12 @@ import SwiftUI
     
     private let presentation: AnyModalPresentation?
     
+    public var subviews: [ViewDescription] = [] {
+        didSet {
+            print(subviews)
+        }
+    }
+    
     public var presentingCoordinator: CocoaPresentationCoordinator? {
         if let presentingViewController = viewController.presentingViewController {
             return presentingViewController.presentationCoordinator
@@ -90,6 +96,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         viewController.present(
             CocoaPresentationHostingController(
+                presentingViewController: viewController,
                 presentation: modal,
                 coordinator: .init(presentation: modal)
             ),
@@ -130,9 +137,11 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
 }
 
-extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
+extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate, UIPopoverPresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        if let presentation = presentation {
+        if controller is UIPopoverPresentationController {
+            return .none
+        } else if let presentation = presentation {
             return .init(presentation.content.presentationStyle)
         } else {
             return .automatic

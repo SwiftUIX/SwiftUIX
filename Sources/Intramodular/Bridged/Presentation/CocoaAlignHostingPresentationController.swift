@@ -12,11 +12,14 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
     struct BackgroundContainer: View {
         let content: Background
         
+        weak var parent: CocoaController?
+        
         var presentationCoordinator: CocoaPresentationCoordinator?
         var transitionType: PresentationTransitionType?
         
         var body: some View {
             CocoaHostingControllerContent(
+                parent: parent,
                 content: content
                     .environment(\.presentationTransitionType, transitionType),
                 presentationCoordinator: presentationCoordinator

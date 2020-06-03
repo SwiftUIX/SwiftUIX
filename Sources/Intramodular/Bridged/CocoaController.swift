@@ -12,7 +12,7 @@ public protocol opaque_CocoaController {
 }
 
 public protocol CocoaController: opaque_CocoaController, UIViewController {
-    
+    func description(for _: ViewName) -> ViewDescription?
 }
 
 #endif
