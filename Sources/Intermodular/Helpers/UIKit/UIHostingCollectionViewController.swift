@@ -52,10 +52,10 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
     
     override public func viewSafeAreaInsetsDidChange()  {
         super.viewSafeAreaInsetsDidChange()
-
+        
         collectionViewLayout.invalidateLayout() /// WORKAROUND (for rotation animation)
     }
-
+    
     // MARK: - UICollectionViewDataSource -
     
     override public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -69,7 +69,7 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
         cell.indexPath = indexPath
         cell.item = data[indexPath]
         cell.makeContent = rowContent
-                
+        
         cell.willDisplay()
         
         return cell
@@ -108,18 +108,6 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
     override public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         cell(for: indexPath)?.listRowPreferences?.onDeselect?.perform()
     }
-    
-    // MARK: - UICollectionViewDelegateFlowLayout -
-    
-    /*public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let result = UIHostingController(rootView: rowContent(data[indexPath])).sizeThatFits(in: UIView.layoutFittingCompressedSize)
-        
-        if result == .zero {
-            return .init(width: 1, height: 1)
-        }
-        
-        return result
-    }*/
 }
 
 extension UIHostingCollectionViewController {

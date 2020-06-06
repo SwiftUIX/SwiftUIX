@@ -101,7 +101,11 @@ extension CollectionView {
     }
 }
 
-extension CollectionView where Data: RangeReplaceableCollection, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
+extension CollectionView where
+    Data: RangeReplaceableCollection,
+    SectionModel == Never, SectionHeader == Never,
+    SectionFooter == Never
+{
     public init<Items: RandomAccessCollection>(
         _ items: Items,
         @ViewBuilder rowContent: @escaping (Item) -> RowContent
@@ -119,16 +123,21 @@ extension CollectionView where Data: RangeReplaceableCollection, SectionModel ==
     }
 }
 
-extension CollectionView where Data == Array<ListSection<SectionModel, Item>>, SectionModel == Never, SectionHeader == Never, SectionFooter == Never {
-    public init<Items: RandomAccessCollection>(
+extension CollectionView where
+    Data == Array<ListSection<SectionModel, Item>>,
+    SectionModel == Never, SectionHeader == Never,
+    SectionFooter == Never
+{
+    public init<_Item, _ItemID, Items: RandomAccessCollection>(
         _ items: Items,
-        @ViewBuilder rowContent: @escaping (Item) -> RowContent
-    ) where Items.Element == Item {
+        id: KeyPath<_Item, _ItemID>,
+        @ViewBuilder rowContent: @escaping (_Item) -> RowContent
+    ) where Items.Element == _Item, Item == KeyPathHashIdentifiableValue<_Item, _ItemID> {
         self.init(
-            [.init(items: items)],
+            [.init(items: items.map({ KeyPathHashIdentifiableValue(value: $0, keyPath: id) }))],
             sectionHeader: Never.produce,
             sectionFooter: Never.produce,
-            rowContent: rowContent
+            rowContent: { rowContent($0.value) }
         )
     }
 }

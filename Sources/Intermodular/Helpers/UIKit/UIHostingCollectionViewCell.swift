@@ -10,13 +10,12 @@ import SwiftUI
 public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UICollectionViewCell {
     var collectionViewController: (UICollectionViewController & UICollectionViewDelegateFlowLayout)!
     var indexPath: IndexPath?
-    
     var item: Item!
     var makeContent: ((Item) -> Content)!
     
-    private var contentHostingController: UICollectionViewCellContentHostingController<Item, Content>?
-    
     var listRowPreferences: _ListRowPreferences?
+    
+    private var contentHostingController: UICollectionViewCellContentHostingController<Item, Content>?
     
     override public var isHighlighted: Bool {
         didSet {
@@ -30,8 +29,6 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
             height: collectionViewController.collectionView.contentSize.height - 0.001
         )
     }
-    
-    private lazy var systemLayoutSizeCache: [Int: CGSize] = [:]
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,17 +57,11 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
             contentHostingController.view.layoutIfNeeded()
         }
     }
-
+    
     override public func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
         layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
         
         return layoutAttributes
-    }
-    
-    override public func invalidateIntrinsicContentSize() {
-        super.invalidateIntrinsicContentSize()
-        
-        systemLayoutSizeCache.removeAll()
     }
     
     override public func prepareForReuse() {
@@ -89,7 +80,7 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         guard let contentHostingController = contentHostingController else  {
             return CGSize(width: 1, height: 1)
         }
-
+        
         contentHostingController.view.setNeedsLayout()
         contentHostingController.view.layoutIfNeeded()
         
@@ -149,17 +140,6 @@ extension UIHostingCollectionViewCell {
 
 // MARK: - Auxiliary Implementation -
 
-extension CGSize {
-    fileprivate var _hashValue: Int {
-        var hasher = Hasher()
-        
-        hasher.combine(width)
-        hasher.combine(height)
-        
-        return hasher.finalize()
-    }
-}
-
 extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
 }
@@ -171,10 +151,6 @@ open class UICollectionViewCellContentHostingController<Item: Identifiable, Cont
         self.base = base
         
         super.init(rootView: .init(base: base))
-    }
-    
-    override open func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {
