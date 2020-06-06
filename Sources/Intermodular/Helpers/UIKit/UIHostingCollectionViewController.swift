@@ -69,8 +69,8 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
         cell.indexPath = indexPath
         cell.item = data[indexPath]
         cell.makeContent = rowContent
-        
-        cell.update()
+                
+        cell.willDisplay()
         
         return cell
     }
@@ -81,8 +81,12 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
     
     // MARK: - UICollectionViewDelegate -
     
+    override public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        (cell as! UIHostingCollectionViewCell<Item, RowContent>).willDisplay()
+    }
+    
     override public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.cell(for: indexPath)?.update()
+        (cell as! UIHostingCollectionViewCell<Item, RowContent>).didEndDisplaying()
     }
     
     override public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {

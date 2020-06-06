@@ -14,13 +14,13 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
     var item: Item!
     var makeContent: ((Item) -> Content)!
     
-    private var contentHostingController: UICollectionViewCellContentHostingController<Item, Content>!
+    private var contentHostingController: UICollectionViewCellContentHostingController<Item, Content>?
     
     var listRowPreferences: _ListRowPreferences?
     
     override public var isHighlighted: Bool {
         didSet {
-            contentHostingController.rootView.manager.isHighlighted = isHighlighted
+            contentHostingController?.rootView.manager.isHighlighted = isHighlighted
         }
     }
     
@@ -31,43 +31,46 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         )
     }
     
-    override public func awakeFromNib() {
-        super.awakeFromNib()
+    private lazy var systemLayoutSizeCache: [Int: CGSize] = [:]
+    
+    override public init(frame: CGRect) {
+        super.init(frame: frame)
         
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            contentView.leftAnchor.constraint(equalTo: leftAnchor),
-            contentView.rightAnchor.constraint(equalTo: rightAnchor),
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        backgroundColor = .clear
+        backgroundView = .init()
+        contentView.backgroundColor = .clear
+        contentView.bounds.origin = .zero
+        layoutMargins = .zero
+        selectedBackgroundView = .init()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if let contentHostingController = contentHostingController {
+            if contentHostingController.view.frame != contentView.bounds {
+                contentHostingController.view.frame = contentView.bounds
+                contentHostingController.view.setNeedsLayout()
+            }
+            
+            contentHostingController.view.layoutIfNeeded()
+        }
+    }
+
     override public func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
         layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
         
         return layoutAttributes
     }
     
-    override public func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize  {
-        guard let contentHostingController = contentHostingController else  {
-            return CGSize(width: 1, height: 1)
-        }
+    override public func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
         
-        return contentHostingController.sizeThatFits(
-            in: .init(targetSize),
-            targetSize: nil,
-            maximumSize: maximumSize
-        )
-    }
-    
-    override public func systemLayoutSizeFitting(
-        _ targetSize: CGSize,
-        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
-        verticalFittingPriority: UILayoutPriority
-    ) -> CGSize {
-        systemLayoutSizeFitting(targetSize)
+        systemLayoutSizeCache.removeAll()
     }
     
     override public func prepareForReuse() {
@@ -78,47 +81,84 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         listRowPreferences = nil
     }
     
+    override public func systemLayoutSizeFitting(
+        _ targetSize: CGSize,
+        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+        verticalFittingPriority: UILayoutPriority
+    ) -> CGSize {
+        guard let contentHostingController = contentHostingController else  {
+            return CGSize(width: 1, height: 1)
+        }
+
+        contentHostingController.view.setNeedsLayout()
+        contentHostingController.view.layoutIfNeeded()
+        
+        return contentHostingController.sizeThatFits(
+            in: .init(targetSize),
+            targetSize: nil,
+            maximumSize: maximumSize
+        )
+    }
+    
+    func willDisplay() {
+        attachContentHostingController()
+    }
+    
+    func didEndDisplaying() {
+        detachContentHostingController()
+    }
+}
+
+extension UIHostingCollectionViewCell {
+    func attachContentHostingController() {
+        if contentHostingController == nil {
+            contentHostingController = UICollectionViewCellContentHostingController(base: self)
+            
+            contentHostingController?.view.backgroundColor = .clear
+        } else {
+            contentHostingController!.rootView.itemID = item.id
+        }
+        
+        if contentHostingController?.parent == nil {
+            contentHostingController!.willMove(toParent: collectionViewController)
+            collectionViewController.addChild(contentHostingController!)
+            contentView.addSubview(contentHostingController!.view)
+            contentHostingController!.view.frame = contentView.bounds
+            contentHostingController!.didMove(toParent: collectionViewController)
+        }
+    }
+    
+    func detachContentHostingController() {
+        contentHostingController?.willMove(toParent: nil)
+        contentHostingController?.view.removeFromSuperview()
+        contentHostingController?.removeFromParent()
+    }
+}
+
+extension UIHostingCollectionViewCell {
     public func reload() {
         guard let indexPath = indexPath else {
             return
         }
         
+        invalidateIntrinsicContentSize()
+        
         collectionViewController.collectionView.reloadItems(at: [indexPath])
     }
 }
 
-extension UIHostingCollectionViewCell {
-    func update() {
-        if contentHostingController == nil {
-            backgroundColor = .clear
-            backgroundView = .init()
-            contentView.backgroundColor = .clear
-            contentView.bounds.origin = .zero
-            layoutMargins = .zero
-            selectedBackgroundView = .init()
-            
-            contentHostingController = .init(base: self)
-            contentHostingController.view.backgroundColor = .clear
-            contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-            
-            contentHostingController.willMove(toParent: collectionViewController)
-            collectionViewController.addChild(contentHostingController)
-            contentView.addSubview(contentHostingController.view)
-            contentHostingController.didMove(toParent: collectionViewController)
-            
-            NSLayoutConstraint.activate([
-                contentHostingController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                contentHostingController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-                contentHostingController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-            ])
-        } else {
-            contentHostingController.rootView = .init(base: self)
-        }
+// MARK: - Auxiliary Implementation -
+
+extension CGSize {
+    fileprivate var _hashValue: Int {
+        var hasher = Hasher()
+        
+        hasher.combine(width)
+        hasher.combine(height)
+        
+        return hasher.finalize()
     }
 }
-
-// MARK: - Auxiliary Implementation -
 
 extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"

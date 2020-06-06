@@ -23,6 +23,7 @@ public struct UIHostingCollectionViewCellRootView<Item: Identifiable, Content: V
     }
     
     var manager: _ListRowManager
+    var itemID: Item.ID?
     
     init(base: UIHostingCollectionViewCell<Item, Content>?) {
         self.manager = .init(base: base)
@@ -34,7 +35,6 @@ public struct UIHostingCollectionViewCellRootView<Item: Identifiable, Content: V
                 .makeContent(base.item)
                 .environment(\.listRowManager, manager)
                 .onPreferenceChange(_ListRowPreferencesKey.self, perform: { base.listRowPreferences = $0 })
-                .id(base.item.id)
         }
     }
 }
