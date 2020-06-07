@@ -16,9 +16,9 @@ public struct AuthorizationAppleIDButton {
     let style: ASAuthorizationAppleIDButton.Style
     
     @usableFromInline
-    var requestedScopes: [ASAuthorization.Scope]?
-    @usableFromInline
     var onAuthorization: (Result<ASAuthorization, Error>) -> Void = { _ in }
+    @usableFromInline
+    var requestedScopes: [ASAuthorization.Scope]?
     
     public init(
         type: ASAuthorizationAppleIDButton.ButtonType,
