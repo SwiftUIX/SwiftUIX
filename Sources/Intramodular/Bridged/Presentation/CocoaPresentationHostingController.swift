@@ -23,6 +23,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
         presentationController?.delegate = coordinator
         transitioningDelegate = presentation.content.presentationStyle.transitioningDelegate
         
+        #if !os(tvOS)
         if case .popover = presentation.content.presentationStyle {
             popoverPresentationController?.delegate = coordinator
             popoverPresentationController?.permittedArrowDirections = .any
@@ -37,6 +38,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
                 popoverPresentationController?.sourceRect = sourceRect
             }
         }
+        #endif
         
         if presentation.content.presentationStyle != .automatic {
             view.backgroundColor = .clear

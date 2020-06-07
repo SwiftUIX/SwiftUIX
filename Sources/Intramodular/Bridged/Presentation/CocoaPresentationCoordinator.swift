@@ -137,11 +137,15 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
 }
 
-extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate, UIPopoverPresentationControllerDelegate {
+extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        #if !os(tvOS)
         if controller is UIPopoverPresentationController {
             return .none
-        } else if let presentation = presentation {
+        }
+        #endif
+        
+        if let presentation = presentation {
             return .init(presentation.content.presentationStyle)
         } else {
             return .automatic
@@ -166,6 +170,14 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
         
     }
 }
+
+#if !os(tvOS)
+
+extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate {
+    
+}
+
+#endif
 
 // MARK: - Helpers -
 
