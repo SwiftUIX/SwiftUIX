@@ -23,7 +23,7 @@ public final class ErrorContext: ObservableObject {
 }
 
 extension ErrorContext {
-    public func add(_ error: Error) {
+    public func push(_ error: Error) {
         errors.append(error)
     }
     
@@ -40,7 +40,7 @@ extension ErrorContext {
             try action()
         } catch {
             DispatchQueue.asyncOnMainIfNecessary {
-                self.add(error)
+                self.push(error)
             }
         }
     }
@@ -86,11 +86,39 @@ extension View {
             .environmentObject(context)
     }
     
-    public func attachError(_ error: Error?) -> some View {
+    public func attach(error: Error?) -> some View {
         error.ifSome { error in
             preference(key: ErrorContextPreferenceKey.self, value: ErrorContext([error]))
         }.else {
             self
+        }
+    }
+    
+    public func onAppear(perform action: (() throws -> Void)?) -> some View {
+        EnvironmentValueAccessView(\.errorContext) { errorContext in
+            self.onAppear(perform: action.map({ action in
+                {
+                    do {
+                        try action()
+                    } catch {
+                        errorContext.push(error)
+                    }
+                }
+            }))
+        }
+    }
+
+    public func onDisappear(perform action: (() throws -> Void)?) -> some View {
+        EnvironmentValueAccessView(\.errorContext) { errorContext in
+            self.onDisappear(perform: action.map({ action in
+                {
+                    do {
+                        try action()
+                    } catch {
+                        errorContext.push(error)
+                    }
+                }
+            }))
         }
     }
 }
@@ -114,9 +142,7 @@ extension EnvironmentValues {
 final class ErrorContextPreferenceKey: PreferenceKey {
     typealias Value = ErrorContext
     
-    static var defaultValue: Value {
-        return .init()
-    }
+    static let defaultValue = ErrorContext()
     
     static func reduce(value: inout Value, nextValue: () -> Value) {
         value.merge(nextValue())

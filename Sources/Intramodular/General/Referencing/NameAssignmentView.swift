@@ -54,7 +54,7 @@ extension View {
     }
     
     @inlinable
-    public func named() -> some View {
+    public func name() -> some View {
         name(ViewName(type(of: self)))
     }
 }

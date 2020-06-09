@@ -70,6 +70,6 @@ extension AnyModalPresentation {
 
 extension AnyModalPresentation: Equatable {
     public static func == (lhs: AnyModalPresentation, rhs: AnyModalPresentation) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 }

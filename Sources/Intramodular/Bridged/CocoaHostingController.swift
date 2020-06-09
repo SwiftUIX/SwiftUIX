@@ -64,6 +64,14 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         fatalError("init(coder:) has not been implemented")
     }
     
+    override open func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let window = view.window, window.canResizeToFitContent {
+            window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
+        }
+    }
+    
     public func description(for name: ViewName) -> ViewDescription? {
         subviewDescriptions.first(where: { $0.name ~= name })
     }

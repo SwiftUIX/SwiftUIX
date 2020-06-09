@@ -200,7 +200,7 @@ extension View {
     }
     
     @inlinable
-    public func square(_ sideLength: CGFloat?) -> some View {
+    public func squareFrame(sideLength: CGFloat?) -> some View {
         frame(width: sideLength, height: sideLength)
     }
 }

@@ -24,9 +24,9 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
         transitioningDelegate = presentation.content.presentationStyle.transitioningDelegate
         
         #if !os(tvOS)
-        if case .popover = presentation.content.presentationStyle {
+        if case let .popover(permittedArrowDirections) = presentation.content.presentationStyle {
             popoverPresentationController?.delegate = coordinator
-            popoverPresentationController?.permittedArrowDirections = .any
+            popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
             
             let sourceViewDescription = presentation.content.preferredSourceViewName.flatMap {
                 (presentingViewController as? CocoaController)?.description(for: $0)

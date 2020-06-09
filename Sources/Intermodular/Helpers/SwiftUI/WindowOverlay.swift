@@ -7,15 +7,55 @@
 import Swift
 import SwiftUI
 
-fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
+@usableFromInline
+struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
+    @usableFromInline
     typealias Context = UIViewControllerRepresentableContext<Self>
     
+    @usableFromInline
+    let content: Content
+    
+    @usableFromInline
+    let isKeyAndVisible: Binding<Bool>
+    
+    @usableFromInline
+    init(content: Content, isKeyAndVisible: Binding<Bool>) {
+        self.content = content
+        self.isKeyAndVisible = isKeyAndVisible
+    }
+    
+    @usableFromInline
+    func makeUIViewController(context: Context) -> UIViewControllerType {
+        .init(content: content, isKeyAndVisible: isKeyAndVisible.wrappedValue)
+    }
+    
+    @usableFromInline
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.isKeyAndVisible = isKeyAndVisible.wrappedValue
+        uiViewController.content = content
+        
+        uiViewController.updateWindow()
+    }
+}
+
+extension WindowOverlay {
+    @usableFromInline
+    class UIWindowType: UIHostingWindow<Content> {
+        
+    }
+    
+    @usableFromInline
     class UIViewControllerType: UIViewController {
+        @usableFromInline
         var content: Content
+        
+        @usableFromInline
         var isKeyAndVisible: Bool
         
-        var contentWindow: UIHostingWindow<Content>?
+        @usableFromInline
+        var contentWindow: UIWindowType?
         
+        @usableFromInline
         init(content: Content, isKeyAndVisible: Bool) {
             self.content = content
             self.isKeyAndVisible = isKeyAndVisible
@@ -23,17 +63,18 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
             super.init(nibName: nil, bundle: nil)
         }
         
+        @usableFromInline
         func updateWindow() {
             if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible {
                 return
             }
-
+            
             if isKeyAndVisible {
                 guard let window = view?.window, let windowScene = window.windowScene else {
                     return
                 }
                 
-                let contentWindow = self.contentWindow ?? UIHostingWindow(
+                let contentWindow = self.contentWindow ?? UIWindowType(
                     windowScene: windowScene,
                     rootView: content
                 ).then {
@@ -42,6 +83,7 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
                 
                 contentWindow.rootView = content
                 
+                contentWindow.canResizeToFitContent = true
                 contentWindow.isHidden = false
                 contentWindow.isUserInteractionEnabled = true
                 contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
@@ -53,34 +95,17 @@ fileprivate struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
             }
         }
         
+        @usableFromInline
         @objc required dynamic init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
-        override fileprivate func didMove(toParent parent: UIViewController?) {
+        @usableFromInline
+        override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
             updateWindow()
         }
-    }
-    
-    private let content: Content
-    private let isKeyAndVisible: Binding<Bool>
-    
-    init(content: Content, isKeyAndVisible: Binding<Bool>) {
-        self.content = content
-        self.isKeyAndVisible = isKeyAndVisible
-    }
-    
-    func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(content: content, isKeyAndVisible: isKeyAndVisible.wrappedValue)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.isKeyAndVisible = isKeyAndVisible.wrappedValue
-        uiViewController.content = content
-        
-        uiViewController.updateWindow()
     }
 }
 

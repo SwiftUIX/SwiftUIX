@@ -23,7 +23,11 @@ public enum ModalViewPresentationStyle: Equatable {
     #endif
     
     #if os(iOS) || targetEnvironment(macCatalyst)
-    case popover
+    case popover(permittedArrowDirections: UIPopoverArrowDirection)
+    
+    public static var popover: Self {
+        return .popover(permittedArrowDirections: .any)
+    }
     #endif
     
     case automatic
@@ -155,7 +159,7 @@ extension UIViewController {
             #endif
             #if os(iOS) || targetEnvironment(macCatalyst)
             case .popover:
-                return .popover
+                return .popover(permittedArrowDirections: popoverPresentationController?.permittedArrowDirections ?? .any)
             #endif
             case .automatic:
                 return .automatic
@@ -168,4 +172,5 @@ extension UIViewController {
         }
     }
 }
+
 #endif
