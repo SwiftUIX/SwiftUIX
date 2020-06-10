@@ -8,40 +8,23 @@ import SwiftUI
 
 /// A control you add to your interface that enables users to initiate the Sign In with Apple flow.
 public struct AuthorizationAppleIDButton {
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @usableFromInline
-    let type: ASAuthorizationAppleIDButton.ButtonType
+    let type: AuthorizationAppleIDButtonType
     @usableFromInline
-    let style: ASAuthorizationAppleIDButton.Style
-    #endif
-
-    #if os(watchOS)
-    @usableFromInline
-    let style: WKInterfaceAuthorizationAppleIDButton.Style
-    #endif
+    let style: AuthorizationAppleIDButtonStyle
     
     @usableFromInline
     var onAuthorization: (Result<ASAuthorization, Error>) -> Void = { _ in }
     @usableFromInline
     var requestedScopes: [ASAuthorization.Scope]?
 
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public init(
-        type: ASAuthorizationAppleIDButton.ButtonType,
-        style: ASAuthorizationAppleIDButton.Style
+        type: AuthorizationAppleIDButtonType,
+        style: AuthorizationAppleIDButtonStyle
     ) {
         self.type = type
         self.style = style
     }
-    #endif
-
-    #if os(watchOS)
-    public init(
-        style: WKInterfaceAuthorizationAppleIDButton.Style
-    ) {
-        self.style = style
-    }
-    #endif
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -50,7 +33,7 @@ extension AuthorizationAppleIDButton: UIViewRepresentable {
     public typealias UIViewType = ASAuthorizationAppleIDButton
     
     public func makeUIView(context: Context) -> ASAuthorizationAppleIDButton {
-        ASAuthorizationAppleIDButton(type: type, style: style).then {
+        ASAuthorizationAppleIDButton(type: .init(type), style: .init(style)).then {
             $0.addTarget(context.coordinator, action: #selector(Coordinator.authenticate), for: .touchUpInside)
         }
     }
@@ -78,7 +61,7 @@ extension AuthorizationAppleIDButton: NSViewRepresentable {
     public typealias NSViewType = ASAuthorizationAppleIDButton
 
     public func makeNSView(context: Context) -> ASAuthorizationAppleIDButton {
-        ASAuthorizationAppleIDButton(type: type, style: style).then {
+        ASAuthorizationAppleIDButton(type: .init(type), style: .init(style)).then {
             $0.target = context.coordinator
             $0.action = #selector(Coordinator.authenticate)
         }
@@ -108,7 +91,7 @@ extension AuthorizationAppleIDButton: WKInterfaceObjectRepresentable {
 
     public func makeWKInterfaceObject(context: Context) -> WKInterfaceAuthorizationAppleIDButton {
         if #available(watchOS 6.1, *) {
-            return WKInterfaceAuthorizationAppleIDButton(style: style, target: context.coordinator, action: #selector(Coordinator.authenticate))
+            return WKInterfaceAuthorizationAppleIDButton(style: .init(style), target: context.coordinator, action: #selector(Coordinator.authenticate))
         } else {
             return WKInterfaceAuthorizationAppleIDButton(target: context.coordinator, action: #selector(Coordinator.authenticate))
         }
