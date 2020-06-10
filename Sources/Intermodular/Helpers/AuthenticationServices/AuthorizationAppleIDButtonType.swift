@@ -1,8 +1,5 @@
 //
-//  AuthorizationAppleIDButtonType.swift
-//  
-//
-//  Created by Siddarth on 6/9/20.
+// Copyright (c) Vatsal Manot
 //
 
 import AuthenticationServices
@@ -17,7 +14,7 @@ public enum AuthorizationAppleIDButtonType: Equatable {
     @available(iOS 13.2, tvOS 13.1, OSX 10.15.1, *)
     case signUp
     #endif
-
+    
     case `default`
 }
 
@@ -28,18 +25,19 @@ public enum AuthorizationAppleIDButtonType: Equatable {
 extension ASAuthorizationAppleIDButton.ButtonType {
     public init(_ type: AuthorizationAppleIDButtonType) {
         switch type {
-        case .continue:
-            self = .continue
-        case .signIn:
-            self = .signIn
-        case .signUp:
-            if #available(iOS 13.2, tvOS 13.1, OSX 10.15.1, *) {
-                self = .signUp
-            } else {
+            case .continue:
+                self = .continue
+            case .signIn:
                 self = .signIn
+            case .signUp: do {
+                if #available(iOS 13.2, tvOS 13.1, OSX 10.15.1, *) {
+                    self = .signUp
+                } else {
+                    self = .signIn
+                }
             }
-        case .default:
-            self = .default
+            case .default:
+                self = .default
         }
     }
 }

@@ -1,8 +1,5 @@
 //
-//  AuthorizationAppleIDButtonStyle.swift
-//
-//
-//  Created by Siddarth on 6/9/20.
+// Copyright (c) Vatsal Manot
 //
 
 import AuthenticationServices
@@ -17,12 +14,12 @@ public enum AuthorizationAppleIDButtonStyle: Equatable {
     /// A black button.
     case black
     #endif
-
+    
     #if os(watchOS)
     /// The system’s default button style.
     case `default`
     #endif
-
+    
     /// A white button with black lettering.
     case white
 }
@@ -34,12 +31,12 @@ public enum AuthorizationAppleIDButtonStyle: Equatable {
 extension ASAuthorizationAppleIDButton.Style {
     public init(_ style: AuthorizationAppleIDButtonStyle) {
         switch style {
-        case .whiteOutline:
-            self = .whiteOutline
-        case .black:
-            self = .black
-        case .white:
-            self = .white
+            case .whiteOutline:
+                self = .whiteOutline
+            case .black:
+                self = .black
+            case .white:
+                self = .white
         }
     }
 }
@@ -49,10 +46,10 @@ extension ASAuthorizationAppleIDButton.Style {
 extension WKInterfaceAuthorizationAppleIDButton.Style {
     public init(_ style: AuthorizationAppleIDButtonStyle) {
         switch style {
-        case .default:
-            self = .default
-        case .white:
-            self = .white
+            case .default:
+                self = .default
+            case .white:
+                self = .white
         }
     }
 }
