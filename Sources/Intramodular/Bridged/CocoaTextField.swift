@@ -59,7 +59,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
 }
 
 public struct _CocoaTextField: UIViewRepresentable {
-    public typealias UIViewType = _UITextField
+    public typealias UIViewType = UIHostingTextField
     
     @Environment(\.font) var font
     @Environment(\.isEnabled) var isEnabled
@@ -117,7 +117,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     }
     
     public func makeUIView(context: Context) -> UIViewType {
-        let uiView = _UITextField()
+        let uiView = UIHostingTextField()
         
         uiView.delegate = context.coordinator
         
