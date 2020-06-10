@@ -6,15 +6,9 @@ import AuthenticationServices
 import Swift
 import SwiftUI
 
-#if os(watchOS)
-import WatchKit
-#endif
-
-#if !os(macOS)
-
 /// A control you add to your interface that enables users to initiate the Sign In with Apple flow.
 public struct AuthorizationAppleIDButton {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @usableFromInline
     let type: ASAuthorizationAppleIDButton.ButtonType
     @usableFromInline
@@ -31,7 +25,7 @@ public struct AuthorizationAppleIDButton {
     @usableFromInline
     var requestedScopes: [ASAuthorization.Scope]?
 
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public init(
         type: ASAuthorizationAppleIDButton.ButtonType,
         style: ASAuthorizationAppleIDButton.Style
@@ -78,9 +72,36 @@ extension AuthorizationAppleIDButton.Coordinator: ASAuthorizationControllerPrese
     }
 }
 
-#endif
+#elseif os(macOS)
 
-#if os(watchOS)
+extension AuthorizationAppleIDButton: NSViewRepresentable {
+    public typealias NSViewType = ASAuthorizationAppleIDButton
+
+    public func makeNSView(context: Context) -> ASAuthorizationAppleIDButton {
+        ASAuthorizationAppleIDButton(type: type, style: style).then {
+            $0.target = context.coordinator
+            $0.action = #selector(Coordinator.authenticate)
+        }
+    }
+
+    public func updateNSView(_ nsView: ASAuthorizationAppleIDButton, context: Context) {
+        context.coordinator.base = self
+    }
+}
+
+extension AuthorizationAppleIDButton.Coordinator: ASAuthorizationControllerPresentationContextProviding {
+    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let window = NSApplication.shared.firstKeyWindow else {
+            assertionFailure()
+
+            return NSWindow()
+        }
+
+        return window
+    }
+}
+
+#elseif os(watchOS)
 
 extension AuthorizationAppleIDButton: WKInterfaceObjectRepresentable {
     public typealias WKInterfaceObjectType = WKInterfaceAuthorizationAppleIDButton
@@ -148,5 +169,3 @@ extension AuthorizationAppleIDButton {
         then({ $0.requestedScopes = requestedScopes })
     }
 }
-
-#endif
