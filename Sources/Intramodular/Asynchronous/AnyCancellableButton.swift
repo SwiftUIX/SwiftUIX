@@ -21,6 +21,14 @@ public struct AnyCancellableButton<Label: View>: View {
         self.label = label()
     }
     
+    public init<C: Cancellable>(
+        action: @escaping () -> C,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.action = { AnyCancellable(action()) }
+        self.label = label()
+    }
+    
     public var body: some View {
         Button(action: trigger) {
             label
