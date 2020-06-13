@@ -38,3 +38,15 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
         }
     }
 }
+
+extension ResultView where Success == Void, Failure == Error {
+    public init(successView: () throws -> SuccessView, failureView: (Error) -> FailureView) {
+        do {
+            self.successView = try successView()
+            self.failureView = nil
+        } catch {
+            self.successView = nil
+            self.failureView = failureView(error)
+        }
+    }
+}
