@@ -12,13 +12,17 @@ import UIKit
 public struct PageControl {
     public let numberOfPages: Int
     public let currentPage: Binding<Int>
+    public let hidesForSinglePage: Bool
+    public let defersCurrentPageDisplay: Bool
     
     @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
     @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
     
-    public init(numberOfPages: Int, currentPage: Binding<Int>) {
+    public init(numberOfPages: Int, currentPage: Binding<Int>, hidesForSinglePage: Bool = false, defersCurrentPageDisplay: Bool = false) {
         self.numberOfPages = numberOfPages
         self.currentPage = currentPage
+        self.hidesForSinglePage = hidesForSinglePage
+        self.defersCurrentPageDisplay = defersCurrentPageDisplay
     }
 }
 
@@ -56,6 +60,8 @@ extension PageControl: UIViewRepresentable {
         uiView.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor3()
         uiView.numberOfPages = numberOfPages
         uiView.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
+        uiView.hidesForSinglePage = hidesForSinglePage
+        uiView.defersCurrentPageDisplay = defersCurrentPageDisplay
     }
     
     public func makeCoordinator() -> Coordinator {
