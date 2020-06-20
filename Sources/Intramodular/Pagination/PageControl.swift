@@ -16,6 +16,13 @@ public struct PageControl {
     @Environment(\.pageIndicatorTintColor) private var pageIndicatorTintColor
     @Environment(\.currentPageIndicatorTintColor) private var currentPageIndicatorTintColor
     
+    @usableFromInline
+    var defersCurrentPageDisplay: Bool?
+    
+    @usableFromInline
+    var hidesForSinglePage: Bool?
+    
+    @inlinable
     public init(numberOfPages: Int, currentPage: Binding<Int>) {
         self.numberOfPages = numberOfPages
         self.currentPage = currentPage
@@ -26,14 +33,17 @@ public struct PageControl {
 
 extension PageControl: UIViewRepresentable {
     public class Coordinator: NSObject {
-        public var parent: PageControl
+        @usableFromInline
+        var base: PageControl
         
-        public init(_ parent: PageControl) {
-            self.parent = parent
+        @usableFromInline
+        init(_ base: PageControl) {
+            self.base = base
         }
         
+        @inlinable
         @objc public func updateCurrentPage(sender: UIViewType) {
-            parent.currentPage.wrappedValue = sender.currentPage
+            base.currentPage.wrappedValue = sender.currentPage
         }
     }
     
@@ -52,14 +62,50 @@ extension PageControl: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        context.coordinator.base = self
+        
         uiView.currentPage = currentPage.wrappedValue
         uiView.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor3()
         uiView.numberOfPages = numberOfPages
         uiView.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
+        
+        if let hidesForSinglePage = hidesForSinglePage {
+            uiView.hidesForSinglePage = hidesForSinglePage
+        }
+        
+        if let defersCurrentPageDisplay = defersCurrentPageDisplay {
+            uiView.defersCurrentPageDisplay = defersCurrentPageDisplay
+        }
     }
     
     public func makeCoordinator() -> Coordinator {
         .init(self)
+    }
+}
+
+// MARK: - API -
+
+extension PageControl {
+    @inlinable
+    public func defersCurrentPageDisplay(_ defersCurrentPageDisplay: Bool) -> Self {
+        then({ $0.defersCurrentPageDisplay = defersCurrentPageDisplay })
+    }
+    
+    @inlinable
+    public func hidesForSinglePage(_ hidesForSinglePage: Bool) -> Self {
+        then({ $0.hidesForSinglePage = hidesForSinglePage })
+    }
+}
+
+extension View {
+    @inlinable
+    public func pageIndicatorTintColor(_ color: Color) -> some View {
+        environment(\.pageIndicatorTintColor, color)
+    }
+    
+    @inlinable
+    public func currentPageIndicatorTintColor(_ color: Color) -> some View {
+        environment(\.currentPageIndicatorTintColor, color)
     }
 }
 
@@ -90,20 +136,6 @@ extension EnvironmentValues {
         } set {
             self[PageControl.CurrentTintColorEnvironmentKey] = newValue
         }
-    }
-}
-
-// MARK: - API -
-
-extension View {
-    @inlinable
-    public func pageIndicatorTintColor(_ color: Color) -> some View {
-        environment(\.pageIndicatorTintColor, color)
-    }
-    
-    @inlinable
-    public func currentPageIndicatorTintColor(_ color: Color) -> some View {
-        environment(\.currentPageIndicatorTintColor, color)
     }
 }
 
