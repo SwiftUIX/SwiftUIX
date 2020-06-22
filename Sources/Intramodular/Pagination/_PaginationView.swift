@@ -192,11 +192,12 @@ extension _PaginationView {
             return pageViewController
                 .allViewControllers
                 .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap({
-                    $0 + 1 == pageViewController.allViewControllers.count
-                        ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
-                        : pageViewController.allViewControllers[$0 + 1]
-                })
+                .flatMap {
+                    let viewController = $0 + 1 == pageViewController.allViewControllers.count
+                                                ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
+                                                : pageViewController.allViewControllers[$0 + 1]
+                    return viewController
+                }
         }
         
         func pageViewController(
@@ -246,11 +247,12 @@ extension _PaginationView {
             return pageViewController
                 .allViewControllers
                 .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap({
-                    $0 + 1 == pageViewController.allViewControllers.count
-                        ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
-                        : pageViewController.allViewControllers[$0 + 1]
-                })
+                .flatMap {
+                    let viewController = $0 + 1 == pageViewController.allViewControllers.count
+                                                ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
+                                                : pageViewController.allViewControllers[$0 + 1]
+                    return viewController
+                }
         }
         
         func pageViewController(
