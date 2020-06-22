@@ -28,6 +28,10 @@ public enum UserInterfaceIdiom: Hashable {
                 return .pad
             case .tv:
                 return .tv
+            #if swift(>=5.3)
+            case .mac:
+                return .mac
+            #endif
             case .unspecified:
                 return .unspecified
             
