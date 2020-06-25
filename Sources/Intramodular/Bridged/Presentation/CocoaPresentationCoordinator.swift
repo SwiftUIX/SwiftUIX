@@ -65,7 +65,7 @@ import SwiftUI
 
 extension CocoaPresentationCoordinator {
     public override var description: String {
-        if let name = name {
+        if let name = presentationName {
             return "Bridged Presentation Coordinator (" + name.description + ")"
         } else {
             return "Bridged Presentation Coordinator"
@@ -84,7 +84,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentedCoordinator
     }
     
-    public var name: ViewName? {
+    public var presentationName: ViewName? {
         presentation?.content.opaque_getViewName()
     }
     

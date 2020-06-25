@@ -7,16 +7,20 @@ import SwiftUI
 
 /// A type that manages view presentation.
 public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider, PresentationManager {
+    /// The presented item.
     var presented: DynamicViewPresentable? { get }
     
-    func present(_ presentation: AnyModalPresentation)
+    /// Presents a new item.
+    func present(_ item: AnyModalPresentation)
     
+    /// Dismisses the currently presented item (if any).
     func dismiss(animated: Bool, completion: (() -> Void)?)
 }
 
 // MARK: - Implementation -
 
 extension DynamicViewPresenter {
+    /// A reference to the top-most presented item.
     public var topmostPresented: DynamicViewPresentable? {
         var presented = self.presented
         
@@ -27,10 +31,12 @@ extension DynamicViewPresenter {
         return presented
     }
     
+    /// The top-most available presenter.
     public var topmostPresenter: DynamicViewPresenter {
         (topmostPresented as? DynamicViewPresenter) ?? self
     }
     
+    /// Indicates whether a presenter is currently presenting.
     public var isPresenting: Bool {
         return presented != nil
     }
@@ -104,7 +110,7 @@ extension DynamicViewPresenter {
         var presenter: DynamicViewPresenter? = self.presenter ?? self
         
         while let presented = presenter {
-            if presented.name == name {
+            if presented.presentationName == name {
                 presented.presenter?.dismiss(completion: completion)
                 
                 return
@@ -143,7 +149,7 @@ extension EnvironmentValues {
 
 extension UIViewController: DynamicViewPresenter {
     private static var presentationCoordinatorKey: Void = ()
-        
+    
     @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &UIViewController.presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
@@ -169,7 +175,7 @@ extension UIWindow: DynamicViewPresenter {
     public var presented: DynamicViewPresentable? {
         rootViewController?.presented
     }
-        
+    
     public func present(_ presentation: AnyModalPresentation) {
         rootViewController?.present(presentation)
     }
