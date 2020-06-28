@@ -143,7 +143,13 @@ extension Color {
     }
     
     public func toUIColor() -> UIColor? {
-        nil
+        #if swift(>=5.3)
+        if #available(iOS 14.0, *) {
+            return UIColor(self)
+        }
+        #endif
+
+        return nil
             ?? toUIColor0()
             ?? toUIColor1()
             ?? toUIColor2()
