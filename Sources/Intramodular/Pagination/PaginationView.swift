@@ -28,11 +28,16 @@ public struct PaginationView<Page: View>: View {
     @usableFromInline
     var currentPageIndex: Binding<Int>?
     
-    @State private var _currentPageIndex = 0
+    /// The current page index internally used by `PaginationView`.
+    /// Never access this directly, it is marked public as a workaround to a compiler bug.
+    @inlinable
+    @State public var _currentPageIndex = 0
     
-    @DelayedState private var progressionController: ProgressionController?
+    /// Never access this directly, it is marked public as a workaround to a compiler bug.
+    @inlinable
+    @DelayedState public var _progressionController: ProgressionController?
     
-    @inline(never)
+    @inlinable
     public init(
         pages: [Page],
         axis: Axis = .horizontal,
@@ -52,7 +57,7 @@ public struct PaginationView<Page: View>: View {
         }
     }
     
-    @inline(never)
+    @inlinable
     public init(
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
@@ -67,6 +72,7 @@ public struct PaginationView<Page: View>: View {
         )
     }
     
+    @inlinable
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             _PaginationView(
@@ -78,7 +84,7 @@ public struct PaginationView<Page: View>: View {
                 cyclesPages: cyclesPages,
                 initialPageIndex: initialPageIndex,
                 currentPageIndex: currentPageIndex ?? $_currentPageIndex,
-                progressionController: $progressionController
+                progressionController: $_progressionController
             )
             
             if showsIndicators && (axis == .vertical || pageIndicatorAlignment != .center) {
@@ -92,12 +98,12 @@ public struct PaginationView<Page: View>: View {
                 )
             }
         }
-        .environment(\.progressionController, progressionController)
+        .environment(\.progressionController, _progressionController)
     }
 }
 
 extension PaginationView {
-    @inline(never)
+    @inlinable
     public init<Data, ID>(
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
