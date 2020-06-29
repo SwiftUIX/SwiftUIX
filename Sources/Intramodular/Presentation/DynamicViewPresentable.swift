@@ -27,12 +27,44 @@ extension UIView: DynamicViewPresentable {
 }
 
 extension UIViewController: DynamicViewPresentable {
+    public var presentationName: ViewName? {
+        presentationCoordinator.presentationName
+    }
+    
     public var presenter: DynamicViewPresenter? {
         presentingViewController
     }
+}
+
+#elseif os(macOS)
+
+extension NSView: DynamicViewPresentable {
+    public var presentationName: ViewName? {
+        return nil
+    }
     
+    public var presenter: DynamicViewPresenter? {
+        window
+    }
+}
+
+extension NSViewController: DynamicViewPresentable {
     public var presentationName: ViewName? {
         presentationCoordinator.presentationName
+    }
+    
+    public var presenter: DynamicViewPresenter? {
+        presentingViewController
+    }
+}
+
+extension NSWindow: DynamicViewPresentable {
+    public var presentationName: ViewName? {
+        return nil
+    }
+    
+    public var presenter: DynamicViewPresenter? {
+        parent
     }
 }
 

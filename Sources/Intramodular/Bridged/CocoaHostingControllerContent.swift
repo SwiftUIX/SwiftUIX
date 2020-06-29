@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: CocoaController?

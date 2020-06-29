@@ -5,9 +5,9 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
-open class CocoaHostingController<Content: View>: UIHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
+open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
     public let _presentationCoordinator: CocoaPresentationCoordinator
     
     override public var presentationCoordinator: CocoaPresentationCoordinator {
@@ -31,9 +31,9 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         self._presentationCoordinator = presentationCoordinator
         
         super.init(rootView: .init(
-            parent: nil,
-            content: rootView,
-            presentationCoordinator: presentationCoordinator)
+                    parent: nil,
+                    content: rootView,
+                    presentationCoordinator: presentationCoordinator)
         )
         
         presentationCoordinator.setViewController(self)
@@ -41,14 +41,18 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         self.rootView.parent = self
         
         if let rootView = rootView as? EnvironmentalAnyView {
+            environmentBuilder.merge(rootView.presentationEnvironmentBuilder)
+            
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)
             hidesBottomBarWhenPushed = rootView.hidesBottomBarWhenPushed
             #endif
             isModalInPresentation = !rootView.isModalDismissable
             modalPresentationStyle = .init(rootView.presentationStyle)
             transitioningDelegate = rootView.presentationStyle.transitioningDelegate
-            
-            environmentBuilder.merge(rootView.presentationEnvironmentBuilder)
+            #elseif os(macOS)
+            fatalError("unimplemented")
+            #endif
         }
     }
     
@@ -64,6 +68,7 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
         fatalError("init(coder:) has not been implemented")
     }
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -71,6 +76,13 @@ open class CocoaHostingController<Content: View>: UIHostingController<CocoaHosti
             window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
         }
     }
+    #elseif os(macOS)
+    override open func viewDidLayout() {
+        super.viewDidLayout()
+        
+        preferredContentSize = sizeThatFits(in: Screen.main.bounds.size)
+    }
+    #endif
     
     public func description(for name: ViewName) -> ViewDescription? {
         subviewDescriptions.first(where: { $0.name ~= name })

@@ -24,9 +24,9 @@ extension EnvironmentProvider {
 
 // MARK: - Concrete Implementations -
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 private var environmentBuilderKey: Void = ()
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController {
     public var environmentBuilder: EnvironmentBuilder {
@@ -39,6 +39,28 @@ extension UIViewController {
 }
 
 extension UIWindow {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
+        } set {
+            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+}
+
+#elseif os(macOS)
+
+extension NSViewController {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
+        } set {
+            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+}
+
+extension NSWindow {
     public var environmentBuilder: EnvironmentBuilder {
         get {
             objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()

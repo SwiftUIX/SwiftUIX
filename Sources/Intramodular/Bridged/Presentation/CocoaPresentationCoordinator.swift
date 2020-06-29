@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     public var environmentBuilder = EnvironmentBuilder()
@@ -19,6 +19,7 @@ import SwiftUI
     }
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let presentingViewController = viewController.presentingViewController {
             return presentingViewController.presentationCoordinator
         } else if let navigationController = viewController.navigationController {
@@ -26,9 +27,17 @@ import SwiftUI
         } else {
             return nil
         }
+        #elseif os(macOS)
+        if let presentingViewController = viewController.presentingViewController {
+            return presentingViewController.presentationCoordinator
+        } else {
+            return nil
+        }
+        #endif
     }
     
     public var presentedCoordinator: CocoaPresentationCoordinator? {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let presentedViewController = viewController.presentedViewController {
             return presentedViewController.presentationCoordinator
         } else if let navigationController = viewController.navigationController {
@@ -36,21 +45,30 @@ import SwiftUI
         } else {
             return nil
         }
+        #elseif os(macOS)
+        if let presentedViewControllers = viewController.presentedViewControllers, presentedViewControllers.count == 1 {
+            return presentedViewControllers.first?.presentationCoordinator
+        } else {
+            return nil
+        }
+        #endif
     }
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    #endif
     
-    private weak var viewController: UIViewController!
+    private weak var viewController: AppKitOrUIKitViewController!
     
     public init(
         presentation: AnyModalPresentation? = nil,
-        viewController: UIViewController? = nil
+        viewController: AppKitOrUIKitViewController? = nil
     ) {
         self.presentation = presentation
         self.viewController = viewController
     }
     
-    func setViewController(_ viewController: UIViewController) {
+    func setViewController(_ viewController: AppKitOrUIKitViewController) {
         guard self.viewController == nil else {
             return assertionFailure()
         }
@@ -59,7 +77,11 @@ import SwiftUI
     }
     
     func setIsInPresentation(_ isActive: Bool) {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         viewController.isModalInPresentation = isActive
+        #elseif os(macOS)
+        fatalError("unimplemented")
+        #endif
     }
 }
 
@@ -89,6 +111,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public func present(_ modal: AnyModalPresentation) {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let viewController = viewController.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.content.presentationStyle {
             viewController.rootView.content.presentation = modal
             return
@@ -106,6 +129,9 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             
             self.objectWillChange.send()
         }
+        #elseif os(macOS)
+        fatalError("unimplemented")
+        #endif
     }
     
     public func dismiss(animated: Bool, completion: (() -> Void)?) {
@@ -121,6 +147,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if viewController.presentedViewController != nil {
             viewController.dismiss(animated: animated) {
                 self.presentation?.content.onDismiss()
@@ -134,8 +161,13 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 completion?()
             }
         }
+        #elseif os(macOS)
+        fatalError("unimplemented")
+        #endif
     }
 }
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
@@ -171,7 +203,9 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
 }
 
-#if !os(tvOS)
+#endif
+
+#if os(iOS) && !os(tvOS)
 
 extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate {
     
