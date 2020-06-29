@@ -10,6 +10,7 @@ import UIKit
 
 public class UIHostingPageViewController<Page: View>: UIPageViewController {
     var allViewControllers: [UIHostingController<Page>] = []
+    var cyclesPages: Bool = false
     
     var pages: [Page] {
         get {
@@ -55,6 +56,42 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         }
         
         return currentPageIndex + 1
+    }
+}
+
+extension UIHostingPageViewController {
+    func viewController(before viewController: UIViewController) -> UIViewController? {
+        guard let viewController = viewController as? UIHostingController<Page> else {
+            assertionFailure()
+            
+            return nil
+        }
+        
+        return allViewControllers
+            .firstIndex(of: viewController)
+            .flatMap({ (index: Int) -> UIViewController? in
+                index == 0
+                    ? (cyclesPages ? allViewControllers.last : nil)
+                    : allViewControllers[index - 1]
+            })
+    }
+    
+    func viewController(after viewController: UIViewController) -> UIViewController? {
+        guard let viewController = viewController as? UIHostingController<Page> else {
+            assertionFailure()
+            
+            return nil
+        }
+        
+        return  allViewControllers
+            .firstIndex(of: viewController)
+            .flatMap { (index: Int) -> UIViewController? in
+                let viewController = (index + 1) == allViewControllers.count
+                    ? (cyclesPages ? allViewControllers.first : nil)
+                    : allViewControllers[index + 1]
+                
+                return viewController
+            }
     }
 }
 

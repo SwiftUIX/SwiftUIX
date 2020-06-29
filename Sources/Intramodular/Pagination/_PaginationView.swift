@@ -136,6 +136,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             uiViewController.pageControl?.currentPage = currentPageIndex
         }
         
+        uiViewController.cyclesPages = cyclesPages
         uiViewController.isEdgePanGestureEnabled = context.environment.isEdgePanGestureEnabled
         uiViewController.isPanGestureEnabled = context.environment.isPanGestureEnabled
         uiViewController.isScrollEnabled = context.environment.isScrollEnabled
@@ -171,33 +172,26 @@ extension _PaginationView {
             _ pageViewController: UIPageViewController,
             viewControllerBefore viewController: UIViewController
         ) -> UIViewController? {
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
             
-            return pageViewController
-                .allViewControllers
-                .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap({
-                    $0 == 0
-                        ? (parent.cyclesPages ? pageViewController.allViewControllers.last : nil)
-                        : pageViewController.allViewControllers[$0 - 1]
-                })
+            return pageViewController.viewController(before: viewController)
         }
         
         func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerAfter viewController: UIViewController
         ) -> UIViewController? {
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
             
-            return pageViewController
-                .allViewControllers
-                .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap {
-                    let viewController = $0 + 1 == pageViewController.allViewControllers.count
-                                                ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
-                                                : pageViewController.allViewControllers[$0 + 1]
-                    return viewController
-                }
+            return pageViewController.viewController(after: viewController)
         }
         
         func pageViewController(
@@ -226,33 +220,26 @@ extension _PaginationView {
             _ pageViewController: UIPageViewController,
             viewControllerBefore viewController: UIViewController
         ) -> UIViewController? {
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
             
-            return pageViewController
-                .allViewControllers
-                .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap({
-                    $0 == 0
-                        ? (parent.cyclesPages ? pageViewController.allViewControllers.last : nil)
-                        : pageViewController.allViewControllers[$0 - 1]
-                })
+            return pageViewController.viewController(before: viewController)
         }
         
         func pageViewController(
             _ pageViewController: UIPageViewController,
             viewControllerAfter viewController: UIViewController
         ) -> UIViewController? {
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
             
-            return pageViewController
-                .allViewControllers
-                .firstIndex(of: viewController as! UIHostingController<Page>)
-                .flatMap {
-                    let viewController = $0 + 1 == pageViewController.allViewControllers.count
-                                                ? (parent.cyclesPages ? pageViewController.allViewControllers.first : nil)
-                                                : pageViewController.allViewControllers[$0 + 1]
-                    return viewController
-                }
+            return pageViewController.viewController(after: viewController)
         }
         
         func pageViewController(
@@ -299,10 +286,10 @@ extension _PaginationView {
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,
                 let nextViewController = baseDataSource.pageViewController(base, viewControllerAfter: currentViewController)
-                else {
-                    return
+            else {
+                return
             }
-                        
+            
             base.setViewControllers([nextViewController], direction: .forward, animated: true) { finished in
                 guard finished else {
                     return
@@ -320,10 +307,10 @@ extension _PaginationView {
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,
                 let previousViewController = baseDataSource.pageViewController(base, viewControllerBefore: currentViewController)
-                else {
-                    return
+            else {
+                return
             }
-                                    
+            
             base.setViewControllers([previousViewController], direction: .reverse, animated: true) { finished in
                 guard finished else {
                     return
