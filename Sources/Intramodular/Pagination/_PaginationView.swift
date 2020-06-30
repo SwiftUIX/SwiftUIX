@@ -12,7 +12,7 @@ import UIKit
 @usableFromInline
 struct _PaginationView<Page: View> {
     @usableFromInline
-    let pages: [Page]
+    let content: AnyForEach<Page>
     @usableFromInline
     let axis: Axis
     @usableFromInline
@@ -34,7 +34,7 @@ struct _PaginationView<Page: View> {
     
     @usableFromInline
     init(
-        pages: [Page],
+        content: AnyForEach<Page>,
         axis: Axis,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool,
@@ -44,7 +44,7 @@ struct _PaginationView<Page: View> {
         currentPageIndex: Binding<Int>,
         progressionController: Binding<ProgressionController?>
     ) {
-        self.pages = pages
+        self.content = content
         self.axis = axis
         self.transitionStyle = transitionStyle
         self.showsIndicators = showsIndicators
@@ -71,12 +71,12 @@ extension _PaginationView: UIViewControllerRepresentable {
                 : .vertical
         )
         
-        uiViewController.pages = pages
+        uiViewController.content = content
         
         uiViewController.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
         uiViewController.delegate = .some(context.coordinator as! UIPageViewControllerDelegate)
         
-        guard !pages.isEmpty else {
+        guard !content.isEmpty else {
             return uiViewController
         }
         
@@ -84,20 +84,28 @@ extension _PaginationView: UIViewControllerRepresentable {
             currentPageIndex = initialPageIndex
         }
         
-        if uiViewController.pages.indices.contains(currentPageIndex) {
-            uiViewController.setViewControllers(
-                [uiViewController.allViewControllers[initialPageIndex ?? currentPageIndex]],
-                direction: .forward,
-                animated: true
-            )
-        } else {
-            if !uiViewController.allViewControllers.isEmpty {
+        if content.data.indices.contains(content.data.index(content.data.startIndex, offsetBy: currentPageIndex)) {
+            let firstIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex ?? currentPageIndex)
+            
+            if let firstViewController = uiViewController.viewController(for: firstIndex) {
                 uiViewController.setViewControllers(
-                    [uiViewController.allViewControllers.first!],
+                    [firstViewController],
                     direction: .forward,
-                    animated: false
+                    animated: true
                 )
+            }
+        } else {
+            if !content.isEmpty {
+                let firstIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex ?? currentPageIndex)
                 
+                if let firstViewController = uiViewController.viewController(for: firstIndex) {
+                    uiViewController.setViewControllers(
+                        [firstViewController],
+                        direction: .forward,
+                        animated: true
+                    )
+                }
+
                 currentPageIndex = 0
             }
         }
@@ -109,43 +117,8 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     @usableFromInline
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.pages = pages
-        
-        if uiViewController.pages.indices.contains(currentPageIndex) {
-            if uiViewController.allViewControllers[currentPageIndex] !== uiViewController.viewControllers?.first {
-                if let currentPageIndexOfViewController = uiViewController.currentPageIndex {
-                    var direction: UIPageViewController.NavigationDirection
-                    
-                    if currentPageIndex < currentPageIndexOfViewController {
-                        direction = .reverse
-                    } else {
-                        direction = .forward
-                    }
-                    
-                    uiViewController.setViewControllers(
-                        [uiViewController.allViewControllers[currentPageIndex]],
-                        direction: direction,
-                        animated: true
-                    )
-                } else {
-                    uiViewController.setViewControllers(
-                        [uiViewController.allViewControllers[currentPageIndex]],
-                        direction: .forward,
-                        animated: false
-                    )
-                }
-            }
-        } else {
-            if !uiViewController.allViewControllers.isEmpty {
-                uiViewController.setViewControllers(
-                    [uiViewController.allViewControllers.first!],
-                    direction: .forward,
-                    animated: false
-                )
-                
-                currentPageIndex = 0
-            }
-        }
+        uiViewController.content = content
+        uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: self.currentPageIndex)
         
         if uiViewController.pageControl?.currentPage != currentPageIndex {
             uiViewController.pageControl?.currentPage = currentPageIndex
@@ -227,13 +200,14 @@ extension _PaginationView {
                 return
             }
             
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return
+            }
             
-            if let controller = pageViewController.viewControllers?.first {
-                pageViewController
-                    .allViewControllers
-                    .firstIndex(of: controller as! UIHostingController<Page>)
-                    .map({ parent.currentPageIndex = $0 })
+            if let offset = pageViewController.currentPageIndexOffset {
+                parent.currentPageIndex = offset
             }
         }
     }
@@ -279,26 +253,31 @@ extension _PaginationView {
                 return
             }
             
-            let pageViewController = pageViewController as! UIViewControllerType
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return
+            }
             
-            if let controller = pageViewController.viewControllers?.first {
-                pageViewController
-                    .allViewControllers
-                    .firstIndex(of: controller as! UIHostingController<Page>)
-                    .map({ parent.currentPageIndex = $0 })
+            if let offset = pageViewController.currentPageIndexOffset {
+                parent.currentPageIndex = offset
             }
         }
         
         @usableFromInline
         @objc func presentationCount(for pageViewController: UIPageViewController) -> Int {
-            let pageViewController = pageViewController as! UIViewControllerType
-            
-            return pageViewController.allViewControllers.count
+            return parent.content.data.count
         }
         
         @usableFromInline
         @objc func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-            (pageViewController as? UIHostingPageViewController<Page>)?.currentPageIndex ?? 0
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return 0
+            }
+
+            return pageViewController.currentPageIndexOffset ?? 0
         }
     }
 }
@@ -328,9 +307,7 @@ extension _PaginationView {
                     return
                 }
                 
-                if let currentPageIndex = base.currentPageIndex {
-                    self.currentPageIndex.wrappedValue = currentPageIndex
-                }
+                syncCurrentPageIndex()
             }
         }
         
@@ -350,9 +327,14 @@ extension _PaginationView {
                     return
                 }
                 
-                if let currentPageIndex = base.currentPageIndex {
-                    self.currentPageIndex.wrappedValue = currentPageIndex
-                }
+                syncCurrentPageIndex()
+            }
+        }
+        
+        @usableFromInline
+        func syncCurrentPageIndex() {
+            if let currentPageIndex = base?.currentPageIndexOffset {
+                self.currentPageIndex.wrappedValue = currentPageIndex
             }
         }
     }

@@ -5,6 +5,16 @@
 import Swift
 import SwiftUI
 
+extension ForEach {
+    public var isEmpty: Bool {
+        data.isEmpty
+    }
+    
+    public var count: Int {
+        data.count
+    }
+}
+
 extension ForEach where Content: View {
     public init<Elements: RandomAccessCollection, ElementID: Hashable>(
         _ data: Elements,

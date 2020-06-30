@@ -11,7 +11,7 @@ import UIKit
 /// A view that paginates its children along a given axis.
 public struct PaginationView<Page: View>: View {
     @usableFromInline
-    let pages: [Page]
+    let content: AnyForEach<Page>
     @usableFromInline
     let axis: Axis
     @usableFromInline
@@ -39,12 +39,12 @@ public struct PaginationView<Page: View>: View {
     
     @inlinable
     public init(
-        pages: [Page],
+        content: AnyForEach<Page>,
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true
     ) {
-        self.pages = pages
+        self.content = content
         self.axis = axis
         self.transitionStyle = transitionStyle
         self.showsIndicators = showsIndicators
@@ -58,25 +58,10 @@ public struct PaginationView<Page: View>: View {
     }
     
     @inlinable
-    public init(
-        axis: Axis = .horizontal,
-        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
-        showsIndicators: Bool = true,
-        @ArrayBuilder<Page> content: () -> [Page]
-    ) {
-        self.init(
-            pages: content(),
-            axis: axis,
-            transitionStyle: transitionStyle,
-            showsIndicators: showsIndicators
-        )
-    }
-    
-    @inlinable
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             _PaginationView(
-                pages: pages,
+                content: content,
                 axis: axis,
                 transitionStyle: transitionStyle,
                 showsIndicators: showsIndicators,
@@ -89,7 +74,7 @@ public struct PaginationView<Page: View>: View {
             
             if showsIndicators && (axis == .vertical || pageIndicatorAlignment != .center) {
                 PageControl(
-                    numberOfPages: pages.count,
+                    numberOfPages: content.count,
                     currentPage: currentPageIndex ?? $_currentPageIndex
                 ).rotationEffect(
                     axis == .vertical
@@ -104,16 +89,78 @@ public struct PaginationView<Page: View>: View {
 
 extension PaginationView {
     @inlinable
+    public init<Data: RandomAccessCollection, ID: Hashable>(
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: @escaping (Data.Element) -> Page
+    ) {
+        self.init(
+            content: .init(data, id: id, content: content),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+
+    @inlinable
     public init<Data, ID>(
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
-        @ViewBuilder pages: () -> ForEach<Data, ID, Page>
+        content: () -> ForEach<Data, ID, Page>
     ) {
-        let _pages = pages()
-        
         self.init(
-            pages: _pages.data.map(_pages.content),
+            content: .init(content()),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<Data, ID>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        content: () -> ForEach<Data, ID, Page>
+    ) where Data.Element: Identifiable {
+        self.init(
+            content: .init(content()),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+}
+
+extension PaginationView {
+    @inlinable
+    public init(
+        pages: [Page],
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true
+    ) {
+        self.init(
+            content: AnyForEach(pages.indices, id: \.self, content: { pages[$0] }),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ArrayBuilder<Page> content: () -> [Page]
+    ) {
+        self.init(
+            pages: content(),
             axis: axis,
             transitionStyle: transitionStyle,
             showsIndicators: showsIndicators
