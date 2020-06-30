@@ -307,7 +307,7 @@ extension _PaginationView {
                     return
                 }
                 
-                syncCurrentPageIndex()
+                self.syncCurrentPageIndex()
             }
         }
         
@@ -327,7 +327,7 @@ extension _PaginationView {
                     return
                 }
                 
-                syncCurrentPageIndex()
+                self.syncCurrentPageIndex()
             }
         }
         
