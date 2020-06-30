@@ -49,7 +49,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
                 direction = .forward
             }
             
-            if let viewController = viewController(for: currentPageIndex) {
+            if let viewController = viewController(for: newValue) {
                 setViewControllers(
                     [viewController],
                     direction: direction,
