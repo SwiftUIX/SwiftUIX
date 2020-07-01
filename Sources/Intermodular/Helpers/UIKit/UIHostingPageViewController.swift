@@ -8,6 +8,8 @@ import Swift
 import SwiftUI
 import UIKit
 
+var objectIndex: Int = 0
+
 public class UIHostingPageViewController<Page: View>: UIPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
@@ -18,12 +20,32 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         }
     }
     
+    class PageContentController: UIHostingController<PageContainer> {
+        override open func viewDidLoad() {
+            super.viewDidLoad()
+            
+            view.backgroundColor = .clear
+        }
+        
+        override open func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            view.backgroundColor = .clear
+        }
+        
+        override open func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            
+            view.backgroundColor = .clear
+        }
+    }
+    
     var content: AnyForEach<Page>?
     var cyclesPages: Bool = false
-        
+            
     var currentPageIndex: AnyIndex? {
         get {
-            guard let currentViewController = viewControllers?.first as? UIHostingController<PageContainer> else {
+            guard let currentViewController = viewControllers?.first as? PageContentController else {
                 return nil
             }
             
@@ -94,7 +116,7 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        return UIHostingController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+        return PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
     }
     
     func viewController(before viewController: UIViewController) -> UIViewController? {
@@ -102,7 +124,7 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        guard let viewController = viewController as? UIHostingController<PageContainer> else {
+        guard let viewController = viewController as? PageContentController else {
             assertionFailure()
             
             return nil
@@ -114,7 +136,7 @@ extension UIHostingPageViewController {
         
         
         return index.map { index in
-            UIHostingController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+            PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
         }
     }
     
@@ -123,7 +145,7 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        guard let viewController = viewController as? UIHostingController<PageContainer> else {
+        guard let viewController = viewController as? PageContentController else {
             assertionFailure()
             
             return nil
@@ -134,7 +156,7 @@ extension UIHostingPageViewController {
             : content.data.index(after: viewController.rootView.index)
         
         return index.map { index in
-            UIHostingController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+            PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
         }
     }
 }
