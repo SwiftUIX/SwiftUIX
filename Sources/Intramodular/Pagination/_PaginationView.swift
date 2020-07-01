@@ -22,6 +22,8 @@ struct _PaginationView<Page: View> {
     @usableFromInline
     let pageIndicatorAlignment: Alignment
     @usableFromInline
+    let interPageSpacing: CGFloat?
+    @usableFromInline
     let cyclesPages: Bool
     @usableFromInline
     let initialPageIndex: Int?
@@ -39,6 +41,7 @@ struct _PaginationView<Page: View> {
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool,
         pageIndicatorAlignment: Alignment,
+        interPageSpacing: CGFloat?,
         cyclesPages: Bool,
         initialPageIndex: Int?,
         currentPageIndex: Binding<Int>,
@@ -49,6 +52,7 @@ struct _PaginationView<Page: View> {
         self.transitionStyle = transitionStyle
         self.showsIndicators = showsIndicators
         self.pageIndicatorAlignment = pageIndicatorAlignment
+        self.interPageSpacing = interPageSpacing
         self.cyclesPages = cyclesPages
         self.initialPageIndex = initialPageIndex
         self._currentPageIndex = currentPageIndex
@@ -66,9 +70,8 @@ extension _PaginationView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewControllerType {
         let uiViewController = UIViewControllerType(
             transitionStyle: transitionStyle,
-            navigationOrientation: axis == .horizontal
-                ? .horizontal
-                : .vertical
+            navigationOrientation: axis == .horizontal ? .horizontal : .vertical,
+            options: interPageSpacing.map({ [.interPageSpacing: $0 as NSNumber] })
         )
         
         uiViewController.content = content

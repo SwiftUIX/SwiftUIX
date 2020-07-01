@@ -22,6 +22,8 @@ public struct PaginationView<Page: View>: View {
     @usableFromInline
     var pageIndicatorAlignment: Alignment
     @usableFromInline
+    var interPageSpacing: CGFloat?
+    @usableFromInline
     var cyclesPages: Bool = false
     @usableFromInline
     var initialPageIndex: Int?
@@ -66,6 +68,7 @@ public struct PaginationView<Page: View>: View {
                 transitionStyle: transitionStyle,
                 showsIndicators: showsIndicators,
                 pageIndicatorAlignment: pageIndicatorAlignment,
+                interPageSpacing: interPageSpacing,
                 cyclesPages: cyclesPages,
                 initialPageIndex: initialPageIndex,
                 currentPageIndex: currentPageIndex ?? $_currentPageIndex,
@@ -176,6 +179,11 @@ extension PaginationView {
         then({ $0.pageIndicatorAlignment = alignment })
     }
     
+    @inlinable
+    public func interPageSpacing(_ interPageSpacing: CGFloat) -> Self {
+        then({ $0.interPageSpacing = interPageSpacing })
+    }
+
     @inlinable
     public func cyclesPages(_ cyclesPages: Bool) -> Self {
         then({ $0.cyclesPages = cyclesPages })
