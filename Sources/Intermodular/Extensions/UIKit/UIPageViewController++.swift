@@ -21,20 +21,20 @@ extension UIPageViewController {
             #if os(tvOS)
             return false
             #else
-            return gestureRecognizers.filter { $0 is UIScreenEdgePanGestureRecognizer }.first?.isEnabled ?? true
+            return gestureRecognizers.filter({ $0 is UIScreenEdgePanGestureRecognizer }).first?.isEnabled ?? true
             #endif
         } set {
             #if !os(tvOS)
-            return gestureRecognizers.filter { $0 is UIScreenEdgePanGestureRecognizer }.forEach { $0.isEnabled = newValue }
+            return gestureRecognizers.filter({ $0 is UIScreenEdgePanGestureRecognizer }).forEach({ $0.isEnabled = newValue })
             #endif
         }
     }
     
     var isTapGestureEnabled: Bool {
         get {
-            gestureRecognizers.filter { $0 is UITapGestureRecognizer }.first?.isEnabled ?? true
+            gestureRecognizers.filter({ $0 is UITapGestureRecognizer }).first?.isEnabled ?? true
         } set {
-            gestureRecognizers.filter { $0 is UITapGestureRecognizer }.forEach { $0.isEnabled = newValue }
+            gestureRecognizers.filter({ $0 is UITapGestureRecognizer }).forEach({ $0.isEnabled = newValue })
         }
     }
     

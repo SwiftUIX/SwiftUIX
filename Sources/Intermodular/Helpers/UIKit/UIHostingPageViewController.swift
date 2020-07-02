@@ -8,8 +8,6 @@ import Swift
 import SwiftUI
 import UIKit
 
-var objectIndex: Int = 0
-
 public class UIHostingPageViewController<Page: View>: UIPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
@@ -133,7 +131,6 @@ extension UIHostingPageViewController {
         let index = viewController.rootView.index == content.data.startIndex
             ? (cyclesPages ? content.data.indices.last : nil)
             : content.data.index(before: viewController.rootView.index)
-        
         
         return index.map { index in
             PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))

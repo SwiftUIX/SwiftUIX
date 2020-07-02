@@ -107,7 +107,7 @@ extension PaginationView {
             showsIndicators: showsIndicators
         )
     }
-
+    
     @inlinable
     public init<Data, ID>(
         axis: Axis = .horizontal,
@@ -183,7 +183,7 @@ extension PaginationView {
     public func interPageSpacing(_ interPageSpacing: CGFloat) -> Self {
         then({ $0.interPageSpacing = interPageSpacing })
     }
-
+    
     @inlinable
     public func cyclesPages(_ cyclesPages: Bool) -> Self {
         then({ $0.cyclesPages = cyclesPages })

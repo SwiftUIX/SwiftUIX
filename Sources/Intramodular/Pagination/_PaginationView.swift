@@ -160,113 +160,70 @@ extension _PaginationView {
         init(_ parent: _PaginationView) {
             self.parent = parent
         }
+        
+        @objc(pageViewController:viewControllerBeforeViewController:)
+        @usableFromInline
+        func pageViewController(
+            _ pageViewController: UIPageViewController,
+            viewControllerBefore viewController: UIViewController
+        ) -> UIViewController? {
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
+            
+            return pageViewController.viewController(before: viewController)
+        }
+        
+        @objc(pageViewController:viewControllerAfterViewController:)
+        @usableFromInline
+        func pageViewController(
+            _ pageViewController: UIPageViewController,
+            viewControllerAfter viewController: UIViewController
+        ) -> UIViewController? {
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return nil
+            }
+            
+            return pageViewController.viewController(after: viewController)
+        }
+
+        @usableFromInline
+        @objc(pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:)
+        func pageViewController(
+            _ pageViewController: UIPageViewController,
+            didFinishAnimating _: Bool,
+            previousViewControllers: [UIViewController],
+            transitionCompleted completed: Bool
+        ) {
+            guard completed else {
+                return
+            }
+            
+            guard let pageViewController = pageViewController as? UIViewControllerType else {
+                assertionFailure()
+                
+                return
+            }
+            
+            if let offset = pageViewController.currentPageIndexOffset {
+                DispatchQueue.main.async {
+                    self.parent.currentPageIndex = offset
+                }
+            }
+        }
     }
     
     @usableFromInline
     class _Coordinator_No_UIPageControl: Coordinator, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            viewControllerBefore viewController: UIViewController
-        ) -> UIViewController? {
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return nil
-            }
-            
-            return pageViewController.viewController(before: viewController)
-        }
         
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            viewControllerAfter viewController: UIViewController
-        ) -> UIViewController? {
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return nil
-            }
-            
-            return pageViewController.viewController(after: viewController)
-        }
-        
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            didFinishAnimating _: Bool,
-            previousViewControllers: [UIViewController],
-            transitionCompleted completed: Bool
-        ) {
-            guard completed else {
-                return
-            }
-            
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return
-            }
-            
-            if let offset = pageViewController.currentPageIndexOffset {
-                parent.currentPageIndex = offset
-            }
-        }
     }
     
     @usableFromInline
     class _Coordinator_Default_UIPageControl: Coordinator, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            viewControllerBefore viewController: UIViewController
-        ) -> UIViewController? {
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return nil
-            }
-            
-            return pageViewController.viewController(before: viewController)
-        }
-        
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            viewControllerAfter viewController: UIViewController
-        ) -> UIViewController? {
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return nil
-            }
-            
-            return pageViewController.viewController(after: viewController)
-        }
-        
-        @usableFromInline
-        func pageViewController(
-            _ pageViewController: UIPageViewController,
-            didFinishAnimating _: Bool,
-            previousViewControllers: [UIViewController],
-            transitionCompleted completed: Bool
-        ) {
-            guard completed else {
-                return
-            }
-            
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
-                
-                return
-            }
-            
-            if let offset = pageViewController.currentPageIndexOffset {
-                parent.currentPageIndex = offset
-            }
-        }
-        
         @usableFromInline
         @objc func presentationCount(for pageViewController: UIPageViewController) -> Int {
             return parent.content.data.count

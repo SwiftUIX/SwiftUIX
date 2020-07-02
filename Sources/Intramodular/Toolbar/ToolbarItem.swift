@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+#if swift(<5.3) && (os(iOS) || os(macOS) || targetEnvironment(macCatalyst))
 
 #if targetEnvironment(macCatalyst)
 import AppKit

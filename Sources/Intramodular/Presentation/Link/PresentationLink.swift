@@ -10,7 +10,7 @@ import SwiftUI
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
-    private let destination: () -> Destination
+    private let destination: Destination
     private let label: Label
     private let onDismiss: (() -> ())?
     
@@ -19,7 +19,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @State private var isPresented: Bool = false
     
     public init(
-        destination: @autoclosure @escaping () -> Destination,
+        destination: Destination,
         onDismiss: (() -> ())?,
         @ViewBuilder label: () -> Label
     ) {
@@ -29,11 +29,11 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public init(
-        destination: @autoclosure @escaping () -> Destination,
+        destination: Destination,
         @ViewBuilder label: () -> Label
     ) {
         self.init(
-            destination: destination(),
+            destination: destination,
             onDismiss: nil,
             label: label
         )
@@ -46,7 +46,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 onDismiss: _onDismiss
             ) {
                 CocoaHosted(
-                    rootView: self.destination()
+                    rootView: self.destination
                         .mergeEnvironmentBuilder(self.environmentBuilder)
                 )
             }

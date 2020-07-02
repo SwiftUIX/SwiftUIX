@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(macOS) || targetEnvironment(macCatalyst)
+#if swift(<5.3) && (os(macOS) || targetEnvironment(macCatalyst))
 
 import AppKit
 
