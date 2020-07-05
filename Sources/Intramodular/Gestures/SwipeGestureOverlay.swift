@@ -111,27 +111,48 @@ struct SwipeGestureOverlay: UIViewRepresentable {
 
 extension View {
     @inlinable
-    public func onSwipeGestures(
-        onSwipeUp: @escaping () -> Void = {},
-        onSwipeLeft: @escaping () -> Void = {},
-        onSwipeDown: @escaping () -> Void = {},
-        onSwipeRight: @escaping () -> Void = {}
+    public func onSwipe(
+        up: @escaping () -> Void = { },
+        left: @escaping () -> Void = { },
+        down: @escaping () -> Void = { },
+        right: @escaping () -> Void = { }
     ) -> some View {
         overlay(
             SwipeGestureOverlay(
-                onSwipeUp: .init(onSwipeUp),
-                onSwipeLeft: .init(onSwipeLeft),
-                onSwipeDown: .init(onSwipeDown),
-                onSwipeRight: .init(onSwipeRight)
+                onSwipeUp: .init(up),
+                onSwipeLeft: .init(left),
+                onSwipeDown: .init(down),
+                onSwipeRight: .init(right)
             )
         )
     }
     
     @inlinable
-    public func onSwipeUpGesture(
+    public func onSwipeUp(
         perform action: @escaping () -> Void
     ) -> some View {
-        onSwipeGestures(onSwipeUp: action)
+        onSwipe(up: action)
+    }
+    
+    @inlinable
+    public func onSwipeLeft(
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onSwipe(left: action)
+    }
+    
+    @inlinable
+    public func onSwipeDown(
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onSwipe(down: action)
+    }
+    
+    @inlinable
+    public func onSwipeRight(
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onSwipe(right: action)
     }
 }
 
