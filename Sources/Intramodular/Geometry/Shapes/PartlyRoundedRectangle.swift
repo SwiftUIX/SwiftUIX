@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 public struct PartlyRoundedRectangle: Shape {
     public let corners: [RectangleCorner]
     public let cornerRadii: CGFloat
@@ -15,17 +17,13 @@ public struct PartlyRoundedRectangle: Shape {
     }
     
     public func path(in rect: CGRect) -> Path {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return Path(
-            UIBezierPath(
+            AppKitOrUIKitBezierPath(
                 roundedRect: rect,
                 byRoundingCorners: .init(corners),
                 cornerRadii: .init(width: cornerRadii, height: cornerRadii)
             )
         )
-        #elseif os(macOS)
-        return Path(NSBezierPath(rect: rect, byRoundingCorners: corners, cornerRadii: cornerRadii).cgPath)
-        #endif
     }
 }
 
@@ -40,3 +38,5 @@ extension View {
         clipShape(PartlyRoundedRectangle(corners: corners, cornerRadii: cornerRadii))
     }
 }
+
+#endif

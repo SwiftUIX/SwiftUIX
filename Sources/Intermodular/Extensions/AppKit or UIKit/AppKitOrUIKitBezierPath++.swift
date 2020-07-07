@@ -2,26 +2,23 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(AppKit) || canImport(UIKit)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import SwiftUI
 
 extension AppKitOrUIKitBezierPath {
-    #if os(iOS) || os(tvOS)
-    public func curve(to point: CGPoint, controlPoint1: CGPoint, controlPoint2: CGPoint) {
-        addCurve(to: point, controlPoint1: controlPoint1, controlPoint2: controlPoint2)
-    }
-    
-    public func line(to point: CGPoint) {
-        addLine(to: point)
-    }
-    #endif
-    
     public convenience init(
         rect: CGRect,
         byRoundingCorners corners: [RectangleCorner],
         cornerRadii: CGFloat
     ) {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        self.init(
+            roundedRect: rect,
+            byRoundingCorners: .init(corners),
+            cornerRadii: .init(width: cornerRadii, height: cornerRadii)
+        )
+        #elseif os(macOS)
         self.init()
         
         let topLeft = NSPoint(x: rect.minX, y: rect.minY)
@@ -36,7 +33,8 @@ extension AppKitOrUIKitBezierPath {
         appendArc(from: bottomRight, to: bottomLeft, radius: corners.contains(.bottomTrailing) ? cornerRadii : 0)
         appendArc(from: bottomLeft, to: topLeft, radius: corners.contains(.bottomLeading) ? cornerRadii : 0)
         
-        self.close()
+        close()
+        #endif
     }
 }
 
