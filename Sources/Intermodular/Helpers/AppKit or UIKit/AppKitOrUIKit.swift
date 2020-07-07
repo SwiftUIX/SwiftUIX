@@ -10,6 +10,7 @@ import SwiftUI
 import AppKit
 
 public typealias AppKitOrUIKitApplication = NSApplication
+public typealias AppKitOrUIKitBezierPath = NSBezierPath
 public typealias AppKitOrUIKitButton = NSButton
 public typealias AppKitOrUIKitColor = NSColor
 public typealias AppKitOrUIKitControl = NSControl
@@ -42,6 +43,7 @@ extension NSView {
 import UIKit
 
 public typealias AppKitOrUIKitApplication = UIApplication
+public typealias AppKitOrUIKitBezierPath = UIBezierPath
 public typealias AppKitOrUIKitButton = UIButton
 public typealias AppKitOrUIKitColor = UIColor
 public typealias AppKitOrUIKitControl = UIControl
