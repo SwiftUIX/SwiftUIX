@@ -24,54 +24,19 @@ extension AppKitOrUIKitBezierPath {
     ) {
         self.init()
         
-        #if os(iOS) || os(tvOS)
-        let corners = corners.map({ $0.flip(axis: .vertical) })
-        #elseif os(macOS)
-        let corners = corners.map({ $0.flip(axis: .horizontal) })
-        #endif
+        let topLeft = NSPoint(x: rect.minX, y: rect.minY)
+        let topRight = NSPoint(x: rect.maxX, y: rect.minY)
+        let bottomRight = NSPoint(x: rect.maxX, y: rect.maxY)
+        let bottomLeft = NSPoint(x: rect.minX, y: rect.maxY)
         
-        let maxX: CGFloat = rect.size.width
-        let minX: CGFloat = 0
-        let maxY: CGFloat = rect.size.height
-        let minY: CGFloat =  0
+        move(to: CGPoint(x: topLeft.x, y: topLeft.y + cornerRadii))
         
-        let bottomRightCorner = CGPoint(x: maxX, y: minY)
+        appendArc(from: topLeft, to: topRight, radius: corners.contains(.topLeading) ? cornerRadii : 0)
+        appendArc(from: topRight, to: bottomRight, radius: corners.contains(.topTrailing) ? cornerRadii : 0)
+        appendArc(from: bottomRight, to: bottomLeft, radius: corners.contains(.bottomTrailing) ? cornerRadii : 0)
+        appendArc(from: bottomLeft, to: topLeft, radius: corners.contains(.bottomLeading) ? cornerRadii : 0)
         
-        move(to: bottomRightCorner)
-        
-        if corners.contains(.bottomTrailing) {
-            line(to: CGPoint(x: maxX - cornerRadii, y: minY))
-            curve(to: CGPoint(x: maxX, y: minY + cornerRadii), controlPoint1: bottomRightCorner, controlPoint2: bottomRightCorner)
-        } else {
-            line(to: bottomRightCorner)
-        }
-        
-        let topRightCorner = CGPoint(x: maxX, y: maxY)
-        
-        if corners.contains(.topTrailing) {
-            line(to: CGPoint(x: maxX, y: maxY - cornerRadii))
-            curve(to: CGPoint(x: maxX - cornerRadii, y: maxY), controlPoint1: topRightCorner, controlPoint2: topRightCorner)
-        } else {
-            line(to: topRightCorner)
-        }
-        
-        let topLeftCorner = CGPoint(x: minX, y: maxY)
-        
-        if corners.contains(.topLeading) {
-            line(to: CGPoint(x: minX + cornerRadii, y: maxY))
-            curve(to: CGPoint(x: minX, y: maxY - cornerRadii), controlPoint1: topLeftCorner, controlPoint2: topLeftCorner)
-        } else {
-            line(to: topLeftCorner)
-        }
-        
-        let bottomLeftCorner = CGPoint(x: minX, y: minY)
-        
-        if corners.contains(.bottomLeading) {
-            line(to: CGPoint(x: minX, y: minY + cornerRadii))
-            curve(to: CGPoint(x: minX + cornerRadii, y: minY), controlPoint1: bottomLeftCorner, controlPoint2: bottomLeftCorner)
-        } else {
-            line(to: bottomLeftCorner)
-        }
+        self.close()
     }
 }
 
