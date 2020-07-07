@@ -11,16 +11,30 @@ public enum RectangleCorner: Hashable {
     case bottomLeading
     case bottomTrailing
     
-    public func flip() -> RectangleCorner {
-        switch self {
-            case .topLeading:
-                return .bottomLeading
-            case .topTrailing:
-                return .bottomTrailing
-            case .bottomLeading:
-                return .topLeading
-            case .bottomTrailing:
-                return .bottomTrailing
+    public func flip(axis: Axis) -> RectangleCorner {
+        switch axis {
+            case .vertical:
+                switch self {
+                    case .topLeading:
+                        return .bottomLeading
+                    case .topTrailing:
+                        return .bottomTrailing
+                    case .bottomLeading:
+                        return .topLeading
+                    case .bottomTrailing:
+                        return .bottomTrailing
+                }
+            case .horizontal:
+                switch self {
+                    case .topLeading:
+                        return .topTrailing
+                    case .topTrailing:
+                        return .topLeading
+                    case .bottomLeading:
+                        return .bottomTrailing
+                    case .bottomTrailing:
+                        return .bottomLeading
+                }
         }
     }
 }

@@ -25,9 +25,9 @@ extension AppKitOrUIKitBezierPath {
         self.init()
         
         #if os(iOS) || os(tvOS)
-        let corners = corners
+        let corners = corners.map({ $0.flip(axis: .vertical) })
         #elseif os(macOS)
-        let corners = corners.map({ $0.flip() })
+        let corners = corners.map({ $0.flip(axis: .horizontal) })
         #endif
         
         let maxX: CGFloat = rect.size.width
