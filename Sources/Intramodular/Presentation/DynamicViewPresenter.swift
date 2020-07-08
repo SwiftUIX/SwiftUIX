@@ -77,6 +77,16 @@ extension DynamicViewPresenter {
             completion: completion
         )
     }
+    
+    public func presentOnTop<V: View>(
+        presentationStyle: ModalViewPresentationStyle? = nil,
+        @ViewBuilder content: @escaping () -> V
+    ) {
+        topmostPresenter.present(
+            content(),
+            presentationStyle: presentationStyle
+        )
+    }
 }
 
 extension DynamicViewPresenter {
