@@ -6,34 +6,54 @@ import Swift
 import SwiftUI
 
 public enum RectangleCorner: Hashable {
+    case topLeft
     case topLeading
+    case topRight
     case topTrailing
+    case bottomLeft
     case bottomLeading
+    case bottomRight
     case bottomTrailing
     
     public func flip(axis: Axis) -> RectangleCorner {
         switch axis {
-            case .vertical:
-                switch self {
-                    case .topLeading:
-                        return .bottomLeading
-                    case .topTrailing:
-                        return .bottomTrailing
-                    case .bottomLeading:
-                        return .topLeading
-                    case .bottomTrailing:
-                        return .bottomTrailing
-                }
             case .horizontal:
                 switch self {
+                    case .topLeft:
+                        return .topRight
                     case .topLeading:
                         return .topTrailing
+                    case .topRight:
+                        return .topLeft
                     case .topTrailing:
                         return .topLeading
+                    case .bottomLeft:
+                        return .bottomRight
                     case .bottomLeading:
                         return .bottomTrailing
+                    case .bottomRight:
+                        return .bottomLeft
                     case .bottomTrailing:
                         return .bottomLeading
+                }
+            case .vertical:
+                switch self {
+                    case .topLeft:
+                        return .bottomLeft
+                    case .topLeading:
+                        return .bottomLeading
+                    case .topRight:
+                        return .bottomRight
+                    case .topTrailing:
+                        return .bottomTrailing
+                    case .bottomLeft:
+                        return .topLeft
+                    case .bottomLeading:
+                        return .topLeading
+                    case .bottomRight:
+                        return .topRight
+                    case .bottomTrailing:
+                        return .bottomTrailing
                 }
         }
     }
@@ -49,14 +69,22 @@ extension UIRectCorner {
         
         for corner in corners {
             switch corner {
-                case .topLeading:
+                case .topLeft:
                     formUnion(.topLeft)
-                case .topTrailing:
+                case .topLeading:
+                    formUnion(.topLeft) // FIXME
+                case .topRight:
                     formUnion(.topRight)
-                case .bottomLeading:
+                case .topTrailing:
+                    formUnion(.topRight) // FIXME
+                case .bottomLeft:
                     formUnion(.bottomLeft)
-                case .bottomTrailing:
+                case .bottomLeading:
+                    formUnion(.bottomLeft) // FIXME
+                case .bottomRight:
                     formUnion(.bottomRight)
+                case .bottomTrailing:
+                    formUnion(.bottomRight) // FIXME
             }
         }
     }
