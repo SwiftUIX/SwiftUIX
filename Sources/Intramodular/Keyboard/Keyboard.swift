@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 
 /// An object representing the keyboard.
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 public final class Keyboard: ObservableObject {
     public static let main = Keyboard()
@@ -63,6 +64,7 @@ public final class Keyboard: ObservableObject {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension Keyboard {
     public struct State {
@@ -118,6 +120,7 @@ extension Keyboard {
 
 // MARK: - Helpers -
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 struct HiddenIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
@@ -127,6 +130,7 @@ struct HiddenIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 struct VisibleIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
@@ -136,6 +140,7 @@ struct VisibleIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 struct RemoveIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
@@ -149,6 +154,7 @@ struct RemoveIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 struct AddIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
@@ -162,6 +168,7 @@ struct AddIfKeyboardActive: ViewModifier {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension View {
     public func hiddenIfKeyboardActive() -> some View {
