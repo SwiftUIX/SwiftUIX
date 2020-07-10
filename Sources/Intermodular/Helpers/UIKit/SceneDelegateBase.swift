@@ -14,6 +14,7 @@ open class SceneDelegateBase<AppDelegate: UIApplicationDelegate>: UIResponder, U
         .init()
     }
     
+    @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     open var applicationDelegate: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate

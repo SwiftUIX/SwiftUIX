@@ -7,6 +7,7 @@
 import Combine
 import SwiftUI
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 private struct KeyboardAvoidance: ViewModifier {
     let isSimple: Bool
@@ -49,6 +50,7 @@ private struct KeyboardAvoidance: ViewModifier {
 
 // MARK: - API -
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension View {
     public func keyboardAvoiding(animation: Animation = .spring()) -> some View {
