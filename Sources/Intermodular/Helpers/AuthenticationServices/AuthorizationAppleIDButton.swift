@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 /// A control you add to your interface that enables users to initiate the Sign In with Apple flow.
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 public struct AuthorizationAppleIDButton {
     @usableFromInline
@@ -30,6 +31,7 @@ public struct AuthorizationAppleIDButton {
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton: UIViewRepresentable {
     public typealias UIViewType = ASAuthorizationAppleIDButton
@@ -45,6 +47,7 @@ extension AuthorizationAppleIDButton: UIViewRepresentable {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton.Coordinator: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
@@ -107,6 +110,7 @@ extension AuthorizationAppleIDButton: WKInterfaceObjectRepresentable {
 
 #endif
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton {
     public class Coordinator: NSObject, ASAuthorizationControllerDelegate {
@@ -147,6 +151,7 @@ extension AuthorizationAppleIDButton {
 
 // MARK: - API -
 
+@available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton {
     public func onAuthorization(perform action: @escaping (Result<ASAuthorization, Error>) -> Void) -> Self {
