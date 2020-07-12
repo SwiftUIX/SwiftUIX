@@ -128,13 +128,12 @@ extension EnvironmentBuilder {
 
 extension View {
     @inlinable
+    @ViewBuilder
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> some View {
-        Group {
-            if builder.isEmpty {
-                self
-            } else {
-                _mergeEnvironmentBuilder(builder)
-            }
+        if builder.isEmpty {
+            self
+        } else {
+            _mergeEnvironmentBuilder(builder)
         }
     }
     

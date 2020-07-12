@@ -207,13 +207,12 @@ extension View {
 
 extension View {
     @inlinable
+    @ViewBuilder
     public func hidden(_ isHidden: Bool) -> some View {
-        Group {
-            if isHidden {
-                hidden()
-            } else {
-                self
-            }
+        if isHidden {
+            hidden()
+        } else {
+            self
         }
     }
 }

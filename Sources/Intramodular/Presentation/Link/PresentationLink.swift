@@ -40,16 +40,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public var body: some View {
-        Group {
-            Button(action: present, label: { label }).sheet(
-                isPresented: $isPresented,
-                onDismiss: _onDismiss
-            ) {
-                CocoaHosted(
-                    rootView: self.destination
-                        .mergeEnvironmentBuilder(self.environmentBuilder)
-                )
-            }
+        Button(action: present, label: { label }).sheet(
+            isPresented: $isPresented,
+            onDismiss: _onDismiss
+        ) {
+            CocoaHosted(
+                rootView: self.destination
+                    .mergeEnvironmentBuilder(self.environmentBuilder)
+            )
         }
     }
     

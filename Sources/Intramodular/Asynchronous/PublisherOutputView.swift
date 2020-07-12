@@ -36,13 +36,11 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
     }
     
     public var body: some View {
-        Group {
-            observer.lastValue.map(makeContent) ?? placeholder
-        }
-        .onAppear {
-            if self.policy == .delayed {
-                self.observer.attach()
-            }
-        }
+        (observer.lastValue.map(makeContent) ?? placeholder)
+          .onAppear {
+              if self.policy == .delayed {
+                  self.observer.attach()
+              }
+          }
     }
 }

@@ -195,15 +195,14 @@ struct _UIHostingScrollViewRootView<Content: View>: View {
     
     var content: Content
     
+    @ViewBuilder
     var body: some View {
-        Group {
-            if base?._isPagingEnabled ?? false {
-                content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
-                    self.base?.pages = page
-                })
-            } else {
-                content
-            }
+        if base?._isPagingEnabled ?? false {
+            content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
+                self.base?.pages = page
+            })
+        } else {
+            content
         }
     }
 }

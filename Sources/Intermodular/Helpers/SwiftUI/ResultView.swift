@@ -28,13 +28,12 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
     }
     
     @inlinable
+    @ViewBuilder
     public var body: some View {
-        Group {
-            if successView != nil {
-                successView!
-            } else {
-                failureView!
-            }
+        if successView != nil {
+            successView.unsafelyUnwrapped
+        } else {
+            failureView!
         }
     }
 }

@@ -19,15 +19,14 @@ public struct LazyAppearView<Body: View>: View {
     
     @_optimize(none)
     @inline(never)
+    @ViewBuilder
     public var body: some View {
-        Group {
-            if content == nil {
-                EmptyFillView().onAppear {
-                    self.content = self.destination()
-                }
-            } else {
-                content!
+        if content == nil {
+            EmptyFillView().onAppear {
+                self.content = self.destination()
             }
+        } else {
+            content!
         }
     }
 }

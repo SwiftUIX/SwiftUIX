@@ -36,43 +36,42 @@ public struct AutomaticAxisStack<Content: View>: View {
     }
     
     @inlinable
+    @ViewBuilder
     public var body: some View {
-        Group {
-            if wantsRealign {
+        if wantsRealign {
+            AxisStack(
+                axis: self.preferredAxis.orthogonal,
+                alignment: self.alignment,
+                spacing: self.spacing
+            ) {
+                self.content
+            }
+        } else {
+            GeometryReader { geometry in
                 AxisStack(
-                    axis: self.preferredAxis.orthogonal,
+                    axis: self.preferredAxis,
                     alignment: self.alignment,
                     spacing: self.spacing
                 ) {
                     self.content
                 }
-            } else {
-                GeometryReader { geometry in
-                    AxisStack(
-                        axis: self.preferredAxis,
-                        alignment: self.alignment,
-                        spacing: self.spacing
-                    ) {
-                        self.content
-                    }
-                    .fixedSize()
-                    .background(GeometryReader { intrinsicGeometry in
-                        ZeroSizeView().then { _ in
-                            DispatchQueue.main.async {
-                                if intrinsicGeometry.size.dimensionLength(for: self.preferredAxis) > geometry.size.dimensionLength(for: self.preferredAxis) {
-                                    self.intrinsicGeometrySize = intrinsicGeometry.size
-                                    self.geometrySize = geometry.size
-                                    self.wantsRealign = true
-                                }
+                .fixedSize()
+                .background(GeometryReader { intrinsicGeometry in
+                    ZeroSizeView().then { _ in
+                        DispatchQueue.main.async {
+                            if intrinsicGeometry.size.dimensionLength(for: self.preferredAxis) > geometry.size.dimensionLength(for: self.preferredAxis) {
+                                self.intrinsicGeometrySize = intrinsicGeometry.size
+                                self.geometrySize = geometry.size
+                                self.wantsRealign = true
                             }
                         }
-                    })
-                }
-                .frame(
-                    minimum: intrinsicGeometrySize.dimensionLength(for: preferredAxis),
-                    axis: preferredAxis
-                )
+                    }
+                })
             }
+            .frame(
+                minimum: intrinsicGeometrySize.dimensionLength(for: preferredAxis),
+                axis: preferredAxis
+            )
         }
     }
 }
