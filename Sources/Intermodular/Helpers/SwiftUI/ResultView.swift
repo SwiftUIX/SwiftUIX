@@ -33,7 +33,7 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
         if successView != nil {
             successView.unsafelyUnwrapped
         } else {
-            failureView!
+            failureView.unsafelyUnwrapped
         }
     }
 }

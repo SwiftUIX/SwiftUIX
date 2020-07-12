@@ -58,7 +58,7 @@ extension View {
     @ViewBuilder
     public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
         if value != nil {
-            transform(value!, self)
+            transform(value.unsafelyUnwrapped, self)
         } else {
             self
         }

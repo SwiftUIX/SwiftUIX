@@ -26,7 +26,7 @@ public struct LazyAppearView<Body: View>: View {
                 self.content = self.destination()
             }
         } else {
-            content!
+            content.unsafelyUnwrapped
         }
     }
 }
