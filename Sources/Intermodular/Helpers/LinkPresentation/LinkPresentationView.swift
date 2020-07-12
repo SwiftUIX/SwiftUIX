@@ -16,8 +16,10 @@ public struct LinkPresentationView: View {
     public let url: URL?
     public let metadata: LPLinkMetadata?
     
+    #if !os(tvOS)
     @usableFromInline
     @State var metadataProvider: LPMetadataProvider?
+    #endif
     @usableFromInline
     @State var isFetchingMetadata: Bool = false
     @usableFromInline
@@ -54,6 +56,7 @@ public struct LinkPresentationView: View {
     
     @usableFromInline
     func fetchMetadata() {
+        #if !os(tvOS)
         guard !disableFetchingMetadata else {
             return
         }
@@ -79,6 +82,7 @@ public struct LinkPresentationView: View {
                 }
             }
         }
+        #endif
     }
 }
 

@@ -8,18 +8,6 @@ import Swift
 import UIKit
 
 extension UIView {
-    @usableFromInline
-    var isHorizontalContentHuggingPriorityHigh: Bool {
-        contentHuggingPriority(for: .horizontal) == .defaultHigh
-    }
-    
-    @usableFromInline
-    var isVerticalContentHuggingPriorityHigh: Bool {
-        contentHuggingPriority(for: .vertical) == .defaultHigh
-    }
-}
-
-extension UIView {
     func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
         guard !subviews.isEmpty else {
             return nil
