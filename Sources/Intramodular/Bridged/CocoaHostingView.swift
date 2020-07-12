@@ -2,58 +2,48 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 import Swift
 import SwiftUI
-import UIKit
 
-/// A `UIView` subclass capable of hosting a SwiftUI view.
-open class CocoaHostingView<Content: View>: UIView {
-    private let rootViewHostingController: CocoaHostingController<Content>
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+public struct CocoaHostingView<Content: View>: UIViewControllerRepresentable {
+    public typealias UIViewControllerType = CocoaHostingController<Content>
     
-    public var rootView: Content {
-        get {
-            return rootViewHostingController.rootViewContent
-        } set {
-            rootViewHostingController.rootViewContent = newValue
-        }
+    private let rootView: Content
+    
+    public init(rootView: Content) {
+        self.rootView = rootView
     }
     
-    public required init(rootView: Content) {
-        self.rootViewHostingController = .init(rootView: rootView)
-        
-        super.init(frame: .zero)
-        
-        rootViewHostingController.view.backgroundColor = .clear
-        
-        addSubview(rootViewHostingController.view)
+    public init(@ViewBuilder rootView: () -> Content) {
+        self.rootView = rootView()
     }
     
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public func makeUIViewController(context: Context) -> UIViewControllerType {
+        .init(rootView: rootView)
     }
     
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        
-        rootViewHostingController.view.frame = bounds
+    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.rootViewContent = rootView
+    }
+}
+
+#else
+
+public struct CocoaHostingView<Content: View>: View {
+    private let rootView: Content
+    
+    public init(rootView: Content) {
+        self.rootView = rootView
     }
     
-    override open func sizeThatFits(_ size: CGSize) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: size)
+    public init(@ViewBuilder rootView: () -> Content) {
+        self.rootView = rootView()
     }
-    
-    override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: targetSize)
-    }
-    
-    override open func systemLayoutSizeFitting(
-        _ targetSize: CGSize,
-        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
-        verticalFittingPriority: UILayoutPriority
-    ) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: targetSize)
+
+    public var body: some View {
+        rootView
     }
 }
 

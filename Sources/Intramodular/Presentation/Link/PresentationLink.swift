@@ -44,7 +44,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             isPresented: $isPresented,
             onDismiss: _onDismiss
         ) {
-            CocoaHosted(
+            CocoaHostingView(
                 rootView: self.destination
                     .mergeEnvironmentBuilder(self.environmentBuilder)
             )

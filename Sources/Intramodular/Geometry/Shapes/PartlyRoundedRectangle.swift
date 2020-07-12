@@ -21,8 +21,9 @@ public struct PartlyRoundedRectangle: Shape {
             AppKitOrUIKitBezierPath(
                 roundedRect: rect,
                 byRoundingCorners: .init(corners),
-                cornerRadii: .init(width: cornerRadii, height: cornerRadii)
+                cornerRadii: cornerRadii
             )
+            .cgPath
         )
     }
 }

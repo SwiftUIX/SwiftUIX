@@ -36,9 +36,7 @@ fileprivate struct _TextView {
     
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
-    
-    @Environment(\.isScrollEnabled) private var isScrollEnabled
-    
+        
     init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -121,7 +119,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         uiView.backgroundColor = nil
-        uiView.isScrollEnabled = isScrollEnabled
+        uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = true
         uiView.text = text
         uiView.textContainerInset = .zero

@@ -31,10 +31,10 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
     let source: Alignment
     let destination: Alignment
     
-    var _backgroundHostingView: CocoaHostingView<BackgroundContainer>?
+    var _backgroundHostingView: UIHostingView<BackgroundContainer>?
     
-    var backgroundHostingView: CocoaHostingView<BackgroundContainer> {
-        _backgroundHostingView ?? CocoaHostingView<BackgroundContainer>(rootView: .init(content: background)).then {
+    var backgroundHostingView: UIHostingView<BackgroundContainer> {
+        _backgroundHostingView ?? UIHostingView<BackgroundContainer>(rootView: .init(content: background)).then {
             $0.frame = .init(
                 origin: .zero,
                 size: containerView!.bounds.size

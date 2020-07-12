@@ -71,6 +71,12 @@ public struct CollectionViewFlowLayout: CollectionViewLayout {
     }
 }
 
+extension UICollectionViewLayout: CollectionViewLayout {
+    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
+        self
+    }
+}
+
 #elseif os(macOS)
 
 public struct CollectionViewFlowLayout: CollectionViewLayout {
