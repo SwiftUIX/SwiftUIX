@@ -8,7 +8,7 @@ import SwiftUI
 
 extension AppKitOrUIKitBezierPath {
     public convenience init(
-        rect: CGRect,
+        roundedRect rect: CGRect,
         byRoundingCorners corners: [RectangleCorner],
         cornerRadii: CGFloat
     ) {

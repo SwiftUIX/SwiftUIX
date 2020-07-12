@@ -203,6 +203,13 @@ extension View {
     public func squareFrame(sideLength: CGFloat?) -> some View {
         frame(width: sideLength, height: sideLength)
     }
+    
+    @inlinable
+    public func squareFrame() -> some View {
+        GeometryReader { geometry in
+            self.frame(width: geometry.size.minimumDimensionLength, height: geometry.size.minimumDimensionLength)
+        }
+    }
 }
 
 extension View {

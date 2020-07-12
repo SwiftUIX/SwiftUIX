@@ -19,10 +19,6 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
     
     private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
-    @Environment(\.collectionViewLayout) var collectionViewLayout
-    @Environment(\.initialContentAlignment) var initialContentAlignment
-    @Environment(\.isScrollEnabled) var isScrollEnabled
-    
     public init(
         _ data: Data,
         sectionHeader: @escaping (SectionModel) -> SectionHeader,
@@ -38,7 +34,7 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(
             data,
-            collectionViewLayout: collectionViewLayout._toUICollectionViewLayout(),
+            collectionViewLayout: context.environment.collectionViewLayout._toUICollectionViewLayout(),
             sectionHeader: sectionHeader,
             sectionFooter: sectionFooter,
             rowContent: rowContent
@@ -53,7 +49,7 @@ public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Dat
         
         uiViewController.collectionView.configure(with: scrollViewConfiguration)
         
-        let newCollectionViewLayout = collectionViewLayout._toUICollectionViewLayout()
+        let newCollectionViewLayout = context.environment.collectionViewLayout._toUICollectionViewLayout()
         
         if uiViewController.collectionViewLayout !== newCollectionViewLayout, uiViewController.collectionViewLayout != newCollectionViewLayout {
             uiViewController.collectionView.setCollectionViewLayout(newCollectionViewLayout, animated: true)
