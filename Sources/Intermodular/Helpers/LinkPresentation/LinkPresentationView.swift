@@ -52,6 +52,7 @@ public struct LinkPresentationView: View {
         .id(url ?? metadata?.originalURL)
     }
     
+    @usableFromInline
     func fetchMetadata() {
         guard !disableFetchingMetadata else {
             return
@@ -105,6 +106,13 @@ struct _LinkPresentationView: AppKitOrUIKitViewRepresentable, Equatable {
     var metadata: LPLinkMetadata?
     @usableFromInline
     var isCompact: Bool
+    
+    @usableFromInline
+    init(url: URL?, metadata: LPLinkMetadata?, isCompact: Bool) {
+        self.url = url
+        self.metadata = metadata
+        self.isCompact = isCompact
+    }
     
     @usableFromInline
     func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
