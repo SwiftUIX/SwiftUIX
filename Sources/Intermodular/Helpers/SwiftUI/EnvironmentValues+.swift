@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import CoreData
 import Swift
 import SwiftUI
 
@@ -11,5 +12,10 @@ extension View {
         transformEnvironment(\.self) { environment in
             environment = newEnvironment
         }
+    }
+    
+    @inlinable
+    public func managedObjectContext(_ managedObjectContext: NSManagedObjectContext) -> some View {
+        environment(\.managedObjectContext, managedObjectContext)
     }
 }
