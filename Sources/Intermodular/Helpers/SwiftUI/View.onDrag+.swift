@@ -10,15 +10,22 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension View {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     @ViewBuilder
     public func onDragIfAvailable(_ data: @escaping () -> NSItemProvider) -> some View {
+        #if swift(>=5.3)
+        if #available(iOS 13.4, *) {
+            self.onDrag(data)
+        } else {
+            self
+        }
+        #else
         if #available(iOS 13.4, *) {
             return self.onDrag(data)
         } else {
             return self
         }
+        #endif
     }
 }
 

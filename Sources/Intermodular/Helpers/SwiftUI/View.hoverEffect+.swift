@@ -12,11 +12,19 @@ extension View {
     @inlinable
     @ViewBuilder
     public func hoverEffectIfAvailable(_ effect: HoverEffect = .automatic) -> some View {
+        #if swift(>=5.3)
+        if #available(iOS 13.4, *) {
+            self.hoverEffect(.init(effect))
+        } else {
+            self
+        }
+        #else
         if #available(iOS 13.4, *) {
             return self.hoverEffect(.init(effect))
         } else {
             return self
         }
+        #endif
     }
 }
 
