@@ -26,21 +26,20 @@ public struct AxisStack<Content: View>: View {
     }
     
     @inlinable
+    @ViewBuilder
     public var body: some View {
-        Group {
-            if axis == .horizontal {
-                HStack(
-                    alignment: self.alignment.vertical,
-                    spacing: self.spacing,
-                    content: { content }
-                )
-            } else {
-                VStack(
-                    alignment: self.alignment.horizontal,
-                    spacing: self.spacing,
-                    content: { content }
-                )
-            }
+        if axis == .horizontal {
+            HStack(
+                alignment: self.alignment.vertical,
+                spacing: self.spacing,
+                content: { content }
+            )
+        } else {
+            VStack(
+                alignment: self.alignment.horizontal,
+                spacing: self.spacing,
+                content: { content }
+            )
         }
     }
 }

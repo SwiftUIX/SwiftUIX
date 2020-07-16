@@ -22,13 +22,12 @@ public struct UnwrapOptionalView<Content: View>: View {
     }
     
     @inlinable
+    @ViewBuilder
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
-        Group {
-            if lhs.content == nil {
-                rhs
-            } else {
-                lhs
-            }
+        if lhs.content == nil {
+            rhs
+        } else {
+            lhs
         }
     }
 }
@@ -56,13 +55,12 @@ extension Optional {
 
 extension View {
     @inlinable
+    @ViewBuilder
     public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
-        Group {
-            if value != nil {
-                transform(value!, self)
-            } else {
-                self
-            }
+        if value != nil {
+            transform(value.unsafelyUnwrapped, self)
+        } else {
+            self
         }
     }
 }

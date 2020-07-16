@@ -16,15 +16,14 @@ struct AddActionPrimitiveButtonStlye: PrimitiveButtonStyle {
 }
 
 extension View {
+    @ViewBuilder
     public func onButtonAction(_ action: @escaping () -> ()) -> some View {
-        Group {
-            if self is opaque_ActionButton {
-                (self as! opaque_ActionButton)
-                    .onPrimaryTrigger(perform: action)
-                    .eraseToAnyView()
-            } else {
-                buttonStyle(AddActionPrimitiveButtonStlye(action: action))
-            }
+        if self is opaque_ActionButton {
+            (self as! opaque_ActionButton)
+                .onPrimaryTrigger(perform: action)
+                .eraseToAnyView()
+        } else {
+            buttonStyle(AddActionPrimitiveButtonStlye(action: action))
         }
     }
 }

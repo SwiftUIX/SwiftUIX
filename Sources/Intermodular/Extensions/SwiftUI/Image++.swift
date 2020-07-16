@@ -40,13 +40,12 @@ extension Image {
 }
 
 extension Image {
+    @ViewBuilder
     public func resizable(_ resizable: Bool) -> some View {
-        Group {
-            if resizable {
-                self.resizable()
-            } else {
-                self
-            }
+        if resizable {
+            self.resizable()
+        } else {
+            self
         }
     }
 }

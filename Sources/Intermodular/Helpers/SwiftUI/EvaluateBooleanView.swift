@@ -31,13 +31,12 @@ public struct EvaluateBooleanView<Content: View>: View {
     }
     
     @inlinable
+    @ViewBuilder
     public static func ?? <V: View>(lhs: Self, rhs: V) -> some View {
-        Group {
-            if lhs.content == nil {
-                rhs
-            } else {
-                lhs
-            }
+        if lhs.content == nil {
+            rhs
+        } else {
+            lhs
         }
     }
 }
@@ -51,13 +50,12 @@ extension Bool {
     }
     
     @inlinable
+    @ViewBuilder
     public func ifFalse<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        Group {
-            if self {
-                EmptyView()
-            } else {
-                content()
-            }
+        if self {
+            EmptyView()
+        } else {
+            content()
         }
     }
 }
