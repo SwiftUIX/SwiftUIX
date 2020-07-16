@@ -13,9 +13,9 @@ extension View {
     @ViewBuilder
     public func onHoverIfAvailable(perform action: @escaping (Bool) -> Void) -> some View {
         if #available(iOS 13.4, *) {
-            return self.onHover(perform: action)
+            self.onHover(perform: action)
         } else {
-            return self
+            self
         }
     }
 }

@@ -13,9 +13,9 @@ extension View {
     @ViewBuilder
     public func hoverEffectIfAvailable(_ effect: HoverEffect = .automatic) -> some View {
         if #available(iOS 13.4, *) {
-            return self.hoverEffect(.init(effect))
+            self.hoverEffect(.init(effect))
         } else {
-            return self
+            self
         }
     }
 }

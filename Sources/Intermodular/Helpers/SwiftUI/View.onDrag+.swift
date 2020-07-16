@@ -15,9 +15,9 @@ extension View {
     @ViewBuilder
     public func onDragIfAvailable(_ data: @escaping () -> NSItemProvider) -> some View {
         if #available(iOS 13.4, *) {
-            return self.onDrag(data)
+            self.onDrag(data)
         } else {
-            return self
+            self
         }
     }
 }
