@@ -43,7 +43,7 @@ public struct AnyModalPresentation: Identifiable {
         }
         
         if let onDismiss = onDismiss {
-            self.content = self.content.onPresent(perform: onDismiss)
+            self.content = self.content.onDismiss(perform: onDismiss)
         }
         
         if let name = contentName {
