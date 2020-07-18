@@ -65,7 +65,8 @@ extension View {
 #if os(macOS)
 
 extension StatusItem {
-    public func update(_ item: NSStatusItem) {
+    @usableFromInline
+    func update(_ item: NSStatusItem) {
         item.length = length
         
         if let button = item.button {

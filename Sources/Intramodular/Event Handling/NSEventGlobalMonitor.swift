@@ -10,8 +10,8 @@ import SwiftUI
 import Swift
 
 public final class NSEventGlobalMonitor: ObservableObject {
-    private var monitor: Any?
     private let mask: NSEvent.EventTypeMask
+    private var monitor: Any?
     
     public let objectWillChange = PassthroughSubject<NSEvent, Never>()
     

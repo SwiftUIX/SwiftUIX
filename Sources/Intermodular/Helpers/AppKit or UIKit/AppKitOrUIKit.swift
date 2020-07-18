@@ -5,6 +5,36 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS)
+
+import UIKit
+
+public typealias AppKitOrUIKitApplication = UIApplication
+public typealias AppKitOrUIKitBezierPath = UIBezierPath
+public typealias AppKitOrUIKitButton = UIButton
+public typealias AppKitOrUIKitColor = UIColor
+public typealias AppKitOrUIKitControl = UIControl
+public typealias AppKitOrUIKitControlEvent = UIControl.Event
+public typealias AppKitOrUIKitEvent = UIEvent
+public typealias AppKitOrUIKitFont = UIFont
+public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>
+public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
+public typealias AppKitOrUIKitImage = UIImage
+public typealias AppKitOrUIKitLabel = UILabel
+public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
+public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
+public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
+public typealias AppKitOrUIKitResponder = UIResponder
+public typealias AppKitOrUIKitTableView = UITableView
+public typealias AppKitOrUIKitTableViewController = UITableViewController
+public typealias AppKitOrUIKitTextField = UITextField
+public typealias AppKitOrUIKitTextView = UITextView
+public typealias AppKitOrUIKitView = UIView
+public typealias AppKitOrUIKitViewController = UIViewController
+public typealias AppKitOrUIKitWindow = UIWindow
+
+#endif
+
 #if os(macOS)
 
 import AppKit
@@ -38,35 +68,7 @@ extension NSView {
 
 #endif
 
-#if os(iOS) || os(tvOS)
-
-import UIKit
-
-public typealias AppKitOrUIKitApplication = UIApplication
-public typealias AppKitOrUIKitBezierPath = UIBezierPath
-public typealias AppKitOrUIKitButton = UIButton
-public typealias AppKitOrUIKitColor = UIColor
-public typealias AppKitOrUIKitControl = UIControl
-public typealias AppKitOrUIKitControlEvent = UIControl.Event
-public typealias AppKitOrUIKitEvent = UIEvent
-public typealias AppKitOrUIKitFont = UIFont
-public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>
-public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
-public typealias AppKitOrUIKitImage = UIImage
-public typealias AppKitOrUIKitLabel = UILabel
-public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
-public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
-public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
-public typealias AppKitOrUIKitResponder = UIResponder
-public typealias AppKitOrUIKitTableView = UITableView
-public typealias AppKitOrUIKitTableViewController = UITableViewController
-public typealias AppKitOrUIKitTextField = UITextField
-public typealias AppKitOrUIKitTextView = UITextView
-public typealias AppKitOrUIKitView = UIView
-public typealias AppKitOrUIKitViewController = UIViewController
-public typealias AppKitOrUIKitWindow = UIWindow
-
-#elseif os(watchOS)
+#if os(watchOS)
 
 import UIKit
 import WatchKit
@@ -74,28 +76,5 @@ import WatchKit
 public typealias AppKitOrUIKitColor = UIColor
 public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitImage = UIImage
-
-#endif
-
-// MARK: - Helpers -
-
-public enum AppKitOrUIKitLayoutAlignment: Hashable {
-    case leading
-    case trailing
-    case center
-    case fill
-}
-
-#if !os(macOS) && !targetEnvironment(macCatalyst)
-
-public enum ControlSize: CaseIterable {
-    case regular
-    case small
-    case mini
-}
-
-public protocol NSToolbarDelegate {
-    
-}
 
 #endif

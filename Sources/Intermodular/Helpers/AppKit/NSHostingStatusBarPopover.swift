@@ -78,8 +78,10 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
     }
     
     deinit {
-        if let _statusItemBase = _statusItemBase{
-            _statusBarBase.removeStatusItem(_statusItemBase)
+        _ = Unmanaged.passUnretained(self).retain() // fixes a crash
+        
+        if let item = _statusItemBase {
+            item.statusBar?.removeStatusItem(item)
         }
     }
 }
