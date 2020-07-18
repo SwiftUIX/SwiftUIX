@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 public protocol PresentationManager: ViewInteractor {
-    var isPresenting: Bool { get }
+    var isPresented: Bool { get }
     
     func dismiss()
 }
@@ -36,7 +36,7 @@ extension EnvironmentValues {
 // MARK: - Concrete Implementations -
 
 extension Binding: PresentationManager where Value: PresentationModeProtocol {
-    public var isPresenting: Bool {
+    public var isPresented: Bool {
         return wrappedValue.isPresented
     }
     

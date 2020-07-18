@@ -51,7 +51,7 @@ extension Image {
     }
 }
 
-#if os(macOS)
+#if os(macOS) && swift(<5.3)
 
 extension Image {
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")

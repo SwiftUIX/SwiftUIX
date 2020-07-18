@@ -37,7 +37,7 @@ public struct NavigationPresentationManager: PresentationManager {
         self.isActive = isActive
     }
     
-    public var isPresenting: Bool {
+    public var isPresented: Bool {
         return isActive.wrappedValue
     }
     

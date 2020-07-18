@@ -1712,7 +1712,7 @@ public enum SanFranciscoSymbolName: String, CaseIterable {
 
 // MARK: - Helpers -
 
-#if os(macOS)
+#if os(macOS) && swift(<5.3)
 
 public extension Image {
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")
@@ -1723,9 +1723,10 @@ public extension Image {
 
 #else
 
-public extension Image {
+extension Image {
+    @available(OSX 10.16, *)
     @inlinable
-    init(systemName: SanFranciscoSymbolName) {
+    public init(systemName: SanFranciscoSymbolName) {
         self.init(systemName: systemName.rawValue)
     }
 }

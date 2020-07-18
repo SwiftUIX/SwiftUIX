@@ -25,6 +25,7 @@ public protocol CheckboxStyle {
 // MARK: - API -
 
 extension View {
+    @available(OSX 10.16, *)
     public func checkboxStyle<S: CheckboxStyle>(_ style: S) -> some View {
         environment(\._checkboxStyle, .init(style))
     }
@@ -32,6 +33,7 @@ extension View {
 
 // MARK: - Auxiliary Implementation -
 
+@available(OSX 10.16, *)
 struct _CheckboxStyle {
     var makeBodyImpl: (CheckboxStyleConfiguration) -> AnyView
     
@@ -40,13 +42,17 @@ struct _CheckboxStyle {
     }
 }
 
+@available(OSX 10.16, *)
 extension _CheckboxStyle {
+    @available(OSX 10.16, *)
     struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        @available(OSX 10.16, *)
         static let defaultValue = _CheckboxStyle(DefaultCheckboxStyle())
     }
 }
 
 extension EnvironmentValues {
+    @available(OSX 10.16, *)
     var _checkboxStyle: _CheckboxStyle {
         get {
             self[_CheckboxStyle.EnvironmentKey]

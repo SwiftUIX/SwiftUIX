@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A type that manages view presentation.
-public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider, PresentationManager {
+public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider {
     /// The presented item.
     var presented: DynamicViewPresentable? { get }
     

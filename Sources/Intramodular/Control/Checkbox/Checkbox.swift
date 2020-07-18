@@ -6,7 +6,9 @@ import Swift
 import SwiftUI
 
 /// A checkbox control.
+@available(OSX 10.16, *)
 public struct Checkbox<Label: View>: View {
+    @available(OSX 10.16, *)
     @Environment(\._checkboxStyle) var _checkboxStyle
     
     /// A view that describes the effect of toggling `isOn`.
@@ -27,6 +29,7 @@ public struct Checkbox<Label: View>: View {
     }
 }
 
+@available(OSX 10.16, *)
 extension Checkbox where Label == EmptyView {
     public init(isOn: Binding<Bool>) {
         self.isOn = isOn
@@ -36,6 +39,7 @@ extension Checkbox where Label == EmptyView {
 
 // MARK: - Auxiliary Implementation -
 
+@available(OSX 10.16, *)
 public struct DefaultCheckboxStyle: CheckboxStyle {
     public init() {
         
@@ -52,6 +56,7 @@ public struct DefaultCheckboxStyle: CheckboxStyle {
     }
 }
 
+@available(OSX 10.16, *)
 public struct CircularCheckboxStyle: CheckboxStyle {
     public init() {
         
