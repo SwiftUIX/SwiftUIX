@@ -5,14 +5,14 @@
 import Swift
 import SwiftUI
 
-extension HStack {
+extension VStack {
     public enum _ProportionalFill {
         case proportionally
     }
     
     @inlinable
     public init(
-        alignment: VerticalAlignment = .center,
+        alignment: HorizontalAlignment = .center,
         fill: _ProportionalFill,
         spacing: CGFloat? = nil,
         @ViewBuilder content: () -> Content
@@ -22,7 +22,7 @@ extension HStack {
     
     @inlinable
     public init<V0: View, V1: View>(
-        alignment: VerticalAlignment = .center,
+        alignment: HorizontalAlignment = .center,
         fill: _ProportionalFill,
         spacing: CGFloat? = nil,
         @ViewBuilder content: () -> TupleView<(V0, V1)>
@@ -31,9 +31,9 @@ extension HStack {
         
         self.init {
             GeometryReader { geometry in
-                SwiftUI.HStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(width: geometry.size.width / 2)
-                    content.value.1.frame(width: geometry.size.width / 2)
+                SwiftUI.VStack(alignment: alignment, spacing: spacing) {
+                    content.value.0.frame(height: geometry.size.height / 2)
+                    content.value.1.frame(height: geometry.size.height / 2)
                 }
             }
             .eraseToAnyView()
@@ -42,7 +42,7 @@ extension HStack {
     
     @inlinable
     public init<V0: View, V1: View, V2: View>(
-        alignment: VerticalAlignment = .center,
+        alignment: HorizontalAlignment = .center,
         fill: _ProportionalFill,
         spacing: CGFloat? = nil,
         @ViewBuilder content: () -> TupleView<(V0, V1, V2)>
@@ -51,10 +51,10 @@ extension HStack {
         
         self.init {
             GeometryReader { geometry in
-                SwiftUI.HStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(width: geometry.size.width / 3)
-                    content.value.1.frame(width: geometry.size.width / 3)
-                    content.value.2.frame(width: geometry.size.width / 3)
+                SwiftUI.VStack(alignment: alignment, spacing: spacing) {
+                    content.value.0.frame(height: geometry.size.height / 3)
+                    content.value.1.frame(height: geometry.size.height / 3)
+                    content.value.2.frame(height: geometry.size.height / 3)
                 }
             }
             .eraseToAnyView()
@@ -63,7 +63,7 @@ extension HStack {
     
     @inlinable
     public init<V0: View, V1: View, V2: View, V3: View>(
-        alignment: VerticalAlignment = .center,
+        alignment: HorizontalAlignment = .center,
         fill: _ProportionalFill,
         spacing: CGFloat? = nil,
         @ViewBuilder content: () -> TupleView<(V0, V1, V2, V3)>
@@ -72,11 +72,11 @@ extension HStack {
         
         self.init {
             GeometryReader { geometry in
-                SwiftUI.HStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(width: geometry.size.width / 4)
-                    content.value.1.frame(width: geometry.size.width / 4)
-                    content.value.2.frame(width: geometry.size.width / 4)
-                    content.value.3.frame(width: geometry.size.width / 4)
+                SwiftUI.VStack(alignment: alignment, spacing: spacing) {
+                    content.value.0.frame(height: geometry.size.height / 4)
+                    content.value.1.frame(height: geometry.size.height / 4)
+                    content.value.2.frame(height: geometry.size.height / 4)
+                    content.value.3.frame(height: geometry.size.height / 4)
                 }
             }
             .eraseToAnyView()
