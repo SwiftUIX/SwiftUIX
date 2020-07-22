@@ -78,3 +78,35 @@ public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitImage = UIImage
 
 #endif
+
+#if targetEnvironment(macCatalyst)
+
+@objc public protocol NSAlertProtocol: NSObjectProtocol {
+    @objc var alertStyle: UInt { get set }
+    @objc var messageText: String { get set }
+    @objc var informativeText: String { get set }
+    
+    @objc func addButton(withTitle: String)
+    @objc func runModal()
+    
+    init()
+}
+
+@objc public protocol NSOpenPanelProtocol: NSObjectProtocol {
+    @objc var directoryURL: URL? { get set }
+    @objc var message: String? { get set }
+    @objc var prompt: String? { get set }
+    @objc var allowedFileTypes: [String]? { get set }
+    @objc var allowsOtherFileTypes: Bool { get set }
+    @objc var canChooseDirectories: Bool { get set }
+    @objc var urls: [URL] { get set }
+    
+    @objc func runModal()
+    
+    init()
+}
+
+public let NSAlert_Type = unsafeBitCast(NSClassFromString("NSAlert"), to: NSAlertProtocol.Type.self)
+public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to: NSOpenPanelProtocol.Type.self)
+
+#endif

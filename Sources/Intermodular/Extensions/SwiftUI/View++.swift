@@ -37,12 +37,22 @@ extension View {
 extension View {
     @inlinable
     public func inset(_ point: CGPoint) -> some View {
-        return offset(x: -point.x, y: -point.y)
+        offset(x: -point.x, y: -point.y)
+    }
+    
+    @inlinable
+    public func inset(_ length: CGFloat) -> some View {
+        offset(x: -length, y: -length)
     }
     
     @inlinable
     public func offset(_ point: CGPoint) -> some View {
-        return offset(x: point.x, y: point.y)
+        offset(x: point.x, y: point.y)
+    }
+    
+    @inlinable
+    public func offset(_ length: CGFloat) -> some View {
+        offset(x: length, y: length)
     }
 }
 
@@ -107,13 +117,13 @@ extension View {
 
 extension View {
     @inlinable
-    public func frame(minimum dimensionLength: CGFloat, axis: Axis) -> some View {
-        switch axis {
-            case .horizontal:
-                return frame(minWidth: dimensionLength)
-            case .vertical:
-                return frame(minWidth: dimensionLength)
-        }
+    public func width(_ width: CGFloat?) -> some View {
+        frame(width: width)
+    }
+    
+    @inlinable
+    public func height(_ height: CGFloat?) -> some View {
+        frame(height: height)
     }
     
     /// Positions this view within an invisible frame with the specified size.
@@ -158,7 +168,79 @@ extension View {
             alignment: alignment
         )
     }
+}
+
+extension View {
+    @inlinable
+    public func minWidth(_ width: CGFloat?) -> some View {
+        frame(minWidth: width)
+    }
     
+    @inlinable
+    public func maxWidth(_ width: CGFloat?) -> some View {
+        frame(maxWidth: width)
+    }
+    
+    @inlinable
+    public func minHeight(_ height: CGFloat?) -> some View {
+        frame(minHeight: height)
+    }
+    
+    @inlinable
+    public func maxHeight(_ height: CGFloat?) -> some View {
+        frame(maxHeight: height)
+    }
+    
+    @inlinable
+    public func frame(minimum dimensionLength: CGFloat, axis: Axis) -> some View {
+        switch axis {
+            case .horizontal:
+                return frame(minWidth: dimensionLength)
+            case .vertical:
+                return frame(minWidth: dimensionLength)
+        }
+    }
+}
+
+extension View {
+    @inlinable
+    public func idealFrame(width: CGFloat?, height: CGFloat?) -> some View {
+        frame(idealWidth: width, idealHeight: height)
+    }
+    
+    @inlinable
+    public func idealMinFrame(
+        width: CGFloat?,
+        maxWidth: CGFloat?,
+        height: CGFloat?,
+        maxHeight: CGFloat?
+    ) -> some View {
+        frame(
+            minWidth: width,
+            idealWidth: width,
+            maxWidth: maxWidth,
+            minHeight: height,
+            idealHeight: height,
+            maxHeight: maxHeight
+        )
+    }
+}
+
+extension View {
+    @inlinable
+    public func squareFrame(sideLength: CGFloat?) -> some View {
+        frame(width: sideLength, height: sideLength)
+    }
+    
+    @inlinable
+    public func squareFrame() -> some View {
+        GeometryReader { geometry in
+            self.frame(width: geometry.size.minimumDimensionLength, height: geometry.size.minimumDimensionLength)
+        }
+    }
+}
+
+extension View {
     @inlinable
     public func widthZeroClipped(_ clipped: Bool = true) -> some View {
         width(clipped ? .zero : nil)
@@ -180,40 +262,6 @@ extension View {
 
 extension View {
     @inlinable
-    public func width(_ width: CGFloat?) -> some View {
-        frame(width: width)
-    }
-    
-    @inlinable
-    public func height(_ height: CGFloat?) -> some View {
-        frame(height: height)
-    }
-    
-    @inlinable
-    public func maxWidth(_ width: CGFloat?) -> some View {
-        frame(maxWidth: width)
-    }
-    
-    @inlinable
-    public func maxHeight(_ height: CGFloat?) -> some View {
-        frame(maxHeight: height)
-    }
-    
-    @inlinable
-    public func squareFrame(sideLength: CGFloat?) -> some View {
-        frame(width: sideLength, height: sideLength)
-    }
-    
-    @inlinable
-    public func squareFrame() -> some View {
-        GeometryReader { geometry in
-            self.frame(width: geometry.size.minimumDimensionLength, height: geometry.size.minimumDimensionLength)
-        }
-    }
-}
-
-extension View {
-    @inlinable
     public func hidden(_ isHidden: Bool) -> some View {
         Group {
             if isHidden {
@@ -224,21 +272,3 @@ extension View {
         }
     }
 }
-
-#if os(macOS)
-
-extension View {
-    @available(*, deprecated, message: "This function is currently unavailable on macOS.")
-    @inlinable
-    public func navigationBarTitle(_ title: String) -> some View {
-        return self
-    }
-    
-    @available(*, deprecated, message: "This function is currently unavailable on macOS.")
-    @inlinable
-    public func navigationBarItems<V: View>(trailing: V) -> some View {
-        return self
-    }
-}
-
-#endif
