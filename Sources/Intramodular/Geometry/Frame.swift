@@ -13,17 +13,6 @@ public struct Frame: Hashable {
     
     public let width: Dimension?
     public let height: Dimension?
-    
-    public var isRelative: Bool {
-        (width?.isRelative ?? true) && (height?.isRelative ?? true)
-    }
-    
-    public func evaluate(in size: CGSize) -> CGSize {
-        .init(
-            width: width?.evaluate(in: size, for: .horizontal) ?? .infinity,
-            height: height?.evaluate(in: size, for: .vertical) ?? .infinity
-        )
-    }
 }
 
 // MARK: - Auxiliary Implementation -
@@ -42,8 +31,22 @@ extension Frame.Dimension {
         switch self {
             case .constant(let value):
                 return value
+                
             case .relative:
                 return size.dimensionLength(for: axis)
         }
+    }
+}
+
+extension Frame {
+    public var isRelative: Bool {
+        (width?.isRelative ?? true) && (height?.isRelative ?? true)
+    }
+    
+    public func evaluate(in size: CGSize) -> CGSize {
+        .init(
+            width: width?.evaluate(in: size, for: .horizontal) ?? .infinity,
+            height: height?.evaluate(in: size, for: .vertical) ?? .infinity
+        )
     }
 }
