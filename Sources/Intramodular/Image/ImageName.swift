@@ -2,8 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
-import SwiftUI
 import Swift
+import SwiftUI
 
 public enum ImageName: Hashable {
     case resource(String, bundle: Bundle? = .main)

@@ -21,7 +21,7 @@ public struct TextView<Label: View>: View {
             label
                 .visible(text.isEmpty)
                 .animation(.none)
-
+            
             _TextView(
                 text: $text,
                 onEditingChanged: onEditingChanged,
@@ -36,7 +36,7 @@ fileprivate struct _TextView {
     
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
-        
+    
     init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },

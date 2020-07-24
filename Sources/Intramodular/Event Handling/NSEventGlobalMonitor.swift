@@ -6,8 +6,8 @@
 
 import AppKit
 import Combine
-import SwiftUI
 import Swift
+import SwiftUI
 
 public final class NSEventGlobalMonitor: ObservableObject {
     private let mask: NSEvent.EventTypeMask
