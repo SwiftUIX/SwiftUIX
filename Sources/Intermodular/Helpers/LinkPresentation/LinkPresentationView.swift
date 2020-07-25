@@ -12,6 +12,8 @@ import SwiftUI
 public struct LinkPresentationView: View {
     @usableFromInline
     @Environment(\.errorContext) var errorContext
+    @usableFromInline
+    @UniqueCache(for: Self.self) var cache
     
     public let url: URL?
     public let metadata: LPLinkMetadata?
@@ -54,11 +56,21 @@ public struct LinkPresentationView: View {
         .id(url ?? metadata?.originalURL)
     }
     
+    #if !os(tvOS)
     @usableFromInline
     func fetchMetadata() {
-        #if !os(tvOS)
         guard !disableFetchingMetadata else {
             return
+        }
+        
+        do {
+            if let metadata = try cache.decache(LPLinkMetadata.self, forKey: url) {
+                self.fetchedMetadata = metadata
+                
+                return
+            }
+        } catch {
+            errorContext.push(error)
         }
         
         guard let url = url ?? metadata?.originalURL else {
@@ -80,10 +92,21 @@ public struct LinkPresentationView: View {
                 if let error = error {
                     self.errorContext.push(error)
                 }
+                
+                if let metadata = metadata {
+                    self.errorContext.withCriticalScope {
+                        try self.cache.cache(metadata, forKey: url)
+                    }
+                }
             }
         }
-        #endif
     }
+    #else
+    @usableFromInline
+    func fetchMetadata() {
+        
+    }
+    #endif
 }
 
 // MARK: - API -
