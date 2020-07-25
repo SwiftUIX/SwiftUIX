@@ -4,7 +4,7 @@
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-import Foundation
+import SwiftUI
 import UIKit
 
 public final class MutableUIViewWrapper<Content: UIView>: UIView {
