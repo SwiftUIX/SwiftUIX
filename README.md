@@ -34,8 +34,8 @@ This project is also **by far** the most complete port of missing UIKit/AppKit f
 # Requirements 
 
 - iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
-- Swift 5.1
-- Xcode 11
+- Swift 5.2
+- Xcode 11.6
 
 # Installation
 
@@ -47,6 +47,7 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 2. Paste the repository URL (`https://github.com/SwiftUIX/SwiftUIX`) and click **Next**.
 3. For **Rules**, select **Branch** (with branch set to `master`).
 4. Click **Finish**.
+5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
 # Usage
 
