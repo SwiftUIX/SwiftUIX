@@ -41,21 +41,22 @@ fileprivate struct SelectionNavigator<Selection, Destination: View>: ViewModifie
     }
     
     public func body(content: Content) -> some View {
-        ZStack {
-            NavigationLink(destination: LazyView {
-                self.destination(self.selection.wrappedValue!)
-            }, isActive: isActive) {
-                EmptyView().frame(CGSize.zero)
-            }
-            
-            content
-        }
+        content.background(
+            NavigationLink(
+                destination: LazyView {
+                    self.destination(self.selection.wrappedValue!)
+                },
+                isActive: isActive,
+                label: { ZeroSizeView() }
+            )
+        )
     }
 }
 
 // MARK: - Helpers -
 
 extension View {
+    @available(*, deprecated, message: "This implementation is unreliable.")
     public func navigate<Selection, Destination: View>(
         selection: Binding<Selection?>,
         onDismiss: (() -> ())? = nil,
@@ -71,30 +72,14 @@ extension View {
     public func navigate<Destination: View>(
         isActive: Binding<Bool>,
         onDismiss: (() -> ())? = nil,
-        @ViewBuilder to destination: @escaping () -> Destination
+        @ViewBuilder to destination: () -> Destination
     ) -> some View {
-        navigate(
-            selection:  Binding<Void?>(
-                get: { isActive.wrappedValue ? () : nil },
-                set: { isActive.wrappedValue = $0 != nil }
-            ),
-            onDismiss: onDismiss,
-            destination: destination
-        )
-    }
-    
-    public func navigate<Destination: View>(
-        isActive: Binding<Bool?>,
-        onDismiss: (() -> ())? = nil,
-        @ViewBuilder to destination: @escaping () -> Destination
-    ) -> some View {
-        navigate(
-            selection: Binding<Void?>(
-                get: { (isActive.wrappedValue ?? false) ? () : nil },
-                set: { isActive.wrappedValue = $0 != nil }
-            ),
-            onDismiss: onDismiss,
-            destination: destination
+        background(
+            NavigationLink(
+                destination: destination(),
+                isActive: isActive,
+                label: { ZeroSizeView() }
+            )
         )
     }
 }

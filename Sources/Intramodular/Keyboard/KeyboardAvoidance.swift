@@ -16,17 +16,23 @@ private struct KeyboardAvoidance: ViewModifier {
     @State var padding: CGFloat = 0
     
     func body(content: Content) -> some View {
-        GeometryReader { geometry in
-            content
-                .padding(.bottom, self.padding)
-                .onReceive(self.keyboardHeightPublisher, perform: { keyboardHeight in
-                    if self.isSimple {
-                        self.padding = keyboardHeight > 0 ? keyboardHeight - geometry.safeAreaInsets.bottom : 0
-                    } else {
-                        self.padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
-                    }
-                })
-                .animation(self.animation)
+        Group {
+            if isSystemEnabled {
+                content
+            } else {
+                GeometryReader { geometry in
+                    content
+                        .padding(.bottom, self.padding)
+                        .onReceive(self.keyboardHeightPublisher, perform: { keyboardHeight in
+                            if self.isSimple {
+                                self.padding = keyboardHeight > 0 ? keyboardHeight - geometry.safeAreaInsets.bottom : 0
+                            } else {
+                                self.padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
+                            }
+                        })
+                        .animation(self.animation)
+                }
+            }
         }
     }
     
@@ -44,25 +50,29 @@ private struct KeyboardAvoidance: ViewModifier {
                 .map({ _ in 0 })
         )
     }
+    
+    private var isSystemEnabled: Bool {
+        if #available(iOS 14.0, *) {
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 #endif
 
 // MARK: - API -
 
+public enum KeyboardPadding {
+    case keyboard
+}
+
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension View {
-    public func keyboardAvoiding(animation: Animation = .spring()) -> some View {
-        #if os(iOS) || targetEnvironment(macCatalyst)
-        return modifier(KeyboardAvoidance(isSimple: false, animation: animation))
-        #else
-        return self
-        #endif
-    }
-    
     /// Pads this view with the active system height of the keyboard.
-    public func keyboardPadding(animation: Animation = .spring()) -> some View {
+    public func padding(_: KeyboardPadding, animation: Animation = .spring()) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return modifier(KeyboardAvoidance(isSimple: true, animation: animation))
         #else
