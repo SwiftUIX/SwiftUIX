@@ -3,6 +3,18 @@
 
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
+# Documentation
+
+- [**General**](https://github.com/SwiftUIX/SwiftUIX/wiki/General)
+- [**Control Flow**](https://github.com/SwiftUIX/SwiftUIX/wiki/Control-Flow)
+- [**Controls**](https://github.com/SwiftUIX/SwiftUIX/wiki/Controls) 
+- [**Dynamic Presentation**](https://github.com/SwiftUIX/SwiftUIX/wiki/Dynamic-Presentation)
+- [**Geometry**](https://github.com/SwiftUIX/SwiftUIX/wiki/Geometry)
+- [**Keyboard**](https://github.com/SwiftUIX/SwiftUIX/wiki/Keyboard) 
+- [**Pagination**](https://github.com/SwiftUIX/SwiftUIX/wiki/Pagination)
+- [**Text**](https://github.com/SwiftUIX/SwiftUIX/wiki/Text) 
+- [**Utilities**](https://github.com/SwiftUIX/SwiftUIX/wiki/Utilities) 
+
 All documentation is hosted [on the project wiki here](https://github.com/SwiftUIX/SwiftUIX/wiki). Documentation is a currently a **work-in-progress**. Volunteers needed! 
 
 # Why
