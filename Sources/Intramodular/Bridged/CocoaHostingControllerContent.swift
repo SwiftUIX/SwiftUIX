@@ -32,6 +32,17 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
                     parent.subviewDescriptions = $0
                 }
             })
+            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in
+                if let presentation = presentation {
+                    self.presentationCoordinator?.present(presentation)
+                } else {
+                    self.presentationCoordinator?.dismiss()
+                }
+            }
+            .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
+            .onPreferenceChange(IsModalInPresentation.self) {
+                self.presentationCoordinator?.setIsInPresentation($0)
+            }
     }
 }
 

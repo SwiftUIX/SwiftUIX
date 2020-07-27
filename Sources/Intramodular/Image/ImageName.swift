@@ -40,7 +40,7 @@ extension NSImage {
         switch name {
             case .resource(let name, let bundle): do {
                 if let bundle = bundle, let _ = bundle.image(forResource: name) {
-                    self.init(named: name) // FIXME(@vmanot)
+                    self.init(named: name) // FIXME
                 } else {
                     self.init(named: name)
                 }

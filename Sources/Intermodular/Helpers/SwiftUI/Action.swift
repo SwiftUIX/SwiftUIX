@@ -6,6 +6,8 @@ import Swift
 import SwiftUI
 
 public struct Action: Hashable {
+    public static let empty = Action({ })
+    
     private var value: @convention(block) () -> Void
     
     public init(_ value: @escaping () -> Void) {
@@ -57,7 +59,17 @@ public struct Actions: Hashable {
     }
 }
 
-// MARK: - Usage -
+// MARK: - Auxiliary Implementation -
+
+public protocol ActionInitiable {
+    init(action: Action)
+}
+
+extension ActionInitiable {
+    public init(action: @escaping () -> Void) {
+        self.init(action: .init(action))
+    }
+}
 
 public struct PerformActionView: View {
     private let action: Action

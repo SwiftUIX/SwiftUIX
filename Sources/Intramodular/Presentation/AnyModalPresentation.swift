@@ -7,26 +7,31 @@ import Swift
 import SwiftUI
 
 public struct AnyModalPresentation: Identifiable {
-    public let id = UUID()
+    public typealias PreferenceKey = TakeLastPreferenceKey<AnyModalPresentation>
+    
+    public let id: UUID
     
     public private(set) var content: EnvironmentalAnyView
     
     let resetBinding: () -> ()
     
     init(_ content: EnvironmentalAnyView) {
+        self.id = UUID()
         self.content = content
         self.resetBinding = { }
     }
     
     init<V: View>(
+        id: UUID = UUID(),
         content: V,
-        contentName: ViewName?,
+        contentName: ViewName? = nil,
         presentationStyle: ModalViewPresentationStyle? = nil,
         isModalDismissable: (() -> Bool)? = nil,
         onPresent: (() -> Void)? = nil,
         onDismiss: (() -> Void)? = nil,
-        resetBinding: @escaping () -> ()
+        resetBinding: @escaping () -> () = { }
     ) {
+        self.id = id
         self.content = EnvironmentalAnyView(content)
         self.resetBinding = resetBinding
         

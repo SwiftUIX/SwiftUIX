@@ -9,7 +9,7 @@ import SwiftUI
 #if os(iOS) || targetEnvironment(macCatalyst)
 
 public struct PopoverPresentationLink<Destination: View, Label: View>: PresentationLinkView {
-    private let destination: () -> Destination
+    private let destination: Destination
     private let label: Label
     private let onDismiss: (() -> ())?
     
@@ -19,7 +19,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     @State private var isPresented: Bool = false
     
     public init(
-        destination: @autoclosure @escaping () -> Destination,
+        destination: Destination,
         onDismiss: (() -> ())?,
         @ViewBuilder label: () -> Label
     ) {
@@ -29,11 +29,11 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     }
     
     public init(
-        destination: @autoclosure @escaping () -> Destination,
+        destination: Destination,
         @ViewBuilder label: () -> Label
     ) {
         self.init(
-            destination: destination(),
+            destination: destination,
             onDismiss: nil,
             label: label
         )
@@ -50,7 +50,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
                     }
                 ) {
                     CocoaHostingView(
-                        rootView: self.destination()
+                        rootView: self.destination
                             .mergeEnvironmentBuilder(self.environmentBuilder)
                     )
                 }
@@ -63,7 +63,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
                     }
                 ) {
                     CocoaHostingView(
-                        rootView: self.destination()
+                        rootView: self.destination
                             .mergeEnvironmentBuilder(self.environmentBuilder)
                     )
                 }

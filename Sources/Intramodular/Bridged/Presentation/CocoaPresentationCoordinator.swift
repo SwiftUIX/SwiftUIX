@@ -11,6 +11,7 @@ import SwiftUI
     public var environmentBuilder = EnvironmentBuilder()
     
     private let presentation: AnyModalPresentation?
+    private var stagedPresentation: AnyModalPresentation?
     
     public var subviews: [ViewDescription] = [] {
         didSet {
@@ -116,7 +117,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             viewController.rootView.content.presentation = modal
             return
         }
-        
+                
         viewController.present(
             CocoaPresentationHostingController(
                 presentingViewController: viewController,
@@ -143,22 +144,34 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        if let presentation = presentation, !presentation.content.isModalDismissable {
+        guard let presentation = presentedCoordinator?.presentation else {
+            assertionFailure()
+            
+            return
+        }
+        
+        guard presentation.content.isModalDismissable else {
             return
         }
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if viewController.presentedViewController != nil {
             viewController.dismiss(animated: animated) {
-                self.presentation?.content.onDismiss()
+                presentation.content.onDismiss()
+                presentation.resetBinding()
                 
                 completion?()
+                
+                self.objectWillChange.send()
             }
         } else if let navigationController = viewController.navigationController {
             navigationController.popToViewController(viewController, animated: animated) {
-                self.presentation?.content.onDismiss()
+                presentation.content.onDismiss()
+                presentation.resetBinding()
                 
                 completion?()
+                
+                self.objectWillChange.send()
             }
         }
         #elseif os(macOS)

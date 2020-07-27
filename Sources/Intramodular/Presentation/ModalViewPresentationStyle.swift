@@ -87,7 +87,33 @@ public enum ModalViewPresentationStyle: Equatable {
     }
 }
 
-// MARK: - Helpers-
+// MARK: - API -
+
+extension View {
+    public func modalPresentationStyle(_ style: ModalViewPresentationStyle) -> some View {
+        environment(\.modalPresentationStyle, style)
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension ModalViewPresentationStyle {
+    @usableFromInline
+    struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        @usableFromInline
+        static let defaultValue: ModalViewPresentationStyle = .automatic
+    }
+}
+
+extension EnvironmentValues {
+    public var modalPresentationStyle: ModalViewPresentationStyle {
+        get {
+            self[ModalViewPresentationStyle.EnvironmentKey]
+        } set {
+            self[ModalViewPresentationStyle.EnvironmentKey] = newValue
+        }
+    }
+}
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

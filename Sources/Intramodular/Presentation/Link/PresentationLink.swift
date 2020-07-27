@@ -10,14 +10,21 @@ import SwiftUI
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
-    private let destination: Destination
-    private let label: Label
-    private let onDismiss: (() -> ())?
+    @usableFromInline
+    let destination: Destination
+    @usableFromInline
+    let onDismiss: (() -> ())?
+    @usableFromInline
+    let label: Label
     
-    @Environment(\.environmentBuilder) private var environmentBuilder
+    @State var isPresented: Bool = false
     
-    @State private var isPresented: Bool = false
+    @usableFromInline
+    @Environment(\.environmentBuilder) var environmentBuilder
+    @usableFromInline
+    @Environment(\.modalPresentationStyle) var modalPresentationStyle
     
+    @inlinable
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -28,38 +35,81 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         self.onDismiss = onDismiss
     }
     
-    public init(
-        destination: Destination,
-        @ViewBuilder label: () -> Label
-    ) {
-        self.init(
-            destination: destination,
-            onDismiss: nil,
-            label: label
-        )
-    }
-    
     public var body: some View {
-        Group {
-            Button(action: present, label: { label }).sheet(
-                isPresented: $isPresented,
-                onDismiss: _onDismiss
-            ) {
-                CocoaHostingView(
-                    rootView: self.destination
-                        .mergeEnvironmentBuilder(self.environmentBuilder)
-                )
+        Button(action: { self.isPresented = true }, label: { label })
+            .background(
+                CocoaHostingView {
+                    _Presenter(
+                        destination: destination,
+                        isActive: $isPresented,
+                        onDismiss: onDismiss
+                    )
+                    .mergeEnvironmentBuilder(environmentBuilder)
+                    .modalPresentationStyle(modalPresentationStyle)
+                }
+            )
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension PresentationLink {
+    @usableFromInline
+    struct _Presenter: View {
+        private let destination: Destination
+        private let isActive: Binding<Bool>
+        private let onDismiss: (() -> ())?
+        
+        @State var id = UUID()
+        
+        @Environment(\.environmentBuilder) var environmentBuilder
+        @Environment(\.modalPresentationStyle) var modalPresentationStyle
+        
+        @usableFromInline
+        init(
+            destination: Destination,
+            isActive: Binding<Bool>,
+            onDismiss: (() -> ())?
+        ) {
+            self.destination = destination
+            self.isActive = isActive
+            self.onDismiss = onDismiss
+        }
+        
+        private var activePresentation: AnyModalPresentation? {
+            guard isActive.wrappedValue else {
+                return nil
+            }
+            
+            return AnyModalPresentation(
+                id: id,
+                content: destination,
+                presentationStyle: modalPresentationStyle,
+                onDismiss: { self.onDismiss?() },
+                resetBinding: { self.isActive.wrappedValue = false }
+            )
+        }
+        
+        @usableFromInline
+        var body: some View {
+            Group {
+                if modalPresentationStyle == .automatic {
+                    ZeroSizeView().sheet(
+                        isPresented: isActive,
+                        onDismiss: { self.onDismiss?() }
+                    ) {
+                        CocoaHostingView(
+                            rootView: self.destination
+                                .mergeEnvironmentBuilder(self.environmentBuilder)
+                        )
+                    }
+                } else {
+                    ZeroSizeView().preference(
+                        key: AnyModalPresentation.PreferenceKey.self,
+                        value: activePresentation
+                    )
+                }
             }
         }
-    }
-    
-    private func present() {
-        isPresented = true
-    }
-    
-    private func _onDismiss() {
-        onDismiss?()
-        
-        isPresented = false
     }
 }

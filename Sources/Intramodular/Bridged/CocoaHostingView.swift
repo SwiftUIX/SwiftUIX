@@ -41,7 +41,7 @@ public struct CocoaHostingView<Content: View>: View {
     public init(@ViewBuilder rootView: () -> Content) {
         self.rootView = rootView()
     }
-
+    
     public var body: some View {
         rootView
     }

@@ -18,11 +18,7 @@ public struct CocoaPresentationHostingControllerContent: View {
     }
     
     public var body: some View {
-        presentation
-            .content
-            .onPreferenceChange(IsModalInPresentation.self, perform: {
-                self.coordinator?.setIsInPresentation($0)
-            })
+        presentation.content
     }
 }
 
