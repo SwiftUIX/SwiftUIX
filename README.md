@@ -5,7 +5,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 
 - [Why](#why) 
 - [Documentation](#documentation) 
-- [Requirements](#requirement) 
+- [Requirements](#requirements) 
 - [Installation](#installation)
 - [Contributing](#contributing)
 - [License](#license)
