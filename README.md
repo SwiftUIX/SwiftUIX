@@ -1,9 +1,24 @@
 <img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX: An extension to the standard SwiftUI library.
 ======================================
 
-SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library.
+SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
+
+- [Why](#why) 
+- [Documentation](#documentation) 
+- [Requirements](#requirement) 
+- [Installation](#installation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
+- [Credits](#credits)
+
+# Why
+
+The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
 
 # Documentation
+
+All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
 
 - [**General**](https://github.com/SwiftUIX/SwiftUIX/wiki/General)
 - [**Control Flow**](https://github.com/SwiftUIX/SwiftUIX/wiki/Control-Flow)
@@ -14,14 +29,6 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 - [**Pagination**](https://github.com/SwiftUIX/SwiftUIX/wiki/Pagination)
 - [**Text**](https://github.com/SwiftUIX/SwiftUIX/wiki/Text) 
 - [**Utilities**](https://github.com/SwiftUIX/SwiftUIX/wiki/Utilities) 
-
-All documentation is hosted [on the project wiki here](https://github.com/SwiftUIX/SwiftUIX/wiki). Documentation is a currently a **work-in-progress**. Volunteers needed! 
-
-# Why
-
-The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
-
-This project is also **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
 | UIKit                                   | SwiftUI      | SwiftUIX                                      |
 | --------------------------------------- | ------------ | --------------------------------------------- |
@@ -61,10 +68,6 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 4. Click **Finish**.
 5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
-# Usage
-
-SwiftUIX's documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
-
 # Contributing
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
@@ -73,10 +76,10 @@ SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. 
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
 
-# Credits
-
-SwiftUIX is a project of [@vmanot](https://github.com/vmanot).
-
 # Support 
 
 SwiftUIX is and will always be free and open. Maintaining SwiftUIX, however, is a time-consuming endeavour. If you're reliant on SwiftUIX for your app/project and would like to see it grow, consider contributing/donating as way to help.
+
+# Credits
+
+SwiftUIX is a project of [@vmanot](https://github.com/vmanot).
