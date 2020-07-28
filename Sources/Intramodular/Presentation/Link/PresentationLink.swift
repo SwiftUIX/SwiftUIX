@@ -22,6 +22,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @usableFromInline
     @Environment(\.environmentBuilder) var environmentBuilder
     @usableFromInline
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @usableFromInline
     @Environment(\.modalPresentationStyle) var modalPresentationStyle
     
     @inlinable
@@ -40,7 +42,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             .background(
                 CocoaHostingView {
                     _Presenter(
-                        destination: destination,
+                        destination: destination
+                            .managedObjectContext(managedObjectContext)
+                            .mergeEnvironmentBuilder(environmentBuilder)
+                            .modalPresentationStyle(modalPresentationStyle),
                         isActive: $isPresented,
                         onDismiss: onDismiss
                     )
@@ -55,7 +60,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
 
 extension PresentationLink {
     @usableFromInline
-    struct _Presenter: View {
+    struct _Presenter<Destination: View>: View {
         private let destination: Destination
         private let isActive: Binding<Bool>
         private let onDismiss: (() -> ())?
@@ -96,13 +101,9 @@ extension PresentationLink {
                 if modalPresentationStyle == .automatic {
                     ZeroSizeView().sheet(
                         isPresented: isActive,
-                        onDismiss: { self.onDismiss?() }
-                    ) {
-                        CocoaHostingView(
-                            rootView: self.destination
-                                .mergeEnvironmentBuilder(self.environmentBuilder)
-                        )
-                    }
+                        onDismiss: { self.onDismiss?() },
+                        content: { CocoaHostingView(rootView: self.destination) }
+                    )
                 } else {
                     ZeroSizeView().preference(
                         key: AnyModalPresentation.PreferenceKey.self,

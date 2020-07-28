@@ -20,7 +20,7 @@ extension PerformActionView {
         .init(base: self, action: action)
     }
     
-    public func onAction<A: DynamicAction>(_ action: A) -> AddDynamicAction<Self, A> {
+    public func addAction<A: DynamicAction>(_ action: A) -> AddDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
 }
