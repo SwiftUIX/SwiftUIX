@@ -25,37 +25,33 @@ public struct Action: Hashable {
     public func perform() {
         value()
     }
-}
-
-public struct Actions: Hashable {
-    private var value: [Action]
     
-    public init(_ value: [Action]) {
-        self.value = value
+    public func insert(_ action: Action) -> Action {
+        .init {
+            action.perform()
+            self.perform()
+        }
     }
     
-    public init(initial action: (Action)) {
-        self.init([action])
+    public func insert(_ action: @escaping () -> Void) -> Action {
+        .init {
+            action()
+            self.perform()
+        }
     }
     
-    public init(initial action: @escaping () -> Void) {
-        self.init(initial: .init(action))
+    public func append(_ action: Action) -> Action {
+        .init {
+            self.perform()
+            action.perform()
+        }
     }
     
-    public init() {
-        self.init([])
-    }
-    
-    public mutating func insert(_ action: Action) {
-        value.append(action)
-    }
-    
-    public mutating func insert(_ action: @escaping () -> Void) {
-        insert(.init(action))
-    }
-    
-    public func perform() {
-        value.forEach({ $0.perform() })
+    public func append(_ action: @escaping () -> Void) -> Action {
+        .init {
+            self.perform()
+            action()
+        }
     }
 }
 
@@ -71,15 +67,11 @@ extension ActionInitiable {
     }
 }
 
-public struct PerformActionView: View {
+public struct PeformAction: ActionInitiable, PerformActionView {
     private let action: Action
     
-    public init(perform action: Action) {
+    public init(action: Action) {
         self.action = action
-    }
-    
-    public init(perform action: @escaping () -> Void) {
-        self.action = .init(action)
     }
     
     public var body: some View {
@@ -88,5 +80,9 @@ public struct PerformActionView: View {
         }
         
         return AnyView(EmptyView())
+    }
+    
+    public func transformAction(_ transform: (Action) -> Action) -> Self {
+        .init(action: transform(action))
     }
 }

@@ -8,7 +8,8 @@ import SwiftUI
 
 /// A button that creates and stores an `AnyCancellable`.
 public struct AnyCancellableButton<Label: View>: View {
-    private let action: () -> AnyCancellable
+    private let makeCancellable: () -> AnyCancellable
+    private var action: Action = .empty
     private let label: Label
     
     @State private var cancellable: AnyCancellable?
@@ -17,7 +18,7 @@ public struct AnyCancellableButton<Label: View>: View {
         action: @escaping () -> AnyCancellable,
         @ViewBuilder label: () -> Label
     ) {
-        self.action = action
+        self.makeCancellable = action
         self.label = label()
     }
     
@@ -25,7 +26,7 @@ public struct AnyCancellableButton<Label: View>: View {
         action: @escaping () -> C,
         @ViewBuilder label: () -> Label
     ) {
-        self.action = { AnyCancellable(action()) }
+        self.makeCancellable = { AnyCancellable(action()) }
         self.label = label()
     }
     
@@ -36,14 +37,16 @@ public struct AnyCancellableButton<Label: View>: View {
     }
     
     private func trigger() {
-        cancellable = action()
+        cancellable = makeCancellable()
     }
 }
 
 // MARK: - Protocol Implementations -
 
-extension AnyCancellableButton: ActionTriggerView {
-    public func onPrimaryTrigger(perform action: @escaping () -> ()) -> Self {
-        .init(action: { action(); return self.action() }, label: { label })
+extension AnyCancellableButton: PerformActionView {
+    public func transformAction(_ transform: (Action) -> Action) -> Self {
+        then {
+            $0.action = transform($0.action)
+        }
     }
 }

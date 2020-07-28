@@ -117,7 +117,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             viewController.rootView.content.presentation = modal
             return
         }
-                
+        
         viewController.present(
             CocoaPresentationHostingController(
                 presentingViewController: viewController,
@@ -144,21 +144,17 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        guard let presentation = presentedCoordinator?.presentation else {
-            assertionFailure()
-            
-            return
-        }
+        let presentation = presentedCoordinator?.presentation
         
-        guard presentation.content.isModalDismissable else {
+        if let presentation = presentation, !presentation.content.isModalDismissable {
             return
         }
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if viewController.presentedViewController != nil {
             viewController.dismiss(animated: animated) {
-                presentation.content.onDismiss()
-                presentation.resetBinding()
+                presentation?.content.onDismiss()
+                presentation?.resetBinding()
                 
                 completion?()
                 
@@ -166,8 +162,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             }
         } else if let navigationController = viewController.navigationController {
             navigationController.popToViewController(viewController, animated: animated) {
-                presentation.content.onDismiss()
-                presentation.resetBinding()
+                presentation?.content.onDismiss()
+                presentation?.resetBinding()
                 
                 completion?()
                 

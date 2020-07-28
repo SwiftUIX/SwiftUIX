@@ -23,6 +23,14 @@ extension View {
 }
 
 extension View {
+    #if swift(>=5.3)
+    @_disfavoredOverload
+    @inlinable
+    public func background(_ color: Color) -> some View {
+        background(PassthroughView(content: { color }))
+    }
+    #endif
+
     @inlinable
     public func backgroundColor(_ color: Color) -> some View {
         background(color.edgesIgnoringSafeArea(.all))

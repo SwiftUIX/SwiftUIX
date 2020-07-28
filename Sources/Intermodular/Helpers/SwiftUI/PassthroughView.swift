@@ -9,7 +9,7 @@ import SwiftUI
 public struct PassthroughView<Content: View>: View {
     @usableFromInline
     let content: Content
-     
+    
     @inlinable
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()

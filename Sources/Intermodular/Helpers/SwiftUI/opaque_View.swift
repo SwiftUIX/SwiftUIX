@@ -24,3 +24,7 @@ extension opaque_View where Self: View {
         .init(self)
     }
 }
+
+extension ModifiedContent: opaque_View where Content: View, Modifier: ViewModifier {
+    
+}

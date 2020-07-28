@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 public protocol Scroller: ViewInteractor {
-
+    
 }
 
 // MARK: - Auxiliary Implementation -
