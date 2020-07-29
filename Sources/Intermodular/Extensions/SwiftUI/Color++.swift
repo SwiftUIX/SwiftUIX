@@ -92,24 +92,48 @@ extension Color {
     }
 }
 
+#endif
+
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 /// Foreground colors for static text and related elements.
 extension Color {
     public static var label: Color {
+        #if os(macOS)
+        return .init(.labelColor)
+        #else
         return .init(.label)
+        #endif
     }
     
     public static var secondaryLabel: Color {
+        #if os(macOS)
+        return .init(.secondaryLabelColor)
+        #else
         return .init(.secondaryLabel)
+        #endif
     }
     
     public static var tertiaryLabel: Color {
+        #if os(macOS)
+        return .init(.tertiaryLabelColor)
+        #else
         return .init(.tertiaryLabel)
+        #endif
     }
     
     public static var quaternaryLabel: Color {
+        #if os(macOS)
+        return .init(.quaternaryLabelColor)
+        #else
         return .init(.quaternaryLabel)
+        #endif
     }
 }
+
+#endif
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     /// A foreground color for standard system links.
@@ -127,6 +151,10 @@ extension Color {
         return .init(.opaqueSeparator)
     }
 }
+
+#endif
+
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     public static var systemBackground: Color {
@@ -268,7 +296,7 @@ extension Color {
             return nil
         }
     }
-
+    
     /// Creates a color from a 6-digit hexadecimal color code.
     public init(hexadecimal6: Int) {
         let red = Double((hexadecimal6 & 0xFF0000) >> 16) / 255.0

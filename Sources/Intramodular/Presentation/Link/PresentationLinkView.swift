@@ -11,7 +11,6 @@ public protocol PresentationLinkView: View {
     associatedtype Label: View
     
     init(destination: Destination, onDismiss: (() -> Void)?, @ViewBuilder label: () -> Label)
-    init(destination: Destination, @ViewBuilder label: () -> Label) 
 }
 
 extension PresentationLinkView {

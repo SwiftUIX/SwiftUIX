@@ -5,7 +5,11 @@
 import Swift
 import SwiftUI
 
+/// A dynamic action.
+///
+/// Dynamic actions are actions that are reliant on dynamic properties, such as `@Environment`, `@EnvironmentObject` etc. Hence, they conform to `DynamicProperty` themselves, so that the SwiftUI runtime may populate held dynamic properties accordingly.
 public protocol DynamicAction: DynamicProperty {
+    /// Perform the action represented by this type.
     func perform()
 }
 

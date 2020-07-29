@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A convenience around a closure of the type `() -> Void`.
 public struct Action: Hashable {
     public static let empty = Action({ })
     
@@ -55,17 +56,7 @@ public struct Action: Hashable {
     }
 }
 
-// MARK: - Auxiliary Implementation -
-
-public protocol ActionInitiable {
-    init(action: Action)
-}
-
-extension ActionInitiable {
-    public init(action: @escaping () -> Void) {
-        self.init(action: .init(action))
-    }
-}
+// MARK: - API -
 
 public struct PeformAction: ActionInitiable, PerformActionView {
     private let action: Action
@@ -84,5 +75,17 @@ public struct PeformAction: ActionInitiable, PerformActionView {
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {
         .init(action: transform(action))
+    }
+}
+
+// MARK: - Helpers -
+
+public protocol ActionInitiable {
+    init(action: Action)
+}
+
+extension ActionInitiable {
+    public init(action: @escaping () -> Void) {
+        self.init(action: .init(action))
     }
 }

@@ -11,13 +11,15 @@ import SwiftUI
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     @usableFromInline
-    let destination: Destination
+    let _destination: Destination
     @usableFromInline
     let onDismiss: (() -> ())?
     @usableFromInline
+    let _isPresented: Binding<Bool>?
+    @usableFromInline
     let label: Label
     
-    @State var isPresented: Bool = false
+    @State var _internal_isPresented: Bool = false
     
     @usableFromInline
     @Environment(\.environmentBuilder) var environmentBuilder
@@ -26,33 +28,69 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @usableFromInline
     @Environment(\.modalPresentationStyle) var modalPresentationStyle
     
+    @usableFromInline
+    var destination: some View {
+        CocoaHostingView {
+            _destination
+                .managedObjectContext(managedObjectContext)
+                .mergeEnvironmentBuilder(environmentBuilder)
+                .modalPresentationStyle(modalPresentationStyle)
+        }
+    }
+    
+    @usableFromInline
+    var isPresented: Binding<Bool> {
+        _isPresented ?? $_internal_isPresented
+    }
+    
+    public var body: some View {
+        Group {
+            if modalPresentationStyle == .automatic {
+                Button(action: { self.isPresented.wrappedValue = true }, label: label).sheet(
+                    isPresented: isPresented,
+                    onDismiss: { self.onDismiss?() },
+                    content: { self.destination }
+                )
+            } else {
+                Button(action: { self.isPresented.wrappedValue = true }, label: label).background(
+                    CocoaHostingView {
+                        _Presenter(
+                            destination: destination,
+                            isPresented: isPresented,
+                            onDismiss: onDismiss
+                        )
+                        .mergeEnvironmentBuilder(environmentBuilder)
+                        .modalPresentationStyle(modalPresentationStyle)
+                    }
+                )
+            }
+        }
+    }
+}
+
+extension PresentationLink {
     @inlinable
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
         @ViewBuilder label: () -> Label
     ) {
-        self.destination = destination
-        self.label = label()
+        self._destination = destination
         self.onDismiss = onDismiss
+        self._isPresented = nil
+        self.label = label()
     }
     
-    public var body: some View {
-        Button(action: { self.isPresented = true }, label: { label })
-            .background(
-                CocoaHostingView {
-                    _Presenter(
-                        destination: destination
-                            .managedObjectContext(managedObjectContext)
-                            .mergeEnvironmentBuilder(environmentBuilder)
-                            .modalPresentationStyle(modalPresentationStyle),
-                        isActive: $isPresented,
-                        onDismiss: onDismiss
-                    )
-                    .mergeEnvironmentBuilder(environmentBuilder)
-                    .modalPresentationStyle(modalPresentationStyle)
-                }
-            )
+    @inlinable
+    public init(
+        destination: Destination,
+        isPresented: Binding<Bool>,
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination
+        self.onDismiss = nil
+        self._isPresented = isPresented
+        self.label = label()
     }
 }
 
@@ -62,7 +100,7 @@ extension PresentationLink {
     @usableFromInline
     struct _Presenter<Destination: View>: View {
         private let destination: Destination
-        private let isActive: Binding<Bool>
+        private let isPresented: Binding<Bool>
         private let onDismiss: (() -> ())?
         
         @State var id = UUID()
@@ -73,16 +111,16 @@ extension PresentationLink {
         @usableFromInline
         init(
             destination: Destination,
-            isActive: Binding<Bool>,
+            isPresented: Binding<Bool>,
             onDismiss: (() -> ())?
         ) {
             self.destination = destination
-            self.isActive = isActive
+            self.isPresented = isPresented
             self.onDismiss = onDismiss
         }
         
-        private var activePresentation: AnyModalPresentation? {
-            guard isActive.wrappedValue else {
+        private var presentation: AnyModalPresentation? {
+            guard isPresented.wrappedValue else {
                 return nil
             }
             
@@ -91,7 +129,7 @@ extension PresentationLink {
                 content: destination,
                 presentationStyle: modalPresentationStyle,
                 onDismiss: { self.onDismiss?() },
-                resetBinding: { self.isActive.wrappedValue = false }
+                resetBinding: { self.isPresented.wrappedValue = false }
             )
         }
         
@@ -100,14 +138,14 @@ extension PresentationLink {
             Group {
                 if modalPresentationStyle == .automatic {
                     ZeroSizeView().sheet(
-                        isPresented: isActive,
+                        isPresented: isPresented,
                         onDismiss: { self.onDismiss?() },
-                        content: { CocoaHostingView(rootView: self.destination) }
+                        content: { self.destination }
                     )
                 } else {
                     ZeroSizeView().preference(
                         key: AnyModalPresentation.PreferenceKey.self,
-                        value: activePresentation
+                        value: presentation
                     )
                 }
             }

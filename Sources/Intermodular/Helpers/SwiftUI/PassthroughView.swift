@@ -6,10 +6,15 @@ import Combine
 import Swift
 import SwiftUI
 
-public struct PassthroughView<Content: View>: View {
+public struct PassthroughView<Content: View>: opaque_View, View {
     @usableFromInline
     let content: Content
     
+    @inlinable
+    public init(content: Content) {
+        self.content = content
+    }
+
     @inlinable
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()
