@@ -34,18 +34,11 @@ extension View {
     #endif
     
     @inlinable
+    @available(*, deprecated, message: "Please use View.backgroundFill(_:) instead.")
     public func backgroundColor(_ color: Color) -> some View {
         background(color.edgesIgnoringSafeArea(.all))
     }
     
-    @inlinable
-    public func backgroundColor<BackgroundFill: View>(
-        _ fill: BackgroundFill,
-        alignment: Alignment = .center
-    ) -> some View {
-        background(fill, alignment: alignment)
-    }
-
     @inlinable
     public func backgroundFill(_ color: Color) -> some View {
         background(color.edgesIgnoringSafeArea(.all))
