@@ -35,6 +35,7 @@ public struct LinkPresentationView<Placeholder: View>: Identifiable, View {
             disableMetadataFetch: disableMetadataFetch
         )
         .id(id)
+        .clipped()
     }
 }
 
@@ -153,9 +154,9 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
                 metadata: (fetchedMetadata ?? metadata),
                 proposedMinHeight: $proposedMinHeight
             )
-                .equatable()
-                .minHeight(proposedMinHeight)
-                .visible(!isPlaceholderVisible)
+            .equatable()
+            .minHeight(proposedMinHeight)
+            .visible(!isPlaceholderVisible)
             
             placeholder
                 .visible(isPlaceholderVisible)
@@ -283,6 +284,10 @@ struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentab
     }
     
     private func proposeMinimumHeight(for view: AppKitOrUIKitViewType) {
+        guard view.frame.minimumDimensionLength != 0 else {
+            return
+        }
+        
         if view.frame.height == 0 && proposedMinHeight == nil {
             #if os(iOS) || targetEnvironment(macCatalyst)
             view.base!._UIKit_only_sizeToFit()

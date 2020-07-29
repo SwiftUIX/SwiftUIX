@@ -34,6 +34,19 @@ extension View {
     #endif
     
     @inlinable
+    public func backgroundColor(_ color: Color) -> some View {
+        background(color.edgesIgnoringSafeArea(.all))
+    }
+    
+    @inlinable
+    public func backgroundColor<BackgroundFill: View>(
+        _ fill: BackgroundFill,
+        alignment: Alignment = .center
+    ) -> some View {
+        background(fill, alignment: alignment)
+    }
+
+    @inlinable
     public func backgroundFill(_ color: Color) -> some View {
         background(color.edgesIgnoringSafeArea(.all))
     }
@@ -41,7 +54,7 @@ extension View {
     @inlinable
     public func backgroundFill<BackgroundFill: View>(
         _ fill: BackgroundFill,
-        alignment: Alignment
+        alignment: Alignment = .center
     ) -> some View {
         background(fill, alignment: alignment)
     }
@@ -89,9 +102,18 @@ extension View {
 // MARK: View.padding
 
 extension View {
+    #if swift(>=5.3)
+    /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
+    @_disfavoredOverload
+    @inlinable
+    public func padding(_ color: Color) -> some View {
+        padding().background(color)
+    }
+    #else
     /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
     @inlinable
     public func padding(_ color: Color) -> some View {
         padding().background(color)
     }
+    #endif
 }
