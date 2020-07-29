@@ -112,13 +112,11 @@ extension _TextView: UIViewRepresentable {
             cursorOffset = uiView.offset(from: uiView.beginningOfDocument, to: selectedRange.start)
         }
         
-        if let font = context.environment.font {
-            uiView.font = font.toUIFont()
-        } else {
-            uiView.font = .preferredFont(forTextStyle: .body)
-        }
-        
         uiView.backgroundColor = nil
+        uiView.font = context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        #if !os(tvOS)
+        uiView.isEditable = context.environment.isEnabled
+        #endif
         uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = true
         uiView.text = text

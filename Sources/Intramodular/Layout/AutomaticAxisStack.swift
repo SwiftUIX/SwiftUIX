@@ -69,7 +69,7 @@ public struct AutomaticAxisStack<Content: View>: View {
                     })
                 }
                 .frame(
-                    minimum: intrinsicGeometrySize.dimensionLength(for: preferredAxis),
+                    min: intrinsicGeometrySize.dimensionLength(for: preferredAxis),
                     axis: preferredAxis
                 )
             }

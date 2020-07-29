@@ -9,14 +9,102 @@ import Swift
 import SwiftUI
 
 /// A rich visual representation of a link.
-public struct LinkPresentationView: View {
+public struct LinkPresentationView<Placeholder: View>: Identifiable, View {
+    @usableFromInline
+    let url: URL?
+    @usableFromInline
+    let metadata: LPLinkMetadata?
+    @usableFromInline
+    let onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)?
+    @usableFromInline
+    let placeholder: Placeholder
+    
+    @usableFromInline
+    var disableMetadataFetch: Bool = false
+    
+    public var id: some Hashable {
+        url ?? metadata?.originalURL
+    }
+    
+    public var body: some View {
+        _LinkPresentationView(
+            url: url,
+            metadata: metadata,
+            onMetadataFetchCompletion: onMetadataFetchCompletion,
+            placeholder: placeholder,
+            disableMetadataFetch: disableMetadataFetch
+        )
+        .id(id)
+    }
+}
+
+// MARK: - API -
+
+extension LinkPresentationView {
+    @inlinable
+    public init(
+        url: URL,
+        onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)? = nil,
+        @ViewBuilder placeholder: () -> Placeholder
+    ) {
+        self.url = url
+        self.metadata = nil
+        self.onMetadataFetchCompletion = onMetadataFetchCompletion
+        self.placeholder = placeholder()
+    }
+    
+    @inlinable
+    public init(metadata: LPLinkMetadata, @ViewBuilder placeholder: () -> Placeholder) {
+        self.url = nil
+        self.metadata = metadata
+        self.onMetadataFetchCompletion = nil
+        self.placeholder = placeholder()
+    }
+}
+
+extension LinkPresentationView where Placeholder == EmptyView {
+    @inlinable
+    public init(
+        url: URL,
+        onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)? = nil
+    ) {
+        self.init(url: url, onMetadataFetchCompletion: onMetadataFetchCompletion) {
+            EmptyView()
+        }
+    }
+    
+    @inlinable
+    public init(metadata: LPLinkMetadata) {
+        self.init(metadata: metadata) {
+            EmptyView()
+        }
+    }
+}
+
+extension LinkPresentationView {
+    public func disableMetadataFetch(_ disableMetadataFetch: Bool) -> Self {
+        then({ $0.disableMetadataFetch = disableMetadataFetch })
+    }
+}
+
+// MARK: - Implementation -
+
+struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @usableFromInline
     @Environment(\.errorContext) var errorContext
     @usableFromInline
     @UniqueCache(for: Self.self) var cache
     
-    public let url: URL?
-    public let metadata: LPLinkMetadata?
+    let url: URL?
+    @usableFromInline
+    let metadata: LPLinkMetadata?
+    @usableFromInline
+    let onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)?
+    @usableFromInline
+    let placeholder: Placeholder
+    
+    @usableFromInline
+    var disableMetadataFetch: Bool
     
     #if !os(tvOS)
     @usableFromInline
@@ -26,51 +114,73 @@ public struct LinkPresentationView: View {
     @State var isFetchingMetadata: Bool = false
     @usableFromInline
     @State var fetchedMetadata: LPLinkMetadata?
-    
     @usableFromInline
-    var disableFetchingMetadata: Bool = false
-    @usableFromInline
-    var isCompact: Bool = false
+    @State var proposedMinHeight: CGFloat?
     
-    @inlinable
-    public init(url: URL) {
-        self.url = url
-        self.metadata = nil
+    var id: some Hashable {
+        url ?? metadata?.originalURL
     }
     
-    @inlinable
-    public init(metadata: LPLinkMetadata) {
-        self.url = nil
-        self.metadata = metadata
+    private var isPlaceholderVisible: Bool {
+        placeholder is EmptyView ? false : (metadata ?? fetchedMetadata) == nil
     }
     
-    @inlinable
-    public var body: some View {
-        _LinkPresentationView(
-            url: url,
-            metadata: (fetchedMetadata ?? metadata),
-            isCompact: isCompact
-        )
-        .equatable()
+    var body: some View {
+        #if swift(>=5.3)
+        ZStack {
+            _LPLinkViewRepresentable<Placeholder>(
+                url: url,
+                metadata: (fetchedMetadata ?? metadata),
+                proposedMinHeight: $proposedMinHeight
+            )
+            .equatable()
+            .minHeight(proposedMinHeight)
+            .visible(!isPlaceholderVisible)
+            
+            placeholder
+                .visible(isPlaceholderVisible)
+        }
         .onAppear(perform: fetchMetadata)
-        .id(url ?? metadata?.originalURL)
+        .onChange(of: id) { _ in
+            self.fetchedMetadata = nil
+            
+            fetchMetadata()
+        }
+        #else
+        return ZStack {
+            _LPLinkViewRepresentable<Placeholder>(
+                url: url,
+                metadata: (fetchedMetadata ?? metadata),
+                proposedMinHeight: $proposedMinHeight
+            )
+                .equatable()
+                .minHeight(proposedMinHeight)
+                .visible(!isPlaceholderVisible)
+            
+            placeholder
+                .visible(isPlaceholderVisible)
+        }
+        .onAppear(perform: fetchMetadata)
+        #endif
     }
     
     #if !os(tvOS)
     @usableFromInline
     func fetchMetadata() {
-        guard !disableFetchingMetadata else {
+        guard !disableMetadataFetch else {
             return
         }
         
         do {
             if let metadata = try cache.decache(LPLinkMetadata.self, forKey: url) {
                 self.fetchedMetadata = metadata
-                
-                return
             }
         } catch {
             errorContext.push(error)
+        }
+        
+        guard fetchedMetadata == nil else {
+            return
         }
         
         guard let url = url ?? metadata?.originalURL else {
@@ -88,9 +198,16 @@ public struct LinkPresentationView: View {
             DispatchQueue.asyncOnMainIfNecessary {
                 self.fetchedMetadata = metadata
                 self.isFetchingMetadata = false
+                self.proposedMinHeight = nil
                 
-                if let error = error {
-                    self.errorContext.push(error)
+                if let metadata = metadata {
+                    self.onMetadataFetchCompletion?(.success(metadata))
+                } else if let error = error {
+                    if let onMetadataFetchCompletion = self.onMetadataFetchCompletion {
+                        onMetadataFetchCompletion(.failure(error))
+                    } else {
+                        self.errorContext.push(error)
+                    }
                 }
                 
                 if let metadata = metadata {
@@ -109,73 +226,79 @@ public struct LinkPresentationView: View {
     #endif
 }
 
-// MARK: - API -
-
-extension LinkPresentationView {
-    public func disableFetchingMetadata(_ disableFetchingMetadata: Bool) -> Self {
-        then({ $0.disableFetchingMetadata = disableFetchingMetadata })
-    }
-    
-    public func compact(_ isCompact: Bool) -> Self {
-        then({ $0.isCompact = isCompact })
-    }
-}
-
-// MARK: - Implementation -
-
 @usableFromInline
-struct _LinkPresentationView: AppKitOrUIKitViewRepresentable, Equatable {
-    public typealias AppKitOrUIKitViewType = LPLinkView
+struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentable, Equatable {
+    public typealias AppKitOrUIKitViewType = MutableAppKitOrUIKitViewWrapper<LPLinkView>
     
     @usableFromInline
     var url: URL?
     @usableFromInline
     var metadata: LPLinkMetadata?
     @usableFromInline
-    var isCompact: Bool
+    @Binding var proposedMinHeight: CGFloat?
     
     @usableFromInline
-    init(url: URL?, metadata: LPLinkMetadata?, isCompact: Bool) {
+    init(
+        url: URL?,
+        metadata: LPLinkMetadata?,
+        proposedMinHeight: Binding<CGFloat?>
+    ) {
         self.url = url
         self.metadata = metadata
-        self.isCompact = isCompact
+        self._proposedMinHeight = proposedMinHeight
     }
     
     @usableFromInline
     func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
+        DispatchQueue.main.async {
+            self.proposedMinHeight = nil
+        }
+        
         if let metadata = metadata {
-            return LPLinkView(metadata: metadata)
+            return .init(base: LPLinkView(metadata: metadata))
         } else if let url = url {
-            return LPLinkView(url: url)
+            return .init(base: LPLinkView(url: url))
         } else {
             assertionFailure()
             
-            return LPLinkView(metadata: LPLinkMetadata())
+            return .init(base: LPLinkView(metadata: LPLinkMetadata()))
         }
     }
     
     @usableFromInline
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         if let metadata = metadata {
-            view.metadata = metadata
+            let wasMetadataPresent = view.base?.metadata.title != nil
+            
+            view.base?.metadata = metadata
+            
+            if !wasMetadataPresent {
+                DispatchQueue.main.async {
+                    self.proposeMinimumHeight(for: view)
+                }
+            }
         }
         
-        if isCompact {
-            if !view.isHorizontalContentHuggingPriorityHigh && !view.isVerticalContentHuggingPriorityHigh {
-                view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                view.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        self.proposeMinimumHeight(for: view)
+    }
+    
+    private func proposeMinimumHeight(for view: AppKitOrUIKitViewType) {
+        if view.frame.height == 0 && proposedMinHeight == nil {
+            #if os(iOS) || targetEnvironment(macCatalyst)
+            view.base!._UIKit_only_sizeToFit()
+            #endif
+            
+            #if os(iOS) || targetEnvironment(macCatalyst)
+            DispatchQueue.main.async {
+                self.proposedMinHeight = view.base!.sizeThatFits(view.frame.size).height
             }
-        } else {
-            if view.isHorizontalContentHuggingPriorityHigh && view.isVerticalContentHuggingPriorityHigh {
-                view.setContentHuggingPriority(.defaultLow, for: .horizontal)
-                view.setContentHuggingPriority(.defaultLow, for: .vertical)
-            }
+            #endif
         }
     }
     
     @usableFromInline
     static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs.isCompact == rhs.isCompact else {
+        guard lhs.proposedMinHeight == rhs.proposedMinHeight else {
             return false
         }
         

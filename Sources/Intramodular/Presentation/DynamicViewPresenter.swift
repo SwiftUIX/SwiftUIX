@@ -98,8 +98,8 @@ extension DynamicViewPresenter {
         dismiss(animated: true, completion: nil)
     }
     
-    public func dismissSelf() {
-        presenter?.dismiss()
+    public func dismissSelf(animated: Bool = true, completion: (() -> Void)? = nil) {
+        presenter?.dismiss(animated: animated, completion: completion)
     }
     
     public func dismissTopmost() {

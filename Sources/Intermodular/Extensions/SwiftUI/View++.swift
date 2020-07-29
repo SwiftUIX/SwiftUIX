@@ -22,6 +22,8 @@ extension View {
     }
 }
 
+// MARK: View.background
+
 extension View {
     #if swift(>=5.3)
     @_disfavoredOverload
@@ -30,17 +32,37 @@ extension View {
         background(PassthroughView(content: { color }))
     }
     #endif
-
+    
     @inlinable
-    public func backgroundColor(_ color: Color) -> some View {
+    public func backgroundFill(_ color: Color) -> some View {
         background(color.edgesIgnoringSafeArea(.all))
     }
     
     @inlinable
-    public func backgroundPreference<K: PreferenceKey>(key _: K.Type = K.self, value: K.Value) -> some View {
-        background(EmptyView().preference(key: K.self, value: value))
+    public func backgroundFill<BackgroundFill: View>(
+        _ fill: BackgroundFill,
+        alignment: Alignment
+    ) -> some View {
+        background(fill, alignment: alignment)
     }
 }
+
+// MARK: View.hidden
+
+extension View {
+    @inlinable
+    public func hidden(_ isHidden: Bool) -> some View {
+        Group {
+            if isHidden {
+                hidden()
+            } else {
+                self
+            }
+        }
+    }
+}
+
+// MARK: View.offset
 
 extension View {
     @inlinable
@@ -64,15 +86,12 @@ extension View {
     }
 }
 
+// MARK: View.padding
+
 extension View {
+    /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
     @inlinable
-    public func hidden(_ isHidden: Bool) -> some View {
-        Group {
-            if isHidden {
-                hidden()
-            } else {
-                self
-            }
-        }
+    public func padding(_ color: Color) -> some View {
+        padding().background(color)
     }
 }

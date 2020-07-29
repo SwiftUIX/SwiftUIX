@@ -93,7 +93,7 @@ extension View {
     /// resulting view assumes this view's sizing behavior in the other
     /// dimension.
     @inlinable
-    public func frame(minimum size: CGSize?, alignment: Alignment = .center) -> some View {
+    public func frame(min size: CGSize?, alignment: Alignment = .center) -> some View {
         frame(minWidth: size?.width, minHeight: size?.height, alignment: alignment)
     }
     
@@ -104,9 +104,19 @@ extension View {
     /// resulting view assumes this view's sizing behavior in the other
     /// dimension.
     @inlinable
+    public func frame(max size: CGSize?, alignment: Alignment = .center) -> some View {
+        frame(maxWidth: size?.width, maxHeight: size?.height, alignment: alignment)
+    }
+    /// Positions this view within an invisible frame with the specified size.
+    ///
+    /// Use this method to specify a fixed size for a view's width,
+    /// height, or both. If you only specify one of the dimensions, the
+    /// resulting view assumes this view's sizing behavior in the other
+    /// dimension.
+    @inlinable
     public func frame(
-        minimum minSize: CGSize?,
-        maximum maxSize: CGSize?,
+        min minSize: CGSize?,
+        max maxSize: CGSize?,
         alignment: Alignment = .center
     ) -> some View {
         frame(
@@ -141,7 +151,7 @@ extension View {
     }
     
     @inlinable
-    public func frame(minimum dimensionLength: CGFloat, axis: Axis) -> some View {
+    public func frame(min dimensionLength: CGFloat, axis: Axis) -> some View {
         switch axis {
             case .horizontal:
                 return frame(minWidth: dimensionLength)
