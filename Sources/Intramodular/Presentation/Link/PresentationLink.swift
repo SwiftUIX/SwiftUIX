@@ -69,7 +69,6 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
 }
 
 extension PresentationLink {
-    @inlinable
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -81,7 +80,6 @@ extension PresentationLink {
         self.label = label()
     }
     
-    @inlinable
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,
