@@ -12,7 +12,7 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
     
     @Environment(\.presentationManager) private var presentationManager
     
-    public init(action: Action, label: () -> Label) {
+    public init(action: Action, @ViewBuilder label: () -> Label) {
         self.action = action
         self.label = label()
     }
