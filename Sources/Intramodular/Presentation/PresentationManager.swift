@@ -51,7 +51,7 @@ extension EnvironmentValues {
 
 // MARK: - Concrete Implementations -
 
-extension Binding: PresentationManager where Value: PresentationModeProtocol {
+extension Binding: PresentationManager where Value == PresentationMode {
     public var isPresented: Bool {
         return wrappedValue.isPresented
     }

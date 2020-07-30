@@ -2,14 +2,13 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(macOS) || targetEnvironment(macCatalyst)
+
+import AppKit
 import Swift
 import SwiftUI
 
-#if swift(<5.3) && (os(macOS) || targetEnvironment(macCatalyst))
-
-import AppKit
-
-public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
+public struct OldToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
     private let content: Content
@@ -65,7 +64,7 @@ public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
     public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
         context.coordinator.toolbar = toolbar
         
-        let rootView = content.onPreferenceChange(ToolbarViewItemsPreferenceKey.self) { items in
+        let rootView = content.onPreferenceChange(OldToolbarViewItemsPreferenceKey.self) { items in
             context.coordinator.items = items.map({ $0.toNSToolbarItem() })
         }
         
@@ -128,6 +127,9 @@ public struct ToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
 
 #elseif os(iOS)
 
-public typealias ToolbarView<Content: View> = PassthroughView<Content>
+import Swift
+import SwiftUI
+
+public typealias OldToolbarView<Content: View> = PassthroughView<Content>
 
 #endif

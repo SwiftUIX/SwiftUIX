@@ -27,6 +27,18 @@ public struct VibrancyEffectView<Content: View>: View {
         VisualEffectView(effect: UIVibrancyEffect(blurEffect: UIBlurEffect(style: blurStyle), style: vibrancyStyle)) {
             content
         }
+        .accessibility(hidden: Content.self == EmptyView.self)
+    }
+}
+
+extension VibrancyEffectView where Content == EmptyView {
+    public init(
+        blurStyle: UIBlurEffect.Style,
+        vibrancyStyle: UIVibrancyEffectStyle
+    ) {
+        self.init(blurStyle: blurStyle, vibrancyStyle: vibrancyStyle) {
+            EmptyView()
+        }
     }
 }
 

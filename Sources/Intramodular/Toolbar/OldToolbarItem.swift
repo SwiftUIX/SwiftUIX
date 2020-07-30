@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(<5.3) && (os(iOS) || os(macOS) || targetEnvironment(macCatalyst))
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 #if targetEnvironment(macCatalyst)
 import AppKit
@@ -17,7 +17,7 @@ import UIKit
 #endif
 
 /// A toolbar item.
-public struct ToolbarItem {
+public struct OldToolbarItem {
     public enum Content {
         #if os(iOS) || targetEnvironment(macCatalyst)
         case systemSymbol(SanFranciscoSymbolName)
@@ -60,7 +60,7 @@ public struct ToolbarItem {
     #endif
 }
 
-extension ToolbarItem {
+extension OldToolbarItem {
     static var targetAssociationKey: Void = ()
     
     #if os(macOS) || targetEnvironment(macCatalyst)
@@ -98,7 +98,7 @@ extension ToolbarItem {
                 break
         }
         
-        objc_setAssociatedObject(result, &ToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(result, &OldToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
         
         result.action = #selector(NSToolbarItem._ActionTarget.performAction)
         result.isEnabled = true
@@ -120,7 +120,7 @@ extension ToolbarItem {
 
 // MARK: - Protocol Implementations -
 
-extension ToolbarItem: Equatable {
+extension OldToolbarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.itemIdentifier == rhs.itemIdentifier
     }
@@ -128,8 +128,8 @@ extension ToolbarItem: Equatable {
 
 // MARK: - API -
 
-extension ToolbarItem {
-    public func content(_ content: Content) -> ToolbarItem {
+extension OldToolbarItem {
+    public func content(_ content: Content) -> Self {
         var result = self
         
         result.content = content
@@ -137,7 +137,7 @@ extension ToolbarItem {
         return result
     }
     
-    public func action(_ action: @escaping () -> ()) -> ToolbarItem {
+    public func action(_ action: @escaping () -> ()) -> Self {
         var result = self
         
         result.action = action
@@ -145,7 +145,7 @@ extension ToolbarItem {
         return result
     }
     
-    public func label(_ label: String) -> ToolbarItem {
+    public func label(_ label: String) -> Self {
         var result = self
         
         result.label = label
@@ -153,7 +153,7 @@ extension ToolbarItem {
         return result
     }
     
-    public func title(_ title: String) -> ToolbarItem {
+    public func title(_ title: String) -> Self {
         var result = self
         
         result.title = title
@@ -161,7 +161,7 @@ extension ToolbarItem {
         return result
     }
     
-    public func bordered(_ isBordered: Bool) -> ToolbarItem {
+    public func bordered(_ isBordered: Bool) -> Self {
         var result = self
         
         result.isBordered = isBordered
@@ -172,20 +172,20 @@ extension ToolbarItem {
 
 extension View {
     #if os(macOS)
-    public func toolbarItem(withIdentifier identifier: String) -> ToolbarItem {
+    public func toolbarItem(withIdentifier identifier: String) -> OldToolbarItem {
         .init(itemIdentifier: identifier, content: .view(.init(self)))
     }
     #endif
     
-    public func toolbarItems(_ toolbarItems: ToolbarItem...) -> some View {
-        preference(key: ToolbarViewItemsPreferenceKey.self, value: toolbarItems)
+    public func toolbarItems(_ toolbarItems: OldToolbarItem...) -> some View {
+        preference(key: OldToolbarViewItemsPreferenceKey.self, value: toolbarItems)
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-public struct ToolbarViewItemsPreferenceKey: PreferenceKey {
-    public typealias Value = [ToolbarItem]
+public struct OldToolbarViewItemsPreferenceKey: PreferenceKey {
+    public typealias Value = [OldToolbarItem]
     
     public static var defaultValue: Value {
         []

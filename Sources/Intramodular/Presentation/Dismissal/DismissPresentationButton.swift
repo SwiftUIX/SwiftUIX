@@ -6,13 +6,13 @@ import Swift
 import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
-public struct DismissPresentationButton<Label: View>: View {
+public struct DismissPresentationButton<Label: View>: ActionLabelView {
+    private let action: Action
     private let label: Label
-    private let action: (() -> ())?
     
     @Environment(\.presentationManager) private var presentationManager
     
-    public init(action: (() -> ())? = nil, label: () -> Label) {
+    public init(action: Action, label: () -> Label) {
         self.action = action
         self.label = label()
     }
@@ -22,19 +22,16 @@ public struct DismissPresentationButton<Label: View>: View {
     }
     
     public func dismiss() {
-        action?()
+        action.perform()
         presentationManager.dismiss()
     }
 }
 
-#if !os(macOS)
-
 extension DismissPresentationButton where Label == Image {
-    public init(action: (() -> ())? = nil) {
+    @available(OSX 11.0, *)
+    public init(action: @escaping () -> Void = { }) {
         self.init(action: action) {
             Image(systemName: .xmarkCircleFill)
         }
     }
 }
-
-#endif

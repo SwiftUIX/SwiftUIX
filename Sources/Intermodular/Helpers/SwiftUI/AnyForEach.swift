@@ -27,7 +27,7 @@ extension ForEach where Content: View, Data == AnyForEachData, ID == AnyHashable
             content(collection[element.index].value as! Data.Element)
         }
     }
-
+    
     public init<Data: RandomAccessCollection, ID: Hashable>(
         _ data: ForEach<Data, ID, Content>
     ) where Data.Element: Identifiable {

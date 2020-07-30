@@ -6,8 +6,6 @@ import Combine
 import Swift
 import SwiftUI
 
-#if !os(tvOS)
-
 public struct DismissPresentationUnderlay<Content: View>: View {
     @Environment(\.presentationManager) var presentationManager
     
@@ -18,15 +16,19 @@ public struct DismissPresentationUnderlay<Content: View>: View {
     }
     
     public var body: some View {
-        GeometryReader { proxy in
+        #if !os(tvOS)
+        return GeometryReader { proxy in
             self.content
         }
         .background(
-            ClearFillView().onTapGesture {
+            Color.almostClear.onTapGesture {
                 self.presentationManager.dismiss()
             }
         )
+        #else
+        return GeometryReader { proxy in
+            self.content
+        }
+        #endif
     }
 }
-
-#endif

@@ -24,6 +24,7 @@ public struct ListSeparatorStyleNoneModifier: ViewModifier {
 }
 
 extension View {
+    @available(iOS, introduced: 13.4, deprecated: 14.0, message: "This no longer works on iOS 14.")
     @inlinable
     public func listSeparatorStyleNone() -> some View {
         modifier(ListSeparatorStyleNoneModifier())

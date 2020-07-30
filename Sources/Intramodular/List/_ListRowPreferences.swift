@@ -6,11 +6,10 @@ import Swift
 import SwiftUI
 
 /// An internal structure used to manage cell preferences for `CocoaList` and `CollectionView`.
+@usableFromInline
 struct _ListRowPreferences: Equatable {
     var estimatedCellSize: CGSize? = nil
-    
     var isHighlightable = true
-    
     var onSelect: Action?
     var onDeselect: Action?
 }

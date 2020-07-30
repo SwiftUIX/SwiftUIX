@@ -15,7 +15,7 @@ public struct TimerState: DynamicProperty {
     @State var timerConnection: Cancellable?
     @State var timerSubscription: AnyCancellable? = nil
     
-    private var updateWrappedValue = MutableHeapWrapper<() -> Void>({ })
+    private var updateWrappedValue = ReferenceBox<() -> Void>({ })
     
     @State public private(set) var wrappedValue: Int = 0
     

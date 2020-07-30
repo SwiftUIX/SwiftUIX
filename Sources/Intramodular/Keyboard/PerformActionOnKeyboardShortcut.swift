@@ -35,7 +35,10 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     }
 }
 
+// MARK: - API -
+
 extension View {
+    /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
     @available(watchOS, unavailable)
     @inlinable
@@ -46,6 +49,7 @@ extension View {
         modifier(PerformActionOnKeyboardShortcut(shortcut: shortcut, action: action))
     }
     
+    /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
     @available(watchOS, unavailable)
     @inlinable

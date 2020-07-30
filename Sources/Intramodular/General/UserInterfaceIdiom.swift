@@ -34,7 +34,7 @@ public enum UserInterfaceIdiom: Hashable {
             #endif
             case .unspecified:
                 return .unspecified
-            
+                
             @unknown default:
                 return .unspecified
         }

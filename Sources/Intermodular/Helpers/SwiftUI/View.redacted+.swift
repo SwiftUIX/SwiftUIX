@@ -4,10 +4,10 @@
 
 #if swift(>=5.3)
 
+import Swift
 import SwiftUI
 
 extension View {
-    
     @inlinable
     @ViewBuilder
     public func redactedIfAvailable(reason: RedactionReasons, fallbackBlurRadius: CGFloat? = 16) -> some View {
@@ -27,7 +27,6 @@ extension View {
             self
         }
     }
-    
 }
 
 #endif

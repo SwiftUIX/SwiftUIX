@@ -21,10 +21,14 @@ public struct DraggabilityViewModifier: ViewModifier {
     
     @inlinable
     public func body(content: Content) -> some View {
-        content.gesture(DragGesture(minimumDistance: minimumDistance).onChanged { value in
-            self.offset.x += value.location.x - value.startLocation.x
-            self.offset.y += value.location.y - value.startLocation.y
-        }).offset(x: offset.x, y: offset.y)
+        content
+            .gesture(
+                DragGesture(minimumDistance: minimumDistance).onChanged { value in
+                    self.offset.x += value.location.x - value.startLocation.x
+                    self.offset.y += value.location.y - value.startLocation.y
+                }
+            )
+            .offset(x: offset.x, y: offset.y)
     }
 }
 

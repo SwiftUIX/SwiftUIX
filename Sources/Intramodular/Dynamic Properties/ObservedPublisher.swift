@@ -13,7 +13,7 @@ public struct ObservedPublisher<P: Publisher>: DynamicProperty where P.Failure =
     
     @State var subscription: AnyCancellable? = nil
     
-    private var updateWrappedValue = MutableHeapWrapper<(P.Output) -> Void>({ _ in })
+    private var updateWrappedValue = ReferenceBox<(P.Output) -> Void>({ _ in })
     
     @State public private(set) var wrappedValue: P.Output
     

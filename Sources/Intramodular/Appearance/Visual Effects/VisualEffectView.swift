@@ -32,4 +32,3 @@ public struct VisualEffectView<Content: View>: UIViewRepresentable {
 }
 
 #endif
-

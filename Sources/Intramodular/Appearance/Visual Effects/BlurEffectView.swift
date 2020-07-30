@@ -21,6 +21,15 @@ public struct BlurEffectView<Content: View>: View {
         VisualEffectView(effect: UIBlurEffect(style: style)) {
             content
         }
+        .accessibility(hidden: Content.self == EmptyView.self)
+    }
+}
+
+extension BlurEffectView where Content == EmptyView {
+    public init(style: UIBlurEffect.Style) {
+        self.init(style: style) {
+            EmptyView()
+        }
     }
 }
 
