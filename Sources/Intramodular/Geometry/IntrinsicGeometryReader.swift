@@ -6,33 +6,35 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A proxy for access to the size and coordinate space (for anchor resolution) of the content view.
 public struct IntrinsicGeometryProxy {
-    public let frame: CGRect?
+    private let localFrame: CGRect?
     
-    public var size: CGSize {
-        frame?.size ?? .zero
+    public init(_ geometry: GeometryProxy?) {
+        localFrame = geometry?.frame(in: .local)
     }
     
-    public var estimatedFrame: CGRect {
-        frame ?? .zero
+    public var size: CGSize {
+        localFrame?.size ?? .zero
     }
 }
 
 /// A container view that recursively defines its content as a function of the content's size and coordinate space.
 public struct IntrinsicGeometryReader<Content: View>: View {
-    private let content: (IntrinsicGeometryProxy) -> Content
+    @usableFromInline
+    let content: (IntrinsicGeometryProxy) -> Content
     
     public init(@ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content) {
         self.content = content
     }
     
-    @DelayedState var frame: CGRect?
+    @DelayedState var proxy = IntrinsicGeometryProxy(nil)
     
     public var body: some View {
-        self.content(.init(frame: self.frame)).background(
+        content(proxy).background(
             GeometryReader { geometry in
-                ZeroSizeView().then { _ in
-                    self.frame = geometry.frame(in: .local)
+                PeformAction {
+                    self.proxy = .init(geometry)
                 }
             }
         )

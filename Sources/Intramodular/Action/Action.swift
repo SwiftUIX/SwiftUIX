@@ -70,7 +70,7 @@ public struct PeformAction: ActionInitiable, PerformActionView {
             self.action.perform()
         }
         
-        return AnyView(EmptyView())
+        return ZeroSizeView()
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {
