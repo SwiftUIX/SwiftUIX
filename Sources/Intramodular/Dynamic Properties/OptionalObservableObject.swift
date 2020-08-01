@@ -43,14 +43,17 @@ private final class OptionalObservableObject<ObjectType: ObservableObject>: Obse
     private var baseSubscription: AnyCancellable?
     
     fileprivate(set) var base: ObjectType? {
-        didSet {
-            baseSubscription = base?.objectWillChange.sink(receiveValue: { [unowned self] _ in
-                self.objectWillChange.send()
-            })
-        }
+        didSet { subscribe() }
     }
     
     init(base: ObjectType?) {
         self.base = base
+        subscribe()
+    }
+    
+    private func subscribe() {
+        baseSubscription = base?.objectWillChange.sink(receiveValue: { [unowned self] _ in
+            self.objectWillChange.send()
+        })
     }
 }
