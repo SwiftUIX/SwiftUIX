@@ -8,12 +8,12 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: CocoaHostingControllerTransitioningDelegate<Content> {
+class UIHostingAlignTransitioningDelegate<Background: View, Content: View>: UIHostingControllerTransitioningDelegate<Content> {
     let background: Background
     let source: Alignment
     let destination: Alignment
     
-    let dismissalInteractionController = CocoaAlignModalTransition()
+    let dismissalInteractionController = UIHostingAlignModalTransition()
     
     init(
         background: Background,
@@ -31,7 +31,7 @@ class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: C
         presenting: UIViewController,
         source: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        CocoaAlignHostingTransitionAnimator(
+        UIHostingAlignTransitionAnimator(
             source: self.source,
             destination: self.destination,
             isPresenting: true
@@ -41,7 +41,7 @@ class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: C
     override func animationController(
         forDismissed dismissed: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        CocoaAlignHostingTransitionAnimator(
+        UIHostingAlignTransitionAnimator(
             source: self.source,
             destination: self.destination,
             isPresenting: false
@@ -57,7 +57,7 @@ class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: C
         presenting: UIViewController?,
         source: UIViewController
     ) -> UIPresentationController? {
-        CocoaAlignHostingPresentationController<Background, Content>(
+        UIHostingAlignPresentationController<Background, Content>(
             presented: presented,
             presenting: presenting,
             background: background,
@@ -70,13 +70,13 @@ class CocoaAlignHostingTransitioningDelegate<Background: View, Content: View>: C
 
 // MARK: - Helpers -
 
-extension ModalViewPresentationStyle {
+extension ModalPresentationStyle {
     public static func align(
         source: Alignment = .bottom,
         destination: Alignment
     ) -> Self {
         .custom(
-            CocoaAlignHostingTransitioningDelegate(
+            UIHostingAlignTransitioningDelegate(
                 background: DefaultPresentationBackdrop(),
                 source: source,
                 destination: destination,

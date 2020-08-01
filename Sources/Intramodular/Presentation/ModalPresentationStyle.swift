@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A view's modal presentation style.
-public enum ModalViewPresentationStyle: Equatable {
+public enum ModalPresentationStyle: Equatable {
     case fullScreen
     
     #if os(iOS) || targetEnvironment(macCatalyst)
@@ -37,7 +37,7 @@ public enum ModalViewPresentationStyle: Equatable {
     case custom(UIViewControllerTransitioningDelegate)
     #endif
     
-    private var _automatic: ModalViewPresentationStyle {
+    private var _automatic: ModalPresentationStyle {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return .page
         #else
@@ -45,7 +45,7 @@ public enum ModalViewPresentationStyle: Equatable {
         #endif
     }
     
-    public static func == (lhs: ModalViewPresentationStyle, rhs: ModalViewPresentationStyle) -> Bool {
+    public static func == (lhs: ModalPresentationStyle, rhs: ModalPresentationStyle) -> Bool {
         switch (lhs, rhs) {
             case (.fullScreen, .fullScreen):
                 return true
@@ -90,34 +90,34 @@ public enum ModalViewPresentationStyle: Equatable {
 // MARK: - API -
 
 extension View {
-    public func modalPresentationStyle(_ style: ModalViewPresentationStyle) -> some View {
+    public func modalPresentationStyle(_ style: ModalPresentationStyle) -> some View {
         environment(\.modalPresentationStyle, style)
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-extension ModalViewPresentationStyle {
+extension ModalPresentationStyle {
     @usableFromInline
     struct EnvironmentKey: SwiftUI.EnvironmentKey {
         @usableFromInline
-        static let defaultValue: ModalViewPresentationStyle = .automatic
+        static let defaultValue: ModalPresentationStyle = .automatic
     }
 }
 
 extension EnvironmentValues {
-    public var modalPresentationStyle: ModalViewPresentationStyle {
+    public var modalPresentationStyle: ModalPresentationStyle {
         get {
-            self[ModalViewPresentationStyle.EnvironmentKey]
+            self[ModalPresentationStyle.EnvironmentKey]
         } set {
-            self[ModalViewPresentationStyle.EnvironmentKey] = newValue
+            self[ModalPresentationStyle.EnvironmentKey] = newValue
         }
     }
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-extension ModalViewPresentationStyle {
+extension ModalPresentationStyle {
     public var transitioningDelegate: UIViewControllerTransitioningDelegate? {
         if case let .custom(delegate) = self {
             return delegate
@@ -128,7 +128,7 @@ extension ModalViewPresentationStyle {
 }
 
 extension UIModalPresentationStyle {
-    public init(_ style: ModalViewPresentationStyle) {
+    public init(_ style: ModalPresentationStyle) {
         switch style {
             case .fullScreen:
                 self = .fullScreen
@@ -163,7 +163,7 @@ extension UIModalPresentationStyle {
 }
 
 extension UIViewController {
-    public var modalViewPresentationStyle: ModalViewPresentationStyle {
+    public var modalViewPresentationStyle: ModalPresentationStyle {
         switch modalPresentationStyle {
             case .fullScreen:
                 return .fullScreen

@@ -45,8 +45,8 @@ All documentation is available via the [repository wiki](https://github.com/Swif
 | `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                         |
 | `UITableView`                           | `List`       | `CocoaList`                                   |
 | `UITextField`                           | `TextField`  | `CocoaTextField`                              |
-| `UIModalPresentationStyle`              | -            | `ModalViewPresentationStyle`                  |
-| `UIViewControllerTransitioningDelegate` | -            | `CocoaHostingControllerTransitioningDelegate` |
+| `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                  |
+| `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
 | `UIWindow`                              | -            | `WindowOverlay`                               |
 

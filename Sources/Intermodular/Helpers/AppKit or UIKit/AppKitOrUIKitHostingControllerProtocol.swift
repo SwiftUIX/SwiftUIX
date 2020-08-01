@@ -5,15 +5,9 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol AppKitOrUIKitHostingControllerProtocol: UIViewController {
-    func sizeThatFits(in _: CGSize) -> CGSize
-}
-
-#elseif os(macOS)
-
-public protocol AppKitOrUIKitHostingControllerProtocol: NSViewController {
+public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {
     func sizeThatFits(in _: CGSize) -> CGSize
 }
 

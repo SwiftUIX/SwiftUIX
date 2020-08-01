@@ -8,7 +8,7 @@ import SwiftUI
 public protocol opaque_ModalPresentationView: opaque_View {
     var preferredSourceViewName: ViewName? { get }
     var presentationEnvironmentBuilder: EnvironmentBuilder? { get }
-    var presentationStyle: ModalViewPresentationStyle { get }
+    var presentationStyle: ModalPresentationStyle { get }
     var isModalPresentationAnimated: Bool { get }
     var isModalDismissable: Bool { get }
     
@@ -25,7 +25,7 @@ public protocol ModalPresentationView: opaque_ModalPresentationView, View {
     var presentationEnvironmentBuilder: EnvironmentBuilder? { get }
     
     /// The presentation style for the modal presentation.
-    var presentationStyle: ModalViewPresentationStyle { get }
+    var presentationStyle: ModalPresentationStyle { get }
     
     /// Whether the modal presentation is animated or not.
     var isModalPresentationAnimated: Bool { get }
@@ -48,7 +48,7 @@ extension ModalPresentationView {
         presentationEnvironmentBuilder
     }
     
-    public var presentationStyle: ModalViewPresentationStyle {
+    public var presentationStyle: ModalPresentationStyle {
         .automatic
     }
     

@@ -9,7 +9,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaAlignHostingTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+class UIHostingAlignTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let source: Alignment
     let destination: Alignment
     let isPresenting: Bool

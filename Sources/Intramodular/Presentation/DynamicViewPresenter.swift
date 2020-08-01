@@ -47,7 +47,7 @@ extension DynamicViewPresenter {
         _ view: V,
         named name: ViewName? = nil,
         onDismiss: (() -> Void)? = nil,
-        presentationStyle: ModalViewPresentationStyle? = nil,
+        presentationStyle: ModalPresentationStyle? = nil,
         completion: @escaping () -> Void = { }
     ) {
         present(
@@ -66,7 +66,7 @@ extension DynamicViewPresenter {
         _ view: V,
         named name: ViewName? = nil,
         onDismiss: (() -> Void)? = nil,
-        presentationStyle: ModalViewPresentationStyle? = nil,
+        presentationStyle: ModalPresentationStyle? = nil,
         completion: @escaping () -> () = { }
     ) {
         topmostPresenter.present(
@@ -79,7 +79,7 @@ extension DynamicViewPresenter {
     }
     
     public func presentOnTop<V: View>(
-        presentationStyle: ModalViewPresentationStyle? = nil,
+        presentationStyle: ModalPresentationStyle? = nil,
         @ViewBuilder content: @escaping () -> V
     ) {
         topmostPresenter.present(

@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaAlignModalTransition: UIPercentDrivenInteractiveTransition {
+class UIHostingAlignModalTransition: UIPercentDrivenInteractiveTransition {
     override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         super.wantsInteractiveStart = false
         

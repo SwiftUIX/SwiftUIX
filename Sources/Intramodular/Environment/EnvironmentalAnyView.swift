@@ -16,7 +16,7 @@ public struct EnvironmentalAnyView: View {
     private var _onPresentImpl: (() -> Void)?
     private var _onDismissImpl: (() -> Void)?
     
-    private var _modalPresentationStyle: ModalViewPresentationStyle?
+    private var _modalPresentationStyle: ModalPresentationStyle?
     private var _isModalPresentationAnimated: Bool?
     private var _isModalDismissableImpl: (() -> Bool)?
     
@@ -53,7 +53,7 @@ extension EnvironmentalAnyView: ModalPresentationView {
         (base as? opaque_ModalPresentationView)?.presentationEnvironmentBuilder
     }
     
-    public var presentationStyle: ModalViewPresentationStyle {
+    public var presentationStyle: ModalPresentationStyle {
         _modalPresentationStyle ?? (base as? opaque_ModalPresentationView)?.presentationStyle ?? .automatic
     }
     
@@ -111,7 +111,7 @@ extension EnvironmentalAnyView {
 }
 
 extension EnvironmentalAnyView {
-    public func modalPresentationStyle(_ style: ModalViewPresentationStyle) -> Self {
+    public func modalPresentationStyle(_ style: ModalPresentationStyle) -> Self {
         then({ $0._modalPresentationStyle = style })
     }
     

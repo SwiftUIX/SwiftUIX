@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaHostingControllerTransitioningDelegate<Content: View>: NSObject, UIViewControllerTransitioningDelegate {    
+class UIHostingControllerTransitioningDelegate<Content: View>: NSObject, UIViewControllerTransitioningDelegate {    
     func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,

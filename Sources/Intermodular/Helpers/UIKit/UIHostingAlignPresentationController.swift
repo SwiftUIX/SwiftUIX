@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-class CocoaAlignHostingPresentationController<Background: View, Content: View>: UIPresentationController {
+class UIHostingAlignPresentationController<Background: View, Content: View>: UIPresentationController {
     struct BackgroundContainer: View {
         let content: Background
         
@@ -44,7 +44,7 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         }
     }
     
-    var dismissalInteractionController: CocoaAlignModalTransition
+    var dismissalInteractionController: UIHostingAlignModalTransition
     
     var _presentedViewController: AppKitOrUIKitHostingControllerProtocol {
         presentedViewController as! AppKitOrUIKitHostingControllerProtocol
@@ -67,7 +67,7 @@ class CocoaAlignHostingPresentationController<Background: View, Content: View>: 
         background: Background,
         source: Alignment,
         destination: Alignment,
-        dismissalInteractionController: CocoaAlignModalTransition
+        dismissalInteractionController: UIHostingAlignModalTransition
     ) {
         self.background = background
         self.source = source

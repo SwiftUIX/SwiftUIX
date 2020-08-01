@@ -25,7 +25,7 @@ public struct AnyModalPresentation: Identifiable {
         id: UUID = UUID(),
         content: V,
         contentName: ViewName? = nil,
-        presentationStyle: ModalViewPresentationStyle? = nil,
+        presentationStyle: ModalPresentationStyle? = nil,
         isModalDismissable: (() -> Bool)? = nil,
         onPresent: (() -> Void)? = nil,
         onDismiss: (() -> Void)? = nil,
