@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(>=5.3) && (os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst))
+#if swift(>=5.3) && os(macOS)
 
 import Swift
 import SwiftUI

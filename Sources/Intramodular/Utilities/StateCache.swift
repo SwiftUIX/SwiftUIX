@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol ViewCache {
+public protocol StateCache {
     func cache<T>(_ value: T, forKey key: AnyHashable) throws
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T?
     
@@ -16,7 +16,7 @@ public protocol ViewCache {
 // MARK: - Default Implementation -
 
 @usableFromInline
-final class InMemoryCache: ViewCache {
+final class InMemoryCache: StateCache {
     enum Error: Swift.Error {
         case typeMismatch
     }
@@ -55,24 +55,24 @@ final class InMemoryCache: ViewCache {
 // MARK: - Auxiliary Implementation -
 
 @usableFromInline
-struct ViewCacheEnvironmentKey: EnvironmentKey {
+struct StateCacheEnvironmentKey: EnvironmentKey {
     @usableFromInline
-    static let defaultValue: ViewCache = InMemoryCache()
+    static let defaultValue: StateCache = InMemoryCache()
 }
 
 extension EnvironmentValues {
     @inlinable
-    public var cache: ViewCache {
+    public var cache: StateCache {
         get {
-            self[ViewCacheEnvironmentKey.self]
+            self[StateCacheEnvironmentKey.self]
         } set {
-            self[ViewCacheEnvironmentKey.self] = newValue
+            self[StateCacheEnvironmentKey.self] = newValue
         }
     }
 }
 
 @propertyWrapper
-public struct UniqueCache: DynamicProperty, ViewCache {
+public struct UniqueCache: DynamicProperty, StateCache {
     private struct CacheKey: Hashable {
         let base: AnyHashable
         let parentID: AnyHashable
@@ -80,9 +80,9 @@ public struct UniqueCache: DynamicProperty, ViewCache {
     
     @State private var id: AnyHashable
     
-    @Environment(\.cache) private var cache: ViewCache
+    @Environment(\.cache) private var cache: StateCache
     
-    public var wrappedValue: ViewCache {
+    public var wrappedValue: StateCache {
         self
     }
     
