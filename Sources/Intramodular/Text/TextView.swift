@@ -114,7 +114,8 @@ extension _TextView: UIViewRepresentable {
         
         uiView.backgroundColor = nil
         
-        // As default font of UITextView is smaller than SwiftUI. `.preferredFont(forTextStyle: .body)` is required when environment's font is nil. 
+        // `UITextView`'s default font is smaller than SwiftUI's default font.
+        // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
         uiView.font = context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         #if !os(tvOS)
         uiView.isEditable = context.environment.isEnabled
