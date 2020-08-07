@@ -8,12 +8,118 @@ import SwiftUI
 #if canImport(UIKit)
 
 extension Font.TextStyle {
-    public func toUIFontTextStyle() -> UIFont.TextStyle? {
+    public var defaultMetrics: (weight: Font.Weight, size: CGFloat, leading: CGFloat) {
+        #if swift(>=5.3)
         switch self {
-            #if os(iOS) || os(macOS)
+            case .largeTitle:
+                return (.regular, 34, 41)
+            case .title:
+                return (.regular, 28, 34)
+            case .headline:
+                return (.semibold, 17, 22)
+            case .subheadline:
+                return (.regular, 15, 20)
+            case .body:
+                return (.regular, 17, 22)
+            case .callout:
+                return (.regular, 16, 21)
+            case .footnote:
+                return (.regular, 13, 18)
+            case .caption:
+                return (.regular, 12, 16)
+                
+            default: do {
+                if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+                    switch self {
+                        case .title2:
+                            return (.regular, 22, 28)
+                        case .title3:
+                            return (.regular, 20, 25)
+                        case .caption2:
+                            return (.regular, 11, 13)
+                        default: do {
+                            assertionFailure()
+                            
+                            return Self.body.defaultMetrics
+                        }
+                    }
+                } else {
+                    assertionFailure()
+                    
+                    return Self.body.defaultMetrics
+                }
+            }
+        }
+        #else
+        switch self {
+            case .largeTitle:
+                return (.regular, 34, 41)
+            case .title:
+                return (.regular, 28, 34)
+            case .headline:
+                return (.semibold, 17, 22)
+            case .subheadline:
+                return (.regular, 15, 20)
+            case .body:
+                return (.regular, 17, 22)
+            case .callout:
+                return (.regular, 16, 21)
+            case .footnote:
+                return (.regular, 13, 18)
+            case .caption:
+                return (.regular, 12, 16)
+        }
+        #endif
+    }
+}
+
+extension Font.TextStyle {
+    public func toUIFontTextStyle() -> UIFont.TextStyle? {
+        #if swift(>=5.3)
+        switch self {
             case .largeTitle:
                 return .largeTitle
-            #endif
+            case .title:
+                return .title1
+            case .headline:
+                return .headline
+            case .subheadline:
+                return .subheadline
+            case .body:
+                return .body
+            case .callout:
+                return .callout
+            case .footnote:
+                return .footnote
+            case .caption:
+                return .caption1
+                
+            default: do {
+                if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+                    switch self {
+                        case .title2:
+                            return .title2
+                        case .title3:
+                            return .title3
+                        case .caption2:
+                            return .caption2
+                        default: do {
+                            assertionFailure()
+                            
+                            return .body
+                        }
+                    }
+                } else {
+                    assertionFailure()
+                    
+                    return .body
+                }
+            }
+        }
+        #else
+        switch self {
+            case .largeTitle:
+                return .largeTitle
             case .title:
                 return .title1
             case .headline:
@@ -29,6 +135,7 @@ extension Font.TextStyle {
             default:
                 return nil
         }
+        #endif
     }
 }
 

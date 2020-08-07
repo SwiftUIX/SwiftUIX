@@ -5,6 +5,10 @@
 import Swift
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 extension Font {
     public func getTextStyle() -> TextStyle? {
         switch self {
@@ -28,11 +32,8 @@ extension Font {
                 return nil
         }
     }
-}
-
-#if canImport(UIKit)
-
-extension Font {
+    
+    #if canImport(UIKit)
     public func toUIFont() -> UIFont? {
         guard let textStyle = getTextStyle()?.toUIFontTextStyle() else {
             return nil
@@ -40,6 +41,34 @@ extension Font {
         
         return .preferredFont(forTextStyle: textStyle)
     }
+    #endif
 }
 
-#endif
+extension Font {
+    #if canImport(UIKit)
+    public static func custom(
+        _ name: String,
+        relativeTo textStyle: Font.TextStyle
+    ) -> Font {
+        func _default() -> Font {
+            guard let font = UIFont(name: name, size: textStyle.defaultMetrics.size) else {
+                return .body
+            }
+            
+            let fontMetrics = UIFontMetrics(forTextStyle: textStyle.toUIFontTextStyle() ?? .body)
+            
+            return Font(fontMetrics.scaledFont(for: font))
+        }
+        
+        #if swift(>=5.3)
+        if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+            return Font.custom(name, size: textStyle.defaultMetrics.size, relativeTo: textStyle)
+        } else {
+            return _default()
+        }
+        #else
+        return _default()
+        #endif
+    }
+    #endif
+}
