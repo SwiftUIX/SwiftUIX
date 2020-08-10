@@ -16,7 +16,7 @@ public protocol StateCache {
 // MARK: - Default Implementation -
 
 @usableFromInline
-final class InMemoryCache: StateCache {
+final class InMemoryStateCache: StateCache {
     enum Error: Swift.Error {
         case typeMismatch
     }
@@ -57,7 +57,7 @@ final class InMemoryCache: StateCache {
 @usableFromInline
 struct StateCacheEnvironmentKey: EnvironmentKey {
     @usableFromInline
-    static let defaultValue: StateCache = InMemoryCache()
+    static let defaultValue: StateCache = InMemoryStateCache()
 }
 
 extension EnvironmentValues {
@@ -72,7 +72,7 @@ extension EnvironmentValues {
 }
 
 @propertyWrapper
-public struct UniqueCache: DynamicProperty, StateCache {
+public struct _UniqueStateCache: DynamicProperty, StateCache {
     private struct CacheKey: Hashable {
         let base: AnyHashable
         let parentID: AnyHashable
@@ -113,4 +113,8 @@ public struct UniqueCache: DynamicProperty, StateCache {
     public func removeAllCachedValues() {
         cache.removeAllCachedValues()
     }
+}
+
+extension View {
+    public typealias UniqueCache = _UniqueStateCache
 }

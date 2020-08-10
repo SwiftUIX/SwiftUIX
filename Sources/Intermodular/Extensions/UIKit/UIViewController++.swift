@@ -8,6 +8,18 @@ import Swift
 import UIKit
 
 extension UIViewController {
+    open var root: UIViewController? {
+        var parent = self.parent
+        
+        while let _parent = parent?.parent {
+            parent = _parent
+        }
+        
+        return parent
+    }
+}
+
+extension UIViewController {
     open var topmostNavigationController: UINavigationController? {
         topmostViewController?.nearestNavigationController ?? nearestNavigationController
     }

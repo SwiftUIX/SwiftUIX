@@ -98,6 +98,7 @@ extension Color {
 
 /// Foreground colors for static text and related elements.
 extension Color {
+    /// The color for text labels that contain primary content.
     public static var label: Color {
         #if os(macOS)
         return .init(.labelColor)
@@ -106,6 +107,7 @@ extension Color {
         #endif
     }
     
+    /// The color for text labels that contain secondary content.
     public static var secondaryLabel: Color {
         #if os(macOS)
         return .init(.secondaryLabelColor)
@@ -114,6 +116,7 @@ extension Color {
         #endif
     }
     
+    /// The color for text labels that contain tertiary content.
     public static var tertiaryLabel: Color {
         #if os(macOS)
         return .init(.tertiaryLabelColor)
@@ -122,6 +125,7 @@ extension Color {
         #endif
     }
     
+    /// The color for text labels that contain quaternary content.
     public static var quaternaryLabel: Color {
         #if os(macOS)
         return .init(.quaternaryLabelColor)
@@ -157,26 +161,32 @@ extension Color {
 #if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
+    /// The color for the main background of your interface.
     public static var systemBackground: Color {
         return .init(.systemBackground)
     }
     
+    /// The color for content layered on top of the main background.
     public static var secondarySystemBackground: Color {
         return .init(.secondarySystemBackground)
     }
     
+    /// The color for content layered on top of secondary backgrounds.
     public static var tertiarySystemBackground: Color {
         return .init(.tertiarySystemBackground)
     }
     
+    /// The color for the main background of your grouped interface.
     public static var systemGroupedBackground: Color {
         return .init(.systemGroupedBackground)
     }
     
+    /// The color for content layered on top of the main background of your grouped interface.
     public static var secondarySystemGroupedBackground: Color {
         return .init(.secondarySystemGroupedBackground)
     }
     
+    /// The color for content layered on top of secondary backgrounds of your grouped interface.
     public static var tertiarySystemGroupedBackground: Color {
         return .init(.tertiarySystemGroupedBackground)
     }

@@ -68,6 +68,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
 }
 
+// MARK: - API -
+
 extension PresentationLink {
     public init(
         destination: Destination,
@@ -89,6 +91,27 @@ extension PresentationLink {
         self.onDismiss = nil
         self._isPresented = isPresented
         self.label = label()
+    }
+}
+
+extension View {
+    /// Adds a destination to present when this view is pressed.
+    public func onPress<Destination: View>(present destination: Destination) -> some View {
+        PresentationLink(destination: destination, label: { self.contentShape(Rectangle()) })
+            .buttonStyle(PlainButtonStyle())
+    }
+    
+    /// Adds a destination to present when this view is pressed.
+    public func onPress<Destination: View>(
+        present destination: Destination,
+        isPresented: Binding<Bool>
+    ) -> some View {
+        PresentationLink(
+            destination: destination,
+            isPresented: isPresented,
+            label: { self.contentShape(Rectangle()) }
+        )
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
