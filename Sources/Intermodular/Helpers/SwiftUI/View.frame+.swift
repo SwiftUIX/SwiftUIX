@@ -34,25 +34,49 @@ extension View {
     
     @inlinable
     public func relativeSize(
-        width widthRatio: CGFloat,
-        height heightRatio: CGFloat,
+        width widthRatio: CGFloat?,
+        height heightRatio: CGFloat?,
         alignment: Alignment = .center
     ) -> some View {
         GeometryReader { geometry in
             self.frame(
-                width: geometry.size.width * widthRatio,
-                height: geometry.size.height * heightRatio,
+                width: widthRatio.map({ $0 * geometry.size.width }),
+                height: heightRatio.map({ $0 * geometry.size.height }),
                 alignment: alignment
             )
         }
     }
-    
-    /// Causes the view to fill into its superview.
+}
+
+extension View {
+    /// Causes the view to fill into its container.
     @inlinable
     public func fill(alignment: Alignment = .center) -> some View {
-        relativeSize(width: 1.0, height: 1.0)
+        relativeSize(width: 1.0, height: 1.0, alignment: alignment)
+    }
+}
+
+extension View {
+    /// Causes the view to greedily fill into its container.
+    @inlinable
+    public func greedyFrame(alignment: Alignment = .center) -> some View {
+        relativeSize(width: 1, height: 1, alignment: alignment)
     }
     
+    /// Causes the view to greedily fill into its container.
+    @inlinable
+    public func greedyFrame(_ axis: Axis, alignment: Alignment = .center) -> some View {
+        switch axis {
+            case .horizontal:
+                return relativeSize(width: 1.0, height: nil, alignment: alignment)
+            case .vertical:
+                return relativeSize(width: nil, height: 1.0, alignment: alignment)
+        }
+    }
+}
+
+extension View {
+    /// Causes the view to greedily fill into its container.
     @inlinable
     public func fit() -> some View {
         GeometryReader { geometry in
