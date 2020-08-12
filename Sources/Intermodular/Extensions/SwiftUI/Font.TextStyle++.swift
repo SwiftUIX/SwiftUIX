@@ -68,6 +68,8 @@ extension Font.TextStyle {
                 return (.regular, 13, 18)
             case .caption:
                 return (.regular, 12, 16)
+            @unknown default:
+                return Self.body.defaultMetrics
         }
         #endif
     }
