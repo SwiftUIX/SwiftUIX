@@ -60,7 +60,7 @@ extension View {
     /// Causes the view to greedily fill into its container.
     @inlinable
     public func greedyFrame(alignment: Alignment = .center) -> some View {
-        relativeSize(width: 1, height: 1, alignment: alignment)
+        frame(idealWidth: .infinity, maxWidth: .infinity)
     }
     
     /// Causes the view to greedily fill into its container.
@@ -68,9 +68,9 @@ extension View {
     public func greedyFrame(_ axis: Axis, alignment: Alignment = .center) -> some View {
         switch axis {
             case .horizontal:
-                return relativeSize(width: 1.0, height: nil, alignment: alignment)
+                return frame(idealWidth: .infinity, maxWidth: .infinity)
             case .vertical:
-                return relativeSize(width: nil, height: 1.0, alignment: alignment)
+                return frame(idealHeight: .infinity, maxHeight: .infinity)
         }
     }
 }
