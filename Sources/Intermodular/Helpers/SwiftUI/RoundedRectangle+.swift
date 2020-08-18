@@ -29,7 +29,7 @@ extension View {
             )
             .padding(lineWidth / 2)
     }
-
+    
     @inlinable
     public func border<S: ShapeStyle>(
         _ content: S,
@@ -65,9 +65,9 @@ extension View {
                     style: .circular,
                     lineWidth: lineWidth
                 )
-                    .stroke(content, lineWidth: lineWidth)
-        )
-        .padding(lineWidth / 2)
+                .stroke(content, lineWidth: lineWidth)
+            )
+            .padding(lineWidth / 2)
     }
     
     @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:style:) instead.")
@@ -85,9 +85,9 @@ extension View {
                     style: style,
                     lineWidth: lineWidth
                 )
-                    .stroke(content, lineWidth: lineWidth)
-        )
-        .padding(lineWidth / 2)
+                .stroke(content, lineWidth: lineWidth)
+            )
+            .padding(lineWidth / 2)
     }
 }
 
