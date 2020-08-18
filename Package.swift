@@ -18,6 +18,6 @@ let package = Package(
             name: "SwiftUIX",
             dependencies: [],
             path: "Sources"
-        ),
+        )
     ]
 )
