@@ -28,7 +28,6 @@ public final class Keyboard: ObservableObject {
     
     public init(notificationCenter: NotificationCenter = .default) {
         #if os(iOS) || targetEnvironment(macCatalyst)
-        
         self.keyboardWillChangeFrameSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             .compactMap({ Keyboard.State(notification: $0, screen: .main) })
@@ -44,8 +43,8 @@ public final class Keyboard: ObservableObject {
         self.keyboardDidHideSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardDidHideNotification)
             .receive(on: DispatchQueue.main)
-            .sink { [unowned self] _ in self.state = .init() }
-        
+            .map({ _ in .init() })
+            .assign(to: \.state, on: self)
         #endif
     }
     
@@ -84,13 +83,12 @@ extension Keyboard {
         
         init?(notification: Notification, screen: Screen) {
             #if os(iOS) || targetEnvironment(macCatalyst)
-            
             guard
                 let userInfo = notification.userInfo,
                 let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
                 let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
-                else {
-                    return nil
+            else {
+                return nil
             }
             
             self.animationDuration = animationDuration
@@ -108,11 +106,8 @@ extension Keyboard {
                 self.keyboardFrame = nil
                 self.height = nil
             }
-            
             #else
-            
             return nil
-            
             #endif
         }
     }
