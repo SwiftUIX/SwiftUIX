@@ -29,6 +29,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
     
     @Environment(\.font) var font
     
+    @ObservedObject var keyboard = Keyboard.main
+    
     public var body: some View {
         return ZStack(alignment: .topLeading) {
             if placeholder == nil {
