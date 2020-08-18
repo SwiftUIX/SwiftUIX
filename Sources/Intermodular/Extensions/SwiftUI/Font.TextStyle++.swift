@@ -27,7 +27,7 @@ extension Font.TextStyle {
                 return (.regular, 13, 18)
             case .caption:
                 return (.regular, 12, 16)
-            
+                
             default: do {
                 if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
                     switch self {
@@ -79,8 +79,10 @@ extension Font.TextStyle {
     public func toUIFontTextStyle() -> UIFont.TextStyle? {
         #if swift(>=5.3)
         switch self {
+            #if !os(tvOS)
             case .largeTitle:
                 return .largeTitle
+            #endif
             case .title:
                 return .title1
             case .headline:
@@ -95,7 +97,7 @@ extension Font.TextStyle {
                 return .footnote
             case .caption:
                 return .caption1
-            
+                
             default: do {
                 if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
                     switch self {
