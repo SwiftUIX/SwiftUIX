@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol opaque_ModalPresentationView: opaque_View {
+public protocol _opaque_ModalPresentationView: _opaque_View {
     var preferredSourceViewName: ViewName? { get }
     var presentationEnvironmentBuilder: EnvironmentBuilder? { get }
     var presentationStyle: ModalPresentationStyle { get }
@@ -17,7 +17,7 @@ public protocol opaque_ModalPresentationView: opaque_View {
 }
 
 /// A view that is configured for modal presentation.
-public protocol ModalPresentationView: opaque_ModalPresentationView, View {
+public protocol ModalPresentationView: _opaque_ModalPresentationView, View {
     /// The preferred source view for the modal presentation.
     var preferredSourceViewName: ViewName? { get }
     

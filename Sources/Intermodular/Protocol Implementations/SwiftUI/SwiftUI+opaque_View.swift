@@ -5,20 +5,20 @@
 import Swift
 import SwiftUI
 
-extension AnyView: opaque_View {
+extension AnyView: _opaque_View {
     public func eraseToAnyView() -> AnyView {
         return self
     }
 }
 
-extension HStack: opaque_View {
+extension HStack: _opaque_View {
     
 }
 
-extension Text: opaque_View {
+extension Text: _opaque_View {
     
 }
 
-extension VStack: opaque_View {
+extension VStack: _opaque_View {
     
 }

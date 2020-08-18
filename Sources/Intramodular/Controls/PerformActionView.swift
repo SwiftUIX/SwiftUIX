@@ -5,12 +5,12 @@
 import Swift
 import SwiftUI
 
-public protocol opaque_PerformActionView: opaque_View {
+public protocol _opaque_PerformActionView: _opaque_View {
     func transformAction(_: (Action) -> Action) -> Self
 }
 
 /// A view with the primary goal of triggering an action.
-public protocol PerformActionView: opaque_PerformActionView, View {
+public protocol PerformActionView: _opaque_PerformActionView, View {
     func transformAction(_: (Action) -> Action) -> Self
     func addAction(perform _: Action) -> Self
 }
@@ -45,7 +45,7 @@ extension PerformActionView {
 
 // MARK: - Auxiliary Implementation -
 
-extension ModifiedContent: opaque_PerformActionView, PerformActionView where Content: PerformActionView, Modifier: ViewModifier {
+extension ModifiedContent: _opaque_PerformActionView, PerformActionView where Content: PerformActionView, Modifier: ViewModifier {
     public func transformAction(_ transform: (Action) -> Action) -> Self {
         Self.init(content: content.transformAction(transform), modifier: modifier)
     }

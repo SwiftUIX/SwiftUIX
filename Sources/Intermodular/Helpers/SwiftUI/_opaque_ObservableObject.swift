@@ -5,13 +5,13 @@
 import Swift
 import SwiftUI
 
-public protocol opaque_ObservableObject {
+public protocol _opaque_ObservableObject {
     func asEnvironmentObject<V: View>(in _: V) -> AnyView
 }
 
 // MARK: - Implementation -
 
-extension ObservableObject where Self: opaque_ObservableObject {
+extension ObservableObject where Self: _opaque_ObservableObject {
     public func asEnvironmentObject<V: View>(in view: V) -> AnyView {
         view.environmentObject(self).eraseToAnyView()
     }

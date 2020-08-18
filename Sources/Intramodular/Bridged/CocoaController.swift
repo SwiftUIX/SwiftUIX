@@ -7,11 +7,11 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol opaque_CocoaController: AppKitOrUIKitViewController {
+public protocol _opaque_CocoaController: AppKitOrUIKitViewController {
     
 }
 
-public protocol CocoaController: opaque_CocoaController {
+public protocol CocoaController: _opaque_CocoaController {
     func description(for _: ViewName) -> ViewDescription?
 }
 

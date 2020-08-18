@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public struct PassthroughView<Content: View>: opaque_View, View {
+public struct PassthroughView<Content: View>: _opaque_View, View {
     @usableFromInline
     let content: Content
     

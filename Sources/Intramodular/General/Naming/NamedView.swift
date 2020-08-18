@@ -6,11 +6,11 @@ import Combine
 import Swift
 import SwiftUI
 
-public protocol opaque_NamedView {
+public protocol _opaque_NamedView {
     var name: ViewName { get }
 }
 
-public protocol NamedView: opaque_NamedView, View {
+public protocol NamedView: _opaque_NamedView, View {
     
 }
 

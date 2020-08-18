@@ -108,7 +108,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public var presentationName: ViewName? {
-        presentation?.content.opaque_getViewName()
+        presentation?.content._opaque_getViewName()
     }
     
     public func present(_ modal: AnyModalPresentation) {

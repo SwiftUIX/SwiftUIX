@@ -1,0 +1,36 @@
+//
+// Copyright (c) Vatsal Manot
+//
+
+import Swift
+import SwiftUI
+
+public protocol _opaque_View {
+    func _opaque_environmentObject<B: ObservableObject>(_: B) -> _opaque_View
+    func _opaque_getViewName() -> ViewName?
+    
+    func eraseToAnyView() -> AnyView
+}
+
+// MARK: - Implementation -
+
+extension _opaque_View where Self: View {
+    @inlinable
+    public func _opaque_environmentObject<B: ObservableObject>(_ bindable: B) -> _opaque_View {
+        PassthroughView(content: environmentObject(bindable))
+    }
+
+    @inlinable
+    public func _opaque_getViewName() -> ViewName? {
+        nil
+    }
+    
+    @inlinable
+    public func eraseToAnyView() -> AnyView {
+        .init(self)
+    }
+}
+
+extension ModifiedContent: _opaque_View where Content: View, Modifier: ViewModifier {
+
+}

@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 public struct EnvironmentalAnyView: View {
-    public let base: opaque_View
+    public let base: _opaque_View
     
     private var environmentBuilder: EnvironmentBuilder
     
@@ -30,7 +30,7 @@ public struct EnvironmentalAnyView: View {
         if let view = view as? EnvironmentalAnyView {
             self = view
         } else {
-            self.base = (view as? opaque_View) ?? view.eraseToAnyView()
+            self.base = (view as? _opaque_View) ?? view.eraseToAnyView()
             self.environmentBuilder = .init()
         }
     }
@@ -38,47 +38,47 @@ public struct EnvironmentalAnyView: View {
 
 // MARK: - Protocol Implementations -
 
-extension EnvironmentalAnyView: opaque_View {
-    public func opaque_getViewName() -> ViewName? {
-        _name ?? base.opaque_getViewName()
+extension EnvironmentalAnyView: _opaque_View {
+    public func _opaque_getViewName() -> ViewName? {
+        _name ?? base._opaque_getViewName()
     }
 }
 
 extension EnvironmentalAnyView: ModalPresentationView {
     public var preferredSourceViewName: ViewName? {
-        (base as? opaque_ModalPresentationView)?.preferredSourceViewName
+        (base as? _opaque_ModalPresentationView)?.preferredSourceViewName
     }
     
     public var presentationEnvironmentBuilder: EnvironmentBuilder? {
-        (base as? opaque_ModalPresentationView)?.presentationEnvironmentBuilder
+        (base as? _opaque_ModalPresentationView)?.presentationEnvironmentBuilder
     }
     
     public var presentationStyle: ModalPresentationStyle {
-        _modalPresentationStyle ?? (base as? opaque_ModalPresentationView)?.presentationStyle ?? .automatic
+        _modalPresentationStyle ?? (base as? _opaque_ModalPresentationView)?.presentationStyle ?? .automatic
     }
     
     public var isModalPresentationAnimated: Bool {
-        _isModalPresentationAnimated ?? (base as? opaque_ModalPresentationView)?.isModalPresentationAnimated ?? true
+        _isModalPresentationAnimated ?? (base as? _opaque_ModalPresentationView)?.isModalPresentationAnimated ?? true
     }
     
     public var isModalDismissable: Bool {
-        _isModalDismissableImpl?() ?? (base as? opaque_ModalPresentationView)?.isModalDismissable ?? true
+        _isModalDismissableImpl?() ?? (base as? _opaque_ModalPresentationView)?.isModalDismissable ?? true
     }
     
     public func onPresent() {
         _onPresentImpl?()
-        (base as? opaque_ModalPresentationView)?.onPresent()
+        (base as? _opaque_ModalPresentationView)?.onPresent()
     }
     
     public func onDismiss() {
         _onDismissImpl?()
-        (base as? opaque_ModalPresentationView)?.onDismiss()
+        (base as? _opaque_ModalPresentationView)?.onDismiss()
     }
 }
 
 extension EnvironmentalAnyView: NavigatableView {
     public var hidesBottomBarWhenPushed: Bool {
-        _hidesBottomBarWhenPushed ?? (base as? opaque_NavigatableView)?.hidesBottomBarWhenPushed ?? false
+        _hidesBottomBarWhenPushed ?? (base as? _opaque_NavigatableView)?.hidesBottomBarWhenPushed ?? false
     }
 }
 
