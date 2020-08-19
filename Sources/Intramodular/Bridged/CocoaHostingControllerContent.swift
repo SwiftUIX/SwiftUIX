@@ -25,7 +25,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     public var body: some View {
         content
             .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
-            .environment(\.dynamicViewPresenter, presentationCoordinator)
+            .environment(\.presenter, presentationCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))
             .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.parent as? CocoaHostingController<EnvironmentalAnyView> {

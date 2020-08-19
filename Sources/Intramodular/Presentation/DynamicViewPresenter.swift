@@ -42,7 +42,13 @@ extension DynamicViewPresenter {
     }
 }
 
+// MARK: - Extensions
+
 extension DynamicViewPresenter {
+    public func present<Content: View>(@ViewBuilder content: () -> Content) {
+        present(content())
+    }
+    
     public func present<V: View>(
         _ view: V,
         named name: ViewName? = nil,
@@ -144,7 +150,16 @@ private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    @available(*, deprecated, message: "Use EnvironmentValues.presenter instead.")
     public var dynamicViewPresenter: DynamicViewPresenter? {
+        get {
+            self[DynamicViewPresenterEnvironmentKey.self]
+        } set {
+            self[DynamicViewPresenterEnvironmentKey.self] = newValue
+        }
+    }
+
+    public var presenter: DynamicViewPresenter? {
         get {
             self[DynamicViewPresenterEnvironmentKey.self]
         } set {

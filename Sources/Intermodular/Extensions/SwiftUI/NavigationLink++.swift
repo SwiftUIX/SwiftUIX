@@ -5,6 +5,15 @@
 import Swift
 import SwiftUI
 
+extension NavigationLink {
+    public init(
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(destination: destination(), label: label)
+    }
+}
+
 extension NavigationLink where Label == Text {
     /// Creates an instance that presents `destination`, with a Text label generated from a title string.
     public init(_ title: LocalizedStringKey, @ViewBuilder destination: () -> Destination) {

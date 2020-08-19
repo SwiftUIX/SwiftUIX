@@ -12,21 +12,6 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
     @usableFromInline
     let failureView: FailureView?
     
-    public init(
-        _ result: Result<Success, Failure>,
-        @ViewBuilder successView: @escaping (Success) -> SuccessView,
-        @ViewBuilder failureView: @escaping (Failure) -> FailureView
-    ) {
-        switch result {
-            case .success(let success):
-                self.successView = successView(success)
-                self.failureView = nil
-            case .failure(let failure):
-                self.successView = nil
-                self.failureView = failureView(failure)
-        }
-    }
-    
     @inlinable
     public var body: some View {
         Group {
@@ -36,6 +21,29 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
                 failureView!
             }
         }
+    }
+    
+    public init(
+        _ result: Result<Success, Failure>,
+        @ViewBuilder success: @escaping (Success) -> SuccessView,
+        @ViewBuilder failure: @escaping (Failure) -> FailureView
+    ) {
+        switch result {
+            case .success(let value):
+                self.successView = success(value)
+                self.failureView = nil
+            case .failure(let error):
+                self.successView = nil
+                self.failureView = failure(error)
+        }
+    }
+    
+    public init(
+        _ result: Result<Success, Failure>,
+        @ViewBuilder success: @escaping (Success) -> SuccessView,
+        @ViewBuilder failure: @escaping () -> FailureView
+    ) {
+        self.init(result, success: success, failure: { _ in failure() })
     }
 }
 

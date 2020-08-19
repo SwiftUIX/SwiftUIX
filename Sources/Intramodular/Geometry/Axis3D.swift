@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// An axis in three dimensions.
 public enum Axis3D {
     case x
     case y

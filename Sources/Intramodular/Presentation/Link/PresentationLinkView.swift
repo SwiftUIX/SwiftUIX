@@ -17,4 +17,11 @@ extension PresentationLinkView {
     public init(destination: Destination, @ViewBuilder label: () -> Label) {
         self.init(destination: destination, onDismiss: nil, label: label)
     }
+    
+    public init(
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(destination: destination(), onDismiss: nil, label: label)
+    }
 }

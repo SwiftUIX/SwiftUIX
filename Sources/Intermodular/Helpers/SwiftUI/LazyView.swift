@@ -26,7 +26,7 @@ public struct LazyView<Body: View>: View {
 public struct LazyAppearView<Body: View>: View {
     private let destination: () -> Body
     
-    @DelayedState private var content: Body?
+    @DelayedState var content: Body?
     
     @_optimize(none)
     @inline(never)
@@ -43,7 +43,9 @@ public struct LazyAppearView<Body: View>: View {
                     self.content = self.destination()
                 }
             } else {
-                content!
+                content!.onDisappear {
+                    self.content = nil
+                }
             }
         }
     }

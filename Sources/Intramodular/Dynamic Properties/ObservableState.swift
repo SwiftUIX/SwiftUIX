@@ -9,55 +9,40 @@ import SwiftUI
 /// A @State-like property wrapper that offers affordances for observing value changes as a stream of publisher events.
 @propertyWrapper
 public struct ObservableState<Value>: DynamicProperty {
-    public typealias ValueChange = (oldValue: Value, newValue: Value)
-    
-    @State private var _willChange: PassthroughSubject<ValueChange, Never>
-    @State private var _didChange: PassthroughSubject<ValueChange, Never>
-    @State private var _wrappedValue: (previous: Value?, current: Value)
+    @State private var base: ObservableValueRoot<Value>
+    @ObservedObject private var observedBase: ObservableValueRoot<Value>
     
     /// An observable stream of value changes, before they happen.
-    public var willChange: AnyPublisher<ValueChange, Never> {
-        return _willChange.eraseToAnyPublisher()
+    public var willChange: AnyPublisher<Void, Never> {
+        base.objectWillChange.eraseToAnyPublisher()
     }
     
     /// An observable stream of value changes, after they happen.
-    public var didChange: AnyPublisher<ValueChange, Never> {
-        return _didChange.eraseToAnyPublisher()
+    public var didChange: AnyPublisher<Void, Never> {
+        base.objectDidChange.eraseToAnyPublisher()
     }
     
     /// The current state value.
     public var wrappedValue: Value {
         get {
-            _wrappedValue.current
+            base.wrappedValue
         } nonmutating set {
-            let current = _wrappedValue.current
-            
-            defer {
-                _didChange.send((current, newValue))
-            }
-            
-            _willChange.send((current, newValue))
-            
-            _wrappedValue = (_wrappedValue.current, newValue)
+            base.wrappedValue = newValue
         }
     }
     
     /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
-    public var projectedValue: Binding<Value> {
-        return .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
+    public var projectedValue: ObservedValue<Value> {
+        .init(base)
     }
     
     /// Initialize with the provided initial value.
     public init(wrappedValue value: Value) {
-        self.__willChange = .init(initialValue: .init())
-        self.__didChange = .init(initialValue: .init())
-        self.__wrappedValue = .init(initialValue: (nil, value))
+        self._base = .init(wrappedValue: .init(root: value))
+        self.observedBase = _base.wrappedValue
     }
     
     public mutating func update() {
-        self.__wrappedValue.update()
+        self.observedBase = base
     }
 }
