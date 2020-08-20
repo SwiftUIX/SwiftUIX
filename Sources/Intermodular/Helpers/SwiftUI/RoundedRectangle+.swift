@@ -51,6 +51,7 @@ extension View {
 }
 
 extension View {
+    @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:antialiased:) instead.")
     @inlinable
     public func border<S: ShapeStyle>(
         _ content: S,
