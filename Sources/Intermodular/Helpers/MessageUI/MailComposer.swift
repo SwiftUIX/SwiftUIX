@@ -8,7 +8,7 @@ import MessageUI
 import Foundation
 import SwiftUI
 
-/// A view that displays a mail composer with a content configuration.
+/// A view whose interface lets the user manage, edit, and send email messages.
 public struct MailComposer: UIViewControllerRepresentable {
     public struct Attachment: Codable, Hashable {
         fileprivate let data: Data
@@ -45,11 +45,12 @@ public struct MailComposer: UIViewControllerRepresentable {
         
         uiViewController.mailComposeDelegate = context.coordinator
         
-        uiViewController.configure(with: configuration)
+        uiViewController.configure(with: configuration, context: context)
     }
     
     public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         var onCompletion: (MFMailComposeResult, Error?) -> Void
+        var addedAttachmentHashes = Set<Int>()
         
         init(onCompletion: @escaping (MFMailComposeResult, Error?) -> Void) {
             self.onCompletion = onCompletion
@@ -115,7 +116,7 @@ extension MailComposer {
 // MARK: - Auxiliary Implementation -
 
 extension MFMailComposeViewController {
-    fileprivate func configure(with configuration: MailComposer.Configuration) {
+    fileprivate func configure(with configuration: MailComposer.Configuration, context: MailComposer.Context) {
         if let subject = configuration.subject {
             setSubject(subject)
         }
@@ -137,11 +138,15 @@ extension MFMailComposeViewController {
         }
         
         for attachment in configuration.attachments {
-            addAttachmentData(
-                attachment.data,
-                mimeType: attachment.mimeType,
-                fileName: attachment.fileName
-            )
+            if !context.coordinator.addedAttachmentHashes.contains(attachment.hashValue) {
+                addAttachmentData(
+                    attachment.data,
+                    mimeType: attachment.mimeType,
+                    fileName: attachment.fileName
+                )
+                
+                context.coordinator.addedAttachmentHashes.insert(attachment.hashValue)
+            }
         }
     }
 }
