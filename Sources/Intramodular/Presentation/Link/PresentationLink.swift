@@ -72,7 +72,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
 // MARK: - API -
 
 extension PresentationLink {
-    @inlinable
+    @inline(never)
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -84,7 +84,7 @@ extension PresentationLink {
         self.label = label()
     }
     
-    @inlinable
+    @inline(never)
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,
