@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct PartlyRoundedRectangle: Shape {
+public struct PartRoundedRectangle: Shape {
     public let corners: [RectangleCorner]
     public let cornerRadii: CGFloat
     
@@ -36,7 +36,7 @@ extension View {
         _ corners: [RectangleCorner],
         _ cornerRadii: CGFloat
     ) -> some View {
-        clipShape(PartlyRoundedRectangle(corners: corners, cornerRadii: cornerRadii))
+        clipShape(PartRoundedRectangle(corners: corners, cornerRadii: cornerRadii))
     }
 }
 

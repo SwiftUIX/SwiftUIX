@@ -16,14 +16,17 @@ public protocol DynamicAction: DynamicProperty {
 // MARK: - API -
 
 extension PerformActionView {
+    @inlinable
     public func insertAction<A: DynamicAction>(_ action: A) -> InsertDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
     
+    @inlinable
     public func appendAction<A: DynamicAction>(_ action: A) -> AppendDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
     
+    @inlinable
     public func addAction<A: DynamicAction>(_ action: A) -> AddDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
@@ -40,6 +43,7 @@ public struct InsertDynamicAction<Base: PerformActionView, Action: DynamicAction
         self.action = action
     }
     
+    @inlinable
     public var body: some View {
         base.transformAction({ $0.insert(action.perform) })
     }
@@ -54,6 +58,7 @@ public struct AppendDynamicAction<Base: PerformActionView, Action: DynamicAction
         self.action = action
     }
     
+    @inlinable
     public var body: some View {
         base.transformAction({ $0.insert(action.perform) })
     }
@@ -68,6 +73,7 @@ public struct AddDynamicAction<Base: PerformActionView, Action: DynamicAction>: 
         self.action = action
     }
     
+    @inlinable
     public var body: some View {
         base.addAction(perform: action.perform)
     }

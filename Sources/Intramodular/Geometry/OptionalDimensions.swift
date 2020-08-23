@@ -23,7 +23,75 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - API -
+
+extension View {
+    /// Sets the preferred maximum layout width for the view.
+    public func preferredMaximumLayoutWidth(_ preferredMaximumLayoutWidth: CGFloat) -> some View {
+        environment(\.preferredMaximumLayoutWidth, preferredMaximumLayoutWidth)
+    }
+    
+    /// Sets the preferred maximum layout height for the view.
+    public func preferredMaximumLayoutHeight(_ preferredMaximumLayoutHeight: CGFloat) -> some View {
+        environment(\.preferredMaximumLayoutHeight, preferredMaximumLayoutHeight)
+    }
+    
+    /// Sets the preferred maximum layout dimensions for the view.
+    public func preferredMaximumLayoutDimensions(_ size: OptionalDimensions) -> some View {
+        environment(\.preferredMaximumLayoutDimensions, size)
+    }
+    
+    /// Sets the preferred maximum layout dimensions for the view.
+    public func preferredMaximumLayoutDimensions(_ size: CGSize) -> some View {
+        preferredMaximumLayoutDimensions(.init(size))
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    private final class PreferredMaximumLayoutWidth: DefaultEnvironmentKey<CGFloat> {
+        
+    }
+    
+    /// The preferred maximum layout width for the view with this environment.
+    ///
+    /// The default value is nil.
+    public var preferredMaximumLayoutWidth: CGFloat? {
+        get {
+            self[PreferredMaximumLayoutWidth]
+        } set {
+            self[PreferredMaximumLayoutWidth] = newValue
+        }
+    }
+    
+    private final class PreferredMaximumLayoutHeight: DefaultEnvironmentKey<CGFloat> {
+        
+    }
+    
+    /// The preferred maximum layout height for the view with this environment.
+    ///
+    /// The default value is nil.
+    public var preferredMaximumLayoutHeight: CGFloat? {
+        get {
+            self[PreferredMaximumLayoutHeight]
+        } set {
+            self[PreferredMaximumLayoutHeight] = newValue
+        }
+    }
+    
+    /// The preferred maximum layout dimensions for the view with this environment.
+    ///
+    /// The default value is nil.
+    public var preferredMaximumLayoutDimensions: OptionalDimensions {
+        get {
+            .init(width: preferredMaximumLayoutWidth, height: preferredMaximumLayoutHeight)
+        } set {
+            preferredMaximumLayoutWidth = newValue.width
+            preferredMaximumLayoutHeight = newValue.height
+        }
+    }
+}
 
 extension CGSize {
     public init(_ dimensions: OptionalDimensions, default: CGSize) {

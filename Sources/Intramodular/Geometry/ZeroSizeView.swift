@@ -7,6 +7,7 @@
 import Swift
 import SwiftUI
 
+/// A zero-size view for when `EmptyView` just doesn't work.
 public struct ZeroSizeView: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
@@ -28,6 +29,7 @@ public struct ZeroSizeView: AppKitOrUIKitViewRepresentable {
 
 #else
 
+/// A zero-size view for when `EmptyView` just doesn't work.
 public struct ZeroSizeView: View {
     @inlinable
     public var body: some View {

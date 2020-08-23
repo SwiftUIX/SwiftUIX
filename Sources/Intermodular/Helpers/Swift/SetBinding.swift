@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A `Binding` that only allows the _setting_ of values.
 @propertyWrapper
 public struct SetBinding<Value> {
     @usableFromInline

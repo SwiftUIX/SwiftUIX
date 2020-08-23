@@ -31,7 +31,7 @@ extension Frame.Dimension {
         switch self {
             case .constant(let value):
                 return value
-                
+            
             case .relative:
                 return size.dimensionLength(for: axis)
         }

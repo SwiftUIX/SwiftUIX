@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+/// A corner of a rectangle.
 public enum RectangleCorner: Hashable {
     case topLeft
     case topLeading
@@ -35,7 +36,7 @@ public enum RectangleCorner: Hashable {
                         return .bottomLeft
                     case .bottomTrailing:
                         return .bottomLeading
-                }
+            }
             case .vertical:
                 switch self {
                     case .topLeft:
@@ -54,7 +55,7 @@ public enum RectangleCorner: Hashable {
                         return .topRight
                     case .bottomTrailing:
                         return .bottomTrailing
-                }
+            }
         }
     }
 }
