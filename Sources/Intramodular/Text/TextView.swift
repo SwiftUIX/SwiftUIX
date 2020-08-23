@@ -31,24 +31,32 @@ public struct TextView<Label: View>: View {
     }
 }
 
-fileprivate struct _TextView {
-    @Binding private var text: String
-    
-    private var onEditingChanged: (Bool) -> Void
-    private var onCommit: () -> Void
-    
-    init(
+// MARK: - API -
+
+extension TextView where Label == EmptyView {
+    public init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
         onCommit: @escaping () -> Void = { }
     ) {
+        self.label = EmptyView()
         self._text = text
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
+    
+    public init(
+        text: Binding<String?>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            text: text.withDefaultValue(String()),
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
+    }
 }
-
-// MARK: - Extensions -
 
 extension TextView where Label == Text {
     public init<S: StringProtocol>(
@@ -69,18 +77,37 @@ extension TextView where Label == Text {
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
         onCommit: @escaping () -> Void = { }
     ) {
-        self.label = Text(title).foregroundColor(.placeholderText)
-        self._text = text.withDefaultValue(String())
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
+        self.init(
+            title,
+            text: text.withDefaultValue(String()),
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
     }
 }
+
+// MARK: - Implementation -
 
 #if os(iOS) || os(tvOS)
 
 import UIKit
 
-// MARK: - Protocol Implementations -
+fileprivate struct _TextView {
+    @Binding private var text: String
+    
+    private var onEditingChanged: (Bool) -> Void
+    private var onCommit: () -> Void
+    
+    init(
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self._text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+}
 
 extension _TextView: UIViewRepresentable {
     typealias UIViewType = _UITextView

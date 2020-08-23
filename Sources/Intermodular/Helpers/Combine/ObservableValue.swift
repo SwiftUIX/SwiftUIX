@@ -5,13 +5,14 @@
 import Combine
 import Swift
 
+/// An abstract base class for an observable value box.
 @dynamicMemberLookup
 public class ObservableValue<Value>: ObservableObject {
     public var wrappedValue: Value {
         get {
-            fatalError()
+            fatalError() // abstract
         } set {
-            fatalError()
+            fatalError() // abstract
         }
     }
     
