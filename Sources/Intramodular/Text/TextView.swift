@@ -62,6 +62,18 @@ extension TextView where Label == Text {
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
+    
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String?>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.label = Text(title).foregroundColor(.placeholderText)
+        self._text = text.withDefaultValue(String())
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
 }
 
 #if os(iOS) || os(tvOS)
