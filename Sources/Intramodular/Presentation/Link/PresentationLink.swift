@@ -97,8 +97,7 @@ extension PresentationLink {
 extension View {
     /// Adds a destination to present when this view is pressed.
     public func onPress<Destination: View>(present destination: Destination) -> some View {
-        PresentationLink(destination: destination, label: { self.contentShape(Rectangle()) })
-            .buttonStyle(PlainButtonStyle())
+        modifier(_PresentOnPressViewModifier(destination: destination))
     }
     
     /// Adds a destination to present when this view is pressed.
@@ -116,6 +115,27 @@ extension View {
 }
 
 // MARK: - Auxiliary Implementation -
+
+struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
+    @Environment(\.presenter) var presenter
+    
+    let destination: Destination
+    
+    @usableFromInline
+    func body(content: Content) -> some View {
+        presenter.ifSome { presenter in
+            Button(action: { presenter.present(self.destination) }) {
+                content.contentShape(Rectangle())
+            }
+        }.else {
+            PresentationLink(
+                destination: destination,
+                label: { content.contentShape(Rectangle()) }
+            )
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+}
 
 extension PresentationLink {
     @usableFromInline
