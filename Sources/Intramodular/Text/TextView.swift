@@ -88,10 +88,6 @@ extension TextView where Label == Text {
 
 // MARK: - Implementation -
 
-#if os(iOS) || os(tvOS)
-
-import UIKit
-
 fileprivate struct _TextView {
     @Binding private var text: String
     
@@ -108,6 +104,10 @@ fileprivate struct _TextView {
         self.onCommit = onCommit
     }
 }
+
+#if os(iOS) || os(tvOS)
+
+import UIKit
 
 extension _TextView: UIViewRepresentable {
     typealias UIViewType = _UITextView
