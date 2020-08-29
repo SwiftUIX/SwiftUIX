@@ -3,8 +3,8 @@ name: CI
 on: [push]
 
 jobs:
-  Xcode-11.6:
-    - name: Xcode-11.6
+  xcode11_6:
+    name: Xcode-11.6
     env:
       DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
     runs-on: macos-latest
