@@ -9,6 +9,7 @@ import SwiftUI
 /// A control you add to your interface that enables users to initiate the Sign In with Apple flow.
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public struct AuthorizationAppleIDButton {
     @usableFromInline
     let type: AuthorizationAppleIDButtonType
@@ -33,6 +34,7 @@ public struct AuthorizationAppleIDButton {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton: UIViewRepresentable {
     public typealias UIViewType = ASAuthorizationAppleIDButton
     
@@ -49,6 +51,7 @@ extension AuthorizationAppleIDButton: UIViewRepresentable {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton.Coordinator: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         guard let window = UIApplication.shared.firstKeyWindow else {
@@ -112,6 +115,7 @@ extension AuthorizationAppleIDButton: WKInterfaceObjectRepresentable {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton {
     public class Coordinator: NSObject, ASAuthorizationControllerDelegate {
         var base: AuthorizationAppleIDButton
@@ -153,6 +157,7 @@ extension AuthorizationAppleIDButton {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AuthorizationAppleIDButton {
     public func onAuthorization(perform action: @escaping (Result<ASAuthorization, Error>) -> Void) -> Self {
         then({ $0.onAuthorization = action })

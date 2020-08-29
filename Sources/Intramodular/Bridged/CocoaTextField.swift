@@ -29,6 +29,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
     
     @Environment(\.font) var font
     
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     @ObservedObject var keyboard = Keyboard.main
     
     public var body: some View {
