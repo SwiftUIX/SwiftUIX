@@ -1,6 +1,8 @@
 <img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX: An extension to the standard SwiftUI library.
 ======================================
 
+![CI](https://github.com/SwiftUIX/SwiftUIX/workflows/CI/badge.svg)
+
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
 - [Why](#why) 
@@ -71,6 +73,9 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 # Contributing
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
+
+To create an Xcode project for SwiftUIX run `bundle install; bundle exec fastlane generate_xcodeproj`.
+To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`. 
 
 # License
 
