@@ -1,0 +1,21 @@
+lane :build do |options|
+  spm(
+    command: "generate-xcodeproj"
+  )
+
+  build_app(
+    destination: "generic/platform=iOS"
+  )
+
+  build_app(
+    destination: "generic/platform=macOS"
+  )
+
+  build_app(
+    destination: "generic/platform=watchOS"
+  )
+
+  build_app(
+    destination: "generic/platform=tvOS"
+  )
+end
