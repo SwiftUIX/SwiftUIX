@@ -13,14 +13,17 @@ public struct AnyModalPresentation: Identifiable {
     
     public private(set) var content: EnvironmentalAnyView
     
+    @usableFromInline
     let resetBinding: () -> ()
     
+    @usableFromInline
     init(_ content: EnvironmentalAnyView) {
         self.id = UUID()
         self.content = content
         self.resetBinding = { }
     }
     
+    @usableFromInline
     init<V: View>(
         id: UUID = UUID(),
         content: V,

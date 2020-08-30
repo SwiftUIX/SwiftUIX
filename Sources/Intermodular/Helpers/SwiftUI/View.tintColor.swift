@@ -5,11 +5,11 @@
 import Swift
 import SwiftUI
 
-private struct TintColorEnvironmentKey: EnvironmentKey {
-    static let defaultValue: Color? = nil
-}
-
 extension EnvironmentValues {
+    private struct TintColorEnvironmentKey: EnvironmentKey {
+        static let defaultValue: Color? = nil
+    }
+    
     public var tintColor: Color? {
         get {
             self[TintColorEnvironmentKey]
@@ -22,6 +22,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    /// Sets the tint color of the elements displayed by this view.
     @inlinable
     public func tintColor(_ color: Color) -> some View {
         environment(\.tintColor, color)

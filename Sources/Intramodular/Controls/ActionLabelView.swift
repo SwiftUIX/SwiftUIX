@@ -53,6 +53,23 @@ extension ActionLabelView {
     }
 }
 
+#if swift(>=5.3)
+
+@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+extension ActionLabelView where Label == SwiftUI.Label<Text, Image> {
+    public init<S: StringProtocol>(
+        _ title: S,
+        systemImage: SanFranciscoSymbolName,
+        action: @escaping () -> Void
+    ) {
+        self.init(action: action) {
+            Label(title, systemImage: systemImage)
+        }
+    }
+}
+
+#endif
+
 // MARK: - Concrete Implementaitons -
 
 extension Button: ActionLabelView {

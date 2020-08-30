@@ -20,15 +20,23 @@ public struct XStack<Content: View>: View {
     @inlinable
     public var body: some View {
         ZStack(alignment: alignment) {
-            VStack {
+            VStack(spacing: 0) {
                 Spacer()
                 
-                HStack {
+                HStack(spacing: 0) {
                     Spacer()
                 }
             }
             
             content
+        }
+    }
+}
+
+extension XStack where Content == EmptyView {
+    public init() {
+        self.init {
+            EmptyView()
         }
     }
 }

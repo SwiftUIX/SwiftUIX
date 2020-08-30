@@ -13,6 +13,8 @@ public protocol PresentationLinkView: View {
     init(destination: Destination, onDismiss: (() -> Void)?, @ViewBuilder label: () -> Label)
 }
 
+// MARK: - Extensions -
+
 extension PresentationLinkView {
     public init(destination: Destination, @ViewBuilder label: () -> Label) {
         self.init(destination: destination, onDismiss: nil, label: label)

@@ -141,8 +141,9 @@ fileprivate struct NavigateOnPress<Destination: View>: ViewModifier {
             NavigationLink(
                 destination: destination,
                 isActive: isActive ?? $_internal_isActive,
-                label: { ZeroSizeView() }
+                label: { EmptyView() }
             )
+            .hidden()
         )
     }
 }

@@ -17,7 +17,7 @@ public struct _VisibilityModifier: ViewModifier {
     
     @inlinable
     public func body(content: Content) -> some View {
-        content.disabled(!isVisible).opacity(isVisible ? 1 : 0)
+        content.opacity(isVisible ? 1 : 0)
     }
 }
 

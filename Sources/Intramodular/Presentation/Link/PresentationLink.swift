@@ -11,6 +11,15 @@ import SwiftUI
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     @usableFromInline
+    @Environment(\.environmentBuilder) var environmentBuilder
+    @usableFromInline
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @usableFromInline
+    @Environment(\.modalPresentationStyle) var modalPresentationStyle
+    @usableFromInline
+    @Environment(\.presenter) var presenter
+    
+    @usableFromInline
     let _destination: Destination
     @usableFromInline
     let onDismiss: (() -> ())?
@@ -19,14 +28,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @usableFromInline
     let label: Label
     
+    @usableFromInline
+    @State var id = UUID()
+    @usableFromInline
     @State var _internal_isPresented: Bool = false
-    
-    @usableFromInline
-    @Environment(\.environmentBuilder) var environmentBuilder
-    @usableFromInline
-    @Environment(\.managedObjectContext) var managedObjectContext
-    @usableFromInline
-    @Environment(\.modalPresentationStyle) var modalPresentationStyle
     
     @usableFromInline
     var destination: some View {
@@ -46,22 +51,40 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @inlinable
     public var body: some View {
         Group {
-            if modalPresentationStyle == .automatic {
+            if _isPresented == nil && presenter != nil {
+                Button(action: {
+                    self.presenter!.present(
+                        AnyModalPresentation(
+                            id: self.id,
+                            content: self.destination,
+                            presentationStyle: self.modalPresentationStyle,
+                            onDismiss: { self.onDismiss?() },
+                            resetBinding: { self.isPresented.wrappedValue = false }
+                        )
+                    )
+                }) {
+                    self.label
+                }
+            } else if modalPresentationStyle == .automatic {
                 Button(action: { self.isPresented.wrappedValue = true }, label: label).sheet(
                     isPresented: isPresented,
                     onDismiss: { self.onDismiss?() },
                     content: { self.destination }
                 )
             } else {
-                Button(action: { self.isPresented.wrappedValue = true }, label: label).background(
+                Button(
+                    action: { self.isPresented.wrappedValue = true },
+                    label: label
+                ).background(
                     CocoaHostingView {
                         _Presenter(
+                            id: id,
                             destination: destination,
                             isPresented: isPresented,
                             onDismiss: onDismiss
                         )
-                        .mergeEnvironmentBuilder(environmentBuilder)
-                        .modalPresentationStyle(modalPresentationStyle)
+                            .mergeEnvironmentBuilder(environmentBuilder)
+                            .modalPresentationStyle(modalPresentationStyle)
                     }
                 )
             }
@@ -115,7 +138,7 @@ extension View {
             isPresented: isPresented,
             label: { self.contentShape(Rectangle()) }
         )
-        .buttonStyle(PlainButtonStyle())
+            .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -145,7 +168,7 @@ struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
                 destination: destination,
                 label: { content.contentShape(Rectangle()) }
             )
-            .buttonStyle(PlainButtonStyle())
+                .buttonStyle(PlainButtonStyle())
         }
     }
 }
@@ -153,25 +176,24 @@ struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
 extension PresentationLink {
     @usableFromInline
     struct _Presenter<Destination: View>: View {
-        private let destination: Destination
-        private let isPresented: Binding<Bool>
-        private let onDismiss: (() -> ())?
-
-        @usableFromInline
-        @State var id = UUID()
-        
         @usableFromInline
         @Environment(\.environmentBuilder) var environmentBuilder
-        
         @usableFromInline
         @Environment(\.modalPresentationStyle) var modalPresentationStyle
         
+        private let id: UUID
+        private let destination: Destination
+        private let isPresented: Binding<Bool>
+        private let onDismiss: (() -> ())?
+        
         @usableFromInline
         init(
+            id: UUID,
             destination: Destination,
             isPresented: Binding<Bool>,
             onDismiss: (() -> ())?
         ) {
+            self.id = id
             self.destination = destination
             self.isPresented = isPresented
             self.onDismiss = onDismiss
