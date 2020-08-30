@@ -12,6 +12,7 @@ import UIKit
 /// An object representing the keyboard.
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public final class Keyboard: ObservableObject {
     public static let main = Keyboard()
     
@@ -65,6 +66,7 @@ public final class Keyboard: ObservableObject {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension Keyboard {
     public struct State {
         public static let `default` = State()
@@ -117,6 +119,7 @@ extension Keyboard {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 struct HiddenIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -127,6 +130,7 @@ struct HiddenIfKeyboardActive: ViewModifier {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 struct VisibleIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -137,6 +141,7 @@ struct VisibleIfKeyboardActive: ViewModifier {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 struct RemoveIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -151,6 +156,7 @@ struct RemoveIfKeyboardActive: ViewModifier {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 struct AddIfKeyboardActive: ViewModifier {
     @ObservedObject var keyboard: Keyboard = .main
     
@@ -165,6 +171,7 @@ struct AddIfKeyboardActive: ViewModifier {
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension View {
     public func hiddenIfKeyboardActive() -> some View {
         modifier(HiddenIfKeyboardActive())

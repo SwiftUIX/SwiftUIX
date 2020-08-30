@@ -3,5 +3,9 @@
 .swiftpm/*
 /*.xcodeproj
 /.build
+/build
 /Packages
 xcuserdata/
+fastlane/*
+!fastlane/Fastfile
+!fastlane/Pluginfile

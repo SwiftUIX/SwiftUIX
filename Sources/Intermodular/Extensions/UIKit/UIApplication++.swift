@@ -14,6 +14,7 @@ extension UIApplication {
     
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     public var topmostViewController: UIViewController? {
         UIApplication.shared.firstKeyWindow?.rootViewController?.topmostViewController
     }

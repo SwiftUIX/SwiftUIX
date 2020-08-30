@@ -1,0 +1,39 @@
+lane :build do |options|
+
+  xcodebuild(
+    scheme: "SwiftUIX",
+    xcargs: "\
+clean \
+-configuration release \
+-destination 'generic/platform=iOS' \
+-destination 'generic/platform=tvOS' \
+-destination 'generic/platform=watchOS' \
+-destination 'generic/platform=macOS' \
+-destination 'generic/platform=macOS,variant=Mac Catalyst' \
+-xcconfig SwiftUIX.xcconfig\
+"
+  )
+
+  xcodebuild(
+    scheme: "SwiftUIX",
+    xcargs: "\
+build \
+-configuration release \
+-destination 'generic/platform=iOS' \
+-destination 'generic/platform=tvOS' \
+-destination 'generic/platform=watchOS' \
+-destination 'generic/platform=macOS' \
+-destination 'generic/platform=macOS,variant=Mac Catalyst' \
+-xcconfig SwiftUIX.xcconfig\
+"
+  )
+
+end
+
+
+lane :generate_xcodeproj do |options|
+  spm(
+    command: "generate-xcodeproj",
+    xcconfig: "SwiftUIX.xcconfig"
+  )
+end
