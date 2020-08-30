@@ -1,4 +1,42 @@
-lane :build do |options|
+lane :build_debug do |options|
+
+  xcodebuild(
+    scheme: "SwiftUIX",
+    xcargs: "\
+clean \
+-configuration debug \
+-destination 'generic/platform=iOS' \
+-destination 'generic/platform=iOS Simulator' \
+-destination 'generic/platform=tvOS' \
+-destination 'generic/platform=tvOS Simulator' \
+-destination 'generic/platform=watchOS' \
+-destination 'generic/platform=watchOS Simulator' \
+-destination 'generic/platform=macOS' \
+-destination 'generic/platform=macOS,variant=Mac Catalyst' \
+-xcconfig SwiftUIX.xcconfig\
+"
+  )
+
+  xcodebuild(
+    scheme: "SwiftUIX",
+    xcargs: "\
+build \
+-configuration debug \
+-destination 'generic/platform=iOS' \
+-destination 'generic/platform=iOS Simulator' \
+-destination 'generic/platform=tvOS' \
+-destination 'generic/platform=tvOS Simulator' \
+-destination 'generic/platform=watchOS' \
+-destination 'generic/platform=watchOS Simulator' \
+-destination 'generic/platform=macOS' \
+-destination 'generic/platform=macOS,variant=Mac Catalyst' \
+-xcconfig SwiftUIX.xcconfig\
+"
+  )
+
+end
+
+lane :build_release do |options|
 
   xcodebuild(
     scheme: "SwiftUIX",
@@ -6,8 +44,11 @@ lane :build do |options|
 clean \
 -configuration release \
 -destination 'generic/platform=iOS' \
+-destination 'generic/platform=iOS Simulator' \
 -destination 'generic/platform=tvOS' \
+-destination 'generic/platform=tvOS Simulator' \
 -destination 'generic/platform=watchOS' \
+-destination 'generic/platform=watchOS Simulator' \
 -destination 'generic/platform=macOS' \
 -destination 'generic/platform=macOS,variant=Mac Catalyst' \
 -xcconfig SwiftUIX.xcconfig\
@@ -20,8 +61,11 @@ clean \
 build \
 -configuration release \
 -destination 'generic/platform=iOS' \
+-destination 'generic/platform=iOS Simulator' \
 -destination 'generic/platform=tvOS' \
+-destination 'generic/platform=tvOS Simulator' \
 -destination 'generic/platform=watchOS' \
+-destination 'generic/platform=watchOS Simulator' \
 -destination 'generic/platform=macOS' \
 -destination 'generic/platform=macOS,variant=Mac Catalyst' \
 -xcconfig SwiftUIX.xcconfig\
@@ -29,7 +73,6 @@ build \
   )
 
 end
-
 
 lane :generate_xcodeproj do |options|
   spm(

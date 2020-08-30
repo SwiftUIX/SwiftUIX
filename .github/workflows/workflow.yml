@@ -3,8 +3,8 @@ name: CI
 on: [push]
 
 jobs:
-  xcode11_6:
-    name: Xcode-11.6
+  debug_xcode11_6:
+    name: Debug-Xcode-11.6
     env:
       DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
     runs-on: macos-latest
@@ -16,10 +16,40 @@ jobs:
           bundle install
       - name: Fastlane build
         run: |
-          bundle exec fastlane build
+          bundle exec fastlane build_debug
 
-  xcode12_0:
-    name: Xcode-12.0
+  release_xcode11_6:
+    name: Release-Xcode-12.0
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Bundle install
+        run: |
+          bundle install
+      - name: Fastlane build
+        run: |
+          bundle exec fastlane build_release
+
+  debug_xcode12_0:
+    name: Debug-Xcode-12.0
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Bundle install
+        run: |
+          bundle install
+      - name: Fastlane build
+        run: |
+          bundle exec fastlane build_debug
+
+  release_xcode12_0:
+    name: Release-Xcode-12.0
     env:
       DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
     runs-on: macos-latest
@@ -31,4 +61,4 @@ jobs:
           bundle install
       - name: Fastlane build
         run: |
-          bundle exec fastlane build
+          bundle exec fastlane build_release
