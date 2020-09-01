@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if !((!DEBUG) && swift(>=5.3) && targetEnvironment(simulator)) // workaround for Xcode 12 beta 6
+
 import AuthenticationServices
 import Swift
 import SwiftUI
@@ -53,5 +55,7 @@ extension WKInterfaceAuthorizationAppleIDButton.Style {
         }
     }
 }
+
+#endif
 
 #endif

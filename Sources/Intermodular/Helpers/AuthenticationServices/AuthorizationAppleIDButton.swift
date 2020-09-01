@@ -2,11 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if !((!DEBUG) && swift(>=5.3) && targetEnvironment(simulator)) // workaround for Xcode 12 beta 6
+
 import AuthenticationServices
 import Swift
 import SwiftUI
-
-#if !((!DEBUG) && swift(>=5.3) && targetEnvironment(simulator)) // workaround for Xcode 12 beta 6
 
 /// A control you add to your interface that enables users to initiate the Sign In with Apple flow.
 @available(macCatalystApplicationExtension, unavailable)
