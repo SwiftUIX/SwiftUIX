@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        xcode: [11.4, 11.5, 11.6, 11.7, 12.0]
-        lane: [build_debug, build_release]
+        xcode: ['11.4', '11.5', '11.6', '11.7', '12.0']
+        lane: ['build_debug', 'build_release']
     runs-on: macos-latest
     env:
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
