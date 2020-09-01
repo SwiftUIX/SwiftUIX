@@ -7,7 +7,7 @@ import SwiftUI
 
 // Modified from https://stackoverflow.com/questions/58363563/swiftui-get-notified-when-binding-value-changes
 
-struct ChangeObserver<Base: View, Value: Equatable>: View {
+public struct ChangeObserver<Base: View, Value: Equatable>: View {
     let base: Base
     let value: Value
     @State private var oldValue: Value?
@@ -15,7 +15,7 @@ struct ChangeObserver<Base: View, Value: Equatable>: View {
 
     @State var model = Model()
 
-    var body: some View {
+    public var body: some View {
         if model.update(value: value) {
             DispatchQueue.main.async {
                 self.action(self.oldValue, self.value)
@@ -42,7 +42,7 @@ extension View {
     @available(macOS 10.15, *)
     @available(tvOS 13.0, *)
     @available(watchOS 6.0, *)
-    func onChange<Value: Equatable>(of value: Value, perform action: @escaping (_ oldValue: Value?, _ newValue: Value) -> Void) -> ChangeObserver<Self, Value> {
+    public func onChange<Value: Equatable>(of value: Value, perform action: @escaping (_ oldValue: Value?, _ newValue: Value) -> Void) -> ChangeObserver<Self, Value> {
         ChangeObserver(base: self, value: value, action: action)
     }
 }
