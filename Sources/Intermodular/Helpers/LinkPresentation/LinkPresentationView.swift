@@ -142,7 +142,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
                 .visible(isPlaceholderVisible)
         }
         .onAppear(perform: fetchMetadata)
-        .onChange(of: id) { _ in
+        .onChange(of: id) { _, _ in
             self.fetchedMetadata = nil
             
             fetchMetadata()
