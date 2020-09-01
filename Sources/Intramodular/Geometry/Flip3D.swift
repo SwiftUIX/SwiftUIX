@@ -22,7 +22,7 @@ struct Flip3D<Reverse: View>: ViewModifier {
             content
                 .hidden(isFlipped)
             reverse
-                .mirrored3D(for: axis)
+                .mirror3D(axis: axis)
                 .hidden(!isFlipped)
         }
         .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: axis)
