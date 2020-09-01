@@ -6,8 +6,9 @@ jobs:
   build:
     name: Build
     strategy:
+      fail-fast: false
       matrix:
-        xcode: [11.3, 11.4, 11.5, 11.6, 11.7, 12.0]
+        xcode: [11.4, 11.5, 11.6, 11.7, 12.0]
         lane: [build_debug, build_release]
     runs-on: macos-latest
     env:
