@@ -3,11 +3,16 @@ name: CI
 on: [push]
 
 jobs:
-  debug_xcode11_6:
-    name: Debug-Xcode-11.6
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode: ['11.6', '11.7_beta', '12_beta']
+        lane: ['build_debug', 'build_release']
     runs-on: macos-latest
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -16,49 +21,4 @@ jobs:
           bundle install
       - name: Fastlane build
         run: |
-          bundle exec fastlane build_debug
-
-  release_xcode11_6:
-    name: Release-Xcode-11.6
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_11.6.app/Contents/Developer
-    runs-on: macos-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Bundle install
-        run: |
-          bundle install
-      - name: Fastlane build
-        run: |
-          bundle exec fastlane build_release
-
-  debug_xcode12_0:
-    name: Debug-Xcode-12.0
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
-    runs-on: macos-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Bundle install
-        run: |
-          bundle install
-      - name: Fastlane build
-        run: |
-          bundle exec fastlane build_debug
-
-  release_xcode12_0:
-    name: Release-Xcode-12.0
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
-    runs-on: macos-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Bundle install
-        run: |
-          bundle install
-      - name: Fastlane build
-        run: |
-          bundle exec fastlane build_release
+          bundle exec fastlane ${{ matrix.lane }}
