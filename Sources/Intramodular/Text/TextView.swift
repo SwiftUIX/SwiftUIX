@@ -133,14 +133,14 @@ extension _TextView: UIViewRepresentable {
         }
     }
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    func makeUIView(context: Context) -> _UITextView {
-        _UITextView().then {
+    func makeUIView(context: Context) -> UIViewType {
+        let result = _UITextView().then {
             $0.delegate = context.coordinator
         }
+        
+        updateUIView(result, context: context)
+        
+        return result
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -168,6 +168,10 @@ extension _TextView: UIViewRepresentable {
         if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
             uiView.selectedTextRange = textRange
         }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
     }
 }
 
