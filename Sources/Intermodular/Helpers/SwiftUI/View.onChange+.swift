@@ -27,11 +27,15 @@ struct OnChangeOfValue<V: Equatable>: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
+    public func _backport_onChange<V: Equatable>(
+        of value: V,
+        perform action: @escaping (V) -> Void
+    ) -> some View {
+        modifier(OnChangeOfValue(initialValue: value, value: value, action: action))
+    }
+    
     @_disfavoredOverload
-    @available(iOS, introduced: 13.0, deprecated: 14.0)
-    @available(macOS, introduced: 10.15, deprecated: 11.0)
-    @available(tvOS, introduced: 13.0, deprecated: 14.0)
-    @available(watchOS, introduced: 6.0, deprecated: 7.0)
     @ViewBuilder
     public func onChange<V: Equatable>(
         of value: V,
@@ -40,7 +44,7 @@ extension View {
         if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
             onChange(of: value, perform: action)
         } else {
-            modifier(OnChangeOfValue(initialValue: value, value: value, action: action))
+            _backport_onChange(of: value, perform: action)
         }
     }
 }

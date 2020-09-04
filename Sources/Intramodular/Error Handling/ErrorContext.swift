@@ -94,6 +94,7 @@ extension View {
         }
     }
     
+    /// Adds an action to perform when this view appears.
     public func onAppear(perform action: (() throws -> Void)?) -> some View {
         EnvironmentValueAccessView(\.errorContext) { errorContext in
             self.onAppear(perform: action.map({ action in
@@ -107,7 +108,8 @@ extension View {
             }))
         }
     }
-
+    
+    /// Adds an action to perform when this view disappears.
     public func onDisappear(perform action: (() throws -> Void)?) -> some View {
         EnvironmentValueAccessView(\.errorContext) { errorContext in
             self.onDisappear(perform: action.map({ action in

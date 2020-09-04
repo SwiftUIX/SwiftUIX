@@ -95,7 +95,10 @@ extension EnvironmentValues {
 
 extension CGSize {
     public init(_ dimensions: OptionalDimensions, default: CGSize) {
-        self.init(width: dimensions.width ?? `default`.width, height: dimensions.height ?? `default`.height)
+        self.init(
+            width: dimensions.width ?? `default`.width,
+            height: dimensions.height ?? `default`.height
+        )
     }
     
     public mutating func clamp(to dimensions: OptionalDimensions) {

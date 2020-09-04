@@ -38,12 +38,36 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
         }
     }
     
+    public init?(
+        _ result: Result<Success, Failure>?,
+        @ViewBuilder success: @escaping (Success) -> SuccessView,
+        @ViewBuilder failure: @escaping (Failure) -> FailureView
+    ) {
+        guard let result = result else {
+            return nil
+        }
+        
+        self.init(result, success: success, failure: failure)
+    }
+    
     public init(
         _ result: Result<Success, Failure>,
         @ViewBuilder success: @escaping (Success) -> SuccessView,
         @ViewBuilder failure: @escaping () -> FailureView
     ) {
         self.init(result, success: success, failure: { _ in failure() })
+    }
+    
+    public init?(
+        _ result: Result<Success, Failure>?,
+        @ViewBuilder success: @escaping (Success) -> SuccessView,
+        @ViewBuilder failure: @escaping () -> FailureView
+    ) {
+        guard let result = result else {
+            return nil
+        }
+        
+        self.init(result, success: success, failure: failure)
     }
 }
 

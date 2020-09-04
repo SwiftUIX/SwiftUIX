@@ -19,6 +19,14 @@ extension Image {
         #endif
     }
     
+    public init(cgImage: CGImage) {
+        #if os(macOS)
+        self.init(nsImage: NSImage(cgImage: cgImage, size: .zero))
+        #else
+        self.init(uiImage: UIImage(cgImage: cgImage))
+        #endif
+    }
+    
     /// Initializes and returns the image with the specified data.
     public init?(data: Data) {
         #if os(macOS)
