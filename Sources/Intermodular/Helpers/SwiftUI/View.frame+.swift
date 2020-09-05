@@ -186,17 +186,19 @@ extension View {
 }
 
 extension View {
+    /// Positions this view within an invisible frame having the specified ideal size constraints.
     @inlinable
     public func idealFrame(width: CGFloat?, height: CGFloat?) -> some View {
         frame(idealWidth: width, idealHeight: height)
     }
     
+    /// Positions this view within an invisible frame having the specified ideal size constraints.
     @inlinable
     public func idealMinFrame(
         width: CGFloat?,
-        maxWidth: CGFloat?,
+        maxWidth: CGFloat? = nil,
         height: CGFloat?,
-        maxHeight: CGFloat?
+        maxHeight: CGFloat? = nil
     ) -> some View {
         frame(
             minWidth: width,
