@@ -4,31 +4,38 @@
 
 import SwiftUI
 
-public struct TryButton<Label: View>: View {
+public struct TryButton<Label: View>: ActionLabelView {
     private let action: () throws -> ()
     private let label: Label
     
     @State var error: Error?
     
-    public init(action: @escaping () throws -> Void, @ViewBuilder label: () -> Label) {
+    public init(
+        action: @escaping () throws -> Void,
+        @ViewBuilder label: () -> Label
+    ) {
         self.action = action
         self.label = label()
+    }
+    
+    public init(
+        action: Action,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(action: action.perform, label: label)
     }
     
     public var body: some View {
         Button(action: trigger) {
             label
         }
-        .preference(
-            key: ErrorContextPreferenceKey.self,
-            value: error.map({ .init([$0]) }) ?? .init()
-        )
+        .pushError(error)
     }
     
     public func trigger() {
-        error = nil
-        
         do {
+            error = nil
+            
             try action()
         } catch {
             self.error = error

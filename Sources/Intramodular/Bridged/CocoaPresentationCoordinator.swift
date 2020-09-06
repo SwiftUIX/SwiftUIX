@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
@@ -135,44 +136,52 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         #endif
     }
     
-    public func dismiss(animated: Bool, completion: (() -> Void)?) {
+    @discardableResult
+    public func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard isPresenting else {
-            return
+            return .init({ $0(.success(false)) })
         }
         
         guard let viewController = viewController else {
-            return
+            return .init({ $0(.success(false)) })
         }
         
         let presentation = presentedCoordinator?.presentation
         
         if let presentation = presentation, !presentation.content.isModalDismissable {
-            return
+            return .init({ $0(.success(false)) })
         }
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        if viewController.presentedViewController != nil {
-            viewController.dismiss(animated: animated) {
-                presentation?.content.onDismiss()
-                presentation?.resetBinding()
-                
-                completion?()
-                
+        return .init { attemptToFulfill in
+            if viewController.presentedViewController != nil {
                 self.objectWillChange.send()
-            }
-        } else if let navigationController = viewController.navigationController {
-            navigationController.popToViewController(viewController, animated: animated) {
-                presentation?.content.onDismiss()
-                presentation?.resetBinding()
                 
-                completion?()
-                
+                viewController.dismiss(animated: animation != nil) {
+                    presentation?.content.onDismiss()
+                    presentation?.resetBinding()
+                    
+                    attemptToFulfill(.success(true))
+                }
+            } else if let navigationController = viewController.navigationController {
                 self.objectWillChange.send()
+                
+                navigationController.popToViewController(viewController, animated: animation != nil) {
+                    presentation?.content.onDismiss()
+                    presentation?.resetBinding()
+                    
+                    attemptToFulfill(.success(true))
+                }
             }
         }
         #elseif os(macOS)
         fatalError("unimplemented")
         #endif
+    }
+    
+    @discardableResult
+    public func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
+        viewController.dismissSelf(withAnimation: animation)
     }
 }
 

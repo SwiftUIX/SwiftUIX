@@ -20,7 +20,11 @@ public struct UserDefaultsState<Value: Codable>: DynamicProperty {
         } nonmutating set {
             _wrappedValue = newValue
             
-            try! defaults.encode(wrappedValue, forKey: key)
+            do {
+                try defaults.encode(wrappedValue, forKey: key)
+            } catch {
+                assertionFailure(error.localizedDescription)
+            }
         }
     }
     /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
@@ -40,6 +44,20 @@ public struct UserDefaultsState<Value: Codable>: DynamicProperty {
         self.defaultValue = defaultValue
         self.defaults = defaults
         
-        __wrappedValue = .init(initialValue: try! defaults.decode(forKey: key, defaultValue: defaultValue))
+        __wrappedValue = .init(initialValue: (try? defaults.decode(forKey: key)) ?? defaultValue)
+    }
+}
+
+extension UserDefaultsState where Value: ExpressibleByNilLiteral {
+    public init(
+        _ key: String,
+        defaultValue: Value = nil,
+        defaults: UserDefaults = .standard
+    ) {
+        self.key = key
+        self.defaultValue = defaultValue
+        self.defaults = defaults
+        
+        __wrappedValue = .init(initialValue: (try? defaults.decode(forKey: key)) ?? defaultValue)
     }
 }

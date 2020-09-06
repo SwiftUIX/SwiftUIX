@@ -86,41 +86,38 @@ extension View {
             .environmentObject(context)
     }
     
-    public func attach(error: Error?) -> some View {
-        error.ifSome { error in
-            preference(key: ErrorContextPreferenceKey.self, value: ErrorContext([error]))
-        }.else {
-            self
-        }
+    public func pushError(_ error: Error?) -> some View {
+        background(error.ifSome { error in
+            ZeroSizeView().preference(
+                key: ErrorContextPreferenceKey.self,
+                value: ErrorContext([error])
+            )
+        })
     }
     
     /// Adds an action to perform when this view appears.
     public func onAppear(perform action: (() throws -> Void)?) -> some View {
         EnvironmentValueAccessView(\.errorContext) { errorContext in
-            self.onAppear(perform: action.map({ action in
-                {
-                    do {
-                        try action()
-                    } catch {
-                        errorContext.push(error)
-                    }
+            self.onAppear(perform: action.map({ action in {
+                do {
+                    try action()
+                } catch {
+                    errorContext.push(error)
                 }
-            }))
+            } }))
         }
     }
     
     /// Adds an action to perform when this view disappears.
     public func onDisappear(perform action: (() throws -> Void)?) -> some View {
         EnvironmentValueAccessView(\.errorContext) { errorContext in
-            self.onDisappear(perform: action.map({ action in
-                {
-                    do {
-                        try action()
-                    } catch {
-                        errorContext.push(error)
-                    }
+            self.onDisappear(perform: action.map({ action in {
+                do {
+                    try action()
+                } catch {
+                    errorContext.push(error)
                 }
-            }))
+            } }))
         }
     }
 }
