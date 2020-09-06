@@ -54,6 +54,9 @@ open class UIHostingVisualEffectBlurView<Content: View>: UIView {
         blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         super.init(frame: .zero)
+        
+        addSubview(blurView)
+        autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
     required public init?(coder: NSCoder) {
