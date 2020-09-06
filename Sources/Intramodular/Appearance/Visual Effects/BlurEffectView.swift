@@ -18,7 +18,7 @@ public struct BlurEffectView<Content: View>: View {
     }
     
     public var body: some View {
-        VisualEffectBlurView(blurStyle: style) {
+        VisualEffectView(effect: UIBlurEffect(style: style)) {
             content
         }
         .accessibility(hidden: Content.self == EmptyView.self)
