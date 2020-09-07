@@ -56,7 +56,7 @@ extension View {
     public func border<S: ShapeStyle>(
         _ content: S,
         cornerRadius: CGFloat,
-        width lineWidth: CGFloat = 1,
+        width lineWidth: CGFloat,
         antialiased: Bool
     ) -> some View {
         self.cornerRadius(cornerRadius, antialiased: antialiased)
@@ -76,7 +76,7 @@ extension View {
     public func border<S: ShapeStyle>(
         _ content: S,
         cornerRadius: CGFloat,
-        width lineWidth: CGFloat = 1,
+        width lineWidth: CGFloat,
         style: RoundedCornerStyle = .circular
     ) -> some View {
         clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: style))
