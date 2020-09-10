@@ -15,9 +15,32 @@ public enum UserInterfaceOrientation {
     case unrecognized
 }
 
+extension UserInterfaceOrientation {
+    public var isPortrait: Bool {
+        switch self {
+            case .portrait, .portraitUpsideDown:
+                return true
+            default:
+                return false
+        }
+    }
+    
+    public var isLandscape: Bool {
+        switch self {
+            case .landscapeLeft, .landscapeRight:
+                return true
+            default:
+                return false
+        }
+    }
+}
+
 #if os(iOS)
 
 extension UserInterfaceOrientation {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     public var current: UserInterfaceOrientation {
         guard let orientation = UIApplication.shared.firstKeyWindow?.windowScene?.interfaceOrientation else {
             return .portrait
