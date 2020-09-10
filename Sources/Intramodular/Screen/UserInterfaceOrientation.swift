@@ -41,7 +41,7 @@ extension UserInterfaceOrientation {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    public var current: UserInterfaceOrientation {
+    public static var current: UserInterfaceOrientation {
         guard let orientation = UIApplication.shared.firstKeyWindow?.windowScene?.interfaceOrientation else {
             return .portrait
         }
