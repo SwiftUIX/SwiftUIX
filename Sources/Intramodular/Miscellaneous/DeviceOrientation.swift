@@ -17,13 +17,16 @@ public enum DeviceOrientation {
     case unrecognized
 }
 
-#if canImport(UIKit)
-
 extension DeviceOrientation {
     public static var current: Self {
-        .init(UIDevice.current.orientation)
+        #if os(iOS)
+        return .init(UIDevice.current.orientation)
+        #else
+        return .portrait
+        #endif
     }
     
+    #if os(iOS)
     public init(_ orientation: UIDeviceOrientation) {
         switch orientation {
             case .portrait:
@@ -44,5 +47,5 @@ extension DeviceOrientation {
                 self = .unrecognized
         }
     }
+    #endif
 }
-#endif
