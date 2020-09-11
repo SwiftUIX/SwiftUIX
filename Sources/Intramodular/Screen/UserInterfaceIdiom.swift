@@ -45,3 +45,15 @@ public enum UserInterfaceIdiom: Hashable {
         #endif
     }
 }
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    public var userInterfaceIdiom: UserInterfaceIdiom {
+        get {
+            self[DefaultEnvironmentKey<UserInterfaceIdiom>] ?? .current
+        } set {
+            self[DefaultEnvironmentKey<UserInterfaceIdiom>] = newValue
+        }
+    }
+}
