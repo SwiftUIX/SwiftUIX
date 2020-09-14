@@ -13,19 +13,19 @@ extension EdgeInsets {
             return
         }
         
-        if edges.contains(.all) || edges.contains(.top) || edges.contains(.vertical) {
+        if edges.contains(.top) {
             top = length
         }
         
-        if edges.contains(.all) || edges.contains(.leading) || edges.contains(.horizontal) {
+        if edges.contains(.leading) {
             leading = length
         }
         
-        if edges.contains(.all) || edges.contains(.bottom) || edges.contains(.vertical) {
+        if edges.contains(.bottom) {
             bottom = length
         }
         
-        if edges.contains(.all) || edges.contains(.trailing) || edges.contains(.horizontal) {
+        if edges.contains(.trailing) {
             trailing = length
         }
     }
