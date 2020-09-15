@@ -10,6 +10,10 @@ import SwiftUI
 
 /// A view whose interface lets the user manage, edit, and send email messages.
 public struct MailComposer: UIViewControllerRepresentable {
+    public typealias UIViewControllerType = MFMailComposeViewController
+    
+    @Environment(\.presentationManager) var presentationManager
+    
     public struct Attachment: Codable, Hashable {
         fileprivate let data: Data
         fileprivate let mimeType: String
@@ -36,11 +40,12 @@ public struct MailComposer: UIViewControllerRepresentable {
     fileprivate let onCompletion: (MFMailComposeResult, Error?) -> Void
     fileprivate var configuration = Configuration()
     
-    public func makeUIViewController(context: Context) -> MFMailComposeViewController {
-        MFMailComposeViewController()
+    public func makeUIViewController(context: Context) -> UIViewControllerType {
+        .init()
     }
     
-    public func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {
+    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        context.coordinator.dismissPresentation = presentationManager.dismiss
         context.coordinator.onCompletion = onCompletion
         
         uiViewController.mailComposeDelegate = context.coordinator
@@ -49,6 +54,7 @@ public struct MailComposer: UIViewControllerRepresentable {
     }
     
     public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        var dismissPresentation: () -> () = { }
         var onCompletion: (MFMailComposeResult, Error?) -> Void
         var addedAttachmentHashes = Set<Int>()
         
@@ -62,6 +68,8 @@ public struct MailComposer: UIViewControllerRepresentable {
             error: Error?
         ) {
             onCompletion(result, error)
+            
+            dismissPresentation()
         }
     }
     
