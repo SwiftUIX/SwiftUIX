@@ -2,10 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(>=5.3)
-
 import Swift
 import SwiftUI
+
+#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
 
 extension View {
     @inlinable

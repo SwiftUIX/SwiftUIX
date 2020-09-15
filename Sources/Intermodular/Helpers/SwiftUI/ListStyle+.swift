@@ -6,8 +6,8 @@ import Swift
 import SwiftUI
 
 extension View {
+    #if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
     public func sidebarListStyleIfAvailable() -> some View {
-        #if swift(>=5.3)
         #if os(macOS)
         return listStyle(SidebarListStyle())
         #elseif targetEnvironment(macCatalyst)
@@ -19,8 +19,14 @@ extension View {
         #else
         return self
         #endif
+    }
+    #else
+    public func sidebarListStyleIfAvailable() -> some View {
+        #if os(macOS)
+        return listStyle(SidebarListStyle())
         #else
         return self
         #endif
     }
+    #endif
 }

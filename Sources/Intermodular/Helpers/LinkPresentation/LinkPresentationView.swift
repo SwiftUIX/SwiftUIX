@@ -127,7 +127,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     }
     
     var body: some View {
-        #if swift(>=5.3)
         ZStack {
             _LPLinkViewRepresentable<Placeholder>(
                 url: url,
@@ -147,22 +146,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
             
             fetchMetadata()
         }
-        #else
-        return ZStack {
-            _LPLinkViewRepresentable<Placeholder>(
-                url: url,
-                metadata: (fetchedMetadata ?? metadata),
-                proposedMinHeight: $proposedMinHeight
-            )
-            .equatable()
-            .minHeight(proposedMinHeight)
-            .visible(!isPlaceholderVisible)
-            
-            placeholder
-                .visible(isPlaceholderVisible)
-        }
-        .onAppear(perform: fetchMetadata)
-        #endif
     }
     
     #if !os(tvOS)

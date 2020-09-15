@@ -2,11 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(>=5.3)
+#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
 
 /// A type to mirror `SwiftUI.RedactionReasons`, added for compatibility.
 /// The reasons to apply a redaction to data displayed on screen.
-public struct RedactionReasons : OptionSet {
+public struct RedactionReasons: OptionSet {
     /// The raw value.
     public let rawValue: Int
     

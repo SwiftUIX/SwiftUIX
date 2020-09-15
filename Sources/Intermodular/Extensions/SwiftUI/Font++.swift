@@ -35,15 +35,20 @@ extension Font {
     
     #if canImport(UIKit)
     public func toUIFont() -> UIFont? {
+        #if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
         guard let textStyle = getTextStyle()?.toUIFontTextStyle() else {
             return nil
         }
         
         return .preferredFont(forTextStyle: textStyle)
+        #else
+        return nil
+        #endif
     }
     #endif
 }
 
+#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
 extension Font {
     #if canImport(UIKit)
     public static func custom(
@@ -72,3 +77,4 @@ extension Font {
     }
     #endif
 }
+#endif

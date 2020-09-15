@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if canImport(UIKit)
+#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
 
 extension Font.TextStyle {
     public var defaultMetrics: (weight: Font.Weight, size: CGFloat, leading: CGFloat) {
