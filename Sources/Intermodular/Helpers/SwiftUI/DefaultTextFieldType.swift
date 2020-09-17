@@ -2,12 +2,31 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
-extension TextField where Label == Text {
-    public init(
-        _ title: LocalizedStringKey,
+public protocol DefaultTextFieldType {
+    init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void,
+        onCommit: @escaping () -> Void
+    )
+    
+    init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void
+    )
+}
+
+// MARK: - Extensions -
+
+extension DefaultTextFieldType {
+    public init<S: StringProtocol>(
+        _ title: S,
         text: Binding<String>,
         isEditing: Binding<Bool>,
         onCommit: @escaping () -> Void = { }
@@ -19,9 +38,9 @@ extension TextField where Label == Text {
             onCommit: onCommit
         )
     }
-
-    public init(
-        _ title: LocalizedStringKey,
+    
+    public init<S: StringProtocol>(
+        _ title: S,
         text: Binding<String?>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
         onCommit: @escaping () -> Void = { }
@@ -34,8 +53,8 @@ extension TextField where Label == Text {
         )
     }
     
-    public init(
-        _ title: LocalizedStringKey,
+    public init<S: StringProtocol>(
+        _ title: S,
         text: Binding<String?>,
         isEditing: Binding<Bool>,
         onCommit: @escaping () -> Void = { }
@@ -47,4 +66,10 @@ extension TextField where Label == Text {
             onCommit: onCommit
         )
     }
+}
+
+// MARK: - Conformances -
+
+extension TextField: DefaultTextFieldType where Label == Text {
+    
 }

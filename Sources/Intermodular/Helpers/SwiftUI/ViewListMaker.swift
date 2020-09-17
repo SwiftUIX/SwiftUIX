@@ -9,7 +9,7 @@ public protocol ViewListMaker {
     func makeViewList() -> [AnyView]
 }
 
-// MARK: - Concrete Implementations -
+// MARK: - Conformances -
 
 extension EmptyView: ViewListMaker {
     @inlinable

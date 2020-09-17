@@ -12,7 +12,7 @@ public protocol DynamicViewPresentable {
     var presenter: DynamicViewPresenter? { get }
 }
 
-// MARK: - Concrete Implementations -
+// MARK: - Conformances -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

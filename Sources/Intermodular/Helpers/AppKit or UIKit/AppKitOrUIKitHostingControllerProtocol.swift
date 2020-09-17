@@ -13,7 +13,7 @@ public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewControl
 
 #endif
 
-// MARK: - Concrete Implementations -
+// MARK: - Conformances -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

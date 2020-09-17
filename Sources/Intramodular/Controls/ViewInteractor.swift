@@ -22,7 +22,7 @@ extension ViewInteractorEnvironmentKey {
     }
 }
 
-// MARK: - Concrete Implementations -
+// MARK: - Conformances -
 
 extension Binding: ViewInteractor {
     

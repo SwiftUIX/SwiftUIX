@@ -49,7 +49,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Concrete Implementations -
+// MARK: - Conformances -
 
 extension Binding: PresentationManager where Value == PresentationMode {
     public var isPresented: Bool {
