@@ -229,6 +229,24 @@ extension Color {
 
 #endif
 
+extension Color {
+    public init(
+        cube256 colorSpace: RGBColorSpace,
+        red: Int,
+        green: Int,
+        blue: Int,
+        opacity: Double = 1
+    ) {
+        self.init(
+            colorSpace,
+            red: Double(red) / 255,
+            green: Double(green) / 255,
+            blue: Double(blue) / 255,
+            opacity: opacity
+        )
+    }
+}
+
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension Color {
