@@ -42,6 +42,14 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
 // MARK: - API -
 
 extension CocoaScrollView {
+    public func alwaysBounceVertical(_ alwaysBounceVertical: Bool) -> Self {
+        then({ $0.configuration.alwaysBounceVertical = alwaysBounceVertical })
+    }
+    
+    public func alwaysBounceHorizontal(_ alwaysBounceHorizontal: Bool) -> Self {
+        then({ $0.configuration.alwaysBounceHorizontal = alwaysBounceHorizontal })
+    }
+    
     public func isPagingEnabled(_ enabled: Bool) -> Self {
         then({ $0.configuration.isPagingEnabled = enabled })
     }
