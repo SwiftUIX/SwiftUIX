@@ -6,7 +6,7 @@ import Foundation
 import Swift
 
 extension UserDefaults {
-    public func decode<Value: Codable>(_ type: Value.Type = Value.self, forKey key: String) throws -> Value? {
+    func decode<Value: Codable>(_ type: Value.Type = Value.self, forKey key: String) throws -> Value? {
         if type is URL.Type || type is Optional<URL>.Type {
             return try decode(String.self, forKey: key).flatMap(URL.init(string:)) as? Value
         } else if let value = value(forKey: key) as? Value {
@@ -18,10 +18,10 @@ extension UserDefaults {
         }
     }
         
-    public func encode<Value: Codable>(_ value: Value, forKey key: String) throws {
+    func encode<Value: Codable>(_ value: Value, forKey key: String) throws {
         if let value = value as? _opaque_Optional, !value.isNotNil {
             removeObject(forKey: key)
-        } else if let value = value as? UserDefaultsPrimitve {
+        } else if let value = value as? UserDefaultsPrimitive {
             setValue(value, forKey: key)
         } else if let value = value as? URL {
             setValue(value.path, forKey: key)
@@ -43,62 +43,62 @@ extension Optional: _opaque_Optional {
     }
 }
 
-private protocol UserDefaultsPrimitve {
+private protocol UserDefaultsPrimitive {
 
 }
 
-extension Bool: UserDefaultsPrimitve {
+extension Bool: UserDefaultsPrimitive {
     
 }
 
-extension Double: UserDefaultsPrimitve {
+extension Double: UserDefaultsPrimitive {
     
 }
 
-extension Float: UserDefaultsPrimitve {
+extension Float: UserDefaultsPrimitive {
     
 }
 
-extension Int: UserDefaultsPrimitve {
+extension Int: UserDefaultsPrimitive {
     
 }
 
-extension Int8: UserDefaultsPrimitve {
+extension Int8: UserDefaultsPrimitive {
     
 }
 
-extension Int16: UserDefaultsPrimitve {
+extension Int16: UserDefaultsPrimitive {
     
 }
 
-extension Int32: UserDefaultsPrimitve {
+extension Int32: UserDefaultsPrimitive {
     
 }
 
-extension Int64: UserDefaultsPrimitve {
+extension Int64: UserDefaultsPrimitive {
     
 }
 
-extension String: UserDefaultsPrimitve {
+extension String: UserDefaultsPrimitive {
     
 }
 
-extension UInt: UserDefaultsPrimitve {
+extension UInt: UserDefaultsPrimitive {
     
 }
 
-extension UInt8: UserDefaultsPrimitve {
+extension UInt8: UserDefaultsPrimitive {
     
 }
 
-extension UInt16: UserDefaultsPrimitve {
+extension UInt16: UserDefaultsPrimitive {
     
 }
 
-extension UInt32: UserDefaultsPrimitve {
+extension UInt32: UserDefaultsPrimitive {
     
 }
 
-extension UInt64: UserDefaultsPrimitve {
+extension UInt64: UserDefaultsPrimitive {
     
 }
