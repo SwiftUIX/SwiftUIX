@@ -83,8 +83,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             isPresented: isPresented,
                             onDismiss: onDismiss
                         )
-                            .mergeEnvironmentBuilder(environmentBuilder)
-                            .modalPresentationStyle(modalPresentationStyle)
+                        .mergeEnvironmentBuilder(environmentBuilder)
+                        .modalPresentationStyle(modalPresentationStyle)
                     }
                 )
             }
@@ -138,7 +138,7 @@ extension View {
             isPresented: isPresented,
             label: { self.contentShape(Rectangle()) }
         )
-            .buttonStyle(PlainButtonStyle())
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -168,7 +168,7 @@ struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
                 destination: destination,
                 label: { content.contentShape(Rectangle()) }
             )
-                .buttonStyle(PlainButtonStyle())
+            .buttonStyle(PlainButtonStyle())
         }
     }
 }

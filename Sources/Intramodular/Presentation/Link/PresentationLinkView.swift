@@ -26,4 +26,11 @@ extension PresentationLinkView {
     ) {
         self.init(destination: destination(), onDismiss: nil, label: label)
     }
+    
+    public init<S: StringProtocol>(
+        _ title: S,
+        @ViewBuilder destination: () -> Destination
+    ) where Label == Text {
+        self.init(destination: destination(), label: { Text(title) })
+    }
 }
