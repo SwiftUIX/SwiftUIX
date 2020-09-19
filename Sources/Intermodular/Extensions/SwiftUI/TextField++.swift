@@ -19,7 +19,7 @@ extension TextField where Label == Text {
             onCommit: onCommit
         )
     }
-
+    
     public init(
         _ title: LocalizedStringKey,
         text: Binding<String?>,
