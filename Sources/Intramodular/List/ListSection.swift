@@ -24,6 +24,13 @@ public struct ListSection<Model, Item> {
         self._model = model
         self.items = items
     }
+    
+    public init(
+        _ model: Model,
+        @ArrayBuilder<Item> items: () -> [Item]
+    ) {
+        self.init(model: model, items: items())
+    }
 }
 
 extension ListSection where Model: Identifiable, Item: Identifiable {
