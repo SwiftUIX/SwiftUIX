@@ -35,20 +35,15 @@ extension Font {
     
     #if canImport(UIKit)
     public func toUIFont() -> UIFont? {
-        #if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
         guard let textStyle = getTextStyle()?.toUIFontTextStyle() else {
             return nil
         }
         
         return .preferredFont(forTextStyle: textStyle)
-        #else
-        return nil
-        #endif
     }
     #endif
 }
 
-#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
 extension Font {
     #if canImport(UIKit)
     public static func custom(
@@ -65,16 +60,11 @@ extension Font {
             return Font(fontMetrics.scaledFont(for: font))
         }
         
-        #if swift(>=5.3)
         if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
             return Font.custom(name, size: textStyle.defaultMetrics.size, relativeTo: textStyle)
         } else {
             return _default()
         }
-        #else
-        return _default()
-        #endif
     }
     #endif
 }
-#endif

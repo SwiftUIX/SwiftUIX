@@ -5,8 +5,6 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
-
 extension View {
     @inlinable
     @ViewBuilder
@@ -28,5 +26,3 @@ extension View {
         }
     }
 }
-
-#endif

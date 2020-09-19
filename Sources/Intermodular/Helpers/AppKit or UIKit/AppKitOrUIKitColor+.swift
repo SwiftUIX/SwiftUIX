@@ -143,19 +143,14 @@ extension Color {
     }
     
     public func toUIColor() -> UIColor? {
-        #if swift(>=5.3)
         #if os(iOS)
         if #available(iOS 14.0, *) {
-            #if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
             return UIColor(self)
-            #else
-            #endif
         }
         #elseif os(tvOS)
         if #available(tvOS 14.0, *) {
             return UIColor(self)
         }
-        #endif
         #endif
         
         return nil

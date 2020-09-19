@@ -46,17 +46,11 @@ extension NSImage {
                 }
             }
             case .system(let name): do {
-                #if swift(>=5.3)
                 if #available(OSX 10.16, *) {
-                    // self.init(systemSymbolName: name, accessibilityDescription: nil)
-                    _ = name
-                    fatalError("Fuck Xcode 12 GM")
+                    self.init(systemSymbolName: name, accessibilityDescription: nil)
                 } else {
                     fatalError("unimplemented")
                 }
-                #else
-                fatalError("unimplemented")
-                #endif
             }
         }
     }
@@ -73,9 +67,7 @@ extension Image {
                 self.init(name, bundle: bundle)
             case .system(let name): do {
                 if #available(OSX 10.16, *) {
-                    _ = name
-                    // self.init(systemName: name)
-                    fatalError()
+                    self.init(systemName: name)
                 } else {
                     fatalError()
                 }

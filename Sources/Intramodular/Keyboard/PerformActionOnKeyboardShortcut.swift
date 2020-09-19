@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) && !targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
 @available(watchOS, unavailable)

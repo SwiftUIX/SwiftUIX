@@ -5,11 +5,10 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
+#if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension Font.TextStyle {
     public var defaultMetrics: (weight: Font.Weight, size: CGFloat, leading: CGFloat) {
-        #if swift(>=5.3)
         switch self {
             case .largeTitle:
                 return (.regular, 34, 41)
@@ -50,28 +49,6 @@ extension Font.TextStyle {
                 }
             }
         }
-        #else
-        switch self {
-            case .largeTitle:
-                return (.regular, 34, 41)
-            case .title:
-                return (.regular, 28, 34)
-            case .headline:
-                return (.semibold, 17, 22)
-            case .subheadline:
-                return (.regular, 15, 20)
-            case .body:
-                return (.regular, 17, 22)
-            case .callout:
-                return (.regular, 16, 21)
-            case .footnote:
-                return (.regular, 13, 18)
-            case .caption:
-                return (.regular, 12, 16)
-            @unknown default:
-                return Self.body.defaultMetrics
-        }
-        #endif
     }
 }
 

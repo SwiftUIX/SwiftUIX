@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if (os(iOS) || os(watchOS) || os(tvOS)) && !targetEnvironment(macCatalyst)
+import SwiftUI
 
 /// A type to mirror `SwiftUI.RedactionReasons`, added for compatibility.
 /// The reasons to apply a redaction to data displayed on screen.
@@ -39,5 +39,3 @@ extension SwiftUI.RedactionReasons {
         self = swiftUIRedactionReasons
     }
 }
-
-#endif
