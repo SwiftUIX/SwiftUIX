@@ -5,11 +5,16 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+
 /// A specialized view for receiving search-related information from the user.
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public struct SearchBar: DefaultTextFieldType {
     @Binding fileprivate var text: String
     
-    #if !BUILDING_FOR_APP_EXTENSION && (os(iOS) || targetEnvironment(macCatalyst))
+    #if os(iOS) || targetEnvironment(macCatalyst)
     @ObservedObject private var keyboard = Keyboard.main
     #endif
     
@@ -58,6 +63,9 @@ public struct SearchBar: DefaultTextFieldType {
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension SearchBar: UIViewRepresentable {
     public typealias UIViewType = UISearchBar
     
@@ -131,6 +139,9 @@ extension SearchBar: UIViewRepresentable {
 
 #elseif os(macOS)
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension SearchBar: NSViewRepresentable {
     public typealias NSViewType = NSSearchField
     
@@ -195,6 +206,9 @@ extension SearchBar: NSViewRepresentable {
 
 // MARK: - API -
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension SearchBar {
     #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
     public func placeholder(_ placeholder: String) -> Self {
@@ -240,6 +254,7 @@ extension SearchBar {
 // MARK: - Auxiliary Implementation -
 
 #if os(iOS) || targetEnvironment(macCatalyst)
+
 extension UISearchBar {
     /// Retrieves the UITextField contained inside the UISearchBar.
     ///
@@ -248,4 +263,7 @@ extension UISearchBar {
         findSubview(ofKind: UITextField.self)
     }
 }
+
+#endif
+
 #endif
