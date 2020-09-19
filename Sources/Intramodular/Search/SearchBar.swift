@@ -9,7 +9,7 @@ import SwiftUI
 public struct SearchBar: DefaultTextFieldType {
     @Binding fileprivate var text: String
     
-    #if os(iOS) || targetEnvironment(macCatalyst)
+    #if !BUILDING_FOR_APP_EXTENSION && (os(iOS) || targetEnvironment(macCatalyst))
     @ObservedObject private var keyboard = Keyboard.main
     #endif
     
