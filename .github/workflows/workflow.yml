@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        xcode: ['12_beta']
+        xcode: ['12', '12.2']
         build_type: ['debug', 'release']
     runs-on: macos-latest
     env:
