@@ -54,7 +54,6 @@ extension Font.TextStyle {
 
 extension Font.TextStyle {
     public func toUIFontTextStyle() -> UIFont.TextStyle? {
-        #if swift(>=5.3)
         switch self {
             #if !os(tvOS)
             case .largeTitle:
@@ -97,28 +96,6 @@ extension Font.TextStyle {
                 }
             }
         }
-        #else
-        switch self {
-            #if !os(tvOS)
-            case .largeTitle:
-                return .largeTitle
-            #endif
-            case .title:
-                return .title1
-            case .headline:
-                return .headline
-            case .subheadline:
-                return .subheadline
-            case .callout:
-                return .callout
-            case .footnote:
-                return .footnote
-            case .caption:
-                return .caption1
-            default:
-                return nil
-        }
-        #endif
     }
 }
 

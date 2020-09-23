@@ -21,6 +21,15 @@ public enum Axis3D {
                 return (0, 0, 1)
         }
     }
+    
+    public init(_ axis: Axis) {
+        switch axis {
+            case .horizontal:
+                self = .x
+            case .vertical:
+                self = .y
+        }
+    }
 }
 
 // MARK: - Helpers -

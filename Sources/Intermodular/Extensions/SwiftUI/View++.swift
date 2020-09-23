@@ -25,13 +25,19 @@ extension View {
 // MARK: View.background
 
 extension View {
-    #if swift(>=5.3)
+    @_disfavoredOverload
+    @inlinable
+    public func background<Background: View>(
+        @ViewBuilder _ background: () -> Background
+    ) -> some View {
+        self.background(background())
+    }
+    
     @_disfavoredOverload
     @inlinable
     public func background(_ color: Color) -> some View {
         background(PassthroughView(content: { color }))
     }
-    #endif
     
     @inlinable
     @available(*, deprecated, message: "Please use View.backgroundFill(_:) instead.")
@@ -95,18 +101,10 @@ extension View {
 // MARK: View.padding
 
 extension View {
-    #if swift(>=5.3)
     /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
     @_disfavoredOverload
     @inlinable
     public func padding(_ color: Color) -> some View {
         padding().background(color)
     }
-    #else
-    /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
-    @inlinable
-    public func padding(_ color: Color) -> some View {
-        padding().background(color)
-    }
-    #endif
 }
