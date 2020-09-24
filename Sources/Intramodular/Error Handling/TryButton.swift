@@ -42,3 +42,14 @@ public struct TryButton<Label: View>: ActionLabelView {
         }
     }
 }
+
+extension TryButton where Label == Text {
+    public init<S: StringProtocol>(
+        _ title: S,
+        action: @escaping () throws -> Void
+    ) {
+        self.init(action: action) {
+            Text(title)
+        }
+    }
+}

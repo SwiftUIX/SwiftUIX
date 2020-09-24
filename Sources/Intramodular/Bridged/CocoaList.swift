@@ -62,7 +62,7 @@ public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: Ra
         uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
         uiViewController.scrollViewConfiguration = scrollViewConfiguration.updating(from: context.environment)
-
+        
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif

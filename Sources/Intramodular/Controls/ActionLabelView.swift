@@ -54,6 +54,18 @@ extension ActionLabelView {
 }
 
 @available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+extension ActionLabelView where Label == Text {
+    public init<S: StringProtocol>(
+        _ title: S,
+        action: @escaping () -> Void
+    ) {
+        self.init(action: action) {
+            Text(title)
+        }
+    }
+}
+
+@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
 extension ActionLabelView where Label == SwiftUI.Label<Text, Image> {
     public init<S: StringProtocol>(
         _ title: S,
