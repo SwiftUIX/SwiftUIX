@@ -1,0 +1,23 @@
+//
+// Copyright (c) Vatsal Manot
+//
+
+import Swift
+import SwiftUI
+
+@available(iOS 13.0, tvOS 13.0, watchOS 7.0, *)
+@available(macOS, unavailable)
+public struct StackNavigationView<Content: View>: View {
+    private let content: Content
+    
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    public var body: some View {
+        NavigationView {
+            content
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+}

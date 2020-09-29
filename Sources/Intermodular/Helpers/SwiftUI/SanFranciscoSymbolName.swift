@@ -1715,7 +1715,11 @@ public enum SanFranciscoSymbolName: String, CaseIterable {
 public extension Image {
     init(systemName: SanFranciscoSymbolName) {
         #if os(macOS)
-        fatalError()
+        if #available(OSX 11.0, *) {
+            self.init(systemName: systemName.rawValue)
+        } else {
+            fatalError()
+        }
         #else
         self.init(systemName: systemName.rawValue)
         #endif
