@@ -6,19 +6,22 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A property wrapper type that instantiates an observable object.
+@propertyWrapper
 public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
     let thunk: () -> ObjectType
     
     @OptionalObservedObject
     private var observedObject: ObjectType?
     @State
-    public var state: ObjectType?
+    private var state = ReferenceBox<ObjectType?>(nil)
     
     public var wrappedValue: ObjectType {
         get {
-            state!
+            state.value!
         } nonmutating set {
-            state = newValue
+            state.value = newValue
+            observedObject = newValue
         }
     }
     public var projectedValue: ObservedObject<ObjectType>.Wrapper {
@@ -30,13 +33,11 @@ public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
     }
     
     public mutating func update() {
-        if _state.wrappedValue == nil {
+        if state.value == nil {
             let object = thunk()
             
-            _state = .init(initialValue: object)
+            state.value = object
             _observedObject = .init(wrappedValue: object)
-        } else {
-            observedObject = state
         }
     }
 }
