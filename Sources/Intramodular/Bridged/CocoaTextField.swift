@@ -180,7 +180,7 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.attributedPlaceholder = NSAttributedString(
                 string: placeholder,
                 attributes: [
-                    .font: font as Any,
+                    .font: uiFont ?? font?.toUIFont() as Any,
                     .paragraphStyle: NSMutableParagraphStyle().then {
                         $0.alignment = .init(multilineTextAlignment)
                     }
