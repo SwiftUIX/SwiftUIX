@@ -11,7 +11,7 @@ import SwiftUI
 @available(macCatalyst, unavailable)
 extension NSApplication {
     public var firstKeyWindow: NSWindow? {
-        windows.first(where: { $0.isKeyWindow })
+        keyWindow
     }
 }
 
