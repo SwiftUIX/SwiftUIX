@@ -13,13 +13,13 @@ public protocol Navigator: DynamicViewPresenter {
 
 // MARK: - Helpers -
 
-struct NavigatorEnvironmentKey: EnvironmentKey {
-    static var defaultValue: Navigator? {
-        return nil
-    }
-}
-
 extension EnvironmentValues {
+    private struct NavigatorEnvironmentKey: EnvironmentKey {
+        static var defaultValue: Navigator? {
+            return nil
+        }
+    }
+    
     public var navigator: Navigator? {
         get {
             self[NavigatorEnvironmentKey.self]
