@@ -8,6 +8,8 @@ import SwiftUI
 /// A type that provides an environment for its children to inherit.
 public protocol EnvironmentProvider {
     var environmentBuilder: EnvironmentBuilder { get nonmutating set }
+    
+    func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder)
 }
 
 // MARK: - Extensions -

@@ -36,7 +36,7 @@ public enum RectangleCorner: Hashable {
                         return .bottomLeft
                     case .bottomTrailing:
                         return .bottomLeading
-            }
+                }
             case .vertical:
                 switch self {
                     case .topLeft:
@@ -55,7 +55,7 @@ public enum RectangleCorner: Hashable {
                         return .topRight
                     case .bottomTrailing:
                         return .bottomTrailing
-            }
+                }
         }
     }
 }
