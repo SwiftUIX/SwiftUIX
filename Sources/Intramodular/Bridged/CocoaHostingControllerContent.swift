@@ -23,6 +23,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     }
     
     public var body: some View {
+        #if os(iOS) || targetEnvironment(macCatalyst)
         content
             .environment(\._appKitOrUIKitViewController, parent)
             .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
@@ -45,6 +46,29 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
             .onPreferenceChange(IsModalInPresentation.self) {
                 self.presentationCoordinator?.setIsInPresentation($0)
             }
+        #else
+        content
+            .environment(\._appKitOrUIKitViewController, parent)
+            .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
+            .environment(\.presenter, presentationCoordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))
+            .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
+                if let parent = self.parent as? CocoaHostingController<AnyPresentationView> {
+                    parent.subviewDescriptions = $0
+                }
+            })
+            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in
+                if let presentation = presentation {
+                    self.presentationCoordinator?.present(presentation)
+                } else {
+                    self.presentationCoordinator?.dismiss()
+                }
+            }
+            .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
+            .onPreferenceChange(IsModalInPresentation.self) {
+                self.presentationCoordinator?.setIsInPresentation($0)
+            }
+        #endif
     }
 }
 
