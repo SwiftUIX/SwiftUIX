@@ -30,10 +30,12 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     ) {
         self._presentationCoordinator = presentationCoordinator
         
-        super.init(rootView: .init(
-                    parent: nil,
-                    content: rootView,
-                    presentationCoordinator: presentationCoordinator)
+        super.init(
+            rootView: .init(
+                parent: nil,
+                content: rootView,
+                presentationCoordinator: presentationCoordinator
+            )
         )
         
         presentationCoordinator.setViewController(self)

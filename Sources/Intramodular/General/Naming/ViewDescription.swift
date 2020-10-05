@@ -43,7 +43,5 @@ public struct ViewDescription: Equatable {
 
 extension ViewDescription {
     @usableFromInline
-    final class PreferenceKey: ArrayReducePreferenceKey<ViewDescription> {
-        
-    }
+    typealias PreferenceKey = ArrayReducePreferenceKey<ViewDescription>
 }

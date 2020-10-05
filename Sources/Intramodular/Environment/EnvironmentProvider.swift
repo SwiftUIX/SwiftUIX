@@ -9,10 +9,13 @@ import SwiftUI
 public protocol EnvironmentProvider {
     var environmentBuilder: EnvironmentBuilder { get nonmutating set }
     
+    func insertEnvironmentObject<B: ObservableObject>(_ bindable: B)
     func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder)
 }
 
-// MARK: - Extensions -
+// MARK: - Implementation -
+
+private var objc_environmentBuilderKey: Void = ()
 
 extension EnvironmentProvider {
     public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) {
@@ -24,52 +27,12 @@ extension EnvironmentProvider {
     }
 }
 
-// MARK: - Conformances -
-
-private var environmentBuilderKey: Void = ()
-
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-extension UIViewController {
+extension EnvironmentProvider where Self: AnyObject {
     public var environmentBuilder: EnvironmentBuilder {
         get {
-            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
+            objc_getAssociatedObject(self, &objc_environmentBuilderKey) as? EnvironmentBuilder ?? .init()
         } set {
-            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &objc_environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 }
-
-extension UIWindow {
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
-        } set {
-            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-}
-
-#elseif os(macOS)
-
-extension NSViewController {
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
-        } set {
-            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-}
-
-extension NSWindow {
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
-        } set {
-            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-}
-
-#endif

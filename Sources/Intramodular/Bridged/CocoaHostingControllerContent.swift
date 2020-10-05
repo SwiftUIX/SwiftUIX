@@ -24,6 +24,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     
     public var body: some View {
         content
+            .environment(\._appKitOrUIKitViewController, parent)
             .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
             .environment(\.presenter, presentationCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))

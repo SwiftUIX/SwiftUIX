@@ -8,31 +8,43 @@ import Swift
 import SwiftUI
 import UIKit
 
-open class CocoaPresentationHostingController: CocoaHostingController<CocoaPresentationHostingControllerContent> {
+open class CocoaPresentationHostingController: CocoaHostingController<AnyPresentationView> {
+    var presentation: AnyModalPresentation {
+        didSet {
+            presentationDidChange(presentingViewController: presentingViewController)
+        }
+    }
+    
     init(
         presentingViewController: UIViewController,
         presentation: AnyModalPresentation,
         coordinator: CocoaPresentationCoordinator
     ) {
+        self.presentation = presentation
+        
         super.init(
-            rootView: .init(presentation: presentation),
+            rootView: presentation.content,
             presentationCoordinator: coordinator
         )
         
+        presentationDidChange(presentingViewController: presentingViewController)
+    }
+    
+    private func presentationDidChange(presentingViewController: UIViewController?) {
         modalPresentationStyle = .init(presentation.content.presentationStyle)
-        presentationController?.delegate = coordinator
+        presentationController?.delegate = presentationCoordinator
         transitioningDelegate = presentation.content.presentationStyle.transitioningDelegate
         
         #if !os(tvOS)
         if case let .popover(permittedArrowDirections) = presentation.content.presentationStyle {
-            popoverPresentationController?.delegate = coordinator
+            popoverPresentationController?.delegate = presentationCoordinator
             popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
             
             let sourceViewDescription = presentation.content.preferredSourceViewName.flatMap {
                 (presentingViewController as? CocoaController)?.description(for: $0)
             }
             
-            popoverPresentationController?.sourceView = presentingViewController.view
+            popoverPresentationController?.sourceView = presentingViewController?.view
             
             if let sourceRect = sourceViewDescription?.globalBounds {
                 popoverPresentationController?.sourceRect = sourceRect
@@ -43,6 +55,8 @@ open class CocoaPresentationHostingController: CocoaHostingController<CocoaPrese
         if presentation.content.presentationStyle != .automatic {
             view.backgroundColor = .clear
         }
+        
+        rootViewContent = presentation.content
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {

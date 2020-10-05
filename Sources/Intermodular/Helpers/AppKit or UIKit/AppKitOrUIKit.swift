@@ -110,3 +110,17 @@ public let NSAlert_Type = unsafeBitCast(NSClassFromString("NSAlert"), to: NSAler
 public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to: NSOpenPanelProtocol.Type.self)
 
 #endif
+
+#if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+
+extension EnvironmentValues {
+    public var _appKitOrUIKitViewController: AppKitOrUIKitViewController? {
+        get {
+            self[DefaultEnvironmentKey<AppKitOrUIKitViewController>]
+        } set {
+            self[DefaultEnvironmentKey<AppKitOrUIKitViewController>] = newValue
+        }
+    }
+}
+
+#endif

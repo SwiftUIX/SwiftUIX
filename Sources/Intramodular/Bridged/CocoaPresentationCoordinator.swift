@@ -115,7 +115,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func present(_ modal: AnyModalPresentation) {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let viewController = viewController.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.content.presentationStyle {
-            viewController.rootView.content.presentation = modal
+            viewController.presentation = modal
             return
         }
         
