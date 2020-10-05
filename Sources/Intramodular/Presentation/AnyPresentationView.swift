@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public struct EnvironmentalAnyView: View {
+public struct AnyPresentationView: View {
     public let base: _opaque_View
     
     private var environmentBuilder: EnvironmentBuilder
@@ -27,7 +27,7 @@ public struct EnvironmentalAnyView: View {
     }
     
     public init<V: View>(_ view: V) {
-        if let view = view as? EnvironmentalAnyView {
+        if let view = view as? AnyPresentationView {
             self = view
         } else {
             self.base = (view as? _opaque_View) ?? view.eraseToAnyView()
@@ -38,13 +38,13 @@ public struct EnvironmentalAnyView: View {
 
 // MARK: - Protocol Implementations -
 
-extension EnvironmentalAnyView: _opaque_View {
+extension AnyPresentationView: _opaque_View {
     public func _opaque_getViewName() -> ViewName? {
         _name ?? base._opaque_getViewName()
     }
 }
 
-extension EnvironmentalAnyView: ModalPresentationView {
+extension AnyPresentationView: ModalPresentationView {
     public var preferredSourceViewName: ViewName? {
         (base as? _opaque_ModalPresentationView)?.preferredSourceViewName
     }
@@ -76,7 +76,7 @@ extension EnvironmentalAnyView: ModalPresentationView {
     }
 }
 
-extension EnvironmentalAnyView: NavigatableView {
+extension AnyPresentationView: NavigatableView {
     public var hidesBottomBarWhenPushed: Bool {
         _hidesBottomBarWhenPushed ?? (base as? _opaque_NavigatableView)?.hidesBottomBarWhenPushed ?? false
     }
@@ -84,7 +84,7 @@ extension EnvironmentalAnyView: NavigatableView {
 
 // MARK: - API -
 
-extension EnvironmentalAnyView {
+extension AnyPresentationView {
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> Self {
         then({ $0.environmentBuilder.merge(builder) })
     }
@@ -94,13 +94,13 @@ extension EnvironmentalAnyView {
     }
 }
 
-extension EnvironmentalAnyView {
+extension AnyPresentationView {
     public func name(_ name: ViewName?) -> Self {
         then({ $0._name = name })
     }
 }
 
-extension EnvironmentalAnyView {
+extension AnyPresentationView {
     public func onPresent(perform action: @escaping () -> Void) -> Self {
         then({ $0._onPresentImpl = action })
     }
@@ -110,7 +110,7 @@ extension EnvironmentalAnyView {
     }
 }
 
-extension EnvironmentalAnyView {
+extension AnyPresentationView {
     public func modalPresentationStyle(_ style: ModalPresentationStyle) -> Self {
         then({ $0._modalPresentationStyle = style })
     }
@@ -128,7 +128,7 @@ extension EnvironmentalAnyView {
     }
 }
 
-extension EnvironmentalAnyView {
+extension AnyPresentationView {
     public func hidesBottomBarWhenPushed(_ hidesBottomBarWhenPushed: Bool) -> Self {
         then({ $0._hidesBottomBarWhenPushed = hidesBottomBarWhenPushed })
     }

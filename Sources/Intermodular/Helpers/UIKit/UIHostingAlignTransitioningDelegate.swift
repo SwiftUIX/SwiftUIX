@@ -80,7 +80,7 @@ extension ModalPresentationStyle {
                 background: DefaultPresentationBackdrop(),
                 source: source,
                 destination: destination,
-                contentType: EnvironmentalAnyView.self
+                contentType: AnyPresentationView.self
             )
         )
     }

@@ -11,13 +11,13 @@ public struct AnyModalPresentation: Identifiable {
     
     public let id: UUID
     
-    public private(set) var content: EnvironmentalAnyView
+    public private(set) var content: AnyPresentationView
     
     @usableFromInline
     let resetBinding: () -> ()
     
     @usableFromInline
-    init(_ content: EnvironmentalAnyView) {
+    init(_ content: AnyPresentationView) {
         self.id = UUID()
         self.content = content
         self.resetBinding = { }
@@ -35,7 +35,7 @@ public struct AnyModalPresentation: Identifiable {
         resetBinding: @escaping () -> () = { }
     ) {
         self.id = id
-        self.content = EnvironmentalAnyView(content)
+        self.content = AnyPresentationView(content)
         self.resetBinding = resetBinding
         
         if let presentationStyle = presentationStyle {
