@@ -26,6 +26,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
         content
             .environment(\._appKitOrUIKitViewController, parent)
             .environment(\.cocoaPresentationCoordinator, presentationCoordinator)
+            .environment(\.navigator, parent?.navigationController)
             .environment(\.presenter, presentationCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinator))
             .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
