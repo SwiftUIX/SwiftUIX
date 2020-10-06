@@ -14,14 +14,7 @@ public struct PageControl {
     public let currentPage: Binding<Int>
     
     @usableFromInline
-    @Environment(\.pageIndicatorTintColor) var pageIndicatorTintColor
-    
-    @usableFromInline
-    @Environment(\.currentPageIndicatorTintColor) var currentPageIndicatorTintColor
-    
-    @usableFromInline
     var defersCurrentPageDisplay: Bool?
-    
     @usableFromInline
     var hidesForSinglePage: Bool?
     
@@ -70,9 +63,15 @@ extension PageControl: UIViewRepresentable {
         context.coordinator.base = self
         
         uiView.currentPage = currentPage.wrappedValue
-        uiView.currentPageIndicatorTintColor = currentPageIndicatorTintColor?.toUIColor3()
+        uiView.currentPageIndicatorTintColor = context.environment.currentPageIndicatorTintColor?.toUIColor3()
         uiView.numberOfPages = numberOfPages
-        uiView.pageIndicatorTintColor = pageIndicatorTintColor?.toUIColor()
+        uiView.pageIndicatorTintColor = context.environment.pageIndicatorTintColor?.toUIColor()
+        
+        if #available(iOS 14.0, *) {
+            if let backgroundStyle = context.environment.pageControlBackgroundStyle {
+                uiView.backgroundStyle = backgroundStyle
+            }
+        }
         
         if let hidesForSinglePage = hidesForSinglePage {
             uiView.hidesForSinglePage = hidesForSinglePage
@@ -104,6 +103,12 @@ extension PageControl {
 }
 
 extension View {
+    @available(iOS 14.0, *)
+    @inlinable
+    public func pageControlBackgroundStyle(_ backgroundStyle: UIPageControl.BackgroundStyle) -> some View {
+        environment(\.pageControlBackgroundStyle, backgroundStyle)
+    }
+    
     @inlinable
     public func pageIndicatorTintColor(_ color: Color) -> some View {
         environment(\.pageIndicatorTintColor, color)
@@ -118,6 +123,13 @@ extension View {
 // MARK: - Auxiliary Implementation -
 
 extension PageControl {
+    @available(iOS 14.0, *)
+    @usableFromInline
+    struct BackgroundStyleEnvironmentKey: EnvironmentKey {
+        @usableFromInline
+        static let defaultValue: UIPageControl.BackgroundStyle? = nil
+    }
+    
     @usableFromInline
     struct TintColorEnvironmentKey: EnvironmentKey {
         @usableFromInline
@@ -132,6 +144,16 @@ extension PageControl {
 }
 
 extension EnvironmentValues {
+    @available(iOS 14.0, *)
+    @inlinable
+    public var pageControlBackgroundStyle: UIPageControl.BackgroundStyle? {
+        get {
+            self[PageControl.BackgroundStyleEnvironmentKey]
+        } set {
+            self[PageControl.BackgroundStyleEnvironmentKey] = newValue
+        }
+    }
+    
     @inlinable
     public var pageIndicatorTintColor: Color? {
         get {

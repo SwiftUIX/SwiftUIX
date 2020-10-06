@@ -132,6 +132,13 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController.isPanGestureEnabled = context.environment.isPanGestureEnabled
         uiViewController.isScrollEnabled = context.environment.isScrollEnabled
         uiViewController.isTapGestureEnabled = context.environment.isTapGestureEnabled
+        
+        if #available(iOS 14.0, *) {
+            if let backgroundStyle = context.environment.pageControlBackgroundStyle {
+                uiViewController.pageControl?.backgroundStyle = backgroundStyle
+            }
+        }
+        
         uiViewController.pageControl?.currentPageIndicatorTintColor = context.environment.currentPageIndicatorTintColor?.toUIColor()
         uiViewController.pageControl?.pageIndicatorTintColor = context.environment.pageIndicatorTintColor?.toUIColor()
     }
