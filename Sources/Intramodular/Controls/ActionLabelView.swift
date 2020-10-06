@@ -51,6 +51,13 @@ extension ActionLabelView {
     ) {
         self.init(action: { boolean.wrappedValue.toggle() }, label: label)
     }
+    
+    public init(
+        toggle editMode: Binding<EditMode>,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(action: { editMode.wrappedValue.toggle() }, label: label)
+    }
 }
 
 @available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
@@ -61,17 +68,6 @@ extension ActionLabelView where Label == Text {
     ) {
         self.init(action: action) {
             Text(title)
-        }
-    }
-}
-
-extension ActionLabelView where Label == Image {
-    public init(
-        systemImage: SanFranciscoSymbolName,
-        action: @escaping () -> Void
-    ) {
-        self.init(action: action) {
-            Image(systemName: systemImage)
         }
     }
 }
