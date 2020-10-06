@@ -7,6 +7,16 @@ import SwiftUI
 
 extension Binding {
     @inlinable
+    public func map<T>(_ keyPath: WritableKeyPath<Value, T>) -> Binding<T> {
+        .init(
+            get: { self.wrappedValue[keyPath: keyPath] },
+            set: { self.wrappedValue[keyPath: keyPath] = $0 }
+        )
+    }
+}
+
+extension Binding {
+    @inlinable
     public static func receiveValue<Wrapped>(_ receiveValue: @escaping (Wrapped?) -> ()) -> Binding where Optional<Wrapped> == Value {
         .init(
             get: { nil },
