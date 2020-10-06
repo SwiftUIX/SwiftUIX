@@ -5,6 +5,9 @@
 import Swift
 import SwiftUI
 
+@available(iOS 13.0, tvOS 13.0, *)
+@available(macOS, unavailable)
+@available(watchOS, unavailable)
 extension EditMode {
     public mutating func toggle() {
         switch self {

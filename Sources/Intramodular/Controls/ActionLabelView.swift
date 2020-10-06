@@ -52,6 +52,9 @@ extension ActionLabelView {
         self.init(action: { boolean.wrappedValue.toggle() }, label: label)
     }
     
+    @available(iOS 13.0, tvOS 13.0, *)
+    @available(macOS, unavailable)
+    @available(watchOS, unavailable)
     public init(
         toggle editMode: Binding<EditMode>,
         @ViewBuilder label: () -> Label
