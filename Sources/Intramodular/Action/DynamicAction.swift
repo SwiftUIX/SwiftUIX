@@ -32,6 +32,34 @@ extension PerformActionView {
     }
 }
 
+public struct DynamicActionButton<Action: DynamicAction, Label: View>: View {
+    public let action: Action
+    public let label: Label
+    
+    public init(
+        action: Action,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.action = action
+        self.label = label()
+    }
+    
+    public var body: some View {
+        Button(action: action.perform) {
+            label
+        }
+    }
+}
+
+extension View {
+    public func onPress<A: DynamicAction>(perform action: A) -> some View {
+        DynamicActionButton(action: action) {
+            self
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 public struct InsertDynamicAction<Base: PerformActionView, Action: DynamicAction>: View {

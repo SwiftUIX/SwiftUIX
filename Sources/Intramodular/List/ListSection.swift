@@ -33,6 +33,24 @@ public struct ListSection<Model, Item> {
     }
 }
 
+extension ListSection where Model: Equatable {
+    public static func == (lhs: Self, rhs: Model) -> Bool {
+        lhs.model == rhs
+    }
+    
+    public static func == (lhs: Model, rhs: Self) -> Bool {
+        rhs.model == lhs
+    }
+    
+    public static func != (lhs: Self, rhs: Model) -> Bool {
+        !(lhs == rhs)
+    }
+    
+    public static func != (lhs: Model, rhs: Self) -> Bool {
+        !(lhs == rhs)
+    }
+}
+
 extension ListSection where Model: Identifiable, Item: Identifiable {
     public init(
         model: Model,

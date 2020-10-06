@@ -25,9 +25,8 @@ extension UIViewController {
     }
     
     override open var nearestNavigationController: UINavigationController? {
-        nil
+        navigationController
             ?? nearestChild(ofKind: UINavigationController.self)
-            ?? navigationController
             ?? nearestResponder(ofKind: UINavigationController.self)
     }
 }
@@ -49,32 +48,71 @@ extension UIViewController {
         }
     }
     
-    func nearestChild<T: UIViewController>(ofKind kind: T.Type) -> T? {
-        if let result = presentedViewController?.nearestChild(ofKind: kind) {
+    func _nearestChild<T: UIViewController>(
+        ofKind kind: T.Type,
+        currentDepth: Int?,
+        maximumDepth: Int?
+    ) -> T? {
+        var currentDepth = currentDepth
+        
+        if maximumDepth != nil {
+            currentDepth = currentDepth.map({ $0 + 1 }) ?? 0
+        }
+        
+        if let currentDepth = currentDepth {
+            if currentDepth == maximumDepth {
+                return nil
+            }
+        }
+        
+        if let result = presentedViewController?._nearestChild(
+            ofKind: kind,
+            currentDepth: currentDepth,
+            maximumDepth: maximumDepth
+        ) {
             return result
         }
         
         for child in children {
             if let child = (child as? UITabBarController)?.selectedViewController {
-                if let child = child.nearestChild(ofKind: kind) {
+                if let child = child._nearestChild(
+                    ofKind: kind,
+                    currentDepth: currentDepth,
+                    maximumDepth: maximumDepth
+                ) {
                     return child
                 }
             }
             
             if let child = (child as? UINavigationController)?.visibleViewController {
-                if let child = child.nearestChild(ofKind: kind) {
+                if let child = child._nearestChild(
+                    ofKind: kind,
+                    currentDepth: currentDepth,
+                    maximumDepth: maximumDepth
+                ) {
                     return child
                 }
             }
             
             if child.isKind(of: kind) {
                 return child as? T
-            } else if let result = child.nearestChild(ofKind: kind) {
+            } else if let result = child._nearestChild(
+                ofKind: kind,
+                currentDepth: currentDepth,
+                maximumDepth: maximumDepth
+            ) {
                 return result
             }
         }
         
         return nil
+    }
+    
+    func nearestChild<T: UIViewController>(
+        ofKind kind: T.Type,
+        maximumDepth: Int? = nil
+    ) -> T? {
+        _nearestChild(ofKind: kind, currentDepth: nil, maximumDepth: maximumDepth)
     }
 }
 
