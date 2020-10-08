@@ -18,9 +18,9 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
     
     public var rootView: Content {
         get {
-            rootHostingViewController.rootViewContent.content
+            rootHostingViewController.rootView.content.content
         } set {
-            rootHostingViewController.rootViewContent.content = newValue
+            rootHostingViewController.rootView.content.content = newValue
         }
     }
     

@@ -67,7 +67,7 @@ extension PageControl: UIViewRepresentable {
         uiView.numberOfPages = numberOfPages
         uiView.pageIndicatorTintColor = context.environment.pageIndicatorTintColor?.toUIColor()
         
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.0, tvOS 14.0, *) {
             if let backgroundStyle = context.environment.pageControlBackgroundStyle {
                 uiView.backgroundStyle = backgroundStyle
             }
@@ -103,7 +103,7 @@ extension PageControl {
 }
 
 extension View {
-    @available(iOS 14.0, *)
+    @available(iOS 14.0, tvOS 14.0, *)
     @inlinable
     public func pageControlBackgroundStyle(_ backgroundStyle: UIPageControl.BackgroundStyle) -> some View {
         environment(\.pageControlBackgroundStyle, backgroundStyle)
@@ -123,7 +123,7 @@ extension View {
 // MARK: - Auxiliary Implementation -
 
 extension PageControl {
-    @available(iOS 14.0, *)
+    @available(iOS 14.0, tvOS 14.0, *)
     @usableFromInline
     struct BackgroundStyleEnvironmentKey: EnvironmentKey {
         @usableFromInline
@@ -144,7 +144,7 @@ extension PageControl {
 }
 
 extension EnvironmentValues {
-    @available(iOS 14.0, *)
+    @available(iOS 14.0, tvOS 14.0, *)
     @inlinable
     public var pageControlBackgroundStyle: UIPageControl.BackgroundStyle? {
         get {

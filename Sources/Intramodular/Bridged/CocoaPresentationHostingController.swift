@@ -56,7 +56,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
             view.backgroundColor = .clear
         }
         
-        rootViewContent = presentation.content
+        rootView.content = presentation.content
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {

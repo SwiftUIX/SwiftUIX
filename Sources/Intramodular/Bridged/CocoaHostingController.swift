@@ -14,14 +14,6 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         return _presentationCoordinator
     }
     
-    public var rootViewContent: Content {
-        get {
-            rootView.content
-        } set {
-            rootView.content = newValue
-        }
-    }
-    
     public var subviewDescriptions: [ViewDescription] = []
     
     init(

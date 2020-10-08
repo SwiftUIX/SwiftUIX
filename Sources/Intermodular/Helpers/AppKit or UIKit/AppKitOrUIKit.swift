@@ -123,4 +123,23 @@ extension EnvironmentValues {
     }
 }
 
+struct _SetAppKitOrUIKitViewControllerEnvironmentValue: ViewModifier {
+    @State var _appKitOrUIKitViewController: AppKitOrUIKitViewController?
+    
+    func body(content: Content) -> some View {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        return content
+            .environment(\._appKitOrUIKitViewController, _appKitOrUIKitViewController)
+            .environment(\.navigator, _appKitOrUIKitViewController?.navigationController)
+            .onUIViewControllerResolution {
+                if !(self._appKitOrUIKitViewController === $0) {
+                    self._appKitOrUIKitViewController = $0
+                }
+            }
+        #else
+        return content
+        #endif
+    }
+}
+
 #endif

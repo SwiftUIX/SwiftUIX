@@ -44,9 +44,8 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
         content.background(
             selection.wrappedValue.ifSome { selection in
                 NavigationLink(
-                    destination: LazyView {
-                        self.destination(selection)
-                    },
+                    destination: self.destination(selection)
+                        .modifier(_SetAppKitOrUIKitViewControllerEnvironmentValue()),
                     isActive: isActive,
                     label: { ZeroSizeView() }
                 )

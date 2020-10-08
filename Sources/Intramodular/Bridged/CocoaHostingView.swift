@@ -25,7 +25,7 @@ public struct CocoaHostingView<Content: View>: UIViewControllerRepresentable {
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.rootViewContent = rootView
+        uiViewController.rootView.content = rootView
     }
 }
 

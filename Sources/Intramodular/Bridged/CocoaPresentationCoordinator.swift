@@ -12,13 +12,6 @@ import SwiftUI
     public var environmentBuilder = EnvironmentBuilder()
     
     private let presentation: AnyModalPresentation?
-    private var stagedPresentation: AnyModalPresentation?
-    
-    public var subviews: [ViewDescription] = [] {
-        didSet {
-            print(subviews)
-        }
-    }
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -55,12 +48,7 @@ import SwiftUI
         }
         #endif
     }
-    
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    var transitioningDelegate: UIViewControllerTransitioningDelegate?
-    #endif
-    
-    private weak var viewController: AppKitOrUIKitViewController!
+    fileprivate weak var viewController: AppKitOrUIKitViewController!
     
     public init(
         presentation: AnyModalPresentation? = nil,
@@ -231,21 +219,29 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 
 #endif
 
-// MARK: - Helpers -
-
-extension CocoaPresentationCoordinator {
-    struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        static let defaultValue: CocoaPresentationCoordinator? = nil
-    }
-}
-
-extension EnvironmentValues {
-    public var cocoaPresentationCoordinator: CocoaPresentationCoordinator? {
-        get {
-            self[CocoaPresentationCoordinator.EnvironmentKey]
-        } set {
-            self[CocoaPresentationCoordinator.EnvironmentKey] = newValue
-        }
+struct _UseCocoaPresentationCoordinator: ViewModifier {
+    let coordinator: CocoaPresentationCoordinator?
+    
+    func body(content: Content) -> some View {
+        content
+            .environment(\.presenter, coordinator)
+            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
+            .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
+                if let parent = self.coordinator?.viewController as? CocoaHostingController<AnyPresentationView> {
+                    parent.subviewDescriptions = $0
+                }
+            })
+            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in
+                if let presentation = presentation {
+                    self.coordinator?.present(presentation)
+                } else {
+                    self.coordinator?.dismiss()
+                }
+            }
+            .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
+            .onPreferenceChange(IsModalInPresentation.self) {
+                self.coordinator?.setIsInPresentation($0)
+            }
     }
 }
 

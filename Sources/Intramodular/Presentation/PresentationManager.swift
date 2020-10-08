@@ -42,7 +42,13 @@ private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey 
 extension EnvironmentValues {
     public var presentationManager: PresentationManager {
         get {
-            self[_PresentationManagerEnvironmentKey.self] ?? presentationMode
+            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+            return self[_PresentationManagerEnvironmentKey.self]
+                ?? (_appKitOrUIKitViewController?.presentationCoordinator).map(CocoaPresentationMode.init)
+                ?? presentationMode
+            #else
+            return self[_PresentationManagerEnvironmentKey.self] ?? presentationMode
+            #endif
         } set {
             self[_PresentationManagerEnvironmentKey.self] = newValue
         }

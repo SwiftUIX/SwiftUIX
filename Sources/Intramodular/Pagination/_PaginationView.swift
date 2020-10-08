@@ -108,7 +108,7 @@ extension _PaginationView: UIViewControllerRepresentable {
                         animated: true
                     )
                 }
-
+                
                 currentPageIndex = 0
             }
         }
@@ -133,7 +133,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController.isScrollEnabled = context.environment.isScrollEnabled
         uiViewController.isTapGestureEnabled = context.environment.isTapGestureEnabled
         
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.0, tvOS 14.0, *) {
             if let backgroundStyle = context.environment.pageControlBackgroundStyle {
                 uiViewController.pageControl?.backgroundStyle = backgroundStyle
             }
@@ -197,7 +197,7 @@ extension _PaginationView {
             
             return pageViewController.viewController(after: viewController)
         }
-
+        
         @usableFromInline
         @objc(pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:)
         func pageViewController(
@@ -243,7 +243,7 @@ extension _PaginationView {
                 
                 return 0
             }
-
+            
             return pageViewController.currentPageIndexOffset ?? 0
         }
     }

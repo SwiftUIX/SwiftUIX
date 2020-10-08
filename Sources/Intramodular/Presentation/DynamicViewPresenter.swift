@@ -151,18 +151,13 @@ private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    @available(*, deprecated, message: "Use EnvironmentValues.presenter instead.")
-    public var dynamicViewPresenter: DynamicViewPresenter? {
-        get {
-            self[DynamicViewPresenterEnvironmentKey.self]
-        } set {
-            self[DynamicViewPresenterEnvironmentKey.self] = newValue
-        }
-    }
-    
     public var presenter: DynamicViewPresenter? {
         get {
-            self[DynamicViewPresenterEnvironmentKey.self]
+            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+            return self[DynamicViewPresenterEnvironmentKey.self] ?? _appKitOrUIKitViewController
+            #else
+            return self[DynamicViewPresenterEnvironmentKey.self]
+            #endif
         } set {
             self[DynamicViewPresenterEnvironmentKey.self] = newValue
         }
