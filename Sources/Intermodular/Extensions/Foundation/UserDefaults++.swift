@@ -17,7 +17,7 @@ extension UserDefaults {
             return nil
         }
     }
-        
+    
     func encode<Value: Codable>(_ value: Value, forKey key: String) throws {
         if let value = value as? _opaque_Optional, !value.isNotNil {
             removeObject(forKey: key)
@@ -43,8 +43,8 @@ extension Optional: _opaque_Optional {
     }
 }
 
-private protocol UserDefaultsPrimitive {
-
+protocol UserDefaultsPrimitive {
+    
 }
 
 extension Bool: UserDefaultsPrimitive {

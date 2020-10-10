@@ -5,9 +5,8 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
-
-@available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
+@available(iOS 14.0, macOS 11.0, *)
+@available(tvOS, unavailable)
 @available(watchOS, unavailable)
 @usableFromInline
 struct PerformActionOnKeyboardShortcut: ViewModifier {
@@ -24,14 +23,13 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     @available(watchOS, unavailable)
     @usableFromInline
     func body(content: Content) -> some View {
-        ZStack {
+        content.background(
             Button(action: action) {
                 EmptyView()
             }
             .keyboardShortcut(shortcut)
-            
-            content
-        }
+            .visible(false)
+        )
     }
 }
 
@@ -39,7 +37,8 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
 
 extension View {
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
-    @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
+    @available(iOS 14.0, macOS 11.0, *)
+    @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     @inlinable
     public func onKeyboardShortcut(
@@ -50,7 +49,8 @@ extension View {
     }
     
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
-    @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
+    @available(iOS 14.0, macOS 11.0, *)
+    @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     @inlinable
     public func onKeyboardShortcut(
@@ -61,5 +61,3 @@ extension View {
         modifier(PerformActionOnKeyboardShortcut(shortcut: .init(key, modifiers: modifiers), action: action))
     }
 }
-
-#endif

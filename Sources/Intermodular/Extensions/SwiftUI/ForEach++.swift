@@ -29,19 +29,30 @@ extension ForEach where Content: View {
     
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
+        id: KeyPath<Elements.Element, ID>,
         @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
-    ) where Data ==  [ElementOffsetPair<Elements.Element, Int>], ID == Elements.Element.ID {
-        self.init(data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })) {
+    ) where Data == [_KeyPathIdentifiableElementOffsetPair<Elements.Element, Int, ID>] {
+        self.init(data.enumerated().map({ _KeyPathIdentifiableElementOffsetPair(element: $0.element, offset: $0.offset, id: id) })) {
             rowContent($0.offset, $0.element)
         }
     }
+    
+    public init<Elements: RandomAccessCollection>(
+        enumerating data: Elements,
+        @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
+    ) where Data == [_IdentifiableElementOffsetPair<Elements.Element, Int>], ID == Elements.Element.ID {
+        self.init(data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })) {
+            rowContent($0.offset, $0.element)
+        }
+    }
+    
 }
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
     public func interleave<Separator: View>(with separator: Separator) -> some View {
-        let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
+        let data = self.data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })
         
-        return ForEach<[ElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Separator?)>>>(data) { pair in
+        return ForEach<[_IdentifiableElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Separator?)>>>(data) { pair in
             Group {
                 self.content(pair.element)
                 
@@ -55,9 +66,9 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
     public func interdivided() -> some View {
-        let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
+        let data = self.data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })
         
-        return ForEach<[ElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Divider?)>>>(data) { pair in
+        return ForEach<[_IdentifiableElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Divider?)>>>(data) { pair in
             Group {
                 self.content(pair.element)
                 
@@ -71,9 +82,9 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {
     public func interspaced() -> some View {
-        let data = self.data.enumerated().map({ ElementOffsetPair(element: $0.element, offset: $0.offset) })
+        let data = self.data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })
         
-        return ForEach<[ElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Spacer?)>>>(data) { pair in
+        return ForEach<[_IdentifiableElementOffsetPair<Data.Element, Int>], Data.Element.ID,  Group<TupleView<(Content, Spacer?)>>>(data) { pair in
             Group {
                 self.content(pair.element)
                 
@@ -87,7 +98,7 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
 
 // MARK: - Helpers -
 
-public struct ElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
+public struct _IdentifiableElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
     let element: Element
     let offset: Offset
     
@@ -98,5 +109,21 @@ public struct ElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
     init(element: Element, offset: Offset) {
         self.element = element
         self.offset = offset
+    }
+}
+
+public struct _KeyPathIdentifiableElementOffsetPair<Element, Offset, ID: Hashable>: Identifiable {
+    let element: Element
+    let offset: Offset
+    let keyPathToID: KeyPath<Element, ID>
+    
+    public var id: ID {
+        element[keyPath: keyPathToID]
+    }
+    
+    init(element: Element, offset: Offset, id: KeyPath<Element, ID>) {
+        self.element = element
+        self.offset = offset
+        self.keyPathToID = id
     }
 }
