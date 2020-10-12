@@ -26,9 +26,10 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
+    private var textColor: UIColor?
     
     @Environment(\.font) var font
-    
+
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
@@ -85,7 +86,8 @@ public struct _CocoaTextField: UIViewRepresentable {
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
-    
+    var textColor: UIColor?
+
     public class Coordinator: NSObject, UITextFieldDelegate {
         var base: _CocoaTextField
         
@@ -146,7 +148,8 @@ public struct _CocoaTextField: UIViewRepresentable {
         
         uiView.borderStyle = borderStyle
         uiView.font = uiFont ?? font?.toUIFont()
-        
+        uiView.textColor = textColor
+
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
         }
@@ -299,6 +302,10 @@ extension CocoaTextField {
     
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
+    }
+
+    public func textColor(_ textColor: UIColor?) -> Self {
+        then({ $0.textColor = textColor })
     }
 }
 
