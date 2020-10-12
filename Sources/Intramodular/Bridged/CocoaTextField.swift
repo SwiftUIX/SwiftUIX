@@ -58,7 +58,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 inputView: inputView,
                 kerning: kerning,
                 keyboardType: keyboardType,
-                placeholder: placeholder
+                placeholder: placeholder,
+                textColor: textColor
             )
         }
     }
