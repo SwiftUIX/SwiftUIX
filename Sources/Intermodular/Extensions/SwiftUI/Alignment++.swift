@@ -23,3 +23,16 @@ extension Alignment {
         edges.map(isAligned(to:)).reduce(true, { $0 && $1 })
     }
 }
+
+extension HorizontalAlignment {
+    init(from alignment: TextAlignment) {
+        switch alignment {
+        case .center:
+            self = .center
+        case .leading:
+            self = .leading
+        case .trailing:
+            self = .trailing
+        }
+    }
+}
