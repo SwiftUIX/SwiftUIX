@@ -4,11 +4,11 @@
 
 import SwiftUI
 
-struct IsScrollEnabledEnvironmentKey: EnvironmentKey {
-    static let defaultValue = true
-}
-
 extension EnvironmentValues {
+    private struct IsScrollEnabledEnvironmentKey: EnvironmentKey {
+        static let defaultValue = true
+    }
+    
     public var isScrollEnabled: Bool {
         get {
             self[IsScrollEnabledEnvironmentKey]
