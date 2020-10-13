@@ -6,6 +6,10 @@ import Swift
 import SwiftUI
 
 extension EdgeInsets {
+    public static var zero: Self {
+        .init()
+    }
+    
     public init(_ edges: Edge.Set = .all, _ length: CGFloat? = nil) {
         self.init(top: 0, leading: 0, bottom: 0, trailing: 0)
         

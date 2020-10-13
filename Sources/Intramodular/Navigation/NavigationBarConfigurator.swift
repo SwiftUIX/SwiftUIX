@@ -8,9 +8,13 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 @usableFromInline
-struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: UIViewControllerRepresentable {
+struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, LargeTrailing: View>: UIViewControllerRepresentable {
     @usableFromInline
     class UIViewControllerType: UIViewController {
+        weak var navigationBarLargeTitleView: UIView? = nil
+        
+        var navigationBarLargeTitleTrailingItemHostingController: UIHostingController<LargeTrailing>? = nil
+        
         var leading: Leading? {
             didSet {
                 updateNavigationBar(parent: parent)
@@ -29,12 +33,18 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
             }
         }
         
+        var largeTrailing: LargeTrailing? {
+            didSet {
+                updateNavigationBar(parent: parent)
+            }
+        }
+        
         var displayMode: NavigationBarItem.TitleDisplayMode? {
             didSet {
                 updateNavigationBar(parent: parent)
             }
         }
-                
+        
         override func willMove(toParent parent: UIViewController?) {
             updateNavigationBar(parent: parent)
             
@@ -104,12 +114,52 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
             parent.navigationItem.leftBarButtonItem?.customView?.sizeToFit()
             parent.navigationItem.titleView?.sizeToFit()
             parent.navigationItem.rightBarButtonItem?.customView?.sizeToFit()
+            
+            if let largeTrailing = largeTrailing, !(largeTrailing is EmptyView) {
+                guard let navigationBar = self.navigationController?.navigationBar else {
+                    return
+                }
+                
+                guard let _UINavigationBarLargeTitleView = NSClassFromString("_" + "UINavigationBar" + "LargeTitleView") else {
+                    return
+                }
+                
+                for subview in navigationBar.subviews {
+                    if subview.isKind(of: _UINavigationBarLargeTitleView.self) {
+                        navigationBarLargeTitleView = subview
+                    }
+                }
+                
+                if let navigationBarLargeTitleView = navigationBarLargeTitleView {
+                    if let hostingController = navigationBarLargeTitleTrailingItemHostingController, hostingController.view.superview == navigationBarLargeTitleView {
+                        hostingController.rootView = largeTrailing
+                    } else {
+                        let hostingController = UIHostingController(rootView: largeTrailing)
+                        
+                        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+                        
+                        navigationBarLargeTitleView.addSubview(hostingController.view)
+                        
+                        NSLayoutConstraint.activate([
+                            hostingController.view.centerYAnchor.constraint(
+                                equalTo: navigationBarLargeTitleView.centerYAnchor
+                            ),
+                            hostingController.view.trailingAnchor.constraint(
+                                equalTo: navigationBarLargeTitleView.layoutMarginsGuide.trailingAnchor
+                            )
+                        ])
+                        
+                        self.navigationBarLargeTitleTrailingItemHostingController = hostingController
+                    }
+                }
+            }
         }
     }
     
     let leading: Leading
     let center: Center
     let trailing: Trailing
+    let largeTrailing: LargeTrailing
     let displayMode: NavigationBarItem.TitleDisplayMode?
     
     @usableFromInline
@@ -117,11 +167,13 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
         leading: Leading,
         center: Center,
         trailing: Trailing,
+        largeTrailing: LargeTrailing,
         displayMode: NavigationBarItem.TitleDisplayMode?
     ) {
         self.leading = leading
         self.center = center
         self.trailing = trailing
+        self.largeTrailing = largeTrailing
         self.displayMode = displayMode
     }
     
@@ -136,6 +188,7 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View>: U
         viewController.leading = leading
         viewController.center = center
         viewController.trailing = trailing
+        viewController.largeTrailing = largeTrailing
     }
 }
 
@@ -147,7 +200,28 @@ extension View {
         trailing: Trailing,
         displayMode: NavigationBarItem.TitleDisplayMode? = .automatic
     ) -> some View {
-        background(NavigationBarConfigurator(leading: leading, center: center, trailing: trailing, displayMode: displayMode))
+        background(
+            NavigationBarConfigurator(
+                leading: leading,
+                center: center,
+                trailing: trailing,
+                largeTrailing: EmptyView(),
+                displayMode: displayMode
+            )
+        )
+    }
+    
+    @inlinable
+    public func navigationBarLargeTitleItems<L>(trailing: L) -> some View where L : View {
+        background(
+            NavigationBarConfigurator(
+                leading: EmptyView(),
+                center: EmptyView(),
+                trailing: EmptyView(),
+                largeTrailing: trailing,
+                displayMode: nil
+            )
+        )
     }
     
     @inlinable
@@ -173,7 +247,7 @@ extension View {
     ) -> some View {
         navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: .automatic)
     }
-
+    
     @inlinable
     public func navigationBarItems<Center: View, Trailing: View>(
         center: Center,
