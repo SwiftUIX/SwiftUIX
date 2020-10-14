@@ -28,7 +28,7 @@ import Swift
 import SwiftUI
 
 /// Imported for convenience from https://github.com/piknotech/SFSafeSymbols
-public enum SanFranciscoSymbolName: String, CaseIterable {
+public enum SFSymbolName: String, CaseIterable {
     case _00Circle = "00.circle"
     case _00CircleFill = "00.circle.fill"
     case _00Square = "00.square"
@@ -1713,7 +1713,7 @@ public enum SanFranciscoSymbolName: String, CaseIterable {
 // MARK: - Helpers -
 
 public extension Image {
-    init(systemName: SanFranciscoSymbolName) {
+    init(systemName: SFSymbolName) {
         #if os(macOS)
         if #available(OSX 11.0, *) {
             self.init(systemName: systemName.rawValue)

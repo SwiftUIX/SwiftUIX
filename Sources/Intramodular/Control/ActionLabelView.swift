@@ -79,7 +79,7 @@ extension ActionLabelView where Label == Text {
 extension ActionLabelView where Label == SwiftUI.Label<Text, Image> {
     public init<S: StringProtocol>(
         _ title: S,
-        systemImage: SanFranciscoSymbolName,
+        systemImage: SFSymbolName,
         action: @escaping () -> Void
     ) {
         self.init(action: action) {

@@ -20,7 +20,7 @@ import UIKit
 public struct OldToolbarItem {
     public enum Content {
         #if os(iOS) || targetEnvironment(macCatalyst)
-        case systemSymbol(SanFranciscoSymbolName)
+        case systemSymbol(SFSymbolName)
         case systemItem(UIBarButtonItem.SystemItem)
         #endif
         

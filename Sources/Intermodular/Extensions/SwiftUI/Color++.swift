@@ -26,43 +26,43 @@ extension Color {
 
 extension Color {
     public static var systemRed: Color {
-        return .init(.systemRed)
+        .init(.systemRed)
     }
     
     public static var systemGreen: Color {
-        return .init(.systemGreen)
+        .init(.systemGreen)
     }
     
     public static var systemBlue: Color {
-        return .init(.systemBlue)
+        .init(.systemBlue)
     }
     
     public static var systemOrange: Color {
-        return .init(.systemOrange)
+        .init(.systemOrange)
     }
     
     public static var systemYellow: Color {
-        return .init(.systemYellow)
+        .init(.systemYellow)
     }
     
     public static var systemPink: Color {
-        return .init(.systemPink)
+        .init(.systemPink)
     }
     
     public static var systemPurple: Color {
-        return .init(.systemPurple)
+        .init(.systemPurple)
     }
     
     public static var systemTeal: Color {
-        return .init(.systemTeal)
+        .init(.systemTeal)
     }
     
     public static var systemIndigo: Color {
-        return .init(.systemIndigo)
+        .init(.systemIndigo)
     }
     
     public static var systemGray: Color {
-        return .init(.systemGray)
+        .init(.systemGray)
     }
 }
 
@@ -71,24 +71,38 @@ extension Color {
 #if os(iOS) || targetEnvironment(macCatalyst)
 
 extension Color {
+    public static var brown: Color {
+        return .init(.brown)
+    }
+    
+    public static var indigo: Color {
+        .init(.systemIndigo)
+    }
+    
+    public static var teal: Color {
+        .init(.systemTeal)
+    }
+}
+
+extension Color {
     public static var systemGray2: Color {
-        return .init(.systemGray2)
+        .init(.systemGray2)
     }
     
     public static var systemGray3: Color {
-        return .init(.systemGray3)
+        .init(.systemGray3)
     }
     
     public static var systemGray4: Color {
-        return .init(.systemGray4)
+        .init(.systemGray4)
     }
     
     public static var systemGray5: Color {
-        return .init(.systemGray5)
+        .init(.systemGray5)
     }
     
     public static var systemGray6: Color {
-        return .init(.systemGray6)
+        .init(.systemGray6)
     }
 }
 
@@ -163,7 +177,7 @@ extension Color {
 extension Color {
     /// The color for the main background of your interface.
     public static var systemBackground: Color {
-        return .init(.systemBackground)
+        .init(.systemBackground)
     }
     
     /// The color for content layered on top of the main background.
@@ -178,7 +192,7 @@ extension Color {
     
     /// The color for the main background of your grouped interface.
     public static var systemGroupedBackground: Color {
-        return .init(.systemGroupedBackground)
+        .init(.systemGroupedBackground)
     }
     
     /// The color for content layered on top of the main background of your grouped interface.
@@ -199,7 +213,7 @@ extension Color {
     ///
     /// Example: The track of a slider.
     public static var systemFill: Color {
-        return .init(.systemFill)
+        .init(.systemFill)
     }
     
     

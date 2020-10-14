@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if !os(watchOS) && !os(tvOS)
+
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
@@ -14,12 +16,15 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     let action: () -> Void
     
     @usableFromInline
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
     init(shortcut: KeyboardShortcut, action: @escaping () -> ()) {
         self.shortcut = shortcut
         self.action = action
     }
     
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
+    @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     @usableFromInline
     func body(content: Content) -> some View {
@@ -61,3 +66,5 @@ extension View {
         modifier(PerformActionOnKeyboardShortcut(shortcut: .init(key, modifiers: modifiers), action: action))
     }
 }
+
+#endif

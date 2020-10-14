@@ -41,7 +41,8 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
     }
     
     public func body(content: Content) -> some View {
-        content.background(
+        #if !os(watchOS)
+        return content.background(
             selection.wrappedValue.ifSome { selection in
                 NavigationLink(
                     destination: self.destination(selection)
@@ -52,6 +53,18 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
                 .id(selection.id)
             }
         )
+        #else
+        return content.background(
+            selection.wrappedValue.ifSome { selection in
+                NavigationLink(
+                    destination: self.destination(selection),
+                    isActive: isActive,
+                    label: { ZeroSizeView() }
+                )
+                .id(selection.id)
+            }
+        )
+        #endif
     }
 }
 

@@ -211,6 +211,7 @@ extension View {
         )
     }
     
+    @available(tvOS, unavailable)
     @inlinable
     public func navigationBarLargeTitleItems<L>(
         trailing: L,
