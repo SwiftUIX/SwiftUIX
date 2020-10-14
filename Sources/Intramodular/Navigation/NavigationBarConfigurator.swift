@@ -212,14 +212,17 @@ extension View {
     }
     
     @inlinable
-    public func navigationBarLargeTitleItems<L>(trailing: L) -> some View where L : View {
+    public func navigationBarLargeTitleItems<L>(
+        trailing: L,
+        displayMode: NavigationBarItem.TitleDisplayMode? = .large
+    ) -> some View where L : View {
         background(
             NavigationBarConfigurator(
                 leading: EmptyView(),
                 center: EmptyView(),
                 trailing: EmptyView(),
-                largeTrailing: trailing,
-                displayMode: nil
+                largeTrailing: trailing.font(.largeTitle),
+                displayMode: displayMode
             )
         )
     }
