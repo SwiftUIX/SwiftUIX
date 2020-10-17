@@ -154,7 +154,8 @@ extension PaginationView {
             showsIndicators: showsIndicators
         )
     }
-    
+
+    @_disfavoredOverload
     @inlinable
     public init(
         axis: Axis = .horizontal,

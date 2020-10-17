@@ -16,6 +16,7 @@ public struct AnyForEachElement: Identifiable {
 }
 
 extension ForEach where Content: View, Data == AnyForEachData, ID == AnyHashable {
+    @_disfavoredOverload
     public init<Data: RandomAccessCollection, ID: Hashable>(
         _ data: Data,
         id: KeyPath<Data.Element, ID>,
