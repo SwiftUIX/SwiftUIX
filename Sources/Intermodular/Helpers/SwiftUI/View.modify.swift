@@ -16,4 +16,19 @@ extension View {
             self
         }
     }
+    
+    @ViewBuilder
+    public func modify<T: View, U: Equatable>(
+        if keyPath: KeyPath<EnvironmentValues, U>,
+        equals comparate: U,
+        transform: @escaping (Self) -> T
+    ) -> some View {
+        EnvironmentValueAccessView(keyPath) { value in
+            if value == comparate {
+                transform(self)
+            } else {
+                self
+            }
+        }
+    }
 }
