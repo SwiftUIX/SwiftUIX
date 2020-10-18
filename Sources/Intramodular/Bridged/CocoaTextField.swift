@@ -31,7 +31,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     
     @Environment(\.font) var font
     @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
-
+    
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
@@ -92,7 +92,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var placeholder: String?
     var textColor: UIColor?
     var textContentType: UITextContentType?
-
+    
     public class Coordinator: NSObject, UITextFieldDelegate {
         var base: _CocoaTextField
         
@@ -153,11 +153,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         
         uiView.borderStyle = borderStyle
         uiView.font = uiFont ?? font?.toUIFont()
-        uiView.textColor = textColor
-        if let textContentType = textContentType {
-            uiView.textContentType = textContentType
-        }
-
+        
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
         }
@@ -200,6 +196,14 @@ public struct _CocoaTextField: UIViewRepresentable {
         } else {
             uiView.attributedPlaceholder = nil
             uiView.placeholder = nil
+        }
+        
+        if let textColor = textColor {
+            uiView.textColor = textColor
+        }
+        
+        if let textContentType = textContentType {
+            uiView.textContentType = textContentType
         }
         
         uiView.text = text
@@ -311,11 +315,20 @@ extension CocoaTextField {
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.placeholder = placeholder })
     }
-
-    public func textColor(_ textColor: UIColor?) -> Self {
-        then({ $0.textColor = textColor })
+    
+    public func foregroundColor(_ foregroundColor: Color) -> Self {
+        then({ $0.textColor = foregroundColor.toUIColor() })
     }
-
+    
+    public func foregroundColor(_ foregroundColor: UIColor) -> Self {
+        then({ $0.textColor = foregroundColor })
+    }
+    
+    @available(iOS, deprecated: 13.0, renamed: "foregroundColor(_:)")
+    public func textColor(_ foregroundColor: Color) -> Self {
+        then({ $0.textColor = foregroundColor.toUIColor() })
+    }
+    
     public func textContentType(_ textContentType: UITextContentType?) -> Self {
         then({ $0.textContentType = textContentType })
     }
