@@ -27,6 +27,8 @@
 import Swift
 import SwiftUI
 
+public typealias SanFranciscoSymbolName = SFSymbolName
+
 /// Imported for convenience from https://github.com/piknotech/SFSafeSymbols
 public enum SFSymbolName: String, CaseIterable {
     case _00Circle = "00.circle"
