@@ -8,6 +8,11 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaTextField<Label: View>: CocoaView {
+    @Environment(\.font) var font
+    @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
+    
+    @ObservedObject var keyboard = Keyboard.main
+    
     private var label: Label
     
     private var text: Binding<String>
@@ -30,14 +35,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var textColor: UIColor?
     private var textContentType: UITextContentType?
     
-    @Environment(\.font) var font
-    @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
-    
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    @ObservedObject var keyboard = Keyboard.main
-    
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .init(from: multilineTextAlignment), vertical: .top)) {
             if placeholder == nil {
