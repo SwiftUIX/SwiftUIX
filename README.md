@@ -22,15 +22,15 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
 
-- [**General**](https://github.com/SwiftUIX/SwiftUIX/wiki/General)
-- [**Control Flow**](https://github.com/SwiftUIX/SwiftUIX/wiki/Control-Flow)
-- [**Controls**](https://github.com/SwiftUIX/SwiftUIX/wiki/Controls) 
-- [**Dynamic Presentation**](https://github.com/SwiftUIX/SwiftUIX/wiki/Dynamic-Presentation)
-- [**Geometry**](https://github.com/SwiftUIX/SwiftUIX/wiki/Geometry)
-- [**Keyboard**](https://github.com/SwiftUIX/SwiftUIX/wiki/Keyboard) 
-- [**Pagination**](https://github.com/SwiftUIX/SwiftUIX/wiki/Pagination)
-- [**Text**](https://github.com/SwiftUIX/SwiftUIX/wiki/Text) 
-- [**Utilities**](https://github.com/SwiftUIX/SwiftUIX/wiki/Utilities) 
+- [General](https://github.com/SwiftUIX/SwiftUIX/wiki/General)
+- [Control Flow](https://github.com/SwiftUIX/SwiftUIX/wiki/Control-Flow)
+- [Controls](https://github.com/SwiftUIX/SwiftUIX/wiki/Controls) 
+- [Dynamic Presentation](https://github.com/SwiftUIX/SwiftUIX/wiki/Dynamic-Presentation)
+- [Geometry](https://github.com/SwiftUIX/SwiftUIX/wiki/Geometry)
+- [Keyboard](https://github.com/SwiftUIX/SwiftUIX/wiki/Keyboard) 
+- [Pagination](https://github.com/SwiftUIX/SwiftUIX/wiki/Pagination)
+- [Text](https://github.com/SwiftUIX/SwiftUIX/wiki/Text) 
+- [Utilities](https://github.com/SwiftUIX/SwiftUIX/wiki/Utilities) 
 
 | UIKit                                   | SwiftUI      | SwiftUIX                                      |
 | --------------------------------------- | ------------ | --------------------------------------------- |
