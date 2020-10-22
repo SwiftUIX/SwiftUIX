@@ -28,3 +28,17 @@ extension List {
         })
     }
 }
+
+extension List where SelectionValue == Never {
+    @available(watchOS, unavailable)
+    public init<Data: MutableCollection & RandomAccessCollection, RowContent: View>(
+        _ data: Binding<Data>,
+        @ViewBuilder rowContent: @escaping (Binding<Data.Element>) -> RowContent
+    ) where Data.Element: Identifiable, Content == ForEach<AnyRandomAccessCollection<_IdentifiableElementOffsetPair<Data.Element, Data.Index>>, Data.Element.ID, RowContent> {
+        self.init {
+            ForEach(data) { (element: Binding<Data.Element>) -> RowContent in
+                rowContent(element)
+            }
+        }
+    }
+}
