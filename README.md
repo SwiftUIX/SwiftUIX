@@ -6,9 +6,9 @@
 SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
 
 - [Why](#why) 
-- [Documentation](#documentation) 
 - [Requirements](#requirements) 
 - [Installation](#installation)
+- [Documentation](#documentation) 
 - [Contributing](#contributing)
 - [License](#license)
 - [Support](#support)
@@ -17,6 +17,24 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 # Why
 
 The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
+
+# Requirements 
+
+- iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
+- Swift 5.2
+- Xcode 11.6
+
+# Installation
+
+The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
+
+>Xcode 11 integrates with libSwiftPM to provide support for iOS, watchOS, and tvOS platforms.
+
+1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
+2. Paste the repository URL (`https://github.com/SwiftUIX/SwiftUIX`) and click **Next**.
+3. For **Rules**, select **Branch** (with branch set to `master`).
+4. Click **Finish**.
+5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
 # Documentation
 
@@ -51,24 +69,6 @@ All documentation is available via the [repository wiki](https://github.com/Swif
 | `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
 | `UIWindow`                              | -            | `WindowOverlay`                               |
-
-# Requirements 
-
-- iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
-- Swift 5.2
-- Xcode 11.6
-
-# Installation
-
-The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
-
->Xcode 11 integrates with libSwiftPM to provide support for iOS, watchOS, and tvOS platforms.
-
-1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
-2. Paste the repository URL (`https://github.com/SwiftUIX/SwiftUIX`) and click **Next**.
-3. For **Rules**, select **Branch** (with branch set to `master`).
-4. Click **Finish**.
-5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
 # Contributing
 
