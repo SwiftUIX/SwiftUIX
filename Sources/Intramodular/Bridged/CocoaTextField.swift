@@ -26,6 +26,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var kerning: CGFloat?
     private var keyboardType: UIKeyboardType = .default
     private var placeholder: String?
+    private var returnKeyType: UIReturnKeyType?
     private var textColor: UIColor?
     private var textContentType: UITextContentType?
     
@@ -61,6 +62,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                 kerning: kerning,
                 keyboardType: keyboardType,
                 placeholder: placeholder,
+                returnKeyType: returnKeyType,
                 textColor: textColor,
                 textContentType: textContentType
             )
@@ -90,6 +92,7 @@ public struct _CocoaTextField: UIViewRepresentable {
     var kerning: CGFloat?
     var keyboardType: UIKeyboardType
     var placeholder: String?
+    var returnKeyType: UIReturnKeyType?
     var textColor: UIColor?
     var textContentType: UITextContentType?
     
@@ -196,6 +199,10 @@ public struct _CocoaTextField: UIViewRepresentable {
         } else {
             uiView.attributedPlaceholder = nil
             uiView.placeholder = nil
+        }
+        
+        if let returnKeyType = returnKeyType {
+            uiView.returnKeyType = returnKeyType
         }
         
         if let textColor = textColor {
@@ -322,6 +329,10 @@ extension CocoaTextField {
     
     public func foregroundColor(_ foregroundColor: UIColor) -> Self {
         then({ $0.textColor = foregroundColor })
+    }
+    
+    public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
+        then({ $0.returnKeyType = returnKeyType })
     }
     
     @available(iOS, deprecated: 13.0, renamed: "foregroundColor(_:)")
