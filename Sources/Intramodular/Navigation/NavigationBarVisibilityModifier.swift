@@ -9,7 +9,7 @@ import SwiftUI
 
 private struct HideNavigationBar: ViewModifier {
     @State var isNavigationBarHidden = false
-        
+    
     func body(content: Content) -> some View {
         ZStack {
             if isNavigationBarHidden {

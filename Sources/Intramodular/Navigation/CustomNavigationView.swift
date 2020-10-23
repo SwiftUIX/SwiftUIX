@@ -45,4 +45,20 @@ final class IsNavigationBarVisible: TakeLastPreferenceKey<Bool> {
     
 }
 
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    final class IsNavigationBarHidden: DefaultEnvironmentKey<Bool> {
+        
+    }
+    
+    public var isNavigationBarHidden: Bool? {
+        get {
+            self[IsNavigationBarHidden]
+        } set {
+            self[IsNavigationBarHidden] = newValue
+        }
+    }
+}
+
 #endif
