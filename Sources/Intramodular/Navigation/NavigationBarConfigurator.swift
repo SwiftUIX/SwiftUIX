@@ -22,10 +22,44 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         var largeTrailingAlignment: VerticalAlignment?
         var displayMode: NavigationBarItem.TitleDisplayMode?
         
+        var hasMovedToParentOnce: Bool = false
+        var isVisible: Bool = false
+        
         override func willMove(toParent parent: UIViewController?) {
-            updateNavigationBar(parent: parent)
+            if !hasMovedToParentOnce {
+                updateNavigationBar(parent: parent)
+                
+                hasMovedToParentOnce = true
+            }
             
             super.willMove(toParent: parent)
+        }
+        
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            updateNavigationBar(parent: parent)
+        }
+        
+        override func viewDidAppear(_ animated: Bool) {
+            isVisible = true
+            
+            updateNavigationBar(parent: parent)
+        }
+        
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            
+            navigationBarLargeTitleTrailingItemHostingController?.view.removeFromSuperview()
+            navigationBarLargeTitleTrailingItemHostingController = nil
+        }
+        
+        override func viewDidDisappear(_ animated: Bool) {
+            super.viewDidDisappear(animated)
+            
+            isVisible = false
+            
+            updateNavigationBar(parent: parent)
         }
         
         func updateNavigationBar(parent: UIViewController?) {
@@ -92,7 +126,7 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
             parent.navigationItem.titleView?.sizeToFit()
             parent.navigationItem.rightBarButtonItem?.customView?.sizeToFit()
             
-            if let largeTrailing = largeTrailing, !(largeTrailing is EmptyView) {
+            if let largeTrailing = largeTrailing, !(largeTrailing is EmptyView), isVisible {
                 guard let navigationBar = self.navigationController?.navigationBar else {
                     return
                 }
@@ -154,6 +188,9 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
                         self.navigationBarLargeTitleTrailingItemHostingController = hostingController
                     }
                 }
+            } else {
+                self.navigationBarLargeTitleTrailingItemHostingController?.view.removeFromSuperview()
+                self.navigationBarLargeTitleTrailingItemHostingController = nil
             }
         }
     }
@@ -198,6 +235,18 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         
         viewController.updateNavigationBar(parent: viewController.parent)
     }
+    
+    @usableFromInline
+    static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
+        uiViewController.displayMode = nil
+        uiViewController.leading = nil
+        uiViewController.center = nil
+        uiViewController.trailing = nil
+        uiViewController.largeTrailing = nil
+        uiViewController.largeTrailingAlignment = nil
+        
+        uiViewController.updateNavigationBar(parent: uiViewController.parent)
+    }
 }
 
 extension View {
@@ -220,7 +269,6 @@ extension View {
     }
     
     @available(tvOS, unavailable)
-    @inlinable
     public func navigationBarLargeTitleItems<Trailing: View>(
         trailing: Trailing,
         alignment: VerticalAlignment? = nil,
