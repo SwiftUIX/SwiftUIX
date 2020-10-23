@@ -22,14 +22,16 @@ public struct CustomNavigationView<Content: View>: View {
         
         return !isNavigationBarVisible
     }
-        
+    
     public var body: some View {
         NavigationView {
-            content
-                .onPreferenceChange(IsNavigationBarVisible.self, perform: {
-                    self.isNavigationBarVisible = $0
-                })
-                .environment(\.isNavigationBarHidden, isNavigationBarHidden)
+            PresentationView {
+                content
+                    .onPreferenceChange(IsNavigationBarVisible.self, perform: {
+                        self.isNavigationBarVisible = $0
+                    })
+                    .environment(\.isNavigationBarHidden, isNavigationBarHidden)
+            }
         }
     }
     
