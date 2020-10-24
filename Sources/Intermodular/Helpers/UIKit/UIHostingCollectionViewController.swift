@@ -59,7 +59,7 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
     // MARK: - UICollectionViewDataSource -
     
     override public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        data[data.index(data.startIndex, offsetBy: section)].items.count
+        data[data.index(data.startIndex, offsetBy: section)].data.count
     }
     
     override public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

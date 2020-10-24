@@ -90,7 +90,7 @@ extension CollectionView {
         sectionFooter: @escaping (_SectionModel) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
     ) where Data == Array<ListSection<SectionModel, Item>>, SectionModel == HashIdentifiableValue<_SectionModel>, Item == HashIdentifiableValue<_Item> {
-        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
+        self.data = data.map({ .init(model: .init($0.model), items: $0.data.map(HashIdentifiableValue.init)) })
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
         self.rowContent = { rowContent($0.value) }

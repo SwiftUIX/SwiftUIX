@@ -30,7 +30,7 @@ extension View {
     ///   with specified amount of padding.
     @ViewBuilder
     public func padding(
-        _ edges: Edge.Set = .all,
+        _ edges: Edge.Set,
         _ amount: _PaddingAmount?
     ) -> some View {
         switch amount {
@@ -43,5 +43,11 @@ extension View {
             case .some(.large):
                 padding(edges).padding(edges)
         }
+    }
+    
+    public func padding(
+        _ amount: _PaddingAmount
+    ) -> some View {
+        padding(.all, amount)
     }
 }

@@ -14,22 +14,29 @@ public struct ListSection<Model, Item> {
         _model
     }
     
-    public let items: [Item]
+    public let data: AnyRandomAccessCollection<Item>
+    
+    public init(
+        model: Model,
+        data: [Item]
+    ) {
+        self._id = nil
+        self._model = model
+        self.data = .init(data)
+    }
     
     public init(
         model: Model,
         items: [Item]
     ) {
-        self._id = nil
-        self._model = model
-        self.items = items
+        self.init(model: model, data: items)
     }
     
     public init(
         _ model: Model,
-        @ArrayBuilder<Item> items: () -> [Item]
+        @ArrayBuilder<Item> data: () -> [Item]
     ) {
-        self.init(model: model, items: items())
+        self.init(model: model, data: data())
     }
 }
 
@@ -54,10 +61,10 @@ extension ListSection where Model: Equatable {
 extension ListSection where Model: Identifiable, Item: Identifiable {
     public init(
         model: Model,
-        items: [Item]
+        data: [Item]
     ) {
         self._model = model
-        self.items = items
+        self.data = .init(data)
         
         var hasher = Hasher()
         
@@ -65,7 +72,7 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
             hasher.combine(model.id)
         }
         
-        items.forEach {
+        data.forEach {
             hasher.combine($0.id)
         }
         
@@ -77,7 +84,7 @@ extension ListSection where Model == Never {
     public init(items: [Item]) {
         self._id = nil
         self._model = nil
-        self.items = items
+        self.data = .init(items)
     }
     
     public init<C: Collection>(items: C) where C.Element == Item {
@@ -90,7 +97,7 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
         if let id = _id, let otherId = other._id {
             return id == otherId
         } else {
-            guard items.count == other.items.count else {
+            guard data.count == other.data.count else {
                 return false
             }
             
@@ -100,7 +107,7 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
                 }
             }
             
-            for (item, otherItem) in zip(items, other.items) {
+            for (item, otherItem) in zip(data, other.data) {
                 guard item.id == otherItem.id else {
                     return false
                 }
@@ -116,9 +123,9 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
 extension ListSection: Equatable where Model: Equatable, Item: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         if Model.self == Never.self {
-            return lhs.items == rhs.items
+            return Array(lhs.data) == Array(rhs.data)
         } else {
-            return lhs.model == rhs.model && lhs.items == rhs.items
+            return lhs.model == rhs.model && Array(lhs.data) == Array(rhs.data)
         }
     }
 }
@@ -129,7 +136,7 @@ extension ListSection: Hashable where Model: Hashable, Item: Hashable {
             hasher.combine(model)
         }
         
-        hasher.combine(items)
+        data.forEach({ hasher.combine($0) })
     }
 }
 
@@ -141,7 +148,7 @@ extension ListSection: Identifiable where Model: Identifiable, Item: Identifiabl
             hasher.combine(model.id)
         }
         
-        items.forEach({ hasher.combine($0.id) })
+        data.forEach({ hasher.combine($0.id) })
         
         return hasher.finalize()
     }
@@ -154,11 +161,12 @@ extension Collection  {
     subscript<SectionModel, Item>(_ indexPath: IndexPath) -> Item where Element == ListSection<SectionModel, Item> {
         get {
             let sectionIndex = index(startIndex, offsetBy: indexPath.section)
-            let rowIndex = self[sectionIndex]
-                .items
-                .index(self[sectionIndex].items.startIndex, offsetBy: indexPath.row)
             
-            return self[sectionIndex].items[rowIndex]
+            let rowIndex = self[sectionIndex]
+                .data
+                .index(self[sectionIndex].data.startIndex, offsetBy: indexPath.row)
+            
+            return self[sectionIndex].data[rowIndex]
         }
     }
     #endif

@@ -14,7 +14,7 @@ public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITable
     var item: Item!
     var makeContent: ((Item) -> Content)!
     
-    private var contentHostingController: UIHostingController<RootView>!
+    var contentHostingController: UIHostingController<RootView>!
     
     override public func awakeFromNib() {
         super.awakeFromNib()
@@ -73,6 +73,7 @@ extension UIHostingTableViewCell {
             ])
         } else {
             contentHostingController.rootView = RootView(uiTableViewCell: self)
+            contentHostingController.view.invalidateIntrinsicContentSize()
         }
     }
     
@@ -89,12 +90,12 @@ extension UIHostingTableViewCell {
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingTableViewCell {
-    private struct RootView: View {
+    struct RootView: View {
         private struct _ListRowManager: ListRowManager {
             var isHighlighted: Bool {
                 false // FIXME!!!
             }
-
+            
             weak var uiTableViewCell: UIHostingTableViewCell<Item, Content>?
             
             func _animate(_ action: () -> ()) {
@@ -107,7 +108,7 @@ extension UIHostingTableViewCell {
                 uiTableViewCell?.reload(with: .none)
             }
         }
-
+        
         private let item: Item
         private let makeContent: (Item) -> Content
         private let listRowManager: _ListRowManager

@@ -7,7 +7,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CocoaList<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
+public struct CocoaList<
+    SectionModel: Identifiable,
+    Item: Identifiable,
+    Data: RandomAccessCollection,
+    SectionHeader: View,
+    SectionFooter: View,
+    RowContent: View
+>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
     public typealias UIViewControllerType = UIHostingTableViewController<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
     
@@ -102,7 +109,7 @@ extension CocoaList {
         sectionFooter: @escaping (_SectionModel) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
     ) where Data == Array<ListSection<SectionModel, Item>>, SectionModel == HashIdentifiableValue<_SectionModel>, Item == HashIdentifiableValue<_Item> {
-        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
+        self.data = data.map({ .init(model: .init($0.model), data: $0.data.map(HashIdentifiableValue.init)) })
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
         self.rowContent = { rowContent($0.value) }
@@ -123,6 +130,23 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionModel == Neve
             sectionHeader: Never.produce,
             sectionFooter: Never.produce,
             rowContent: rowContent
+        )
+    }
+    
+    public init<Items: RandomAccessCollection>(
+        @ViewBuilder content: @escaping () -> ForEach<Items, Item.ID, RowContent>
+    ) where Items.Element == Item, Data == Array<ListSection<SectionModel, Item>> {
+        var data = Data.init()
+        
+        let content = content()
+        
+        data.append(.init(items: .init(content.data)))
+        
+        self.init(
+            data,
+            sectionHeader: Never.produce,
+            sectionFooter: Never.produce,
+            rowContent: content.content
         )
     }
 }

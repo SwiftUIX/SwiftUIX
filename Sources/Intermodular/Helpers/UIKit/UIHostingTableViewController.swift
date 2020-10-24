@@ -13,7 +13,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             isContentOffsetDirty = _isDataDirty
         }
     }
-
+    
     var data: Data {
         didSet {
             if !data.isIdentical(to: oldValue) {
@@ -96,7 +96,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
             }
         }
     }
-        
+    
     var _estimatedContentSizeCache: CGSize?
     
     private var _sectionHeaderContentHeightCache: [SectionModel.ID: CGFloat] = [:]
@@ -191,7 +191,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        data[data.index(data.startIndex, offsetBy: section)].items.count
+        data[data.index(data.startIndex, offsetBy: section)].data.count
     }
     
     // MARK: - Delegate -
@@ -306,8 +306,8 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         prototypeCell.update()
         
         let height = prototypeCell
-            .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
+            .contentHostingController
+            .sizeThatFits(in: UIView.layoutFittingExpandedSize)
             .height
         
         _rowContentHeightCache[item.id] = height

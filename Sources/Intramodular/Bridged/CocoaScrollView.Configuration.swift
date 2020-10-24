@@ -17,7 +17,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
     var showsIndicators: Bool = true
     @usableFromInline
-    var alwaysBounceVertical: Bool = false
+    var alwaysBounceVertical: Bool? = nil
     @usableFromInline
     var alwaysBounceHorizontal: Bool = false
     @usableFromInline
@@ -76,7 +76,10 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
-        alwaysBounceVertical = configuration.alwaysBounceVertical
+        if let alwaysBounceVertical = configuration.alwaysBounceVertical {
+            self.alwaysBounceVertical = alwaysBounceVertical
+        }
+        
         alwaysBounceHorizontal = configuration.alwaysBounceHorizontal
         isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
         isScrollEnabled = configuration.isScrollEnabled
