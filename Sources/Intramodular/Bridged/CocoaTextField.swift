@@ -11,7 +11,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
     @Environment(\.font) var font
     @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
     
+    #if !os(tvOS)
     @ObservedObject var keyboard = Keyboard.main
+    #endif
     
     private var label: Label
     
@@ -35,9 +37,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var textColor: UIColor?
     private var textContentType: UITextContentType?
     
-    @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
+    @available(macCatalystApplicationExtension, unavailable)
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .init(from: multilineTextAlignment), vertical: .top)) {
             if placeholder == nil {
