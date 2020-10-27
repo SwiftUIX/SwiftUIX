@@ -3,7 +3,7 @@
 
 ![CI](https://github.com/SwiftUIX/SwiftUIX/workflows/CI/badge.svg)
 
-SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving it to deliver in most Apple-like fashion possible.
+SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
 
 - [Why](#why) 
 - [Requirements](#requirements) 
