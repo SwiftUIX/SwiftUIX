@@ -37,7 +37,7 @@ class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: Vi
             contentHostingController = UIHostingController(rootView: rootView)
             contentHostingController.view.backgroundColor = .clear
             contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
+            
             contentHostingController.willMove(toParent: parent)
             parent.addChild(contentHostingController)
             contentView.addSubview(contentHostingController.view)

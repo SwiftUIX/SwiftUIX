@@ -40,7 +40,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
     
     var content: AnyForEach<Page>?
     var cyclesPages: Bool = false
-            
+    
     var currentPageIndex: AnyIndex? {
         get {
             guard let currentViewController = viewControllers?.first as? PageContentController else {
@@ -90,7 +90,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         
         return content.data.distance(from: content.data.startIndex, to: currentPageIndex)
     }
-
+    
     var previousPageIndex: AnyIndex? {
         guard let currentPageIndex = currentPageIndex else {
             return nil
@@ -127,7 +127,7 @@ extension UIHostingPageViewController {
             
             return nil
         }
-                
+        
         let index = viewController.rootView.index == content.data.startIndex
             ? (cyclesPages ? content.data.indices.last : nil)
             : content.data.index(before: viewController.rootView.index)

@@ -25,7 +25,6 @@ private struct HideNavigationBar: ViewModifier {
                 .onDisappear(perform: {
                     self.isNavigationBarHidden = false
                 })
-                .preference(key: IsNavigationBarVisible.self, value: !isNavigationBarHidden)
         }
     }
 }

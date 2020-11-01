@@ -8,7 +8,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CollectionView<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
+public struct CollectionView<
+    SectionModel: Identifiable,
+    Item: Identifiable,
+    Data: RandomAccessCollection,
+    SectionHeader: View,
+    SectionFooter: View,
+    RowContent: View
+>: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, Item> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
     public typealias UIViewControllerType = UIHostingCollectionViewController<SectionModel, Item, Data, SectionHeader, SectionFooter, RowContent>
     

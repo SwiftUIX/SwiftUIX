@@ -68,7 +68,7 @@ class UIHostingAlignTransitioningDelegate<Background: View, Content: View>: UIHo
     }
 }
 
-// MARK: - Helpers -
+// MARK: - API -
 
 extension ModalPresentationStyle {
     public static func align(

@@ -10,7 +10,7 @@ import SwiftUI
 public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UICollectionViewCell {
     var collectionViewController: (UICollectionViewController & UICollectionViewDelegateFlowLayout)!
     var indexPath: IndexPath?
-    var item: Item!
+    var item: Item?
     var makeContent: ((Item) -> Content)!
     
     var listRowPreferences: _ListRowPreferences?
@@ -102,12 +102,14 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
 
 extension UIHostingCollectionViewCell {
     func attachContentHostingController() {
-        if contentHostingController == nil {
+        if let contentHostingController = contentHostingController {
+            if let item = item {
+                contentHostingController.rootView.itemID = item.id
+            }
+        } else {
             contentHostingController = UICollectionViewCellContentHostingController(base: self)
             
             contentHostingController?.view.backgroundColor = .clear
-        } else {
-            contentHostingController!.rootView.itemID = item.id
         }
         
         if contentHostingController?.parent == nil {
@@ -144,7 +146,7 @@ extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
 }
 
-open class UICollectionViewCellContentHostingController<Item: Identifiable, Content: View>: UIHostingController<UIHostingCollectionViewCellRootView<Item, Content>> {
+open class UICollectionViewCellContentHostingController<Item: Identifiable, Content: View>: UIHostingController<UIHostingCollectionViewCell<Item, Content>.RootView> {
     unowned let base: UIHostingCollectionViewCell<Item, Content>
     
     init(base: UIHostingCollectionViewCell<Item, Content>) {
@@ -155,6 +157,39 @@ open class UICollectionViewCellContentHostingController<Item: Identifiable, Cont
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension UIHostingCollectionViewCell {
+    public struct RootView: View {
+        struct _ListRowManager: ListRowManager {
+            weak var base: UIHostingCollectionViewCell<Item, Content>?
+            
+            var isHighlighted: Bool = false
+            
+            func _animate(_ action: () -> ()) {
+                base?.collectionViewController.collectionViewLayout.invalidateLayout()
+            }
+            
+            func _reload() {
+                base?.reload()
+            }
+        }
+        
+        var manager: _ListRowManager
+        var itemID: Item.ID?
+        
+        init(base: UIHostingCollectionViewCell<Item, Content>?) {
+            self.manager = .init(base: base)
+        }
+        
+        public var body: some View {
+            if let base = self.manager.base, let item = base.item {
+                base.makeContent(item)
+                    .environment(\.listRowManager, manager)
+                    .onPreferenceChange(_ListRowPreferencesKey.self, perform: { base.listRowPreferences = $0 })
+            }
+        }
     }
 }
 

@@ -27,6 +27,7 @@
 import Swift
 import SwiftUI
 
+@available(*, deprecated, renamed: "SFSymbolName")
 public typealias SanFranciscoSymbolName = SFSymbolName
 
 /// Imported for convenience from https://github.com/piknotech/SFSafeSymbols

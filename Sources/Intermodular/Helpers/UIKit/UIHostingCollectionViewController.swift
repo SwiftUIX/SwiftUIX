@@ -7,7 +7,14 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public final class UIHostingCollectionViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UICollectionViewController, UICollectionViewDelegateFlowLayout where Data.Element == ListSection<SectionModel, Item> {
+public final class UIHostingCollectionViewController<
+    SectionModel: Identifiable,
+    Item: Identifiable,
+    Data: RandomAccessCollection,
+    SectionHeader: View,
+    SectionFooter: View,
+    RowContent: View
+>: UICollectionViewController, UICollectionViewDelegateFlowLayout where Data.Element == ListSection<SectionModel, Item> {
     private var _isDataDirty: Bool
     
     var data: Data {
@@ -53,7 +60,7 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
     override public func viewSafeAreaInsetsDidChange()  {
         super.viewSafeAreaInsetsDidChange()
         
-        collectionViewLayout.invalidateLayout() /// WORKAROUND (for rotation animation)
+        collectionViewLayout.invalidateLayout() // WORKAROUND (for rotation animation)
     }
     
     // MARK: - UICollectionViewDataSource -
@@ -112,15 +119,23 @@ public final class UIHostingCollectionViewController<SectionModel: Identifiable,
 
 extension UIHostingCollectionViewController {
     public func cell(for indexPath: IndexPath) -> UIHostingCollectionViewCell<Item, RowContent>? {
-        collectionView.visibleCells.compactMap({ $0 as? UIHostingCollectionViewCell<Item, RowContent> }).first(where: { $0.indexPath == indexPath }) ?? collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
+        let result = collectionView
+            .visibleCells
+            .compactMap({ $0 as? UIHostingCollectionViewCell<Item, RowContent> })
+            .first(where: { $0.indexPath == indexPath })
+        
+        return result ?? collectionView.dequeueReusableCell(
+            withReuseIdentifier: .hostingCollectionViewCellIdentifier,
+            for: indexPath
+        ) as! UIHostingCollectionViewCell<Item, RowContent>
     }
     
     public func reloadData() {
-        if _isDataDirty {
-            collectionView.reloadData()
-            
-            _isDataDirty = false
+        guard _isDataDirty else {
+            return
         }
+        
+        collectionView.reloadData()
     }
 }
 

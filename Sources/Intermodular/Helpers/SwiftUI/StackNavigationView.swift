@@ -23,3 +23,8 @@ public struct StackNavigationView<Content: View>: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
 }
+
+// MARK: - API -
+
+@available(*, deprecated, renamed: "StackNavigationView")
+public typealias CustomNavigationView<Content: View> = StackNavigationView<Content>
