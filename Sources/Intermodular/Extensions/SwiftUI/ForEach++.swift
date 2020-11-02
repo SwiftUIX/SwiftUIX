@@ -29,6 +29,15 @@ extension ForEach where Content: View {
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
+    ) where Data == [_KeyPathIdentifiableElementOffsetPair<Elements.Element, Int, Elements.Element.ID>], ID == Elements.Element.ID, Elements.Element: Identifiable {
+        self.init(enumerating: data, id: \.id) { (index, element) in
+            rowContent(index, element)
+        }
+    }
+    
+    public init<Elements: RandomAccessCollection>(
+        enumerating data: Elements,
+        @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
     ) where Data == [_IdentifiableElementOffsetPair<Elements.Element, Int>], ID == Elements.Element.ID {
         self.init(data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })) {
             rowContent($0.offset, $0.element)
