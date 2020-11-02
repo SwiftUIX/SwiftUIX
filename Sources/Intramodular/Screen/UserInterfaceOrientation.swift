@@ -68,3 +68,47 @@ extension UserInterfaceOrientation {
 }
 
 #endif
+
+// MARK: - Auxiliary Implementation -
+
+#if os(iOS)
+
+extension UIInterfaceOrientation {
+    public init(_ orientation: UserInterfaceOrientation) {
+        switch orientation {
+            case .portrait:
+                self = .portrait
+            case .portraitUpsideDown:
+                self = .portraitUpsideDown
+            case .landscapeLeft:
+                self = .landscapeLeft
+            case .landscapeRight:
+                self = .landscapeRight
+            case .unrecognized:
+                self = .unknown
+        }
+    }
+}
+
+extension UIInterfaceOrientationMask {
+    public init(_ orientation: UserInterfaceOrientation) {
+        switch orientation {
+            case .portrait:
+                self = .portrait
+            case .portraitUpsideDown:
+                self = .portraitUpsideDown
+            case .landscapeLeft:
+                self = .landscapeLeft
+            case .landscapeRight:
+                self = .landscapeRight
+            default:
+                self = []
+        }
+    }
+    
+    public init(_ orientations: [UserInterfaceOrientation]) {
+        self = orientations.map({ UIInterfaceOrientationMask($0) }).reduce(into: [], { $0.formUnion($1) })
+    }
+}
+
+#endif
