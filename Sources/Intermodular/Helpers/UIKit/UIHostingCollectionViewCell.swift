@@ -84,11 +84,7 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         contentHostingController.view.setNeedsLayout()
         contentHostingController.view.layoutIfNeeded()
         
-        return contentHostingController.sizeThatFits(
-            in: .init(targetSize),
-            targetSize: nil,
-            maximumSize: maximumSize
-        )
+        return contentHostingController._fixed_sizeThatFits(in: targetSize)
     }
     
     func willDisplay() {

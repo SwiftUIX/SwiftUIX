@@ -57,42 +57,49 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension AppKitOrUIKitHostingControllerProtocol {
-    func sizeThatFits(
+    func _fixed_sizeThatFits(
         in size: OptionalDimensions,
-        targetSize: OptionalDimensions,
-        maximumSize: OptionalDimensions
+        targetSize: OptionalDimensions = nil,
+        maximumSize: OptionalDimensions = nil
     ) -> CGSize {
         let fittingSize = CGSize(
             width: size.width ?? .infinity,
             height: size.height ?? .infinity
-        ).clamping(to: maximumSize)
+        )
+        .clamping(to: maximumSize)
         
-        var desiredSize = sizeThatFits(in: fittingSize)
+        var result = sizeThatFits(in: fittingSize)
         
-        switch (desiredSize.width, desiredSize.height)  {
+        switch (result.width, result.height)  {
             case (.infinity, .infinity):
-                desiredSize = sizeThatFits(in: .init(size, default: .zero))
+                result = sizeThatFits(in: .init(size, default: .zero))
             case (.infinity, _):
-                desiredSize = sizeThatFits(in: CGSize(width: size.width ?? targetSize.width ?? .zero, height: fittingSize.height))
+                result = sizeThatFits(in: CGSize(width: size.width ?? targetSize.width ?? .zero, height: fittingSize.height))
             case (_, .infinity):
-                desiredSize = sizeThatFits(in: CGSize(width: fittingSize.width, height: size.height ?? targetSize.height ?? .zero))
+                result = sizeThatFits(in: CGSize(width: fittingSize.width, height: size.height ?? targetSize.height ?? .zero))
+            case (.zero, 1...):
+                result = sizeThatFits(in: CGSize(width: UIView.layoutFittingExpandedSize.width, height: fittingSize.height))
             default:
                 break
         }
         
         if size.width == nil {
             if let targetWidth = targetSize.width {
-                desiredSize.width = targetWidth
+                result.width = targetWidth
             }
         }
         
         if size.height == nil {
             if let targetHeight = targetSize.height {
-                desiredSize.height = targetHeight
+                result.height = targetHeight
             }
         }
         
-        return desiredSize.clamping(to: maximumSize)
+        return result.clamping(to: maximumSize)
+    }
+    
+    func _fixed_sizeThatFits(in size: CGSize) -> CGSize {
+        _fixed_sizeThatFits(in: .init(size))
     }
 }
 

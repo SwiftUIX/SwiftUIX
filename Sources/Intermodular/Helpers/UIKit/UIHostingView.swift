@@ -28,6 +28,8 @@ open class UIHostingView<Content: View>: UIView {
         rootViewHostingController.view.backgroundColor = .clear
         
         addSubview(rootViewHostingController.view)
+        
+        rootViewHostingController.view.constrainEdges(to: self)
     }
     
     public required init?(coder: NSCoder) {
@@ -48,12 +50,6 @@ open class UIHostingView<Content: View>: UIView {
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
         rootViewHostingController.sizeThatFits(in: targetSize)
-    }
-    
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        
-        rootViewHostingController.view.frame = bounds
     }
     
     override open func sizeToFit() {

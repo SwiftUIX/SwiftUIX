@@ -238,11 +238,6 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
     
     @usableFromInline
     static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
-        uiViewController.displayMode = nil
-        uiViewController.leading = nil
-        uiViewController.center = nil
-        uiViewController.trailing = nil
-        uiViewController.largeTrailing = nil
         uiViewController.largeTrailingAlignment = nil
         
         uiViewController.updateNavigationBar(parent: uiViewController.parent)
@@ -292,7 +287,12 @@ extension View {
         center: Center,
         displayMode: NavigationBarItem.TitleDisplayMode = .automatic
     ) -> some View {
-        navigationBarItems(leading: leading, center: center, trailing: EmptyView(), displayMode: displayMode)
+        navigationBarItems(
+            leading: leading,
+            center: center,
+            trailing: EmptyView(),
+            displayMode: displayMode
+        )
     }
     
     @inlinable
@@ -300,14 +300,24 @@ extension View {
         _ center: V,
         displayMode: NavigationBarItem.TitleDisplayMode
     ) -> some View {
-        navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: displayMode)
+        navigationBarItems(
+            leading: EmptyView(),
+            center: center,
+            trailing: EmptyView(),
+            displayMode: displayMode
+        )
     }
     
     @inlinable
     public func navigationBarTitleView<V: View>(
         _ center: V
     ) -> some View {
-        navigationBarItems(leading: EmptyView(), center: center, trailing: EmptyView(), displayMode: .automatic)
+        navigationBarItems(
+            leading: EmptyView(),
+            center: center,
+            trailing: EmptyView(),
+            displayMode: .automatic
+        )
     }
     
     @inlinable
@@ -316,7 +326,12 @@ extension View {
         trailing: Trailing,
         displayMode: NavigationBarItem.TitleDisplayMode = .automatic
     ) -> some View {
-        navigationBarItems(leading: EmptyView(), center: center, trailing: trailing, displayMode: displayMode)
+        navigationBarItems(
+            leading: EmptyView(),
+            center: center,
+            trailing: trailing,
+            displayMode: displayMode
+        )
     }
 }
 

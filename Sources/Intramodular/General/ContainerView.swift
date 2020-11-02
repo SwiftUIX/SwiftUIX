@@ -10,3 +10,11 @@ public protocol ContainerView: View {
     
     init(@ViewBuilder content: () -> Content)
 }
+
+// MARK: - Extensions -
+
+extension ContainerView {
+    public init(content: Content) {
+        self.init(content: { content })
+    }
+}
