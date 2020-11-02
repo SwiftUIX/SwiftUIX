@@ -77,8 +77,11 @@ extension AppKitOrUIKitHostingControllerProtocol {
                 result = sizeThatFits(in: CGSize(width: size.width ?? targetSize.width ?? .zero, height: fittingSize.height))
             case (_, .infinity):
                 result = sizeThatFits(in: CGSize(width: fittingSize.width, height: size.height ?? targetSize.height ?? .zero))
-            case (.zero, 1...):
+            case (.zero, 1...): do {
+                #if os(iOS) || os(tvOS)
                 result = sizeThatFits(in: CGSize(width: UIView.layoutFittingExpandedSize.width, height: fittingSize.height))
+                #endif
+            }
             default:
                 break
         }
