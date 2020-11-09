@@ -1,10 +1,13 @@
-lane :build_debug do |options|
+EXCLUDE_MACOS_DESTINATION = ENV["XCODE_VERSION"] == "12" || ENV["XCODE_VERSION"] == "12.1"
 
-  xcodebuild(
-    scheme: "SwiftUIX",
-    xcargs: "\
-clean \
--configuration debug \
+DESTINATIONS= EXCLUDE_MACOS_DESTINATION ? "\
+-destination 'generic/platform=iOS' \
+-destination 'generic/platform=iOS Simulator' \
+-destination 'generic/platform=tvOS' \
+-destination 'generic/platform=tvOS Simulator' \
+-destination 'generic/platform=watchOS' \
+-destination 'generic/platform=watchOS Simulator'
+" : "\
 -destination 'generic/platform=iOS' \
 -destination 'generic/platform=iOS Simulator' \
 -destination 'generic/platform=tvOS' \
@@ -12,7 +15,17 @@ clean \
 -destination 'generic/platform=watchOS' \
 -destination 'generic/platform=watchOS Simulator' \
 -destination 'generic/platform=macOS' \
--destination 'generic/platform=macOS,variant=Mac Catalyst' \
+-destination 'generic/platform=macOS,variant=Mac Catalyst'
+"
+
+lane :build_debug do |options|
+
+  xcodebuild(
+    scheme: "SwiftUIX",
+    xcargs: "\
+clean \
+-configuration debug \
+#{DESTINATIONS} \
 -xcconfig SwiftUIX.xcconfig\
 "
   )
@@ -22,14 +35,7 @@ clean \
     xcargs: "\
 build \
 -configuration debug \
--destination 'generic/platform=iOS' \
--destination 'generic/platform=iOS Simulator' \
--destination 'generic/platform=tvOS' \
--destination 'generic/platform=tvOS Simulator' \
--destination 'generic/platform=watchOS' \
--destination 'generic/platform=watchOS Simulator' \
--destination 'generic/platform=macOS' \
--destination 'generic/platform=macOS,variant=Mac Catalyst' \
+#{DESTINATIONS} \
 -xcconfig SwiftUIX.xcconfig\
 "
   )
@@ -43,14 +49,7 @@ lane :build_release do |options|
     xcargs: "\
 clean \
 -configuration release \
--destination 'generic/platform=iOS' \
--destination 'generic/platform=iOS Simulator' \
--destination 'generic/platform=tvOS' \
--destination 'generic/platform=tvOS Simulator' \
--destination 'generic/platform=watchOS' \
--destination 'generic/platform=watchOS Simulator' \
--destination 'generic/platform=macOS' \
--destination 'generic/platform=macOS,variant=Mac Catalyst' \
+#{DESTINATIONS} \
 -xcconfig SwiftUIX.xcconfig\
 "
   )
@@ -60,14 +59,7 @@ clean \
     xcargs: "\
 build \
 -configuration release \
--destination 'generic/platform=iOS' \
--destination 'generic/platform=iOS Simulator' \
--destination 'generic/platform=tvOS' \
--destination 'generic/platform=tvOS Simulator' \
--destination 'generic/platform=watchOS' \
--destination 'generic/platform=watchOS Simulator' \
--destination 'generic/platform=macOS' \
--destination 'generic/platform=macOS,variant=Mac Catalyst' \
+#{DESTINATIONS} \
 -xcconfig SwiftUIX.xcconfig\
 "
   )
