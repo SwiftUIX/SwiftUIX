@@ -40,8 +40,6 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var textColor: UIColor?
     private var textContentType: UITextContentType?
     
-    @available(iOSApplicationExtension, unavailable)
-    @available(macCatalystApplicationExtension, unavailable)
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .init(from: multilineTextAlignment), vertical: .top)) {
             if placeholder == nil {
