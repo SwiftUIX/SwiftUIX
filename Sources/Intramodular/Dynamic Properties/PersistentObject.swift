@@ -9,7 +9,7 @@ import SwiftUI
 /// A property wrapper type that instantiates an observable object.
 @propertyWrapper
 public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
-    let thunk: () -> ObjectType
+    private let thunk: () -> ObjectType
     
     @OptionalObservedObject
     private var observedObject: ObjectType?

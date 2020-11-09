@@ -7,6 +7,9 @@ import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>: UIViewControllerRepresentable  {
     let searchBar: SearchBar
     let searchResultsContent: () -> SearchResultsContent
@@ -33,6 +36,9 @@ fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>:
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension _NavigationSearchBarConfigurator {
     class Coordinator: NSObject, UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
         var base: _NavigationSearchBarConfigurator
@@ -188,25 +194,11 @@ extension _NavigationSearchBarConfigurator {
 // MARK: - API -
 
 extension View {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     public func navigationSearchBar(_ searchBar: () -> SearchBar) -> some View {
         background(_NavigationSearchBarConfigurator(searchBar: searchBar(), searchResultsContent: { EmptyView() }))
-    }
-}
-
-private struct Previews: PreviewProvider {
-    static var previews: some View {
-        WithInlineState(initialValue: "") { searchText in
-            NavigationView {
-                List {
-                    Text("1")
-                    Text("2")
-                    Text("3")
-                }
-                .navigationSearchBar {
-                    SearchBar("test", text: searchText)
-                }
-            }
-        }
     }
 }
 
