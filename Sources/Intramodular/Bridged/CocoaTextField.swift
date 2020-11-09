@@ -11,11 +11,11 @@ public struct CocoaTextField<Label: View>: CocoaView {
     @Environment(\.font) var font
     @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
     
-    #if !os(tvOS)
+    #if os(iOS) || targetEnvironment(macCatalyst)
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    @ObservedObject var keyboard = Keyboard.main
+    @ObservedObject private var keyboard = Keyboard.main
     #endif
     
     private var label: Label

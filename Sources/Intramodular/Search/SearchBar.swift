@@ -8,13 +8,13 @@ import SwiftUI
 #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 /// A specialized view for receiving search-related information from the user.
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
 public struct SearchBar: DefaultTextFieldType {
     @Binding fileprivate var text: String
     
     #if os(iOS) || targetEnvironment(macCatalyst)
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     @ObservedObject private var keyboard = Keyboard.main
     #endif
     
@@ -210,9 +210,6 @@ extension SearchBar: NSViewRepresentable {
 
 // MARK: - API -
 
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
 extension SearchBar {
     #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
     public func placeholder(_ placeholder: String) -> Self {
