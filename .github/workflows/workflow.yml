@@ -13,7 +13,7 @@ jobs:
         build_type: ['debug', 'release']
         exclude:
           - os: macos-11.0
-            xcode: '12'
+            xcode: ['12', '12.1']
     runs-on: ${{ matrix.os }}
     env:
       XCODE_VERSION: ${{ matrix.xcode }}
