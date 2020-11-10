@@ -227,12 +227,9 @@ extension SearchBar {
     }
     
     public func onCancel(perform action: @escaping () -> Void) -> Self {
-        then({
-            $0.onCancel = action
-            $0.showsCancelButton = true
-        })
+        then({ $0.onCancel = action })
     }
-    
+
     public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
         then({ $0.returnKeyType = returnKeyType })
     }
