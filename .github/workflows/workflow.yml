@@ -1,6 +1,6 @@
 
 name: CI
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -14,6 +14,8 @@ jobs:
         exclude:
           - os: macos-11.0
             xcode: '12'
+          - os: macos-11.0
+            xcode: '12.1'
     runs-on: ${{ matrix.os }}
     env:
       XCODE_VERSION: ${{ matrix.xcode }}
