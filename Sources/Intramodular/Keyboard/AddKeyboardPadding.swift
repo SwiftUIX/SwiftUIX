@@ -65,6 +65,7 @@ private struct AddKeyboardPadding: ViewModifier {
 public enum KeyboardPadding {
     case keyboard
     case keyboardForced // if you don't want this modifier automatically disabled for iOS 14
+    case keyboardIntelligent // experimental
 }
 
 @available(macCatalystApplicationExtension, unavailable)
@@ -80,7 +81,7 @@ extension View {
             AddKeyboardPadding(
                 isActive: padding != nil,
                 isForced: padding == .keyboardForced,
-                isBasic: true,
+                isBasic: !(padding == .keyboardIntelligent),
                 animation: animation
             )
         )
