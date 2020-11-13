@@ -29,7 +29,6 @@ public struct AnyModalPresentation: Identifiable {
         content: V,
         contentName: ViewName? = nil,
         presentationStyle: ModalPresentationStyle? = nil,
-        isModalDismissable: (() -> Bool)? = nil,
         onPresent: (() -> Void)? = nil,
         onDismiss: (() -> Void)? = nil,
         resetBinding: @escaping () -> () = { }
@@ -40,18 +39,6 @@ public struct AnyModalPresentation: Identifiable {
         
         if let presentationStyle = presentationStyle {
             self.content = self.content.modalPresentationStyle(presentationStyle)
-        }
-        
-        if let isModalDismissable = isModalDismissable {
-            self.content = self.content.isModalDismissable(isModalDismissable)
-        }
-        
-        if let onPresent = onPresent {
-            self.content = self.content.onPresent(perform: onPresent)
-        }
-        
-        if let onDismiss = onDismiss {
-            self.content = self.content.onDismiss(perform: onDismiss)
         }
         
         if let name = contentName {

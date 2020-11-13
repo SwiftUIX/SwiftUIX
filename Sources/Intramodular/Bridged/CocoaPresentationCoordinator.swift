@@ -113,10 +113,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 presentation: modal,
                 coordinator: .init(presentation: modal)
             ),
-            animated: modal.content.isModalPresentationAnimated
+            animated: true
         ) {
-            modal.content.onPresent()
-            
             self.objectWillChange.send()
         }
         #elseif os(macOS)
@@ -136,17 +134,12 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         let presentation = presentedCoordinator?.presentation
         
-        if let presentation = presentation, !presentation.content.isModalDismissable {
-            return .init({ $0(.success(false)) })
-        }
-        
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return .init { attemptToFulfill in
             if viewController.presentedViewController != nil {
                 self.objectWillChange.send()
                 
                 viewController.dismiss(animated: animation != nil) {
-                    presentation?.content.onDismiss()
                     presentation?.resetBinding()
                     
                     attemptToFulfill(.success(true))
@@ -155,7 +148,6 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
                 self.objectWillChange.send()
                 
                 navigationController.popToViewController(viewController, animated: animation != nil) {
-                    presentation?.content.onDismiss()
                     presentation?.resetBinding()
                     
                     attemptToFulfill(.success(true))
@@ -191,7 +183,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
-        presentation?.content.isModalDismissable ?? true
+        (viewController?.isModalInPresentation).map({ !$0 }) ?? true
     }
     
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
@@ -199,8 +191,6 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        presentation?.content.onDismiss()
-        
         presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
     }
     

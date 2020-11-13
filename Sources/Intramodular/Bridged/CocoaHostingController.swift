@@ -35,13 +35,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         self.rootView.parent = self
         
         if let rootView = rootView as? AnyPresentationView {
-            environmentBuilder.merge(rootView.presentationEnvironmentBuilder)
-            
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)
             hidesBottomBarWhenPushed = rootView.hidesBottomBarWhenPushed
             #endif
-            isModalInPresentation = !rootView.isModalDismissable
             modalPresentationStyle = .init(rootView.presentationStyle)
             transitioningDelegate = rootView.presentationStyle.transitioningDelegate
             #elseif os(macOS)
