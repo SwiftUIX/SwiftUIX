@@ -118,7 +118,7 @@ extension OldToolbarItem {
     #endif
 }
 
-// MARK: - Protocol Implementations -
+// MARK: - Protocol Conformances -
 
 extension OldToolbarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {

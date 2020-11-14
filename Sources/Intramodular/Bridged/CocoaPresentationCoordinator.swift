@@ -85,7 +85,7 @@ extension CocoaPresentationCoordinator {
     }
 }
 
-// MARK: - Protocol Implementations -
+// MARK: - Protocol Conformances -
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public var presenter: DynamicViewPresenter? {

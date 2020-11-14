@@ -41,7 +41,7 @@ public struct AnyCancellableButton<Label: View>: View {
     }
 }
 
-// MARK: - Protocol Implementations -
+// MARK: - Protocol Conformances -
 
 extension AnyCancellableButton: PerformActionView {
     public func transformAction(_ transform: (Action) -> Action) -> Self {

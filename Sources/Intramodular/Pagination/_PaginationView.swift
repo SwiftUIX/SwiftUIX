@@ -60,7 +60,7 @@ struct _PaginationView<Page: View> {
     }
 }
 
-// MARK: - Protocol Implementations -
+// MARK: - Protocol Conformances -
 
 extension _PaginationView: UIViewControllerRepresentable {
     @usableFromInline
