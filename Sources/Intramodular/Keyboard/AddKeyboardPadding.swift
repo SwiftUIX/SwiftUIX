@@ -28,12 +28,16 @@ private struct AddKeyboardPadding: ViewModifier {
     func body(content: Content) -> some View {
         GeometryReader { geometry in
             content
-                .padding(.bottom, (isActive && (!isSystemEnabled || isForced)) ? self.padding : 0)
-                .onReceive(self.keyboardHeightPublisher, perform: { keyboardHeight in
+                .padding(.bottom, (isActive && (!isSystemEnabled || isForced)) ? padding : 0)
+                .onReceive(keyboardHeightPublisher, perform: { keyboardHeight in
                     if isBasic {
-                        padding = keyboardHeight > 0
-                            ? keyboardHeight - geometry.safeAreaInsets.bottom
-                            : 0
+                        if !isForced {
+                            padding = keyboardHeight > 0
+                                ? keyboardHeight - geometry.safeAreaInsets.bottom
+                                : 0
+                        } else {
+                            padding = keyboardHeight
+                        }
                     } else {
                         padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
                     }
