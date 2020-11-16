@@ -15,8 +15,6 @@ public struct ActivityIndicator {
     private var isAnimated: Bool = true
     private var style: Style?
     
-    @Environment(\.tintColor) private var tintColor
-    
     public init() {
         
     }
@@ -39,16 +37,22 @@ extension ActivityIndicator: UIViewRepresentable {
             uiView.style = .init(style)
         }
         
-        if #available(iOS 13.1, *) {
-            uiView.color = tintColor?.toUIColor()
-            uiView.tintColor = tintColor?.toUIColor()
-        }
+        uiView.color = context.environment.tintColor?.toUIColor()
+        uiView.tintColor = context.environment.tintColor?.toUIColor()
         
-        isAnimated ? uiView.startAnimating() : uiView.stopAnimating()
-    }
-    
-    public func animated(_ isAnimated: Bool) -> ActivityIndicator {
-        then({ $0.isAnimated = isAnimated })
+        if !context.environment.isEnabled && uiView.isAnimating {
+            uiView.stopAnimating()
+        } else {
+            if isAnimated {
+                if !uiView.isAnimating {
+                    uiView.startAnimating()
+                }
+            } else {
+                if uiView.isAnimating {
+                    uiView.stopAnimating()
+                }
+            }
+        }
     }
     
     public func style(_ style: Style?) -> ActivityIndicator {
@@ -81,7 +85,19 @@ extension ActivityIndicator: NSViewRepresentable {
 
 #endif
 
-// MARK: - Helpers -
+// MARK: - API -
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension ActivityIndicator {
+    public func animated(_ isAnimated: Bool) -> ActivityIndicator {
+        then({ $0.isAnimated = isAnimated })
+    }
+}
+
+#endif
+
+// MARK: - Auxiliary Implementation -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

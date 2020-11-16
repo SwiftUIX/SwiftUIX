@@ -25,8 +25,8 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
                     value: .bounds
                 ) {
                     [
-                        .init(
-                            name: self.name,
+                        name: .init(
+                            name: name,
                             bounds: $0,
                             globalBounds: geometry.frame(in: .global)
                         )

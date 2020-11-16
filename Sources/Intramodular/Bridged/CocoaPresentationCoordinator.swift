@@ -218,7 +218,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.coordinator?.viewController as? CocoaHostingController<AnyPresentationView> {
-                    parent.subviewDescriptions = $0
+                    parent._namedViewDescriptions = $0
                 }
             })
             .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in

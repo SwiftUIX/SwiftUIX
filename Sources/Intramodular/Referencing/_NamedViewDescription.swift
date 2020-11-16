@@ -42,6 +42,15 @@ public struct _NamedViewDescription: Equatable {
 }
 
 extension _NamedViewDescription {
-    @usableFromInline
-    typealias PreferenceKey = ArrayReducePreferenceKey<_NamedViewDescription>
+    struct PreferenceKey: SwiftUI.PreferenceKey {
+        typealias Value = [ViewName: _NamedViewDescription]
+        
+        static var defaultValue: Value {
+            [:]
+        }
+        
+        static func reduce(value: inout Value, nextValue: () -> Value) {
+            value.merge(nextValue(), uniquingKeysWith: { lhs, rhs in lhs })
+        }
+    }
 }
