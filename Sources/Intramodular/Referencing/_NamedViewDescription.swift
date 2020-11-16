@@ -8,7 +8,7 @@ import SwiftUI
 /// A view description.
 ///
 /// The description is composed of two things - the view's name and the view's frame.
-public struct ViewDescription: Equatable {
+public struct _NamedViewDescription: Equatable {
     @usableFromInline
     let name: ViewName
     @usableFromInline
@@ -41,7 +41,7 @@ public struct ViewDescription: Equatable {
     }
 }
 
-extension ViewDescription {
+extension _NamedViewDescription {
     @usableFromInline
-    typealias PreferenceKey = ArrayReducePreferenceKey<ViewDescription>
+    typealias PreferenceKey = ArrayReducePreferenceKey<_NamedViewDescription>
 }

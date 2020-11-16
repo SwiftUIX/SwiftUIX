@@ -7,23 +7,21 @@ import Swift
 import SwiftUI
 
 /// A view modifier that attaches a view name.
-public struct NameAssignmentView<Content: View>: NamedView {
-    public let content: Content
-    public let name: ViewName
+fileprivate struct _NameAssignmentView<Content: View>: View {
+    private let content: Content
+    private let name: ViewName
     
-    @usableFromInline
     init(content: Content, name: ViewName) {
         self.content = content
         self.name = name
     }
     
-    @inlinable
-    public var body: some View {
+    var body: some View {
         content
             .environment(\.viewName, name)
             .background(GeometryReader { geometry in
                 ZeroSizeView().anchorPreference(
-                    key: ViewDescription.PreferenceKey.self,
+                    key: _NamedViewDescription.PreferenceKey.self,
                     value: .bounds
                 ) {
                     [
@@ -42,19 +40,12 @@ public struct NameAssignmentView<Content: View>: NamedView {
 
 extension View {
     /// Set a name for `self`.
-    @inlinable
-    public func name(_ name: ViewName) -> NameAssignmentView<Self> {
-        .init(content: self, name: name.withViewType(type(of: self)))
+    public func name(_ name: ViewName) -> some View {
+        _NameAssignmentView(content: self, name: name.withViewType(type(of: self)))
     }
     
     /// Set a name for `self`.
-    @inlinable
-    public func name<H: Hashable>(_ name: H) -> NameAssignmentView<Self> {
+    public func name<H: Hashable>(_ name: H) -> some View {
         self.name(ViewName(name))
-    }
-    
-    @inlinable
-    public func name() -> some View {
-        name(ViewName(type(of: self)))
     }
 }

@@ -2,10 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+
 import Swift
 import SwiftUI
-
-#if !os(watchOS) && !os(tvOS)
 
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
@@ -34,6 +34,8 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
             }
             .keyboardShortcut(shortcut)
             .visible(false)
+            .frame(width: 0, height: 0)
+            .clipped()
         )
     }
 }

@@ -216,7 +216,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
         content
             .environment(\.presenter, coordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
-            .onPreferenceChange(ViewDescription.PreferenceKey.self, perform: {
+            .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.coordinator?.viewController as? CocoaHostingController<AnyPresentationView> {
                     parent.subviewDescriptions = $0
                 }

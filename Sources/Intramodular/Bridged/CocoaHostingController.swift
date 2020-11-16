@@ -14,7 +14,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         return _presentationCoordinator
     }
     
-    public var subviewDescriptions: [ViewDescription] = []
+    var subviewDescriptions: [_NamedViewDescription] = []
     
     init(
         rootView: Content,
@@ -75,7 +75,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     #endif
     
-    public func description(for name: ViewName) -> ViewDescription? {
+    public func _description(for name: ViewName) -> _NamedViewDescription? {
         subviewDescriptions.first(where: { $0.name ~= name })
     }
 }
