@@ -23,7 +23,6 @@ The above code looks like:
 ## Parameters
 `ImagePicker(data: , encoding:)`
 
-
 The `ImagePicker` takes in 2 parameters: `data` and `encoding`. 
 
 The `data` parameter takes in a optional `Data` type binding. In the code example above, the value of variable `image` will be provided by the `ImagePicker`. If you want to display the result of the `ImagePicker`, simply use the `Image(data: )` initializer to convert the `Data` into an `Image`. 
