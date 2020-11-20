@@ -2,6 +2,7 @@
 The `ImagePicker` in SwiftUIX is a simple, efficient, and native SwiftUI way to display an equivalent of `UIImagePickerController`.
 
 <br />
+
 ## Usage Example
 To use the Image Picker, define a variable of type `Data` and pass it into `ImagePicker`. The user's picked image can be accessed from the variable.
 
@@ -22,6 +23,7 @@ The above code looks like:
 </center>
 	
 <br />
+
 ## Parameters
 `ImagePicker(data: , encoding:)`
 
