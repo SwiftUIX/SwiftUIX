@@ -18,9 +18,9 @@ To use the Image Picker, define a variable of type `Data` and pass it into `Imag
 	        }
 	}
 The above code looks like:
-<center>
+<p align="center">
 <Image src="https://i.imgur.com/1rhpwsl.png" height=600> 
-</center>
+	</p>
 	
 <br />
 
