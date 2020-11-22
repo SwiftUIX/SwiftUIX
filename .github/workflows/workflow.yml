@@ -9,13 +9,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-10.15, macos-11.0]
-        xcode: ['12', '12.1', '12.2']
+        xcode: ['12', '12.1', '12.1.1', '12.2', '12.3']
         build_type: ['debug', 'release']
         exclude:
           - os: macos-11.0
             xcode: '12'
           - os: macos-11.0
-            xcode: '12.1'
+            xcode: '12.1' 
+          - os: macos-11.0
+            xcode: '12.1.1'
     runs-on: ${{ matrix.os }}
     env:
       XCODE_VERSION: ${{ matrix.xcode }}
