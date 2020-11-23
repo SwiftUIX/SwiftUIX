@@ -14,25 +14,23 @@ fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>:
     let searchBar: SearchBar
     let searchResultsContent: () -> SearchResultsContent
     
-    var automaticallyShowSearchBar: Bool? = true
+    var automaticallyShowSearchBar: Bool? = false
     var hideNavigationBarDuringPresentation: Bool?
-    var hideSearchBarOnScroll: Bool?
+    var hidesSearchBarWhenScrolling: Bool? = true
     var obscuresBackgroundDuringPresentation: Bool?
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator(base: self, searchBarCoordinator: .init(base: searchBar))
-    }
-    
     func makeUIViewController(context: Context) -> UIViewControllerType {
-        UIViewControllerType()
+        UIViewControllerType(coordinator: context.coordinator)
     }
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         context.coordinator.base = self
         context.coordinator.searchBarCoordinator.base = searchBar
-        context.coordinator.uiViewController = uiViewController
-        
-        context.coordinator.updateSearchController()
+        context.coordinator.uiViewController = uiViewController.navigationController?.topViewController
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(base: self, searchBarCoordinator: .init(base: searchBar))
     }
 }
 
@@ -45,7 +43,15 @@ extension _NavigationSearchBarConfigurator {
         var searchBarCoordinator: SearchBar.Coordinator
         var searchController: UISearchController!
         
-        weak var uiViewController: UIViewControllerType?
+        weak var uiViewController: UIViewController? {
+            didSet {
+                if uiViewController == nil || uiViewController != oldValue {
+                    oldValue?.searchController = nil
+                }
+                
+                updateSearchController()
+            }
+        }
         
         init(
             base: _NavigationSearchBarConfigurator,
@@ -57,6 +63,7 @@ extension _NavigationSearchBarConfigurator {
             super.init()
             
             initializeSearchController()
+            updateSearchController()
         }
         
         func initializeSearchController() {
@@ -74,13 +81,15 @@ extension _NavigationSearchBarConfigurator {
             searchController.obscuresBackgroundDuringPresentation = false
             searchController.searchBar.delegate = self
             searchController.searchResultsUpdater = self
-            
-            updateSearchController()
         }
         
         func updateSearchController() {
             guard let uiViewController = uiViewController else {
                 return
+            }
+            
+            if uiViewController.searchController !== searchController {
+                uiViewController.searchController = searchController
             }
             
             if let obscuresBackgroundDuringPresentation = base.obscuresBackgroundDuringPresentation {
@@ -95,16 +104,12 @@ extension _NavigationSearchBarConfigurator {
             
             (searchController.searchResultsController as? UIHostingController<SearchResultsContent>)?.rootView = base.searchResultsContent()
             
-            if let hideSearchBarOnScroll = base.hideSearchBarOnScroll {
-                uiViewController.hidesSearchBarWhenScrolling = hideSearchBarOnScroll
+            if let hidesSearchBarWhenScrolling = base.hidesSearchBarWhenScrolling {
+                uiViewController.hidesSearchBarWhenScrolling = hidesSearchBarWhenScrolling
             }
             
             if let automaticallyShowSearchBar = base.automaticallyShowSearchBar, automaticallyShowSearchBar {
-                uiViewController.navigationBarSizeToFit()
-            }
-            
-            if uiViewController.searchController !== searchController {
-                uiViewController.searchController = searchController
+                uiViewController.sizeToFitSearchBar()
             }
         }
         
@@ -160,33 +165,32 @@ extension _NavigationSearchBarConfigurator {
     }
     
     class UIViewControllerType: UIViewController {
-        var searchController: UISearchController? {
-            get {
-                self.parent?.navigationItem.searchController
-            } set {
-                self.parent?.navigationItem.searchController = newValue
-            }
+        weak var coordinator: Coordinator?
+        
+        init(coordinator: Coordinator?) {
+            self.coordinator = coordinator
+            
+            super.init(nibName: nil, bundle: nil)
         }
         
-        var hidesSearchBarWhenScrolling: Bool {
-            get {
-                self.parent?.navigationItem.hidesSearchBarWhenScrolling ?? true
-            } set {
-                self.parent?.navigationItem.hidesSearchBarWhenScrolling = newValue
-            }
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
         
+        override func willMove(toParent parent: UIViewController?) {
+            super.willMove(toParent: parent)
+            
+            coordinator?.uiViewController = navigationController?.topViewController
+        }
+        
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            
+            coordinator?.uiViewController = navigationController?.topViewController
+        }
         
         override func viewWillAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-        }
-        
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-        }
-        
-        func navigationBarSizeToFit() {
-            self.parent?.navigationController?.navigationBar.sizeToFit()
+            coordinator?.uiViewController = navigationController?.topViewController
         }
     }
 }
@@ -199,6 +203,30 @@ extension View {
     @available(tvOSApplicationExtension, unavailable)
     public func navigationSearchBar(_ searchBar: () -> SearchBar) -> some View {
         background(_NavigationSearchBarConfigurator(searchBar: searchBar(), searchResultsContent: { EmptyView() }))
+    }
+}
+
+// MARK: - Helpers -
+
+private extension UIViewController {
+    var searchController: UISearchController? {
+        get {
+            navigationItem.searchController
+        } set {
+            navigationItem.searchController = newValue
+        }
+    }
+    
+    var hidesSearchBarWhenScrolling: Bool {
+        get {
+            navigationItem.hidesSearchBarWhenScrolling
+        } set {
+            navigationItem.hidesSearchBarWhenScrolling = newValue
+        }
+    }
+    
+    func sizeToFitSearchBar() {
+        navigationController?.navigationBar.sizeToFit()
     }
 }
 
