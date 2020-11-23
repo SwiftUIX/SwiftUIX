@@ -9,6 +9,7 @@ import SwiftUI
 public protocol Navigator: DynamicViewPresenter {
     func push<V: View>(_: V)
     func pop()
+    func popToRoot()
 }
 
 // MARK: - Helpers -
@@ -38,6 +39,10 @@ extension UINavigationController: Navigator {
     
     public func pop() {
         popViewController(animated: true)
+    }
+    
+    public func popToRoot() {
+        popToRootViewController(animated: true)
     }
 }
 
