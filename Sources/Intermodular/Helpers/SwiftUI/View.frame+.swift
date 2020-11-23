@@ -78,7 +78,8 @@ extension View {
     /// Causes the view to greedily fill into its container.
     @inlinable
     public func frame(
-        _ size: _GreedyFrameSize, _ axis: Axis,
+        _ size: _GreedyFrameSize,
+        _ axis: Axis,
         alignment: Alignment = .center
     ) -> some View {
         switch axis {
