@@ -71,7 +71,8 @@ extension View {
             idealWidth: .infinity,
             maxWidth: .infinity,
             idealHeight: .infinity,
-            maxHeight: .infinity
+            maxHeight: .infinity,
+            alignment: alignment
         )
     }
     
@@ -84,9 +85,9 @@ extension View {
     ) -> some View {
         switch axis {
             case .horizontal:
-                return frame(idealWidth: .infinity, maxWidth: .infinity)
+                return frame(idealWidth: .infinity, maxWidth: .infinity, alignment: alignment)
             case .vertical:
-                return frame(idealHeight: .infinity, maxHeight: .infinity)
+                return frame(idealHeight: .infinity, maxHeight: .infinity, alignment: alignment)
         }
     }
     
