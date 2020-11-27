@@ -55,6 +55,18 @@ extension LinkPresentationView {
     }
     
     @inlinable
+    public init(
+        url: URL,
+        metadata: LPLinkMetadata?,
+        @ViewBuilder placeholder: () -> Placeholder
+    ) {
+        self.url = url
+        self.metadata = metadata
+        self.onMetadataFetchCompletion = nil
+        self.placeholder = placeholder()
+    }
+    
+    @inlinable
     public init(metadata: LPLinkMetadata, @ViewBuilder placeholder: () -> Placeholder) {
         self.url = nil
         self.metadata = metadata
@@ -72,6 +84,14 @@ extension LinkPresentationView where Placeholder == EmptyView {
         self.init(url: url, onMetadataFetchCompletion: onMetadataFetchCompletion) {
             EmptyView()
         }
+    }
+    
+    @inlinable
+    public init(
+        url: URL,
+        metadata: LPLinkMetadata?
+    ) {
+        self.init(url: url, metadata: metadata, placeholder: { EmptyView() })
     }
     
     @inlinable
@@ -138,6 +158,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
             .visible(!isPlaceholderVisible)
             
             placeholder
+                .accessibility(hidden: placeholder is EmptyView)
                 .visible(isPlaceholderVisible)
         }
         .onAppear(perform: fetchMetadata)
