@@ -9,9 +9,10 @@ import SwiftUI
 public struct AnyPresentationView: View {
     public let base: _opaque_View
     private var environmentBuilder: EnvironmentBuilder
-    private var _name: ViewName?
-    private var _modalPresentationStyle: ModalPresentationStyle?
-    private var _hidesBottomBarWhenPushed: Bool?
+
+    public private(set) var name: ViewName
+    public private(set) var modalPresentationStyle: ModalPresentationStyle = .automatic
+    public private(set) var hidesBottomBarWhenPushed: Bool = false
     
     public var body: some View {
         base.eraseToAnyView().mergeEnvironmentBuilder(environmentBuilder)
@@ -24,6 +25,8 @@ public struct AnyPresentationView: View {
             self.base = (view as? _opaque_View) ?? view.eraseToAnyView()
             self.environmentBuilder = .init()
         }
+        
+        self.name = ViewName()
     }
 }
 
@@ -31,7 +34,7 @@ public struct AnyPresentationView: View {
 
 extension AnyPresentationView: _opaque_View {
     public func _opaque_getViewName() -> ViewName? {
-        _name ?? base._opaque_getViewName()
+        name
     }
 }
 
@@ -41,13 +44,7 @@ extension AnyPresentationView: ModalPresentationView {
     }
     
     public var presentationStyle: ModalPresentationStyle {
-        _modalPresentationStyle ?? (base as? _opaque_ModalPresentationView)?.presentationStyle ?? .automatic
-    }
-}
-
-extension AnyPresentationView: NavigatableView {
-    public var hidesBottomBarWhenPushed: Bool {
-        _hidesBottomBarWhenPushed ?? (base as? _opaque_NavigatableView)?.hidesBottomBarWhenPushed ?? false
+        modalPresentationStyle
     }
 }
 
@@ -64,19 +61,19 @@ extension AnyPresentationView {
 }
 
 extension AnyPresentationView {
-    public func name(_ name: ViewName?) -> Self {
-        then({ $0._name = name })
+    public func name(_ name: ViewName) -> Self {
+        then({ $0.name = name })
     }
 }
 
 extension AnyPresentationView {
     public func modalPresentationStyle(_ style: ModalPresentationStyle) -> Self {
-        then({ $0._modalPresentationStyle = style })
+        then({ $0.modalPresentationStyle = style })
     }
 }
 
 extension AnyPresentationView {
     public func hidesBottomBarWhenPushed(_ hidesBottomBarWhenPushed: Bool) -> Self {
-        then({ $0._hidesBottomBarWhenPushed = hidesBottomBarWhenPushed })
+        then({ $0.hidesBottomBarWhenPushed = hidesBottomBarWhenPushed })
     }
 }

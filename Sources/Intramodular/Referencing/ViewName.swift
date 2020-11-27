@@ -32,6 +32,10 @@ public struct ViewName {
         self.viewType = .init(type)
         self.base = self.viewType
     }
+    
+    public init() {
+        self.init(UUID())
+    }
 }
 
 extension ViewName {
@@ -81,7 +85,8 @@ extension ViewName: Hashable {
 // MARK: - Auxiliary Implementation -
 
 extension EnvironmentValues {
-    public var viewName: ViewName? {
+    @usableFromInline
+    var _name: ViewName? {
         get {
             self[DefaultEnvironmentKey<ViewName>]
         } set {

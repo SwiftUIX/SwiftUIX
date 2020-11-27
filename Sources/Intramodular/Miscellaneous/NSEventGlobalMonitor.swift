@@ -38,4 +38,18 @@ public final class NSEventGlobalMonitor: ObservableObject {
     }
 }
 
+// MARK: - API -
+
+@available(macOS 11.0, *)
+extension View {
+    public func onAppKitEvent(
+        matching mask: NSEvent.EventTypeMask,
+        peform action: @escaping (NSEvent) -> ()
+    ) -> some View {
+        WithInlineStateObject(NSEventGlobalMonitor(matching: mask)) { object in
+            self.onReceive(object.objectWillChange, perform: action)
+        }
+    }
+}
+
 #endif

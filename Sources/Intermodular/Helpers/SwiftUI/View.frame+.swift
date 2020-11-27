@@ -76,7 +76,22 @@ extension View {
         )
     }
     
-    /// Causes the view to greedily fill into its container.
+    @inlinable
+    public func frame(
+        width: _GreedyFrameSize,
+        alignment: Alignment = .center
+    ) -> some View {
+        frame(idealWidth: .infinity, maxWidth: .infinity, alignment: alignment)
+    }
+    
+    @inlinable
+    public func frame(
+        height: _GreedyFrameSize,
+        alignment: Alignment = .center
+    ) -> some View {
+        frame(idealHeight: .infinity, maxHeight: .infinity, alignment: alignment)
+    }
+
     @inlinable
     public func frame(
         _ size: _GreedyFrameSize,

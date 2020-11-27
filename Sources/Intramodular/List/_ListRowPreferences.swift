@@ -22,37 +22,3 @@ struct _ListRowPreferencesKey: PreferenceKey {
         value = nextValue()
     }
 }
-
-// MARK: - API -
-
-extension View {
-    /// Sets the estimated size for the list row.
-    public func estimatedListRowSize(_ estimatedCellSize: CGSize) -> some View {
-        transformPreference(_ListRowPreferencesKey.self) { preferences in
-            preferences.estimatedCellSize = estimatedCellSize
-        }
-    }
-    
-    /// Sets whether the list row is highlightable or not.
-    public func listRowHighlightable(_ isHighlightable: Bool) -> some View {
-        transformPreference(_ListRowPreferencesKey.self) { preferences in
-            preferences.isHighlightable = isHighlightable
-        }
-    }
-    
-    /// Returns a version of `self` that will invoke `action` after
-    /// recognizing a selection.
-    public func onListRowSelect(perform action: @escaping () -> Void) -> some View {
-        transformPreference(_ListRowPreferencesKey.self) { preferences in
-            preferences.onSelect = .init(action)
-        }
-    }
-    
-    /// Returns a version of `self` that will invoke `action` after
-    /// recognizing a deselection.
-    public func onListRowDeselect(perform action: @escaping () -> Void) -> some View {
-        transformPreference(_ListRowPreferencesKey.self) { preferences in
-            preferences.onDeselect = .init(action)
-        }
-    }
-}

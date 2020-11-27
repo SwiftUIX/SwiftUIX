@@ -96,17 +96,4 @@ extension View {
     }
 }
 
-// MARK: - API -
-
-extension View {
-    /// Sets whether the bottom bar is hidden when this view is pushed.
-    @available(tvOS, unavailable)
-    @inlinable
-    public func hidesBottomBarWhenPushed(_ newValue: Bool) -> some View {
-        configureUIViewController {
-            $0.hidesBottomBarWhenPushed = newValue
-        }
-    }
-}
-
 #endif

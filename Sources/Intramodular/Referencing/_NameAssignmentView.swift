@@ -18,7 +18,7 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
     
     var body: some View {
         content
-            .environment(\.viewName, name)
+            .environment(\._name, name)
             .background(GeometryReader { geometry in
                 ZeroSizeView().anchorPreference(
                     key: _NamedViewDescription.PreferenceKey.self,
