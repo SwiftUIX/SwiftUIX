@@ -29,7 +29,7 @@ public final class UIHostingCollectionViewController<
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (Item) -> RowContent
     
-    private var _rowContentHeightCache: [Item.ID: CGFloat] = [:]
+    private var _rowContentSizeCache: [Item.ID: CGSize] = [:]
     
     public init(
         _ data: Data,
@@ -115,6 +115,26 @@ public final class UIHostingCollectionViewController<
     override public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         cell(for: indexPath)?.listRowPreferences?.onDeselect?.perform()
     }
+    
+    // MARK: - UICollectionViewDelegateFlowLayout -
+    
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let cellData = data[indexPath]
+        
+        if let size = _rowContentSizeCache[cellData.id] {
+            return size
+        } else {
+            let size = UIHostingController(rootView: rowContent(data[indexPath])).sizeThatFits(in: UIView.layoutFittingExpandedSize)
+            
+            _rowContentSizeCache[cellData.id] = size
+            
+            return size
+        }
+    }
 }
 
 extension UIHostingCollectionViewController {
@@ -124,10 +144,7 @@ extension UIHostingCollectionViewController {
             .compactMap({ $0 as? UIHostingCollectionViewCell<Item, RowContent> })
             .first(where: { $0.indexPath == indexPath })
         
-        return result ?? collectionView.dequeueReusableCell(
-            withReuseIdentifier: .hostingCollectionViewCellIdentifier,
-            for: indexPath
-        ) as! UIHostingCollectionViewCell<Item, RowContent>
+        return result ?? collectionView(collectionView, cellForItemAt: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
     }
     
     public func reloadData() {
