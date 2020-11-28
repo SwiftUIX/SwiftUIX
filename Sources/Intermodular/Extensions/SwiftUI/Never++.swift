@@ -6,11 +6,11 @@ import Swift
 import SwiftUI
 
 extension Never {
-    public static func produce() -> Never {
+    static func produce() -> Never {
         Swift.fatalError()
     }
     
-    public static func produce<T>(from _: T) -> Never {
+    static func produce<T>(from _: T) -> Never {
         Swift.fatalError()
     }
 }
