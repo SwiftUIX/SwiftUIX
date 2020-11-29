@@ -11,7 +11,7 @@ import UIKit
 public class UIHostingPageViewController<Page: View>: UIPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
-        let page: Page
+        var page: Page
         
         var body: some View {
             page
@@ -38,7 +38,16 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         }
     }
     
-    var content: AnyForEach<Page>?
+    var content: AnyForEach<Page>? {
+        didSet {
+            if let content = content {
+                for viewController in (viewControllers ?? []).map({ $0 as! PageContentController }) {
+                    viewController.rootView.page = content.content(content.data[viewController.rootView.index])
+                }
+            }
+        }
+    }
+    
     var cyclesPages: Bool = false
     
     var currentPageIndex: AnyIndex? {

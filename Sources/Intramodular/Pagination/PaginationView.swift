@@ -90,6 +90,8 @@ public struct PaginationView<Page: View>: View {
     }
 }
 
+// MARK: - Initialization -
+
 extension PaginationView {
     @inlinable
     public init<Data: RandomAccessCollection, ID: Hashable>(
@@ -170,16 +172,14 @@ extension PaginationView {
             showsIndicators: showsIndicators
         )
     }
-}
-
-extension PaginationView where Page == AnyView {
+    
     @inlinable
     public init<C0: View, C1: View>(
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
         @ViewBuilder content: () -> TupleView<(C0, C1)>
-    ) {
+    ) where Page == AnyView {
         let content = content()
         
         self.init(
@@ -199,7 +199,7 @@ extension PaginationView where Page == AnyView {
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
         @ViewBuilder content: () -> TupleView<(C0, C1, C2)>
-    ) {
+    ) where Page == AnyView {
         let content = content()
         
         self.init(
