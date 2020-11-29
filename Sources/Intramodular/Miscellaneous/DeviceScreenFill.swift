@@ -26,14 +26,6 @@ public struct DeviceScreenFill<Content: View>: View {
     }
 }
 
-extension DeviceScreenFill where Content == EmptyFillView {
-    public init() {
-        self.init {
-            EmptyFillView()
-        }
-    }
-}
-
 // MARK: - Helpers -
 
 private extension GeometryProxy {

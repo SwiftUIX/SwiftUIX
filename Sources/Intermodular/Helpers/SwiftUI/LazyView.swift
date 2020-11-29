@@ -39,7 +39,7 @@ public struct LazyAppearView<Body: View>: View {
     public var body: some View {
         Group {
             if content == nil {
-                EmptyFillView().onAppear {
+                ZeroSizeView().onAppear {
                     self.content = self.destination()
                 }
             } else {
