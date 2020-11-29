@@ -39,7 +39,7 @@ private class _AlertWindow: UIWindow {
         let alert: Alert
         
         var body: some View {
-            EmptyView()
+            ZeroSizeView()
                 .alert(isPresented: $isPresenting, content: { alert })
         }
     }
