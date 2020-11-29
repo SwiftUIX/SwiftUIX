@@ -172,6 +172,49 @@ extension PaginationView {
     }
 }
 
+extension PaginationView where Page == AnyView {
+    @inlinable
+    public init<C0: View, C1: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1)>
+    ) {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2)>
+    ) {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+}
+
 // MARK: - API -
 
 extension PaginationView {
