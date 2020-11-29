@@ -110,6 +110,7 @@ extension LinkPresentationView {
 
 // MARK: - Implementation -
 
+@usableFromInline
 struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @usableFromInline
     @Environment(\.errorContext) var errorContext
@@ -138,6 +139,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @usableFromInline
     @State var proposedMinHeight: CGFloat?
     
+    @usableFromInline
     var id: some Hashable {
         url ?? metadata?.originalURL
     }
@@ -146,6 +148,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
         placeholder is EmptyView ? false : (metadata ?? fetchedMetadata) == nil
     }
     
+    @usableFromInline
     var body: some View {
         ZStack {
             _LPLinkViewRepresentable<Placeholder>(
