@@ -67,6 +67,13 @@ extension ActionLabelView {
 extension ActionLabelView where Label == Text {
     public init<S: StringProtocol>(
         _ title: S,
+        toggle boolean: Binding<Bool>
+    ) {
+        self.init(title, action: { boolean.wrappedValue.toggle() })
+    }
+
+    public init<S: StringProtocol>(
+        _ title: S,
         action: @escaping () -> Void
     ) {
         self.init(action: action) {

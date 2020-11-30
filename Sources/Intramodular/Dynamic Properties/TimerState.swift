@@ -9,37 +9,36 @@ import SwiftUI
 
 @propertyWrapper
 public struct TimerState: DynamicProperty {
+    class ValueBox: ObservableObject {
+        @Published var value: Int = 0
+    }
+    
     private let interval: TimeInterval
-    private let timerPublisher: Timer.TimerPublisher
     
-    @State var timerConnection: Cancellable?
-    @State var timerSubscription: AnyCancellable? = nil
+    @State private var state = ReferenceBox<(publisher: Timer.TimerPublisher, connection: Cancellable, subscription: Cancellable)?>(nil)
+    @PersistentObject private var valueBox = ValueBox()
     
-    private var updateWrappedValue = ReferenceBox<() -> Void>({ })
-    
-    @State public private(set) var wrappedValue: Int = 0
+    public var wrappedValue: Int {
+        valueBox.value
+    }
     
     /// - Parameters:
     ///   - interval: The time interval on which to publish events. For example, a value of `0.5` publishes an event approximately every half-second.
     public init(interval: TimeInterval) {
         self.interval = interval
-        self.timerPublisher = Timer.publish(every: interval, on: .main, in: .common)
-        self.timerSubscription = nil
-        
-        let updateWrappedValue = self.updateWrappedValue
-        
-        self._timerSubscription = .init(initialValue: timerPublisher.sink(receiveValue: { _ in
-            updateWrappedValue.value()
-        }))
     }
     
     public mutating func update() {
-        let _wrappedValue = self._wrappedValue
-        
-        updateWrappedValue.value = { _wrappedValue.wrappedValue += 1 }
-        
-        if timerConnection == nil {
-            _timerConnection = .init(initialValue: timerPublisher.connect())
+        if state.value == nil {
+            let valueBox = self.valueBox
+            
+            let timerPublisher = Timer.publish(every: interval, on: .main, in: .common)
+            let connection = timerPublisher.connect()
+            let timerSubscription = timerPublisher.sink { _ in
+                valueBox.value += 1
+            }
+            
+            state.value = (timerPublisher, connection, timerSubscription)
         }
     }
 }

@@ -8,11 +8,9 @@ import SwiftUI
 
 @propertyWrapper
 public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicProperty {
-    @usableFromInline
-    @ObservedObject var _wrappedValue: OptionalObservableObject<ObjectType>
+    @ObservedObject fileprivate var _wrappedValue: OptionalObservableObject<ObjectType>
     
     /// The current state value.
-    @inlinable
     public var wrappedValue: ObjectType? {
         get {
             _wrappedValue.base
@@ -31,12 +29,10 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     }
     
     /// Initialize with the provided initial value.
-    @inlinable
     public init(wrappedValue value: ObjectType?) {
         self._wrappedValue = .init(base: value)
     }
     
-    @inlinable
     public init() {
         self.init(wrappedValue: nil)
     }
@@ -44,28 +40,27 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
 
 // MARK: - Auxiliary Implementation -
 
-@usableFromInline
-final class OptionalObservableObject<ObjectType: ObservableObject>: ObservableObject {
-    @usableFromInline
+fileprivate final class OptionalObservableObject<ObjectType: ObservableObject>: ObservableObject {
     var baseSubscription: AnyCancellable?
     
-    @usableFromInline
     var base: ObjectType? {
         didSet {
             subscribe()
         }
     }
     
-    @usableFromInline
     init(base: ObjectType?) {
         self.base = base
         
         subscribe()
     }
     
-    @usableFromInline
     func subscribe() {
-        baseSubscription = base?.objectWillChange.sink(receiveValue: { [unowned self] _ in
+        guard let base = base else {
+            return
+        }
+        
+        baseSubscription = base.objectWillChange.sink(receiveValue: { [unowned self] _ in
             self.objectWillChange.send()
         })
     }

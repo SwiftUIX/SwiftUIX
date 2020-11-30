@@ -24,6 +24,7 @@ public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
             observedObject = newValue
         }
     }
+    
     public var projectedValue: ObservedObject<ObjectType>.Wrapper {
         ObservedObject(wrappedValue: observedObject!).projectedValue
     }
@@ -37,7 +38,7 @@ public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
             let object = thunk()
             
             state.value = object
-            _observedObject = .init(wrappedValue: object)
+            observedObject = object
         }
     }
 }
