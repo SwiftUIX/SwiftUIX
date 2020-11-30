@@ -38,7 +38,7 @@ public struct TimerState: DynamicProperty {
         wrappedValue: Int = 0,
         interval: TimeInterval,
         maxCount: Int? = nil,
-        animation: Animation? = .default
+        animation: Animation? = nil
     ) {
         self._valueBox = .init(wrappedValue: ValueBox(wrappedValue))
         self.interval = interval
