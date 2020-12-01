@@ -13,6 +13,10 @@ public struct TextView<Label: View>: View {
     
     @Binding private var text: String
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    private var appKitOrUIKitClass: UITextView.Type = _UITextView.self
+    #endif
+    
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
     
@@ -22,11 +26,20 @@ public struct TextView<Label: View>: View {
                 .visible(text.isEmpty)
                 .animation(.none)
             
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+            _TextView(
+                appKitOrUIKitClass: appKitOrUIKitClass,
+                text: $text,
+                onEditingChanged: onEditingChanged,
+                onCommit: onCommit
+            )
+            #else
             _TextView(
                 text: $text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit
             )
+            #endif
         }
     }
 }
@@ -86,14 +99,38 @@ extension TextView where Label == Text {
     }
 }
 
+extension TextView {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func appKitOrUIKitClass(_ type: UITextView.Type) -> Self {
+        then({ $0.appKitOrUIKitClass = type })
+    }
+    #endif
+}
+
 // MARK: - Implementation -
 
 fileprivate struct _TextView {
     @Binding private var text: String
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    private var appKitOrUIKitClass: UITextView.Type
+    #endif
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    init(
+        appKitOrUIKitClass: UITextView.Type,
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.appKitOrUIKitClass = appKitOrUIKitClass
+        self._text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+    #else
     init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -103,6 +140,7 @@ fileprivate struct _TextView {
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
     }
+    #endif
 }
 
 #if os(iOS) || os(tvOS)
@@ -110,7 +148,7 @@ fileprivate struct _TextView {
 import UIKit
 
 extension _TextView: UIViewRepresentable {
-    typealias UIViewType = _UITextView
+    typealias UIViewType = UITextView
     
     class Coordinator: NSObject, UITextViewDelegate {
         var view: _TextView
@@ -134,7 +172,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let result = _UITextView().then {
+        let result = appKitOrUIKitClass.init().then {
             $0.delegate = context.coordinator
         }
         

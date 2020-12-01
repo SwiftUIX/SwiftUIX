@@ -76,10 +76,16 @@ extension View {
     /// - Parameters:
     ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
     @inlinable
-    public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
+    public func navigationBarTransparent(_ transparent: Bool) -> some View {
         configureUINavigationBar { navigationBar in
-            navigationBar.isDefaultTransparent = isTransparent
+            navigationBar.isDefaultTransparent = transparent
         }
+    }
+    
+    @inlinable
+    @available(iOS, deprecated: 13.0, renamed: "navigationBarTransparent(_:)")
+    public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
+        navigationBarTransparent(isTransparent)
     }
     
     /// Configures the color of the navigation bar for this view.
