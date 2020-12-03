@@ -51,6 +51,20 @@ public class Screen: ObservableObject {
     }
 }
 
+// MARK: - Extensions -
+
+extension Screen {
+    public var width: CGFloat {
+        bounds.width
+    }
+    
+    public var height: CGFloat {
+        bounds.height
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
 extension EnvironmentValues {
     public var screen: Screen {
         get {
