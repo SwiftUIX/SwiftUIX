@@ -13,12 +13,13 @@ public struct TextView<Label: View>: View {
     
     @Binding private var text: String
     
+    private var onEditingChanged: (Bool) -> Void
+    private var onCommit: () -> Void
+    
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var appKitOrUIKitClass: UITextView.Type = _UITextView.self
     #endif
-    
-    private var onEditingChanged: (Bool) -> Void
-    private var onCommit: () -> Void
+    private var appKitOrUIKitFont: AppKitOrUIKitFont?
     
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
@@ -28,119 +29,36 @@ public struct TextView<Label: View>: View {
             
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             _TextView(
-                appKitOrUIKitClass: appKitOrUIKitClass,
                 text: $text,
                 onEditingChanged: onEditingChanged,
-                onCommit: onCommit
+                onCommit: onCommit,
+                appKitOrUIKitClass: appKitOrUIKitClass,
+                appKitOrUIKitFont: appKitOrUIKitFont
             )
             #else
             _TextView(
                 text: $text,
                 onEditingChanged: onEditingChanged,
-                onCommit: onCommit
+                onCommit: onCommit,
+                appKitOrUIKitFont: appKitOrUIKitFont
             )
             #endif
         }
     }
 }
 
-// MARK: - API -
-
-extension TextView where Label == EmptyView {
-    public init(
-        text: Binding<String>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.label = EmptyView()
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
-    }
-    
-    public init(
-        text: Binding<String?>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.init(
-            text: text.withDefaultValue(String()),
-            onEditingChanged: onEditingChanged,
-            onCommit: onCommit
-        )
-    }
-}
-
-extension TextView where Label == Text {
-    public init<S: StringProtocol>(
-        _ title: S,
-        text: Binding<String>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.label = Text(title).foregroundColor(.placeholderText)
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
-    }
-    
-    public init<S: StringProtocol>(
-        _ title: S,
-        text: Binding<String?>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.init(
-            title,
-            text: text.withDefaultValue(String()),
-            onEditingChanged: onEditingChanged,
-            onCommit: onCommit
-        )
-    }
-}
-
-extension TextView {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    public func appKitOrUIKitClass(_ type: UITextView.Type) -> Self {
-        then({ $0.appKitOrUIKitClass = type })
-    }
-    #endif
-}
-
 // MARK: - Implementation -
 
 fileprivate struct _TextView {
-    @Binding private var text: String
+    @Binding var text: String
+    
+    var onEditingChanged: (Bool) -> Void
+    var onCommit: () -> Void
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var appKitOrUIKitClass: UITextView.Type
+    var appKitOrUIKitClass: UITextView.Type
     #endif
-    private var onEditingChanged: (Bool) -> Void
-    private var onCommit: () -> Void
-    
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    init(
-        appKitOrUIKitClass: UITextView.Type,
-        text: Binding<String>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self.appKitOrUIKitClass = appKitOrUIKitClass
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
-    }
-    #else
-    init(
-        text: Binding<String>,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
-        onCommit: @escaping () -> Void = { }
-    ) {
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
-    }
-    #endif
+    var appKitOrUIKitFont: AppKitOrUIKitFont?
 }
 
 #if os(iOS) || os(tvOS)
@@ -193,7 +111,7 @@ extension _TextView: UIViewRepresentable {
         
         // `UITextView`'s default font is smaller than SwiftUI's default font.
         // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
-        uiView.font = context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        uiView.font = appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         #if !os(tvOS)
         uiView.isEditable = context.environment.isEnabled
         #endif
@@ -285,5 +203,72 @@ class _NSTextView: NSTextView {
 }
 
 #endif
+
+// MARK: - API -
+
+extension TextView where Label == EmptyView {
+    public init(
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.label = EmptyView()
+        self._text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+    
+    public init(
+        text: Binding<String?>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            text: text.withDefaultValue(String()),
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
+    }
+}
+
+extension TextView where Label == Text {
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.label = Text(title).foregroundColor(.placeholderText)
+        self._text = text
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+    }
+    
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String?>,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            title,
+            text: text.withDefaultValue(String()),
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
+    }
+}
+
+extension TextView {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func appKitOrUIKitClass(_ type: UITextView.Type) -> Self {
+        then({ $0.appKitOrUIKitClass = type })
+    }
+    #endif
+    
+    public func font(_ font: AppKitOrUIKitFont) -> Self {
+        then({ $0.appKitOrUIKitFont = font })
+    }
+}
 
 #endif
