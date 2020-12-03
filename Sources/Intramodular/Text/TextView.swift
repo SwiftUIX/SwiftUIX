@@ -9,6 +9,8 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {
+    @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
+    
     private let label: Label
     
     @Binding private var text: String
@@ -17,7 +19,7 @@ public struct TextView<Label: View>: View {
     private var onCommit: () -> Void
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var appKitOrUIKitClass: UITextView.Type = _UITextView.self
+    private var appKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
     #endif
     private var appKitOrUIKitFont: AppKitOrUIKitFont?
     
@@ -28,7 +30,7 @@ public struct TextView<Label: View>: View {
                 .animation(.none)
             
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-            _TextView(
+            _TextView<Label>(
                 text: $text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
@@ -36,7 +38,7 @@ public struct TextView<Label: View>: View {
                 appKitOrUIKitFont: appKitOrUIKitFont
             )
             #else
-            _TextView(
+            _TextView<Label>(
                 text: $text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
@@ -49,7 +51,7 @@ public struct TextView<Label: View>: View {
 
 // MARK: - Implementation -
 
-fileprivate struct _TextView {
+fileprivate struct _TextView<Label: View> {
     @Binding var text: String
     
     var onEditingChanged: (Bool) -> Void
@@ -120,6 +122,8 @@ extension _TextView: UIViewRepresentable {
         uiView.text = text
         uiView.textContainerInset = .zero
         
+        (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
+        
         // Reset the cursor offset if possible.
         if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
             uiView.selectedTextRange = textRange
@@ -128,15 +132,6 @@ extension _TextView: UIViewRepresentable {
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
-    }
-}
-
-class _UITextView: UITextView {
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        textContainerInset = .zero
-        textContainer.lineFragmentPadding = 0
     }
 }
 
