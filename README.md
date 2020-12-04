@@ -85,6 +85,10 @@ All documentation is available via the [repository wiki](https://github.com/Swif
       }
   ```
 
+### Appearance
+
+- `View#visible(_:)` - Sets a view's visibility.
+
 ### Error Handling
 
 - `TryButton` - A button capable of performing throwing functions.
