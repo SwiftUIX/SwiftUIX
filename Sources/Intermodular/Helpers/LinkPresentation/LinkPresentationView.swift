@@ -115,7 +115,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @usableFromInline
     @Environment(\.errorContext) var errorContext
     @usableFromInline
-    @UniqueCache(for: Self.self) var cache
+    @_UniqueStateCache(for: Self.self) var cache
     
     let url: URL?
     @usableFromInline
@@ -157,7 +157,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
                 proposedMinHeight: $proposedMinHeight
             )
             .equatable()
-            .minHeight(proposedMinHeight)
+            .frame(minHeight: proposedMinHeight)
             .visible(!isPlaceholderVisible)
             
             placeholder

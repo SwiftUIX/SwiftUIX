@@ -5,7 +5,8 @@
 import Swift
 import SwiftUI
 
-public protocol StateCache {
+@usableFromInline
+protocol StateCache {
     func cache<T>(_ value: T, forKey key: AnyHashable) throws
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T?
     
@@ -27,11 +28,13 @@ final class InMemoryStateCache: StateCache {
         
     }
     
-    public func cache<T>(_ value: T, forKey key: AnyHashable) throws {
+    @usableFromInline
+    func cache<T>(_ value: T, forKey key: AnyHashable) throws {
         storage[key] = value
     }
     
-    public func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
+    @usableFromInline
+    func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
         guard let value = storage[key] else {
             return nil
         }
@@ -43,11 +46,13 @@ final class InMemoryStateCache: StateCache {
         return castValue
     }
     
-    public func removeCachedValue(forKey key: AnyHashable) {
+    @usableFromInline
+    func removeCachedValue(forKey key: AnyHashable) {
         storage.removeValue(forKey: key)
     }
     
-    public func removeAllCachedValues() {
+    @usableFromInline
+    func removeAllCachedValues() {
         storage.removeAll()
     }
 }
@@ -61,8 +66,8 @@ struct StateCacheEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    @inlinable
-    public var cache: StateCache {
+    @usableFromInline
+    var cache: StateCache {
         get {
             self[StateCacheEnvironmentKey.self]
         } set {
@@ -72,7 +77,8 @@ extension EnvironmentValues {
 }
 
 @propertyWrapper
-public struct _UniqueStateCache: DynamicProperty, StateCache {
+@usableFromInline
+struct _UniqueStateCache: DynamicProperty, StateCache {
     private struct CacheKey: Hashable {
         let base: AnyHashable
         let parentID: AnyHashable
@@ -82,39 +88,40 @@ public struct _UniqueStateCache: DynamicProperty, StateCache {
     
     @Environment(\.cache) private var cache: StateCache
     
-    public var wrappedValue: StateCache {
+    @usableFromInline
+    var wrappedValue: StateCache {
         self
     }
     
-    public init(id: AnyHashable) {
+    init(id: AnyHashable) {
         self._id = .init(initialValue: id)
     }
     
-    public init(for type: Any.Type) {
+    init(for type: Any.Type) {
         self._id = .init(initialValue: AnyHashable(ObjectIdentifier(type)))
     }
     
-    public init() {
+    init() {
         self._id = .init(initialValue: AnyHashable(UUID()))
     }
     
-    public func cache<T>(_ value: T, forKey key: AnyHashable) throws {
+    @usableFromInline
+    func cache<T>(_ value: T, forKey key: AnyHashable) throws {
         try cache.cache(value, forKey: CacheKey(base: key, parentID: id))
     }
     
-    public func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
+    @usableFromInline
+    func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
         try cache.decache(type, forKey: CacheKey(base: key, parentID: id))
     }
     
-    public func removeCachedValue(forKey key: AnyHashable) {
+    @usableFromInline
+    func removeCachedValue(forKey key: AnyHashable) {
         cache.removeCachedValue(forKey: key)
     }
     
-    public func removeAllCachedValues() {
+    @usableFromInline
+    func removeAllCachedValues() {
         cache.removeAllCachedValues()
     }
-}
-
-extension View {
-    public typealias UniqueCache = _UniqueStateCache
 }
