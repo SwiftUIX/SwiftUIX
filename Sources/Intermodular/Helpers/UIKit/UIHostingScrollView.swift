@@ -8,7 +8,25 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate {
-    let hostingContentView: UIHostingView<_UIHostingScrollViewRootView<Content>>
+    struct RootViewContainer: View {
+        weak var base: UIHostingScrollView<Content>?
+        
+        var content: Content
+        
+        var body: some View {
+            Group {
+                if base?._isPagingEnabled ?? false {
+                    content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
+                        self.base?.pages = page
+                    })
+                } else {
+                    content
+                }
+            }
+        }
+    }
+    
+    let hostingContentView: UIHostingView<RootViewContainer>
     
     public var rootView: Content {
         get {
@@ -54,7 +72,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
     }
     
     public init(rootView: Content) {
-        hostingContentView = UIHostingView(rootView: _UIHostingScrollViewRootView(base: nil, content: rootView))
+        hostingContentView = UIHostingView(rootView: RootViewContainer(base: nil, content: rootView))
         
         super.init(frame: .zero)
         
@@ -185,26 +203,6 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         }
         
         targetContentOffset.pointee = contentOffset(forPageIndex: targetIndex)
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-struct _UIHostingScrollViewRootView<Content: View>: View {
-    weak var base: UIHostingScrollView<Content>?
-    
-    var content: Content
-    
-    var body: some View {
-        Group {
-            if base?._isPagingEnabled ?? false {
-                content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
-                    self.base?.pages = page
-                })
-            } else {
-                content
-            }
-        }
     }
 }
 
