@@ -54,6 +54,21 @@ extension View {
 }
 
 extension View {
+    /// Configures the color of the navigation bar for this view.
+    ///
+    /// This modifier only takes effect when this view is inside of and visible
+    /// within a `NavigationView`.
+    ///
+    /// - Parameters:
+    ///     - color: The color to use for the navigation bar.
+    @inlinable
+    public func navigationBarColor(_ color: Color) -> some View {
+        configureUINavigationBar { navigationBar in
+            navigationBar.backgroundColor = color.toUIColor()
+            navigationBar.barTintColor = color.toUIColor()
+        }
+    }
+
     /// Configures the translucency of the navigation bar for this view.
     ///
     /// This modifier only takes effect when this view is inside of and visible
@@ -62,10 +77,16 @@ extension View {
     /// - Parameters:
     ///     - isTranslucent: A Boolean value that indicates whether the navigation bar is translucent.
     @inlinable
-    public func navigationBarIsTranslucent(_ isTranslucent: Bool) -> some View {
+    public func navigationBarTranslucent(_ translucent: Bool) -> some View {
         configureUINavigationBar { navigationBar in
-            navigationBar.isTranslucent = isTranslucent
+            navigationBar.isTranslucent = translucent
         }
+    }
+    
+    @inlinable
+    @available(iOS, deprecated: 13.0, renamed: "navigationBarTranslucent(_:)")
+    public func navigationBarIsTranslucent(_ isTranslucent: Bool) -> some View {
+        navigationBarTranslucent(isTranslucent)
     }
     
     /// Configures the transparency of the navigation bar for this view.
@@ -86,21 +107,6 @@ extension View {
     @available(iOS, deprecated: 13.0, renamed: "navigationBarTransparent(_:)")
     public func navigationBarIsTransparent(_ isTransparent: Bool) -> some View {
         navigationBarTransparent(isTransparent)
-    }
-    
-    /// Configures the color of the navigation bar for this view.
-    ///
-    /// This modifier only takes effect when this view is inside of and visible
-    /// within a `NavigationView`.
-    ///
-    /// - Parameters:
-    ///     - color: The color to use for the navigation bar.
-    @inlinable
-    public func navigationBarColor(_ color: Color) -> some View {
-        configureUINavigationBar { navigationBar in
-            navigationBar.backgroundColor = color.toUIColor()
-            navigationBar.barTintColor = color.toUIColor()
-        }
     }
 }
 

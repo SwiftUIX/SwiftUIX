@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+/// A button capable of performing throwing functions.
 public struct TryButton<Label: View>: ActionLabelView {
     private let action: () throws -> ()
     private let label: Label

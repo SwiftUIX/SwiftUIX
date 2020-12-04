@@ -5,17 +5,10 @@
 import Swift
 import SwiftUI
 
-struct Flip3D<Reverse: View>: ViewModifier {
-    @Binding private var isFlipped: Bool
-    
-    private let reverse: Reverse
-    private let axis: Axis3D
-    
-    init(reverse: Reverse, axis: Axis3D, isFlipped: Binding<Bool>) {
-        self.reverse = reverse
-        self.axis = axis
-        self._isFlipped = isFlipped
-    }
+fileprivate struct Flip3D<Reverse: View>: ViewModifier {
+    let isFlipped: Bool
+    let reverse: Reverse
+    let axis: Axis3D
     
     func body(content: Content) -> some View {
         ZStack {
@@ -32,7 +25,10 @@ struct Flip3D<Reverse: View>: ViewModifier {
 // MARK: - Helpers -
 
 extension View {
-    public func flip3D<Reverse: View>(reverse: Reverse, axis: Axis3D = .y, isFlipped: Binding<Bool>) -> some View {
-        modifier(Flip3D(reverse: reverse, axis: axis, isFlipped: isFlipped))
+    /// Flips this view.
+    public func flip3D<Reverse: View>(
+        _ flip: Bool = true, axis: Axis3D = .y, reverse: Reverse
+    ) -> some View {
+        modifier(Flip3D(isFlipped: flip, reverse: reverse, axis: axis))
     }
 }

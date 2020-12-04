@@ -40,6 +40,30 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 
 All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
 
+### UIKit → SwiftUI 
+
+| UIKit                                   | SwiftUI      | SwiftUIX                                   |
+| --------------------------------------- | ------------ | ------------------------------------------ |
+| `UIActivityIndicatorView`               | -            | `ActivityIndicator`                        |
+| `UIActivityViewController`              | -            | `AppActivityView`                          |
+| `UIBlurEffect`                          | -            | `BlurEffectView`                           |
+| `UICollectionView`                      | -            | `CollectionView`                           |
+| `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                  |
+| `UIImagePickerController`               | -            | `ImagePicker`                              |
+| `UIPageViewController`                  | -            | `PaginationView`                           |
+| `UIScreen`                              | -            | `Screen`                                   |
+| `UISearchBar`                           | -            | `SearchBar`                                |
+| `UIScrollView`                          | `ScrollView` | `CocoaScrollView`                          |
+| `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                      |
+| `UITableView`                           | `List`       | `CocoaList`                                |
+| `UITextField`                           | `TextField`  | `CocoaTextField`                           |
+| `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                   |
+| `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
+| `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
+| `UIWindow`                              | -            | `WindowOverlay`                            |
+
+
+
 ### **Activity**
 
 - `ActivityIndicator`
@@ -61,11 +85,32 @@ All documentation is available via the [repository wiki](https://github.com/Swif
       }
   ```
 
+### Error Handling
+
+- `TryButton` - A button capable of performing throwing functions.
+
+### Geometry
+
+- `flip3D(_:axis:reverse:)` - Flips this view.
+- `RectangleCorner` - A corner of a Rectangle.
+- `ZeroSizeView` - A zero-size view for when `EmptyView` just doesn't work.
+
+### Keyboard
+
+- `Keyboard` - An object representing the keyboard. 
+- `View#padding(.keyboard) `- Pads this view with the active system height of the keyboard.
+
+### Navigation
+
+- `View#navigationBarColor(_:)` - Configures the color of the navigation bar for this view.
+- `View#navigationBarTranslucent(_:)` - Configures the translucency of the navigation bar for this view.
+- `View#navigationBarTransparent(_:)` - Configures the transparency of the navigation bar for this view.
+
 ### Pagination
 
 - `PaginationView`
 
-  ```
+  ```swift
   PaginationView(axis: .horizontal) {
       ForEach(0..<10, id: \.hashValue) { index in
           Text(String(index))
@@ -77,11 +122,22 @@ All documentation is available via the [repository wiki](https://github.com/Swif
   .currentPageIndicatorTintColor(...)
   ```
 
+### Scrolling
+
+- `View#isScrollEnabled(_:)` - Adds a condition that controls whether users can scroll within this view. Works with:
+
+  - `CocoaList`
+  - `CocoaScrollView`
+  - `CollectionView`
+  - `TextView`
+
+  Does not work with SwiftUI's `ScrollView`.
+
 ### Search
 
 - `SearchBar` - A SwiftUI port for `UISearchBar`.
 
-- `navigationSearchBar(_:)` - Sets the navigation search bar for this view.
+- `View#navigationSearchBar(_:)` - Sets the navigation search bar for this view.
 
   ```swift
   Text("Hello, world!")
@@ -98,7 +154,7 @@ All documentation is available via the [repository wiki](https://github.com/Swif
 
 ### Status Bar
 
-- `statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
+- `View#statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
 
   ```swift
   Text("Hello, world!")
@@ -117,28 +173,6 @@ All documentation is available via the [repository wiki](https://github.com/Swif
       print(editing)
   })
   ```
-
-
-
-| UIKit                                   | SwiftUI      | SwiftUIX                                   |
-| --------------------------------------- | ------------ | ------------------------------------------ |
-| `UIActivityIndicatorView`               | -            | `ActivityIndicator`                        |
-| `UIActivityViewController`              | -            | `AppActivityView`                          |
-| `UIBlurEffect`                          | -            | `BlurEffectView`                           |
-| `UICollectionView`                      | -            | `CollectionView`                           |
-| `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                  |
-| `UIImagePickerController`               | -            | `ImagePicker`                              |
-| `UIPageViewController`                  | -            | `PaginationView`                           |
-| `UIScreen`                              | -            | `Screen`                                   |
-| `UISearchBar`                           | -            | `SearchBar`                                |
-| `UIScrollView`                          | `ScrollView` | `CocoaScrollView`                          |
-| `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                      |
-| `UITableView`                           | `List`       | `CocoaList`                                |
-| `UITextField`                           | `TextField`  | `CocoaTextField`                           |
-| `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                   |
-| `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
-| `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
-| `UIWindow`                              | -            | `WindowOverlay`                            |
 
 # Contributing
 

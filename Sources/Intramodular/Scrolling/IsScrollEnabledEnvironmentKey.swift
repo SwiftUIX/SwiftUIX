@@ -21,6 +21,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    /// Adds a condition that controls whether users can scroll within this view.
     public func isScrollEnabled(_ isEnabled: Bool) -> some View {
         environment(\.isScrollEnabled, isEnabled)
     }
