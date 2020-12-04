@@ -56,7 +56,7 @@ public class UIHostingTextView<Label: View>: UITextView {
     
     override open func layoutSubviews() {
         super.layoutSubviews()
-        
+                
         if lastBounds != bounds.size {
             invalidateIntrinsicContentSize()
             

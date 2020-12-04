@@ -120,6 +120,7 @@ extension _TextView: UIViewRepresentable {
         uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = true
         uiView.text = text
+        uiView.textContainer.lineFragmentPadding = .zero
         uiView.textContainerInset = .zero
         
         (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
