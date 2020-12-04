@@ -8,17 +8,19 @@ import Swift
 import SwiftUI
 
 public class UIHostingTextView<Label: View>: UITextView {
-    open var preferredMaximumLayoutWidth: CGFloat? {
+    private var lastBounds: CGSize = .zero
+    
+    open var adjustsFontSizeToFitWidth: Bool = false {
         didSet {
-            if preferredMaximumLayoutWidth != oldValue {
+            if adjustsFontSizeToFitWidth != oldValue {
                 invalidateIntrinsicContentSize()
             }
         }
     }
     
-    open var adjustsFontSizeToFitWidth: Bool = false {
+    open var preferredMaximumLayoutWidth: CGFloat? {
         didSet {
-            if adjustsFontSizeToFitWidth != oldValue {
+            if preferredMaximumLayoutWidth != oldValue {
                 invalidateIntrinsicContentSize()
             }
         }
@@ -34,12 +36,32 @@ public class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
+    override open var isScrollEnabled: Bool {
+        didSet {
+            guard isScrollEnabled != oldValue else {
+                return
+            }
+            
+            invalidateIntrinsicContentSize()
+        }
+    }
+    
     public init() {
         super.init(frame: .zero, textContainer: nil)
     }
     
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if lastBounds != bounds.size {
+            invalidateIntrinsicContentSize()
+            
+            lastBounds = bounds.size
+        }
     }
     
     open func adjustFontSizeToFitWidth() {
@@ -61,20 +83,27 @@ public class UIHostingTextView<Label: View>: UITextView {
             }
         }
     }
-    
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        
-        textContainerInset = .zero
-        textContainer.lineFragmentPadding = 0
-    }
 }
 
 // MARK: - Helpers -
 
 fileprivate extension UITextView {
     func textHeightForWidth(_ width: CGFloat) -> CGFloat {
-        sizeThatFits(.init(width: width, height: .greatestFiniteMagnitude)).height
+        let storage = NSTextStorage(attributedString: attributedText)
+        let width = bounds.width - textContainerInset.horizontal
+        let containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        let container = NSTextContainer(size: containerSize)
+        let manager = NSLayoutManager()
+        
+        manager.addTextContainer(container)
+        storage.addLayoutManager(manager)
+        
+        container.lineFragmentPadding = textContainer.lineFragmentPadding
+        container.lineBreakMode = textContainer.lineBreakMode
+        
+        _ = manager.glyphRange(for: container)
+        
+        return ceil(manager.usedRect(for: container).height + textContainerInset.vertical)
     }
 }
 
