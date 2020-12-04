@@ -36,39 +36,109 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 4. Click **Finish**.
 5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
-# Documentation
+# Contents
 
 All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
 
-- [General](https://github.com/SwiftUIX/SwiftUIX/wiki/General)
-- [Control Flow](https://github.com/SwiftUIX/SwiftUIX/wiki/Control-Flow)
-- [Controls](https://github.com/SwiftUIX/SwiftUIX/wiki/Controls) 
-- [Dynamic Presentation](https://github.com/SwiftUIX/SwiftUIX/wiki/Dynamic-Presentation)
-- [Geometry](https://github.com/SwiftUIX/SwiftUIX/wiki/Geometry)
-- [Keyboard](https://github.com/SwiftUIX/SwiftUIX/wiki/Keyboard) 
-- [Pagination](https://github.com/SwiftUIX/SwiftUIX/wiki/Pagination)
-- [Text](https://github.com/SwiftUIX/SwiftUIX/wiki/Text) 
-- [Utilities](https://github.com/SwiftUIX/SwiftUIX/wiki/Utilities) 
+### **Activity**
 
-| UIKit                                   | SwiftUI      | SwiftUIX                                      |
-| --------------------------------------- | ------------ | --------------------------------------------- |
-| `UIActivityIndicatorView`               | -            | `ActivityIndicator`                           |
-| `UIActivityViewController`              | -            | `AppActivityView`                             |
-| `UIBlurEffect`                          | -            | `BlurEffectView`                              |
-| `UICollectionView`                      | -            | `CollectionView`                              |
-| `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                     |
-| `UIImagePickerController`               | -            | `ImagePicker`                                 |
-| `UIPageViewController`                  | -            | `PaginationView`                              |
-| `UIScreen`                              | -            | `Screen`                                      |
-| `UISearchBar`                           | -            | `SearchBar`                                   |
-| `UIScrollView`                          | `ScrollView` | `CocoaScrollView`                             |
-| `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                         |
-| `UITableView`                           | `List`       | `CocoaList`                                   |
-| `UITextField`                           | `TextField`  | `CocoaTextField`                              |
-| `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                  |
+- `ActivityIndicator`
+
+  ```
+  ActivityIndicator()
+      .animated(true)
+      .style(.large)
+  ```
+
+- `AppActivityView`  - a SwiftUI port for `UIActivityViewController`.
+
+  ```swift
+  AppActivityView(activityItems: [...])
+      .excludeActivityTypes([...])
+      .onCancel { }
+      .onComplete { result in
+          foo(result)
+      }
+  ```
+
+### Pagination
+
+- `PaginationView`
+
+  ```
+  PaginationView(axis: .horizontal) {
+      ForEach(0..<10, id: \.hashValue) { index in
+          Text(String(index))
+      }
+  }
+  .currentPageIndex($...)
+  .pageIndicatorAlignment(...)
+  .pageIndicatorTintColor(...)
+  .currentPageIndicatorTintColor(...)
+  ```
+
+### Search
+
+- `SearchBar` - A SwiftUI port for `UISearchBar`.
+
+- `navigationSearchBar(_:)` - Sets the navigation search bar for this view.
+
+  ```swift
+  Text("Hello, world!")
+      .navigationSearchBar {
+          SearchBar("Placeholder", text: $text)
+      }
+  ```
+
+### Screen
+
+- `Screen` -  A representation of the device's screen.
+- `UserInterfaceIdiom` - A SwiftUI port for `UIUserInterfaceIdiom`.
+- `UserInterfaceOrientation` - A SwiftUI port for `UserInterfaceOrientation`.
+
+### Status Bar
+
+- `statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
+
+  ```swift
+  Text("Hello, world!")
+      .statusItem(id: "foo", image: .system(.exclamationmark)) {
+          Text("Popover!")
+              .padding()
+      }
+  ```
+
+### Text
+
+- `TextView`
+
+  ```swift
+  TextView("placeholder text", text: $text, onEditingChanged: { editing in
+      print(editing)
+  })
+  ```
+
+
+
+| UIKit                                   | SwiftUI      | SwiftUIX                                   |
+| --------------------------------------- | ------------ | ------------------------------------------ |
+| `UIActivityIndicatorView`               | -            | `ActivityIndicator`                        |
+| `UIActivityViewController`              | -            | `AppActivityView`                          |
+| `UIBlurEffect`                          | -            | `BlurEffectView`                           |
+| `UICollectionView`                      | -            | `CollectionView`                           |
+| `UIDeviceOrientation`                   | -            | `DeviceLayoutOrientation`                  |
+| `UIImagePickerController`               | -            | `ImagePicker`                              |
+| `UIPageViewController`                  | -            | `PaginationView`                           |
+| `UIScreen`                              | -            | `Screen`                                   |
+| `UISearchBar`                           | -            | `SearchBar`                                |
+| `UIScrollView`                          | `ScrollView` | `CocoaScrollView`                          |
+| `UISwipeGestureRecognizer`              | -            | `SwipeGestureOverlay`                      |
+| `UITableView`                           | `List`       | `CocoaList`                                |
+| `UITextField`                           | `TextField`  | `CocoaTextField`                           |
+| `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                   |
 | `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
-| `UIVisualEffectView`                    | -            | `VisualEffectView`                            |
-| `UIWindow`                              | -            | `WindowOverlay`                               |
+| `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
+| `UIWindow`                              | -            | `WindowOverlay`                            |
 
 # Contributing
 

@@ -41,6 +41,7 @@ extension StatusItem: Identifiable where ID: Hashable {
 #if os(macOS)
 
 extension View {
+    /// Adds a status bar item configured to present a popover when clicked.
     public func statusItem<ID: Hashable, Content: View>(
         id: ID,
         image: ImageName,
@@ -49,6 +50,7 @@ extension View {
         modifier(InsertStatusBarPopover(item: StatusItem(id: id, image: image, content: content)))
     }
     
+    /// Adds a status bar item configured to present a popover when clicked.
     public func statusItem<ID: Hashable, Content: View>(
         id: ID,
         systemImage image: String,

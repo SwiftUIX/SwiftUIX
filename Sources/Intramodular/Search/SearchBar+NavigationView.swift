@@ -198,6 +198,7 @@ extension _NavigationSearchBarConfigurator {
 // MARK: - API -
 
 extension View {
+    /// Sets the navigation search bar for this view.
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
