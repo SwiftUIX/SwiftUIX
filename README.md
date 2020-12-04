@@ -8,7 +8,7 @@ SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, provi
 - [Why](#why) 
 - [Requirements](#requirements) 
 - [Installation](#installation)
-- [Documentation](#documentation) 
+- [Contents](#contents) 
 - [Contributing](#contributing)
 - [License](#license)
 - [Support](#support)
@@ -39,6 +39,8 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 # Contents
 
 All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
+
+While the project itself is stable and heavily being used in production, its documentation is **work-in-progress**. Contributions are encouraged and welcomed.
 
 ### UIKit → SwiftUI 
 
