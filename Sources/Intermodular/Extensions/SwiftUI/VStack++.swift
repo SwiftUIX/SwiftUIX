@@ -10,6 +10,7 @@ extension VStack {
         case proportionally
     }
     
+    @_disfavoredOverload
     @inlinable
     public init(
         alignment: HorizontalAlignment = .center,

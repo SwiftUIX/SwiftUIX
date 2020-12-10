@@ -9,7 +9,8 @@ extension HStack {
     public enum _ProportionalFill {
         case proportionally
     }
-    
+
+    @_disfavoredOverload
     @inlinable
     public init(
         alignment: VerticalAlignment = .center,
