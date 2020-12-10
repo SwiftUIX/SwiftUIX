@@ -72,7 +72,7 @@ public final class UIHostingCollectionViewController<
     override public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UIHostingCollectionViewCell<Item, RowContent>
         
-        cell.collectionViewController = self
+        cell.parentViewController = self
         cell.indexPath = indexPath
         cell.item = data[indexPath]
         cell.makeContent = rowContent

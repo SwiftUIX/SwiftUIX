@@ -8,10 +8,14 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UICollectionViewCell {
-    var collectionViewController: (UICollectionViewController & UICollectionViewDelegateFlowLayout)!
-    var indexPath: IndexPath?
-    var item: Item?
-    var makeContent: ((Item) -> Content)!
+    public var parentViewController: UIViewController?
+    public var indexPath: IndexPath?
+    public var item: Item?
+    public var makeContent: ((Item) -> Content)!
+    
+    var collectionViewController: (UICollectionViewController & UICollectionViewDelegateFlowLayout)? {
+        parentViewController as? (UICollectionViewController & UICollectionViewDelegateFlowLayout)
+    }
     
     var listRowPreferences: _ListRowPreferences?
     
@@ -24,9 +28,13 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
     }
     
     private var maximumSize: OptionalDimensions {
-        OptionalDimensions(
-            width: collectionViewController.collectionView.contentSize.width - 0.001,
-            height: collectionViewController.collectionView.contentSize.height - 0.001
+        guard let parentViewController = collectionViewController else {
+            return nil
+        }
+        
+        return OptionalDimensions(
+            width: parentViewController.collectionView.contentSize.width - 0.001,
+            height: parentViewController.collectionView.contentSize.height - 0.001
         )
     }
     
@@ -87,11 +95,11 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
         return contentHostingController._fixed_sizeThatFits(in: targetSize)
     }
     
-    func willDisplay() {
+    public func willDisplay() {
         attachContentHostingController()
     }
     
-    func didEndDisplaying() {
+    public func didEndDisplaying() {
         detachContentHostingController()
     }
 }
@@ -109,11 +117,11 @@ extension UIHostingCollectionViewCell {
         }
         
         if contentHostingController?.parent == nil {
-            contentHostingController!.willMove(toParent: collectionViewController)
-            collectionViewController.addChild(contentHostingController!)
+            contentHostingController!.willMove(toParent: parentViewController)
+            parentViewController?.addChild(contentHostingController!)
             contentView.addSubview(contentHostingController!.view)
             contentHostingController!.view.frame = contentView.bounds
-            contentHostingController!.didMove(toParent: collectionViewController)
+            contentHostingController!.didMove(toParent: parentViewController)
         }
     }
     
@@ -132,7 +140,7 @@ extension UIHostingCollectionViewCell {
         
         invalidateIntrinsicContentSize()
         
-        collectionViewController.collectionView.reloadItems(at: [indexPath])
+        collectionViewController?.collectionView.reloadItems(at: [indexPath])
     }
 }
 
@@ -164,7 +172,7 @@ extension UIHostingCollectionViewCell {
             var isHighlighted: Bool = false
             
             func _animate(_ action: () -> ()) {
-                base?.collectionViewController.collectionViewLayout.invalidateLayout()
+                base?.collectionViewController?.collectionViewLayout.invalidateLayout()
             }
             
             func _reload() {
