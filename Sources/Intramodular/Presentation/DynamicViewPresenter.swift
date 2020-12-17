@@ -201,7 +201,7 @@ extension UIViewController: DynamicViewPresenter {
         
         if presentingViewController != nil {
             return .init { attemptToFulfill in
-                self.dismiss(animated: animation == nil) {
+                self.dismiss(animated: animation != nil) {
                     attemptToFulfill(.success(true))
                 }
             }
