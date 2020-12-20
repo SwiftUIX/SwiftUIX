@@ -59,7 +59,7 @@ extension Binding {
             set: { self.wrappedValue = $0; body($0) }
         )
     }
-        
+    
     @inlinable
     public func onChange(perform action: @escaping (Value) -> ()) -> Self {
         return .init(
@@ -70,7 +70,7 @@ extension Binding {
     
     @inlinable
     public func onChange(toggle value: Binding<Bool>) -> Self {
-        onChange { _ in 
+        onChange { _ in
             value.wrappedValue.toggle()
         }
     }
@@ -84,7 +84,7 @@ extension Binding {
             set: { isNil in self.wrappedValue = isNil ? nil : self.wrappedValue  }
         )
     }
-
+    
     @inlinable
     public func isNotNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
