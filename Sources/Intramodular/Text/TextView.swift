@@ -227,7 +227,7 @@ extension TextView where Label == EmptyView {
     }
 }
 
-extension TextView where Label == Text {
+extension TextView: DefaultTextInputType where Label == Text {
     public init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,

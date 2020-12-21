@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public protocol DefaultTextFieldType {
+public protocol DefaultTextInputType {
     init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,
@@ -24,7 +24,7 @@ public protocol DefaultTextFieldType {
 
 // MARK: - Extensions -
 
-extension DefaultTextFieldType {
+extension DefaultTextInputType {
     public init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,
@@ -70,6 +70,6 @@ extension DefaultTextFieldType {
 
 // MARK: - Conformances -
 
-extension TextField: DefaultTextFieldType where Label == Text {
+extension TextField: DefaultTextInputType where Label == Text {
     
 }

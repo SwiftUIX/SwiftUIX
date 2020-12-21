@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 /// A specialized view for receiving search-related information from the user.
-public struct SearchBar: DefaultTextFieldType {
+public struct SearchBar: DefaultTextInputType {
     @Binding fileprivate var text: String
     
     #if os(iOS) || targetEnvironment(macCatalyst)
@@ -229,7 +229,7 @@ extension SearchBar {
     public func onCancel(perform action: @escaping () -> Void) -> Self {
         then({ $0.onCancel = action })
     }
-
+    
     public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
         then({ $0.returnKeyType = returnKeyType })
     }
