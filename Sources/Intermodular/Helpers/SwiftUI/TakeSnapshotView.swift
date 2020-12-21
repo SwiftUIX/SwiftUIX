@@ -87,8 +87,14 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
 }
 
 extension View {
-    public func snapshot(to image: Binding<UIImage?>) -> some View {
+    /// Takes a screenshot when this view appears and passes it via the `image` binding.
+    public func screenshotOnAppear(to image: Binding<UIImage?>) -> some View {
         TakeSnapshotView(image: image, rootView: self)
+    }
+    
+    @available(iOS, deprecated: 13.0, renamed: "screenshotOnAppear(to:)")
+    public func snapshot(to image: Binding<UIImage?>) -> some View {
+        screenshotOnAppear(to: image)
     }
 }
 

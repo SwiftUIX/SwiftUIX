@@ -202,7 +202,9 @@ While the project itself is stable and heavily being used in production, its doc
       .edgesIgnoringSafeArea(.all)
   ```
 
-  
+### Window 
+
+- `View#windowOverlay(isKeyAndVisible:content:)` - Makes a window key and visible when a given condition is true.
 
 # Contributing
 

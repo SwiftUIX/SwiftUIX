@@ -7,6 +7,7 @@
 import Swift
 import SwiftUI
 
+/// A window overlay for SwiftUI.
 @usableFromInline
 struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
     @usableFromInline
@@ -112,6 +113,10 @@ extension WindowOverlay {
 // MARK: - Helpers -
 
 extension View {
+    /// Makes a window key and visible when a given condition is true
+    /// - Parameters:
+    ///   - isKeyAndVisible: A binding to whether the window is key and visible.
+    ///   - content: A closure returning the content of the window.
     public func windowOverlay<Content: View>(
         isKeyAndVisible: Binding<Bool>,
         @ViewBuilder _ content: () -> Content
