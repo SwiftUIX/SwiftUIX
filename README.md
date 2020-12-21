@@ -143,6 +143,19 @@ While the project itself is stable and heavily being used in production, its doc
 
 - `SearchBar` - A SwiftUI port for `UISearchBar`.
 
+  ````swift
+  struct ContentView: View {
+      @State var isEditing: Bool = false
+      @State var searchText: String = ""
+      
+      var body: some View {
+          SearchBar("Search...", text: $searchText, isEditing: $isEditing)
+              .showsCancelButton(isEditing)
+              .onCancel { print("Canceled!") }
+      }
+  }
+  ````
+
 - `View#navigationSearchBar(_:)` - Sets the navigation search bar for this view.
 
   ```swift
@@ -179,6 +192,17 @@ While the project itself is stable and heavily being used in production, its doc
       print(editing)
   })
   ```
+
+### Visual Effects
+
+- `VisualEffectBlurView` - A blur effect view that expands to fill.
+
+  ```swift
+  VisualEffectBlurView(blurStyle: .dark)
+      .edgesIgnoringSafeArea(.all)
+  ```
+
+  
 
 # Contributing
 
