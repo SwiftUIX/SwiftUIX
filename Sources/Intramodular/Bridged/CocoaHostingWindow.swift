@@ -47,7 +47,7 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
 
 extension View {
     public func windowPosition(_ position: CGPoint) -> some View {
-        preference(key: WindowPostionPreferenceKey.self, value: position)
+        preference(key: WindowPositionPreferenceKey.self, value: position)
     }
     
     public func windowPosition(x: CGFloat, y: CGFloat) -> some View {
@@ -58,7 +58,7 @@ extension View {
 // MARK: - Auxiliary Implementation -
 
 @usableFromInline
-final class WindowPostionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
+final class WindowPositionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
     
 }
 
@@ -71,8 +71,14 @@ public struct UIHostingWindowContent<Content: View>: View {
     
     @inlinable
     public var body: some View {
-        content.onPreferenceChange(WindowPostionPreferenceKey.self) {
-            self.parent?.frame.origin = ($0 ?? CGPoint.zero)
+        content.onPreferenceChange(WindowPositionPreferenceKey.self) { value in
+            if let parent = self.parent, let value = value {
+                if parent.frame.origin != value {
+                    UIView.animate(withDuration: 0.2) {
+                        parent.frame.origin = value
+                    }
+                }
+            }
         }
     }
 }

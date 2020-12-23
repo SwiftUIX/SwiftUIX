@@ -48,7 +48,11 @@ extension WindowOverlay {
     @usableFromInline
     class UIViewControllerType: UIViewController {
         @usableFromInline
-        var content: Content
+        var content: Content {
+            didSet {
+                contentWindow?.rootView = content
+            }
+        }
         
         @usableFromInline
         var isKeyAndVisible: Bool
