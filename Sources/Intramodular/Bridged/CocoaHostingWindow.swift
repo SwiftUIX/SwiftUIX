@@ -46,10 +46,16 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
 // MARK: - API -
 
 extension View {
-    public func windowPosition(_ position: CGPoint) -> some View {
-        preference(key: WindowPositionPreferenceKey.self, value: position)
+    /// Positions the top-leading corner of this window at the specified coordinates in the screen's coordinate space.
+    ///
+    /// Use the `windowPosition(x:y:)` modifier to place the top-leading corner of a window at a specific coordinate in the screen using `offset`.
+    public func windowPosition(_ offset: CGPoint) -> some View {
+        preference(key: WindowPositionPreferenceKey.self, value: offset)
     }
     
+    /// Positions the top-leading corner of this window at the specified coordinates in the screen's coordinate space.
+    ///
+    /// Use the `windowPosition(x:y:)` modifier to place the top-leading corner of a window at a specific coordinate in the screen using an `x` and `y` offset.
     public func windowPosition(x: CGFloat, y: CGFloat) -> some View {
         windowPosition(.init(x: x, y: y))
     }
