@@ -21,6 +21,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var label: Label
     
     private var text: Binding<String>
+    private var shouldBeginEditing: Bool = true
     private var onEditingChanged: (Bool) -> Void
     private var onCommit: () -> Void
     private var onDeleteBackward: () -> Void = { }
@@ -51,6 +52,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
             
             _CocoaTextField(
                 text: text,
+                shouldBeginEditing: shouldBeginEditing,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
                 onDeleteBackward: onDeleteBackward,
@@ -75,12 +77,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
 public struct _CocoaTextField: UIViewRepresentable {
     public typealias UIViewType = UIHostingTextField
     
-    @Environment(\.font) var font
-    @Environment(\.isEnabled) var isEnabled
-    @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
-    
     @Binding var text: String
     
+    var shouldBeginEditing: Bool
     var onEditingChanged: (Bool) -> Void
     var onCommit: () -> Void
     var onDeleteBackward: () -> Void
@@ -104,6 +103,10 @@ public struct _CocoaTextField: UIViewRepresentable {
         init(base: _CocoaTextField) {
             self.base = base
         }
+        
+        /*public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+         base.shouldBeginEditing
+         }*/
         
         public func textFieldDidBeginEditing(_ textField: UITextField) {
             base.onEditingChanged(true)
@@ -138,7 +141,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         
         uiView.delegate = context.coordinator
         
-        if let isFirstResponder = isInitialFirstResponder, isFirstResponder {
+        if let isFirstResponder = isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
             DispatchQueue.main.async {
                 uiView.becomeFirstResponder()
             }
@@ -157,7 +160,7 @@ public struct _CocoaTextField: UIViewRepresentable {
         }
         
         uiView.borderStyle = borderStyle
-        uiView.font = uiFont ?? font?.toUIFont()
+        uiView.font = uiFont ?? context.environment.font?.toUIFont()
         
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
@@ -185,16 +188,16 @@ public struct _CocoaTextField: UIViewRepresentable {
             uiView.inputView = nil
         }
         
-        uiView.isUserInteractionEnabled = isEnabled
+        uiView.isUserInteractionEnabled = context.environment.isEnabled
         uiView.keyboardType = keyboardType
         
         if let placeholder = placeholder {
             uiView.attributedPlaceholder = NSAttributedString(
                 string: placeholder,
                 attributes: [
-                    .font: uiFont ?? font?.toUIFont() as Any,
+                    .font: uiFont ?? context.environment.font?.toUIFont() as Any,
                     .paragraphStyle: NSMutableParagraphStyle().then {
-                        $0.alignment = .init(multilineTextAlignment)
+                        $0.alignment = .init(context.environment.multilineTextAlignment)
                     }
                 ]
             )
@@ -216,11 +219,11 @@ public struct _CocoaTextField: UIViewRepresentable {
         }
         
         uiView.text = text
-        uiView.textAlignment = .init(multilineTextAlignment)
+        uiView.textAlignment = .init(context.environment.multilineTextAlignment)
         
         DispatchQueue.main.async {
             if let isFirstResponder = self.isFirstResponder, uiView.window != nil {
-                if isFirstResponder && !uiView.isFirstResponder {
+                if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
                     uiView.becomeFirstResponder()
                 } else if !isFirstResponder && uiView.isFirstResponder {
                     uiView.resignFirstResponder()
