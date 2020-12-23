@@ -111,15 +111,34 @@ extension _TextView: UIViewRepresentable {
         
         uiView.backgroundColor = nil
         
-        // `UITextView`'s default font is smaller than SwiftUI's default font.
-        // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
-        uiView.font = appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        let font: UIFont = appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        
         #if !os(tvOS)
         uiView.isEditable = context.environment.isEnabled
         #endif
         uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = true
-        uiView.text = text
+        
+        if let paragraphSpacing = context.environment._paragraphSpacing {
+            let style = NSMutableParagraphStyle()
+            style.paragraphSpacing = paragraphSpacing
+            
+            uiView.attributedText = NSAttributedString(
+                string: text,
+                attributes: [
+                    NSAttributedString.Key.paragraphStyle: style,
+                    NSAttributedString.Key.font: font
+                ]
+            )
+            
+        } else {
+            uiView.text = text
+            
+            // `UITextView`'s default font is smaller than SwiftUI's default font.
+            // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
+            uiView.font = font
+        }
+        
         uiView.textContainer.lineFragmentPadding = .zero
         uiView.textContainerInset = .zero
         
@@ -268,3 +287,25 @@ extension TextView {
 }
 
 #endif
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    struct _ParagraphSpacing: EnvironmentKey {
+        static let defaultValue: CGFloat? = nil
+    }
+    
+    var _paragraphSpacing: CGFloat? {
+        get {
+            self[_ParagraphSpacing]
+        } set {
+            self[_ParagraphSpacing] = newValue
+        }
+    }
+}
+
+extension View {
+    public func paragraphSpacing(_ paragraphSpacing: CGFloat) -> some View {
+        environment(\._paragraphSpacing, paragraphSpacing)
+    }
+}
