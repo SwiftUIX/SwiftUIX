@@ -160,8 +160,15 @@ public struct _CocoaTextField: UIViewRepresentable {
         }
         
         uiView.borderStyle = borderStyle
-        uiView.font = uiFont ?? context.environment.font?.toUIFont()
         
+        if let disableAutocorrection = context.environment.disableAutocorrection {
+            uiView.autocorrectionType = disableAutocorrection ? .no : .yes
+        } else {
+            uiView.autocorrectionType = .default
+        }
+
+        uiView.font = uiFont ?? context.environment.font?.toUIFont()
+                
         if let kerning = kerning {
             uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)
         }
