@@ -50,7 +50,7 @@ extension DefaultTextInputType {
     ) {
         self.init(
             title,
-            text: text.withDefaultValue(""),
+            text: text.withDefaultValue(String()),
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
         )

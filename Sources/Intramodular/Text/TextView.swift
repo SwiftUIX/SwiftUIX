@@ -119,14 +119,20 @@ extension _TextView: UIViewRepresentable {
         uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = true
         
-        if let paragraphSpacing = context.environment._paragraphSpacing {
-            let style = NSMutableParagraphStyle()
-            style.paragraphSpacing = paragraphSpacing
+        if context.environment.requiresAttributedText {
+            let paragraphStyle = NSMutableParagraphStyle()
+            
+            paragraphStyle.lineBreakMode = context.environment.lineBreakMode
+            paragraphStyle.lineSpacing = context.environment.lineSpacing
+            
+            context.environment._paragraphSpacing.map {
+                paragraphStyle.paragraphSpacing = $0
+            }
             
             uiView.attributedText = NSAttributedString(
                 string: text,
                 attributes: [
-                    NSAttributedString.Key.paragraphStyle: style,
+                    NSAttributedString.Key.paragraphStyle: paragraphStyle,
                     NSAttributedString.Key.font: font
                 ]
             )
@@ -305,7 +311,18 @@ extension EnvironmentValues {
 }
 
 extension View {
+    /// Sets the amount of space between paragraphs of text in this view.
+    ///
+    /// Use `paragraphSpacing(_:)` to set the amount of spacing from the bottom of one paragraph to the top of the next for text elements in the view.
     public func paragraphSpacing(_ paragraphSpacing: CGFloat) -> some View {
         environment(\._paragraphSpacing, paragraphSpacing)
+    }
+}
+
+// MARK: - Helpers -
+
+extension EnvironmentValues {
+    fileprivate var requiresAttributedText: Bool {
+        _paragraphSpacing != nil
     }
 }
