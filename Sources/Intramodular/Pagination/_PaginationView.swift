@@ -74,6 +74,10 @@ extension _PaginationView: UIViewControllerRepresentable {
             options: interPageSpacing.map({ [.interPageSpacing: $0 as NSNumber] })
         )
         
+        #if os(tvOS)
+        uiViewController.view.backgroundColor = UIColor.clear
+        #endif
+        
         uiViewController.content = content
         
         uiViewController.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
