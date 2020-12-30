@@ -38,6 +38,8 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
         }
     }
     
+    var _isAnimated: Bool = true
+    
     var content: AnyForEach<Page>? {
         didSet {
             if let content = content {
@@ -50,6 +52,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
     
     var cyclesPages: Bool = false
     
+    var isInitialPageIndexApplied: Bool = false
     var currentPageIndex: AnyIndex? {
         get {
             guard let currentViewController = viewControllers?.first as? PageContentController else {
@@ -59,7 +62,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
             return currentViewController.rootView.index
         } set {
             guard let newValue = newValue else {
-                return setViewControllers([], direction: .forward, animated: true, completion: nil)
+                return setViewControllers([], direction: .forward, animated: _isAnimated, completion: nil)
             }
             
             guard let currentPageIndex = currentPageIndex else {
@@ -82,7 +85,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
                 setViewControllers(
                     [viewController],
                     direction: direction,
-                    animated: true
+                    animated: _isAnimated
                 )
             }
         }
