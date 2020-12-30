@@ -6,15 +6,15 @@ import Swift
 import SwiftUI
 
 extension EnvironmentValues {
-    private struct TintColorEnvironmentKey: EnvironmentKey {
+    private struct TintColor: EnvironmentKey {
         static let defaultValue: Color? = nil
     }
     
     public var tintColor: Color? {
         get {
-            self[TintColorEnvironmentKey]
+            self[TintColor]
         } set {
-            self[TintColorEnvironmentKey] = newValue
+            self[TintColor] = newValue
         }
     }
 }

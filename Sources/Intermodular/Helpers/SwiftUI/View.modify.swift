@@ -5,6 +5,7 @@
 import SwiftUI
 
 extension View {
+    /// Modifies the view based on a predicate.
     @ViewBuilder
     public func modify<T: View>(
         if predicate: Bool,
@@ -17,6 +18,7 @@ extension View {
         }
     }
     
+    /// Modifies the view based on a predicate.
     @ViewBuilder
     public func modify<T: View, U: Equatable>(
         if keyPath: KeyPath<EnvironmentValues, U>,

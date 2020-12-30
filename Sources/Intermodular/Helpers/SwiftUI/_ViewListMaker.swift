@@ -5,27 +5,27 @@
 import Swift
 import SwiftUI
 
-public protocol ViewListMaker {
+public protocol _ViewListMaker {
     func makeViewList() -> [AnyView]
 }
 
 // MARK: - Conformances -
 
-extension EmptyView: ViewListMaker {
+extension EmptyView: _ViewListMaker {
     @inlinable
     public func makeViewList() -> [AnyView] {
         []
     }
 }
 
-extension ForEach: ViewListMaker where Content: View {
+extension ForEach: _ViewListMaker where Content: View {
     @inlinable
     public func makeViewList() -> [AnyView] {
         data.map({ self.content($0).eraseToAnyView() })
     }
 }
 
-extension TupleView: ViewListMaker {
+extension TupleView: _ViewListMaker {
     @inlinable
     public func makeViewList() -> [AnyView] {
         Mirror(reflecting: value).children.compactMap({ $0.value as? AnyView }) // HACK

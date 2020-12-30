@@ -8,6 +8,7 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension View {
+    /// Presents a `Menu` when this view is pressed.
     public func menuOnPress<MenuContent: View>(
         @ViewBuilder content: () -> MenuContent
     ) -> some View {

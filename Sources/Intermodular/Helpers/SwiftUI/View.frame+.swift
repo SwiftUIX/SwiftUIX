@@ -91,7 +91,7 @@ extension View {
     ) -> some View {
         frame(idealHeight: .infinity, maxHeight: .infinity, alignment: alignment)
     }
-
+    
     @inlinable
     public func frame(
         _ size: _GreedyFrameSize,

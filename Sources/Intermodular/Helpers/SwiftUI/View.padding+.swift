@@ -5,7 +5,10 @@
 import Swift
 import SwiftUI
 
-public enum _PaddingAmount: CaseIterable, Hashable {
+/// The relative amount of padding, to be used with `View/padding(_:_:)`.
+///
+/// **Do not** reference this type directly.
+public enum _RelativePaddingAmount: CaseIterable, Hashable {
     case small
     case regular
     case large
@@ -31,7 +34,7 @@ extension View {
     @ViewBuilder
     public func padding(
         _ edges: Edge.Set,
-        _ amount: _PaddingAmount?
+        _ amount: _RelativePaddingAmount?
     ) -> some View {
         switch amount {
             case .none:
@@ -46,7 +49,7 @@ extension View {
     }
     
     public func padding(
-        _ amount: _PaddingAmount
+        _ amount: _RelativePaddingAmount
     ) -> some View {
         padding(.all, amount)
     }

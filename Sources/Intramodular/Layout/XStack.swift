@@ -20,13 +20,7 @@ public struct XStack<Content: View>: View {
     @inlinable
     public var body: some View {
         ZStack(alignment: alignment) {
-            VStack(spacing: 0) {
-                Spacer()
-                
-                HStack(spacing: 0) {
-                    Spacer()
-                }
-            }
+            XSpacer()
             
             content
         }

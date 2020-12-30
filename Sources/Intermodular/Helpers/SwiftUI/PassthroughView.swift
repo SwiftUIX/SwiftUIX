@@ -14,7 +14,7 @@ public struct PassthroughView<Content: View>: _opaque_View, View {
     public init(content: Content) {
         self.content = content
     }
-
+    
     @inlinable
     public init(@ViewBuilder content: () -> Content) {
         self.content = content()

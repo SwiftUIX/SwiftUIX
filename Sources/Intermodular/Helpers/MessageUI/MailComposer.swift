@@ -89,22 +89,27 @@ extension MailComposer {
         self.init(onCompletion: { _, _ in })
     }
     
+    /// Sets the initial text for the subject line of the email.
     public func subject(_ subject: String) -> Self {
         then({ $0.configuration.subject = subject })
     }
     
+    /// Sets the initial recipients to include in the email’s “To” field.
     public func toRecipients(_ toRecipients: [String]) -> Self {
         then({ $0.configuration.toRecipients = toRecipients })
     }
     
+    /// Sets the initial recipients to include in the email’s “Cc” field.
     public func ccRecipients(_ ccRecipients: [String]) -> Self {
         then({ $0.configuration.ccRecipients = ccRecipients })
     }
     
+    /// Sets the initial recipients to include in the email’s “Bcc” field.
     public func bccRecipients(_ bccRecipients: [String]) -> Self {
         then({ $0.configuration.bccRecipients = bccRecipients })
     }
     
+    /// Sets the initial body text to include in the email.
     public func messageBody(_ body: String, isHTML: Bool = false) -> Self {
         then {
             $0.configuration.messageBody = body
@@ -112,10 +117,12 @@ extension MailComposer {
         }
     }
     
+    /// Sets the specified attachments to include in the email.
     public func attachments(_ attachments: [Attachment]) -> Self {
         then({ $0.configuration.attachments = attachments })
     }
     
+    /// Adds the specified attachment to the message.
     public func attach(_ attachment: Attachment) -> Self {
         then({ $0.configuration.attachments.append(attachment) })
     }
