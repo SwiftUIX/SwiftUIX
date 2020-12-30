@@ -60,6 +60,21 @@ public struct PaginationView<Page: View>: View {
     }
     
     @inlinable
+    public init<Data, ID>(
+        content: ForEach<Data, ID, Page>,
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true
+    ) {
+        self.init(
+            content: .init(content),
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
     public var body: some View {
         ZStack(alignment: pageIndicatorAlignment) {
             _PaginationView(
