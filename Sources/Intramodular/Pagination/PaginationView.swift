@@ -76,32 +76,36 @@ public struct PaginationView<Page: View>: View {
     
     @inlinable
     public var body: some View {
-        ZStack(alignment: pageIndicatorAlignment) {
-            _PaginationView(
-                content: content,
-                axis: axis,
-                transitionStyle: transitionStyle,
-                showsIndicators: showsIndicators,
-                pageIndicatorAlignment: pageIndicatorAlignment,
-                interPageSpacing: interPageSpacing,
-                cyclesPages: cyclesPages,
-                initialPageIndex: initialPageIndex,
-                currentPageIndex: currentPageIndex ?? $_currentPageIndex,
-                progressionController: $_progressionController
-            )
-            
-            if showsIndicators && (axis == .vertical || pageIndicatorAlignment != .center) {
-                PageControl(
-                    numberOfPages: content.count,
-                    currentPage: currentPageIndex ?? $_currentPageIndex
-                ).rotationEffect(
-                    axis == .vertical
-                        ? .init(degrees: 90)
-                        : .init(degrees: 0)
+        if content.isEmpty {
+            EmptyView()
+        } else {
+            ZStack(alignment: pageIndicatorAlignment) {
+                _PaginationView(
+                    content: content,
+                    axis: axis,
+                    transitionStyle: transitionStyle,
+                    showsIndicators: showsIndicators,
+                    pageIndicatorAlignment: pageIndicatorAlignment,
+                    interPageSpacing: interPageSpacing,
+                    cyclesPages: cyclesPages,
+                    initialPageIndex: initialPageIndex,
+                    currentPageIndex: currentPageIndex ?? $_currentPageIndex,
+                    progressionController: $_progressionController
                 )
+                
+                if showsIndicators && (axis == .vertical || pageIndicatorAlignment != .center) {
+                    PageControl(
+                        numberOfPages: content.count,
+                        currentPage: currentPageIndex ?? $_currentPageIndex
+                    ).rotationEffect(
+                        axis == .vertical
+                            ? .init(degrees: 90)
+                            : .init(degrees: 0)
+                    )
+                }
             }
+            .environment(\.progressionController, _progressionController)
         }
-        .environment(\.progressionController, _progressionController)
     }
 }
 
