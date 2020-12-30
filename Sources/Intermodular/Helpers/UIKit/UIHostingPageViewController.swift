@@ -19,6 +19,16 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
     }
     
     class PageContentController: UIHostingController<PageContainer> {
+        override init(rootView: PageContainer) {
+            super.init(rootView: rootView)
+            
+            view.backgroundColor = .clear
+        }
+        
+        @objc required dynamic init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
         override open func viewDidLoad() {
             super.viewDidLoad()
             
@@ -53,6 +63,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
     var cyclesPages: Bool = false
     
     var isInitialPageIndexApplied: Bool = false
+    
     var currentPageIndex: AnyIndex? {
         get {
             guard let currentViewController = viewControllers?.first as? PageContentController else {
