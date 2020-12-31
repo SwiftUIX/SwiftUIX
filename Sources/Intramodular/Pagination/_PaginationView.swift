@@ -134,6 +134,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         if let initialPageIndex = initialPageIndex, !uiViewController.isInitialPageIndexApplied {
             DispatchQueue.main.async {
                 uiViewController.isInitialPageIndexApplied = true
+                
                 currentPageIndex = initialPageIndex
             }
             
