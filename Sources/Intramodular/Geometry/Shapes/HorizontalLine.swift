@@ -34,7 +34,7 @@ public struct HorizontalLine: Shape {
         
         path.move(to: .init(x: 0, y: y))
         path.addLine(to: .init(x: rect.maxX, y: y))
-    
+        
         return path
     }
 }

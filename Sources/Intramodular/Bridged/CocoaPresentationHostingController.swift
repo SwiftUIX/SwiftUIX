@@ -41,7 +41,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
             popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
             
             let sourceViewDescription = presentation.content.preferredSourceViewName.flatMap {
-                (presentingViewController as? CocoaController)?._namedViewDescription(for: $0)
+                (presentingViewController as? _opaque_CocoaController)?._namedViewDescription(for: $0)
             }
             
             popoverPresentationController?.sourceView = presentingViewController?.view

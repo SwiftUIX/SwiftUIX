@@ -10,13 +10,14 @@ import SwiftUI
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: CocoaView {
     struct _Configuration {
-        var shouldBeginEditing: Bool = true
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
         var onDeleteBackward: () -> Void = { }
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
+        
+        var focusRingType: FocusRingType = .none
         
         var autocapitalization: UITextAutocapitalizationType?
         var borderStyle: UITextField.BorderStyle = .none
@@ -75,10 +76,6 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
             self.configuration = configuration
         }
         
-        /*public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-         base.shouldBeginEditing
-         }*/
-        
         func textFieldDidBeginEditing(_ textField: UITextField) {
             configuration.onEditingChanged(true)
         }
@@ -125,6 +122,7 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
         context.coordinator.text = text
         context.coordinator.configuration = configuration
         
+        uiView._focusRingType = configuration.focusRingType
         uiView.onDeleteBackward = configuration.onDeleteBackward
         
         uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -279,6 +277,10 @@ extension CocoaTextField {
 }
 
 extension CocoaTextField {
+    public func focusRingType(_ focusRingType: FocusRingType) -> Self {
+        then({ $0.configuration.focusRingType = focusRingType })
+    }
+    
     public func autocapitalization(_ autocapitalization: UITextAutocapitalizationType) -> Self {
         then({ $0.configuration.autocapitalization = autocapitalization })
     }
