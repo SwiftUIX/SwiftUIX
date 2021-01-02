@@ -317,6 +317,7 @@ extension CocoaTextField {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
     
+    @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: UIColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
     }
