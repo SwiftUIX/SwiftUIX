@@ -109,7 +109,7 @@ public struct PaginationView<Page: View>: View {
     }
 }
 
-// MARK: - Initialization -
+// MARK: - Initializers -
 
 extension PaginationView {
     @inlinable
