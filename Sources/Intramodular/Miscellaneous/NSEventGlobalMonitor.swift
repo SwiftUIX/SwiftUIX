@@ -47,7 +47,9 @@ extension View {
         peform action: @escaping (NSEvent) -> ()
     ) -> some View {
         WithInlineStateObject(NSEventGlobalMonitor(matching: mask)) { object in
-            self.onReceive(object.objectWillChange, perform: action)
+            self.onReceive(object.objectWillChange, perform: action).onAppear {
+                object.start()
+            }
         }
     }
 }

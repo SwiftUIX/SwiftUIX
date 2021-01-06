@@ -122,7 +122,10 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
         context.coordinator.text = text
         context.coordinator.configuration = configuration
         
-        uiView._focusRingType = configuration.focusRingType
+        #if targetEnvironment(macCatalyst)
+        // uiView._focusRingType = configuration.focusRingType
+        #endif
+        
         uiView.onDeleteBackward = configuration.onDeleteBackward
         
         uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)

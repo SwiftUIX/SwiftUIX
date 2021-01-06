@@ -126,6 +126,10 @@ extension MailComposer {
     public func attach(_ attachment: Attachment) -> Self {
         then({ $0.configuration.attachments.append(attachment) })
     }
+    
+    public func preferredSendingEmailAddress(_ preferredSendingEmailAddress: String) -> Self {
+        then({ $0.configuration.preferredSendingEmailAddress = preferredSendingEmailAddress })
+    }
 }
 
 // MARK: - Auxiliary Implementation -
@@ -163,6 +167,10 @@ extension MFMailComposeViewController {
                 context.coordinator.addedAttachmentHashes.insert(attachment.hashValue)
             }
         }
+        
+        if let preferredSendingEmailAddress = configuration.preferredSendingEmailAddress {
+            setPreferredSendingEmailAddress(preferredSendingEmailAddress)
+        } 
     }
 }
 
