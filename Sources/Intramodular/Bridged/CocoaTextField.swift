@@ -13,7 +13,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
         var onDeleteBackward: () -> Void = { }
-        
+        var onChangeCharactersInRangeReplacementString: ((NSRange, String) -> Bool)?
+      
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
         
@@ -94,7 +95,7 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            return true
+            configuration.onChangeCharactersInRangeReplacementString?(range, string) ?? true
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -266,6 +267,10 @@ extension CocoaTextField where Label == Text {
 extension CocoaTextField {
     public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
         then({ $0.configuration.onDeleteBackward = action })
+    }
+  
+    public func onChangeCharactersInRangeReplacementString(perform action: @escaping ((NSRange, String) -> Bool)) -> Self {
+        then({$0.configuration.onChangeCharactersInRangeReplacementString = action})
     }
 }
 
