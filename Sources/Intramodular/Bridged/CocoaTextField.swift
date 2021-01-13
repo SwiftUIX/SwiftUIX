@@ -9,10 +9,16 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: CocoaView {
+    public struct CharactersChange {
+        public let range: NSRange
+        public let replacement: String
+    }
+    
     struct _Configuration {
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
         var onDeleteBackward: () -> Void = { }
+        var onCharactersChange: (CharactersChange) -> Bool = { _ in true }
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
@@ -94,7 +100,7 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            return true
+            configuration.onCharactersChange(.init(range: range, replacement: string))
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -266,6 +272,16 @@ extension CocoaTextField where Label == Text {
 extension CocoaTextField {
     public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
         then({ $0.configuration.onDeleteBackward = action })
+    }
+    
+    /// Adds an action to perform when characters are changed in this text field.
+    public func onCharactersChange(perform action: @escaping (CharactersChange) -> Bool) -> Self {
+        then({ $0.configuration.onCharactersChange = action })
+    }
+
+    /// Adds an action to perform when characters are changed in this text field.
+    public func onCharactersChange(perform action: @escaping (CharactersChange) -> Void) -> Self {
+        then({ $0.configuration.onCharactersChange = { change in action(change); return true } })
     }
 }
 
