@@ -278,7 +278,7 @@ extension CocoaTextField {
     public func onCharactersChange(perform action: @escaping (CharactersChange) -> Bool) -> Self {
         then({ $0.configuration.onCharactersChange = action })
     }
-
+    
     /// Adds an action to perform when characters are changed in this text field.
     public func onCharactersChange(perform action: @escaping (CharactersChange) -> Void) -> Self {
         then({ $0.configuration.onCharactersChange = { change in action(change); return true } })
