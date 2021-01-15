@@ -74,7 +74,14 @@ extension AnyModalPresentation: Equatable {
 extension View {
     @inlinable
     public func isModalInPresentation(_ value: Bool) -> some View {
-        preference(key: IsModalInPresentation.self, value: value)
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return onUIViewControllerResolution {
+            $0.isModalInPresentation = value
+        }
+        .preference(key: IsModalInPresentation.self, value: value)
+        #else
+        return preference(key: IsModalInPresentation.self, value: value)
+        #endif
     }
 }
 
