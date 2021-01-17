@@ -60,6 +60,7 @@ While the project itself is stable and heavily being used in production, its doc
 | `UITableView`                           | `List`       | `CocoaList`                                |
 | `UITextField`                           | `TextField`  | `CocoaTextField`                           |
 | `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                   |
+| `UIInterpolatingMotionEffect`    | -            | `MotionEffectsView`                     |
 | `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
 | `UIWindow`                              | -            | `WindowOverlay`                            |
@@ -105,6 +106,23 @@ While the project itself is stable and heavily being used in production, its doc
 
 - `Keyboard` - An object representing the keyboard. 
 - `View#padding(.keyboard) `- Pads this view with the active system height of the keyboard.
+
+### Motion
+
+- `MotionEffectsView` - Adds an offset to a view based on accelerometer data.
+
+```swift
+ZStack {
+    Text("Movere haec!")
+        .blur(radius: 10)
+        .opacity(0.4)
+    MotionEffectsView(magnitude: 15) {
+        Text("Movere haec!")
+    }
+}
+```
+
+  Note: does not work inside a `drawingGroup`, because that requires a non-moving view.
 
 ### Navigation
 
