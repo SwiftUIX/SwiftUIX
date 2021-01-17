@@ -60,7 +60,7 @@ While the project itself is stable and heavily being used in production, its doc
 | `UITableView`                           | `List`       | `CocoaList`                                |
 | `UITextField`                           | `TextField`  | `CocoaTextField`                           |
 | `UIModalPresentationStyle`              | -            | `ModalPresentationStyle`                   |
-| `UIInterpolatingMotionEffect`    | -            | `MotionEffectsView`                     |
+| `UIInterpolatingMotionEffect`           | -            | `MotionEffectsView`                        |
 | `UIViewControllerTransitioningDelegate` | -            | `UIHostingControllerTransitioningDelegate` |
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
 | `UIWindow`                              | -            | `WindowOverlay`                            |
