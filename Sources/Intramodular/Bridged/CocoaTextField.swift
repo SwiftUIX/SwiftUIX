@@ -87,6 +87,10 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
         
         func textFieldDidChangeSelection(_ textField: UITextField) {
+            guard textField.markedTextRange == nil else {
+                return
+            }
+            
             text.wrappedValue = textField.text ?? ""
         }
         
