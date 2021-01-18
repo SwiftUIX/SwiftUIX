@@ -89,7 +89,7 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Appearance
 
-- `View#visible(_:)` - Sets a view's visibility.
+- `View/visible(_:)` - Sets a view's visibility.
 
 ### Error Handling
 
@@ -104,13 +104,13 @@ While the project itself is stable and heavily being used in production, its doc
 ### Keyboard
 
 - `Keyboard` - An object representing the keyboard. 
-- `View#padding(.keyboard) `- Pads this view with the active system height of the keyboard.
+- `View/padding(.keyboard) `- Pads this view with the active system height of the keyboard.
 
 ### Navigation
 
-- `View#navigationBarColor(_:)` - Configures the color of the navigation bar for this view.
-- `View#navigationBarTranslucent(_:)` - Configures the translucency of the navigation bar for this view.
-- `View#navigationBarTransparent(_:)` - Configures the transparency of the navigation bar for this view.
+- `View/navigationBarColor(_:)` - Configures the color of the navigation bar for this view.
+- `View/navigationBarTranslucent(_:)` - Configures the translucency of the navigation bar for this view.
+- `View/navigationBarTransparent(_:)` - Configures the transparency of the navigation bar for this view.
 
 ### Pagination
 
@@ -130,7 +130,7 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Scrolling
 
-- `View#isScrollEnabled(_:)` - Adds a condition that controls whether users can scroll within this view. Works with:
+- `View/isScrollEnabled(_:)` - Adds a condition that controls whether users can scroll within this view. Works with:
 
   - `CocoaList`
   - `CocoaScrollView`
@@ -156,7 +156,7 @@ While the project itself is stable and heavily being used in production, its doc
   }
   ````
 
-- `View#navigationSearchBar(_:)` - Sets the navigation search bar for this view.
+- `View/navigationSearchBar(_:)` - Sets the navigation search bar for this view.
 
   ```swift
   Text("Hello, world!")
@@ -164,6 +164,8 @@ While the project itself is stable and heavily being used in production, its doc
           SearchBar("Placeholder", text: $text)
       }
   ```
+
+- `View/navigationSearchBarHiddenWhenScrolling(_:)` - Hides the integrated search bar when scrolling any underlying content.
 
 ### Screen
 
@@ -173,7 +175,7 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Status Bar
 
-- `View#statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
+- `View/statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
 
   ```swift
   Text("Hello, world!")
@@ -204,7 +206,7 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Window 
 
-- `View#windowOverlay(isKeyAndVisible:content:)` - Makes a window key and visible when a given condition is true.
+- `View/windowOverlay(isKeyAndVisible:content:)` - Makes a window key and visible when a given condition is true.
 
 # Contributing
 

@@ -14,9 +14,10 @@ fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>:
     let searchBar: SearchBar
     let searchResultsContent: () -> SearchResultsContent
     
+    @Environment(\._hidesNavigationSearchBarWhenScrolling) var hidesSearchBarWhenScrolling: Bool?
+    
     var automaticallyShowSearchBar: Bool? = false
     var hideNavigationBarDuringPresentation: Bool?
-    var hidesSearchBarWhenScrolling: Bool? = true
     var obscuresBackgroundDuringPresentation: Bool?
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
@@ -204,6 +205,27 @@ extension View {
     @available(tvOSApplicationExtension, unavailable)
     public func navigationSearchBar(_ searchBar: () -> SearchBar) -> some View {
         background(_NavigationSearchBarConfigurator(searchBar: searchBar(), searchResultsContent: { EmptyView() }))
+    }
+    
+    /// Hides the integrated search bar when scrolling any underlying content.
+    public func navigationSearchBarHiddenWhenScrolling(_ hidesSearchBarWhenScrolling: Bool) -> some View {
+        environment(\._hidesNavigationSearchBarWhenScrolling, hidesSearchBarWhenScrolling)
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    final class _HidesNavigationSearchBarWhenScrolling: DefaultEnvironmentKey<Bool> {
+        
+    }
+    
+    var _hidesNavigationSearchBarWhenScrolling: Bool? {
+        get {
+            self[_HidesNavigationSearchBarWhenScrolling]
+        } set {
+            self[_HidesNavigationSearchBarWhenScrolling] = newValue
+        }
     }
 }
 
