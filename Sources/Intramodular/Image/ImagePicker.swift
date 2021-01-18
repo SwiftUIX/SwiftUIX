@@ -19,6 +19,53 @@ public struct ImagePicker: UIViewControllerRepresentable {
     @usableFromInline
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
+    public func makeUIViewController(context: Context) -> UIViewControllerType {
+        UIImagePickerController().then {
+            $0.allowsEditing = allowsEditing
+            $0.sourceType = sourceType
+            
+            $0.delegate = context.coordinator
+        }
+    }
+    
+    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        context.coordinator.parent = self
+        
+        uiViewController.allowsEditing = allowsEditing
+        uiViewController.sourceType = sourceType
+    }
+    
+    public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        var parent: ImagePicker
+        
+        init(parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        public func imagePickerController(
+            _ picker: UIImagePickerController,
+            didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+        ) {
+            let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
+            
+            parent.data = image?._fixingOrientation().data(using: parent.encoding)
+            
+            parent.presentationManager.dismiss()
+        }
+        
+        public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.presentationManager.dismiss()
+        }
+    }
+    
+    public func makeCoordinator() -> Coordinator {
+        .init(parent: self)
+    }
+}
+
+// MARK: - API -
+
+extension ImagePicker {
     public init(data: Binding<Data?>, encoding: Image.Encoding) {
         self._data = data
         self.encoding = encoding
@@ -32,48 +79,6 @@ public struct ImagePicker: UIViewControllerRepresentable {
         self.encoding = encoding
     }
     
-    public func makeUIViewController(context: Context) -> UIViewControllerType {
-        UIImagePickerController().then {
-            $0.allowsEditing = allowsEditing
-            $0.sourceType = sourceType
-            
-            $0.delegate = context.coordinator
-        }
-    }
-    
-    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        context.coordinator.base = self
-        
-        uiViewController.allowsEditing = allowsEditing
-        uiViewController.sourceType = sourceType
-    }
-    
-    public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        var base: ImagePicker
-        
-        init(base: ImagePicker) {
-            self.base = base
-        }
-        
-        public func imagePickerController(
-            _ picker: UIImagePickerController,
-            didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
-        ) {
-            let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
-            
-            base.data = image?._fixingOrientation().data(using: base.encoding)
-            
-            base.presentationManager.dismiss()
-        }
-        
-        public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            base.presentationManager.dismiss()
-        }
-    }
-    
-    public func makeCoordinator() -> Coordinator {
-        Coordinator(base: self)
-    }
 }
 
 extension ImagePicker {
