@@ -12,13 +12,10 @@ public struct ImagePicker: UIViewControllerRepresentable {
     
     @usableFromInline
     @Binding var data: Data?
-    
     @usableFromInline
     let encoding: Image.Encoding
-    
     @usableFromInline
     var allowsEditing = false
-    
     @usableFromInline
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
@@ -27,8 +24,11 @@ public struct ImagePicker: UIViewControllerRepresentable {
         self.encoding = encoding
     }
     
-    public init(data: SetBinding<Data?>, encoding: Image.Encoding) {
-        self._data = .init(set: data, defaultValue: nil)
+    public init(image: Binding<AppKitOrUIKitImage?>, encoding: Image.Encoding) {
+        self._data = .init(
+            get: { image.wrappedValue.flatMap({ $0.data(using: encoding) }) },
+            set: { image.wrappedValue = $0.flatMap(AppKitOrUIKitImage.init(data:)) }
+        )
         self.encoding = encoding
     }
     
@@ -55,16 +55,13 @@ public struct ImagePicker: UIViewControllerRepresentable {
             self.base = base
         }
         
-        public var image: Image? {
-            base.data.flatMap(Image.init(data:))
-        }
-        
         public func imagePickerController(
             _ picker: UIImagePickerController,
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
             let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
-            base.data = image?.data(using: base.encoding)
+            
+            base.data = image?._fixingOrientation().data(using: base.encoding)
             
             base.presentationManager.dismiss()
         }
@@ -102,6 +99,22 @@ extension UIImage {
             case .jpeg(let compressionQuality):
                 return jpegData(compressionQuality: compressionQuality)
         }
+    }
+    
+    func _fixingOrientation() -> UIImage {
+        guard imageOrientation != .up else {
+            return self
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        
+        defer {
+            UIGraphicsEndImageContext()
+        }
+        
+        draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        
+        return UIGraphicsGetImageFromCurrentImageContext()!
     }
 }
 
