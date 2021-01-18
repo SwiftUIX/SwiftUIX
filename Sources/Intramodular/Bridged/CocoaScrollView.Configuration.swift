@@ -32,6 +32,8 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var onRefresh: (() -> Void)?
     @usableFromInline
     var isRefreshing: Bool?
+    @usableFromInline
+    var refreshControlTintColor: UIColor?
     
     @available(tvOS, unavailable)
     @usableFromInline
@@ -97,7 +99,9 @@ extension UIScrollView {
                 
                 self.refreshControl = $0
             }
-            
+
+            refreshControl.tintColor = configuration.refreshControlTintColor
+
             if let isRefreshing = configuration.isRefreshing, refreshControl.isRefreshing != isRefreshing {
                 if isRefreshing {
                     refreshControl.beginRefreshing()
