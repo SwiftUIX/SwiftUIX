@@ -162,6 +162,10 @@ extension CollectionView {
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
         then({ $0.scrollViewConfiguration.isRefreshing = isRefreshing })
     }
+
+    public func refreshControlTintColor(_ color: UIColor?) -> Self {
+      then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
+    }
 }
 
 #endif
