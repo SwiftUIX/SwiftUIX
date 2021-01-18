@@ -46,6 +46,7 @@ While the project itself is stable and heavily being used in production, its doc
 
 | UIKit                                   | SwiftUI      | SwiftUIX                                   |
 | --------------------------------------- | ------------ | ------------------------------------------ |
+| `LPLinkView`                            | -            | `LinkPresentationView`                     |
 | `UIActivityIndicatorView`               | -            | `ActivityIndicator`                        |
 | `UIActivityViewController`              | -            | `AppActivityView`                          |
 | `UIBlurEffect`                          | -            | `BlurEffectView`                           |
@@ -105,6 +106,15 @@ While the project itself is stable and heavily being used in production, its doc
 
 - `Keyboard` - An object representing the keyboard. 
 - `View/padding(.keyboard) `- Pads this view with the active system height of the keyboard.
+
+### Link Presentation:
+
+- `LinkPresentationView`
+
+  ```swift
+  LinkPresentationView(url: url)
+      .frame(height: 192)
+  ```
 
 ### Navigation
 
