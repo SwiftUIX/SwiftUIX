@@ -10,12 +10,12 @@ To use the Image Picker, define a variable of type `Data` and pass it into `Imag
 	    @State var image:Data?
 	    var body: some View {
 	        ImagePicker(data: $image, encoding: .png)
-	            Image(data: image!)!
-	                .resizable()
-	                .aspectRatio(contentMode: .fill)
-	                .frame(width:200,height:200)
-	                .clipped()
-	        }
+	        Image(data: image!)!
+	            .resizable()
+	            .aspectRatio(contentMode: .fill)
+	            .frame(width:200,height:200)
+	            .clipped()
+	    }
 	}
 The above code looks like:
 <p align="center">
