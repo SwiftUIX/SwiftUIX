@@ -8,8 +8,9 @@ import SwiftUI
 
 public struct AnyPresentationView: View {
     public let base: _opaque_View
+    
     private var environmentBuilder: EnvironmentBuilder
-
+    
     public private(set) var name: ViewName
     public private(set) var modalPresentationStyle: ModalPresentationStyle = .automatic
     public private(set) var hidesBottomBarWhenPushed: Bool = false
