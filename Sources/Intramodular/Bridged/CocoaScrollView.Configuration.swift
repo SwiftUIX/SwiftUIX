@@ -41,6 +41,9 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     
     @usableFromInline
     var contentOffset: Binding<CGPoint>? = nil
+    
+    @usableFromInline
+    var contentInset: UIEdgeInsets = .zero
 }
 
 extension CocoaScrollViewConfiguration {
@@ -87,6 +90,7 @@ extension UIScrollView {
         isScrollEnabled = configuration.isScrollEnabled
         showsVerticalScrollIndicator = configuration.showsIndicators
         showsHorizontalScrollIndicator = configuration.showsIndicators
+        contentInset = configuration.contentInset
         
         #if os(iOS) || targetEnvironment(macCatalyst)
         isPagingEnabled = configuration.isPagingEnabled
