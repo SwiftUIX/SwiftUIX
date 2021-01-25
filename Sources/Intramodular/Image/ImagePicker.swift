@@ -48,7 +48,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
         ) {
             let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
             
-            parent.data = image?._fixingOrientation().data(using: parent.encoding)
+            parent.data = image?._fixOrientation().data(using: parent.encoding)
             
             parent.presentationManager.dismiss()
         }
@@ -106,7 +106,7 @@ extension UIImage {
         }
     }
     
-    func _fixingOrientation() -> UIImage {
+    func _fixOrientation() -> UIImage {
         guard imageOrientation != .up else {
             return self
         }

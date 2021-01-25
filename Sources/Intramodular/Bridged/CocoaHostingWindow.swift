@@ -27,7 +27,7 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
     public init(windowScene: UIWindowScene, rootView: Content) {
         super.init(windowScene: windowScene)
         
-        rootViewController = CocoaHostingController(rootView: UIHostingWindowContent(parent: self, content: rootView))
+        rootViewController = CocoaHostingController(rootView: UIHostingWindowContent(window: self, content: rootView))
         rootViewController!.view.backgroundColor = .clear
     }
     
@@ -70,7 +70,7 @@ final class WindowPositionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
 
 public struct UIHostingWindowContent<Content: View>: View {
     @usableFromInline
-    weak private(set) var parent: UIWindow?
+    weak private(set) var window: UIWindow?
     
     @usableFromInline
     fileprivate(set) var content: Content
@@ -78,13 +78,35 @@ public struct UIHostingWindowContent<Content: View>: View {
     @inlinable
     public var body: some View {
         content.onPreferenceChange(WindowPositionPreferenceKey.self) { value in
-            if let parent = self.parent, let value = value {
-                if parent.frame.origin != value {
+            if let window = self.window, let value = value {
+                if window.frame.origin != value {
                     UIView.animate(withDuration: 0.2) {
-                        parent.frame.origin = value
+                        window.frame.origin = value
                     }
                 }
             }
+        }
+        .environment(\.presentationManager, _PresentationManager(window: window))
+    }
+    
+    @usableFromInline
+    struct _PresentationManager: PresentationManager {
+        @usableFromInline
+        let window: UIWindow?
+        
+        @usableFromInline
+        init(window: UIWindow?) {
+            self.window = window
+        }
+        
+        @usableFromInline
+        var isPresented: Bool {
+            window?.isHidden == false
+        }
+        
+        @usableFromInline
+        func dismiss() {
+            window?.isHidden = true
         }
     }
 }

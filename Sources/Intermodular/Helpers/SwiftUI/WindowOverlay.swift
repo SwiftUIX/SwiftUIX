@@ -37,6 +37,13 @@ struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
         
         uiViewController.updateWindow()
     }
+    
+    @usableFromInline
+    static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
+        uiViewController.isKeyAndVisible = false
+        uiViewController.updateWindow()
+        uiViewController.contentWindow = nil
+    }
 }
 
 extension WindowOverlay {
