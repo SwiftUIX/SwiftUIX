@@ -188,41 +188,51 @@ extension CocoaList {
     }
     
     @inlinable
-    public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
-        then({ $0.scrollViewConfiguration.contentOffset = contentOffset })
-    }
-    
-    @inlinable
     public func contentInset(_ contentInset: UIEdgeInsets) -> Self {
         then({ $0.scrollViewConfiguration.contentInset = contentInset })
     }
     
     @inlinable
-    public func contentInset(_ contentInset: EdgeInsets) -> Self {
-        self.contentInset(.init(
-            top: contentInset.top,
-            left: contentInset.leading,
-            bottom: contentInset.bottom,
-            right: contentInset.trailing
-        ))
+    public func contentInset(_ insets: EdgeInsets) -> Self {
+        contentInset(
+            .init(
+                top: insets.top,
+                left: insets.leading,
+                bottom: insets.bottom,
+                right: insets.trailing
+            )
+        )
     }
     
     @inlinable
-    public func contentInset(_ edges: Edge.Set = .all, _ length: CGFloat = 0) -> Self {
-        var contentInset = self.scrollViewConfiguration.contentInset
+    public func contentInset(
+        _ edges: Edge.Set = .all,
+        _ length: CGFloat = 0
+    ) -> Self {
+        var insets = self.scrollViewConfiguration.contentInset
+        
         if edges.contains(.top) {
-            contentInset.top += length
+            insets.top += length
         }
+        
         if edges.contains(.leading) {
-            contentInset.left += length
+            insets.left += length
         }
+        
         if edges.contains(.bottom) {
-            contentInset.bottom += length
+            insets.bottom += length
         }
+        
         if edges.contains(.trailing) {
-            contentInset.right += length
+            insets.right += length
         }
-        return self.contentInset(contentInset)
+        
+        return self.contentInset(insets)
+    }
+    
+    @inlinable
+    public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
+        then({ $0.scrollViewConfiguration.contentOffset = contentOffset })
     }
 }
 
@@ -237,10 +247,10 @@ extension CocoaList {
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
         then({ $0.scrollViewConfiguration.isRefreshing = isRefreshing })
     }
-
+    
     @inlinable
     public func refreshControlTintColor(_ color: UIColor?) -> Self {
-      then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
+        then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
     }
 }
 
