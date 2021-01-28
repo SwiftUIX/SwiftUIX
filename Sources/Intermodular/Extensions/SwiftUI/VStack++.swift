@@ -33,8 +33,8 @@ extension VStack {
         self.init {
             GeometryReader { geometry in
                 SwiftUI.VStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(height: geometry.size.height / 2)
-                    content.value.1.frame(height: geometry.size.height / 2)
+                    content.value.0.frame(height: geometry.size.height / 2.0)
+                    content.value.1.frame(height: geometry.size.height / 2.0)
                 }
             }
             .eraseToAnyView()
@@ -53,9 +53,9 @@ extension VStack {
         self.init {
             GeometryReader { geometry in
                 SwiftUI.VStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(height: geometry.size.height / 3)
-                    content.value.1.frame(height: geometry.size.height / 3)
-                    content.value.2.frame(height: geometry.size.height / 3)
+                    content.value.0.frame(height: geometry.size.height / 3.0)
+                    content.value.1.frame(height: geometry.size.height / 3.0)
+                    content.value.2.frame(height: geometry.size.height / 3.0)
                 }
             }
             .eraseToAnyView()
@@ -74,10 +74,10 @@ extension VStack {
         self.init {
             GeometryReader { geometry in
                 SwiftUI.VStack(alignment: alignment, spacing: spacing) {
-                    content.value.0.frame(height: geometry.size.height / 4)
-                    content.value.1.frame(height: geometry.size.height / 4)
-                    content.value.2.frame(height: geometry.size.height / 4)
-                    content.value.3.frame(height: geometry.size.height / 4)
+                    content.value.0.frame(height: geometry.size.height / 4.0)
+                    content.value.1.frame(height: geometry.size.height / 4.0)
+                    content.value.2.frame(height: geometry.size.height / 4.0)
+                    content.value.3.frame(height: geometry.size.height / 4.0)
                 }
             }
             .eraseToAnyView()
