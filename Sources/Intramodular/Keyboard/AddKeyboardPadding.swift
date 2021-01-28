@@ -29,17 +29,17 @@ private struct AddKeyboardPadding: ViewModifier {
         GeometryReader { geometry in
             content
                 .padding(.bottom, (isActive && (!isSystemEnabled || isForced)) ? padding : 0)
-                .onReceive(keyboardHeightPublisher, perform: { keyboardHeight in
+                .onReceive(keyboardHeightPublisher, perform: { (keyboardHeight: CGFloat) in
                     if isBasic {
                         if !isForced {
-                            padding = keyboardHeight > 0
-                                ? keyboardHeight - geometry.safeAreaInsets.bottom
-                                : 0
+                            padding = keyboardHeight > 0.0
+                              ? keyboardHeight - geometry.safeAreaInsets.bottom
+                              : 0.0
                         } else {
                             padding = keyboardHeight
                         }
                     } else {
-                        padding = max(0, min((UIResponder.firstResponder?.globalFrame?.maxY ?? 0) - (geometry.frame(in: .global).height - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
+                      padding = max(0, min(CGFloat(UIResponder.firstResponder?.globalFrame?.maxY ?? 0.0) - CGFloat((geometry.frame(in: .global).height) - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
                     }
                 })
                 .animation(animation)
