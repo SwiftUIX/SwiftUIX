@@ -183,6 +183,16 @@ extension CocoaList {
 
 extension CocoaList {
     @inlinable
+    public func alwaysBounceVertical(_ alwaysBounceVertical: Bool) -> Self {
+        then({ $0.scrollViewConfiguration.alwaysBounceVertical = alwaysBounceVertical })
+    }
+
+    @inlinable
+    public func alwaysBounceHorizontal(_ alwaysBounceHorizontal: Bool) -> Self {
+        then({ $0.scrollViewConfiguration.alwaysBounceHorizontal = alwaysBounceHorizontal })
+    }
+
+    @inlinable
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })
     }
