@@ -25,10 +25,14 @@ private struct AddKeyboardPadding: ViewModifier {
         }
     }
     
+    private var contentPadding: CGFloat {
+       (isActive && (!isSystemEnabled || isForced)) ? padding : 0
+    }
+    
     func body(content: Content) -> some View {
         GeometryReader { geometry in
             content
-                .padding(.bottom, (isActive && (!isSystemEnabled || isForced)) ? padding : 0)
+                .padding(.bottom, contentPadding)
                 .onReceive(keyboardHeightPublisher, perform: { (keyboardHeight: CGFloat) in
                     if isBasic {
                         if !isForced {
@@ -42,7 +46,7 @@ private struct AddKeyboardPadding: ViewModifier {
                       padding = max(0, min(CGFloat(UIResponder.firstResponder?.globalFrame?.maxY ?? 0.0) - CGFloat((geometry.frame(in: .global).height) - keyboardHeight), keyboardHeight) - geometry.safeAreaInsets.bottom)
                     }
                 })
-                .animation(animation)
+                .animation(animation, value: contentPadding)
         }
     }
     
