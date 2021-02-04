@@ -210,6 +210,9 @@ extension SearchBar: NSViewRepresentable {
 
 // MARK: - API -
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension SearchBar {
     #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
     public func placeholder(_ placeholder: String) -> Self {
