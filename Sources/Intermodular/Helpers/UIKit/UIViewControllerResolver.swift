@@ -7,38 +7,71 @@
 import SwiftUI
 import UIKit
 
-public struct UIViewControllerResolver: UIViewControllerRepresentable {
-    public class UIViewControllerType: UIViewController {
-        public var onResolution: (UIViewController) -> Void = { _ in }
+fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
+    class UIViewControllerType: UIViewController {
+        var onResolution: (UIViewController) -> Void = { _ in }
+        var onDeresolution: (UIViewController) -> Void = { _ in }
         
-        public override func didMove(toParent parent: UIViewController?) {
+        weak var resolvedParent: UIViewController?
+        
+        override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
             if let parent = parent {
                 onResolution(parent)
+                resolvedParent = parent
+            } else if let resolvedParent = resolvedParent {
+                onDeresolution(resolvedParent)
+                
+                self.resolvedParent = nil
+            }
+        }
+        
+        override func removeFromParent() {
+            super.removeFromParent()
+            
+            if let resolvedParent = resolvedParent {
+                onDeresolution(resolvedParent)
+                
+                self.resolvedParent = nil
             }
         }
     }
     
-    public let onResolution: (UIViewController) -> Void
+    var onResolution: (UIViewController) -> Void
+    var onDeresolution: (UIViewController) -> Void
     
-    public init(onResolution: @escaping (UIViewController) -> Void) {
-        self.onResolution = onResolution
-    }
-    
-    public func makeUIViewController(context: Context) -> UIViewControllerType {
+    func makeUIViewController(context: Context) -> UIViewControllerType {
         UIViewControllerType()
     }
     
-    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.onResolution = onResolution
+        uiViewController.onDeresolution = onDeresolution
     }
 }
 
 extension View {
-    public func onUIViewControllerResolution(perform action: @escaping (UIViewController) -> ()) -> some View {
+    public func onUIViewControllerResolution(
+        perform action: @escaping (UIViewController) -> ()
+    ) -> some View {
         background(
-            UIViewControllerResolver(onResolution: action)
+            UIViewControllerResolver(
+                onResolution: action,
+                onDeresolution: { _ in }
+            )
+        )
+    }
+    
+    public func onUIViewControllerResolution(
+        perform resolutionAction: @escaping (UIViewController) -> (),
+        onDeresolution deresolutionAction: @escaping (UIViewController) -> ()
+    ) -> some View {
+        background(
+            UIViewControllerResolver(
+                onResolution: resolutionAction,
+                onDeresolution: deresolutionAction
+            )
         )
     }
 }

@@ -8,10 +8,12 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 private struct HideNavigationBar: ViewModifier {
+    @Environment(\._appKitOrUIKitViewController) var _appKitOrUIKitViewController
+    
     @State var isNavigationBarHidden = false
     
     func body(content: Content) -> some View {
-        ZStack {
+        PassthroughView {
             if isNavigationBarHidden {
                 ZeroSizeView()
                     .navigationBarTitle("")
@@ -26,6 +28,9 @@ private struct HideNavigationBar: ViewModifier {
                     self.isNavigationBarHidden = false
                 })
         }
+        .onAppear {
+            _appKitOrUIKitViewController?.navigationController?.setNavigationBarHidden(true, animated: false)
+        }
     }
 }
 
@@ -34,8 +39,19 @@ private struct HideNavigationBar: ViewModifier {
 extension View {
     @inline(never)
     public func hideNavigationBar() -> some View {
-        modifier(HideNavigationBar())
+        modifier(_SetAppKitOrUIKitViewControllerEnvironmentValue().concat( HideNavigationBar()))
     }
 }
 
 #endif
+
+extension View {
+    @inline(never)
+    public func hideNavigationBarIfAvailable() -> some View {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        return hideNavigationBar()
+        #else
+        return self
+        #endif
+    }
+}
