@@ -29,7 +29,12 @@ public struct CocoaList<
     
     @usableFromInline
     var style: UITableView.Style = .plain
-    
+
+    @usableFromInline
+    var tableHeader: UIView? = nil
+    @usableFromInline
+    var tableFooter: UIView? = nil
+
     #if !os(tvOS)
     @usableFromInline
     var separatorStyle: UITableViewCell.SeparatorStyle = .singleLine
@@ -69,7 +74,10 @@ public struct CocoaList<
         uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
         uiViewController.scrollViewConfiguration = scrollViewConfiguration.updating(from: context.environment)
-        
+
+        uiViewController.tableView.tableHeaderView = tableHeader
+        uiViewController.tableView.tableFooterView = tableFooter
+
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif
@@ -172,7 +180,25 @@ extension CocoaList {
     public func listStyle(_ style: UITableView.Style) -> Self {
         then({ $0.style = style })
     }
-    
+
+    @inlinable
+    public func tableHeader<TableHeader: View>(_ tableHeader: TableHeader) -> Self {
+        then {
+            let view = UIHostingView(rootView: tableHeader)
+            view.frame = CGRect(origin: .zero, size: view.sizeThatFits(.greatestFiniteSize))
+            $0.tableHeader = view
+        }
+    }
+
+    @inlinable
+    public func tableFooter<TableHeader: View>(_ tableFooter: TableHeader) -> Self {
+        then {
+            let view = UIHostingView(rootView: tableFooter)
+            view.frame = CGRect(origin: .zero, size: view.sizeThatFits(.greatestFiniteSize))
+            $0.tableFooter = view
+        }
+    }
+
     #if !os(tvOS)
     @inlinable
     public func listSeparatorStyle(_ separatorStyle: UITableViewCell.SeparatorStyle) -> Self {
