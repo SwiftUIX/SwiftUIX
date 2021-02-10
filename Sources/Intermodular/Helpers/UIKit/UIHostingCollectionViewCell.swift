@@ -7,11 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UICollectionViewCell {
+public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable, Content: View>: UICollectionViewCell {
     public var parentViewController: UIViewController?
     public var indexPath: IndexPath?
-    public var item: Item?
-    public var makeContent: ((Item) -> Content)!
+    public var item: ItemType?
+    public var itemID: ItemIdentifierType?
+    public var makeContent: ((ItemType) -> Content)!
     
     var collectionViewController: (UICollectionViewController & UICollectionViewDelegateFlowLayout)? {
         parentViewController as? (UICollectionViewController & UICollectionViewDelegateFlowLayout)
@@ -19,7 +20,7 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
     
     var listRowPreferences: _ListRowPreferences?
     
-    private var contentHostingController: UICollectionViewCellContentHostingController<Item, Content>?
+    private var contentHostingController: UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType, Content>?
     
     override public var isHighlighted: Bool {
         didSet {
@@ -107,9 +108,7 @@ public class UIHostingCollectionViewCell<Item: Identifiable, Content: View> : UI
 extension UIHostingCollectionViewCell {
     func attachContentHostingController() {
         if let contentHostingController = contentHostingController {
-            if let item = item {
-                contentHostingController.rootView.itemID = item.id
-            }
+            contentHostingController.rootView.itemID = itemID
         } else {
             contentHostingController = UICollectionViewCellContentHostingController(base: self)
             
@@ -150,10 +149,10 @@ extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
 }
 
-open class UICollectionViewCellContentHostingController<Item: Identifiable, Content: View>: UIHostingController<UIHostingCollectionViewCell<Item, Content>.RootView> {
-    unowned let base: UIHostingCollectionViewCell<Item, Content>
+open class UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType: Hashable, Content: View>: UIHostingController<UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>.RootView> {
+    unowned let base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>
     
-    init(base: UIHostingCollectionViewCell<Item, Content>) {
+    init(base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>) {
         self.base = base
         
         super.init(rootView: .init(base: base))
@@ -167,7 +166,7 @@ open class UICollectionViewCellContentHostingController<Item: Identifiable, Cont
 extension UIHostingCollectionViewCell {
     public struct RootView: View {
         struct _ListRowManager: ListRowManager {
-            weak var base: UIHostingCollectionViewCell<Item, Content>?
+            weak var base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>?
             
             var isHighlighted: Bool = false
             
@@ -181,9 +180,9 @@ extension UIHostingCollectionViewCell {
         }
         
         var manager: _ListRowManager
-        var itemID: Item.ID?
+        var itemID: ItemIdentifierType?
         
-        init(base: UIHostingCollectionViewCell<Item, Content>?) {
+        init(base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>?) {
             self.manager = .init(base: base)
         }
         

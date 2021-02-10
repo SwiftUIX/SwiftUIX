@@ -7,12 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableViewCell<Item: Identifiable, Content: View> : UITableViewCell {
+public class UIHostingTableViewCell<ItemType: Identifiable, Content: View> : UITableViewCell {
     var tableViewController: UITableViewController!
     var indexPath: IndexPath?
     
-    var item: Item!
-    var makeContent: ((Item) -> Content)!
+    var item: ItemType!
+    var makeContent: ((ItemType) -> Content)!
     
     var contentHostingController: UIHostingController<RootView>!
     
@@ -96,7 +96,7 @@ extension UIHostingTableViewCell {
                 false // FIXME!!!
             }
             
-            weak var uiTableViewCell: UIHostingTableViewCell<Item, Content>?
+            weak var uiTableViewCell: UIHostingTableViewCell<ItemType, Content>?
             
             func _animate(_ action: () -> ()) {
                 uiTableViewCell?.tableViewController.tableView.beginUpdates()
@@ -109,11 +109,11 @@ extension UIHostingTableViewCell {
             }
         }
         
-        private let item: Item
-        private let makeContent: (Item) -> Content
+        private let item: ItemType
+        private let makeContent: (ItemType) -> Content
         private let listRowManager: _ListRowManager
         
-        init(uiTableViewCell: UIHostingTableViewCell<Item, Content>) {
+        init(uiTableViewCell: UIHostingTableViewCell<ItemType, Content>) {
             self.item = uiTableViewCell.item
             self.makeContent = uiTableViewCell.makeContent
             self.listRowManager = .init(uiTableViewCell: uiTableViewCell)

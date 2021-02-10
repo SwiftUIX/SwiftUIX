@@ -25,11 +25,11 @@ public struct ListSection<Model, Item> {
         self.data = .init(data)
     }
     
-    public init(
+    public init<Items: RandomAccessCollection>(
         model: Model,
-        items: [Item]
-    ) {
-        self.init(model: model, data: items)
+        items: Items
+    ) where Items.Element == Item  {
+        self.init(model: model, data: .init(items))
     }
     
     public init(
@@ -77,18 +77,6 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
         }
         
         self._id = hasher.finalize()
-    }
-}
-
-extension ListSection where Model == Never {
-    public init(items: [Item]) {
-        self._id = nil
-        self._model = nil
-        self.data = .init(items)
-    }
-    
-    public init<C: Collection>(items: C) where C.Element == Item {
-        self.init(items: Array(items))
     }
 }
 
@@ -158,7 +146,7 @@ extension ListSection: Identifiable where Model: Identifiable, Item: Identifiabl
 
 extension Collection  {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    subscript<SectionModel, Item>(_ indexPath: IndexPath) -> Item where Element == ListSection<SectionModel, Item> {
+    subscript<SectionModel, ItemType>(_ indexPath: IndexPath) -> ItemType where Element == ListSection<SectionModel, ItemType> {
         get {
             let sectionIndex = index(startIndex, offsetBy: indexPath.section)
             

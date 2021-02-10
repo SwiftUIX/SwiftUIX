@@ -124,4 +124,18 @@ extension UIScrollView {
     }
 }
 
+extension EnvironmentValues {
+    struct _ScrollViewConfiguration: EnvironmentKey {
+        static let defaultValue = CocoaScrollViewConfiguration<AnyView>()
+    }
+    
+    var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
+        get {
+            self[_ScrollViewConfiguration]
+        } set {
+            self[_ScrollViewConfiguration] = newValue
+        }
+    }
+}
+
 #endif

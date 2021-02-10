@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableViewController<SectionModel: Identifiable, Item: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, Item> {
+public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, ItemType> {
     var _isDataDirty: Bool = false {
         didSet {
             isContentOffsetDirty = _isDataDirty
@@ -24,7 +24,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     var sectionHeader: (SectionModel) -> SectionHeader
     var sectionFooter: (SectionModel) -> SectionFooter
-    var rowContent: (Item) -> RowContent
+    var rowContent: (ItemType) -> RowContent
     
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
@@ -101,11 +101,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
     
     private var _sectionHeaderContentHeightCache: [SectionModel.ID: CGFloat] = [:]
     private var _sectionFooterContentHeightCache: [SectionModel.ID: CGFloat] = [:]
-    private var _rowContentHeightCache: [Item.ID: CGFloat] = [:]
+    private var _rowContentHeightCache: [ItemType.ID: CGFloat] = [:]
     
     private var _prototypeSectionHeader: UIHostingTableViewHeaderFooterView<SectionModel, SectionHeader>?
     private var _prototypeSectionFooter: UIHostingTableViewHeaderFooterView<SectionModel, SectionFooter>?
-    private var _prototypeCell: UIHostingTableViewCell<Item, RowContent>?
+    private var _prototypeCell: UIHostingTableViewCell<ItemType, RowContent>?
     
     private var prototypeSectionHeader: UIHostingTableViewHeaderFooterView<SectionModel, SectionHeader> {
         guard let _prototypeSectionHeader = _prototypeSectionHeader else {
@@ -127,9 +127,9 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         return _prototypeSectionFooter
     }
     
-    private var prototypeCell: UIHostingTableViewCell<Item, RowContent> {
+    private var prototypeCell: UIHostingTableViewCell<ItemType, RowContent> {
         guard let _prototypeCell = _prototypeCell else {
-            self._prototypeCell = .some(tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>)
+            self._prototypeCell = .some(tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<ItemType, RowContent>)
             
             return self._prototypeCell!
         }
@@ -142,7 +142,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         style: UITableView.Style,
         sectionHeader: @escaping (SectionModel) -> SectionHeader,
         sectionFooter: @escaping (SectionModel) -> SectionFooter,
-        rowContent: @escaping (Item) -> RowContent
+        rowContent: @escaping (ItemType) -> RowContent
     ) {
         self.data = data
         self.sectionHeader = sectionHeader
@@ -163,7 +163,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         
         tableView.register(UIHostingTableViewHeaderFooterView<SectionModel, SectionHeader>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewHeaderViewIdentifier)
         tableView.register(UIHostingTableViewHeaderFooterView<SectionModel, SectionFooter>.self, forHeaderFooterViewReuseIdentifier: .hostingTableViewFooterViewIdentifier)
-        tableView.register(UIHostingTableViewCell<Item, RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
+        tableView.register(UIHostingTableViewCell<ItemType, RowContent>.self, forCellReuseIdentifier: .hostingTableViewCellIdentifier)
     }
     
     required init?(coder: NSCoder) {
@@ -320,7 +320,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, Item: Iden
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
         let item =  data[indexPath]
-        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<Item, RowContent>
+        let cell = tableView.dequeueReusableCell(withIdentifier: .hostingTableViewCellIdentifier) as! UIHostingTableViewCell<ItemType, RowContent>
         
         if let oldItemID = cell.item?.id, item.id == oldItemID {
             return cell
@@ -431,7 +431,7 @@ extension UIHostingTableViewController {
         tableView.beginUpdates()
         
         for indexPath in indexPathsForVisibleRows ?? [] {
-            if let cell = tableView(tableView, cellForRowAt: indexPath) as? UIHostingTableViewCell<Item, RowContent> {
+            if let cell = tableView(tableView, cellForRowAt: indexPath) as? UIHostingTableViewCell<ItemType, RowContent> {
                 cell.update()
             } else {
                 assertionFailure()

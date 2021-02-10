@@ -10,6 +10,8 @@ import SwiftUI
 
 /// A set of properties for determining whether to recompute the size of items or their position in the layout.
 public protocol CollectionViewLayout {
+    var hashValue: Int { get }
+    
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     func _toUICollectionViewLayout() -> UICollectionViewLayout
     #elseif os(macOS)
@@ -28,7 +30,7 @@ extension View {
 // MARK: - Auxiliary Implementation -
 
 private struct _CollectionViewLayoutEnvironmentKey: EnvironmentKey {
-    static let defaultValue: CollectionViewLayout = CollectionViewFlowLayout()
+    static let defaultValue: CollectionViewLayout = FlowCollectionViewLayout()
 }
 
 extension EnvironmentValues {
@@ -45,14 +47,20 @@ extension EnvironmentValues {
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public struct CollectionViewFlowLayout: CollectionViewLayout {
-    public let uiCollectionViewLayout: UICollectionViewFlowLayout
+public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
+    public let minimumLineSpacing: CGFloat?
+    public let minimumInteritemSpacing: CGFloat?
     
     public init(
         minimumLineSpacing: CGFloat? = nil,
         minimumInteritemSpacing: CGFloat? = nil
     ) {
-        self.uiCollectionViewLayout = UICollectionViewFlowLayout().then {
+        self.minimumLineSpacing = minimumLineSpacing
+        self.minimumInteritemSpacing = minimumInteritemSpacing
+    }
+    
+    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
+        UICollectionViewFlowLayout().then {
             if let minimumLineSpacing = minimumLineSpacing {
                 $0.minimumLineSpacing = minimumLineSpacing
             }
@@ -64,10 +72,6 @@ public struct CollectionViewFlowLayout: CollectionViewLayout {
             $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
             $0.itemSize = UICollectionViewFlowLayout.automaticSize
         }
-    }
-    
-    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
-        uiCollectionViewLayout
     }
 }
 
