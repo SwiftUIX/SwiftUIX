@@ -83,15 +83,13 @@ extension UICollectionViewLayout: CollectionViewLayout {
 
 #elseif os(macOS)
 
-public struct CollectionViewFlowLayout: CollectionViewLayout {
-    public let nsCollectionViewLayout: NSCollectionViewLayout
-    
+public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
     public init() {
-        self.nsCollectionViewLayout = NSCollectionViewLayout()
+        
     }
     
     public func _toNSCollectionViewLayout() -> NSCollectionViewLayout {
-        nsCollectionViewLayout
+        NSCollectionViewLayout()
     }
 }
 
