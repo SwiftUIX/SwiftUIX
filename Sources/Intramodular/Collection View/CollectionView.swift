@@ -31,7 +31,7 @@ extension CollectionView {
         self.init(
             internalBody:
                 _CollectionView(
-                    _CollectionView.UIViewControllerType.DataSource.dynamic(dataSource),
+                    .dynamic(dataSource),
                     sectionHeader: Never.produce,
                     sectionFooter: Never.produce,
                     rowContent: rowContent
@@ -107,7 +107,7 @@ extension CollectionView {
 
 // MARK: - Auxiliary Implementation -
 
-struct _IdentifierHashedValue<Value: Identifiable>: Hashable, Identifiable {
+fileprivate struct _IdentifierHashedValue<Value: Identifiable>: Hashable, Identifiable {
     let value: Value
     
     init(_ value: Value) {
