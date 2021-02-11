@@ -276,7 +276,7 @@ extension UIHostingCollectionViewController {
     }
 }
 
-#endif
+// MARK: - Auxiliary Implementation -
 
 fileprivate extension NSDiffableDataSourceSnapshot {
     mutating func loadSectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
@@ -327,3 +327,5 @@ fileprivate extension NSDiffableDataSourceSnapshot {
         reloadItems(changedObjects.filter { self.itemIdentifiers.contains($0) })
     }
 }
+
+#endif
