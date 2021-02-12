@@ -142,4 +142,35 @@ struct _SetAppKitOrUIKitViewControllerEnvironmentValue: ViewModifier {
     }
 }
 
+public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public typealias UIViewControllerType = AppKitOrUIKitViewControllerType
+    #elseif os(macOS)
+    public typealias NSViewControllerType = AppKitOrUIKitViewControllerType
+    #endif
+    
+    private let makeAppKitOrUIKitViewControllerImpl: (Context) -> AppKitOrUIKitViewControllerType
+    private let updateAppKitOrUIKitViewControllerImpl: (AppKitOrUIKitViewControllerType, Context) -> ()
+    
+    public init(
+        _ makeAppKitOrUIKitViewController: @autoclosure @escaping () -> AppKitOrUIKitViewControllerType
+    ) {
+        self.makeAppKitOrUIKitViewControllerImpl = { _ in makeAppKitOrUIKitViewController() }
+        self.updateAppKitOrUIKitViewControllerImpl = { _, _ in }
+    }
+    
+    public func makeAppKitOrUIKitViewController(
+        context: Context
+    ) -> AppKitOrUIKitViewControllerType {
+        makeAppKitOrUIKitViewControllerImpl(context)
+    }
+    
+    public func updateAppKitOrUIKitViewController(
+        _ uiViewController: AppKitOrUIKitViewControllerType,
+        context: Context
+    ) {
+        updateAppKitOrUIKitViewControllerImpl(uiViewController, context)
+    }
+}
+
 #endif

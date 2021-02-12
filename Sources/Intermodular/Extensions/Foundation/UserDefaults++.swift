@@ -8,7 +8,7 @@ import Swift
 extension UserDefaults {
     func decode<Value: Codable>(_ type: Value.Type = Value.self, forKey key: String) throws -> Value? {
         if type is URL.Type || type is Optional<URL>.Type {
-            return try decode(String.self, forKey: key).flatMap(URL.init(string:)) as? Value
+            return url(forKey: key) as? Value
         } else if let value = value(forKey: key) as? Value {
             return value
         } else if let data = value(forKey: key) as? Data {
@@ -23,15 +23,15 @@ extension UserDefaults {
             removeObject(forKey: key)
         } else if let value = value as? UserDefaultsPrimitive {
             setValue(value, forKey: key)
-        } else if let value = value as? URL {
-            setValue(value.path, forKey: key)
+        } else if let url = value as? URL {
+            set(url, forKey: key)
         } else {
             setValue(try PropertyListEncoder().encode(value), forKey: key)
         }
     }
 }
 
-// MARK: - Helpers-
+// MARK: - Auxiliary Implementation -
 
 private protocol _opaque_Optional {
     var isNotNil: Bool { get }
@@ -43,7 +43,7 @@ extension Optional: _opaque_Optional {
     }
 }
 
-protocol UserDefaultsPrimitive {
+fileprivate protocol UserDefaultsPrimitive {
     
 }
 

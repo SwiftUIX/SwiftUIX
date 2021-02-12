@@ -8,18 +8,19 @@ import SwiftUI
 
 @propertyWrapper
 public struct UserStorage<Value: Codable>: DynamicProperty {
+    @Environment(\.errorContext) var errorContext
+    
     private let key: String
     private let defaultValue: Value
     private let store: UserDefaults
     
-    @State private var hasBeenInitialized = ReferenceBox(false)
-    @State private var state: Value
+    @PersistentObject private var valueBox = ObservableReferenceBox<Value?>(nil)
     
     public var wrappedValue: Value {
         get {
-            state
+            valueBox.value ?? defaultValue
         } nonmutating set {
-            state = newValue
+            valueBox.value = newValue
             
             do {
                 try store.encode(newValue, forKey: key)
@@ -44,18 +45,16 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         self.defaultValue = wrappedValue
         self.key = key
         self.store = store
-        
-        self._state = .init(initialValue: wrappedValue)
     }
     
     public mutating func update() {
-        if !hasBeenInitialized.value {
+        if valueBox.value == nil {
             do {
-                _state = .init(initialValue: try store.decode(Value.self, forKey: key) ?? defaultValue)
-                
-                hasBeenInitialized.value = true
+                valueBox.value = try store.decode(Value.self, forKey: key) ?? defaultValue
             } catch {
-                assertionFailure()
+                errorContext.push(error)
+                
+                valueBox.value = defaultValue
             }
         }
     }
