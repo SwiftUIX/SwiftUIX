@@ -8,23 +8,30 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
+    let _presentationCoordinator: CocoaPresentationCoordinator
+    var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
+    
+    public var mainView: Content {
+        get {
+            rootView.content
+        } set {
+            rootView.content = newValue
+        }
+    }
+    
     #if os(iOS) || targetEnvironment(macCatalyst)
     override open var prefersStatusBarHidden: Bool {
         return false
     }
     #endif
     
-    public let _presentationCoordinator: CocoaPresentationCoordinator
-    
     override public var presentationCoordinator: CocoaPresentationCoordinator {
         return _presentationCoordinator
     }
     
-    var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
-    
     init(
         rootView: Content,
-        presentationCoordinator: CocoaPresentationCoordinator
+        presentationCoordinator: CocoaPresentationCoordinator = .init()
     ) {
         self._presentationCoordinator = presentationCoordinator
         
@@ -55,12 +62,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         _fixSafeAreaInsetsIfNecessary()
     }
     
-    public convenience init(rootView: Content) {
-        self.init(rootView: rootView, presentationCoordinator: .init())
-    }
-    
-    public convenience init(@ViewBuilder rootView: () -> Content) {
-        self.init(rootView: rootView())
+    public convenience init(@ViewBuilder mainView: () -> Content) {
+        self.init(rootView: mainView())
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {

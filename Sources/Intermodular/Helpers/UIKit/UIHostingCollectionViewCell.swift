@@ -47,12 +47,6 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         }
     }
     
-    override public func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
-        
-        return layoutAttributes
-    }
-    
     override public func prepareForReuse() {
         super.prepareForReuse()
         
@@ -79,9 +73,17 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         )
     }
     
+    override public func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
+        
+        return layoutAttributes
+    }
+}
+
+extension UIHostingCollectionViewCell {
     func cellWillDisplay(isPrototype: Bool = false) {
         if let contentHostingController = contentHostingController {
-            contentHostingController.rootView.itemID = itemID
+            contentHostingController.rootView.content.itemID = itemID
         } else {
             contentHostingController = UICollectionViewCellContentHostingController(base: self)
         }
@@ -106,27 +108,19 @@ extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
 }
 
-final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType: Hashable, Content: View>: UIHostingController<UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>.RootView> {
-    weak var base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>?
+final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType: Hashable, Content: View>: CocoaHostingController<UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>.RootView> {
+    typealias UIHostingCollectionViewCellType = UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>
     
-    init(base: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>?) {
+    weak var base: UIHostingCollectionViewCellType?
+    
+    init(base: UIHostingCollectionViewCellType?) {
         self.base = base
         
         super.init(rootView: .init(base: base))
-        
-        view.backgroundColor = .clear
-        view.insetsLayoutMarginsFromSafeArea = false
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        
-        view.backgroundColor = .clear
-        view.insetsLayoutMarginsFromSafeArea = false
     }
     
     public func systemLayoutSizeFitting(
