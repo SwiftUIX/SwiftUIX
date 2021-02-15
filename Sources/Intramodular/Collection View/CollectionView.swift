@@ -12,10 +12,16 @@ public struct CollectionView: View {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
     
     private let internalBody: AnyView
-    private var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
+
+    private var _collectionViewConfiguration = _CollectionViewConfiguration()
+    private var _dynamicViewContentTraitValues = _DynamicViewContentTraitValues()
+    private var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
     
     public var body: some View {
-        internalBody.environment(\._scrollViewConfiguration, scrollViewConfiguration)
+        internalBody
+            .environment(\._collectionViewConfiguration, _collectionViewConfiguration)
+            .environment(\._dynamicViewContentTraitValues, _dynamicViewContentTraitValues)
+            .environment(\._scrollViewConfiguration, _scrollViewConfiguration)
     }
     
     fileprivate init(internalBody: AnyView) {
@@ -45,14 +51,13 @@ extension CollectionView {
         @ViewBuilder rowContent: @escaping (Data.Element) -> RowContent
     ) where Data.Element: Identifiable {
         self.init(
-            internalBody:
-                _CollectionView(
-                    [ListSection(model: 0, items: data.lazy.map(_IdentifierHashedValue.init))],
-                    sectionHeader: Never.produce,
-                    sectionFooter: Never.produce,
-                    rowContent: { rowContent($0.value) }
-                )
-                .eraseToAnyView()
+            internalBody: _CollectionView(
+                [ListSection(model: 0, items: data.lazy.map(_IdentifierHashedValue.init))],
+                sectionHeader: Never.produce,
+                sectionFooter: Never.produce,
+                rowContent: { rowContent($0.value) }
+            )
+            .eraseToAnyView()
         )
     }
     
@@ -62,14 +67,13 @@ extension CollectionView {
         @ViewBuilder rowContent: @escaping (Data.Element) -> RowContent
     ) {
         self.init(
-            internalBody:
-                _CollectionView(
-                    [ListSection(model: 0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))],
-                    sectionHeader: Never.produce,
-                    sectionFooter: Never.produce,
-                    rowContent: { rowContent($0.value.value) }
-                )
-                .eraseToAnyView()
+            internalBody: _CollectionView(
+                [ListSection(model: 0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))],
+                sectionHeader: Never.produce,
+                sectionFooter: Never.produce,
+                rowContent: { rowContent($0.value.value) }
+            )
+            .eraseToAnyView()
         )
     }
 }
@@ -77,29 +81,56 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
-    public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
-        then({ $0.scrollViewConfiguration.onOffsetChange = body })
+    @available(tvOS, unavailable)
+    public func onDelete(perform action: ((IndexSet) -> Void)?) -> Self {
+        then({ $0._dynamicViewContentTraitValues.onDelete = action })
     }
     
     @available(tvOS, unavailable)
+    public func onMove(perform action: ((IndexSet, Int) -> Void)?) -> Self {
+        then({ $0._dynamicViewContentTraitValues.onMove = action })
+    }
+}
+
+extension CollectionView {
+    public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
+        then({ $0._scrollViewConfiguration.onOffsetChange = body })
+    }
+}
+
+extension CollectionView {
+    @available(tvOS, unavailable)
+    public func reorderingCadence(_ reorderingCadence: UICollectionView.ReorderingCadence) -> CollectionView {
+        then({
+            #if !os(tvOS)
+            $0._collectionViewConfiguration.reorderingCadence = reorderingCadence
+            #else
+            _ = $0
+            #endif
+        })
+    }
+}
+
+extension CollectionView {
+    @available(tvOS, unavailable)
     public func onRefresh(_ body: @escaping () -> Void) -> Self {
-        then({ $0.scrollViewConfiguration.onRefresh = body })
+        then({ $0._scrollViewConfiguration.onRefresh = body })
     }
     
     @available(tvOS, unavailable)
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
-        then({ $0.scrollViewConfiguration.isRefreshing = isRefreshing })
+        then({ $0._scrollViewConfiguration.isRefreshing = isRefreshing })
     }
     
     @_disfavoredOverload
     @available(tvOS, unavailable)
     public func refreshControlTintColor(_ color: UIColor?) -> Self {
-        then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
+        then({ $0._scrollViewConfiguration.refreshControlTintColor = color })
     }
     
     @available(tvOS, unavailable)
     public func refreshControlTintColor(_ color: Color?) -> Self {
-        then({ $0.scrollViewConfiguration.refreshControlTintColor = color?.toUIColor() })
+        then({ $0._scrollViewConfiguration.refreshControlTintColor = color?.toUIColor() })
     }
 }
 

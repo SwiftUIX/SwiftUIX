@@ -38,19 +38,25 @@ extension AppKitOrUIKitHostingControllerProtocol {
         maximumSize: OptionalDimensions = nil
     ) -> CGSize {
         let fittingSize = CGSize(
-            width: size.width ?? .infinity,
-            height: size.height ?? .infinity
+            width: size.width ?? .greatestFiniteMagnitude,
+            height: size.height ?? .greatestFiniteMagnitude
         )
         .clamping(to: maximumSize)
+        
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        view.layoutIfNeeded()
+        #elseif os(macOS)
+        view.layout()
+        #endif
         
         var result = sizeThatFits(in: fittingSize)
         
         switch (result.width, result.height)  {
-            case (.infinity, .infinity):
+            case (.greatestFiniteMagnitude, .greatestFiniteMagnitude):
                 result = sizeThatFits(in: .init(size, default: .zero))
-            case (.infinity, _):
+            case (.greatestFiniteMagnitude, _):
                 result = sizeThatFits(in: CGSize(width: size.width ?? targetSize.width ?? .zero, height: fittingSize.height))
-            case (_, .infinity):
+            case (_, .greatestFiniteMagnitude):
                 result = sizeThatFits(in: CGSize(width: fittingSize.width, height: size.height ?? targetSize.height ?? .zero))
             case (.zero, 1...): do {
                 #if os(iOS) || os(tvOS)

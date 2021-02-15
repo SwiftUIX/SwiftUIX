@@ -10,8 +10,6 @@ import SwiftUI
 struct _ListRowPreferences: Equatable {
     var estimatedCellSize: CGSize? = nil
     var isHighlightable = true
-    var onSelect: Action?
-    var onDeselect: Action?
 }
 
 /// An internal preference key that defines a list row's preferences.

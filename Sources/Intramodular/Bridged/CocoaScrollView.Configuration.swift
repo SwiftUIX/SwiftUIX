@@ -61,6 +61,8 @@ extension CocoaScrollViewConfiguration {
     }
 }
 
+// MARK: - Auxiliary Implementation -
+
 #if !os(tvOS)
 
 extension UIRefreshControl {
