@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+// MARK: - Auxiliary Implementation -
+
 private final class CaptureViewSizePreferenceKey<T: View>: TakeLastPreferenceKey<CGSize> {
     
 }

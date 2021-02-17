@@ -15,9 +15,10 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
     var item: ItemType?
     var itemID: ItemIdentifierType?
     var makeContent: ((ItemType) -> Content)!
-    var listRowPreferences: _ListRowPreferences?
-    
+    var cellPreferences = _CollectionOrListCellPreferences()
     var contentHostingController: CellContentHostingControllerType?
+    
+    private var appliedLayoutAttributes: UICollectionViewLayoutAttributes?
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -52,9 +53,18 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         
         indexPath = nil
         itemID = nil
-        listRowPreferences = nil
+        cellPreferences = .init()
+        appliedLayoutAttributes = nil
         
         isSelected = false
+    }
+    
+    override public func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        if let appliedLayoutAttributes = appliedLayoutAttributes, cellPreferences.allowsCustomLayoutAttributeSizeOverride {
+            return appliedLayoutAttributes.size
+        }
+        
+        return contentHostingController?.systemLayoutSizeFitting(targetSize) ?? CGSize(width: 1, height: 1)
     }
     
     override public func systemLayoutSizeFitting(
@@ -62,28 +72,40 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        guard let contentHostingController = contentHostingController else  {
-            return CGSize(width: 1, height: 1)
+        if let appliedLayoutAttributes = appliedLayoutAttributes, cellPreferences.allowsCustomLayoutAttributeSizeOverride {
+            return appliedLayoutAttributes.size
         }
         
-        return contentHostingController.systemLayoutSizeFitting(
+        return contentHostingController?.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
             verticalFittingPriority: verticalFittingPriority
-        )
+        ) ?? CGSize(width: 1, height: 1)
     }
     
-    override public func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+    override public func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
         layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
         
         return layoutAttributes
+    }
+    
+    override public func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        
+        appliedLayoutAttributes = layoutAttributes
+    }
+    
+    override public func setNeedsUpdateConfiguration() {
+        contentHostingController?.update()
     }
 }
 
 extension UIHostingCollectionViewCell {
     func cellWillDisplay(isPrototype: Bool = false) {
         if let contentHostingController = contentHostingController {
-            contentHostingController.rootView.content.itemID = itemID
+            contentHostingController.update()
         } else {
             contentHostingController = UICollectionViewCellContentHostingController(base: self)
         }
@@ -116,11 +138,18 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
     init(base: UIHostingCollectionViewCellType?) {
         self.base = base
         
-        super.init(rootView: .init(base: base))
+        super.init(rootView: .init(base: nil))
+        
+        update()
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    public func systemLayoutSizeFitting(
+        _ targetSize: CGSize
+    ) -> CGSize {
+        _fixed_sizeThatFits(in: targetSize)
     }
     
     public func systemLayoutSizeFitting(
@@ -128,10 +157,7 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-        
-        return _fixed_sizeThatFits(in: targetSize)
+        _fixed_sizeThatFits(in: targetSize)
     }
     
     func move(toParent parent: UIViewController?, ofCell cell: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>) {
@@ -155,23 +181,36 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
             removeFromParent()
         }
     }
+    
+    func update() {
+        rootView.content = .init(base: base)
+        
+        view.setNeedsDisplay()
+    }
 }
 
 extension UIHostingCollectionViewCell {
     public struct RootView: View {
-        weak var base: UIHostingCollectionViewCell?
-        
+        var item: ItemType?
         var itemID: ItemIdentifierType?
+        var cellPreferences: Binding<_CollectionOrListCellPreferences>?
+        var makeContent: ((ItemType) -> Content)?
         
         init(base: UIHostingCollectionViewCell?) {
-            self.base = base
+            if let base = base {
+                self.item = base.item
+                self.itemID = base.itemID
+                self.cellPreferences = .init(get: { [weak base] in base?.cellPreferences ?? .init() }, set: { [weak base] in base?.cellPreferences = $0 })
+                self.makeContent = base.makeContent
+            }
         }
         
         public var body: some View {
-            if let base = self.base, let item = base.item {
-                base.makeContent(item)
+            if let item = item, let itemID = itemID, let cellPreferences = cellPreferences, let makeContent = makeContent {
+                makeContent(item)
                     .edgesIgnoringSafeArea(.all)
-                    .onPreferenceChange(_ListRowPreferencesKey.self, perform: { base.listRowPreferences = $0 })
+                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { cellPreferences.wrappedValue = $0 })
+                    .id(itemID)
             }
         }
     }

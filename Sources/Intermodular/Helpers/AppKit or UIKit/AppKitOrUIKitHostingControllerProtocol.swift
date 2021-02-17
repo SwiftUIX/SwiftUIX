@@ -44,6 +44,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
         .clamping(to: maximumSize)
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        view.setNeedsLayout()
         view.layoutIfNeeded()
         #elseif os(macOS)
         view.layout()
