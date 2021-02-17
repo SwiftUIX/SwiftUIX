@@ -89,9 +89,9 @@ public final class UIHostingCollectionViewController<
         }
     }
     
-    var collectionViewLayout: UICollectionViewLayout = UICollectionViewLayout() {
+    var collectionViewLayout: CollectionViewLayout = FlowCollectionViewLayout() {
         didSet {
-            collectionView.setCollectionViewLayout(collectionViewLayout, animated: true)
+            collectionView.setCollectionViewLayout(collectionViewLayout._toUICollectionViewLayout(), animated: true)
         }
     }
     
@@ -104,7 +104,7 @@ public final class UIHostingCollectionViewController<
     #endif
     
     fileprivate lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
+        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout._toUICollectionViewLayout())
         
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
@@ -119,6 +119,19 @@ public final class UIHostingCollectionViewController<
         
         return collectionView
     }()
+    
+    var maximumCellSize: OptionalDimensions {
+        let result = OptionalDimensions(
+            width: max(collectionView.contentSize.width - 0.001, 0),
+            height: max(collectionView.contentSize.height - 0.001, 0)
+        )
+        
+        guard (result.width != 0 && result.height != 0) else {
+            return nil
+        }
+        
+        return result
+    }
     
     init(
         dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration,
@@ -171,7 +184,13 @@ public final class UIHostingCollectionViewController<
     override public func viewSafeAreaInsetsDidChange()  {
         super.viewSafeAreaInsetsDidChange()
         
-        collectionViewLayout.invalidateLayout() // WORKAROUND (for rotation animation)
+        collectionView.collectionViewLayout.invalidateLayout() // Workaround for rotation animation bugs
+    }
+    
+    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        collectionView.collectionViewLayout.invalidateLayout()
     }
     
     // MARK: - UICollectionViewDelegate -
@@ -286,10 +305,17 @@ extension UIHostingCollectionViewController {
             prototypeCell.item = item
             prototypeCell.itemID = parent.dataSourceConfiguration.dataSourceIdentifierMap.getItemID(item)
             prototypeCell.makeContent = parent.viewProvider.rowContent
+            prototypeCell.maximumSize = parent.maximumCellSize
             
             prototypeCell.cellWillDisplay(isPrototype: true)
             
-            let size = prototypeCell.contentHostingController!.sizeThatFits(in: UIView.layoutFittingExpandedSize)
+            let size = prototypeCell
+                .contentHostingController!
+                .systemLayoutSizeFitting(
+                    parent.maximumCellSize != nil
+                        ? UIView.layoutFittingExpandedSize
+                        : UIView.layoutFittingCompressedSize
+                )
             
             identifierBasedCache[sectionID, default: [:]][itemID] = size
             indexPathBasedCache[indexPath] = size
@@ -324,7 +350,12 @@ extension UIHostingCollectionViewController {
             } else {
                 invalidateCachedSize(forIndexPath: indexPath)
                 
-                return sizeForItem(item, withID: itemID, inSection: section, withID: sectionID, atIndexPath: indexPath)
+                return sizeForItem(
+                    item, withID: itemID,
+                    inSection: section,
+                    withID: sectionID,
+                    atIndexPath: indexPath
+                )
             }
         }
     }
@@ -412,16 +443,26 @@ extension UIHostingCollectionViewController {
         
         snapshot.loadSectionDifference(sectionDifference)
         
+        var dataSourceHasChanged = !sectionDifference.isEmpty
+        
         for sectionData in data {
             let section = sectionData.model
             let sectionItems = sectionData.data
             let oldSectionData = oldValue.first(where: { self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID($0.model) == self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(sectionData.model) })
             let oldSectionItems = oldSectionData?.data ?? AnyRandomAccessCollection([])
             
-            snapshot.loadItemDifference(sectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) })), inSection: self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(section))
+            let difference = sectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }))
+            
+            if !difference.isEmpty {
+                snapshot.loadItemDifference(difference, inSection: self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(section))
+                
+                dataSourceHasChanged = true
+            }
         }
         
-        _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+        if dataSourceHasChanged {
+            _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+        }
     }
 }
 

@@ -61,9 +61,8 @@ struct _CollectionView<
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
         
-        
         if uiViewController.collectionViewLayout.hashValue != context.environment.collectionViewLayout.hashValue {
-            uiViewController.collectionViewLayout = context.environment.collectionViewLayout._toUICollectionViewLayout()
+            uiViewController.collectionViewLayout = context.environment.collectionViewLayout
         }
     }
 }

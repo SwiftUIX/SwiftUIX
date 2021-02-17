@@ -17,8 +17,7 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
     var makeContent: ((ItemType) -> Content)!
     var cellPreferences = _CollectionOrListCellPreferences()
     var contentHostingController: CellContentHostingControllerType?
-    
-    private var appliedLayoutAttributes: UICollectionViewLayoutAttributes?
+    var maximumSize: OptionalDimensions?
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -54,16 +53,11 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         indexPath = nil
         itemID = nil
         cellPreferences = .init()
-        appliedLayoutAttributes = nil
         
         isSelected = false
     }
     
     override public func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        if let appliedLayoutAttributes = appliedLayoutAttributes, cellPreferences.allowsCustomLayoutAttributeSizeOverride {
-            return appliedLayoutAttributes.size
-        }
-        
         return contentHostingController?.systemLayoutSizeFitting(targetSize) ?? CGSize(width: 1, height: 1)
     }
     
@@ -72,10 +66,6 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        if let appliedLayoutAttributes = appliedLayoutAttributes, cellPreferences.allowsCustomLayoutAttributeSizeOverride {
-            return appliedLayoutAttributes.size
-        }
-        
         return contentHostingController?.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
@@ -89,12 +79,6 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
         
         return layoutAttributes
-    }
-    
-    override public func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-        super.apply(layoutAttributes)
-        
-        appliedLayoutAttributes = layoutAttributes
     }
     
     override public func setNeedsUpdateConfiguration() {
@@ -146,10 +130,14 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
     @objc required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     public func systemLayoutSizeFitting(
         _ targetSize: CGSize
     ) -> CGSize {
-        _fixed_sizeThatFits(in: targetSize)
+        _fixed_sizeThatFits(
+            in: .init(targetSize),
+            maximumSize: base?.maximumSize ?? nil
+        )
     }
     
     public func systemLayoutSizeFitting(
@@ -157,7 +145,10 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        _fixed_sizeThatFits(in: targetSize)
+        _fixed_sizeThatFits(
+            in: .init(targetSize),
+            maximumSize: base?.maximumSize ?? nil
+        )
     }
     
     func move(toParent parent: UIViewController?, ofCell cell: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>) {

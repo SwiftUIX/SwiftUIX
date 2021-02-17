@@ -18,6 +18,14 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
         self.init(width: size.width, height: size.height)
     }
     
+    public init(_ size: CGSize?) {
+        if let size = size {
+            self.init(size)
+        } else {
+            self.init(nilLiteral: ())
+        }
+    }
+    
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
     }

@@ -60,18 +60,20 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
     }
     
     public func _toUICollectionViewLayout() -> UICollectionViewLayout {
-        UICollectionViewFlowLayout().then {
-            if let minimumLineSpacing = minimumLineSpacing {
-                $0.minimumLineSpacing = minimumLineSpacing
-            }
-            
-            if let minimumInteritemSpacing = minimumInteritemSpacing {
-                $0.minimumInteritemSpacing = minimumInteritemSpacing
-            }
-            
-            $0.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-            $0.itemSize = UICollectionViewFlowLayout.automaticSize
+        let layout = UICollectionViewFlowLayout()
+        
+        if let minimumLineSpacing = minimumLineSpacing {
+            layout.minimumLineSpacing = minimumLineSpacing
         }
+        
+        if let minimumInteritemSpacing = minimumInteritemSpacing {
+            layout.minimumInteritemSpacing = minimumInteritemSpacing
+        }
+        
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        layout.itemSize = UICollectionViewFlowLayout.automaticSize
+        
+        return layout
     }
 }
 
