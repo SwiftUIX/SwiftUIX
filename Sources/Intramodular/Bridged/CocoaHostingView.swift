@@ -10,22 +10,22 @@ import SwiftUI
 public struct CocoaHostingView<Content: View>: UIViewControllerRepresentable {
     public typealias UIViewControllerType = CocoaHostingController<Content>
     
-    private let rootView: Content
+    private let mainView: Content
     
-    public init(rootView: Content) {
-        self.rootView = rootView
+    public init(mainView: Content) {
+        self.mainView = mainView
     }
     
-    public init(@ViewBuilder rootView: () -> Content) {
-        self.rootView = rootView()
+    public init(@ViewBuilder mainView: () -> Content) {
+        self.mainView = mainView()
     }
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(rootView: rootView)
+        .init(mainView: mainView)
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.rootView.content = rootView
+        uiViewController.mainView = mainView
     }
 }
 

@@ -50,7 +50,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
                     }
                 ) {
                     CocoaHostingView(
-                        rootView: self.destination
+                        mainView: self.destination
                             .mergeEnvironmentBuilder(self.environmentBuilder)
                     )
                 }
@@ -63,7 +63,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
                     }
                 ) {
                     CocoaHostingView(
-                        rootView: self.destination
+                        mainView: self.destination
                             .mergeEnvironmentBuilder(self.environmentBuilder)
                     )
                 }

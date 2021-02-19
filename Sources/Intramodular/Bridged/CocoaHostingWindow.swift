@@ -27,7 +27,7 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
     public init(windowScene: UIWindowScene, rootView: Content) {
         super.init(windowScene: windowScene)
         
-        rootViewController = CocoaHostingController(rootView: UIHostingWindowContent(window: self, content: rootView))
+        rootViewController = CocoaHostingController(mainView: UIHostingWindowContent(window: self, content: rootView))
         rootViewController!.view.backgroundColor = .clear
     }
     

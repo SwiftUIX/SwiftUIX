@@ -23,7 +23,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         self.presentation = presentation
         
         super.init(
-            rootView: presentation.content,
+            mainView: presentation.content,
             presentationCoordinator: coordinator
         )
         

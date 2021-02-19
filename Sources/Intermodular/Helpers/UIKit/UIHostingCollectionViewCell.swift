@@ -122,7 +122,7 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
     init(base: UIHostingCollectionViewCellType?) {
         self.base = base
         
-        super.init(rootView: .init(base: nil))
+        super.init(mainView: nil)
         
         update()
     }
@@ -181,11 +181,15 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
 }
 
 extension UIHostingCollectionViewCell {
-    public struct RootView: View {
+    public struct RootView: ExpressibleByNilLiteral, View {
         var item: ItemType?
         var itemID: ItemIdentifierType?
         var cellPreferences: Binding<_CollectionOrListCellPreferences>?
         var makeContent: ((ItemType) -> Content)?
+        
+        public init(nilLiteral: ()) {
+            
+        }
         
         init(base: UIHostingCollectionViewCell?) {
             if let base = base {

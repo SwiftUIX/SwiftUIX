@@ -62,7 +62,7 @@ extension UINavigationController: Navigator {
             assertionFailure("The animation passed to popToRoot(withAnimation:) must either be `.default` or `nil`")
         }
         
-        pushViewController(CocoaHostingController(rootView: view), animated: animation == .default)
+        pushViewController(CocoaHostingController(mainView: view), animated: animation == .default)
     }
     
     public func pop(withAnimation animation: Animation?) {

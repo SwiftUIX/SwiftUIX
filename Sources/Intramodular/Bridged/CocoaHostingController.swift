@@ -30,7 +30,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     
     init(
-        rootView: Content,
+        mainView: Content,
         presentationCoordinator: CocoaPresentationCoordinator = .init()
     ) {
         self._presentationCoordinator = presentationCoordinator
@@ -38,7 +38,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         super.init(
             rootView: .init(
                 parent: nil,
-                content: rootView,
+                content: mainView,
                 presentationCoordinator: presentationCoordinator
             )
         )
@@ -47,13 +47,13 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         
         self.rootView.parent = self
         
-        if let rootView = rootView as? AnyPresentationView {
+        if let mainView = mainView as? AnyPresentationView {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)
-            hidesBottomBarWhenPushed = rootView.hidesBottomBarWhenPushed
+            hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
             #endif
-            modalPresentationStyle = .init(rootView.presentationStyle)
-            transitioningDelegate = rootView.presentationStyle.transitioningDelegate
+            modalPresentationStyle = .init(mainView.presentationStyle)
+            transitioningDelegate = mainView.presentationStyle.transitioningDelegate
             #elseif os(macOS)
             fatalError("unimplemented")
             #endif
@@ -62,8 +62,18 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         _fixSafeAreaInsetsIfNecessary()
     }
     
+    @available(*, unavailable, renamed: "CocoaHostingController.init(mainView:)")
+    public convenience init(rootView: Content) {
+        self.init(mainView: rootView, presentationCoordinator: .init())
+    }
+    
+    @_disfavoredOverload
+    public convenience init(mainView: Content) {
+        self.init(mainView: mainView, presentationCoordinator: .init())
+    }
+
     public convenience init(@ViewBuilder mainView: () -> Content) {
-        self.init(rootView: mainView())
+        self.init(mainView: mainView())
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {
