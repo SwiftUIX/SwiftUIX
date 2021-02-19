@@ -10,6 +10,7 @@ import SwiftUI
 struct _CollectionOrListCellPreferences: Equatable {
     var estimatedCellSize: CGSize? = nil
     var isHighlightable = true
+    var isReorderable = false
     var allowsCustomLayoutAttributeSizeOverride: Bool = false
 }
 
@@ -28,6 +29,12 @@ extension View {
     public func customResizableCollectionViewCell() -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.allowsCustomLayoutAttributeSizeOverride = true
+        }
+    }
+    
+    public func collectionViewCellReorderable(_ reorderable: Bool) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            value.isReorderable = reorderable
         }
     }
     

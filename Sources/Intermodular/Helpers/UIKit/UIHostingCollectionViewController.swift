@@ -200,26 +200,26 @@ public final class UIHostingCollectionViewController<
         targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath,
         toProposedIndexPath proposedIndexPath: IndexPath
     ) -> IndexPath {
-        guard !(collectionView.collectionViewLayout is UICollectionViewFlowLayout) else {
-            return proposedIndexPath
-        }
+        /*guard !(collectionView.collectionViewLayout is UICollectionViewFlowLayout) else {
+         return proposedIndexPath
+         }
+         
+         if originalIndexPath.section != proposedIndexPath.section {
+         return originalIndexPath
+         }
+         
+         if originalIndexPath.item == proposedIndexPath.item {
+         return originalIndexPath
+         }
+         
+         let cellContentSizeCache = self.cellContentSizeCache
+         
+         cellContentSizeCache.invalidateIndexPath(originalIndexPath)
+         cellContentSizeCache.invalidateIndexPath(proposedIndexPath)*/
         
-        if originalIndexPath.section != proposedIndexPath.section {
-            return originalIndexPath
-        }
-
-        if originalIndexPath.item == proposedIndexPath.item {
-            return originalIndexPath
-        }
-        
-        let cellContentSizeCache = self.cellContentSizeCache
-        
-        cellContentSizeCache.invalidateIndexPath(originalIndexPath)
-        cellContentSizeCache.invalidateIndexPath(proposedIndexPath)
-
         return proposedIndexPath
     }
-
+    
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as! UIHostingCollectionViewCell<ItemType, ItemIdentifierType, RowContent>).cellWillDisplay()
     }
