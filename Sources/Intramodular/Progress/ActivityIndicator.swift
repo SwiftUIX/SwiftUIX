@@ -15,6 +15,10 @@ public struct ActivityIndicator {
     private var isAnimated: Bool = true
     private var style: Style?
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    private var tintUIColor: UIColor?
+    #endif
+    
     public init() {
         
     }
@@ -37,8 +41,8 @@ extension ActivityIndicator: UIViewRepresentable {
             uiView.style = .init(style)
         }
         
-        uiView.color = context.environment.tintColor?.toUIColor()
-        uiView.tintColor = context.environment.tintColor?.toUIColor()
+        uiView.color = tintUIColor ?? context.environment.tintColor?.toUIColor()
+        uiView.tintColor = tintUIColor ?? context.environment.tintColor?.toUIColor()
         
         if !context.environment.isEnabled && uiView.isAnimating {
             uiView.stopAnimating()
@@ -55,8 +59,13 @@ extension ActivityIndicator: UIViewRepresentable {
         }
     }
     
-    public func style(_ style: Style?) -> ActivityIndicator {
+    public func style(_ style: Style?) -> Self {
         then({ $0.style = style })
+    }
+    
+    @_disfavoredOverload
+    public func tintColor(_ color: UIColor?) -> Self {
+        then({ $0.tintUIColor = color })
     }
 }
 
@@ -109,6 +118,17 @@ extension UIActivityIndicatorView.Style {
             case .large:
                 self = .large
         }
+    }
+}
+
+#endif
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+struct ActivityIndicator_Previews: PreviewProvider {
+    static var previews: some View {
+        ActivityIndicator()
+            .tintColor(UIColor.red)
     }
 }
 
