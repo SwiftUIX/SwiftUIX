@@ -99,8 +99,12 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    public func disableDifferenceAnimation(_ disableAnimatingDifferences: Bool) -> Self {
+        then({ $0._collectionViewConfiguration.disableAnimatingDifferences = disableAnimatingDifferences })
+    }
+    
     @available(tvOS, unavailable)
-    public func reorderingCadence(_ reorderingCadence: UICollectionView.ReorderingCadence) -> CollectionView {
+    public func reorderingCadence(_ reorderingCadence: UICollectionView.ReorderingCadence) -> Self {
         then({
             #if !os(tvOS)
             $0._collectionViewConfiguration.reorderingCadence = reorderingCadence

@@ -11,7 +11,11 @@ protocol _opaque_UIHostingCollectionViewCell {
     
 }
 
-public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable, Content: View>: UICollectionViewCell, _opaque_UIHostingCollectionViewCell {
+public class UIHostingCollectionViewCell<
+    ItemType,
+    ItemIdentifierType: Hashable,
+    Content: View
+>: UICollectionViewCell, _opaque_UIHostingCollectionViewCell {
     typealias CellContentHostingControllerType = UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType, Content>
     
     struct State {

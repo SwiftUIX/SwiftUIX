@@ -244,11 +244,11 @@ public final class UIHostingCollectionViewController<
     // MARK: - UICollectionViewDelegate -
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as! UIHostingCollectionViewCell<ItemType, ItemIdentifierType, RowContent>).cellWillDisplay(inParent: self)
+        (cell as? UIHostingCollectionViewCell<ItemType, ItemIdentifierType, RowContent>)?.cellWillDisplay(inParent: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as! UICollectionViewCellType).cellDidEndDisplaying()
+        (cell as? UICollectionViewCellType)?.cellDidEndDisplaying()
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
@@ -269,14 +269,6 @@ public final class UIHostingCollectionViewController<
     
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         cell(for: indexPath)?.isSelected = false
-    }
-    
-    public func collectionView(
-        _ collectionView: UICollectionView,
-        targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath,
-        toProposedIndexPath proposedIndexPath: IndexPath
-    ) -> IndexPath {
-        return proposedIndexPath
     }
     
     // MARK: - UICollectionViewDelegateFlowLayout -
@@ -411,12 +403,20 @@ extension UIHostingCollectionViewController {
             .compactMap({ $0 as? UICollectionViewCellType})
             .first(where: { $0.configuration?.indexPath == indexPath })
         
-        return result ?? _internalDiffableDataSource?.collectionView(collectionView, cellForItemAt: indexPath) as! UICollectionViewCellType
+        if let dataSource = dataSource, !dataSource.contains(indexPath) {
+            return nil
+        }
+        
+        return result ?? (_internalDiffableDataSource?.collectionView(collectionView, cellForItemAt: indexPath) as? UICollectionViewCellType)
     }
 }
 
 extension UIHostingCollectionViewController {
     private func updateDataSource(oldValue: DataSource?, dataSource: DataSource?) {
+        if configuration.disableAnimatingDifferences {
+            _animateDataSourceDifferences = false
+        }
+        
         defer {
             _animateDataSourceDifferences = true
         }
@@ -442,6 +442,7 @@ extension UIHostingCollectionViewController {
             
             var snapshot = _internalDataSource.snapshot()
             
+            snapshot.deleteAllItems()
             snapshot.appendSections(data.map({ dataSourceConfiguration.identifierMap[$0.model] }))
             
             for element in data {
@@ -588,7 +589,9 @@ fileprivate extension NSDiffableDataSourceSnapshot {
         }
     }
     
-    mutating func loadItemDifference(_ difference: CollectionDifference<ItemIdentifierType>, inSection section: SectionIdentifierType) {
+    mutating func loadItemDifference(
+        _ difference: CollectionDifference<ItemIdentifierType>, inSection section: SectionIdentifierType
+    ) {
         difference.forEach({ loadItemChanges($0, inSection: section) })
     }
     
