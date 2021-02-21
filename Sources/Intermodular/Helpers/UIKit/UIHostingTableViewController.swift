@@ -191,7 +191,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        data[data.index(data.startIndex, offsetBy: section)].data.count
+        data[data.index(data.startIndex, offsetBy: section)].items.count
     }
     
     // MARK: - Delegate -

@@ -35,8 +35,44 @@ extension UIHostingCollectionViewController {
             }
         }
         
-        case dynamic(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
+        case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
         case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
+        
+        func contains(_ indexPath: IndexPath) -> Bool {
+            switch self {
+                case .static(let data): do {
+                    guard indexPath.section < data.count else {
+                        return false
+                    }
+                    
+                    let section = data[data.index(data.startIndex, offsetBy: indexPath.section)]
+                    
+                    guard indexPath.row < section.items.count else {
+                        return false
+                    }
+                    
+                    return true
+                }
+                
+                case .diffableDataSource(let dataSource): do {
+                    guard let dataSource = dataSource.wrappedValue else {
+                        return false
+                    }
+                    
+                    let snapshot = dataSource.snapshot()
+                    
+                    guard indexPath.section < snapshot.numberOfSections else {
+                        return false
+                    }
+                    
+                    guard indexPath.row < snapshot.numberOfItems(inSection: snapshot.sectionIdentifiers[indexPath.section]) else {
+                        return false
+                    }
+                    
+                    return true
+                }
+            }
+        }
     }
 }
 
@@ -159,17 +195,21 @@ public final class UIHostingCollectionViewController<
                 return nil
             }
             
-            let item: ItemType = self._unsafelyUnwrappedItem(at: indexPath)
+            let item = self._unsafelyUnwrappedItem(at: indexPath)
+            let section = self._unsafelyUnwrappedSection(from: indexPath)
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UICollectionViewCellType
             
-            cell.parentViewController = self
-            cell.indexPath = indexPath
-            cell.item = item
-            cell.itemID = self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID(item)
-            cell.makeContent = self.viewProvider.rowContent
+            cell.configuration = .init(
+                item: item,
+                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
+                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
+                indexPath: indexPath,
+                makeContent: self.viewProvider.rowContent,
+                maximumSize: self.maximumCellSize
+            )
             
-            cell.cellWillDisplay()
+            cell.cellWillDisplay(inParent: self)
             
             return cell
         }
@@ -184,44 +224,27 @@ public final class UIHostingCollectionViewController<
     override public func viewSafeAreaInsetsDidChange()  {
         super.viewSafeAreaInsetsDidChange()
         
-        collectionView.collectionViewLayout.invalidateLayout()
+        invalidateLayout(includingCellContentSizeCache: false)
     }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+        
+        invalidateLayout(includingCellContentSizeCache: true)
+    }
+    
+    public func invalidateLayout(includingCellContentSizeCache: Bool) {
+        if includingCellContentSizeCache {
+            cellContentSizeCache.invalidate()
+        }
         
         collectionView.collectionViewLayout.invalidateLayout()
     }
     
     // MARK: - UICollectionViewDelegate -
     
-    public func collectionView(
-        _ collectionView: UICollectionView,
-        targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath,
-        toProposedIndexPath proposedIndexPath: IndexPath
-    ) -> IndexPath {
-        /*guard !(collectionView.collectionViewLayout is UICollectionViewFlowLayout) else {
-         return proposedIndexPath
-         }
-         
-         if originalIndexPath.section != proposedIndexPath.section {
-         return originalIndexPath
-         }
-         
-         if originalIndexPath.item == proposedIndexPath.item {
-         return originalIndexPath
-         }
-         
-         let cellContentSizeCache = self.cellContentSizeCache
-         
-         cellContentSizeCache.invalidateIndexPath(originalIndexPath)
-         cellContentSizeCache.invalidateIndexPath(proposedIndexPath)*/
-        
-        return proposedIndexPath
-    }
-    
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as! UIHostingCollectionViewCell<ItemType, ItemIdentifierType, RowContent>).cellWillDisplay()
+        (cell as! UIHostingCollectionViewCell<ItemType, ItemIdentifierType, RowContent>).cellWillDisplay(inParent: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -248,6 +271,14 @@ public final class UIHostingCollectionViewController<
         cell(for: indexPath)?.isSelected = false
     }
     
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath,
+        toProposedIndexPath proposedIndexPath: IndexPath
+    ) -> IndexPath {
+        return proposedIndexPath
+    }
+    
     // MARK: - UICollectionViewDelegateFlowLayout -
     
     private let prototypeCell = UICollectionViewCellType()
@@ -269,9 +300,9 @@ extension UIHostingCollectionViewController {
     class CellContentSizeCache {
         unowned let parent: UIHostingCollectionViewController
         
-        private var identifierBasedCache: [SectionIdentifierType: [ItemIdentifierType: CGSize]] = [:]
+        private var identifierBasedCache: [AnyHashable: [ItemIdentifierType: CGSize]] = [:]
         private var indexPathBasedCache: [Int: [Int: CGSize]] = [:]
-        private var indexPathToIdentifierMap: [IndexPath: (SectionIdentifierType, ItemIdentifierType)] = [:]
+        private var indexPathToIdentifierMap: [IndexPath: (AnyHashable, ItemIdentifierType)] = [:]
         
         private let prototypeCell = UICollectionViewCellType()
         
@@ -294,32 +325,24 @@ extension UIHostingCollectionViewController {
             indexPathToIdentifierMap[indexPath] = nil
         }
         
-        private func sizeForItem(
-            _ item: ItemType,
-            withID itemID: ItemIdentifierType,
-            inSection section: SectionType,
-            withID sectionID: SectionIdentifierType,
-            atIndexPath indexPath: IndexPath
-        ) -> CGSize {
-            prototypeCell.indexPath = indexPath
-            prototypeCell.item = item
-            prototypeCell.itemID = parent.dataSourceConfiguration.dataSourceIdentifierMap.getItemID(item)
-            prototypeCell.makeContent = parent.viewProvider.rowContent
-            prototypeCell.maximumSize = parent.maximumCellSize
+        func invalidate() {
+            identifierBasedCache = [:]
+            indexPathBasedCache = [:]
+            indexPathToIdentifierMap = [:]
+        }
+        
+        private func sizeForItem(withCellConfiguration cellConfiguration: UICollectionViewCellType.Configuration) -> CGSize {
+            prototypeCell.configuration = cellConfiguration
             
-            prototypeCell.cellWillDisplay(isPrototype: true)
+            prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
             
-            let size = prototypeCell
-                .contentHostingController!
-                .systemLayoutSizeFitting(
-                    parent.maximumCellSize != nil
-                        ? UIView.layoutFittingExpandedSize
-                        : UIView.layoutFittingCompressedSize
-                )
+            let size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
             
-            identifierBasedCache[sectionID, default: [:]][itemID] = size
-            indexPathBasedCache[indexPath] = size
-            indexPathToIdentifierMap[indexPath] = (sectionID, itemID)
+            if !(size.width == 1 && size.height == 1) {
+                identifierBasedCache[cellConfiguration.sectionIdentifier, default: [:]][cellConfiguration.itemIdentifier] = size
+                indexPathBasedCache[cellConfiguration.indexPath] = size
+                indexPathToIdentifierMap[cellConfiguration.indexPath] = (cellConfiguration.sectionIdentifier, cellConfiguration.itemIdentifier)
+            }
             
             return size
         }
@@ -329,14 +352,14 @@ extension UIHostingCollectionViewController {
             layout collectionViewLayout: UICollectionViewLayout,
             sizeForItemAt indexPath: IndexPath
         ) -> CGSize {
-            guard parent.dataSource != nil else {
+            guard let dataSource = parent.dataSource, dataSource.contains(indexPath) else {
                 return .init(width: 1.0, height: 1.0)
             }
             
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
-            let sectionID = parent.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(section)
+            let sectionID = parent.dataSourceConfiguration.identifierMap[section]
             let item = parent._unsafelyUnwrappedItem(at: indexPath)
-            let itemID = parent.dataSourceConfiguration.dataSourceIdentifierMap.getItemID(item)
+            let itemID = parent.dataSourceConfiguration.identifierMap[item]
             
             let indexPathBasedSize = indexPathBasedCache[indexPath]
             let identifierBasedSize = identifierBasedCache[sectionID, default: [:]][itemID]
@@ -351,10 +374,14 @@ extension UIHostingCollectionViewController {
                 invalidateCachedSize(forIndexPath: indexPath)
                 
                 return sizeForItem(
-                    item, withID: itemID,
-                    inSection: section,
-                    withID: sectionID,
-                    atIndexPath: indexPath
+                    withCellConfiguration: .init(
+                        item: item,
+                        itemIdentifier: itemID,
+                        sectionIdentifier: sectionID,
+                        indexPath: indexPath,
+                        makeContent: parent.viewProvider.rowContent,
+                        maximumSize: parent.maximumCellSize
+                    )
                 )
             }
         }
@@ -366,7 +393,7 @@ extension UIHostingCollectionViewController {
         if case .static(let data) = dataSource {
             return data[data.index(data.startIndex, offsetBy: indexPath.section)].model
         } else {
-            return dataSourceConfiguration.dataSourceIdentifierMap.getSectionFromID(_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section])
+            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section]]
         }
     }
     
@@ -374,7 +401,7 @@ extension UIHostingCollectionViewController {
         if case .static(let data) = dataSource {
             return data[indexPath]
         } else {
-            return dataSourceConfiguration.dataSourceIdentifierMap.getItemFromID(_internalDiffableDataSource!.itemIdentifier(for: indexPath)!)
+            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
         }
     }
     
@@ -382,7 +409,7 @@ extension UIHostingCollectionViewController {
         let result = collectionView
             .visibleCells
             .compactMap({ $0 as? UICollectionViewCellType})
-            .first(where: { $0.indexPath == indexPath })
+            .first(where: { $0.configuration?.indexPath == indexPath })
         
         return result ?? _internalDiffableDataSource?.collectionView(collectionView, cellForItemAt: indexPath) as! UICollectionViewCellType
     }
@@ -398,12 +425,14 @@ extension UIHostingCollectionViewController {
             return
         }
         
-        if case .dynamic(let binding) = dataSource {
+        if case .diffableDataSource(let binding) = dataSource {
             DispatchQueue.main.async {
                 if binding.wrappedValue !== _internalDataSource {
                     binding.wrappedValue = _internalDataSource
                 }
             }
+            
+            return
         }
         
         guard oldValue != nil else {
@@ -413,10 +442,10 @@ extension UIHostingCollectionViewController {
             
             var snapshot = _internalDataSource.snapshot()
             
-            snapshot.appendSections(data.map({ dataSourceConfiguration.dataSourceIdentifierMap.getSectionID($0.model) }))
+            snapshot.appendSections(data.map({ dataSourceConfiguration.identifierMap[$0.model] }))
             
             for element in data {
-                snapshot.appendItems(element.data.map({ dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }), toSection: dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(element.model))
+                snapshot.appendItems(element.items.map({ dataSourceConfiguration.identifierMap[$0] }), toSection: dataSourceConfiguration.identifierMap[element.model])
             }
             
             _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
@@ -439,28 +468,32 @@ extension UIHostingCollectionViewController {
         
         var snapshot = _internalDataSource.snapshot()
         
-        let sectionDifference = sections.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID($0) }).difference(from: oldSections.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID($0) }))
+        let sectionDifference = sections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
         
         snapshot.loadSectionDifference(sectionDifference)
         
-        var dataSourceHasChanged = !sectionDifference.isEmpty
+        var hasDataSourceChanged: Bool = false
+        
+        if !(sectionDifference.isEmpty) {
+            hasDataSourceChanged = true
+        }
         
         for sectionData in data {
             let section = sectionData.model
-            let sectionItems = sectionData.data
-            let oldSectionData = oldValue.first(where: { self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID($0.model) == self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(sectionData.model) })
-            let oldSectionItems = oldSectionData?.data ?? AnyRandomAccessCollection([])
+            let sectionItems = sectionData.items
+            let oldSectionData = oldValue.first(where: { self.dataSourceConfiguration.identifierMap[$0.model] == self.dataSourceConfiguration.identifierMap[sectionData.model] })
+            let oldSectionItems = oldSectionData?.items ?? AnyRandomAccessCollection([])
             
-            let difference = sectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.dataSourceIdentifierMap.getItemID($0) }))
+            let difference = sectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
             
             if !difference.isEmpty {
-                snapshot.loadItemDifference(difference, inSection: self.dataSourceConfiguration.dataSourceIdentifierMap.getSectionID(section))
+                snapshot.loadItemDifference(difference, inSection: self.dataSourceConfiguration.identifierMap[section])
                 
-                dataSourceHasChanged = true
+                hasDataSourceChanged = true
             }
         }
         
-        if dataSourceHasChanged {
+        if hasDataSourceChanged {
             _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
         }
     }

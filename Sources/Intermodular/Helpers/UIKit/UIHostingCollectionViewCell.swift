@@ -7,17 +7,40 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable, Content: View>: UICollectionViewCell {
+protocol _opaque_UIHostingCollectionViewCell {
+    
+}
+
+public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable, Content: View>: UICollectionViewCell, _opaque_UIHostingCollectionViewCell {
     typealias CellContentHostingControllerType = UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType, Content>
     
-    var parentViewController: UIViewController?
-    var indexPath: IndexPath?
-    var item: ItemType?
-    var itemID: ItemIdentifierType?
-    var makeContent: ((ItemType) -> Content)!
+    struct State {
+        var isHighlighted: Bool
+        var isSelected: Bool
+    }
+    
+    struct Configuration {
+        private struct ID: Hashable {
+            let item: ItemIdentifierType
+            let section: AnyHashable
+        }
+        
+        let item: ItemType
+        let itemIdentifier: ItemIdentifierType
+        let sectionIdentifier: AnyHashable
+        let indexPath: IndexPath
+        let makeContent: (ItemType) -> Content
+        let maximumSize: OptionalDimensions?
+        
+        var id: some Hashable {
+            ID(item: itemIdentifier, section: sectionIdentifier)
+        }
+    }
+    
+    var configuration: Configuration?
     var cellPreferences = _CollectionOrListCellPreferences()
-    var contentHostingController: CellContentHostingControllerType?
-    var maximumSize: OptionalDimensions?
+    
+    private var contentHostingController: CellContentHostingControllerType?
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -47,18 +70,12 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         }
     }
     
-    override public func prepareForReuse() {
-        super.prepareForReuse()
-        
-        indexPath = nil
-        itemID = nil
-        cellPreferences = .init()
-        
-        isSelected = false
-    }
-    
     override public func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        return contentHostingController?.systemLayoutSizeFitting(targetSize) ?? CGSize(width: 1, height: 1)
+        systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .required
+        )
     }
     
     override public func systemLayoutSizeFitting(
@@ -66,11 +83,22 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        return contentHostingController?.systemLayoutSizeFitting(
+        contentHostingController?.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
             verticalFittingPriority: verticalFittingPriority
         ) ?? CGSize(width: 1, height: 1)
+    }
+    
+    override public func sizeThatFits(_ size: CGSize) -> CGSize {
+        systemLayoutSizeFitting(size)
+    }
+    
+    override public func prepareForReuse() {
+        super.prepareForReuse()
+        
+        isHighlighted = false
+        isSelected = false
     }
     
     override public func preferredLayoutAttributesFitting(
@@ -80,14 +108,10 @@ public class UIHostingCollectionViewCell<ItemType, ItemIdentifierType: Hashable,
         
         return layoutAttributes
     }
-    
-    override public func setNeedsUpdateConfiguration() {
-        contentHostingController?.update()
-    }
 }
 
 extension UIHostingCollectionViewCell {
-    func cellWillDisplay(isPrototype: Bool = false) {
+    func cellWillDisplay(inParent parentViewController: UIViewController?, isPrototype: Bool = false) {
         if let contentHostingController = contentHostingController {
             contentHostingController.update()
         } else {
@@ -136,7 +160,7 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
     ) -> CGSize {
         _fixed_sizeThatFits(
             in: .init(targetSize),
-            maximumSize: base?.maximumSize ?? nil
+            maximumSize: base?.configuration?.maximumSize ?? nil
         )
     }
     
@@ -147,7 +171,7 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
     ) -> CGSize {
         _fixed_sizeThatFits(
             in: .init(targetSize),
-            maximumSize: base?.maximumSize ?? nil
+            maximumSize: base?.configuration?.maximumSize ?? nil
         )
     }
     
@@ -182,30 +206,25 @@ final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifie
 
 extension UIHostingCollectionViewCell {
     public struct RootView: ExpressibleByNilLiteral, View {
-        var item: ItemType?
-        var itemID: ItemIdentifierType?
+        var configuration: Configuration?
         var cellPreferences: Binding<_CollectionOrListCellPreferences>?
-        var makeContent: ((ItemType) -> Content)?
+        
+        init(base: UIHostingCollectionViewCell?) {
+            configuration = base?.configuration
+            cellPreferences = .init(get: { [weak base] in base?.cellPreferences ?? .init() }, set: { [weak base] in base?.cellPreferences = $0 })
+        }
         
         public init(nilLiteral: ()) {
             
         }
         
-        init(base: UIHostingCollectionViewCell?) {
-            if let base = base {
-                self.item = base.item
-                self.itemID = base.itemID
-                self.cellPreferences = .init(get: { [weak base] in base?.cellPreferences ?? .init() }, set: { [weak base] in base?.cellPreferences = $0 })
-                self.makeContent = base.makeContent
-            }
-        }
-        
         public var body: some View {
-            if let item = item, let itemID = itemID, let cellPreferences = cellPreferences, let makeContent = makeContent {
-                makeContent(item)
+            if let configuration = configuration {
+                configuration
+                    .makeContent(configuration.item)
                     .edgesIgnoringSafeArea(.all)
-                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { cellPreferences.wrappedValue = $0 })
-                    .id(itemID)
+                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { cellPreferences?.wrappedValue = $0 })
+                    .id(configuration.id)
             }
         }
     }

@@ -28,7 +28,7 @@ struct _CollectionView<
     >
     
     struct DataSourceConfiguration {
-        let dataSourceIdentifierMap: UIViewControllerType.DataSource.IdentifierMap
+        let identifierMap: UIViewControllerType.DataSource.IdentifierMap
     }
     
     struct ViewProvider {
@@ -104,7 +104,7 @@ extension _CollectionView where
     ) {
         self.dataSource = dataSource
         self.dataSourceConfiguration = .init(
-            dataSourceIdentifierMap: .init(
+            identifierMap: .init(
                 getSectionID: { $0 },
                 getSectionFromID: { $0 },
                 getItemID: { $0 },

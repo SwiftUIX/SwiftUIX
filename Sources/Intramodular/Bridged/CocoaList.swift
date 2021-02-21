@@ -109,7 +109,7 @@ extension CocoaList {
         sectionFooter: @escaping (_SectionModel) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
     ) where Data == Array<ListSection<SectionModel, ItemType>>, SectionModel == HashIdentifiableValue<_SectionModel>, ItemType == HashIdentifiableValue<_Item> {
-        self.data = data.map({ .init(model: .init($0.model), data: $0.data.map(HashIdentifiableValue.init)) })
+        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
         self.rowContent = { rowContent($0.value) }
@@ -186,12 +186,12 @@ extension CocoaList {
     public func alwaysBounceVertical(_ alwaysBounceVertical: Bool) -> Self {
         then({ $0.scrollViewConfiguration.alwaysBounceVertical = alwaysBounceVertical })
     }
-
+    
     @inlinable
     public func alwaysBounceHorizontal(_ alwaysBounceHorizontal: Bool) -> Self {
         then({ $0.scrollViewConfiguration.alwaysBounceHorizontal = alwaysBounceHorizontal })
     }
-
+    
     @inlinable
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })

@@ -6,73 +6,66 @@ import Swift
 import SwiftUI
 
 /// A model suitable for representing sections of a list.
-public struct ListSection<Model, Item> {
+public struct ListSection<SectionType, ItemType> {
     private let _id: Int?
-    private let _model: Model!
+    private let _model: SectionType!
     
-    public var model: Model {
+    public var model: SectionType {
         _model
     }
     
-    public let data: AnyRandomAccessCollection<Item>
-    
-    public init(
-        model: Model,
-        data: [Item]
-    ) {
-        self._id = nil
-        self._model = model
-        self.data = .init(data)
-    }
+    public let items: AnyRandomAccessCollection<ItemType>
     
     public init<Items: RandomAccessCollection>(
-        model: Model,
+        model: SectionType,
         items: Items
-    ) where Items.Element == Item  {
-        self.init(model: model, data: .init(items))
+    ) where Items.Element == ItemType  {
+        self._id = nil
+        self._model = model
+        self.items = .init(items)
     }
     
     public init(
-        _ model: Model,
-        @ArrayBuilder<Item> data: () -> [Item]
+        _ model: SectionType,
+        @ArrayBuilder<ItemType> items: () -> [ItemType]
     ) {
-        self.init(model: model, data: data())
+        self.init(model: model, items: items())
     }
 }
 
-extension ListSection where Model: Equatable {
-    public static func == (lhs: Self, rhs: Model) -> Bool {
+extension ListSection where SectionType: Equatable {
+    public static func == (lhs: Self, rhs: SectionType) -> Bool {
         lhs.model == rhs
     }
     
-    public static func == (lhs: Model, rhs: Self) -> Bool {
+    public static func == (lhs: SectionType, rhs: Self) -> Bool {
         rhs.model == lhs
     }
     
-    public static func != (lhs: Self, rhs: Model) -> Bool {
+    public static func != (lhs: Self, rhs: SectionType) -> Bool {
         !(lhs == rhs)
     }
     
-    public static func != (lhs: Model, rhs: Self) -> Bool {
+    public static func != (lhs: SectionType, rhs: Self) -> Bool {
         !(lhs == rhs)
     }
 }
 
-extension ListSection where Model: Identifiable, Item: Identifiable {
+extension ListSection where SectionType: Identifiable, ItemType: Identifiable {
     public init(
-        model: Model,
-        data: [Item]
+        model: SectionType,
+        items: [ItemType]
     ) {
         self._model = model
-        self.data = .init(data)
+        self.items = .init(items)
         
         var hasher = Hasher()
         
-        if Model.self != Never.self {
+        if SectionType.self != Never.self {
             hasher.combine(model.id)
         }
         
-        data.forEach {
+        items.forEach {
             hasher.combine($0.id)
         }
         
@@ -80,22 +73,22 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
     }
 }
 
-extension ListSection where Model: Identifiable, Item: Identifiable {
+extension ListSection where SectionType: Identifiable, ItemType: Identifiable {
     public func isIdentical(to other: Self) -> Bool {
         if let id = _id, let otherId = other._id {
             return id == otherId
         } else {
-            guard data.count == other.data.count else {
+            guard items.count == other.items.count else {
                 return false
             }
             
-            if Model.self != Never.self {
+            if SectionType.self != Never.self {
                 guard model.id == other.model.id else {
                     return false
                 }
             }
             
-            for (item, otherItem) in zip(data, other.data) {
+            for (item, otherItem) in zip(items, other.items) {
                 guard item.id == otherItem.id else {
                     return false
                 }
@@ -108,35 +101,35 @@ extension ListSection where Model: Identifiable, Item: Identifiable {
 
 // MARK: - Protocol Conformances -
 
-extension ListSection: Equatable where Model: Equatable, Item: Equatable {
+extension ListSection: Equatable where SectionType: Equatable, ItemType: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        if Model.self == Never.self {
-            return Array(lhs.data) == Array(rhs.data)
+        if SectionType.self == Never.self {
+            return Array(lhs.items) == Array(rhs.items)
         } else {
-            return lhs.model == rhs.model && Array(lhs.data) == Array(rhs.data)
+            return lhs.model == rhs.model && Array(lhs.items) == Array(rhs.items)
         }
     }
 }
 
-extension ListSection: Hashable where Model: Hashable, Item: Hashable {
+extension ListSection: Hashable where SectionType: Hashable, ItemType: Hashable {
     public func hash(into hasher: inout Hasher) {
-        if Model.self != Never.self {
+        if SectionType.self != Never.self {
             hasher.combine(model)
         }
         
-        data.forEach({ hasher.combine($0) })
+        items.forEach({ hasher.combine($0) })
     }
 }
 
-extension ListSection: Identifiable where Model: Identifiable, Item: Identifiable {
+extension ListSection: Identifiable where SectionType: Identifiable, ItemType: Identifiable {
     public var id: Int {
         var hasher = Hasher()
         
-        if Model.self != Never.self {
+        if SectionType.self != Never.self {
             hasher.combine(model.id)
         }
         
-        data.forEach({ hasher.combine($0.id) })
+        items.forEach({ hasher.combine($0.id) })
         
         return hasher.finalize()
     }
@@ -146,20 +139,38 @@ extension ListSection: Identifiable where Model: Identifiable, Item: Identifiabl
 
 extension Collection  {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    subscript<SectionModel, ItemType>(_ indexPath: IndexPath) -> ItemType where Element == ListSection<SectionModel, ItemType> {
+    subscript<SectionType, ItemType>(
+        _ indexPath: IndexPath
+    ) -> ItemType where Element == ListSection<SectionType, ItemType> {
         get {
             let sectionIndex = index(startIndex, offsetBy: indexPath.section)
             
             let rowIndex = self[sectionIndex]
-                .data
-                .index(self[sectionIndex].data.startIndex, offsetBy: indexPath.row)
+                .items
+                .index(self[sectionIndex].items.startIndex, offsetBy: indexPath.row)
             
-            return self[sectionIndex].data[rowIndex]
+            return self[sectionIndex].items[rowIndex]
+        }
+    }
+    
+    subscript<SectionType, ItemType>(
+        try indexPath: IndexPath
+    ) -> ItemType? where Element == ListSection<SectionType, ItemType> {
+        get {
+            let sectionIndex = index(startIndex, offsetBy: indexPath.section)
+            
+            let rowIndex = self[sectionIndex]
+                .items
+                .index(self[sectionIndex].items.startIndex, offsetBy: indexPath.row)
+            
+            return self[sectionIndex].items[rowIndex]
         }
     }
     #endif
     
-    public func isIdentical<SectionModel: Identifiable, Item: Identifiable>(to other: Self) -> Bool where Element == ListSection<SectionModel, Item> {
+    public func isIdentical<SectionModel: Identifiable, Item: Identifiable>(
+        to other: Self
+    ) -> Bool where Element == ListSection<SectionModel, Item> {
         guard count == other.count else {
             return false
         }

@@ -32,13 +32,13 @@ extension View {
         }
     }
     
-    public func collectionViewCellReorderable(_ reorderable: Bool) -> some View {
+    public func isCellReorderable(_ reorderable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isReorderable = reorderable
         }
     }
     
-    public func collectionViewCellHighlightable(_ highlightable: Bool) -> some View {
+    public func isCellHighlightable(_ highlightable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isHighlightable = highlightable
         }

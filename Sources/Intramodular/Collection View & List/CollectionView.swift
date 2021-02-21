@@ -37,7 +37,7 @@ extension CollectionView {
         self.init(
             internalBody:
                 _CollectionView(
-                    .dynamic(dataSource),
+                    .diffableDataSource(dataSource),
                     sectionHeader: Never.produce,
                     sectionFooter: Never.produce,
                     rowContent: rowContent
