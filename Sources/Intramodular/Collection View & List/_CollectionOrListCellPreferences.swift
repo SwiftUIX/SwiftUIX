@@ -10,7 +10,7 @@ import SwiftUI
 struct _CollectionOrListCellPreferences: Equatable {
     var estimatedCellSize: CGSize? = nil
     var isHighlightable = true
-    var isReorderable = false
+    var isReorderable = true
     var allowsCustomLayoutAttributeSizeOverride: Bool = false
 }
 

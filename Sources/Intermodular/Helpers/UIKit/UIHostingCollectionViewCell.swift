@@ -41,11 +41,28 @@ public class UIHostingCollectionViewCell<
         }
     }
     
-    var configuration: Configuration?
-    var cellPreferences = _CollectionOrListCellPreferences()
+    var configuration: Configuration? {
+        didSet {
+            if oldValue?.id != configuration?.id {
+                cellPreferences = .init()
+                preferredLayoutAttributesSize = nil
+            }
+        }
+    }
     
     private var contentHostingController: CellContentHostingControllerType?
     
+    private var cellPreferences = _CollectionOrListCellPreferences()
+    private var preferredLayoutAttributesSize: CGSize?
+    
+    public var isHighlightable: Bool {
+        cellPreferences.isHighlightable
+    }
+    
+    public var isReorderable: Bool {
+        cellPreferences.isReorderable
+    }
+
     override public init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -108,7 +125,13 @@ public class UIHostingCollectionViewCell<
     override public func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
+        if let preferredLayoutAttributesSize = preferredLayoutAttributesSize {
+            layoutAttributes.size = preferredLayoutAttributesSize
+        } else {
+            layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
+            
+            preferredLayoutAttributesSize = layoutAttributes.size
+        }
         
         return layoutAttributes
     }

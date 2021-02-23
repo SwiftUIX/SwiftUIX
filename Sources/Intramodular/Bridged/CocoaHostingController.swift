@@ -58,8 +58,6 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             fatalError("unimplemented")
             #endif
         }
-        
-        _fixSafeAreaInsetsIfNecessary()
     }
     
     @available(*, unavailable, renamed: "CocoaHostingController.init(mainView:)")
@@ -71,7 +69,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     public convenience init(mainView: Content) {
         self.init(mainView: mainView, presentationCoordinator: .init())
     }
-
+    
     public convenience init(@ViewBuilder mainView: () -> Content) {
         self.init(mainView: mainView())
     }
@@ -111,7 +109,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     public func _setNamedViewDescription(_ description: _NamedViewDescription?, for name: ViewName) {
         _namedViewDescriptions[name] = description
     }
-
+    
     /// https://twitter.com/b3ll/status/1193747288302075906
     func _fixSafeAreaInsetsIfNecessary() {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)

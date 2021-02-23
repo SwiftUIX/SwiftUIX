@@ -252,7 +252,7 @@ public final class UIHostingCollectionViewController<
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        cell(for: indexPath)?.cellPreferences.isHighlightable ?? false
+        cell(for: indexPath)?.isHighlightable ?? false
     }
     
     public func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {

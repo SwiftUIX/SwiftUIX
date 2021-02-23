@@ -10,6 +10,8 @@ import UIKit
 fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
     class UIViewControllerType: UIViewController {
         var onResolution: (UIViewController) -> Void = { _ in }
+        var onAppear: (UIViewController) -> Void = { _ in }
+        var onDisappear: (UIViewController) -> Void = { _ in }
         var onDeresolution: (UIViewController) -> Void = { _ in }
         
         weak var resolvedParent: UIViewController?
@@ -27,6 +29,22 @@ fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
             }
         }
         
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            if let parent = parent {
+                onAppear(parent)
+            }
+        }
+        
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            if let parent = parent {
+                onDisappear(parent)
+            }
+        }
+        
         override func removeFromParent() {
             super.removeFromParent()
             
@@ -39,6 +57,8 @@ fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
     }
     
     var onResolution: (UIViewController) -> Void
+    var onAppear: (UIViewController) -> Void
+    var onDisappear: (UIViewController) -> Void
     var onDeresolution: (UIViewController) -> Void
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
@@ -47,6 +67,8 @@ fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.onResolution = onResolution
+        uiViewController.onAppear = onAppear
+        uiViewController.onDisappear = onDisappear
         uiViewController.onDeresolution = onDeresolution
     }
 }
@@ -58,18 +80,25 @@ extension View {
         background(
             UIViewControllerResolver(
                 onResolution: action,
+                onAppear: { _ in },
+                onDisappear: { _ in },
                 onDeresolution: { _ in }
             )
         )
     }
     
+    @_disfavoredOverload
     public func onUIViewControllerResolution(
         perform resolutionAction: @escaping (UIViewController) -> (),
-        onDeresolution deresolutionAction: @escaping (UIViewController) -> ()
+        onAppear: @escaping (UIViewController) -> () = { _ in },
+        onDisappear: @escaping (UIViewController) -> () = { _ in },
+        onDeresolution deresolutionAction: @escaping (UIViewController) -> () = { _ in }
     ) -> some View {
         background(
             UIViewControllerResolver(
                 onResolution: resolutionAction,
+                onAppear: onAppear,
+                onDisappear: onDisappear,
                 onDeresolution: deresolutionAction
             )
         )
