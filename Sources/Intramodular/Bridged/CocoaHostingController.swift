@@ -108,6 +108,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         _namedViewDescriptions[name]
     }
     
+    public func _setNamedViewDescription(_ description: _NamedViewDescription?, for name: ViewName) {
+        _namedViewDescriptions[name] = description
+    }
+
     /// https://twitter.com/b3ll/status/1193747288302075906
     func _fixSafeAreaInsetsIfNecessary() {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)

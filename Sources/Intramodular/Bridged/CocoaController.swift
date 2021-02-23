@@ -9,6 +9,7 @@ import SwiftUI
 
 public protocol _opaque_CocoaController: AppKitOrUIKitViewController {
     func _namedViewDescription(for _: ViewName) -> _NamedViewDescription?
+    func _setNamedViewDescription(_: _NamedViewDescription?, for _: ViewName)
 }
 
 public protocol CocoaController: _opaque_CocoaController {

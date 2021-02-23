@@ -41,9 +41,9 @@ extension AnyPresentationView: _opaque_View {
 
 extension AnyPresentationView: ModalPresentationView {
     public var preferredSourceViewName: ViewName? {
-        (base as? _opaque_ModalPresentationView)?.preferredSourceViewName
+        (base as? _opaque_ModalPresentationView)?.preferredSourceViewName ?? name
     }
-    
+
     public var presentationStyle: ModalPresentationStyle {
         modalPresentationStyle
     }
