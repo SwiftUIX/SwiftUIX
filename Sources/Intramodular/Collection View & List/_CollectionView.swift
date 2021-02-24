@@ -63,7 +63,9 @@ struct _CollectionView<
         
         if let _collectionViewProxy = context.environment._collectionViewProxy {
             if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
-                _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+                DispatchQueue.main.async {
+                    _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+                }
             }
         }
         

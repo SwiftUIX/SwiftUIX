@@ -67,7 +67,7 @@ class UIHostingCollectionViewCell<
         }
     }
     
-    var state: State? {
+    var state: State {
         .init(
             isFocused: isFocused,
             isHighlighted: isHighlighted,
