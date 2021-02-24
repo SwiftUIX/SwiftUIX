@@ -10,6 +10,7 @@ import SwiftUI
 protocol _opaque_UIHostingCollectionViewController: UIViewController {
     func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
     func select<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
+    func deselect<ID: Hashable>(_ id: ID)
 }
 
 extension UIHostingCollectionViewController {
@@ -34,6 +35,17 @@ extension UIHostingCollectionViewController {
             at: indexPath,
             animated: true,
             scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func deselect<ID: Hashable>(_ id: ID) {
+        guard let indexPath = indexPath(for: id) else {
+            return
+        }
+        
+        collectionView.deselectItem(
+            at: indexPath,
+            animated: true
         )
     }
     

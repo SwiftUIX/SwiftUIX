@@ -57,7 +57,7 @@ extension EnvironmentValues {
     private struct IsCellFocused: EnvironmentKey {
         static let defaultValue = false
     }
-
+    
     private struct IsCellHighlighted: EnvironmentKey {
         static let defaultValue = false
     }
@@ -81,7 +81,7 @@ extension EnvironmentValues {
             self[IsCellHighlighted] = newValue
         }
     }
-
+    
     public var isCellSelected: Bool {
         get {
             self[IsCellSelected]

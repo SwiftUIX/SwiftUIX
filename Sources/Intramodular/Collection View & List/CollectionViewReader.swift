@@ -18,6 +18,10 @@ public struct CollectionViewProxy {
     public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         hostingCollectionViewController?.select(id, anchor: anchor)
     }
+    
+    public func deselect<ID: Hashable>(_ id: ID) {
+        hostingCollectionViewController?.deselect(id)
+    }
 }
 
 public struct CollectionViewReader<Content: View>: View {
