@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CollectionViewProxy {
     weak var hostingCollectionViewController: _opaque_UIHostingCollectionViewController?
