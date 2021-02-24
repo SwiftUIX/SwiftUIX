@@ -81,6 +81,10 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
+    public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
+        then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
+    }
+    
     @available(tvOS, unavailable)
     public func onDelete(perform action: ((IndexSet) -> Void)?) -> Self {
         then({ $0._dynamicViewContentTraitValues.onDelete = action })

@@ -43,14 +43,44 @@ public struct _NamedViewDescription: Equatable {
 
 extension _NamedViewDescription {
     struct PreferenceKey: SwiftUI.PreferenceKey {
-        typealias Value = [ViewName: _NamedViewDescription]
+        struct Value: Equatable, Sequence {
+            typealias Element = _NamedViewDescription
+            
+            var allAsArray: [Element]
+            var allAsDictionary: [ViewName: Element]
+            
+            var first: Element? {
+                allAsArray.first
+            }
+            
+            var last: Element? {
+                allAsArray.last
+            }
+            
+            init(_ element: Element) {
+                self.allAsArray = [element]
+                self.allAsDictionary = [element.name: element]
+            }
+            
+            init() {
+                self.allAsArray = []
+                self.allAsDictionary = [:]
+            }
+            
+            func makeIterator() -> AnyIterator<Element> {
+                .init(allAsArray.makeIterator())
+            }
+        }
         
         static var defaultValue: Value {
-            [:]
+            Value()
         }
         
         static func reduce(value: inout Value, nextValue: () -> Value) {
-            value.merge(nextValue(), uniquingKeysWith: { lhs, rhs in lhs })
+            let nextValue = nextValue()
+            
+            value.allAsArray.append(contentsOf: nextValue.allAsArray)
+            value.allAsDictionary.merge(nextValue.allAsDictionary, uniquingKeysWith: { lhs, rhs in lhs })
         }
     }
 }

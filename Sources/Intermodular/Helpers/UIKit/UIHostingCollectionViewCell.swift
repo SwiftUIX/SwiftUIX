@@ -7,63 +7,115 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-protocol _opaque_UIHostingCollectionViewCell {
-    
-}
-
-public class UIHostingCollectionViewCell<
-    ItemType,
-    ItemIdentifierType: Hashable,
-    Content: View
->: UICollectionViewCell, _opaque_UIHostingCollectionViewCell {
-    typealias CellContentHostingControllerType = UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType, Content>
-    
-    struct State {
-        var isHighlighted: Bool
-        var isSelected: Bool
-    }
-    
-    struct Configuration {
-        private struct ID: Hashable {
+extension UIHostingCollectionViewCell {
+    struct Configuration: Identifiable {
+        struct ID: Hashable {
             let item: ItemIdentifierType
             let section: AnyHashable
         }
         
         let item: ItemType
         let itemIdentifier: ItemIdentifierType
-        let sectionIdentifier: AnyHashable
+        let sectionIdentifier: SectionIdentifierType
         let indexPath: IndexPath
         let makeContent: (ItemType) -> Content
         let maximumSize: OptionalDimensions?
         
-        var id: some Hashable {
-            ID(item: itemIdentifier, section: sectionIdentifier)
+        var id: ID {
+            .init(item: itemIdentifier, section: sectionIdentifier)
         }
     }
+    
+    struct State: Hashable {
+        let isFocused: Bool
+        let isHighlighted: Bool
+        let isSelected: Bool
+    }
+    
+    struct PreferenceValues {
+        var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
+        var _namedViewDescription: _NamedViewDescription?
+        
+        var preferredCellLayoutAttributesSize: CGSize?
+    }
+}
+
+class UIHostingCollectionViewCell<
+    SectionType,
+    SectionIdentifierType: Hashable,
+    ItemType,
+    ItemIdentifierType: Hashable,
+    SectionHeaderContent: View,
+    SectionFooterContent: View,
+    Content: View
+>: UICollectionViewCell {
+    typealias ParentViewControllerType = UIHostingCollectionViewController<
+        SectionType,
+        SectionIdentifierType,
+        ItemType,
+        ItemIdentifierType,
+        SectionHeaderContent,
+        SectionFooterContent,
+        Content
+    >
     
     var configuration: Configuration? {
         didSet {
             if oldValue?.id != configuration?.id {
-                cellPreferences = .init()
-                preferredLayoutAttributesSize = nil
+                preferenceValues = .init()
             }
         }
     }
     
-    private var contentHostingController: CellContentHostingControllerType?
-    
-    private var cellPreferences = _CollectionOrListCellPreferences()
-    private var preferredLayoutAttributesSize: CGSize?
-    
-    public var isHighlightable: Bool {
-        cellPreferences.isHighlightable
+    var state: State? {
+        .init(
+            isFocused: isFocused,
+            isHighlighted: isHighlighted,
+            isSelected: isSelected
+        )
     }
     
-    public var isReorderable: Bool {
-        cellPreferences.isReorderable
+    private var contentHostingController: ContentHostingController?
+    private var parentViewController: ParentViewControllerType?
+    private var preferenceValues = PreferenceValues() {
+        didSet {
+            guard let configuration = configuration, let parentViewController = parentViewController else {
+                return
+            }
+            
+            parentViewController.cellMetadataCache[section: configuration.sectionIdentifier, item: configuration.itemIdentifier] = preferenceValues
+        }
     }
-
-    override public init(frame: CGRect) {
+    
+    override var isHighlighted: Bool {
+        didSet {
+            update()
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            update()
+        }
+    }
+    
+    var isFocusable: Bool {
+        preferenceValues._collectionOrListCellPreferences.isFocusable
+    }
+    
+    var isHighlightable: Bool {
+        preferenceValues._collectionOrListCellPreferences.isHighlightable
+    }
+    
+    var isReorderable: Bool {
+        preferenceValues._collectionOrListCellPreferences.isReorderable
+    }
+    
+    var isSelectable: Bool {
+        preferenceValues._collectionOrListCellPreferences.isSelectable
+    }
+    
+    override init(frame: CGRect) {
         super.init(frame: frame)
         
         backgroundColor = .clear
@@ -91,7 +143,7 @@ public class UIHostingCollectionViewCell<
         }
     }
     
-    override public func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+    override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
         systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: .required,
@@ -99,7 +151,7 @@ public class UIHostingCollectionViewCell<
         )
     }
     
-    override public func systemLayoutSizeFitting(
+    override func systemLayoutSizeFitting(
         _ targetSize: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
@@ -111,26 +163,26 @@ public class UIHostingCollectionViewCell<
         ) ?? CGSize(width: 1, height: 1)
     }
     
-    override public func sizeThatFits(_ size: CGSize) -> CGSize {
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
         systemLayoutSizeFitting(size)
     }
     
-    override public func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
         
         isHighlighted = false
         isSelected = false
     }
     
-    override public func preferredLayoutAttributesFitting(
+    override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        if let preferredLayoutAttributesSize = preferredLayoutAttributesSize {
+        if let preferredLayoutAttributesSize = preferenceValues.preferredCellLayoutAttributesSize {
             layoutAttributes.size = preferredLayoutAttributesSize
         } else {
             layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
             
-            preferredLayoutAttributesSize = layoutAttributes.size
+            preferenceValues.preferredCellLayoutAttributesSize = layoutAttributes.size
         }
         
         return layoutAttributes
@@ -138,11 +190,15 @@ public class UIHostingCollectionViewCell<
 }
 
 extension UIHostingCollectionViewCell {
-    func cellWillDisplay(inParent parentViewController: UIViewController?, isPrototype: Bool = false) {
+    func cellWillDisplay(inParent parentViewController: ParentViewControllerType?, isPrototype: Bool = false) {
+        defer {
+            self.parentViewController = parentViewController
+        }
+        
         if let contentHostingController = contentHostingController {
             contentHostingController.update()
         } else {
-            contentHostingController = UICollectionViewCellContentHostingController(base: self)
+            contentHostingController = ContentHostingController(base: self)
         }
         
         if let parentViewController = parentViewController {
@@ -155,90 +211,30 @@ extension UIHostingCollectionViewCell {
     }
     
     func cellDidEndDisplaying() {
+        defer {
+            self.parentViewController = nil
+        }
+        
         contentHostingController?.move(toParent: nil, ofCell: self)
+    }
+    
+    func update() {
+        contentHostingController?.update()
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-extension String {
-    static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
-}
-
-final class UICollectionViewCellContentHostingController<ItemType, ItemIdentifierType: Hashable, Content: View>: CocoaHostingController<UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>.RootView> {
-    typealias UIHostingCollectionViewCellType = UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>
-    
-    weak var base: UIHostingCollectionViewCellType?
-    
-    init(base: UIHostingCollectionViewCellType?) {
-        self.base = base
-        
-        super.init(mainView: nil)
-        
-        update()
-    }
-    
-    @objc required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public func systemLayoutSizeFitting(
-        _ targetSize: CGSize
-    ) -> CGSize {
-        _fixed_sizeThatFits(
-            in: .init(targetSize),
-            maximumSize: base?.configuration?.maximumSize ?? nil
-        )
-    }
-    
-    public func systemLayoutSizeFitting(
-        _ targetSize: CGSize,
-        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
-        verticalFittingPriority: UILayoutPriority
-    ) -> CGSize {
-        _fixed_sizeThatFits(
-            in: .init(targetSize),
-            maximumSize: base?.configuration?.maximumSize ?? nil
-        )
-    }
-    
-    func move(toParent parent: UIViewController?, ofCell cell: UIHostingCollectionViewCell<ItemType, ItemIdentifierType, Content>) {
-        if let parent = parent {
-            if let existingParent = self.parent, existingParent !== parent {
-                move(toParent: nil, ofCell: cell)
-            }
-            
-            if self.parent == nil {
-                self.willMove(toParent: parent)
-                parent.addChild(self)
-                cell.contentView.addSubview(view)
-                view.frame = cell.contentView.bounds
-                didMove(toParent: parent)
-            } else {
-                assertionFailure()
-            }
-        } else {
-            willMove(toParent: nil)
-            view.removeFromSuperview()
-            removeFromParent()
-        }
-    }
-    
-    func update() {
-        rootView.content = .init(base: base)
-        
-        view.setNeedsDisplay()
-    }
-}
-
 extension UIHostingCollectionViewCell {
-    public struct RootView: ExpressibleByNilLiteral, View {
+    private struct RootView: ExpressibleByNilLiteral, View {
         var configuration: Configuration?
-        var cellPreferences: Binding<_CollectionOrListCellPreferences>?
+        var state: State?
+        var preferenceValues: Binding<PreferenceValues>?
         
         init(base: UIHostingCollectionViewCell?) {
             configuration = base?.configuration
-            cellPreferences = .init(get: { [weak base] in base?.cellPreferences ?? .init() }, set: { [weak base] in base?.cellPreferences = $0 })
+            state = base?.state
+            preferenceValues = .init(get: { [weak base] in base?.preferenceValues ?? .init() }, set: { [weak base] in base?.preferenceValues = $0 })
         }
         
         public init(nilLiteral: ()) {
@@ -246,15 +242,87 @@ extension UIHostingCollectionViewCell {
         }
         
         public var body: some View {
-            if let configuration = configuration {
+            if let configuration = configuration, let state = state, let preferenceValues = preferenceValues {
                 configuration
                     .makeContent(configuration.item)
+                    .environment(\.isCellFocused, state.isFocused)
+                    .environment(\.isCellHighlighted, state.isHighlighted)
+                    .environment(\.isCellSelected, state.isSelected)
                     .edgesIgnoringSafeArea(.all)
-                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { cellPreferences?.wrappedValue = $0 })
+                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { preferenceValues._collectionOrListCellPreferences.wrappedValue = $0 })
+                    .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: { preferenceValues._namedViewDescription.wrappedValue = $0.last })
                     .id(configuration.id)
             }
         }
     }
+    
+    private class ContentHostingController: CocoaHostingController<RootView> {
+        weak var base: UIHostingCollectionViewCell?
+        
+        init(base: UIHostingCollectionViewCell?) {
+            self.base = base
+            
+            super.init(mainView: nil)
+            
+            update()
+        }
+        
+        @objc required public init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        public func systemLayoutSizeFitting(
+            _ targetSize: CGSize
+        ) -> CGSize {
+            _fixed_sizeThatFits(
+                in: .init(targetSize),
+                maximumSize: base?.configuration?.maximumSize ?? nil
+            )
+        }
+        
+        public func systemLayoutSizeFitting(
+            _ targetSize: CGSize,
+            withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+            verticalFittingPriority: UILayoutPriority
+        ) -> CGSize {
+            _fixed_sizeThatFits(
+                in: .init(targetSize),
+                maximumSize: base?.configuration?.maximumSize ?? nil
+            )
+        }
+        
+        func move(toParent parent: _opaque_UIHostingCollectionViewController?, ofCell cell: UIHostingCollectionViewCell) {
+            if let parent = parent {
+                if let existingParent = self.parent, existingParent !== parent {
+                    move(toParent: nil, ofCell: cell)
+                }
+                
+                if self.parent == nil {
+                    self.willMove(toParent: parent)
+                    parent.addChild(self)
+                    cell.contentView.addSubview(view)
+                    view.frame = cell.contentView.bounds
+                    didMove(toParent: parent)
+                } else {
+                    assertionFailure()
+                }
+            } else {
+                willMove(toParent: nil)
+                view.removeFromSuperview()
+                removeFromParent()
+            }
+        }
+        
+        func update() {
+            rootView.content = .init(base: base)
+            
+            view.setNeedsDisplay()
+        }
+    }
+}
+
+extension String {
+    static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
 }
 
 #endif

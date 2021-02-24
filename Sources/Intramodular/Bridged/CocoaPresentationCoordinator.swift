@@ -218,8 +218,8 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.coordinator?.viewController as? _opaque_CocoaController {
-                    for (name, description) in $0 {
-                        parent._setNamedViewDescription(description, for: name)
+                    for description in $0 {
+                        parent._setNamedViewDescription(description, for: description.name)
                     }
                 }
             })

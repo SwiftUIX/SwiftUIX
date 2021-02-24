@@ -8,10 +8,10 @@ import SwiftUI
 /// An internal structure used to manage cell preferences for `CocoaList` and `CollectionView`.
 @usableFromInline
 struct _CollectionOrListCellPreferences: Equatable {
-    var estimatedCellSize: CGSize? = nil
+    var isFocusable = true
     var isHighlightable = true
     var isReorderable = true
-    var allowsCustomLayoutAttributeSizeOverride: Bool = false
+    var isSelectable = true
 }
 
 extension _CollectionOrListCellPreferences {
@@ -26,21 +26,67 @@ extension _CollectionOrListCellPreferences {
 }
 
 extension View {
-    public func customResizableCollectionViewCell() -> some View {
+    public func cellFocusable(_ focusable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
-            value.allowsCustomLayoutAttributeSizeOverride = true
+            value.isFocusable = focusable
         }
     }
     
-    public func isCellReorderable(_ reorderable: Bool) -> some View {
+    public func cellHighlightable(_ highlightable: Bool) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            value.isHighlightable = highlightable
+        }
+    }
+    
+    public func cellReorderable(_ reorderable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isReorderable = reorderable
         }
     }
     
-    public func isCellHighlightable(_ highlightable: Bool) -> some View {
+    public func cellSelectable(_ selectable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
-            value.isHighlightable = highlightable
+            value.isSelectable = selectable
+        }
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension EnvironmentValues {
+    private struct IsCellFocused: EnvironmentKey {
+        static let defaultValue = false
+    }
+
+    private struct IsCellHighlighted: EnvironmentKey {
+        static let defaultValue = false
+    }
+    
+    private struct IsCellSelected: EnvironmentKey {
+        static let defaultValue = false
+    }
+    
+    public var isCellFocused: Bool {
+        get {
+            self[IsCellFocused]
+        } set {
+            self[IsCellFocused] = newValue
+        }
+    }
+    
+    public var isCellHighlighted: Bool {
+        get {
+            self[IsCellHighlighted]
+        } set {
+            self[IsCellHighlighted] = newValue
+        }
+    }
+
+    public var isCellSelected: Bool {
+        get {
+            self[IsCellSelected]
+        } set {
+            self[IsCellSelected] = newValue
         }
     }
 }

@@ -19,20 +19,22 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
     var body: some View {
         content
             .environment(\._name, name)
-            .background(GeometryReader { geometry in
-                ZeroSizeView().anchorPreference(
-                    key: _NamedViewDescription.PreferenceKey.self,
-                    value: .bounds
-                ) {
-                    [
-                        name: .init(
-                            name: name,
-                            bounds: $0,
-                            globalBounds: geometry.frame(in: .global)
+            .background(
+                GeometryReader { geometry in
+                    ZeroSizeView().anchorPreference(
+                        key: _NamedViewDescription.PreferenceKey.self,
+                        value: .bounds
+                    ) {
+                        .init(
+                            _NamedViewDescription(
+                                name: name,
+                                bounds: $0,
+                                globalBounds: geometry.frame(in: .global)
+                            )
                         )
-                    ]
+                    }
                 }
-            })
+            )
     }
 }
 

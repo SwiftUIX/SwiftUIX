@@ -61,6 +61,12 @@ struct _CollectionView<
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
         
+        if let _collectionViewProxy = context.environment._collectionViewProxy {
+            if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
+                _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+            }
+        }
+        
         if uiViewController.collectionViewLayout.hashValue != context.environment.collectionViewLayout.hashValue {
             uiViewController.collectionViewLayout = context.environment.collectionViewLayout
         }
@@ -116,6 +122,24 @@ extension _CollectionView where
             sectionFooter: sectionFooter,
             rowContent: rowContent
         )
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension CollectionViewProxy {
+    fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        static let defaultValue: Binding<CollectionViewProxy>? = nil
+    }
+}
+
+extension EnvironmentValues {
+    var _collectionViewProxy: Binding<CollectionViewProxy>? {
+        get {
+            self[CollectionViewProxy.EnvironmentKey]
+        } set {
+            self[CollectionViewProxy.EnvironmentKey] = newValue
+        }
     }
 }
 
