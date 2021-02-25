@@ -36,6 +36,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var returnKeyType: UIReturnKeyType?
         var textColor: UIColor?
         var textContentType: UITextContentType?
+        var secureTextEntry: Bool?
     }
     
     @Environment(\.font) var font
@@ -214,6 +215,10 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
             uiView.textContentType = nil
         }
         
+        if let secureTextEntry = configuration.secureTextEntry {
+            uiView.isSecureTextEntry = secureTextEntry
+        }
+        
         uiView.text = text.wrappedValue
         uiView.textAlignment = .init(context.environment.multilineTextAlignment)
         
@@ -356,6 +361,10 @@ extension CocoaTextField {
     
     public func textContentType(_ textContentType: UITextContentType?) -> Self {
         then({ $0.configuration.textContentType = textContentType })
+    }
+    
+    public func secureTextEntry(_ isSecureTextEntry: Bool) -> Self {
+        then({ $0.configuration.secureTextEntry = isSecureTextEntry })
     }
 }
 
