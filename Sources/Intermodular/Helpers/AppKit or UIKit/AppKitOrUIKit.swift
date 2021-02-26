@@ -10,6 +10,9 @@ import SwiftUI
 import UIKit
 
 public typealias AppKitOrUIKitApplication = UIApplication
+public typealias AppKitOrUIKitApplicationDelegate = UIApplicationDelegate
+@available(iOS 14.0, tvOS 14.0, *)
+public typealias AppKitOrUIKitApplicationDelegateAdapter = UIApplicationDelegateAdaptor
 public typealias AppKitOrUIKitBezierPath = UIBezierPath
 public typealias AppKitOrUIKitButton = UIButton
 public typealias AppKitOrUIKitColor = UIColor
@@ -40,6 +43,9 @@ public typealias AppKitOrUIKitWindow = UIWindow
 import AppKit
 
 public typealias AppKitOrUIKitApplication = NSApplication
+public typealias AppKitOrUIKitApplicationDelegate = NSApplicationDelegate
+@available(macOS 11, *)
+public typealias AppKitOrUIKitApplicationDelegateAdapter = NSApplicationDelegateAdaptor
 public typealias AppKitOrUIKitBezierPath = NSBezierPath
 public typealias AppKitOrUIKitButton = NSButton
 public typealias AppKitOrUIKitColor = NSColor
