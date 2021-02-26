@@ -16,6 +16,16 @@ final class ReferenceBox<T> {
     }
 }
 
+final class WeakReferenceBox<T: AnyObject> {
+    @usableFromInline
+    weak var value: T?
+    
+    @usableFromInline
+    init(_ value: T?) {
+        self.value = value
+    }
+}
+
 @usableFromInline
 final class ObservableReferenceBox<T>: ObservableObject {
     @usableFromInline

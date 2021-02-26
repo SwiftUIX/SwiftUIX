@@ -35,20 +35,22 @@ extension UserInterfaceOrientation {
     }
 }
 
-#if os(iOS)
-
 extension UserInterfaceOrientation {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
     public static var current: UserInterfaceOrientation {
+        #if os(iOS)
         guard let orientation = UIApplication.shared.firstKeyWindow?.windowScene?.interfaceOrientation else {
             return .portrait
         }
         
         return .init(orientation)
+        #else
+        return .portrait
+        #endif
     }
     
+    #if os(iOS)
     public init(_ orientation: UIInterfaceOrientation) {
         switch orientation {
             case .portrait:
@@ -65,9 +67,8 @@ extension UserInterfaceOrientation {
                 self = .unrecognized
         }
     }
+    #endif
 }
-
-#endif
 
 // MARK: - Auxiliary Implementation -
 

@@ -11,7 +11,7 @@ extension UIHostingCollectionViewCell {
     struct Configuration: Identifiable {
         struct ID: Hashable {
             let item: ItemIdentifierType
-            let section: AnyHashable
+            let section: SectionIdentifierType
         }
         
         let item: ItemType

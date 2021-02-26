@@ -81,18 +81,57 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
-    public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
-        then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
-    }
-    
+    /// Sets the deletion action for the dynamic view.
+    ///
+    /// - Parameter action: The action that you want SwiftUI to perform when
+    ///   elements in the view are deleted. SwiftUI passes a set of indices to the
+    ///   closure that's relative to the dynamic view's underlying collection of
+    ///   data.
+    ///
+    /// - Returns: A view that calls `action` when elements are deleted from the
+    ///   original view.
     @available(tvOS, unavailable)
     public func onDelete(perform action: ((IndexSet) -> Void)?) -> Self {
         then({ $0._dynamicViewContentTraitValues.onDelete = action })
     }
     
+    /// Sets the move action for the dynamic view.
+    ///
+    /// - Parameters:
+    ///   - action: A closure that SwiftUI invokes when elements in the dynamic
+    ///     view are moved. The closure takes two arguments that represent the
+    ///     offset relative to the dynamic view's underlying collection of data.
+    ///     Pass `nil` to disable the ability to move items.
+    ///
+    /// - Returns: A view that calls `action` when elements are moved within the
+    ///   original view.
     @available(tvOS, unavailable)
     public func onMove(perform action: ((IndexSet, Int) -> Void)?) -> Self {
         then({ $0._dynamicViewContentTraitValues.onMove = action })
+    }
+    
+    /// Sets the move action (if available) for the dynamic view.
+    ///
+    /// - Parameters:
+    ///   - action: A closure that SwiftUI invokes when elements in the dynamic
+    ///     view are moved. The closure takes two arguments that represent the
+    ///     offset relative to the dynamic view's underlying collection of data.
+    ///     Pass `nil` to disable the ability to move items.
+    ///
+    /// - Returns: A view that calls `action` when elements are moved within the
+    ///   original view.
+    public func onMoveIfAvailable(perform action: ((IndexSet, Int) -> Void)?) -> Self {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return onMove(perform: action)
+        #else
+        return self
+        #endif
+    }
+}
+
+extension CollectionView {
+    public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
+        then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
     }
 }
 
@@ -100,10 +139,8 @@ extension CollectionView {
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0._scrollViewConfiguration.onOffsetChange = body })
     }
-}
-
-extension CollectionView {
-    public func disableDifferenceAnimation(_ disableAnimatingDifferences: Bool) -> Self {
+    
+    public func disableAnimatingDifferences(_ disableAnimatingDifferences: Bool) -> Self {
         then({ $0._collectionViewConfiguration.disableAnimatingDifferences = disableAnimatingDifferences })
     }
     

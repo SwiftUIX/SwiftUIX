@@ -136,6 +136,7 @@ extension CollectionViewProxy {
 }
 
 extension EnvironmentValues {
+    @usableFromInline
     var _collectionViewProxy: Binding<CollectionViewProxy>? {
         get {
             self[CollectionViewProxy.EnvironmentKey]

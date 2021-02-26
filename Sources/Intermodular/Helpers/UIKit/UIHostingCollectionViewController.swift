@@ -9,49 +9,17 @@ import SwiftUI
 
 protocol _opaque_UIHostingCollectionViewController: UIViewController {
     func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
+    func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint?)
+    func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint?)
+    
     func select<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
+    func select<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint?)
+    func select<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint?)
+    
+    func selectNextItem(anchor: UnitPoint?)
+    func selectPreviousItem(anchor: UnitPoint?)
+    
     func deselect<ID: Hashable>(_ id: ID)
-}
-
-extension UIHostingCollectionViewController {
-    public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
-        guard let indexPath = cellMetadataCache.firstIndexPath(for: id) else {
-            return
-        }
-        
-        collectionView.scrollToItem(
-            at: indexPath,
-            at: .init(anchor),
-            animated: true
-        )
-    }
-    
-    public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
-        guard let indexPath = indexPath(for: id) else {
-            return
-        }
-        
-        collectionView.selectItem(
-            at: indexPath,
-            animated: true,
-            scrollPosition: .init(anchor)
-        )
-    }
-    
-    public func deselect<ID: Hashable>(_ id: ID) {
-        guard let indexPath = indexPath(for: id) else {
-            return
-        }
-        
-        collectionView.deselectItem(
-            at: indexPath,
-            animated: true
-        )
-    }
-    
-    private func indexPath<ID: Hashable>(for id: ID) -> IndexPath? {
-        cellMetadataCache.firstIndexPath(for: id)
-    }
 }
 
 public final class UIHostingCollectionViewController<
@@ -558,6 +526,161 @@ extension UIHostingCollectionViewController {
     }
 }
 
+// MARK: - Extensions -
+
+extension UIHostingCollectionViewController {
+    public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = cellMetadataCache.firstIndexPath(for: id) else {
+            return
+        }
+        
+        collectionView.scrollToItem(
+            at: indexPath,
+            at: .init(anchor),
+            animated: true
+        )
+    }
+    
+    public func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = cellMetadataCache.firstIndexPath(for: id).map(collectionView.indexPath(before:)), collectionView.contains(indexPath) else {
+            return
+        }
+        
+        collectionView.scrollToItem(
+            at: indexPath,
+            at: .init(anchor),
+            animated: true
+        )
+    }
+    
+    public func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = cellMetadataCache.firstIndexPath(for: id).map(collectionView.indexPath(after:)), collectionView.contains(indexPath) else {
+            return
+        }
+        
+        collectionView.scrollToItem(
+            at: indexPath,
+            at: .init(anchor),
+            animated: true
+        )
+    }
+    
+    public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = indexPath(for: id) else {
+            return
+        }
+        
+        collectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func select<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = cellMetadataCache.firstIndexPath(for: id).map(collectionView.indexPath(before:)), collectionView.contains(indexPath) else {
+            return
+        }
+        
+        collectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func select<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
+        guard let indexPath = cellMetadataCache.firstIndexPath(for: id).map(collectionView.indexPath(after:)), collectionView.contains(indexPath) else {
+            return
+        }
+        
+        collectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func selectNextItem(anchor: UnitPoint?) {
+        guard !configuration.allowsMultipleSelection else {
+            assertionFailure("selectNextItem(anchor:) is unavailable when multiple selection is allowed.")
+            
+            return
+        }
+        
+        guard let indexPathForSelectedItem = collectionView.indexPathsForSelectedItems?.first else {
+            if let indexPath = collectionView.indexPathsForVisibleItems.sorted().first {
+                collectionView.selectItem(
+                    at: indexPath,
+                    animated: true,
+                    scrollPosition: .init(anchor)
+                )
+            }
+            
+            return
+        }
+        
+        let indexPath = collectionView.indexPath(after: indexPathForSelectedItem)
+        
+        guard collectionView.contains(indexPath) else {
+            return collectionView.deselectItem(at: indexPathForSelectedItem, animated: true)
+        }
+        
+        collectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func selectPreviousItem(anchor: UnitPoint?) {
+        guard !configuration.allowsMultipleSelection else {
+            assertionFailure("selectPreviousItem(anchor:) is unavailable when multiple selection is allowed.")
+            
+            return
+        }
+        
+        guard let indexPathForSelectedItem = collectionView.indexPathsForSelectedItems?.first else {
+            if let indexPath = collectionView.indexPathsForVisibleItems.sorted().last {
+                collectionView.selectItem(
+                    at: indexPath,
+                    animated: true,
+                    scrollPosition: .init(anchor)
+                )
+            }
+            
+            return
+        }
+        
+        let indexPath = collectionView.indexPath(before: indexPathForSelectedItem)
+        
+        guard collectionView.contains(indexPath) else {
+            return collectionView.deselectItem(at: indexPathForSelectedItem, animated: true)
+        }
+        
+        collectionView.selectItem(
+            at: indexPath,
+            animated: true,
+            scrollPosition: .init(anchor)
+        )
+    }
+    
+    public func deselect<ID: Hashable>(_ id: ID) {
+        guard let indexPath = indexPath(for: id) else {
+            return
+        }
+        
+        collectionView.deselectItem(
+            at: indexPath,
+            animated: true
+        )
+    }
+    
+    private func indexPath<ID: Hashable>(for id: ID) -> IndexPath? {
+        cellMetadataCache.firstIndexPath(for: id)
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewController {
@@ -569,7 +692,7 @@ extension UIHostingCollectionViewController {
         
         private var indexPathBasedContentSizeCache: [IndexPath: CGSize] = [:]
         private var identifierToIndexPathMap: [SectionIdentifierType: [ItemIdentifierType: IndexPath]] = [:]
-        private var indexPathToIdentifierMap: [IndexPath: (SectionIdentifierType, ItemIdentifierType)] = [:]
+        private var indexPathToIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
         private let prototypeCell = UICollectionViewCellType()
@@ -586,6 +709,10 @@ extension UIHostingCollectionViewController {
             } else {
                 return nil
             }
+        }
+        
+        func identifier(for indexPath: IndexPath) -> UICollectionViewCellType.Configuration.ID? {
+            indexPathToIdentifierMap[indexPath]
         }
         
         subscript(
@@ -652,7 +779,7 @@ extension UIHostingCollectionViewController {
                 identifierBasedContentSizeCache[cellConfiguration.sectionIdentifier, default: [:]][cellConfiguration.itemIdentifier] = size
                 
                 indexPathBasedContentSizeCache[cellConfiguration.indexPath] = size
-                indexPathToIdentifierMap[cellConfiguration.indexPath] = (cellConfiguration.sectionIdentifier, cellConfiguration.itemIdentifier)
+                indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
                 identifierToIndexPathMap[cellConfiguration.sectionIdentifier, default: [:]][cellConfiguration.itemIdentifier] = indexPath
                 itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
             }
@@ -661,20 +788,20 @@ extension UIHostingCollectionViewController {
         }
         
         func invalidateCachedContentSize(forIndexPath indexPath: IndexPath) {
-            guard let (sectionIdentifier, itemID) = indexPathToIdentifierMap[indexPath] else {
+            guard let id = indexPathToIdentifierMap[indexPath] else {
                 return
             }
             
-            identifierBasedContentSizeCache[sectionIdentifier, default: [:]][itemID] = nil
+            identifierBasedContentSizeCache[id.section, default: [:]][id.item] = nil
             indexPathBasedContentSizeCache[indexPath] = nil
         }
         
         func invalidateIndexPath(_ indexPath: IndexPath) {
             invalidateCachedContentSize(forIndexPath: indexPath)
             
-            if let (sectionIdentifier, itemIdentifier) = indexPathToIdentifierMap[indexPath] {
-                itemIdentifierHashToIndexPathMap[itemIdentifier.hashValue] = nil
-                identifierToIndexPathMap[sectionIdentifier, default: [:]][itemIdentifier] = nil
+            if let id = indexPathToIdentifierMap[indexPath] {
+                itemIdentifierHashToIndexPathMap[id.item.hashValue] = nil
+                identifierToIndexPathMap[id.section, default: [:]][id.item] = nil
                 indexPathToIdentifierMap[indexPath] = nil
             }
         }
@@ -770,7 +897,25 @@ fileprivate extension NSDiffableDataSourceSnapshot {
     }
 }
 
-extension UICollectionView.ScrollPosition {
+fileprivate extension UICollectionView {
+    func contains(_ indexPath: IndexPath) -> Bool {
+        guard indexPath.section < numberOfSections, indexPath.row >= 0, indexPath.row < numberOfItems(inSection: indexPath.section) else {
+            return false
+        }
+        
+        return true
+    }
+    
+    func indexPath(before indexPath: IndexPath) -> IndexPath {
+        IndexPath(row: indexPath.row - 1, section: indexPath.section)
+    }
+    
+    func indexPath(after indexPath: IndexPath) -> IndexPath {
+        IndexPath(row: indexPath.row + 1, section: indexPath.section)
+    }
+}
+
+fileprivate extension UICollectionView.ScrollPosition {
     init(_ unitPoint: UnitPoint?) {
         switch (unitPoint ?? .zero) {
             case .zero:
