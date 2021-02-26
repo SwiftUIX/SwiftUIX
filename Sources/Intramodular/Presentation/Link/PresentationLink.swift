@@ -18,6 +18,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @Environment(\.modalPresentationStyle) var modalPresentationStyle
     @usableFromInline
     @Environment(\.presenter) var presenter
+    @usableFromInline
+    @Environment(\.userInterfaceIdiom) var userInterfaceIdiom
     
     @usableFromInline
     let _destination: Destination
@@ -51,7 +53,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @inlinable
     public var body: some View {
         Group {
-            if _isPresented == nil && presenter != nil {
+            if _isPresented == nil && presenter != nil && userInterfaceIdiom != .mac {
                 Button(action: {
                     self.presenter!.present(
                         AnyModalPresentation(
