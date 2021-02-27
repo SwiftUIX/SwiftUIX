@@ -61,9 +61,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController {
     }
     
     var cyclesPages: Bool = false
-    
-    var isInitialPageIndexApplied: Bool = false
-    
+        
     var currentPageIndex: AnyIndex? {
         get {
             guard let currentViewController = viewControllers?.first as? PageContentController else {

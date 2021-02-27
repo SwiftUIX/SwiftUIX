@@ -13,20 +13,19 @@ import UIKit
 struct _PaginationView<Page: View> {
     @usableFromInline
     let content: AnyForEach<Page>
+    
     @usableFromInline
-    let axis: Axis
-    @usableFromInline
-    let transitionStyle: UIPageViewController.TransitionStyle
-    @usableFromInline
-    let showsIndicators: Bool
-    @usableFromInline
-    let pageIndicatorAlignment: Alignment
-    @usableFromInline
-    let interPageSpacing: CGFloat?
-    @usableFromInline
-    let cyclesPages: Bool
-    @usableFromInline
-    let initialPageIndex: Int?
+    struct Configuration {
+        let axis: Axis
+        let transitionStyle: UIPageViewController.TransitionStyle
+        let showsIndicators: Bool
+        let pageIndicatorAlignment: Alignment
+        let interPageSpacing: CGFloat?
+        let cyclesPages: Bool
+        let initialPageIndex: Int?
+    }
+    
+    let configuration: Configuration
     
     @usableFromInline
     @Binding var currentPageIndex: Int
@@ -37,24 +36,12 @@ struct _PaginationView<Page: View> {
     @usableFromInline
     init(
         content: AnyForEach<Page>,
-        axis: Axis,
-        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
-        showsIndicators: Bool,
-        pageIndicatorAlignment: Alignment,
-        interPageSpacing: CGFloat?,
-        cyclesPages: Bool,
-        initialPageIndex: Int?,
+        configuration: Configuration,
         currentPageIndex: Binding<Int>,
         progressionController: Binding<ProgressionController?>
     ) {
         self.content = content
-        self.axis = axis
-        self.transitionStyle = transitionStyle
-        self.showsIndicators = showsIndicators
-        self.pageIndicatorAlignment = pageIndicatorAlignment
-        self.interPageSpacing = interPageSpacing
-        self.cyclesPages = cyclesPages
-        self.initialPageIndex = initialPageIndex
+        self.configuration = configuration
         self._currentPageIndex = currentPageIndex
         self._progressionController = progressionController
     }
@@ -69,9 +56,9 @@ extension _PaginationView: UIViewControllerRepresentable {
     @usableFromInline
     func makeUIViewController(context: Context) -> UIViewControllerType {
         let uiViewController = UIViewControllerType(
-            transitionStyle: transitionStyle,
-            navigationOrientation: axis == .horizontal ? .horizontal : .vertical,
-            options: interPageSpacing.map({ [.interPageSpacing: $0 as NSNumber] })
+            transitionStyle: configuration.transitionStyle,
+            navigationOrientation: configuration.axis == .horizontal ? .horizontal : .vertical,
+            options: configuration.interPageSpacing.map({ [.interPageSpacing: $0 as NSNumber] })
         )
         
         #if os(tvOS)
@@ -87,12 +74,12 @@ extension _PaginationView: UIViewControllerRepresentable {
             return uiViewController
         }
         
-        if initialPageIndex == nil {
-            uiViewController.isInitialPageIndexApplied = true
+        if configuration.initialPageIndex == nil {
+            context.coordinator.isInitialPageIndexApplied = true
         }
         
-        if content.data.indices.contains(content.data.index(content.data.startIndex, offsetBy: initialPageIndex ?? currentPageIndex)) {
-            let firstIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex ?? currentPageIndex)
+        if content.data.indices.contains(content.data.index(content.data.startIndex, offsetBy: configuration.initialPageIndex ?? currentPageIndex)) {
+            let firstIndex = content.data.index(content.data.startIndex, offsetBy: configuration.initialPageIndex ?? currentPageIndex)
             
             if let firstViewController = uiViewController.viewController(for: firstIndex) {
                 uiViewController.setViewControllers(
@@ -103,7 +90,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             }
         } else {
             if !content.isEmpty {
-                let firstIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex ?? currentPageIndex)
+                let firstIndex = content.data.index(content.data.startIndex, offsetBy: configuration.initialPageIndex ?? currentPageIndex)
                 
                 if let firstViewController = uiViewController.viewController(for: firstIndex) {
                     uiViewController.setViewControllers(
@@ -131,9 +118,9 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController._isAnimated = context.transaction.isAnimated
         uiViewController.content = content
         
-        if let initialPageIndex = initialPageIndex, !uiViewController.isInitialPageIndexApplied {
+        if let initialPageIndex = configuration.initialPageIndex, !context.coordinator.isInitialPageIndexApplied {
             DispatchQueue.main.async {
-                uiViewController.isInitialPageIndexApplied = true
+                context.coordinator.isInitialPageIndexApplied = true
                 
                 currentPageIndex = initialPageIndex
             }
@@ -147,7 +134,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             uiViewController.pageControl?.currentPage = currentPageIndex
         }
         
-        uiViewController.cyclesPages = cyclesPages
+        uiViewController.cyclesPages = configuration.cyclesPages
         uiViewController.isEdgePanGestureEnabled = context.environment.isEdgePanGestureEnabled
         uiViewController.isPanGestureEnabled = context.environment.isPanGestureEnabled
         uiViewController.isScrollEnabled = context.environment.isScrollEnabled
@@ -165,11 +152,11 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     @usableFromInline
     func makeCoordinator() -> Coordinator {
-        guard showsIndicators else {
+        guard configuration.showsIndicators else {
             return _Coordinator_No_UIPageControl(self)
         }
         
-        if axis == .vertical || pageIndicatorAlignment != .center {
+        if configuration.axis == .vertical || configuration.pageIndicatorAlignment != .center {
             return _Coordinator_No_UIPageControl(self)
         } else {
             return _Coordinator_Default_UIPageControl(self)
@@ -180,8 +167,8 @@ extension _PaginationView: UIViewControllerRepresentable {
 extension _PaginationView {
     @usableFromInline
     class Coordinator: NSObject {
-        @usableFromInline
         var parent: _PaginationView
+        var isInitialPageIndexApplied: Bool = false
         
         @usableFromInline
         init(_ parent: _PaginationView) {
@@ -237,9 +224,7 @@ extension _PaginationView {
             }
             
             if let offset = pageViewController.currentPageIndexOffset {
-                DispatchQueue.main.async {
-                    self.parent.currentPageIndex = offset
-                }
+                self.parent.currentPageIndex = offset
             }
         }
     }

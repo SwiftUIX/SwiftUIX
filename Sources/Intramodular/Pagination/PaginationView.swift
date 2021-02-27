@@ -74,7 +74,6 @@ public struct PaginationView<Page: View>: View {
         )
     }
     
-    @inlinable
     public var body: some View {
         if content.isEmpty {
             EmptyView()
@@ -82,13 +81,15 @@ public struct PaginationView<Page: View>: View {
             ZStack(alignment: pageIndicatorAlignment) {
                 _PaginationView(
                     content: content,
-                    axis: axis,
-                    transitionStyle: transitionStyle,
-                    showsIndicators: showsIndicators,
-                    pageIndicatorAlignment: pageIndicatorAlignment,
-                    interPageSpacing: interPageSpacing,
-                    cyclesPages: cyclesPages,
-                    initialPageIndex: initialPageIndex,
+                    configuration: .init(
+                        axis: axis,
+                        transitionStyle: transitionStyle,
+                        showsIndicators: showsIndicators,
+                        pageIndicatorAlignment: pageIndicatorAlignment,
+                        interPageSpacing: interPageSpacing,
+                        cyclesPages: cyclesPages,
+                        initialPageIndex: initialPageIndex
+                    ),
                     currentPageIndex: currentPageIndex ?? $_currentPageIndex,
                     progressionController: $_progressionController
                 )
