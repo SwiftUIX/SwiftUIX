@@ -25,7 +25,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     
     public var body: some View {
         content
-            .modifier(_SetAppKitOrUIKitViewControllerEnvironmentValue(_appKitOrUIKitViewController: parent))
+            .modifier(_ResolveAppKitOrUIKitViewController(_appKitOrUIKitViewController: parent))
             .modifier(_UseCocoaPresentationCoordinator(coordinator: presentationCoordinator))
     }
 }

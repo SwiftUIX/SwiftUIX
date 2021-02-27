@@ -39,7 +39,7 @@ private struct HideNavigationBar: ViewModifier {
 extension View {
     @inline(never)
     public func hideNavigationBar() -> some View {
-        modifier(_SetAppKitOrUIKitViewControllerEnvironmentValue().concat( HideNavigationBar()))
+        modifier(_ResolveAppKitOrUIKitViewController().concat( HideNavigationBar()))
     }
 }
 

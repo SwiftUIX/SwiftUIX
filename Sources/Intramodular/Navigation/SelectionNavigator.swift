@@ -46,7 +46,7 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
             selection.wrappedValue.ifSome { selection in
                 NavigationLink(
                     destination: self.destination(selection)
-                        .modifier(_SetAppKitOrUIKitViewControllerEnvironmentValue()),
+                        .modifier(_ResolveAppKitOrUIKitViewController()),
                     isActive: isActive,
                     label: { ZeroSizeView() }
                 )

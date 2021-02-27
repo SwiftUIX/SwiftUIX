@@ -127,25 +127,47 @@ extension EnvironmentValues {
             self[DefaultEnvironmentKey<AppKitOrUIKitViewController>] = newValue
         }
     }
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public var _appKitOrUIKitWindowScene: UIWindowScene? {
+        get {
+            self[DefaultEnvironmentKey<UIWindowScene>]
+        } set {
+            self[DefaultEnvironmentKey<UIWindowScene>] = newValue
+        }
+    }
+    #endif
 }
 
-struct _SetAppKitOrUIKitViewControllerEnvironmentValue: ViewModifier {
+struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     @State var _appKitOrUIKitViewController: AppKitOrUIKitViewController?
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    @State var _appKitOrUIKitWindowScene: UIWindowScene?
+    #endif
     
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
             .environment(\._appKitOrUIKitViewController, _appKitOrUIKitViewController)
+            .environment(\._appKitOrUIKitWindowScene, _appKitOrUIKitWindowScene)
             .environment(\.navigator, _appKitOrUIKitViewController?.navigationController)
-            .onUIViewControllerResolution {
-                if !(self._appKitOrUIKitViewController === $0) {
-                    self._appKitOrUIKitViewController = $0
-                }
-            }
+            .onUIViewControllerResolution(perform: update(with:))
         #else
         return content
         #endif
     }
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    func update(with viewController: AppKitOrUIKitViewController) {
+        if !(_appKitOrUIKitViewController === viewController) {
+            _appKitOrUIKitViewController = viewController
+        }
+        
+        if !(_appKitOrUIKitWindowScene === viewController.view.window?.windowScene) {
+            _appKitOrUIKitWindowScene = viewController.view.window?.windowScene
+        }
+    }
+    #endif
 }
 
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
