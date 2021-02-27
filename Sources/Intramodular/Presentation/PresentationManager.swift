@@ -43,9 +43,13 @@ extension EnvironmentValues {
     public var presentationManager: PresentationManager {
         get {
             #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-            return self[_PresentationManagerEnvironmentKey.self]
-                ?? (_appKitOrUIKitViewController?.presentationCoordinator).map(CocoaPresentationMode.init)
-                ?? presentationMode
+            if presentationMode.isPresented {
+                return presentationMode
+            } else {
+                return self[_PresentationManagerEnvironmentKey.self]
+                    ?? (_appKitOrUIKitViewController?.presentationCoordinator).map(CocoaPresentationMode.init)
+                    ?? presentationMode
+            }
             #else
             return self[_PresentationManagerEnvironmentKey.self] ?? presentationMode
             #endif
