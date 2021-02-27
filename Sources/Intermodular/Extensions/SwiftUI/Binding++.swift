@@ -6,6 +6,12 @@ import Swift
 import SwiftUI
 
 extension Binding {
+    public func printOnChange() -> Binding {
+        .init(get: { self.wrappedValue }, set: { self.wrappedValue = $0; print("Set value: \($0)") })
+    }
+}
+
+extension Binding {
     @inlinable
     public func map<T>(_ keyPath: WritableKeyPath<Value, T>) -> Binding<T> {
         .init(
