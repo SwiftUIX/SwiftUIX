@@ -12,18 +12,18 @@ public protocol _opaque_PerformActionView: _opaque_View {
 /// A view with the primary goal of triggering an action.
 public protocol PerformActionView: _opaque_PerformActionView, View {
     func transformAction(_: (Action) -> Action) -> Self
-    func addAction(perform _: Action) -> Self
+    func addAction(_: Action) -> Self
 }
 
 // MARK: - Implementation -
 
 extension PerformActionView {
-    public func addAction(perform action: Action) -> Self {
+    public func addAction(_ action: Action) -> Self {
         transformAction({ $0.append(action) })
     }
     
-    public func addAction(perform action: @escaping () -> Void) -> Self {
-        addAction(perform: .init(action))
+    public func addAction(_ action: @escaping () -> Void) -> Self {
+        addAction(.init(action))
     }
 }
 

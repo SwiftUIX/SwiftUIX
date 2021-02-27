@@ -27,6 +27,10 @@ public struct Action: Hashable {
         value()
     }
     
+    public func map(_ transform: (Action) -> Action) -> Action {
+        transform(self)
+    }
+    
     public func insert(_ action: Action) -> Action {
         .init {
             action.perform()
@@ -53,6 +57,10 @@ public struct Action: Hashable {
             self.perform()
             action()
         }
+    }
+    
+    public func add(_ action: Action) -> Action {
+        action.append(action)
     }
 }
 

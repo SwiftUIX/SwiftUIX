@@ -103,6 +103,6 @@ public struct AddDynamicAction<Base: PerformActionView, Action: DynamicAction>: 
     
     @inlinable
     public var body: some View {
-        base.addAction(perform: action.perform)
+        base.addAction(action)
     }
 }

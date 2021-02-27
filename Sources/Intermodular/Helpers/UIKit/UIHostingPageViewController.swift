@@ -18,7 +18,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController, _opa
         var page: Page
         
         var body: some View {
-            page
+            page.modifier(_ResolveAppKitOrUIKitViewController())
         }
     }
     
@@ -65,7 +65,7 @@ public class UIHostingPageViewController<Page: View>: UIPageViewController, _opa
     }
     
     var cyclesPages: Bool = false
-        
+    
     var currentPageIndex: AnyIndex? {
         get {
             guard let currentViewController = viewControllers?.first as? PageContentController else {
