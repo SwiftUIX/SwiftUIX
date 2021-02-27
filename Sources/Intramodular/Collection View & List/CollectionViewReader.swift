@@ -75,4 +75,23 @@ public struct CollectionViewReader<Content: View>: View {
     }
 }
 
+// MARK: - Auxiliary Implementation -
+
+extension CollectionViewProxy {
+    fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        static let defaultValue: Binding<CollectionViewProxy>? = nil
+    }
+}
+
+extension EnvironmentValues {
+    @usableFromInline
+    var _collectionViewProxy: Binding<CollectionViewProxy>? {
+        get {
+            self[CollectionViewProxy.EnvironmentKey]
+        } set {
+            self[CollectionViewProxy.EnvironmentKey] = newValue
+        }
+    }
+}
+
 #endif

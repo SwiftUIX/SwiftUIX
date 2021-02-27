@@ -8,7 +8,11 @@ import Swift
 import SwiftUI
 import UIKit
 
-public class UIHostingPageViewController<Page: View>: UIPageViewController {
+protocol _opaque_UIHostingPageViewController: AnyObject {
+    
+}
+
+public class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
         var page: Page

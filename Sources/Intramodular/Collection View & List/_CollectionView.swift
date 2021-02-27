@@ -54,13 +54,6 @@ struct _CollectionView<
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.dataSource = dataSource
-        uiViewController.dataSourceConfiguration = dataSourceConfiguration
-        uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
-        uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
-        uiViewController.configuration = context.environment._collectionViewConfiguration
-        uiViewController.viewProvider = viewProvider
-        
         if let _collectionViewProxy = context.environment._collectionViewProxy {
             if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
                 DispatchQueue.main.async {
@@ -68,7 +61,14 @@ struct _CollectionView<
                 }
             }
         }
-        
+
+        uiViewController.dataSource = dataSource
+        uiViewController.dataSourceConfiguration = dataSourceConfiguration
+        uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
+        uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
+        uiViewController.configuration = context.environment._collectionViewConfiguration
+        uiViewController.viewProvider = viewProvider
+                
         if uiViewController.collectionViewLayout.hashValue != context.environment.collectionViewLayout.hashValue {
             uiViewController.collectionViewLayout = context.environment.collectionViewLayout
         }
@@ -124,25 +124,6 @@ extension _CollectionView where
             sectionFooter: sectionFooter,
             rowContent: rowContent
         )
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-extension CollectionViewProxy {
-    fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        static let defaultValue: Binding<CollectionViewProxy>? = nil
-    }
-}
-
-extension EnvironmentValues {
-    @usableFromInline
-    var _collectionViewProxy: Binding<CollectionViewProxy>? {
-        get {
-            self[CollectionViewProxy.EnvironmentKey]
-        } set {
-            self[CollectionViewProxy.EnvironmentKey] = newValue
-        }
     }
 }
 

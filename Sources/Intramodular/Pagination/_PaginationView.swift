@@ -115,6 +115,14 @@ extension _PaginationView: UIViewControllerRepresentable {
             uiViewController._isAnimated = true
         }
         
+        if let _paginationViewProxy = context.environment._paginationViewProxy {
+            if _paginationViewProxy.wrappedValue.hostingPageViewController !== uiViewController {
+                DispatchQueue.main.async {
+                    _paginationViewProxy.wrappedValue.hostingPageViewController = uiViewController
+                }
+            }
+        }
+        
         uiViewController._isAnimated = context.transaction.isAnimated
         uiViewController.content = content
         
