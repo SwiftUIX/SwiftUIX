@@ -32,7 +32,7 @@ extension UIHostingCollectionViewCell {
         let isSelected: Bool
     }
     
-    struct PreferenceValues {
+    struct Preferences {
         var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
         var _namedViewDescription: _NamedViewDescription?
         
@@ -62,7 +62,7 @@ class UIHostingCollectionViewCell<
     var configuration: Configuration? {
         didSet {
             if oldValue?.id != configuration?.id {
-                preferenceValues = .init()
+                preferences = .init()
             }
         }
     }
@@ -77,13 +77,13 @@ class UIHostingCollectionViewCell<
     
     private var contentHostingController: ContentHostingController?
     private var parentViewController: ParentViewControllerType?
-    private var preferenceValues = PreferenceValues() {
+    private var preferences = Preferences() {
         didSet {
             guard let configuration = configuration, let parentViewController = parentViewController else {
                 return
             }
             
-            parentViewController.cellMetadataCache[section: configuration.sectionIdentifier, item: configuration.itemIdentifier] = preferenceValues
+            parentViewController.cellMetadataCache[section: configuration.sectionIdentifier, item: configuration.itemIdentifier] = preferences
         }
     }
     
@@ -100,19 +100,19 @@ class UIHostingCollectionViewCell<
     }
     
     var isFocusable: Bool {
-        preferenceValues._collectionOrListCellPreferences.isFocusable
+        preferences._collectionOrListCellPreferences.isFocusable
     }
     
     var isHighlightable: Bool {
-        preferenceValues._collectionOrListCellPreferences.isHighlightable
+        preferences._collectionOrListCellPreferences.isHighlightable
     }
     
     var isReorderable: Bool {
-        preferenceValues._collectionOrListCellPreferences.isReorderable
+        preferences._collectionOrListCellPreferences.isReorderable
     }
     
     var isSelectable: Bool {
-        preferenceValues._collectionOrListCellPreferences.isSelectable
+        preferences._collectionOrListCellPreferences.isSelectable
     }
     
     override init(frame: CGRect) {
@@ -144,11 +144,7 @@ class UIHostingCollectionViewCell<
     }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        systemLayoutSizeFitting(
-            targetSize,
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .required
-        )
+        contentHostingController?.systemLayoutSizeFitting(targetSize) ?? .init(width: 1, height: 1)
     }
     
     override func systemLayoutSizeFitting(
@@ -156,11 +152,15 @@ class UIHostingCollectionViewCell<
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        contentHostingController?.systemLayoutSizeFitting(
+        guard let contentHostingController = contentHostingController else {
+            return .init(width: 1, height: 1)
+        }
+        
+        return contentHostingController.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
             verticalFittingPriority: verticalFittingPriority
-        ) ?? CGSize(width: 1, height: 1)
+        )
     }
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -170,19 +170,19 @@ class UIHostingCollectionViewCell<
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        isHighlighted = false
-        isSelected = false
+        super.isHighlighted = false
+        super.isSelected = false
     }
     
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        if let preferredLayoutAttributesSize = preferenceValues.preferredCellLayoutAttributesSize {
+        if let preferredLayoutAttributesSize = preferences.preferredCellLayoutAttributesSize {
             layoutAttributes.size = preferredLayoutAttributesSize
         } else {
             layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
             
-            preferenceValues.preferredCellLayoutAttributesSize = layoutAttributes.size
+            preferences.preferredCellLayoutAttributesSize = layoutAttributes.size
         }
         
         return layoutAttributes
@@ -229,12 +229,12 @@ extension UIHostingCollectionViewCell {
     private struct RootView: ExpressibleByNilLiteral, View {
         var configuration: Configuration?
         var state: State?
-        var preferenceValues: Binding<PreferenceValues>?
+        var preferences: Binding<Preferences>?
         
         init(base: UIHostingCollectionViewCell?) {
             configuration = base?.configuration
             state = base?.state
-            preferenceValues = .init(get: { [weak base] in base?.preferenceValues ?? .init() }, set: { [weak base] in base?.preferenceValues = $0 })
+            preferences = .init(get: { [weak base] in base?.preferences ?? .init() }, set: { [weak base] in base?.preferences = $0 })
         }
         
         public init(nilLiteral: ()) {
@@ -242,15 +242,15 @@ extension UIHostingCollectionViewCell {
         }
         
         public var body: some View {
-            if let configuration = configuration, let state = state, let preferenceValues = preferenceValues {
+            if let configuration = configuration, let state = state, let preferences = preferences {
                 configuration
                     .makeContent(configuration.item)
                     .environment(\.isCellFocused, state.isFocused)
                     .environment(\.isCellHighlighted, state.isHighlighted)
                     .environment(\.isCellSelected, state.isSelected)
                     .edgesIgnoringSafeArea(.all)
-                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { preferenceValues._collectionOrListCellPreferences.wrappedValue = $0 })
-                    .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: { preferenceValues._namedViewDescription.wrappedValue = $0.last })
+                    .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self, perform: { preferences._collectionOrListCellPreferences.wrappedValue = $0 })
+                    .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: { preferences._namedViewDescription.wrappedValue = $0.last })
                     .id(configuration.id)
             }
         }
@@ -274,10 +274,7 @@ extension UIHostingCollectionViewCell {
         public func systemLayoutSizeFitting(
             _ targetSize: CGSize
         ) -> CGSize {
-            _fixed_sizeThatFits(
-                in: .init(targetSize),
-                maximumSize: base?.configuration?.maximumSize ?? nil
-            )
+            _fixed_sizeThatFits(in: targetSize)
         }
         
         public func systemLayoutSizeFitting(
@@ -286,8 +283,9 @@ extension UIHostingCollectionViewCell {
             verticalFittingPriority: UILayoutPriority
         ) -> CGSize {
             _fixed_sizeThatFits(
-                in: .init(targetSize),
-                maximumSize: base?.configuration?.maximumSize ?? nil
+                in: targetSize,
+                withHorizontalFittingPriority: horizontalFittingPriority,
+                verticalFittingPriority: verticalFittingPriority
             )
         }
         

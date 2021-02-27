@@ -6,8 +6,8 @@ import Swift
 import SwiftUI
 
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
-    public let width: CGFloat?
-    public let height: CGFloat?
+    public var width: CGFloat?
+    public var height: CGFloat?
     
     public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
@@ -28,6 +28,34 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
+    }
+}
+
+extension OptionalDimensions {
+    public mutating func clamp(to dimensions: OptionalDimensions) {
+        if let maxWidth = dimensions.width {
+            if let width = self.width {
+                self.width = min(width, maxWidth)
+            } else {
+                self.width = maxWidth
+            }
+        }
+        
+        if let maxHeight = dimensions.height {
+            if let height = self.height {
+                self.height = min(height, maxHeight)
+            } else {
+                self.height = maxHeight
+            }
+        }
+    }
+
+    public func clamping(to dimensions: OptionalDimensions) -> Self {
+        var result = self
+        
+        result.clamp(to: dimensions)
+        
+        return result
     }
 }
 

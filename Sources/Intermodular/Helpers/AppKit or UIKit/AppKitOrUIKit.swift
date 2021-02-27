@@ -67,6 +67,14 @@ public typealias AppKitOrUIKitViewController = NSViewController
 public typealias AppKitOrUIKitWindow = NSWindow
 
 extension NSView {
+    public static var layoutFittingCompressedSize: CGSize {
+        .init(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+    }
+
+    public static var layoutFittingExpandedSize: CGSize {
+        .init(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude) // FIXME
+    }
+    
     @objc open func hitTest(_ point: CGPoint, with event: NSEvent?) -> NSView? {
         hitTest(point)
     }

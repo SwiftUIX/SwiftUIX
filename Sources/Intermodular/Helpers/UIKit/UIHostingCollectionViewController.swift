@@ -687,43 +687,18 @@ extension UIHostingCollectionViewController {
     class CellMetadataCache {
         unowned let parent: UIHostingCollectionViewController
         
-        private var identifierBasedPreferenceValuesCache: [SectionIdentifierType: [ItemIdentifierType: UICollectionViewCellType.PreferenceValues]] = [:]
-        private var identifierBasedContentSizeCache: [SectionIdentifierType: [ItemIdentifierType: CGSize]] = [:]
-        
-        private var indexPathBasedContentSizeCache: [IndexPath: CGSize] = [:]
-        private var identifierToIndexPathMap: [SectionIdentifierType: [ItemIdentifierType: IndexPath]] = [:]
+        private var identifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
+        private var identifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
+        private var identifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
+        private var indexPathToContentSizeMap: [IndexPath: CGSize] = [:]
         private var indexPathToIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
+        
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
         private let prototypeCell = UICollectionViewCellType()
         
         init(parent: UIHostingCollectionViewController) {
             self.parent = parent
-        }
-        
-        func firstIndexPath(for identifier: AnyHashable) -> IndexPath? {
-            if let itemIdentifier = identifier as? ItemIdentifierType {
-                return identifierToIndexPathMap.first(where: { $0.value[itemIdentifier] != nil })?.value[itemIdentifier]
-            } else if let indexPath = itemIdentifierHashToIndexPathMap[identifier.hashValue] {
-                return indexPath
-            } else {
-                return nil
-            }
-        }
-        
-        func identifier(for indexPath: IndexPath) -> UICollectionViewCellType.Configuration.ID? {
-            indexPathToIdentifierMap[indexPath]
-        }
-        
-        subscript(
-            section sectionIdentifier: SectionIdentifierType,
-            item itemIdentifier: ItemIdentifierType
-        ) -> UICollectionViewCellType.PreferenceValues? {
-            get {
-                identifierBasedPreferenceValuesCache[sectionIdentifier, default: [:]][itemIdentifier]
-            } set {
-                identifierBasedPreferenceValuesCache[sectionIdentifier, default: [:]][itemIdentifier] = newValue
-            }
         }
         
         public func collectionView(
@@ -738,13 +713,14 @@ extension UIHostingCollectionViewController {
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
             let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
             let item = parent._unsafelyUnwrappedItem(at: indexPath)
-            let itemID = parent.dataSourceConfiguration.identifierMap[item]
+            let itemIdentifier = parent.dataSourceConfiguration.identifierMap[item]
+            let id = UICollectionViewCellType.Configuration.ID(item: itemIdentifier, section: sectionIdentifier)
             
-            let indexPathBasedSize = indexPathBasedContentSizeCache[indexPath]
-            let identifierBasedSize = identifierBasedContentSizeCache[sectionIdentifier, default: [:]][itemID]
+            let indexPathBasedSize = indexPathToContentSizeMap[indexPath]
+            let identifierBasedSize = identifierToContentSizeMap[id]
             
             if let size = identifierBasedSize, indexPathBasedSize == nil {
-                indexPathBasedContentSizeCache[indexPath] = size
+                indexPathToContentSizeMap[indexPath] = size
                 return size
             } else if let size = indexPathBasedSize, size == identifierBasedSize {
                 return size
@@ -755,7 +731,7 @@ extension UIHostingCollectionViewController {
                     atIndexPath: indexPath,
                     withCellConfiguration: .init(
                         item: item,
-                        itemIdentifier: itemID,
+                        itemIdentifier: itemIdentifier,
                         sectionIdentifier: sectionIdentifier,
                         indexPath: indexPath,
                         makeContent: parent.viewProvider.rowContent,
@@ -775,14 +751,17 @@ extension UIHostingCollectionViewController {
             
             let size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
             
-            if !(size.width == 1 && size.height == 1) {
-                identifierBasedContentSizeCache[cellConfiguration.sectionIdentifier, default: [:]][cellConfiguration.itemIdentifier] = size
-                
-                indexPathBasedContentSizeCache[cellConfiguration.indexPath] = size
-                indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
-                identifierToIndexPathMap[cellConfiguration.sectionIdentifier, default: [:]][cellConfiguration.itemIdentifier] = indexPath
-                itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
+            guard !(size.width == 1 && size.height == 1) else {
+                return size
             }
+            
+            identifierToContentSizeMap[cellConfiguration.id] = size
+            identifierToIndexPathMap[cellConfiguration.id] = indexPath
+            
+            indexPathToContentSizeMap[cellConfiguration.indexPath] = size
+            indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
+            
+            itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
             
             return size
         }
@@ -792,25 +771,50 @@ extension UIHostingCollectionViewController {
                 return
             }
             
-            identifierBasedContentSizeCache[id.section, default: [:]][id.item] = nil
-            indexPathBasedContentSizeCache[indexPath] = nil
+            identifierToContentSizeMap[id] = nil
+            indexPathToContentSizeMap[indexPath] = nil
         }
         
         func invalidateIndexPath(_ indexPath: IndexPath) {
             invalidateCachedContentSize(forIndexPath: indexPath)
             
-            if let id = indexPathToIdentifierMap[indexPath] {
-                itemIdentifierHashToIndexPathMap[id.item.hashValue] = nil
-                identifierToIndexPathMap[id.section, default: [:]][id.item] = nil
-                indexPathToIdentifierMap[indexPath] = nil
+            guard let id = indexPathToIdentifierMap[indexPath] else {
+                return
             }
+            
+            identifierToIndexPathMap[id] = nil
+            indexPathToIdentifierMap[indexPath] = nil
+            itemIdentifierHashToIndexPathMap[id.item.hashValue] = nil
         }
         
         func invalidate() {
-            identifierBasedContentSizeCache = [:]
-            indexPathBasedContentSizeCache = [:]
+            identifierToContentSizeMap = [:]
+            indexPathToContentSizeMap = [:]
             identifierToIndexPathMap = [:]
             indexPathToIdentifierMap = [:]
+        }
+        
+        func firstIndexPath(for identifier: AnyHashable) -> IndexPath? {
+            if let indexPath = itemIdentifierHashToIndexPathMap[identifier.hashValue] {
+                return indexPath
+            } else {
+                return nil
+            }
+        }
+        
+        func identifier(for indexPath: IndexPath) -> UICollectionViewCellType.Configuration.ID? {
+            indexPathToIdentifierMap[indexPath]
+        }
+        
+        subscript(
+            section sectionIdentifier: SectionIdentifierType,
+            item itemIdentifier: ItemIdentifierType
+        ) -> UICollectionViewCellType.Preferences? {
+            get {
+                identifierToPreferencesMap[.init(item: itemIdentifier, section: sectionIdentifier)]
+            } set {
+                identifierToPreferencesMap[.init(item: itemIdentifier, section: sectionIdentifier)] = newValue
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ import SwiftUI
 /// A view description.
 ///
 /// The description is composed of two things - the view's name and the view's frame.
-public struct _NamedViewDescription: Equatable {
+public struct _NamedViewDescription: Hashable {
     @usableFromInline
     let name: ViewName
     @usableFromInline
@@ -25,6 +25,14 @@ public struct _NamedViewDescription: Equatable {
         self.name = name
         self.bounds = bounds
         self.globalBounds = globalBounds
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(globalBounds.origin.x)
+        hasher.combine(globalBounds.origin.y)
+        hasher.combine(globalBounds.size.width)
+        hasher.combine(globalBounds.size.height)
     }
     
     @inlinable
