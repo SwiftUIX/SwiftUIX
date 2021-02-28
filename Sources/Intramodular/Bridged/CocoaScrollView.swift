@@ -102,7 +102,7 @@ extension CocoaScrollView {
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
         then({ $0.configuration.isRefreshing = isRefreshing })
     }
-
+    
     public func refreshControlTintColor(_ color: UIColor?) -> Self {
         then({ $0.configuration.refreshControlTintColor = color })
     }

@@ -119,6 +119,7 @@ extension _PaginationView: UIViewControllerRepresentable {
             if _paginationViewProxy.wrappedValue.hostingPageViewController !== uiViewController {
                 DispatchQueue.main.async {
                     _paginationViewProxy.wrappedValue.hostingPageViewController = uiViewController
+                    _paginationViewProxy.wrappedValue.progressionController = _ProgressionController(base: uiViewController, currentPageIndex: $currentPageIndex)
                 }
             }
         }

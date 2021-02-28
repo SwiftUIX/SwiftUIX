@@ -30,6 +30,8 @@ public struct SearchBar: DefaultTextInputType {
     private var showsCancelButton: Bool = false
     private var onCancel: () -> Void = { }
     
+    var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
+
     #if os(iOS) || targetEnvironment(macCatalyst)
     private var returnKeyType: UIReturnKeyType?
     private var enablesReturnKeyAutomatically: Bool?
@@ -209,6 +211,15 @@ extension SearchBar: NSViewRepresentable {
 #endif
 
 // MARK: - API -
+
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
+extension SearchBar {
+    public func customAppKitOrUIKitClass(_ cls: AppKitOrUIKitSearchBar.Type) -> Self {
+        then({ $0.customAppKitOrUIKitClass = cls })
+    }
+}
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)

@@ -19,7 +19,7 @@ public struct TextView<Label: View>: View {
     private var onCommit: () -> Void
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var appKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
+    private var customAppKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
     #endif
     private var appKitOrUIKitFont: AppKitOrUIKitFont?
     
@@ -34,7 +34,7 @@ public struct TextView<Label: View>: View {
                 text: $text,
                 onEditingChanged: onEditingChanged,
                 onCommit: onCommit,
-                appKitOrUIKitClass: appKitOrUIKitClass,
+                customAppKitOrUIKitClass: customAppKitOrUIKitClass,
                 appKitOrUIKitFont: appKitOrUIKitFont
             )
             #else
@@ -58,7 +58,7 @@ fileprivate struct _TextView<Label: View> {
     var onCommit: () -> Void
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    var appKitOrUIKitClass: UITextView.Type
+    var customAppKitOrUIKitClass: UITextView.Type
     #endif
     var appKitOrUIKitFont: AppKitOrUIKitFont?
 }
@@ -92,7 +92,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let result = appKitOrUIKitClass.init().then {
+        let result = customAppKitOrUIKitClass.init().then {
             $0.delegate = context.coordinator
         }
         
@@ -282,8 +282,8 @@ extension TextView: DefaultTextInputType where Label == Text {
 
 extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    public func appKitOrUIKitClass(_ type: UITextView.Type) -> Self {
-        then({ $0.appKitOrUIKitClass = type })
+    public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
+        then({ $0.customAppKitOrUIKitClass = type })
     }
     #endif
     

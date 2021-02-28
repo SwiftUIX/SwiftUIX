@@ -9,6 +9,7 @@ import SwiftUI
 
 /// A proxy value allowing the pagination views within a view hierarchy to be manipulated programmatically.
 public struct PaginationViewProxy {
+    private let _progressionController = ReferenceBox<ProgressionController?>(nil)
     private let _hostingPageViewController = WeakReferenceBox<AnyObject>(nil)
     
     var hostingPageViewController: _opaque_UIHostingPageViewController? {
@@ -17,6 +18,22 @@ public struct PaginationViewProxy {
         } set {
             _hostingPageViewController.value = newValue
         }
+    }
+    
+    var progressionController: ProgressionController {
+        get {
+            _progressionController.value!
+        } set {
+            _progressionController.value = newValue
+        }
+    }
+    
+    public func moveToPrevious() {
+        progressionController.moveToPrevious()
+    }
+
+    public func moveToNext() {
+        progressionController.moveToNext()
     }
 }
 
