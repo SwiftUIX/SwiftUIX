@@ -31,7 +31,7 @@ public struct SearchBar: DefaultTextInputType {
     private var onCancel: () -> Void = { }
     
     var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
-
+    
     #if os(iOS) || targetEnvironment(macCatalyst)
     private var returnKeyType: UIReturnKeyType?
     private var enablesReturnKeyAutomatically: Bool?
