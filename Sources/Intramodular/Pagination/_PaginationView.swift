@@ -116,7 +116,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         }
         
         if let _paginationViewProxy = context.environment._paginationViewProxy {
-            if _paginationViewProxy.wrappedValue.hostingPageViewController !== uiViewController {
+            if _paginationViewProxy.wrappedValue.hostingPageViewController !== uiViewController || (_paginationViewProxy.wrappedValue.progressionController as? _ProgressionController)?.base == nil {
                 DispatchQueue.main.async {
                     _paginationViewProxy.wrappedValue.hostingPageViewController = uiViewController
                     _paginationViewProxy.wrappedValue.progressionController = _ProgressionController(base: uiViewController, currentPageIndex: $currentPageIndex)
@@ -274,8 +274,12 @@ extension _PaginationView {
         
         @usableFromInline
         func moveToNext() {
+            guard let base = base else {
+                assertionFailure("Could not resolve a pagination view")
+                return
+            }
+            
             guard
-                let base = base,
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,
                 let nextViewController = baseDataSource.pageViewController(base, viewControllerAfter: currentViewController)
@@ -294,8 +298,12 @@ extension _PaginationView {
         
         @usableFromInline
         func moveToPrevious() {
+            guard let base = base else {
+                assertionFailure("Could not resolve a pagination view")
+                return
+            }
+
             guard
-                let base = base,
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,
                 let previousViewController = baseDataSource.pageViewController(base, viewControllerBefore: currentViewController)
