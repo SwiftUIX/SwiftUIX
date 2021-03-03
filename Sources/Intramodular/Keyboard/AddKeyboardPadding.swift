@@ -10,6 +10,13 @@ import SwiftUI
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 private struct AddKeyboardPadding: ViewModifier {
+    #if os(iOS) || targetEnvironment(macCatalyst)
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
+    @ObservedObject private var keyboard = Keyboard.main
+    #endif
+
     let isActive: Bool
     let isForced: Bool
     let isBasic: Bool
