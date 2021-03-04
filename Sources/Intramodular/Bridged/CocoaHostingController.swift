@@ -10,11 +10,13 @@ import SwiftUI
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
     var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var _transitioningDelegate: UIViewControllerTransitioningDelegate? {
         didSet {
             transitioningDelegate = _transitioningDelegate
         }
     }
+    #endif
     
     public var mainView: Content {
         get {
