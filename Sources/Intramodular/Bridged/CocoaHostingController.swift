@@ -8,8 +8,13 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
-    let _presentationCoordinator: CocoaPresentationCoordinator
     var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
+    var _presentationCoordinator: CocoaPresentationCoordinator
+    var _transitioningDelegate: UIViewControllerTransitioningDelegate? {
+        didSet {
+            transitioningDelegate = _transitioningDelegate
+        }
+    }
     
     public var mainView: Content {
         get {
@@ -53,7 +58,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
             #endif
             modalPresentationStyle = .init(mainView.presentationStyle)
-            transitioningDelegate = mainView.presentationStyle.transitioningDelegate
+            presentationController?.delegate = presentationCoordinator
+            _transitioningDelegate = mainView.presentationStyle.toTransitioningDelegate()
             #elseif os(macOS)
             fatalError("unimplemented")
             #endif

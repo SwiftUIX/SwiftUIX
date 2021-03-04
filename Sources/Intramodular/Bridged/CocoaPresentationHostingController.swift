@@ -31,16 +31,25 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     }
     
     private func presentationDidChange(presentingViewController: UIViewController?) {
-        modalPresentationStyle = .init(presentation.content.presentationStyle)
+        mainView = presentation.content
+        
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
+        #endif
+        modalPresentationStyle = .init(mainView.presentationStyle)
         presentationController?.delegate = presentationCoordinator
-        transitioningDelegate = presentation.content.presentationStyle.transitioningDelegate
+        _transitioningDelegate = mainView.presentationStyle.toTransitioningDelegate()
+        #elseif os(macOS)
+        fatalError("unimplemented")
+        #endif
         
         #if !os(tvOS)
-        if case let .popover(permittedArrowDirections) = presentation.content.presentationStyle {
+        if case let .popover(permittedArrowDirections) = mainView.presentationStyle {
             popoverPresentationController?.delegate = presentationCoordinator
             popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
             
-            let sourceViewDescription = presentation.content.preferredSourceViewName.flatMap {
+            let sourceViewDescription = mainView.preferredSourceViewName.flatMap {
                 (presentingViewController as? _opaque_CocoaController)?._namedViewDescription(for: $0)
             }
             
@@ -52,11 +61,9 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         }
         #endif
         
-        if presentation.content.presentationStyle != .automatic {
+        if mainView.presentationStyle != .automatic {
             view.backgroundColor = .clear
         }
-        
-        rootView.content = presentation.content
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {

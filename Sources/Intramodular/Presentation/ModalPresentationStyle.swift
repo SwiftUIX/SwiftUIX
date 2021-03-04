@@ -118,7 +118,7 @@ extension EnvironmentValues {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension ModalPresentationStyle {
-    public var transitioningDelegate: UIViewControllerTransitioningDelegate? {
+    public func toTransitioningDelegate() -> UIViewControllerTransitioningDelegate? {
         if case let .custom(delegate) = self {
             return delegate
         } else {
@@ -192,7 +192,13 @@ extension UIViewController {
             case .none:
                 return .none
             case .custom:
-                return .custom(transitioningDelegate!)
+                if let transitioningDelegate = transitioningDelegate {
+                    return .custom(transitioningDelegate)
+                } else {
+                    assertionFailure("transitioningDelegate is nil")
+                    
+                    return .automatic
+                }
             @unknown default:
                 return .automatic
         }

@@ -42,7 +42,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
         content.background(
             Group {
                 Button(action: self.actionTrampoline.callAsFunction) {
-                    EmptyView()
+                    ZeroSizeView()
                 }
                 .keyboardShortcut(shortcut)
                 .visible(false)
@@ -83,6 +83,21 @@ extension View {
     ) -> some View {
         modifier(PerformActionOnKeyboardShortcut(shortcut: .init(key, modifiers: modifiers), action: action))
     }
+    
+    /// Adds an action to perform when this view recognizes a keyboard shortcut.
+    @available(iOS 14.0, macOS 11.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @inlinable
+    public func onKeyboardShortcut<Action: DynamicAction>(
+        _ key: KeyEquivalent,
+        modifiers: EventModifiers = [],
+        perform action: Action
+    ) -> some View {
+        WithDynamicAction(action) { action in
+            onKeyboardShortcut(key, modifiers: modifiers, perform: action.perform)
+        }
+    }
 }
 
 @available(iOS 14.0, macOS 11.0, *)
@@ -110,7 +125,12 @@ public struct OnKeyboardShortcut: PerformActionView {
     }
     
     public var body: some View {
-        ZeroSizeView().onKeyboardShortcut(shortcut, perform: action.perform)
+        Button(action: action.perform) {
+            ZeroSizeView()
+        }
+        .keyboardShortcut(shortcut)
+        .visible(false)
+        .frameZeroClipped()
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {
@@ -126,7 +146,7 @@ extension View {
     @inlinable
     public func onKeyboardShortcut(
         _ shortcut: KeyEquivalent,
-        if predicate: Bool,
+        when predicate: Bool,
         perform action: @escaping () -> Void
     ) -> some View {
         background {

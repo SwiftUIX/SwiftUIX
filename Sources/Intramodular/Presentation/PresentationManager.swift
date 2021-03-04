@@ -14,16 +14,22 @@ public protocol PresentationManager: ViewInteractor {
 
 // MARK: - API -
 
-/// A dynamic action that dismisses an active presentation.
-public struct DismissPresentation: DynamicAction {
-    @Environment(\.presentationManager) var presentationManager
-    
-    public init() {
+extension PresentationMode {
+    /// A dynamic action that dismisses an active presentation.
+    public struct DismissPresentationAction: DynamicAction {
+        @Environment(\.presentationManager) var presentationManager
         
+        public init() {
+            
+        }
+        
+        public func perform() {
+            presentationManager.dismiss()
+        }
     }
     
-    public func perform() {
-        presentationManager.dismiss()
+    public static var dismiss: DismissPresentationAction {
+        DismissPresentationAction()
     }
 }
 

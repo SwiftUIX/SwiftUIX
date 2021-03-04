@@ -32,6 +32,20 @@ extension PerformActionView {
     }
 }
 
+public struct WithDynamicAction<Action: DynamicAction, Content: View>: View {
+    public let action: Action
+    public let content: (Action) -> Content
+    
+    public init(_ action: Action, _ content: @escaping (Action) -> Content) {
+        self.action = action
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(action)
+    }
+}
+
 public struct DynamicActionButton<Action: DynamicAction, Label: View>: View {
     public let action: Action
     public let label: Label
