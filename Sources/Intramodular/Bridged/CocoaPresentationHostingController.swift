@@ -73,7 +73,17 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
+        if preferredContentSize != UIView.layoutFittingExpandedSize {
+            preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
+        }
+    }
+    
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        if ProcessInfo.processInfo.isMacCatalystApp {
+            view.frame.size = size
+        }
     }
 }
 
