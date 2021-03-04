@@ -81,9 +81,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        if ProcessInfo.processInfo.isMacCatalystApp {
-            view.frame.size = size
-        }
+        view.frame.size = size
     }
 }
 
