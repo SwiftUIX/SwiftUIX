@@ -32,18 +32,18 @@ public struct CocoaHostingView<Content: View>: UIViewControllerRepresentable {
 #else
 
 public struct CocoaHostingView<Content: View>: View {
-    private let rootView: Content
+    private let mainView: Content
     
-    public init(rootView: Content) {
-        self.rootView = rootView
+    public init(mainView: Content) {
+        self.mainView = mainView
     }
     
-    public init(@ViewBuilder rootView: () -> Content) {
-        self.rootView = rootView()
+    public init(@ViewBuilder mainView: () -> Content) {
+        self.mainView = mainView()
     }
     
     public var body: some View {
-        rootView
+        mainView
     }
 }
 

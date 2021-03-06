@@ -38,7 +38,7 @@ extension PresentationLinkView {
 extension PresentationLinkView where Label == Image {
     public init(
         systemImage: SFSymbolName,
-        destination: @escaping () -> Destination
+        @ViewBuilder destination: @escaping () -> Destination
     ) {
         self.init(destination: destination(), onDismiss: nil) {
             Image(systemName: systemImage)
@@ -51,7 +51,7 @@ extension PresentationLinkView where Label == SwiftUI.Label<Text, Image> {
     public init<S: StringProtocol>(
         _ title: S,
         systemImage: SFSymbolName,
-        destination: @escaping () -> Destination
+        @ViewBuilder destination: @escaping () -> Destination
     ) {
         self.init(destination: destination(), onDismiss: nil) {
             Label(title, systemImage: systemImage)

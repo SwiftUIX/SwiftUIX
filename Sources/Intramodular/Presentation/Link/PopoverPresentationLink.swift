@@ -6,17 +6,27 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 public struct PopoverPresentationLink<Destination: View, Label: View>: PresentationLinkView {
     private let destination: Destination
     private let label: Label
     private let onDismiss: (() -> ())?
     
+    #if os(iOS) || targetEnvironment(macCatalyst)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
     @Environment(\.environmentBuilder) private var environmentBuilder
     
     @State private var isPresented: Bool = false
+    
+    var isPresentedBinding: Binding<Bool> {
+        $isPresented.onSet {
+            if self.isPresented == true && $0 == false {
+                self.onDismiss?()
+            }
+        }
+    }
     
     public init(
         destination: Destination,
@@ -40,43 +50,29 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     }
     
     public var body: some View {
-        Group {
-            if horizontalSizeClass == .compact {
-                Button(action: present, label: { label }).sheet(
-                    isPresented: $isPresented.onSet {
-                        if self.isPresented == true && $0 == false {
-                            self._onDismiss()
-                        }
-                    }
-                ) {
-                    CocoaHostingView(
-                        mainView: self.destination
-                            .mergeEnvironmentBuilder(self.environmentBuilder)
-                    )
+        if isHorizontalCompact {
+            Button(toggle: $isPresented, label: { label })
+                .sheet(isPresented: isPresentedBinding) {
+                    popoverContent
                 }
-            } else {
-                Button(action: present, label: { label }).popover(
-                    isPresented: $isPresented.onSet {
-                        if self.isPresented == true && $0 == false {
-                            self._onDismiss()
-                        }
-                    }
-                ) {
-                    CocoaHostingView(
-                        mainView: self.destination
-                            .mergeEnvironmentBuilder(self.environmentBuilder)
-                    )
+        } else {
+            Button(toggle: $isPresented, label: { label })
+                .popover(isPresented: isPresentedBinding) {
+                    popoverContent
                 }
-            }
         }
     }
     
-    private func present() {
-        isPresented = true
+    private var popoverContent: some View {
+        CocoaHostingView(mainView: destination.mergeEnvironmentBuilder(environmentBuilder))
     }
     
-    private func _onDismiss() {
-        onDismiss?()
+    private var isHorizontalCompact: Bool {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
     }
 }
 
