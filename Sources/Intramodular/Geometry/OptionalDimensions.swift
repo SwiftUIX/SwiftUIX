@@ -8,7 +8,7 @@ import SwiftUI
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     public var width: CGFloat?
     public var height: CGFloat?
-    
+        
     public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
@@ -28,6 +28,10 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
+    }
+    
+    public init() {
+        
     }
 }
 

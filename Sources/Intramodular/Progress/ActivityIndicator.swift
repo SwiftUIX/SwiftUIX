@@ -8,12 +8,25 @@ import SwiftUI
 /// A view that shows that a task is in progress.
 public struct ActivityIndicator {
     public enum Style {
-        case medium
+        #if os(macOS)
+        case small
+        #endif
+        case regular
         case large
+        
+        @available(*, unavailable, renamed: "ActivityIndicator.Style.regular")
+        public static var medium: Self {
+            .regular
+        }
     }
     
     private var isAnimated: Bool = true
-    private var style: Style?
+    
+    #if os(macOS)
+    private var style: Style = .small
+    #else
+    private var style: Style = .regular
+    #endif
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var tintUIColor: UIColor?
@@ -37,11 +50,8 @@ extension ActivityIndicator: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        if let style = style {
-            uiView.style = .init(style)
-        }
-        
         uiView.color = tintUIColor ?? context.environment.tintColor?.toUIColor()
+        uiView.style = .init(style)
         uiView.tintColor = tintUIColor ?? context.environment.tintColor?.toUIColor()
         
         if !context.environment.isEnabled && uiView.isAnimating {
@@ -59,10 +69,6 @@ extension ActivityIndicator: UIViewRepresentable {
         }
     }
     
-    public func style(_ style: Style?) -> Self {
-        then({ $0.style = style })
-    }
-    
     @_disfavoredOverload
     public func tintColor(_ color: UIColor?) -> Self {
         then({ $0.tintUIColor = color })
@@ -76,11 +82,27 @@ import AppKit
 
 extension ActivityIndicator: NSViewRepresentable {
     public typealias Context = NSViewRepresentableContext<Self>
-    public typealias NSViewType = NSProgressIndicator
+    
+    public final class NSViewType: NSProgressIndicator {
+        public private(set) var isAnimating: Bool = false
+        
+        public override func startAnimation(_ sender: Any?) {
+            super.startAnimation(sender)
+            
+            isAnimating = true
+        }
+        
+        public override func stopAnimation(_ sender: Any?) {
+            super.startAnimation(sender)
+            
+            isAnimating = true
+        }
+    }
     
     public func makeNSView(context: Context) -> NSViewType {
-        let nsView = NSProgressIndicator()
+        let nsView = NSViewType()
         
+        nsView.controlSize = .init(style)
         nsView.isIndeterminate = true
         nsView.style = .spinning
         
@@ -88,6 +110,20 @@ extension ActivityIndicator: NSViewRepresentable {
     }
     
     public func updateNSView(_ nsView: NSViewType, context: Context) {
+        if !context.environment.isEnabled && nsView.isAnimating {
+            nsView.stopAnimation(self)
+        } else {
+            if isAnimated {
+                if !nsView.isAnimating {
+                    nsView.startAnimation(self)
+                }
+            } else {
+                if nsView.isAnimating {
+                    nsView.stopAnimation(self)
+                }
+            }
+        }
+        
         isAnimated ? nsView.startAnimation(self) : nsView.stopAnimation(self)
     }
 }
@@ -96,11 +132,15 @@ extension ActivityIndicator: NSViewRepresentable {
 
 // MARK: - API -
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension ActivityIndicator {
     public func animated(_ isAnimated: Bool) -> ActivityIndicator {
         then({ $0.isAnimated = isAnimated })
+    }
+    
+    public func style(_ style: Style) -> Self {
+        then({ $0.style = style })
     }
 }
 
@@ -113,7 +153,7 @@ extension ActivityIndicator {
 extension UIActivityIndicatorView.Style {
     public init(_ style: ActivityIndicator.Style) {
         switch style {
-            case .medium:
+            case .regular:
                 self = .medium
             case .large:
                 self = .large
@@ -121,14 +161,34 @@ extension UIActivityIndicatorView.Style {
     }
 }
 
+#elseif os(macOS)
+
+extension NSControl.ControlSize {
+    public init(_ style: ActivityIndicator.Style) {
+        switch style {
+            case .small:
+                self = .small
+            case .regular:
+                self = .regular
+            case .large: do {
+                if #available(OSX 11.0, *) {
+                    self = .large
+                } else {
+                    self = .regular
+                }
+            }
+        }
+    }
+}
+
 #endif
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct ActivityIndicator_Previews: PreviewProvider {
     static var previews: some View {
         ActivityIndicator()
-            .tintColor(UIColor.red)
+            .tintColor(.red)
     }
 }
 

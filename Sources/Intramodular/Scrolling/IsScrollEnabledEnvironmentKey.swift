@@ -25,4 +25,8 @@ extension View {
     public func isScrollEnabled(_ isEnabled: Bool) -> some View {
         environment(\.isScrollEnabled, isEnabled)
     }
+    
+    public func scrollDisabled(_ disabled: Bool) -> some View {
+        environment(\.isScrollEnabled, !disabled)
+    }
 }

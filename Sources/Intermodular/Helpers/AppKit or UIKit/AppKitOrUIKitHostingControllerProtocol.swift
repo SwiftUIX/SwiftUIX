@@ -49,6 +49,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
         
         var result = sizeThatFits(in: fittingSize)
         
+        print(result, fittingSize)
         switch (result.width, result.height)  {
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude):
                 result = sizeThatFits(in: targetSize.clamping(to: sizeProposal.maximumSize))
@@ -83,7 +84,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
         withHorizontalFittingPriority horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
         verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
     ) -> CGSize {
-        sizeThatFits(
+        return sizeThatFits(
             .init(
                 targetSize: .init(size),
                 horizontalFittingPriority: horizontalFittingPriority,
@@ -121,7 +122,7 @@ public struct AppKitOrUIKitLayoutSizeProposal {
             ? targetSize.clamping(to: maximumSize).width ?? AppKitOrUIKitView.layoutFittingCompressedSize.width
             : (maximumSize.width ?? AppKitOrUIKitView.layoutFittingExpandedSize.width)
         
-        let height = (verticalFittingPriority ?? .defaultLow) != .required
+        let height = verticalFittingPriority == .required
             ? targetSize.clamping(to: maximumSize).height ?? AppKitOrUIKitView.layoutFittingCompressedSize.height
             : (maximumSize.height ?? AppKitOrUIKitView.layoutFittingExpandedSize.height)
         

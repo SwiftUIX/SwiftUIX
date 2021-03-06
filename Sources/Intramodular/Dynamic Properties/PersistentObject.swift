@@ -18,7 +18,11 @@ public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
     
     public var wrappedValue: ObjectType {
         get {
-            state.value!
+            if state.value == nil {
+                state.value = thunk()
+            }
+            
+            return state.value!
         } nonmutating set {
             state.value = newValue
             observedObject = newValue
