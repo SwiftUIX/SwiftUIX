@@ -14,6 +14,7 @@ fileprivate struct Flip3D<Reverse: View>: ViewModifier {
         ZStack {
             content
                 .hidden(isFlipped)
+            
             reverse
                 .mirror3D(axis: axis)
                 .hidden(!isFlipped)

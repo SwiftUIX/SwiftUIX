@@ -8,7 +8,7 @@ import SwiftUI
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     public var width: CGFloat?
     public var height: CGFloat?
-        
+    
     public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
@@ -53,7 +53,7 @@ extension OptionalDimensions {
             }
         }
     }
-
+    
     public func clamping(to dimensions: OptionalDimensions) -> Self {
         var result = self
         
