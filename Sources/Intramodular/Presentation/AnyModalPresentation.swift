@@ -72,7 +72,6 @@ extension AnyModalPresentation: Equatable {
 // MARK: - API -
 
 extension View {
-    @inlinable
     public func isModalInPresentation(_ value: Bool) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return onUIViewControllerResolution {
@@ -87,12 +86,9 @@ extension View {
 
 // MARK: - Auxiliary Implementation -
 
-@usableFromInline
 struct IsModalInPresentation: PreferenceKey {
-    @usableFromInline
     static let defaultValue: Bool = false
     
-    @usableFromInline
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
         value = nextValue()
     }
