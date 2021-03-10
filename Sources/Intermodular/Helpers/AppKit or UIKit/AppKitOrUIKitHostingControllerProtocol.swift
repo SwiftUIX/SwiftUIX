@@ -49,7 +49,6 @@ extension AppKitOrUIKitHostingControllerProtocol {
         
         var result = sizeThatFits(in: fittingSize)
         
-        print(result, fittingSize)
         switch (result.width, result.height)  {
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude):
                 result = sizeThatFits(in: targetSize.clamping(to: sizeProposal.maximumSize))
