@@ -193,6 +193,11 @@ extension CocoaList {
     }
     
     @inlinable
+    public func showsIndicators(_ showsIndicators: Bool) -> Self {
+        then({ $0.scrollViewConfiguration.showsIndicators = showsIndicators })
+    }
+  
+    @inlinable
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })
     }
