@@ -86,7 +86,7 @@ struct InsertStatusBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier
     
     @ViewBuilder
     func body(content: Content) -> some View {
-        PeformAction {
+        PerformAction {
             if let popover = self.popover {
                 popover.statusItem = self.item
             } else {

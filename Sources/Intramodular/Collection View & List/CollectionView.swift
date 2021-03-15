@@ -199,6 +199,6 @@ fileprivate struct _IdentifierHashedValue<Value: Identifiable>: Hashable, Identi
     }
     
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
+        return lhs.id == rhs.id
     }
 }

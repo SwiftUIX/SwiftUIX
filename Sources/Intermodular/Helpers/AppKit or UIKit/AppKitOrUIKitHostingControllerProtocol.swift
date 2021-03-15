@@ -32,7 +32,7 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension AppKitOrUIKitHostingControllerProtocol {
-    func sizeThatFits(_ sizeProposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize {
+    public func sizeThatFits(_ sizeProposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize {
         let targetSize = sizeProposal.appKitOrUIKitTargetSize
         let fittingSize = sizeProposal.appKitOrUIKitFittingSize
         
@@ -78,7 +78,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
         return result.clamping(to: sizeProposal.maximumSize)
     }
     
-    func _fixed_sizeThatFits(
+    public func sizeThatFits(
         in size: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
         verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil

@@ -124,35 +124,37 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         frame.size.width = min(frame.size.width, contentSize.width)
         frame.size.height = min(frame.size.height, contentSize.height)
         
-        if !isInitialContentAlignmentSet {
-            if contentSize != .zero && frame.size != .zero {
-                setContentAlignment(configuration.initialContentAlignment, animated: false)
-                
-                isInitialContentAlignmentSet = true
-            }
-        } else {
-            if contentSize != oldContentSize {
-                var newContentOffset = contentOffset
-                
-                if contentSize.width >= oldContentSize.width {
-                    if configuration.initialContentAlignment.horizontal == .trailing {
-                        newContentOffset.x += contentSize.width - oldContentSize.width
-                    }
+        if let initialContentAlignment = configuration.initialContentAlignment {
+            if !isInitialContentAlignmentSet {
+                if contentSize != .zero && frame.size != .zero {
+                    setContentAlignment(initialContentAlignment, animated: false)
+                    
+                    isInitialContentAlignmentSet = true
                 }
-                
-                if contentSize.height >= oldContentSize.height {
-                    if configuration.initialContentAlignment.vertical == .bottom {
-                        newContentOffset.y += contentSize.height - oldContentSize.height
+            } else {
+                if contentSize != oldContentSize {
+                    var newContentOffset = contentOffset
+                    
+                    if contentSize.width >= oldContentSize.width {
+                        if initialContentAlignment.horizontal == .trailing {
+                            newContentOffset.x += contentSize.width - oldContentSize.width
+                        }
                     }
-                }
-                
-                if newContentOffset != contentOffset {
-                    setContentOffset(newContentOffset, animated: false)
+                    
+                    if contentSize.height >= oldContentSize.height {
+                        if initialContentAlignment.vertical == .bottom {
+                            newContentOffset.y += contentSize.height - oldContentSize.height
+                        }
+                    }
+                    
+                    if newContentOffset != contentOffset {
+                        setContentOffset(newContentOffset, animated: false)
+                    }
                 }
             }
         }
     }
-    
+
     #if !os(tvOS)
     @objc public func refreshChanged(_ control: UIRefreshControl) {
         control.refreshChanged(with: configuration)

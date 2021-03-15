@@ -262,19 +262,7 @@ extension View {
     }
 }
 
-extension View {
-    @inlinable
-    public func widthZeroClipped(_ clipped: Bool = true) -> some View {
-        width(clipped ? .zero : nil)
-            .clipped()
-    }
-    
-    @inlinable
-    public func heightZeroClipped(_ clipped: Bool = true) -> some View {
-        height(clipped ? .zero : nil)
-            .clipped()
-    }
-    
+extension View {    
     @inlinable
     public func frameZeroClipped(_ clipped: Bool = true) -> some View {
         frame(clipped ? .zero : nil)

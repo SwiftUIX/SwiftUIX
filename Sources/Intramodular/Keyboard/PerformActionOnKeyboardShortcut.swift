@@ -48,7 +48,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
                 .visible(false)
                 .frameZeroClipped()
                 
-                PeformAction {
+                PerformAction {
                     actionTrampoline.value = action
                 }
             }

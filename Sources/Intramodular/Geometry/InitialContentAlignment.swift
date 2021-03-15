@@ -6,11 +6,11 @@ import Swift
 import SwiftUI
 
 private struct InitialContentAlignmentEnvironmentKey: EnvironmentKey {
-    static let defaultValue: Alignment = .topLeading
+    static let defaultValue: Alignment? = nil
 }
 
 extension EnvironmentValues {
-    public var initialContentAlignment: Alignment {
+    public var initialContentAlignment: Alignment? {
         get {
             self[InitialContentAlignmentEnvironmentKey]
         } set {

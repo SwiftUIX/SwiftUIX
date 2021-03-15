@@ -8,6 +8,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 protocol _opaque_UIHostingCollectionViewController: UIViewController {
+    func scrollToTop(anchor: UnitPoint?, animated: Bool)
+    
     func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
     func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint?)
     func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint?)
@@ -529,6 +531,10 @@ extension UIHostingCollectionViewController {
 // MARK: - Extensions -
 
 extension UIHostingCollectionViewController {
+    public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
+        collectionView.setContentOffset(.zero, animated: animated)
+    }
+    
     public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cellMetadataCache.firstIndexPath(for: id) else {
             return
@@ -746,6 +752,7 @@ extension UIHostingCollectionViewController {
             withCellConfiguration cellConfiguration: UICollectionViewCellType.Configuration
         ) -> CGSize {
             prototypeCell.configuration = cellConfiguration
+            prototypeCell.preferences = identifierToPreferencesMap[cellConfiguration.id] ?? .init()
             
             prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
             
@@ -806,14 +813,22 @@ extension UIHostingCollectionViewController {
             indexPathToIdentifierMap[indexPath]
         }
         
-        subscript(
-            section sectionIdentifier: SectionIdentifierType,
-            item itemIdentifier: ItemIdentifierType
-        ) -> UICollectionViewCellType.Preferences? {
+        subscript(preferencesFor id: UICollectionViewCellType.Configuration.ID) -> UICollectionViewCellType.Preferences? {
             get {
-                identifierToPreferencesMap[.init(item: itemIdentifier, section: sectionIdentifier)]
+                identifierToPreferencesMap[id]
             } set {
-                identifierToPreferencesMap[.init(item: itemIdentifier, section: sectionIdentifier)] = newValue
+                let oldValue = self[preferencesFor: id]
+                
+                identifierToPreferencesMap[id] = newValue
+                
+                guard let indexPath = identifierToIndexPathMap[id] else {
+                    return
+                }
+                
+                if oldValue?.relativeFrame != newValue?.relativeFrame {
+                    parent.cellMetadataCache.invalidateIndexPath(indexPath)
+                    parent.invalidateLayout(includingCellMetadataCache: false)
+                }
             }
         }
     }

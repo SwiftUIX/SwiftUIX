@@ -48,6 +48,7 @@ import SwiftUI
         }
         #endif
     }
+    
     fileprivate weak var viewController: AppKitOrUIKitViewController!
     
     public init(

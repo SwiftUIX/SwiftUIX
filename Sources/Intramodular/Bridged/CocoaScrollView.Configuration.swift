@@ -10,7 +10,7 @@ import SwiftUI
 /// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
-    var initialContentAlignment: Alignment = .topLeading
+    var initialContentAlignment: Alignment?
     @usableFromInline
     var axes: Axis.Set = [.horizontal, .vertical]
     

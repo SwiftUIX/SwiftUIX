@@ -33,7 +33,7 @@ public struct IntrinsicGeometryReader<Content: View>: View {
     public var body: some View {
         content(proxy).background(
             GeometryReader { geometry in
-                PeformAction {
+                PerformAction {
                     self.proxy = .init(geometry)
                 }
             }

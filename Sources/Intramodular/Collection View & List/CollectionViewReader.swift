@@ -20,6 +20,12 @@ public struct CollectionViewProxy {
         }
     }
     
+    public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
+        _assertResolutionOfCollectionView()
+
+        hostingCollectionViewController?.scrollToTop(anchor: anchor, animated: animated)
+    }
+    
     public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
@@ -51,7 +57,7 @@ public struct CollectionViewProxy {
     }
     
     private func _assertResolutionOfCollectionView() {
-        assert(hostingCollectionViewController != nil, "CollectionViewProxy couldn't resolve a collection view")
+        // assert(hostingCollectionViewController != nil, "CollectionViewProxy couldn't resolve a collection view")
     }
 }
 

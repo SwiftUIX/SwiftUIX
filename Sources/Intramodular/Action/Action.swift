@@ -66,11 +66,15 @@ public struct Action: Hashable {
 
 // MARK: - API -
 
-public struct PeformAction: ActionInitiable, PerformActionView {
+public struct PerformAction: ActionInitiable, PerformActionView {
     private let action: Action
     
     public init(action: Action) {
         self.action = action
+    }
+    
+    public init(action: @escaping () -> Void) {
+        self.action = .init(action)
     }
     
     public var body: some View {
@@ -78,7 +82,7 @@ public struct PeformAction: ActionInitiable, PerformActionView {
             self.action.perform()
         }
         
-        return ZeroSizeView()
+        return ZeroSizeView().frameZeroClipped()
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {
