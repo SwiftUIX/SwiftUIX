@@ -215,7 +215,10 @@ public final class UIHostingCollectionViewController<
             let item = self._unsafelyUnwrappedItem(at: indexPath)
             let section = self._unsafelyUnwrappedSection(from: indexPath)
             
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: .hostingCollectionViewCellIdentifier, for: indexPath) as! UICollectionViewCellType
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: .hostingCollectionViewCellIdentifier,
+                for: indexPath
+            ) as! UICollectionViewCellType
             
             cell.configuration = .init(
                 item: item,
