@@ -764,10 +764,8 @@ extension UIHostingCollectionViewController {
             
             identifierToContentSizeMap[cellConfiguration.id] = size
             identifierToIndexPathMap[cellConfiguration.id] = indexPath
-            
             indexPathToContentSizeMap[cellConfiguration.indexPath] = size
             indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
-            
             itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
             
             return size

@@ -21,8 +21,7 @@ class UIHostingAlignPresentationController<Background: View, Content: View>: UIP
             CocoaHostingControllerContent(
                 parent: parent,
                 content: content
-                    .environment(\.presentationTransitionType, transitionType),
-                presentationCoordinator: presentationCoordinator
+                    .environment(\.presentationTransitionType, transitionType)
             )
         }
     }

@@ -278,13 +278,13 @@ extension UIHostingCollectionViewCell {
         }
     }
     
-    private class ContentHostingController: UIHostingController<RootView> {
+    private class ContentHostingController: CocoaHostingController<RootView> {
         weak var base: UIHostingCollectionViewCell?
         
         init(base: UIHostingCollectionViewCell?) {
             self.base = base
             
-            super.init(rootView: nil)
+            super.init(mainView: nil)
             
             update()
         }
@@ -338,7 +338,17 @@ extension UIHostingCollectionViewCell {
         }
         
         func update() {
-            rootView = .init(base: base)
+            guard let base = base else {
+                return
+            }
+            
+            if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
+                guard currentConfiguration.id != newConfiguration.id else {
+                    return
+                }
+            }
+            
+            mainView = .init(base: base)
             
             view.setNeedsDisplay()
         }

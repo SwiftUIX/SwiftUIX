@@ -26,14 +26,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
     }
     
-    #if os(iOS) || targetEnvironment(macCatalyst)
-    override open var prefersStatusBarHidden: Bool {
-        return false
-    }
-    #endif
-    
     override public var presentationCoordinator: CocoaPresentationCoordinator {
-        return _presentationCoordinator
+        _presentationCoordinator
     }
     
     init(
@@ -45,8 +39,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         super.init(
             rootView: .init(
                 parent: nil,
-                content: mainView,
-                presentationCoordinator: presentationCoordinator
+                content: mainView
             )
         )
         

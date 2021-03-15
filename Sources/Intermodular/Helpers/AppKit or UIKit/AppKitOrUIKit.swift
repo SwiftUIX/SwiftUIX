@@ -130,37 +130,40 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 extension EnvironmentValues {
+    var _appKitOrUIKitViewControllerBox: WeakBox<AppKitOrUIKitViewController> {
+        get {
+            self[DefaultEnvironmentKey<WeakBox<AppKitOrUIKitViewController>>] ?? WeakBox(nil)
+        } set {
+            self[DefaultEnvironmentKey<WeakBox<AppKitOrUIKitViewController>>] = newValue
+        }
+    }
+    
     public var _appKitOrUIKitViewController: AppKitOrUIKitViewController? {
         get {
-            self[DefaultEnvironmentKey<AppKitOrUIKitViewController>]
+            _appKitOrUIKitViewControllerBox.value
         } set {
-            self[DefaultEnvironmentKey<AppKitOrUIKitViewController>] = newValue
+            _appKitOrUIKitViewControllerBox.value = newValue
         }
     }
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public var _appKitOrUIKitWindowScene: UIWindowScene? {
-        get {
-            self[DefaultEnvironmentKey<UIWindowScene>]
-        } set {
-            self[DefaultEnvironmentKey<UIWindowScene>] = newValue
-        }
+        _appKitOrUIKitViewController?.view.window?.windowScene
     }
     #endif
 }
 
 struct _ResolveAppKitOrUIKitViewController: ViewModifier {
-    @State var _appKitOrUIKitViewController: AppKitOrUIKitViewController?
+    @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
     
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
-            .environment(\._appKitOrUIKitViewController, _appKitOrUIKitViewController)
-            .environment(\._appKitOrUIKitWindowScene, _appKitOrUIKitViewController?.view.window?.windowScene)
-            .environment(\.navigator, _appKitOrUIKitViewController?.navigationController)
+            .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
+            .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
             .onUIViewControllerResolution { viewController in
-                if !(_appKitOrUIKitViewController === viewController) {
-                    _appKitOrUIKitViewController = viewController
+                if !(_appKitOrUIKitViewControllerBox.value === viewController) {
+                    _appKitOrUIKitViewControllerBox = .init(viewController)
                 }
             }
         #else

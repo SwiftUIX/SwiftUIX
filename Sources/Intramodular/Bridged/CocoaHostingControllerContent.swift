@@ -9,23 +9,17 @@ import SwiftUI
 
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: CocoaController?
-    weak var presentationCoordinator: CocoaPresentationCoordinator?
     
     public var content: Content
     
-    init(
-        parent: CocoaController?,
-        content: Content,
-        presentationCoordinator: CocoaPresentationCoordinator?
-    ) {
+    init(parent: CocoaController?, content: Content) {
         self.content = content
-        self.presentationCoordinator = presentationCoordinator
     }
     
     public var body: some View {
         content
-            .modifier(_ResolveAppKitOrUIKitViewController())
-            .modifier(_UseCocoaPresentationCoordinator(coordinator: presentationCoordinator))
+            .modifier(_ResolveAppKitOrUIKitViewController(_appKitOrUIKitViewControllerBox: .init(parent)))
+            .modifier(_UseCocoaPresentationCoordinator(coordinator: parent?.presentationCoordinator))
     }
 }
 
