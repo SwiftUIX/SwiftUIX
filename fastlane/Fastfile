@@ -1,15 +1,4 @@
-EXCLUDE_MACOS_DESTINATION = ENV["XCODE_VERSION"] == "12" || ENV["XCODE_VERSION"] == "12.1" || ENV["XCODE_VERSION"] == "12.1.1"
-
-DESTINATIONS=EXCLUDE_MACOS_DESTINATION ?
-"\
--destination 'generic/platform=iOS' \
--destination 'generic/platform=iOS Simulator' \
--destination 'generic/platform=tvOS' \
--destination 'generic/platform=tvOS Simulator' \
--destination 'generic/platform=watchOS' \
--destination 'generic/platform=watchOS Simulator'\
-"
-:
+DESTINATIONS=
 "\
 -destination 'generic/platform=iOS' \
 -destination 'generic/platform=iOS Simulator' \
