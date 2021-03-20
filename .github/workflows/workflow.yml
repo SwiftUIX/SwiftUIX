@@ -16,7 +16,6 @@ jobs:
             xcode: '12.5'
     runs-on: ${{ matrix.os }}
     env:
-      XCODE_VERSION: ${{ matrix.xcode }}
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out repository
