@@ -123,7 +123,7 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionModel == KeyP
     ) where Items.Element == ItemType {
         var data = Data.init()
         
-        data.append(.init(model: KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items))
+        data.append(.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items))
         
         self.init(
             data,
@@ -140,7 +140,7 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionModel == KeyP
         
         let content = content()
         
-        data.append(.init(model: KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: content.data))
+        data.append(.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: content.data))
         
         self.init(
             data,
@@ -157,7 +157,7 @@ extension CocoaList where Data == Array<ListSection<SectionModel, ItemType>>, Se
         @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
     ) where Items.Element == ItemType {
         self.init(
-            [.init(model: KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items)],
+            [.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items)],
             sectionHeader: Never.produce,
             sectionFooter: Never.produce,
             rowContent: rowContent

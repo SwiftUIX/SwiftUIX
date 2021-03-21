@@ -17,7 +17,7 @@ public struct ListSection<SectionType, ItemType> {
     public let items: AnyRandomAccessCollection<ItemType>
     
     public init<Items: RandomAccessCollection>(
-        model: SectionType,
+        _ model: SectionType,
         items: Items
     ) where Items.Element == ItemType  {
         self._id = nil
@@ -29,7 +29,7 @@ public struct ListSection<SectionType, ItemType> {
         _ model: SectionType,
         @ArrayBuilder<ItemType> items: () -> [ItemType]
     ) {
-        self.init(model: model, items: items())
+        self.init(model, items: items())
     }
 }
 

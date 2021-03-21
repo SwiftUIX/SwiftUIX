@@ -40,7 +40,7 @@ extension CollectionView {
                     .diffableDataSource(dataSource),
                     sectionHeader: Never.produce,
                     sectionFooter: Never.produce,
-                    rowContent: rowContent
+                    rowContent: { rowContent($1) }
                 )
                 .eraseToAnyView()
         )
@@ -52,7 +52,7 @@ extension CollectionView {
     ) where Data.Element: Identifiable {
         self.init(
             internalBody: _CollectionView(
-                [ListSection(model: 0, items: data.lazy.map(_IdentifierHashedValue.init))],
+                CollectionOfOne(ListSection(0, items: data.lazy.map(_IdentifierHashedValue.init))),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
                 rowContent: { rowContent($0.value) }
@@ -68,10 +68,135 @@ extension CollectionView {
     ) {
         self.init(
             internalBody: _CollectionView(
-                [ListSection(model: 0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))],
+                CollectionOfOne(ListSection(0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
                 rowContent: { rowContent($0.value.value) }
+            )
+            .eraseToAnyView()
+        )
+    }
+}
+
+extension CollectionView {
+    public init<
+        Data: RandomAccessCollection,
+        ID: Hashable,
+        Items: RandomAccessCollection,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
+    ) where Items.Element: Identifiable {
+        self.init(
+            internalBody: _CollectionView(
+                data.lazy.map { section in
+                    ListSection(
+                        model: _IdentifierHashedValue(
+                            KeyPathHashIdentifiableValue(
+                                value: section,
+                                keyPath: id
+                            )
+                        ),
+                        items: rowContent(section).content.data.lazy.map { item in
+                            _CollectionViewSectionedItem(item: item, section: section[keyPath: id])
+                        }
+                    )
+                },
+                sectionHeader: { section in
+                    rowContent(section.value.value).header
+                },
+                sectionFooter: { section in
+                    rowContent(section.value.value).footer
+                },
+                rowContent: { section, item  in
+                    rowContent(section.value.value).content.content(item.item)
+                }
+            )
+            .eraseToAnyView()
+        )
+    }
+    
+    public init<
+        Data: RandomAccessCollection,
+        ID: Hashable,
+        Items: RandomAccessCollection,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element, RowContent>, Footer>
+    ) where Items.Element: Hashable {
+        self.init(
+            internalBody: _CollectionView(
+                data.lazy.map { section in
+                    ListSection(
+                        model: _IdentifierHashedValue(
+                            KeyPathHashIdentifiableValue(
+                                value: section,
+                                keyPath: id
+                            )
+                        ),
+                        items: rowContent(section).content.data.lazy.map { item in
+                            _CollectionViewSectionedItem(item: KeyPathHashIdentifiableValue(value: item, keyPath: \.self), section: section[keyPath: id])
+                        }
+                    )
+                },
+                sectionHeader: { section in
+                    rowContent(section.value.value).header
+                },
+                sectionFooter: { section in
+                    rowContent(section.value.value).footer
+                },
+                rowContent: { section, item  in
+                    rowContent(section.value.value).content.content(item.item.value)
+                }
+            )
+            .eraseToAnyView()
+        )
+    }
+    
+    public init<
+        Data: RandomAccessCollection,
+        ID: Hashable,
+        Items: RandomAccessCollection,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Int, RowContent>, Footer>
+    ) where Items.Element: Hashable {
+        self.init(
+            internalBody: _CollectionView(
+                data.lazy.map { section in
+                    ListSection(
+                        model: _IdentifierHashedValue(
+                            KeyPathHashIdentifiableValue(
+                                value: section,
+                                keyPath: id
+                            )
+                        ),
+                        items: rowContent(section).content.data.lazy.map { item in
+                            _CollectionViewSectionedItem(item: KeyPathHashIdentifiableValue(value: item, keyPath: \.hashValue), section: section[keyPath: id])
+                        }
+                    )
+                },
+                sectionHeader: { section in
+                    rowContent(section.value.value).header
+                },
+                sectionFooter: { section in
+                    rowContent(section.value.value).footer
+                },
+                rowContent: { section, item  in
+                    rowContent(section.value.value).content.content(item.item.value)
+                }
             )
             .eraseToAnyView()
         )
@@ -130,6 +255,7 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    /// Sets whether the collection view allows multiple selection.
     public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
         then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
     }
@@ -140,10 +266,12 @@ extension CollectionView {
         then({ $0._scrollViewConfiguration.onOffsetChange = body })
     }
     
+    /// Sets whether the collection view animates differences in the data source.
     public func disableAnimatingDifferences(_ disableAnimatingDifferences: Bool) -> Self {
         then({ $0._collectionViewConfiguration.disableAnimatingDifferences = disableAnimatingDifferences })
     }
     
+    /// Sets the collection view's reordering cadence.
     @available(tvOS, unavailable)
     public func reorderingCadence(_ reorderingCadence: UICollectionView.ReorderingCadence) -> Self {
         then({
@@ -182,6 +310,24 @@ extension CollectionView {
 #endif
 
 // MARK: - Auxiliary Implementation -
+
+fileprivate struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: Hashable>: Hashable, Identifiable {
+    let item: Item
+    let section: SectionID
+    
+    var id: some Hashable {
+        hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(item.id)
+        hasher.combine(section)
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.section == rhs.section && lhs.item.id == rhs.item.id
+    }
+}
 
 fileprivate struct _IdentifierHashedValue<Value: Identifiable>: Hashable, Identifiable {
     let value: Value

@@ -34,7 +34,7 @@ struct _CollectionView<
     struct ViewProvider {
         let sectionHeader: (SectionType) -> SectionHeader
         let sectionFooter: (SectionType) -> SectionFooter
-        let rowContent: (ItemType) -> RowContent
+        let rowContent: (SectionType, ItemType) -> RowContent
     }
     
     typealias Configuration = _CollectionViewConfiguration
@@ -87,13 +87,34 @@ extension _CollectionView {
         SectionType: Hashable,
         ItemType: Hashable,
         Data.Element == ListSection<SectionType, ItemType>,
-        SectionIdentifierType == SectionType, ItemIdentifierType == ItemType
+        SectionIdentifierType == SectionType,
+        ItemIdentifierType == ItemType
     {
         self.init(
             .static(.init(data)),
             sectionHeader: sectionHeader,
             sectionFooter: sectionFooter,
-            rowContent: rowContent
+            rowContent: { rowContent($1) }
+        )
+    }
+    
+    init<Data: RandomAccessCollection>(
+        _ data: Data,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
+        rowContent: @escaping (SectionType, ItemType) -> RowContent
+    ) where
+        SectionType: Hashable,
+        ItemType: Hashable,
+        Data.Element == ListSection<SectionType, ItemType>,
+        SectionIdentifierType == SectionType,
+        ItemIdentifierType == ItemType
+    {
+        self.init(
+            .static(.init(data)),
+            sectionHeader: sectionHeader,
+            sectionFooter: sectionFooter,
+            rowContent: { rowContent($0, $1) }
         )
     }
 }
@@ -108,7 +129,7 @@ extension _CollectionView where
         _ dataSource: UIViewControllerType.DataSource,
         sectionHeader: @escaping (SectionType) -> SectionHeader,
         sectionFooter: @escaping (SectionType) -> SectionFooter,
-        rowContent: @escaping (ItemType) -> RowContent
+        rowContent: @escaping (SectionType, ItemType) -> RowContent
     ) {
         self.dataSource = dataSource
         self.dataSourceConfiguration = .init(

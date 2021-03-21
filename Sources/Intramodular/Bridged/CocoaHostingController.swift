@@ -42,11 +42,11 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
                 content: mainView
             )
         )
-        
+    
         presentationCoordinator.setViewController(self)
         
         self.rootView.parent = self
-        
+    
         if let mainView = mainView as? AnyPresentationView {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)

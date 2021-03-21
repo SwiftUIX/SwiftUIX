@@ -16,6 +16,27 @@ extension ForEach {
 }
 
 extension ForEach where Content: View {
+    public init<_Data: RandomAccessCollection>(
+        _ data: _Data,
+        id: KeyPath<_Data.Element, _Data.Element>,
+        @ViewBuilder content: @escaping (_Data.Element) -> Content
+    ) where _Data.Element: Hashable, Data == AnyRandomAccessCollection<KeyPathHashIdentifiableValue<_Data.Element, ID>>, ID == _Data.Element {
+        self.init(data.elements(identifiedBy: id), id: \.id) {
+            content($0.value)
+        }
+    }
+
+    public init<_Element>(
+        _ data: Data,
+        @ViewBuilder content: @escaping (_Element) -> Content
+    ) where Data.Element == KeyPathHashIdentifiableValue<_Element, ID> {
+        self.init(data) {
+            content($0.value)
+        }
+    }
+}
+
+extension ForEach where Content: View {
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         id: KeyPath<Elements.Element, ID>,
@@ -101,6 +122,14 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
 }
 
 // MARK: - Helpers -
+
+extension RandomAccessCollection {
+    public func elements<ID>(
+        identifiedBy id: KeyPath<Element, ID>
+    ) -> AnyRandomAccessCollection<KeyPathHashIdentifiableValue<Element, ID>> {
+        .init(lazy.map({ KeyPathHashIdentifiableValue(value: $0, keyPath: id) }))
+    }
+}
 
 public struct _IdentifiableElementOffsetPair<Element: Identifiable, Offset>: Identifiable {
     let element: Element
