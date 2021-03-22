@@ -8,7 +8,7 @@ import AppKit
 import Swift
 import SwiftUI
 
-public struct OldToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
+public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
     private let content: Content
@@ -64,7 +64,7 @@ public struct OldToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
     public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
         context.coordinator.toolbar = toolbar
         
-        let rootView = content.onPreferenceChange(OldToolbarViewItemsPreferenceKey.self) { items in
+        let rootView = content.onPreferenceChange(TitlebarConfigurationViewItemsPreferenceKey.self) { items in
             context.coordinator.items = items.map({ $0.toNSToolbarItem() })
         }
         
@@ -130,6 +130,6 @@ public struct OldToolbarView<Content: View>: AppKitOrUIKitViewRepresentable {
 import Swift
 import SwiftUI
 
-public typealias OldToolbarView<Content: View> = PassthroughView<Content>
+public typealias TitlebarConfigurationView<Content: View> = PassthroughView<Content>
 
 #endif

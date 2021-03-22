@@ -17,7 +17,7 @@ import UIKit
 #endif
 
 /// A toolbar item.
-public struct OldToolbarItem {
+public struct TitlebarItem {
     public enum Content {
         #if os(iOS) || targetEnvironment(macCatalyst)
         case systemSymbol(SFSymbolName)
@@ -60,7 +60,7 @@ public struct OldToolbarItem {
     #endif
 }
 
-extension OldToolbarItem {
+extension TitlebarItem {
     static var targetAssociationKey: Void = ()
     
     #if os(macOS) || targetEnvironment(macCatalyst)
@@ -98,7 +98,7 @@ extension OldToolbarItem {
                 break
         }
         
-        objc_setAssociatedObject(result, &OldToolbarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(result, &TitlebarItem.targetAssociationKey, target, .OBJC_ASSOCIATION_RETAIN)
         
         result.action = #selector(NSToolbarItem._ActionTarget.performAction)
         result.isEnabled = true
@@ -120,7 +120,7 @@ extension OldToolbarItem {
 
 // MARK: - Protocol Conformances -
 
-extension OldToolbarItem: Equatable {
+extension TitlebarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.itemIdentifier == rhs.itemIdentifier
     }
@@ -128,7 +128,7 @@ extension OldToolbarItem: Equatable {
 
 // MARK: - API -
 
-extension OldToolbarItem {
+extension TitlebarItem {
     public func content(_ content: Content) -> Self {
         var result = self
         
@@ -171,21 +171,17 @@ extension OldToolbarItem {
 }
 
 extension View {
-    #if os(macOS)
-    public func toolbarItem(withIdentifier identifier: String) -> OldToolbarItem {
-        .init(itemIdentifier: identifier, content: .view(.init(self)))
-    }
-    #endif
-    
-    public func toolbarItems(_ toolbarItems: OldToolbarItem...) -> some View {
-        preference(key: OldToolbarViewItemsPreferenceKey.self, value: toolbarItems)
+    public func titlebar(
+        @ArrayBuilder<TitlebarItem> items: () -> [TitlebarItem]
+    ) -> some View {
+        preference(key: TitlebarConfigurationViewItemsPreferenceKey.self, value: items())
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-public struct OldToolbarViewItemsPreferenceKey: PreferenceKey {
-    public typealias Value = [OldToolbarItem]
+public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
+    public typealias Value = [TitlebarItem]
     
     public static var defaultValue: Value {
         []

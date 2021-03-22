@@ -17,7 +17,7 @@ extension UIHostingCollectionViewController {
         private var identifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToContentSizeMap: [IndexPath: CGSize] = [:]
         private var indexPathToIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
-
+        
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
         private let prototypeHeaderView = UICollectionViewSupplementaryViewType()
