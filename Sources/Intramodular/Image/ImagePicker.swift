@@ -18,28 +18,27 @@ public struct ImagePicker: UIViewControllerRepresentable {
     var allowsEditing = false
     @usableFromInline
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @usableFromInline
+    var onCancel: (() -> Void)?
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         UIImagePickerController().then {
-            $0.allowsEditing = allowsEditing
-            $0.sourceType = sourceType
-            
             $0.delegate = context.coordinator
         }
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        context.coordinator.parent = self
+        context.coordinator.base = self
         
         uiViewController.allowsEditing = allowsEditing
         uiViewController.sourceType = sourceType
     }
     
     public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        var parent: ImagePicker
+        var base: ImagePicker
         
-        init(parent: ImagePicker) {
-            self.parent = parent
+        init(base: ImagePicker) {
+            self.base = base
         }
         
         public func imagePickerController(
@@ -48,37 +47,50 @@ public struct ImagePicker: UIViewControllerRepresentable {
         ) {
             let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
             
-            parent.data = image?._fixOrientation().data(using: parent.encoding)
+            base.data = (image?._fixOrientation() ?? image)?.data(using: base.encoding)
             
-            parent.presentationManager.dismiss()
+            base.presentationManager.dismiss()
         }
         
         public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.presentationManager.dismiss()
+            if let onCancel = base.onCancel {
+                onCancel()
+            } else {
+                base.presentationManager.dismiss()
+            }
         }
     }
     
     public func makeCoordinator() -> Coordinator {
-        .init(parent: self)
+        .init(base: self)
     }
 }
 
 // MARK: - API -
 
 extension ImagePicker {
-    public init(data: Binding<Data?>, encoding: Image.Encoding) {
+    public init(
+        data: Binding<Data?>,
+        encoding: Image.Encoding,
+        onCancel: (() -> Void)? = nil
+    ) {
         self._data = data
         self.encoding = encoding
+        self.onCancel = onCancel
     }
     
-    public init(image: Binding<AppKitOrUIKitImage?>, encoding: Image.Encoding) {
+    public init(
+        image: Binding<AppKitOrUIKitImage?>,
+        encoding: Image.Encoding,
+        onCancel: (() -> Void)? = nil
+    ) {
         self._data = .init(
             get: { image.wrappedValue.flatMap({ $0.data(using: encoding) }) },
             set: { image.wrappedValue = $0.flatMap(AppKitOrUIKitImage.init(data:)) }
         )
         self.encoding = encoding
+        self.onCancel = onCancel
     }
-    
 }
 
 extension ImagePicker {
@@ -106,7 +118,7 @@ extension UIImage {
         }
     }
     
-    func _fixOrientation() -> UIImage {
+    func _fixOrientation() -> UIImage? {
         guard imageOrientation != .up else {
             return self
         }
@@ -119,7 +131,7 @@ extension UIImage {
         
         draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         
-        return UIGraphicsGetImageFromCurrentImageContext()!
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
 
