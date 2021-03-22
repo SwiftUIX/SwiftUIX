@@ -82,6 +82,10 @@ extension SearchBar: UIViewRepresentable {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         context.coordinator.base = self
         
+        if let font = context.environment.font?.toUIFont() {
+            uiView._retrieveTextField()?.font = font
+        }
+        
         uiView.placeholder = placeholder
         uiView.searchBarStyle = searchBarStyle
         
