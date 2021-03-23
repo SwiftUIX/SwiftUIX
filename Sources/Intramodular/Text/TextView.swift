@@ -9,40 +9,40 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {
+    struct _Configuration {
+        var onEditingChanged: (Bool) -> Void
+        var onCommit: () -> Void
+
+        var appKitOrUIKitFont: AppKitOrUIKitFont?
+        var textColor: UIColor?
+    }
+
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
     
-    private let label: Label
-    
-    @Binding private var text: String
-    
-    private var onEditingChanged: (Bool) -> Void
-    private var onCommit: () -> Void
+    private var label: Label
+    private var text: Binding<String>
+    private var configuration: _Configuration
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var customAppKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
     #endif
-    private var appKitOrUIKitFont: AppKitOrUIKitFont?
     
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
             label
-                .visible(text.isEmpty)
+                .visible(text.wrappedValue.isEmpty)
                 .animation(.none)
             
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             _TextView<Label>(
-                text: $text,
-                onEditingChanged: onEditingChanged,
-                onCommit: onCommit,
-                customAppKitOrUIKitClass: customAppKitOrUIKitClass,
-                appKitOrUIKitFont: appKitOrUIKitFont
+                text: text,
+                configuration: configuration,
+                customAppKitOrUIKitClass: customAppKitOrUIKitClass
             )
             #else
             _TextView<Label>(
-                text: $text,
-                onEditingChanged: onEditingChanged,
-                onCommit: onCommit,
-                appKitOrUIKitFont: appKitOrUIKitFont
+                text: text,
+                configuration: configuration
             )
             #endif
         }
@@ -52,15 +52,14 @@ public struct TextView<Label: View>: View {
 // MARK: - Implementation -
 
 fileprivate struct _TextView<Label: View> {
-    @Binding var text: String
-    
-    var onEditingChanged: (Bool) -> Void
-    var onCommit: () -> Void
+    typealias Configuration = TextView<Label>._Configuration
+
+    let text: Binding<String>
+    let configuration: Configuration
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var customAppKitOrUIKitClass: UITextView.Type
     #endif
-    var appKitOrUIKitFont: AppKitOrUIKitFont?
 }
 
 #if os(iOS) || os(tvOS)
@@ -71,23 +70,25 @@ extension _TextView: UIViewRepresentable {
     typealias UIViewType = UITextView
     
     class Coordinator: NSObject, UITextViewDelegate {
-        var view: _TextView
+        var text: Binding<String>
+        var configuration: Configuration
         
-        init(_ view: _TextView) {
-            self.view = view
+        init(text: Binding<String>, configuration: Configuration) {
+            self.text = text
+            self.configuration = configuration
         }
         
         func textViewDidBeginEditing(_ textView: UITextView) {
-            view.onEditingChanged(true)
+            configuration.onEditingChanged(true)
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            view.text = textView.text
+            text.wrappedValue = textView.text
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            view.onEditingChanged(false)
-            view.onCommit()
+            configuration.onEditingChanged(false)
+            configuration.onCommit()
         }
     }
     
@@ -111,7 +112,7 @@ extension _TextView: UIViewRepresentable {
         
         uiView.backgroundColor = nil
         
-        let font: UIFont = appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        let font: UIFont = configuration.appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         
         #if !os(tvOS)
         uiView.isEditable = context.environment.isEnabled
@@ -130,7 +131,7 @@ extension _TextView: UIViewRepresentable {
             }
             
             uiView.attributedText = NSAttributedString(
-                string: text,
+                string: text.wrappedValue,
                 attributes: [
                     NSAttributedString.Key.paragraphStyle: paragraphStyle,
                     NSAttributedString.Key.font: font
@@ -138,11 +139,15 @@ extension _TextView: UIViewRepresentable {
             )
             
         } else {
-            uiView.text = text
+            uiView.text = text.wrappedValue
             
             // `UITextView`'s default font is smaller than SwiftUI's default font.
             // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
             uiView.font = font
+        }
+
+        if let textColor = configuration.textColor {
+            uiView.textColor = textColor
         }
         
         uiView.textContainer.lineFragmentPadding = .zero
@@ -157,7 +162,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        .init(text: text, configuration: configuration)
     }
 }
 
@@ -234,9 +239,8 @@ extension TextView where Label == EmptyView {
         onCommit: @escaping () -> Void = { }
     ) {
         self.label = EmptyView()
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
+        self.text = text
+        self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
     }
     
     public init(
@@ -260,9 +264,8 @@ extension TextView: DefaultTextInputType where Label == Text {
         onCommit: @escaping () -> Void = { }
     ) {
         self.label = Text(title).foregroundColor(.placeholderText)
-        self._text = text
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
+        self.text = text
+        self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
     }
     
     public init<S: StringProtocol>(
@@ -288,7 +291,11 @@ extension TextView {
     #endif
     
     public func font(_ font: AppKitOrUIKitFont) -> Self {
-        then({ $0.appKitOrUIKitFont = font })
+        then({ $0.configuration.appKitOrUIKitFont = font })
+    }
+
+    public func foregroundColor(_ foregroundColor: Color) -> Self {
+        then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
 }
 
