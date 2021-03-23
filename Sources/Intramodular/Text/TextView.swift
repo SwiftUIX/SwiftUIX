@@ -13,10 +13,8 @@ public struct TextView<Label: View>: View {
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
 
-        var appKitOrUIKitFont: AppKitOrUIKitFont?
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        var textColor: UIColor?
-        #endif
+        var font: AppKitOrUIKitFont?
+        var textColor: AppKitOrUIKitColor?
     }
 
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
@@ -114,7 +112,7 @@ extension _TextView: UIViewRepresentable {
         
         uiView.backgroundColor = nil
         
-        let font: UIFont = configuration.appKitOrUIKitFont ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+        let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         
         #if !os(tvOS)
         uiView.isEditable = context.environment.isEnabled
@@ -223,6 +221,7 @@ extension _TextView: NSViewRepresentable {
     
     func updateNSView(_ nsView: NSViewType, context: Context) {
         nsView.string = text.wrappedValue
+        nsView.textColor = configuration.textColor
     }
 }
 
@@ -294,15 +293,14 @@ extension TextView {
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
-
-    @_disfavoredOverload
-    public func foregroundColor(_ foregroundColor: UIColor) -> Self {
-        then({ $0.configuration.textColor = foregroundColor })
-    }
     #endif
     
     public func font(_ font: AppKitOrUIKitFont) -> Self {
-        then({ $0.configuration.appKitOrUIKitFont = font })
+        then({ $0.configuration.font = font })
+    }
+
+    public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
+        then({ $0.configuration.textColor = foregroundColor })
     }
 }
 
