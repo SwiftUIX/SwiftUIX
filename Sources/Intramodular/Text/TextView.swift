@@ -299,6 +299,7 @@ extension TextView {
         then({ $0.configuration.font = font })
     }
 
+    @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
     }
