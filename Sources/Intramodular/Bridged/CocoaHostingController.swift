@@ -95,6 +95,11 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
         }
     }
+    
+    override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
     #elseif os(macOS)
     override open func viewDidLayout() {
         super.viewDidLayout()
