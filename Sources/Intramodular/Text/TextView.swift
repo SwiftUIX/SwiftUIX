@@ -14,7 +14,9 @@ public struct TextView<Label: View>: View {
         var onCommit: () -> Void
 
         var appKitOrUIKitFont: AppKitOrUIKitFont?
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         var textColor: UIColor?
+        #endif
     }
 
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
@@ -185,9 +187,9 @@ extension _TextView: NSViewRepresentable {
                 return
             }
             
-            view.text = textView.string
+            view.text.wrappedValue = textView.string
             
-            view.onEditingChanged(true)
+            view.configuration.onEditingChanged(true)
         }
         
         func textDidChange(_ notification: Notification) {
@@ -195,12 +197,12 @@ extension _TextView: NSViewRepresentable {
                 return
             }
             
-            view.text = textView.string
+            view.text.wrappedValue = textView.string
         }
         
         func textDidEndEditing(_ notification: Notification) {
-            view.onEditingChanged(false)
-            view.onCommit()
+            view.configuration.onEditingChanged(false)
+            view.configuration.onCommit()
         }
     }
     
@@ -220,7 +222,7 @@ extension _TextView: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSViewType, context: Context) {
-        nsView.string = text
+        nsView.string = text.wrappedValue
     }
 }
 
@@ -288,11 +290,6 @@ extension TextView {
     public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
         then({ $0.customAppKitOrUIKitClass = type })
     }
-    #endif
-    
-    public func font(_ font: AppKitOrUIKitFont) -> Self {
-        then({ $0.configuration.appKitOrUIKitFont = font })
-    }
 
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
@@ -301,6 +298,11 @@ extension TextView {
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: UIColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
+    }
+    #endif
+    
+    public func font(_ font: AppKitOrUIKitFont) -> Self {
+        then({ $0.configuration.appKitOrUIKitFont = font })
     }
 }
 
