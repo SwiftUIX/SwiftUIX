@@ -10,6 +10,7 @@ import SwiftUI
 extension UIHostingCollectionViewSupplementaryView {
     struct Configuration: Identifiable {
         struct ID: Hashable {
+            let kind: String
             let item: ItemIdentifierType?
             let section: SectionIdentifierType
         }
@@ -24,7 +25,7 @@ extension UIHostingCollectionViewSupplementaryView {
         let maximumSize: OptionalDimensions?
         
         var id: ID {
-            .init(item: itemIdentifier, section: sectionIdentifier)
+            .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
         }
     }
 }
@@ -106,13 +107,13 @@ class UIHostingCollectionViewSupplementaryView<
         super.prepareForReuse()
     }
     
-    override func preferredLayoutAttributesFitting(
+    /* override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
         layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
         
         return layoutAttributes
-    }
+    }*/
 }
 
 extension UIHostingCollectionViewSupplementaryView {

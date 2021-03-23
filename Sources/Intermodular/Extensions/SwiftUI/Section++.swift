@@ -7,15 +7,15 @@ import SwiftUI
 
 extension Section {
     public var header: Parent {
-        Mirror(reflecting: self).children.first(where: { $0.label == "header" })?.value as! Parent
+        unsafeBitCast(self, to: (Parent, Content, Footer).self).0
     }
     
     public var content: Content {
-        Mirror(reflecting: self).children.first(where: { $0.label == "content" })?.value as! Content
+        unsafeBitCast(self, to: (Parent, Content, Footer).self).1
     }
     
     public var footer: Footer {
-        Mirror(reflecting: self).children.first(where: { $0.label == "footer" })?.value as! Footer
+        unsafeBitCast(self, to: (Parent, Content, Footer).self).2
     }
 }
 

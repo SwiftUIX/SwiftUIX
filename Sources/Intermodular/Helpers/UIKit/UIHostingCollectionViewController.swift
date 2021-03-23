@@ -262,9 +262,7 @@ public final class UIHostingCollectionViewController<
                 makeContent: self.viewProvider.rowContent,
                 maximumSize: self.maximumCellSize
             )
-            
-            cell.cellWillDisplay(inParent: self)
-            
+                        
             return cell
         }
         

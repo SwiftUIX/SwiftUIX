@@ -37,8 +37,6 @@ extension UIHostingCollectionViewCell {
         var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
         var _namedViewDescription: _NamedViewDescription?
         var relativeFrame: RelativeFrame?
-        
-        var preferredCellLayoutAttributesSize: CGSize?
     }
 }
 
@@ -66,6 +64,8 @@ class UIHostingCollectionViewCell<
             if oldValue?.id != configuration?.id {
                 preferences = .init()
             }
+            
+            update()
         }
     }
     
@@ -78,6 +78,7 @@ class UIHostingCollectionViewCell<
     }
     
     private var contentHostingController: ContentHostingController?
+    private var preferredContentSize: CGSize?
     
     private weak var parentViewController: ParentViewControllerType?
     
@@ -93,12 +94,20 @@ class UIHostingCollectionViewCell<
     
     override var isHighlighted: Bool {
         didSet {
+            guard oldValue != isHighlighted else {
+                return
+            }
+            
             update()
         }
     }
     
     override var isSelected: Bool {
         didSet {
+            guard oldValue != isSelected else {
+                return
+            }
+            
             update()
         }
     }
@@ -141,9 +150,8 @@ class UIHostingCollectionViewCell<
             if contentHostingController.view.frame != contentView.bounds {
                 contentHostingController.view.frame = contentView.bounds
                 contentHostingController.view.setNeedsLayout()
+                contentHostingController.view.layoutIfNeeded()
             }
-            
-            contentHostingController.view.layoutIfNeeded()
         }
     }
     
@@ -189,35 +197,28 @@ class UIHostingCollectionViewCell<
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        if let relativeFrame = preferences.relativeFrame {
-            layoutAttributes.size = relativeFrame.resolve(in: layoutAttributes.size)
-        } else if let preferredLayoutAttributesSize = preferences.preferredCellLayoutAttributesSize {
-            layoutAttributes.size = preferredLayoutAttributesSize
-        } else {
-            layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
-            
-            preferences.preferredCellLayoutAttributesSize = layoutAttributes.size
-        }
-        
         return layoutAttributes
     }
 }
 
 extension UIHostingCollectionViewCell {
-    func cellWillDisplay(inParent parentViewController: ParentViewControllerType?, isPrototype: Bool = false) {
+    func cellWillDisplay(
+        inParent parentViewController: ParentViewControllerType?,
+        isPrototype: Bool = false
+    ) {
+        guard let contentHostingController = contentHostingController else {
+            assertionFailure()
+            
+            return
+        }
+        
         defer {
             self.parentViewController = parentViewController
         }
         
-        if let contentHostingController = contentHostingController {
-            contentHostingController.update()
-        } else {
-            contentHostingController = ContentHostingController(base: self)
-        }
-        
         if let parentViewController = parentViewController {
-            if contentHostingController?.parent == nil {
-                contentHostingController?.move(toParent: parentViewController, ofCell: self)
+            if contentHostingController.parent == nil {
+                contentHostingController.move(toParent: parentViewController, ofCell: self)
             }
         } else if !isPrototype {
             assertionFailure()
@@ -225,15 +226,15 @@ extension UIHostingCollectionViewCell {
     }
     
     func cellDidEndDisplaying() {
-        defer {
-            self.parentViewController = nil
-        }
         
-        contentHostingController?.move(toParent: nil, ofCell: self)
     }
     
     func update() {
-        contentHostingController?.update()
+        if let contentHostingController = contentHostingController {
+            contentHostingController.update()
+        } else {
+            contentHostingController = ContentHostingController(base: self)
+        }
     }
 }
 
@@ -261,7 +262,6 @@ extension UIHostingCollectionViewCell {
         public var body: some View {
             if let configuration = configuration, let state = state, let preferences = preferences {
                 configuration.makeContent(configuration.section, configuration.item)
-                    .edgesIgnoringSafeArea(.all)
                     .environment(\.isCellFocused, state.isFocused)
                     .environment(\.isCellHighlighted, state.isHighlighted)
                     .environment(\.isCellSelected, state.isSelected)
@@ -274,7 +274,6 @@ extension UIHostingCollectionViewCell {
                     .onPreferenceChange(RelativeFrame.PreferenceKey.self) {
                         preferences.relativeFrame.wrappedValue = $0.last
                     }
-                    .id(configuration.id)
             }
         }
     }
@@ -344,14 +343,12 @@ extension UIHostingCollectionViewCell {
             }
             
             if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
-                guard currentConfiguration.id != newConfiguration.id else {
+                guard currentConfiguration.id != newConfiguration.id || mainView.state != base.state else {
                     return
                 }
             }
             
             mainView = .init(base: base)
-            
-            view.setNeedsDisplay()
         }
     }
 }
