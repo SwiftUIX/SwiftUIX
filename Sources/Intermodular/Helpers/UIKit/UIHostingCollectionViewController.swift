@@ -616,9 +616,13 @@ extension UIHostingCollectionViewController {
         
         var snapshot = _internalDataSource.snapshot()
         
-        let sectionDifference = sections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
+        let sectionDifference = sections.lazy
+            .map({ self.dataSourceConfiguration.identifierMap[$0] })
+            .difference(
+                from: oldSections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] })
+            )
         
-        snapshot.loadSectionDifference(sectionDifference)
+        snapshot.applySectionDifference(sectionDifference)
         
         var hasDataSourceChanged: Bool = false
         
@@ -635,7 +639,7 @@ extension UIHostingCollectionViewController {
             let difference = sectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
             
             if !difference.isEmpty {
-                snapshot.loadItemDifference(difference, inSection: self.dataSourceConfiguration.identifierMap[section])
+                snapshot.applyItemDifference(difference, inSection: self.dataSourceConfiguration.identifierMap[section])
                 
                 hasDataSourceChanged = true
             }
@@ -858,11 +862,11 @@ fileprivate extension CollectionDifference where ChangeElement: Equatable {
 }
 
 fileprivate extension NSDiffableDataSourceSnapshot {
-    mutating func loadSectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
-        difference.forEach({ loadSectionChanges($0) })
+    mutating func applySectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
+        difference.forEach({ applySectionChanges($0) })
     }
     
-    mutating func loadSectionChanges(_ change: CollectionDifference<SectionIdentifierType>.Change) {
+    mutating func applySectionChanges(_ change: CollectionDifference<SectionIdentifierType>.Change) {
         switch change {
             case .insert(offset: sectionIdentifiers.count, let element, _):
                 appendSections([element])
@@ -873,18 +877,25 @@ fileprivate extension NSDiffableDataSourceSnapshot {
         }
     }
     
-    mutating func loadItemDifference(
+    mutating func applyItemDifference(
         _ difference: CollectionDifference<ItemIdentifierType>, inSection section: SectionIdentifierType
     ) {
-        difference.forEach({ loadItemChanges($0, inSection: section) })
+        difference.forEach({ applyItemChange($0, inSection: section) })
     }
     
-    mutating func loadItemChanges(_ change: CollectionDifference<ItemIdentifierType>.Change, inSection section: SectionIdentifierType) {
+    mutating func applyItemChange(_ change: CollectionDifference<ItemIdentifierType>.Change, inSection section: SectionIdentifierType) {
         switch change {
             case .insert(itemIdentifiers(inSection: section).count, let element, _):
                 appendItems([element], toSection: section)
-            case .insert(let offset, let element, _):
-                insertItems([element], beforeItem: itemIdentifiers(inSection: section)[offset])
+            case .insert(let offset, let element, _): do {
+                let items = itemIdentifiers(inSection: section)
+                
+                if offset < items.count {
+                    insertItems([element], beforeItem: items[offset])
+                } else {
+                    appendItems([element])
+                }
+            }
             case .remove(_, let element, _):
                 deleteItems([element])
         }
