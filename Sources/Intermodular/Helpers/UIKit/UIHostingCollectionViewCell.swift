@@ -274,6 +274,7 @@ extension UIHostingCollectionViewCell {
                     .onPreferenceChange(RelativeFrame.PreferenceKey.self) {
                         preferences.relativeFrame.wrappedValue = $0.last
                     }
+                    .edgesIgnoringSafeArea(.all)
             }
         }
     }

@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableViewCell<ItemType: Identifiable, Content: View> : UITableViewCell {
+public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITableViewCell {
     var tableViewController: UITableViewController!
     var indexPath: IndexPath?
     

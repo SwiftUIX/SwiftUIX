@@ -7,7 +7,7 @@
 import SwiftUI
 import UIKit
 
-fileprivate struct UIViewControllerResolver: UIViewControllerRepresentable {
+fileprivate struct AppKitOrUIKitViewControllerResolver: UIViewControllerRepresentable {
     class UIViewControllerType: UIViewController {
         var onResolution: (UIViewController) -> Void = { _ in }
         var onAppear: (UIViewController) -> Void = { _ in }
@@ -78,7 +78,7 @@ extension View {
         perform action: @escaping (UIViewController) -> ()
     ) -> some View {
         background(
-            UIViewControllerResolver(
+            AppKitOrUIKitViewControllerResolver(
                 onResolution: action,
                 onAppear: { _ in },
                 onDisappear: { _ in },
@@ -95,7 +95,7 @@ extension View {
         onDeresolution deresolutionAction: @escaping (UIViewController) -> () = { _ in }
     ) -> some View {
         background(
-            UIViewControllerResolver(
+            AppKitOrUIKitViewControllerResolver(
                 onResolution: resolutionAction,
                 onAppear: onAppear,
                 onDisappear: onDisappear,

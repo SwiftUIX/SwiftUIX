@@ -67,9 +67,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
     }
 }
 
-struct _CocoaTextField<Label: View>: UIViewRepresentable {
+fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     typealias Configuration = CocoaTextField<Label>._Configuration
-    typealias UIViewType = UIHostingTextField
+    typealias UIViewType = _UITextField
     
     let text: Binding<String>
     let configuration: Configuration
@@ -116,7 +116,7 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let uiView = UIHostingTextField()
+        let uiView = _UITextField()
         
         uiView.delegate = context.coordinator
         
@@ -381,6 +381,26 @@ extension CocoaTextField where Label == Text {
             $0.label = Text(placeholder).kerning(configuration.kerning)
             $0.configuration.placeholder = placeholder
         }
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+private final class _UITextField: UITextField {
+    var onDeleteBackward: () -> Void = { }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func deleteBackward() {
+        super.deleteBackward()
+        
+        onDeleteBackward()
     }
 }
 

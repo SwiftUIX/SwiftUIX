@@ -73,6 +73,10 @@ public final class UIHostingCollectionViewController<
                 getItemID(item)
             }
             
+            subscript(_ item: ItemType?) -> ItemIdentifierType? {
+                item.map({ self[$0] })
+            }
+            
             subscript(_ itemID: ItemIdentifierType) -> ItemType {
                 getItemFromID(itemID)
             }
@@ -124,17 +128,8 @@ public final class UIHostingCollectionViewController<
         }
     }
     
-    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration {
-        didSet {
-            
-        }
-    }
-    
-    var viewProvider: _SwiftUIType.ViewProvider {
-        didSet {
-            
-        }
-    }
+    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration
+    var viewProvider: _SwiftUIType.ViewProvider
     
     var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
@@ -262,7 +257,7 @@ public final class UIHostingCollectionViewController<
                 makeContent: self.viewProvider.rowContent,
                 maximumSize: self.maximumCellSize
             )
-                        
+            
             return cell
         }
         
@@ -275,14 +270,17 @@ public final class UIHostingCollectionViewController<
                 return nil
             }
             
-            let item = self._unsafelyUnwrappedItem(at: indexPath)
-            let section = self._unsafelyUnwrappedSection(from: indexPath)
+            let item = self.item(at: indexPath)
             
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: .hostingCollectionViewSupplementaryViewIdentifier,
                 for: indexPath
             ) as! UICollectionViewSupplementaryViewType
+            
+            guard let section = self.section(from: indexPath) else {
+                return view
+            }
             
             view.configuration = .init(
                 kind: kind,
@@ -527,6 +525,22 @@ extension UIHostingCollectionViewController {
         } else {
             return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
         }
+    }
+    
+    func section(from indexPath: IndexPath) -> SectionType? {
+        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+            return nil
+        }
+        
+        return _unsafelyUnwrappedSection(from: indexPath)
+    }
+    
+    func item(at indexPath: IndexPath) -> ItemType? {
+        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+            return nil
+        }
+        
+        return _unsafelyUnwrappedItem(at: indexPath)
     }
     
     func cellForItem(at indexPath: IndexPath) -> UICollectionViewCellType? {

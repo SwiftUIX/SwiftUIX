@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: View> : UITableViewHeaderFooterView {
+class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: View>: UITableViewHeaderFooterView {
     var parent: UITableViewController!
     var item: SectionModel!
     var makeContent: ((SectionModel) -> Content)!
