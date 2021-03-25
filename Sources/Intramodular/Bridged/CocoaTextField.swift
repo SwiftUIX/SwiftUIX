@@ -9,6 +9,9 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: CocoaView {
+
+    public typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
+
     public struct CharactersChange {
         public let range: NSRange
         public let replacement: String
@@ -20,9 +23,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var onDeleteBackward: () -> Void = { }
         var onCharactersChange: (CharactersChange) -> Bool = { _ in true }
 
-        var textRect: UIHostingTextField.Rect?
-        var editingRect: UIHostingTextField.Rect?
-        var clearButtonRect: UIHostingTextField.Rect?
+        var textRect: Rect?
+        var editingRect: Rect?
+        var clearButtonRect: Rect?
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
@@ -383,15 +386,15 @@ extension CocoaTextField {
 }
 
 extension CocoaTextField {
-    public func textRect(_ textRect: @escaping UIHostingTextField.Rect) -> Self {
+    public func textRect(_ textRect: @escaping Rect) -> Self {
         then({ $0.configuration.textRect = textRect })
     }
 
-    public func editingRect(_ editingRect: @escaping UIHostingTextField.Rect) -> Self {
+    public func editingRect(_ editingRect: @escaping Rect) -> Self {
         then({ $0.configuration.editingRect = editingRect })
     }
 
-    public func clearButtonRect(_ clearButtonRect: @escaping UIHostingTextField.Rect) -> Self {
+    public func clearButtonRect(_ clearButtonRect: @escaping Rect) -> Self {
         then({ $0.configuration.clearButtonRect = clearButtonRect })
     }
 }
@@ -502,13 +505,11 @@ extension CocoaTextField where Label == Text {
 
 private final class _UITextField: UITextField {
 
-    typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
-
     var onDeleteBackward: () -> Void = { }
 
-    var textRect: Rect?
-    var editingRect: Rect?
-    var clearButtonRect: Rect?
+    var textRect: CocoaTextField<AnyView>.Rect?
+    var editingRect: CocoaTextField<AnyView>.Rect?
+    var clearButtonRect: CocoaTextField<AnyView>.Rect?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
