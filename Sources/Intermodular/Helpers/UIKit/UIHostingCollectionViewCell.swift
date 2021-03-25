@@ -71,7 +71,7 @@ class UIHostingCollectionViewCell<
     
     var state: State {
         .init(
-            isFocused: _isFocused ?? super.isFocused,
+            isFocused: isFocused,
             isHighlighted: isHighlighted,
             isSelected: isSelected
         )
@@ -92,18 +92,18 @@ class UIHostingCollectionViewCell<
         }
     }
     
-    var _isFocused: Bool? = nil {
-        didSet {
-            guard oldValue != _isFocused else {
+    var _isFocused: Bool? = nil
+    
+    override var isFocused: Bool {
+        get {
+            _isFocused ?? super.isFocused
+        } set {
+            guard newValue != _isFocused else {
                 return
             }
             
             update()
         }
-    }
-    
-    override var isFocused: Bool {
-        _isFocused ?? super.isFocused
     }
     
     override var isHighlighted: Bool {
@@ -203,6 +203,8 @@ class UIHostingCollectionViewCell<
     
     override func prepareForReuse() {
         super.prepareForReuse()
+
+        _isFocused = false
         
         super.isHighlighted = false
         super.isSelected = false

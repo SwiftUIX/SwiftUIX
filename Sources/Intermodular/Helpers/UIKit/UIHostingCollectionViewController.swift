@@ -380,11 +380,11 @@ public final class UIHostingCollectionViewController<
     
     public func collectionView(_ collectionView: UICollectionView, shouldUpdateFocusIn context: UICollectionViewFocusUpdateContext) -> Bool {
         if let previousCell = context.previouslyFocusedView as? UICollectionViewCellType {
-            previousCell._isFocused = false
+            previousCell.isFocused = false
         }
         
         if let nextCell = context.nextFocusedView as? UICollectionViewCellType {
-            nextCell._isFocused = true
+            nextCell.isFocused = true
         }
         
         return true
