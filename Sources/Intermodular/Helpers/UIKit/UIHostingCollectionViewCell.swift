@@ -102,6 +102,8 @@ class UIHostingCollectionViewCell<
                 return
             }
             
+            _isFocused = newValue
+            
             update()
         }
     }
