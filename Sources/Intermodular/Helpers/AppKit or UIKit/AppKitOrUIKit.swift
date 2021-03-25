@@ -155,25 +155,6 @@ extension EnvironmentValues {
     #endif
 }
 
-struct _ResolveAppKitOrUIKitViewController: ViewModifier {
-    @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
-    
-    func body(content: Content) -> some View {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        return content
-            .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
-            .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
-            .onUIViewControllerResolution { viewController in
-                if !(_appKitOrUIKitViewControllerBox.value === viewController) {
-                    _appKitOrUIKitViewControllerBox = .init(viewController)
-                }
-            }
-        #else
-        return content
-        #endif
-    }
-}
-
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public typealias UIViewControllerType = AppKitOrUIKitViewControllerType
@@ -206,3 +187,28 @@ public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType
 }
 
 #endif
+
+struct _ResolveAppKitOrUIKitViewController: ViewModifier {
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
+    
+    func body(content: Content) -> some View {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        return content
+            .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
+            .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
+            .onUIViewControllerResolution { viewController in
+                if !(_appKitOrUIKitViewControllerBox.value === viewController) {
+                    _appKitOrUIKitViewControllerBox = .init(viewController)
+                }
+            }
+        #else
+        return content
+        #endif
+    }
+    #else
+    func body(content: Content) -> some View {
+        content
+    }
+    #endif
+}

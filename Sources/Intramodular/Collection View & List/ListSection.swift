@@ -7,11 +7,10 @@ import SwiftUI
 
 /// A model suitable for representing sections of a list.
 public struct ListSection<SectionType, ItemType> {
-    private let _id: Int?
-    private let _model: SectionType!
+    private let _model: SectionType?
     
     public var model: SectionType {
-        _model
+        _model!
     }
     
     public let items: AnyRandomAccessCollection<ItemType>
@@ -20,7 +19,14 @@ public struct ListSection<SectionType, ItemType> {
         _ model: SectionType,
         items: Items
     ) where Items.Element == ItemType  {
-        self._id = nil
+        self._model = model
+        self.items = .init(items)
+    }
+    
+    public init(
+        _ model: SectionType,
+        items: AnyRandomAccessCollection<ItemType>
+    ) {
         self._model = model
         self.items = .init(items)
     }
@@ -52,50 +58,42 @@ extension ListSection where SectionType: Equatable {
 }
 
 extension ListSection where SectionType: Identifiable, ItemType: Identifiable {
-    public init(
+    public init<Items: RandomAccessCollection>(
         model: SectionType,
-        items: [ItemType]
-    ) {
+        items: Items
+    ) where Items.Element == ItemType {
         self._model = model
         self.items = .init(items)
-        
-        var hasher = Hasher()
-        
-        if SectionType.self != Never.self {
-            hasher.combine(model.id)
-        }
-        
-        items.forEach {
-            hasher.combine($0.id)
-        }
-        
-        self._id = hasher.finalize()
+    }
+    
+    public init(
+        model: SectionType,
+        items: AnyRandomAccessCollection<ItemType>
+    ) {
+        self._model = model
+        self.items = items
     }
 }
 
 extension ListSection where SectionType: Identifiable, ItemType: Identifiable {
     public func isIdentical(to other: Self) -> Bool {
-        if let id = _id, let otherId = other._id {
-            return id == otherId
-        } else {
-            guard items.count == other.items.count else {
+        guard items.count == other.items.count else {
+            return false
+        }
+        
+        if SectionType.self != Never.self {
+            guard model.id == other.model.id else {
                 return false
             }
-            
-            if SectionType.self != Never.self {
-                guard model.id == other.model.id else {
-                    return false
-                }
-            }
-            
-            for (item, otherItem) in zip(items, other.items) {
-                guard item.id == otherItem.id else {
-                    return false
-                }
-            }
-            
-            return true
         }
+        
+        for (item, otherItem) in zip(items, other.items) {
+            guard item.id == otherItem.id else {
+                return false
+            }
+        }
+        
+        return true
     }
 }
 

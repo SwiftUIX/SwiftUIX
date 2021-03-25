@@ -8,6 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
+    var _safeAreaInsetsAreFixed: Bool = false
     var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -42,11 +43,11 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
                 content: mainView
             )
         )
-    
+        
         presentationCoordinator.setViewController(self)
         
         self.rootView.parent = self
-    
+        
         if let mainView = mainView as? AnyPresentationView {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)
@@ -95,6 +96,11 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
         }
     }
+    
+    override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
     #elseif os(macOS)
     override open func viewDidLayout() {
         super.viewDidLayout()
@@ -112,8 +118,16 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     
     /// https://twitter.com/b3ll/status/1193747288302075906
-    func _fixSafeAreaInsetsIfNecessary() {
+    public func _fixSafeAreaInsetsIfNecessary() {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        defer {
+            _safeAreaInsetsAreFixed = true
+        }
+        
+        guard !_safeAreaInsetsAreFixed else {
+            return
+        }
+        
         guard let viewClass = object_getClass(view) else {
             return
         }
@@ -147,8 +161,24 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
                 objc_registerClassPair(subclass)
                 object_setClass(view, subclass)
             }
+            
+            view.setNeedsDisplay()
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
         }
         #endif
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+final class _FixSafeAreaInsetsPreferenceKey: TakeLastPreferenceKey<Bool> {
+    
+}
+
+extension View {
+    public func _fixSafeAreaInsets() -> some View {
+        preference(key: _FixSafeAreaInsetsPreferenceKey.self, value: true)
     }
 }
 

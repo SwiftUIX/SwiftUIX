@@ -93,7 +93,7 @@ extension CollectionView {
     ) where Items.Element: Identifiable {
         self.init(
             internalBody: _CollectionView(
-                data.lazy.map { section in
+                data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
                             KeyPathHashIdentifiableValue(
@@ -101,7 +101,7 @@ extension CollectionView {
                                 keyPath: id
                             )
                         ),
-                        items: rowContent(section).content.data.lazy.map { item in
+                        items: rowContent(section).content.data.map { item in
                             _CollectionViewSectionedItem(item: item, section: section[keyPath: id])
                         }
                     )
@@ -120,6 +120,7 @@ extension CollectionView {
         )
     }
     
+    @_disfavoredOverload
     public init<
         Data: RandomAccessCollection,
         ID: Hashable,
@@ -134,7 +135,7 @@ extension CollectionView {
     ) where Items.Element: Hashable {
         self.init(
             internalBody: _CollectionView(
-                data.lazy.map { section in
+                data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
                             KeyPathHashIdentifiableValue(
@@ -142,7 +143,7 @@ extension CollectionView {
                                 keyPath: id
                             )
                         ),
-                        items: rowContent(section).content.data.lazy.map { item in
+                        items: rowContent(section).content.data.map { item in
                             _CollectionViewSectionedItem(item: KeyPathHashIdentifiableValue(value: item, keyPath: \.self), section: section[keyPath: id])
                         }
                     )
@@ -175,7 +176,7 @@ extension CollectionView {
     ) where Items.Element: Hashable {
         self.init(
             internalBody: _CollectionView(
-                data.lazy.map { section in
+                data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
                             KeyPathHashIdentifiableValue(
@@ -183,8 +184,11 @@ extension CollectionView {
                                 keyPath: id
                             )
                         ),
-                        items: rowContent(section).content.data.lazy.map { item in
-                            _CollectionViewSectionedItem(item: KeyPathHashIdentifiableValue(value: item, keyPath: \.hashValue), section: section[keyPath: id])
+                        items: rowContent(section).content.data.map { item in
+                            _CollectionViewSectionedItem(
+                                item: KeyPathHashIdentifiableValue(value: item, keyPath: \.hashValue),
+                                section: section[keyPath: id]
+                            )
                         }
                     )
                 },

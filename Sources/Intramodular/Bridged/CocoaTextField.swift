@@ -75,9 +75,9 @@ public struct CocoaTextField<Label: View>: CocoaView {
     }
 }
 
-struct _CocoaTextField<Label: View>: UIViewRepresentable {
+fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     typealias Configuration = CocoaTextField<Label>._Configuration
-    typealias UIViewType = UIHostingTextField
+    typealias UIViewType = _UITextField
     
     let text: Binding<String>
     let isEditing: Binding<Bool>
@@ -145,7 +145,7 @@ struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let uiView = UIHostingTextField()
+        let uiView = _UITextField()
 
         uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         uiView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -495,6 +495,48 @@ extension CocoaTextField where Label == Text {
             $0.label = Text(placeholder).kerning(configuration.kerning)
             $0.configuration.placeholder = placeholder
         }
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+private final class _UITextField: UITextField {
+
+    typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
+
+    var onDeleteBackward: () -> Void = { }
+
+    var textRect: Rect?
+    var editingRect: Rect?
+    var clearButtonRect: Rect?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func deleteBackward() {
+        super.deleteBackward()
+        
+        onDeleteBackward()
+    }
+
+    override func textRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.textRect(forBounds: bounds)
+        return textRect?(bounds, original) ?? original
+    }
+
+    override func editingRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.editingRect(forBounds: bounds)
+        return editingRect?(bounds, original) ?? original
+    }
+
+    override func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.clearButtonRect(forBounds: bounds)
+        return clearButtonRect?(bounds, original) ?? original
     }
 }
 

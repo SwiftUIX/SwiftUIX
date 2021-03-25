@@ -12,11 +12,15 @@ extension UIHostingCollectionViewController {
     class Cache: NSObject, UICollectionViewDelegateFlowLayout {
         unowned let parent: UIHostingCollectionViewController
         
-        private var identifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
-        private var identifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
-        private var identifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
+        private var cellIdentifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
+        private var cellIdentifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
+        private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToContentSizeMap: [IndexPath: CGSize] = [:]
         private var indexPathToIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
+        
+        private var supplementaryViewIdentifierToContentSizeMap: [UICollectionViewSupplementaryViewType.Configuration.ID: CGSize] = [:]
+        private var supplementaryViewIdentifierToIndexPathMap: [UICollectionViewSupplementaryViewType.Configuration.ID: IndexPath] = [:]
+        private var indexPathToSupplementaryViewContentSizeMap: [IndexPath: CGSize] = [:]
         
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
@@ -46,7 +50,7 @@ extension UIHostingCollectionViewController {
             let id = UICollectionViewCellType.Configuration.ID(item: itemIdentifier, section: sectionIdentifier)
             
             let indexPathBasedSize = indexPathToContentSizeMap[indexPath]
-            let identifierBasedSize = identifierToContentSizeMap[id]
+            let identifierBasedSize = cellIdentifierToContentSizeMap[id]
             
             if let size = identifierBasedSize, indexPathBasedSize == nil {
                 indexPathToContentSizeMap[indexPath] = size
@@ -78,24 +82,33 @@ extension UIHostingCollectionViewController {
         ) -> CGSize {
             let indexPath = IndexPath(row: -1, section: section)
             
-            let section = parent._unsafelyUnwrappedSection(from: .init(row: -1, section: section))
+            guard let dataSource = parent.dataSource, dataSource.contains(indexPath) else {
+                return .init(width: 1.0, height: 1.0)
+            }
+            
+            let section = parent._unsafelyUnwrappedSection(from: indexPath)
             let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
+            let id = UICollectionViewSupplementaryViewType.Configuration.ID(kind: UICollectionView.elementKindSectionHeader, item: nil, section: sectionIdentifier)
             
-            let size = sizeForSupplementaryView(
-                atIndexPath: indexPath,
-                withConfiguration: .init(
-                    kind: UICollectionView.elementKindSectionHeader,
-                    item: nil,
-                    section: section,
-                    itemIdentifier: nil,
-                    sectionIdentifier: sectionIdentifier,
-                    indexPath: indexPath,
-                    viewProvider: parent.viewProvider,
-                    maximumSize: parent.maximumCellSize
+            if let size = supplementaryViewIdentifierToContentSizeMap[id] {
+                return size
+            } else {
+                // invalidateCachedContentSize(forIndexPath: indexPath)
+                
+                return sizeForSupplementaryView(
+                    atIndexPath: indexPath,
+                    withConfiguration: .init(
+                        kind: UICollectionView.elementKindSectionHeader,
+                        item: nil,
+                        section: section,
+                        itemIdentifier: nil,
+                        sectionIdentifier: sectionIdentifier,
+                        indexPath: indexPath,
+                        viewProvider: parent.viewProvider,
+                        maximumSize: parent.maximumCellSize
+                    )
                 )
-            )
-            
-            return size
+            }
         }
         
         public func collectionView(
@@ -133,7 +146,7 @@ extension UIHostingCollectionViewController.Cache {
         withCellConfiguration cellConfiguration: UIHostingCollectionViewController.UICollectionViewCellType.Configuration
     ) -> CGSize {
         prototypeCell.configuration = cellConfiguration
-        prototypeCell.preferences = identifierToPreferencesMap[cellConfiguration.id] ?? .init()
+        prototypeCell.preferences = cellIdentifierToPreferencesMap[cellConfiguration.id] ?? .init()
         
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
@@ -143,8 +156,8 @@ extension UIHostingCollectionViewController.Cache {
             return size
         }
         
-        identifierToContentSizeMap[cellConfiguration.id] = size
-        identifierToIndexPathMap[cellConfiguration.id] = indexPath
+        cellIdentifierToContentSizeMap[cellConfiguration.id] = size
+        cellIdentifierToIndexPathMap[cellConfiguration.id] = indexPath
         indexPathToContentSizeMap[cellConfiguration.indexPath] = size
         indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
         itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
@@ -161,7 +174,16 @@ extension UIHostingCollectionViewController.Cache {
         prototypeView.configuration = configuration
         prototypeView.supplementaryViewWillDisplay(inParent: nil, isPrototype: true)
         
-        return prototypeView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        let size = prototypeView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        
+        guard !(size.width == 1 && size.height == 1) else {
+            return size
+        }
+        
+        supplementaryViewIdentifierToContentSizeMap[configuration.id] = size
+        supplementaryViewIdentifierToIndexPathMap[configuration.id] = indexPath
+        
+        return size
     }
     
     func invalidateCachedContentSize(forIndexPath indexPath: IndexPath) {
@@ -169,7 +191,7 @@ extension UIHostingCollectionViewController.Cache {
             return
         }
         
-        identifierToContentSizeMap[id] = nil
+        cellIdentifierToContentSizeMap[id] = nil
         indexPathToContentSizeMap[indexPath] = nil
     }
     
@@ -180,15 +202,15 @@ extension UIHostingCollectionViewController.Cache {
             return
         }
         
-        identifierToIndexPathMap[id] = nil
+        cellIdentifierToIndexPathMap[id] = nil
         indexPathToIdentifierMap[indexPath] = nil
         itemIdentifierHashToIndexPathMap[id.item.hashValue] = nil
     }
     
     func invalidate() {
-        identifierToContentSizeMap = [:]
+        cellIdentifierToContentSizeMap = [:]
         indexPathToContentSizeMap = [:]
-        identifierToIndexPathMap = [:]
+        cellIdentifierToIndexPathMap = [:]
         indexPathToIdentifierMap = [:]
     }
     
@@ -206,13 +228,13 @@ extension UIHostingCollectionViewController.Cache {
     
     subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {
         get {
-            identifierToPreferencesMap[id]
+            cellIdentifierToPreferencesMap[id]
         } set {
             let oldValue = self[preferencesFor: id]
             
-            identifierToPreferencesMap[id] = newValue
+            cellIdentifierToPreferencesMap[id] = newValue
             
-            guard let indexPath = identifierToIndexPathMap[id] else {
+            guard let indexPath = cellIdentifierToIndexPathMap[id] else {
                 return
             }
             

@@ -10,6 +10,7 @@ import SwiftUI
 extension UIHostingCollectionViewSupplementaryView {
     struct Configuration: Identifiable {
         struct ID: Hashable {
+            let kind: String
             let item: ItemIdentifierType?
             let section: SectionIdentifierType
         }
@@ -24,7 +25,7 @@ extension UIHostingCollectionViewSupplementaryView {
         let maximumSize: OptionalDimensions?
         
         var id: ID {
-            .init(item: itemIdentifier, section: sectionIdentifier)
+            .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
         }
     }
 }
@@ -48,7 +49,11 @@ class UIHostingCollectionViewSupplementaryView<
         Content
     >
     
-    var configuration: Configuration?
+    var configuration: Configuration? {
+        didSet {
+            update()
+        }
+    }
     
     private var contentHostingController: ContentHostingController?
     
@@ -72,9 +77,8 @@ class UIHostingCollectionViewSupplementaryView<
             if contentHostingController.view.frame != bounds {
                 contentHostingController.view.frame = bounds
                 contentHostingController.view.setNeedsLayout()
+                contentHostingController.view.layoutIfNeeded()
             }
-            
-            contentHostingController.view.layoutIfNeeded()
         }
     }
     
@@ -109,8 +113,6 @@ class UIHostingCollectionViewSupplementaryView<
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        layoutAttributes.size = systemLayoutSizeFitting(layoutAttributes.size)
-        
         return layoutAttributes
     }
 }
@@ -120,19 +122,19 @@ extension UIHostingCollectionViewSupplementaryView {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        guard let contentHostingController = contentHostingController else {
+            assertionFailure()
+            
+            return
+        }
+        
         defer {
             self.parentViewController = parentViewController
         }
         
-        if let contentHostingController = contentHostingController {
-            contentHostingController.update()
-        } else {
-            contentHostingController = ContentHostingController(base: self)
-        }
-        
         if let parentViewController = parentViewController {
-            if contentHostingController?.parent == nil {
-                contentHostingController?.move(toParent: parentViewController, ofSupplementaryView: self)
+            if contentHostingController.parent == nil {
+                contentHostingController.move(toParent: parentViewController, ofSupplementaryView: self)
             }
         } else if !isPrototype {
             assertionFailure()
@@ -140,15 +142,15 @@ extension UIHostingCollectionViewSupplementaryView {
     }
     
     func supplementaryViewDidEndDisplaying() {
-        defer {
-            self.parentViewController = nil
-        }
         
-        contentHostingController?.move(toParent: nil, ofSupplementaryView: self)
     }
     
     func update() {
-        contentHostingController?.update()
+        if let contentHostingController = contentHostingController {
+            contentHostingController.update()
+        } else {
+            contentHostingController = ContentHostingController(base: self)
+        }
     }
 }
 
@@ -263,8 +265,6 @@ extension UIHostingCollectionViewSupplementaryView {
             }
             
             mainView = .init(base: base)
-            
-            view.setNeedsDisplay()
         }
     }
 }

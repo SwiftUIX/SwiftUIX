@@ -61,14 +61,14 @@ struct _CollectionView<
                 }
             }
         }
-
+        
         uiViewController.dataSource = dataSource
         uiViewController.dataSourceConfiguration = dataSourceConfiguration
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
         uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
-                
+        
         if uiViewController.collectionViewLayout.hashValue != context.environment.collectionViewLayout.hashValue {
             uiViewController.collectionViewLayout = context.environment.collectionViewLayout
         }

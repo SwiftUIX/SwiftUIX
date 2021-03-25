@@ -20,6 +20,11 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
         content
             .modifier(_ResolveAppKitOrUIKitViewController(_appKitOrUIKitViewControllerBox: .init(parent)))
             .modifier(_UseCocoaPresentationCoordinator(coordinator: parent?.presentationCoordinator))
+            .onPreferenceChange(_FixSafeAreaInsetsPreferenceKey.self) {
+                if ($0 ?? false) {
+                    parent?._fixSafeAreaInsetsIfNecessary()
+                }
+            }
     }
 }
 

@@ -73,6 +73,10 @@ public final class UIHostingCollectionViewController<
                 getItemID(item)
             }
             
+            subscript(_ item: ItemType?) -> ItemIdentifierType? {
+                item.map({ self[$0] })
+            }
+            
             subscript(_ itemID: ItemIdentifierType) -> ItemType {
                 getItemFromID(itemID)
             }
@@ -124,17 +128,8 @@ public final class UIHostingCollectionViewController<
         }
     }
     
-    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration {
-        didSet {
-            
-        }
-    }
-    
-    var viewProvider: _SwiftUIType.ViewProvider {
-        didSet {
-            
-        }
-    }
+    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration
+    var viewProvider: _SwiftUIType.ViewProvider
     
     var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
         didSet {
@@ -263,8 +258,6 @@ public final class UIHostingCollectionViewController<
                 maximumSize: self.maximumCellSize
             )
             
-            cell.cellWillDisplay(inParent: self)
-            
             return cell
         }
         
@@ -277,14 +270,17 @@ public final class UIHostingCollectionViewController<
                 return nil
             }
             
-            let item = self._unsafelyUnwrappedItem(at: indexPath)
-            let section = self._unsafelyUnwrappedSection(from: indexPath)
+            let item = self.item(at: indexPath)
             
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: .hostingCollectionViewSupplementaryViewIdentifier,
                 for: indexPath
             ) as! UICollectionViewSupplementaryViewType
+            
+            guard let section = self.section(from: indexPath) else {
+                return view
+            }
             
             view.configuration = .init(
                 kind: kind,
@@ -531,6 +527,22 @@ extension UIHostingCollectionViewController {
         }
     }
     
+    func section(from indexPath: IndexPath) -> SectionType? {
+        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+            return nil
+        }
+        
+        return _unsafelyUnwrappedSection(from: indexPath)
+    }
+    
+    func item(at indexPath: IndexPath) -> ItemType? {
+        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+            return nil
+        }
+        
+        return _unsafelyUnwrappedItem(at: indexPath)
+    }
+    
     func cellForItem(at indexPath: IndexPath) -> UICollectionViewCellType? {
         let result = collectionView
             .visibleCells
@@ -604,9 +616,13 @@ extension UIHostingCollectionViewController {
         
         var snapshot = _internalDataSource.snapshot()
         
-        let sectionDifference = sections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
+        let sectionDifference = sections.lazy
+            .map({ self.dataSourceConfiguration.identifierMap[$0] })
+            .difference(
+                from: oldSections.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] })
+            )
         
-        snapshot.loadSectionDifference(sectionDifference)
+        snapshot.applySectionDifference(sectionDifference)
         
         var hasDataSourceChanged: Bool = false
         
@@ -623,7 +639,7 @@ extension UIHostingCollectionViewController {
             let difference = sectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }).difference(from: oldSectionItems.lazy.map({ self.dataSourceConfiguration.identifierMap[$0] }))
             
             if !difference.isEmpty {
-                snapshot.loadItemDifference(difference, inSection: self.dataSourceConfiguration.identifierMap[section])
+                snapshot.applyItemDifference(difference, inSection: self.dataSourceConfiguration.identifierMap[section])
                 
                 hasDataSourceChanged = true
             }
@@ -846,11 +862,11 @@ fileprivate extension CollectionDifference where ChangeElement: Equatable {
 }
 
 fileprivate extension NSDiffableDataSourceSnapshot {
-    mutating func loadSectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
-        difference.forEach({ loadSectionChanges($0) })
+    mutating func applySectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
+        difference.forEach({ applySectionChanges($0) })
     }
     
-    mutating func loadSectionChanges(_ change: CollectionDifference<SectionIdentifierType>.Change) {
+    mutating func applySectionChanges(_ change: CollectionDifference<SectionIdentifierType>.Change) {
         switch change {
             case .insert(offset: sectionIdentifiers.count, let element, _):
                 appendSections([element])
@@ -861,18 +877,25 @@ fileprivate extension NSDiffableDataSourceSnapshot {
         }
     }
     
-    mutating func loadItemDifference(
+    mutating func applyItemDifference(
         _ difference: CollectionDifference<ItemIdentifierType>, inSection section: SectionIdentifierType
     ) {
-        difference.forEach({ loadItemChanges($0, inSection: section) })
+        difference.forEach({ applyItemChange($0, inSection: section) })
     }
     
-    mutating func loadItemChanges(_ change: CollectionDifference<ItemIdentifierType>.Change, inSection section: SectionIdentifierType) {
+    mutating func applyItemChange(_ change: CollectionDifference<ItemIdentifierType>.Change, inSection section: SectionIdentifierType) {
         switch change {
             case .insert(itemIdentifiers(inSection: section).count, let element, _):
                 appendItems([element], toSection: section)
-            case .insert(let offset, let element, _):
-                insertItems([element], beforeItem: itemIdentifiers(inSection: section)[offset])
+            case .insert(let offset, let element, _): do {
+                let items = itemIdentifiers(inSection: section)
+                
+                if offset < items.count {
+                    insertItems([element], beforeItem: items[offset])
+                } else {
+                    appendItems([element])
+                }
+            }
             case .remove(_, let element, _):
                 deleteItems([element])
         }
