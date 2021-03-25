@@ -118,6 +118,28 @@ extension PresentationLink {
         self._isPresented = isPresented
         self.label = label()
     }
+    
+    @inline(never)
+    public init<V: Hashable>(
+        destination: Destination,
+        tag: V,
+        selection: Binding<V?>,
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination
+        self.onDismiss = nil
+        self._isPresented = .init(
+            get: { selection.wrappedValue == tag },
+            set: { newValue in
+                if newValue {
+                    selection.wrappedValue = tag
+                } else {
+                    selection.wrappedValue = nil
+                }
+            }
+        )
+        self.label = label()
+    }
 }
 
 extension View {
