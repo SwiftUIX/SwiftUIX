@@ -22,6 +22,8 @@ protocol _opaque_UIHostingCollectionViewController: UIViewController {
     func selectPreviousItem(anchor: UnitPoint?)
     
     func deselect<ID: Hashable>(_ id: ID)
+    
+    func selection<ID: Hashable>(for id: ID) -> Binding<Bool>
 }
 
 public final class UIHostingCollectionViewController<
@@ -701,7 +703,7 @@ extension UIHostingCollectionViewController {
             animated: true
         )
     }
-    
+        
     public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = indexPath(for: id) else {
             return
@@ -815,6 +817,21 @@ extension UIHostingCollectionViewController {
     
     private func indexPath<ID: Hashable>(for id: ID) -> IndexPath? {
         cache.firstIndexPath(for: id)
+    }
+    
+    public func selection<ID: Hashable>(for id: ID) -> Binding<Bool> {
+        let indexPath = cache.firstIndexPath(for: id)
+        
+        return .init(
+            get: { indexPath.flatMap({ [weak self] in self?.collectionView.cellForItem(at: $0)?.isSelected }) ?? false },
+            set: { [weak self] newValue in
+                guard let indexPath = indexPath else {
+                    return
+                }
+                
+                self?.collectionView.deselectItem(at: indexPath, animated: true)
+            }
+        )
     }
 }
 

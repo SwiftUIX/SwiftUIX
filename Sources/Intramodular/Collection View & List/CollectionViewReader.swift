@@ -32,6 +32,12 @@ public struct CollectionViewProxy {
         hostingCollectionViewController?.scrollTo(id, anchor: anchor)
     }
     
+    public func selection<ID: Hashable>(for id: ID) -> Binding<Bool> {
+        _assertResolutionOfCollectionView()
+        
+        return hostingCollectionViewController?.selection(for: id) ?? .constant(false)
+    }
+    
     public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
