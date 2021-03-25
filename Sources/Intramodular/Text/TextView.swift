@@ -33,6 +33,7 @@ public struct TextView<Label: View>: View {
             label
                 .visible(text.wrappedValue.isEmpty)
                 .animation(.none)
+                .padding(configuration.textContainerInset.edgeInsets)
             
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             _TextView<Label>(
@@ -343,4 +344,8 @@ extension EnvironmentValues {
     fileprivate var requiresAttributedText: Bool {
         _paragraphSpacing != nil
     }
+}
+
+private extension UIEdgeInsets {
+    var edgeInsets: EdgeInsets { .init(top: top, leading: left, bottom: bottom, trailing: right) }
 }
