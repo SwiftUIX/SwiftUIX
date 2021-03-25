@@ -15,6 +15,7 @@ public struct TextView<Label: View>: View {
 
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
+        var textContainerInset: AppKitOrUIKitInsets = .zero
     }
 
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
@@ -151,7 +152,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         uiView.textContainer.lineFragmentPadding = .zero
-        uiView.textContainerInset = .zero
+        uiView.textContainerInset = configuration.textContainerInset
         
         (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
         
@@ -214,7 +215,7 @@ extension _TextView: NSViewRepresentable {
         nsView.delegate = context.coordinator
         
         nsView.backgroundColor = .clear
-        nsView.textContainerInset = .zero
+        nsView.textContainerInset = configuration.textContainerInset
         
         return nsView
     }
@@ -302,6 +303,10 @@ extension TextView {
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
+    }
+
+    public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
+        then({ $0.configuration.textContainerInset = textContainerInset })
     }
 }
 
