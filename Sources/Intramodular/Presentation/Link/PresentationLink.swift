@@ -37,12 +37,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     @usableFromInline
     var destination: some View {
-        CocoaHostingView {
-            _destination
-                .managedObjectContext(managedObjectContext)
-                .mergeEnvironmentBuilder(environmentBuilder)
-                .modalPresentationStyle(modalPresentationStyle)
-        }
+        _destination
+            .managedObjectContext(managedObjectContext)
+            .mergeEnvironmentBuilder(environmentBuilder)
+            .modalPresentationStyle(modalPresentationStyle)
     }
     
     @usableFromInline
@@ -71,7 +69,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 Button(action: { self.isPresented.wrappedValue = true }, label: label).sheet(
                     isPresented: isPresented,
                     onDismiss: { self.onDismiss?() },
-                    content: { self.destination }
+                    content: { CocoaHostingView(mainView: self.destination) }
                 )
             } else {
                 Button(
