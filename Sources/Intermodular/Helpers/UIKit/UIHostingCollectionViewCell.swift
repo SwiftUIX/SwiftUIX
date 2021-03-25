@@ -245,7 +245,7 @@ extension UIHostingCollectionViewCell {
     
     func update(forced: Bool = false) {
         if let contentHostingController = contentHostingController {
-            contentHostingController.update()
+            contentHostingController.update(forced: forced)
         } else {
             contentHostingController = ContentHostingController(base: self)
         }
