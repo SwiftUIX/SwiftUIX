@@ -71,7 +71,7 @@ class UIHostingCollectionViewCell<
     
     var state: State {
         .init(
-            isFocused: isFocused,
+            isFocused: _isFocused ?? super.isFocused,
             isHighlighted: isHighlighted,
             isSelected: isSelected
         )
@@ -90,6 +90,20 @@ class UIHostingCollectionViewCell<
             
             parentViewController.cache[preferencesFor: configuration.id] = preferences
         }
+    }
+    
+    var _isFocused: Bool? = nil {
+        didSet {
+            guard oldValue != _isFocused else {
+                return
+            }
+            
+            update()
+        }
+    }
+    
+    override var isFocused: Bool {
+        _isFocused ?? super.isFocused
     }
     
     override var isHighlighted: Bool {
@@ -229,7 +243,7 @@ extension UIHostingCollectionViewCell {
         
     }
     
-    func update() {
+    func update(forced: Bool = false) {
         if let contentHostingController = contentHostingController {
             contentHostingController.update()
         } else {
@@ -242,6 +256,8 @@ extension UIHostingCollectionViewCell {
 
 extension UIHostingCollectionViewCell {
     private struct RootView: ExpressibleByNilLiteral, View {
+        var dummy: Bool = false
+        
         var configuration: Configuration?
         var state: State?
         var preferences: Binding<Preferences>?
@@ -338,18 +354,24 @@ extension UIHostingCollectionViewCell {
             }
         }
         
-        func update() {
+        func update(forced: Bool = false) {
             guard let base = base else {
                 return
             }
             
-            if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
-                guard currentConfiguration.id != newConfiguration.id || mainView.state != base.state else {
-                    return
+            if !forced {
+                if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
+                    guard currentConfiguration.id != newConfiguration.id || mainView.state != base.state else {
+                        return
+                    }
                 }
             }
             
             mainView = .init(base: base)
+            
+            if forced {
+                mainView.dummy.toggle()
+            }
         }
     }
 }
