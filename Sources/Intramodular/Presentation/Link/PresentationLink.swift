@@ -53,9 +53,9 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @inlinable
     public var body: some View {
         Group {
-            if _isPresented == nil && presenter != nil && userInterfaceIdiom != .mac {
-                Button(action: {
-                    self.presenter!.present(
+            if let presenter = presenter, _isPresented == nil, userInterfaceIdiom != .mac {
+                Button {
+                    presenter.present(
                         AnyModalPresentation(
                             id: self.id,
                             content: self.destination,
@@ -64,8 +64,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             resetBinding: { self.isPresented.wrappedValue = false }
                         )
                     )
-                }) {
-                    self.label
+                } label: {
+                    label
                 }
             } else if modalPresentationStyle == .automatic {
                 Button(action: { self.isPresented.wrappedValue = true }, label: label).sheet(
