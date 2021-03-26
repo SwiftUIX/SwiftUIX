@@ -38,6 +38,10 @@ public typealias AppKitOrUIKitView = UIView
 public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
 
+extension UIEdgeInsets {
+    var edgeInsets: EdgeInsets { .init(top: top, leading: left, bottom: bottom, trailing: right) }
+}
+
 #endif
 
 #if os(macOS)
@@ -82,6 +86,10 @@ extension NSView {
     @objc open func hitTest(_ point: CGPoint, with event: NSEvent?) -> NSView? {
         hitTest(point)
     }
+}
+
+extension CGSize {
+    var edgeInsets: EdgeInsets { .init(top: height / 2, leading: width / 2, bottom: height / 2, trailing: width / 2) }
 }
 
 #endif

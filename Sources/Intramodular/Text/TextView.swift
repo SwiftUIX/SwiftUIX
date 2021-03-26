@@ -345,7 +345,3 @@ extension EnvironmentValues {
         _paragraphSpacing != nil
     }
 }
-
-private extension UIEdgeInsets {
-    var edgeInsets: EdgeInsets { .init(top: top, leading: left, bottom: bottom, trailing: right) }
-}
