@@ -5,15 +5,15 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-protocol UIHostingWindowProtocol: UIWindow {
-    
-}
-
-open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
-    public var rootHostingViewController: CocoaHostingController<UIHostingWindowContent<Content>> {
-        rootViewController as! CocoaHostingController<UIHostingWindowContent<Content>>
+open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
+    fileprivate var rootHostingViewController: CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>> {
+        #if os(macOS)
+        return contentViewController as! CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
+        #else
+        return rootViewController as! CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
+        #endif
     }
     
     public var rootView: Content {
@@ -24,10 +24,19 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
         }
     }
     
+    #if os(macOS)
+    public convenience init(rootView: Content) {
+        let contentViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: nil, content: rootView))
+        
+        self.init(contentViewController: contentViewController)
+        
+        contentViewController.mainView.window = self
+    }
+    #else
     public init(windowScene: UIWindowScene, rootView: Content) {
         super.init(windowScene: windowScene)
         
-        rootViewController = CocoaHostingController(mainView: UIHostingWindowContent(window: self, content: rootView))
+        rootViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: self, content: rootView))
         rootViewController!.view.backgroundColor = .clear
     }
     
@@ -41,6 +50,7 @@ open class UIHostingWindow<Content: View>: UIWindow, UIHostingWindowProtocol {
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    #endif
 }
 
 // MARK: - API -
@@ -68,21 +78,25 @@ final class WindowPositionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
     
 }
 
-public struct UIHostingWindowContent<Content: View>: View {
+fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @usableFromInline
-    weak private(set) var window: UIWindow?
+    weak var window: AppKitOrUIKitWindow?
     
     @usableFromInline
-    fileprivate(set) var content: Content
+    var content: Content
     
     @inlinable
     public var body: some View {
         content.onPreferenceChange(WindowPositionPreferenceKey.self) { value in
             if let window = self.window, let value = value {
                 if window.frame.origin != value {
+                    #if os(macOS)
+                    window.setFrameOrigin(value)
+                    #else
                     UIView.animate(withDuration: 0.2) {
                         window.frame.origin = value
                     }
+                    #endif
                 }
             }
         }
@@ -92,10 +106,10 @@ public struct UIHostingWindowContent<Content: View>: View {
     @usableFromInline
     struct _PresentationManager: PresentationManager {
         @usableFromInline
-        let window: UIWindow?
+        var window: AppKitOrUIKitWindow?
         
         @usableFromInline
-        init(window: UIWindow?) {
+        init(window: AppKitOrUIKitWindow?) {
             self.window = window
         }
         
@@ -106,7 +120,11 @@ public struct UIHostingWindowContent<Content: View>: View {
         
         @usableFromInline
         func dismiss() {
+            #if os(macOS)
+            window?.close()
+            #else
             window?.isHidden = true
+            #endif
         }
     }
 }

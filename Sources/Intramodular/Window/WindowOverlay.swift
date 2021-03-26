@@ -2,17 +2,14 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
 
 /// A window overlay for SwiftUI.
 @usableFromInline
-struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
-    @usableFromInline
-    typealias Context = UIViewControllerRepresentableContext<Self>
-    
+struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     @usableFromInline
     let content: Content
     
@@ -26,34 +23,29 @@ struct WindowOverlay<Content: View>: UIViewControllerRepresentable {
     }
     
     @usableFromInline
-    func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(content: content, isKeyAndVisible: isKeyAndVisible.wrappedValue)
+    func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
+        .init(content: content, isKeyAndVisible: isKeyAndVisible)
     }
     
     @usableFromInline
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.isKeyAndVisible = isKeyAndVisible.wrappedValue
-        uiViewController.content = content
+    func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
+        viewController.isKeyAndVisible = isKeyAndVisible
+        viewController.content = content
         
-        uiViewController.updateWindow()
+        viewController.updateWindow()
     }
     
     @usableFromInline
-    static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
-        uiViewController.isKeyAndVisible = false
-        uiViewController.updateWindow()
-        uiViewController.contentWindow = nil
+    static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
+        viewController.isKeyAndVisible.wrappedValue = false
+        viewController.updateWindow()
+        viewController.contentWindow = nil
     }
 }
 
 extension WindowOverlay {
     @usableFromInline
-    class UIWindowType: UIHostingWindow<Content> {
-        
-    }
-    
-    @usableFromInline
-    class UIViewControllerType: UIViewController {
+    class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
         @usableFromInline
         var content: Content {
             didSet {
@@ -62,62 +54,105 @@ extension WindowOverlay {
         }
         
         @usableFromInline
-        var isKeyAndVisible: Bool
+        var isKeyAndVisible: Binding<Bool>
         
         @usableFromInline
-        var contentWindow: UIWindowType?
+        var contentWindow: AppKitOrUIKitHostingWindow<Content>?
+        #if os(macOS)
+        @usableFromInline
+        var contentWindowController: NSWindowController?
+        #endif
         
         @usableFromInline
-        init(content: Content, isKeyAndVisible: Bool) {
+        init(content: Content, isKeyAndVisible: Binding<Bool>) {
             self.content = content
             self.isKeyAndVisible = isKeyAndVisible
             
             super.init(nibName: nil, bundle: nil)
+            
+            #if os(macOS)
+            view = NSView()
+            #endif
         }
         
         @usableFromInline
         func updateWindow() {
-            if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible {
+            if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible.wrappedValue {
                 return
             }
             
-            if isKeyAndVisible {
+            if isKeyAndVisible.wrappedValue {
+                #if !os(macOS)
                 guard let window = view?.window, let windowScene = window.windowScene else {
                     return
                 }
+                #endif
                 
-                let contentWindow = self.contentWindow ?? UIWindowType(
+                #if os(macOS)
+                let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(rootView: content)
+                #else
+                let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(
                     windowScene: windowScene,
                     rootView: content
-                ).then {
-                    self.contentWindow = $0
+                )
+                #endif
+                
+                if self.contentWindow == nil {
+                    #if os(macOS)
+                    NotificationCenter.default.addObserver(self, selector: #selector(Self.windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
+                    #endif
                 }
+                
+                self.contentWindow = contentWindow
+                #if os(macOS)
+                self.contentWindowController = .init(window: contentWindow)
+                #endif
                 
                 contentWindow.rootView = content
                 
+                #if os(macOS)
+                contentWindow.title = ""
+                contentWindowController?.showWindow(self)
+                #else
                 contentWindow.canResizeToFitContent = true
                 contentWindow.isHidden = false
                 contentWindow.isUserInteractionEnabled = true
                 contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
                 
                 contentWindow.makeKeyAndVisible()
+                #endif
             } else {
+                #if os(macOS)
+                contentWindow?.close()
+                #else
                 contentWindow?.isHidden = true
                 contentWindow?.isUserInteractionEnabled = false
+                #endif
             }
         }
-        
+                
         @usableFromInline
         @objc required dynamic init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
+        #if !os(macOS)
         @usableFromInline
         override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
             updateWindow()
         }
+        #endif
+        
+        #if os(macOS)
+        @objc
+        public func windowWillClose(_ notification: Notification?) {
+            if (notification?.object as? AppKitOrUIKitHostingWindow<Content>) === contentWindow {
+                isKeyAndVisible.wrappedValue = false
+            }
+        }
+        #endif
     }
 }
 

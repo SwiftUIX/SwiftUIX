@@ -428,7 +428,8 @@ public final class UIHostingCollectionViewController<
         return cache.collectionView(
             collectionView,
             layout: collectionViewLayout,
-            referenceSizeForHeaderInSection: section
+            referenceSizeForHeaderOrFooterInSection: section,
+            kind: UICollectionView.elementKindSectionHeader
         )
     }
     
@@ -444,7 +445,8 @@ public final class UIHostingCollectionViewController<
         return cache.collectionView(
             collectionView,
             layout: collectionViewLayout,
-            referenceSizeForFooterInSection: section
+            referenceSizeForHeaderOrFooterInSection: section,
+            kind: UICollectionView.elementKindSectionFooter
         )
     }
 }

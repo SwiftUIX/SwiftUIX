@@ -25,6 +25,7 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
                     parent?._fixSafeAreaInsetsIfNecessary()
                 }
             }
+            .preference(key: _FixSafeAreaInsetsPreferenceKey.self, value: nil)
     }
 }
 

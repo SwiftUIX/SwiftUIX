@@ -20,7 +20,7 @@ extension UIHostingCollectionViewController {
         
         private var supplementaryViewIdentifierToContentSizeMap: [UICollectionViewSupplementaryViewType.Configuration.ID: CGSize] = [:]
         private var supplementaryViewIdentifierToIndexPathMap: [UICollectionViewSupplementaryViewType.Configuration.ID: IndexPath] = [:]
-        private var indexPathToSupplementaryViewContentSizeMap: [IndexPath: CGSize] = [:]
+        private var indexPathToSupplementaryViewContentSizeMap: [String: [IndexPath: CGSize]] = [:]
         
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
@@ -78,7 +78,8 @@ extension UIHostingCollectionViewController {
         public func collectionView(
             _ collectionView: UICollectionView,
             layout collectionViewLayout: UICollectionViewLayout,
-            referenceSizeForHeaderInSection section: Int
+            referenceSizeForHeaderOrFooterInSection section: Int,
+            kind: String
         ) -> CGSize {
             let indexPath = IndexPath(row: -1, section: section)
             
@@ -88,9 +89,15 @@ extension UIHostingCollectionViewController {
             
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
             let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
-            let id = UICollectionViewSupplementaryViewType.Configuration.ID(kind: UICollectionView.elementKindSectionHeader, item: nil, section: sectionIdentifier)
+            let id = UICollectionViewSupplementaryViewType.Configuration.ID(kind: kind, item: nil, section: sectionIdentifier)
             
-            if let size = supplementaryViewIdentifierToContentSizeMap[id] {
+            let indexPathBasedSize = indexPathToSupplementaryViewContentSizeMap[kind]?[indexPath]
+            let identifierBasedSize = supplementaryViewIdentifierToContentSizeMap[id]
+
+            if let size = identifierBasedSize, indexPathBasedSize == nil {
+                indexPathToSupplementaryViewContentSizeMap[kind]?[indexPath] = size
+                return size
+            } else if let size = indexPathBasedSize, size == identifierBasedSize {
                 return size
             } else {
                 // invalidateCachedContentSize(forIndexPath: indexPath)
@@ -109,33 +116,6 @@ extension UIHostingCollectionViewController {
                     )
                 )
             }
-        }
-        
-        public func collectionView(
-            _ collectionView: UICollectionView,
-            layout collectionViewLayout: UICollectionViewLayout,
-            referenceSizeForFooterInSection section: Int
-        ) -> CGSize {
-            let indexPath = IndexPath(row: -1, section: section)
-            
-            let section = parent._unsafelyUnwrappedSection(from: .init(row: -1, section: section))
-            let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
-            
-            let size = sizeForSupplementaryView(
-                atIndexPath: indexPath,
-                withConfiguration: .init(
-                    kind: UICollectionView.elementKindSectionFooter,
-                    item: nil,
-                    section: section,
-                    itemIdentifier: nil,
-                    sectionIdentifier: sectionIdentifier,
-                    indexPath: indexPath,
-                    viewProvider: parent.viewProvider,
-                    maximumSize: parent.maximumCellSize
-                )
-            )
-            
-            return size
         }
     }
 }
@@ -182,7 +162,8 @@ extension UIHostingCollectionViewController.Cache {
         
         supplementaryViewIdentifierToContentSizeMap[configuration.id] = size
         supplementaryViewIdentifierToIndexPathMap[configuration.id] = indexPath
-        
+        indexPathToSupplementaryViewContentSizeMap[configuration.kind, default: [:]][configuration.indexPath] = size
+
         return size
     }
     

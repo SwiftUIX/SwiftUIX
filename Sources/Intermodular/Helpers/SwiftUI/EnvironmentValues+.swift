@@ -48,3 +48,10 @@ extension View {
         environment(\.managedObjectContext, managedObjectContext)
     }
 }
+
+public func withEnvironmentValue<T, Content: View>(
+    _ keyPath: KeyPath<EnvironmentValues, T>,
+    content: @escaping (T) -> Content
+) -> EnvironmentValueAccessView<T, Content> {
+    .init(keyPath, content: content)
+}

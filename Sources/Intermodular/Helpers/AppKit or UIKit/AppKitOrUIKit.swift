@@ -82,6 +82,12 @@ extension NSView {
     }
 }
 
+extension NSWindow {
+    public var isHidden: Bool {
+        !isVisible
+    }
+}
+
 #endif
 
 #if os(watchOS)

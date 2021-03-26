@@ -205,7 +205,7 @@ class UIHostingCollectionViewCell<
     
     override func prepareForReuse() {
         super.prepareForReuse()
-
+        
         _isFocused = false
         
         super.isHighlighted = false
@@ -371,7 +371,9 @@ extension UIHostingCollectionViewCell {
                 }
             }
             
-            mainView = .init(base: base)
+            withAnimation(nil) {
+                mainView = .init(base: base)
+            }
             
             if forced {
                 mainView.dummy.toggle()

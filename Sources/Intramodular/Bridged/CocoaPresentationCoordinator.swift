@@ -67,11 +67,12 @@ import SwiftUI
         self.viewController = viewController
     }
     
-    func setIsInPresentation(_ isActive: Bool) {
+    func setIsModalInPresentation(_ isActive: Bool) {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         viewController.isModalInPresentation = isActive
         #elseif os(macOS)
-        fatalError("unimplemented")
+        viewController.view.window?.standardWindowButton(NSWindow.ButtonType.closeButton)!.isHidden = isActive
+        viewController.view.window?.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)!.isHidden = isActive
         #endif
     }
 }
@@ -197,7 +198,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         (presentationController.presentedViewController as? CocoaPresentationHostingController)?.presentation.resetBinding()
-
+        
         presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
     }
     
@@ -239,7 +240,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             }
             .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
             .onPreferenceChange(IsModalInPresentation.self) {
-                self.coordinator?.setIsInPresentation($0)
+                self.coordinator?.setIsModalInPresentation($0)
             }
     }
 }

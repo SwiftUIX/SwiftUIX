@@ -264,7 +264,9 @@ extension UIHostingCollectionViewSupplementaryView {
                 }
             }
             
-            mainView = .init(base: base)
+            withAnimation(nil) {
+                mainView = .init(base: base)
+            }
         }
     }
 }
