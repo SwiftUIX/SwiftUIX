@@ -19,7 +19,7 @@ extension UIHostingCollectionViewCell {
         let itemIdentifier: ItemIdentifierType
         let sectionIdentifier: SectionIdentifierType
         let indexPath: IndexPath
-        let makeContent: (SectionType, ItemType) -> Content
+        let content: Content
         let maximumSize: OptionalDimensions?
         
         var id: ID {
@@ -281,7 +281,7 @@ extension UIHostingCollectionViewCell {
         
         public var body: some View {
             if let configuration = configuration, let state = state, let preferences = preferences {
-                configuration.makeContent(configuration.section, configuration.item)
+                configuration.content
                     .environment(\.isCellFocused, state.isFocused)
                     .environment(\.isCellHighlighted, state.isHighlighted)
                     .environment(\.isCellSelected, state.isSelected)

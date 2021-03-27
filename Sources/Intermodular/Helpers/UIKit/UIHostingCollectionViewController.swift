@@ -256,7 +256,7 @@ public final class UIHostingCollectionViewController<
                 itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
                 sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
                 indexPath: indexPath,
-                makeContent: self.viewProvider.rowContent,
+                content: self.viewProvider.rowContent(section, item),
                 maximumSize: self.maximumCellSize
             )
             

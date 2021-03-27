@@ -73,19 +73,19 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if preferredContentSize != UIView.layoutFittingExpandedSize {
-            preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
+        if modalPresentationStyle == .popover {
+            if preferredContentSize != UIView.layoutFittingExpandedSize {
+                preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
+            }
         }
     }
     
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        if UserInterfaceIdiom.current == .mac {
+        if UserInterfaceIdiom.current == .mac || UserInterfaceIdiom.current == .phone {
             view.frame.size = size
         }
-        
-        view.setNeedsLayout()
     }
 }
 

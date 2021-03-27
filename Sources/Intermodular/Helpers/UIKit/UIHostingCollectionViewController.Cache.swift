@@ -68,7 +68,7 @@ extension UIHostingCollectionViewController {
                         itemIdentifier: itemIdentifier,
                         sectionIdentifier: sectionIdentifier,
                         indexPath: indexPath,
-                        makeContent: parent.viewProvider.rowContent,
+                        content: parent.viewProvider.rowContent(section, item),
                         maximumSize: parent.maximumCellSize
                     )
                 )
