@@ -31,7 +31,7 @@ public struct AnyPresentationView: View {
     }
 }
 
-// MARK: - Protocol Conformances -
+// MARK: - Conformances -
 
 extension AnyPresentationView: _opaque_View {
     public func _opaque_getViewName() -> ViewName? {

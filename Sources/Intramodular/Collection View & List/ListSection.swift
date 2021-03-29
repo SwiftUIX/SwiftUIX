@@ -97,7 +97,7 @@ extension ListSection where SectionType: Identifiable, ItemType: Identifiable {
     }
 }
 
-// MARK: - Protocol Conformances -
+// MARK: - Conformances -
 
 extension ListSection: Equatable where SectionType: Equatable, ItemType: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {

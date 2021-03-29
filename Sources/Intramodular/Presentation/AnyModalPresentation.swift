@@ -61,7 +61,7 @@ extension AnyModalPresentation {
     }
 }
 
-// MARK: - Protocol Conformances -
+// MARK: - Conformances -
 
 extension AnyModalPresentation: Equatable {
     public static func == (lhs: AnyModalPresentation, rhs: AnyModalPresentation) -> Bool {

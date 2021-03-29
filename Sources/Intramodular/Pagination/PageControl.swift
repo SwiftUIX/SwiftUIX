@@ -25,7 +25,7 @@ public struct PageControl {
     }
 }
 
-// MARK: - Protocol Conformances -
+// MARK: - Conformances -
 
 extension PageControl: UIViewRepresentable {
     public typealias UIViewType = UIPageControl

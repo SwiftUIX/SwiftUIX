@@ -118,7 +118,7 @@ extension TitlebarItem {
     #endif
 }
 
-// MARK: - Protocol Conformances -
+// MARK: - Conformances -
 
 extension TitlebarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
