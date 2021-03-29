@@ -31,7 +31,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         _presentationCoordinator
     }
     
-    init(
+    public init(
         mainView: Content,
         presentationCoordinator: CocoaPresentationCoordinator = .init()
     ) {

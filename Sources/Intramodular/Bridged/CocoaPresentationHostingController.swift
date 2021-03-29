@@ -85,9 +85,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        if UserInterfaceIdiom.current == .mac || UserInterfaceIdiom.current == .phone {
-            view.frame.size = size
-        }
+        view.frame.size = size
     }
 }
 
