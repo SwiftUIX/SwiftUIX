@@ -5,12 +5,12 @@
 import Swift
 import SwiftUI
 
-public struct WithInlineState<Value, Content: View>: View {
-    @State private var value: Value
+private struct WithInlineState<Value, Content: View>: View {
+    @State var value: Value
     
-    private let content: (Binding<Value>) -> Content
+    let content: (Binding<Value>) -> Content
     
-    public init(
+    init(
         initialValue: Value,
         @ViewBuilder content: @escaping (Binding<Value>) -> Content
     ) {
@@ -18,18 +18,18 @@ public struct WithInlineState<Value, Content: View>: View {
         self.content = content
     }
     
-    public var body: some View {
+    var body: some View {
         content($value)
     }
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
-public struct WithInlineStateObject<Object: ObservableObject, Content: View>: View {
-    @StateObject private var object: Object
+private struct WithInlineStateObject<Object: ObservableObject, Content: View>: View {
+    @StateObject var object: Object
     
-    private let content: (Object) -> Content
+    let content: (Object) -> Content
     
-    public init(
+    init(
         _ object: @autoclosure @escaping () -> Object,
         @ViewBuilder content: @escaping (Object) -> Content
     ) {
@@ -37,7 +37,22 @@ public struct WithInlineStateObject<Object: ObservableObject, Content: View>: Vi
         self.content = content
     }
     
-    public var body: some View {
+    var body: some View {
         content(object)
     }
+}
+
+public func withInlineState<Value, Content: View>(
+    initialValue: Value,
+    @ViewBuilder content: @escaping (Binding<Value>) -> Content
+) -> some View {
+    WithInlineState(initialValue: initialValue, content: content)
+}
+
+@available(iOS 14.0, *)
+public func withInlineStateObject<Object: ObservableObject, Content: View>(
+    _ object: @autoclosure @escaping () -> Object,
+    @ViewBuilder content: @escaping (Object) -> Content
+) -> some View {
+    WithInlineStateObject(object(), content: content)
 }

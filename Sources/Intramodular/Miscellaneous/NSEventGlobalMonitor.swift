@@ -46,7 +46,7 @@ extension View {
         matching mask: NSEvent.EventTypeMask,
         peform action: @escaping (NSEvent) -> ()
     ) -> some View {
-        WithInlineStateObject(NSEventGlobalMonitor(matching: mask)) { object in
+        withInlineStateObject(NSEventGlobalMonitor(matching: mask)) { object in
             self.onReceive(object.objectWillChange, perform: action).onAppear {
                 object.start()
             }
