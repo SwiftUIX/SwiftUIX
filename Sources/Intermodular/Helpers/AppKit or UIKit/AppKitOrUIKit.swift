@@ -88,10 +88,6 @@ extension NSView {
     }
 }
 
-extension CGSize {
-    var edgeInsets: EdgeInsets { .init(top: height / 2, leading: width / 2, bottom: height / 2, trailing: width / 2) }
-}
-
 #endif
 
 #if os(watchOS)
