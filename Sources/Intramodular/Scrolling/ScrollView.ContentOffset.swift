@@ -114,7 +114,11 @@ extension UIScrollView {
         setContentOffset(offset.contentOffset, animated: animated)
     }
     
-    func setContentAlignment(_ alignment: Alignment, animated: Bool) {
+    func setContentAlignment(_ alignment: Alignment?, animated: Bool) {
+        guard let alignment = alignment else {
+            return
+        }
+        
         var offset = contentOffset(forContentType: AnyView.self)
         
         offset.setContentAlignment(alignment)

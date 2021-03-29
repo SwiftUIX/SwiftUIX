@@ -48,7 +48,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
         }
     }
     
-    var initialContentAlignment: Alignment! {
+    var initialContentAlignment: Alignment? {
         didSet {
             guard oldValue != initialContentAlignment else {
                 return
@@ -73,7 +73,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
     var isInitialContentAlignmentSet: Bool = false
     
     var isContentOffsetCorrectionEnabled: Bool {
-        if initialContentAlignment.horizontal == .trailing || initialContentAlignment.vertical == .bottom {
+        if initialContentAlignment?.horizontal == .trailing || initialContentAlignment?.vertical == .bottom {
             return true
         } else {
             return false
@@ -372,11 +372,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
         super.viewWillTransition(to: size, with: coordinator)
         
         if let lastContentSize = lastContentSize {
-            if initialContentAlignment.horizontal == .trailing {
+            if initialContentAlignment?.horizontal == .trailing {
                 tableView.contentOffset.x += tableView.contentSize.width - lastContentSize.width
             }
             
-            if initialContentAlignment.vertical == .bottom {
+            if initialContentAlignment?.vertical == .bottom {
                 tableView.contentOffset.y += tableView.contentSize.height - lastContentSize.height
             }
         }
@@ -475,11 +475,11 @@ extension UIHostingTableViewController {
             
             var newContentOffset = lastContentOffset
             
-            if initialContentAlignment.horizontal == .trailing {
+            if initialContentAlignment?.horizontal == .trailing {
                 newContentOffset.x += newContentSize.width - oldContentSize.width
             }
             
-            if initialContentAlignment.vertical == .bottom {
+            if initialContentAlignment?.vertical == .bottom {
                 newContentOffset.y += newContentSize.height - oldContentSize.height
             }
             
