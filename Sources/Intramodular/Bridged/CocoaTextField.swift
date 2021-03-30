@@ -9,19 +9,27 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: CocoaView {
+
+    typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
+
     public struct CharactersChange {
         public let range: NSRange
         public let replacement: String
     }
     
     struct _Configuration {
-        var onEditingChanged: (Bool) -> Void
+        var onEditingChanged: (Bool) -> Void = { _ in }
         var onCommit: () -> Void
         var onDeleteBackward: () -> Void = { }
         var onCharactersChange: (CharactersChange) -> Bool = { _ in true }
+
+        var textRect: Rect?
+        var editingRect: Rect?
+        var clearButtonRect: Rect?
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
+        var responderIndex: Int?
         
         var focusRingType: FocusRingType = .none
         
@@ -37,6 +45,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var textColor: UIColor?
         var textContentType: UITextContentType?
         var secureTextEntry: Bool?
+        var clearButtonMode: UITextField.ViewMode?
+        var enablesReturnKeyAutomatically: Bool?
     }
     
     @Environment(\.font) var font
@@ -51,6 +61,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     
     private var label: Label
     private var text: Binding<String>
+    private var isEditing: Binding<Bool>
     private var configuration: _Configuration
     
     public var body: some View {
@@ -62,7 +73,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
                     .animation(nil)
             }
             
-            _CocoaTextField<Label>(text: text, configuration: configuration)
+            _CocoaTextField<Label>(text: text, isEditing: isEditing, configuration: configuration)
         }
     }
 }
@@ -72,32 +83,36 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     typealias UIViewType = _UITextField
     
     let text: Binding<String>
+    let isEditing: Binding<Bool>
     let configuration: Configuration
     
     class Coordinator: NSObject, UITextFieldDelegate {
         var text: Binding<String>
+        var isEditing: Binding<Bool>
         var configuration: Configuration
         
-        init(text: Binding<String>, configuration: Configuration) {
+        init(text: Binding<String>, isEditing: Binding<Bool>, configuration: Configuration) {
             self.text = text
+            self.isEditing = isEditing
             self.configuration = configuration
         }
         
         func textFieldDidBeginEditing(_ textField: UITextField) {
+            isEditing.wrappedValue = true
             configuration.onEditingChanged(true)
         }
         
         func textFieldDidChangeSelection(_ textField: UITextField) {
-            guard textField.markedTextRange == nil else {
+            guard textField.markedTextRange == nil, text.wrappedValue != textField.text else {
                 return
             }
-            
+
             text.wrappedValue = textField.text ?? ""
         }
         
         func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+            isEditing.wrappedValue = false
             configuration.onEditingChanged(false)
-            configuration.onCommit()
         }
         
         func textField(
@@ -109,14 +124,34 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            textField.resignFirstResponder()
-            
+            var nextField: UIView?
+
+            if textField.tag != 0 {
+                let nextTag = textField.tag + 1
+                var parentView = textField.superview
+
+                while nextField == nil && parentView != nil {
+                    nextField = parentView?.viewWithTag(nextTag)
+                    parentView = parentView?.superview
+                }
+            }
+
+            if let nextField = nextField {
+                nextField.becomeFirstResponder()
+            } else {
+                textField.resignFirstResponder()
+            }
+
+            configuration.onCommit()
             return true
         }
     }
     
     func makeUIView(context: Context) -> UIViewType {
         let uiView = _UITextField()
+
+        uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        uiView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         
         uiView.delegate = context.coordinator
         
@@ -138,8 +173,10 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         #endif
         
         uiView.onDeleteBackward = configuration.onDeleteBackward
-        
-        uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        uiView.textRect = configuration.textRect
+        uiView.editingRect = configuration.editingRect
+        uiView.clearButtonRect = configuration.clearButtonRect
         
         if let autocapitalization = configuration.autocapitalization {
             uiView.autocapitalizationType = autocapitalization
@@ -218,7 +255,19 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         if let secureTextEntry = configuration.secureTextEntry {
             uiView.isSecureTextEntry = secureTextEntry
         }
-        
+
+        if let clearButtonMode = configuration.clearButtonMode {
+            uiView.clearButtonMode = clearButtonMode
+        }
+
+        if let enablesReturnKeyAutomatically = configuration.enablesReturnKeyAutomatically {
+            uiView.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically
+        }
+
+        if let responderIndex = configuration.responderIndex {
+            uiView.tag = responderIndex
+        }
+
         uiView.text = text.wrappedValue
         uiView.textAlignment = .init(context.environment.multilineTextAlignment)
         
@@ -234,7 +283,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        .init(text: text, configuration: configuration)
+        .init(text: text, isEditing: isEditing, configuration: configuration)
     }
 }
 
@@ -249,6 +298,7 @@ extension CocoaTextField where Label == Text {
     ) {
         self.label = Text(title).foregroundColor(.placeholderText)
         self.text = text
+        self.isEditing = .constant(false)
         self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
     }
     
@@ -274,7 +324,48 @@ extension CocoaTextField where Label == Text {
     ) {
         self.label = label()
         self.text = text
+        self.isEditing = .constant(false)
         self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
+    }
+}
+
+extension CocoaTextField where Label == Text {
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.label = Text(title).foregroundColor(.placeholderText)
+        self.text = text
+        self.isEditing = isEditing
+        self.configuration = .init(onCommit: onCommit)
+    }
+
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String?>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            title,
+            text: text.withDefaultValue(String()),
+            isEditing: isEditing,
+            onCommit: onCommit
+        )
+    }
+
+    public init(
+        text: Binding<String>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { },
+        @ViewBuilder label: () -> Text
+    ) {
+        self.label = label()
+        self.text = text
+        self.isEditing = isEditing
+        self.configuration = .init(onCommit: onCommit)
     }
 }
 
@@ -366,6 +457,14 @@ extension CocoaTextField {
     public func secureTextEntry(_ isSecureTextEntry: Bool) -> Self {
         then({ $0.configuration.secureTextEntry = isSecureTextEntry })
     }
+
+    public func clearButtonMode(_ clearButtonMode: UITextField.ViewMode) -> Self {
+        then({ $0.configuration.clearButtonMode = clearButtonMode })
+    }
+
+    public func enablesReturnKeyAutomatically(_ enablesReturnKeyAutomatically: Bool) -> Self {
+        then({ $0.configuration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
+    }
 }
 
 extension CocoaTextField where Label == Text {
@@ -387,7 +486,12 @@ extension CocoaTextField where Label == Text {
 // MARK: - Auxiliary Implementation -
 
 private final class _UITextField: UITextField {
+
     var onDeleteBackward: () -> Void = { }
+
+    var textRect: CocoaTextField<AnyView>.Rect?
+    var editingRect: CocoaTextField<AnyView>.Rect?
+    var clearButtonRect: CocoaTextField<AnyView>.Rect?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -401,6 +505,21 @@ private final class _UITextField: UITextField {
         super.deleteBackward()
         
         onDeleteBackward()
+    }
+
+    override func textRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.textRect(forBounds: bounds)
+        return textRect?(bounds, original) ?? original
+    }
+
+    override func editingRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.editingRect(forBounds: bounds)
+        return editingRect?(bounds, original) ?? original
+    }
+
+    override func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        let original = super.clearButtonRect(forBounds: bounds)
+        return clearButtonRect?(bounds, original) ?? original
     }
 }
 
