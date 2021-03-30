@@ -73,7 +73,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || targetEnvironment(macCatalyst)
         if modalPresentationStyle == .popover {
             if preferredContentSize != UIView.layoutFittingExpandedSize {
                 preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
