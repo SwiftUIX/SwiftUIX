@@ -49,7 +49,7 @@ public func withInlineState<Value, Content: View>(
     WithInlineState(initialValue: initialValue, content: content)
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object,
     @ViewBuilder content: @escaping (Object) -> Content
