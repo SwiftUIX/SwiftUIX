@@ -247,9 +247,9 @@ extension UIHostingCollectionViewCell {
         
     }
     
-    func update(forced: Bool = false) {
+    func update(disableAnimation: Bool = true, forced: Bool = false) {
         if let contentHostingController = contentHostingController {
-            contentHostingController.update(forced: forced)
+            contentHostingController.update(disableAnimation: disableAnimation, forced: forced)
         } else {
             contentHostingController = ContentHostingController(base: self)
         }
@@ -358,7 +358,7 @@ extension UIHostingCollectionViewCell {
             }
         }
         
-        func update(forced: Bool = false) {
+        func update(disableAnimation: Bool = true, forced: Bool = false) {
             guard let base = base else {
                 return
             }
@@ -371,7 +371,11 @@ extension UIHostingCollectionViewCell {
                 }
             }
             
-            withAnimation(nil) {
+            if disableAnimation {
+                withAnimation(nil) {
+                    mainView = .init(base: base)
+                }
+            } else {
                 mainView = .init(base: base)
             }
             

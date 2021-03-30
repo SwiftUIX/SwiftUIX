@@ -27,6 +27,25 @@ struct _CollectionView<
         RowContent
     >
     
+    public struct _CollectionViewLayout: CollectionViewLayout, Hashable {
+        weak var collectionViewController: NSObject?
+        
+        let base: CollectionViewLayout
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(collectionViewController?.hashValue)
+            hasher.combine(base.hashValue)
+        }
+        
+        public func _toUICollectionViewLayout() -> UICollectionViewLayout {
+            base._toUICollectionViewLayout()
+        }
+        
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.hashValue == rhs.hashValue
+        }
+    }
+    
     struct DataSourceConfiguration {
         let identifierMap: UIViewControllerType.DataSource.IdentifierMap
     }
@@ -54,14 +73,27 @@ struct _CollectionView<
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        if let _collectionViewProxy = context.environment._collectionViewProxy {
-            if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
-                DispatchQueue.main.async {
-                    _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+        populateCollectionViewProxy: do {
+            if let _collectionViewProxy = context.environment._collectionViewProxy {
+                if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
+                    DispatchQueue.main.async {
+                        _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+                    }
                 }
             }
         }
         
+        updateCollectionViewLayout: do {
+            let collectionViewLayout = _CollectionViewLayout(
+                collectionViewController: uiViewController,
+                base: context.environment.collectionViewLayout
+            )
+            
+            if uiViewController.collectionViewLayout.hashValue != collectionViewLayout.hashValue {
+                uiViewController.collectionViewLayout = collectionViewLayout
+            }
+        }
+
         uiViewController.dataSource = dataSource
         uiViewController.dataSourceConfiguration = dataSourceConfiguration
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
@@ -69,9 +101,7 @@ struct _CollectionView<
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
         
-        if uiViewController.collectionViewLayout.hashValue != context.environment.collectionViewLayout.hashValue {
-            uiViewController.collectionViewLayout = context.environment.collectionViewLayout
-        }
+        uiViewController.refreshVisibleCellsAndSupplementaryViews()
     }
 }
 

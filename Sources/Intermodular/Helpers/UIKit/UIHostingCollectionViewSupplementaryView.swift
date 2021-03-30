@@ -145,9 +145,9 @@ extension UIHostingCollectionViewSupplementaryView {
         
     }
     
-    func update() {
+    func update(disableAnimation: Bool = true, forced: Bool = false) {
         if let contentHostingController = contentHostingController {
-            contentHostingController.update()
+            contentHostingController.update(disableAnimation: disableAnimation, forced: forced)
         } else {
             contentHostingController = ContentHostingController(base: self)
         }
@@ -158,6 +158,8 @@ extension UIHostingCollectionViewSupplementaryView {
 
 extension UIHostingCollectionViewSupplementaryView {
     private struct RootView: ExpressibleByNilLiteral, View {
+        var dummy: Bool = false
+        
         var configuration: Configuration?
         
         init(base: UIHostingCollectionViewSupplementaryView?) {
@@ -253,19 +255,29 @@ extension UIHostingCollectionViewSupplementaryView {
             }
         }
         
-        func update() {
+        func update(disableAnimation: Bool = true, forced: Bool = false) {
             guard let base = base else {
                 return
             }
             
-            if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
-                guard currentConfiguration.id != newConfiguration.id else {
-                    return
+            if !forced {
+                if let currentConfiguration = mainView.configuration, let newConfiguration = base.configuration {
+                    guard currentConfiguration.id != newConfiguration.id else {
+                        return
+                    }
                 }
             }
             
-            withAnimation(nil) {
+            if disableAnimation {
+                withAnimation(nil) {
+                    mainView = .init(base: base)
+                }
+            } else {
                 mainView = .init(base: base)
+            }
+            
+            if forced {
+                mainView.dummy.toggle()
             }
         }
     }

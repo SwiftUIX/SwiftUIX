@@ -41,4 +41,17 @@ extension View {
             }
         }
     }
+    
+    /// Modifies the view based on a predicate.
+    @ViewBuilder
+    public func modify<T: View>(
+        if idiom: UserInterfaceIdiom,
+        @ViewBuilder transform: (Self) -> T
+    ) -> some View {
+        if idiom == .current {
+            transform(self)
+        } else {
+            self
+        }
+    }
 }

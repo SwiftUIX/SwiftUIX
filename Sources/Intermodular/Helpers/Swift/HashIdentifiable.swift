@@ -27,22 +27,26 @@ extension Hashable {
     }
 }
 
-public struct HashIdentifiableValue<Value: Hashable>: HashIdentifiable {
+public struct HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, HashIdentifiable {
     public let value: Value
     
+    public var description: String {
+        .init(describing: value)
+    }
+
     @inlinable
     public init(_ value: Value) {
         self.value = value
     }
 }
 
-public protocol _KeyPathHashIdentifiableValueType {
-    
-}
-
-public struct KeyPathHashIdentifiableValue<Value, ID: Hashable>: _KeyPathHashIdentifiableValueType, Identifiable {
+public struct KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
     public let value: Value
     public let keyPath: KeyPath<Value, ID>
+    
+    public var description: String {
+        .init(describing: value)
+    }
     
     public var id: ID {
         value[keyPath: keyPath]
