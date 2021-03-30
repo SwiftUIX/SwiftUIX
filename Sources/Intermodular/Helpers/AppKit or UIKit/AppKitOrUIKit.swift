@@ -23,6 +23,7 @@ public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
 public typealias AppKitOrUIKitImage = UIImage
+public typealias AppKitOrUIKitInsets = UIEdgeInsets
 public typealias AppKitOrUIKitLabel = UILabel
 public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
@@ -36,6 +37,10 @@ public typealias AppKitOrUIKitTextView = UITextView
 public typealias AppKitOrUIKitView = UIView
 public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
+
+extension UIEdgeInsets {
+    var edgeInsets: EdgeInsets { .init(top: top, leading: left, bottom: bottom, trailing: right) }
+}
 
 #endif
 
@@ -56,6 +61,7 @@ public typealias AppKitOrUIKitFont = NSFont
 public typealias AppKitOrUIKitHostingController<Content: View> = NSHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = NSHostingView<Content>
 public typealias AppKitOrUIKitImage = NSImage
+public typealias AppKitOrUIKitInsets = NSSize
 public typealias AppKitOrUIKitLabel = NSLabel
 public typealias AppKitOrUIKitLayoutAxis = NSUserInterfaceLayoutOrientation
 public typealias AppKitOrUIKitLayoutGuide = NSLayoutGuide
