@@ -207,7 +207,7 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
         return content
             .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
             .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
-            .onUIViewControllerResolution { viewController in
+            .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox = .init(viewController)
                 }
