@@ -27,7 +27,7 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         
         override func willMove(toParent parent: UIViewController?) {
             if !hasMovedToParentOnce {
-                updateNavigationBar(parent: parent)
+                updateNavigationBar(viewController: parent?.navigationController?.visibleViewController)
                 
                 hasMovedToParentOnce = true
             }
@@ -38,13 +38,14 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
             
-            updateNavigationBar(parent: parent)
+            updateNavigationBar(viewController: parent?.navigationController?.visibleViewController)
         }
         
         override func viewDidAppear(_ animated: Bool) {
             isVisible = true
             
-            updateNavigationBar(parent: parent)
+            updateNavigationBar(viewController: parent?.navigationController?.visibleViewController
+            )
         }
         
         override func viewWillDisappear(_ animated: Bool) {
@@ -59,11 +60,11 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
             
             isVisible = false
             
-            updateNavigationBar(parent: parent)
+            updateNavigationBar(viewController: parent?.navigationController?.visibleViewController)
         }
         
-        func updateNavigationBar(parent: UIViewController?) {
-            guard let parent = parent else {
+        func updateNavigationBar(viewController: UIViewController?) {
+            guard let parent = viewController else {
                 return
             }
             
@@ -233,14 +234,14 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         viewController.largeTrailing = largeTrailing
         viewController.largeTrailingAlignment = largeTrailingAlignment
         
-        viewController.updateNavigationBar(parent: viewController.parent)
+        viewController.updateNavigationBar(viewController: viewController.navigationController?.presentedViewController)
     }
     
     @usableFromInline
     static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
         uiViewController.largeTrailingAlignment = nil
         
-        uiViewController.updateNavigationBar(parent: uiViewController.parent)
+        uiViewController.updateNavigationBar(viewController: uiViewController.navigationController?.presentedViewController)
     }
 }
 
@@ -312,12 +313,14 @@ extension View {
     public func navigationBarTitleView<V: View>(
         _ center: V
     ) -> some View {
-        navigationBarItems(
-            leading: EmptyView(),
-            center: center,
-            trailing: EmptyView(),
-            displayMode: .automatic
-        )
+        withEnvironmentValue(\.presenter) { presenter in
+            navigationBarItems(
+                leading: EmptyView(),
+                center: center.environment(\.presenter, presenter),
+                trailing: EmptyView(),
+                displayMode: .automatic
+            )
+        }
     }
     
     @inlinable

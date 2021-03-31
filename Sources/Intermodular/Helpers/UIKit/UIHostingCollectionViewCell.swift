@@ -260,8 +260,6 @@ extension UIHostingCollectionViewCell {
 
 extension UIHostingCollectionViewCell {
     private struct RootView: ExpressibleByNilLiteral, View {
-        var dummy: Bool = false
-        
         var configuration: Configuration?
         var state: State?
         var preferences: Binding<Preferences>?
@@ -377,10 +375,6 @@ extension UIHostingCollectionViewCell {
                 }
             } else {
                 mainView = .init(base: base)
-            }
-            
-            if forced {
-                mainView.dummy.toggle()
             }
         }
     }

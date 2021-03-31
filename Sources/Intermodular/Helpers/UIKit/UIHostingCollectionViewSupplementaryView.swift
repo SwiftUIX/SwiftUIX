@@ -15,14 +15,18 @@ extension UIHostingCollectionViewSupplementaryView {
             let section: SectionIdentifierType
         }
         
-        let kind: String
-        let item: ItemType?
-        let section: SectionType
-        let itemIdentifier: ItemIdentifierType?
-        let sectionIdentifier: SectionIdentifierType
-        let indexPath: IndexPath
-        let viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
-        let maximumSize: OptionalDimensions?
+        var kind: String
+        var item: ItemType?
+        var section: SectionType
+        var itemIdentifier: ItemIdentifierType?
+        var sectionIdentifier: SectionIdentifierType
+        var indexPath: IndexPath
+        var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
+        var maximumSize: OptionalDimensions?
+        
+        var content: AnyView? {
+            viewProvider.sectionContent(for: kind)?(section)
+        }
         
         var id: ID {
             .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
@@ -158,12 +162,12 @@ extension UIHostingCollectionViewSupplementaryView {
 
 extension UIHostingCollectionViewSupplementaryView {
     private struct RootView: ExpressibleByNilLiteral, View {
-        var dummy: Bool = false
-        
         var configuration: Configuration?
+        var content: AnyView?
         
         init(base: UIHostingCollectionViewSupplementaryView?) {
             configuration = base?.configuration
+            content = configuration?.content
         }
         
         public init(nilLiteral: ()) {
@@ -171,25 +175,8 @@ extension UIHostingCollectionViewSupplementaryView {
         }
         
         public var body: some View {
-            if let configuration = configuration  {
-                if configuration.kind == UICollectionView.elementKindSectionHeader {
-                    if SectionHeaderContent.self == Never.self {
-                        EmptyView()
-                    } else {
-                        configuration.viewProvider.sectionHeader(configuration.section)
-                            .edgesIgnoringSafeArea(.all)
-                            .id(configuration.id)
-                    }
-                } else if configuration.kind == UICollectionView.elementKindSectionFooter {
-                    if SectionFooterContent.self == Never.self {
-                        EmptyView()
-                    } else {
-                        configuration.viewProvider.sectionFooter(configuration.section)
-                            .edgesIgnoringSafeArea(.all)
-                            .id(configuration.id)
-                    }
-                }
-            }
+            content?
+                .edgesIgnoringSafeArea(.all)
         }
     }
     
@@ -274,10 +261,6 @@ extension UIHostingCollectionViewSupplementaryView {
                 }
             } else {
                 mainView = .init(base: base)
-            }
-            
-            if forced {
-                mainView.dummy.toggle()
             }
         }
     }

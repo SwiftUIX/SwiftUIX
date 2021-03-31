@@ -53,7 +53,31 @@ struct _CollectionView<
     struct ViewProvider {
         let sectionHeader: (SectionType) -> SectionHeader
         let sectionFooter: (SectionType) -> SectionFooter
+        
         let rowContent: (SectionType, ItemType) -> RowContent
+        
+        func sectionContent(for kind: String) -> ((SectionType) -> AnyView)? {
+            switch kind {
+                case UICollectionView.elementKindSectionHeader: do {
+                    if SectionHeader.self != EmptyView.self && SectionHeader.self != Never.self {
+                        return { sectionHeader($0).eraseToAnyView() }
+                    } else {
+                        return nil
+                    }
+                }
+                case UICollectionView.elementKindSectionFooter:
+                    if SectionFooter.self != EmptyView.self && SectionFooter.self != Never.self {
+                        return { sectionFooter($0).eraseToAnyView() }
+                    } else {
+                        return nil
+                    }
+                default: do {
+                    assertionFailure()
+                    
+                    return nil
+                }
+            }
+        }
     }
     
     typealias Configuration = _CollectionViewConfiguration
