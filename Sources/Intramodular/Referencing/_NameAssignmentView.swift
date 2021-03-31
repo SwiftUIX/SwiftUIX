@@ -10,10 +10,12 @@ import SwiftUI
 fileprivate struct _NameAssignmentView<Content: View>: View {
     private let content: Content
     private let name: ViewName
+    private let id: AnyHashable?
     
-    init(content: Content, name: ViewName) {
+    init(content: Content, name: ViewName, id: AnyHashable?) {
         self.content = content
         self.name = name
+        self.id = id
     }
     
     var body: some View {
@@ -28,6 +30,7 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
                         .init(
                             _NamedViewDescription(
                                 name: name,
+                                id: id,
                                 bounds: $0,
                                 globalBounds: geometry.frame(in: .global)
                             )
@@ -43,7 +46,7 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
 extension View {
     /// Set a name for `self`.
     public func name(_ name: ViewName) -> some View {
-        _NameAssignmentView(content: self, name: name.withViewType(type(of: self)))
+        _NameAssignmentView(content: self, name: name.withViewType(type(of: self)), id: nil)
     }
     
     /// Set a name for `self`.

@@ -23,7 +23,7 @@ public enum ModalPresentationStyle: Equatable {
     #endif
     
     #if os(iOS) || targetEnvironment(macCatalyst)
-    case popover(permittedArrowDirections: UIPopoverArrowDirection)
+    case popover(permittedArrowDirections: UIPopoverArrowDirection, sourceRect: CGRect? = nil)
     
     public static var popover: Self {
         return .popover(permittedArrowDirections: .any)

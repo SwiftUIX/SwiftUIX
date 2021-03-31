@@ -31,6 +31,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     let label: Label
     
     @usableFromInline
+    @State var name = ViewName()
+    @usableFromInline
     @State var id = UUID()
     @usableFromInline
     @State var _internal_isPresented: Bool = false
@@ -57,6 +59,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                         AnyModalPresentation(
                             id: self.id,
                             content: self.destination,
+                            preferredSourceViewName: name,
                             presentationStyle: self.modalPresentationStyle,
                             onDismiss: { self.onDismiss?() },
                             resetBinding: { self.isPresented.wrappedValue = false }
@@ -79,6 +82,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     CocoaHostingView {
                         _Presenter(
                             id: id,
+                            name: name,
                             destination: destination,
                             isPresented: isPresented,
                             onDismiss: onDismiss
@@ -89,6 +93,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 )
             }
         }
+        .name(name)
     }
 }
 
@@ -204,6 +209,7 @@ extension PresentationLink {
         @Environment(\.modalPresentationStyle) var modalPresentationStyle
         
         private let id: UUID
+        private let name: ViewName
         private let destination: Destination
         private let isPresented: Binding<Bool>
         private let onDismiss: (() -> ())?
@@ -211,11 +217,13 @@ extension PresentationLink {
         @usableFromInline
         init(
             id: UUID,
+            name: ViewName,
             destination: Destination,
             isPresented: Binding<Bool>,
             onDismiss: (() -> ())?
         ) {
             self.id = id
+            self.name = name
             self.destination = destination
             self.isPresented = isPresented
             self.onDismiss = onDismiss
@@ -230,6 +238,7 @@ extension PresentationLink {
             return AnyModalPresentation(
                 id: id,
                 content: destination,
+                preferredSourceViewName: name,
                 presentationStyle: modalPresentationStyle,
                 onDismiss: { self.onDismiss?() },
                 resetBinding: { self.isPresented.wrappedValue = false }

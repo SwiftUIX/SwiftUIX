@@ -12,6 +12,8 @@ public struct _NamedViewDescription: Hashable {
     @usableFromInline
     let name: ViewName
     @usableFromInline
+    let id: AnyHashable?
+    @usableFromInline
     let bounds: Anchor<CGRect>
     @usableFromInline
     let globalBounds: CGRect
@@ -19,16 +21,19 @@ public struct _NamedViewDescription: Hashable {
     @usableFromInline
     init(
         name: ViewName,
+        id: AnyHashable?,
         bounds: Anchor<CGRect>,
         globalBounds: CGRect
     ) {
         self.name = name
+        self.id = id
         self.bounds = bounds
         self.globalBounds = globalBounds
     }
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
+        hasher.combine(id)
         hasher.combine(globalBounds.origin.x)
         hasher.combine(globalBounds.origin.y)
         hasher.combine(globalBounds.size.width)
@@ -38,6 +43,10 @@ public struct _NamedViewDescription: Hashable {
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.name == rhs.name else {
+            return false
+        }
+        
+        guard lhs.id == rhs.id else {
             return false
         }
         

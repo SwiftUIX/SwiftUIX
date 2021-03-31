@@ -76,7 +76,7 @@ extension DynamicViewPresenter {
         present(
             .init(
                 content: view,
-                contentName: name,
+                name: name,
                 presentationStyle: presentationStyle,
                 onPresent: completion,
                 onDismiss: onDismiss,

@@ -27,7 +27,8 @@ public struct AnyModalPresentation: Identifiable {
     init<V: View>(
         id: UUID = UUID(),
         content: V,
-        contentName: ViewName? = nil,
+        name: ViewName? = nil,
+        preferredSourceViewName: ViewName? = nil,
         presentationStyle: ModalPresentationStyle? = nil,
         onPresent: (() -> Void)? = nil,
         onDismiss: (() -> Void)? = nil,
@@ -37,12 +38,16 @@ public struct AnyModalPresentation: Identifiable {
         self.content = AnyPresentationView(content)
         self.resetBinding = resetBinding
         
+        if let name = name {
+            self.content = self.content.name(name)
+        }
+
+        if let preferredSourceViewName = preferredSourceViewName {
+            self.content = self.content.preferredSourceViewName(preferredSourceViewName)
+        }
+
         if let presentationStyle = presentationStyle {
             self.content = self.content.modalPresentationStyle(presentationStyle)
-        }
-        
-        if let name = contentName {
-            self.content = self.content.name(name)
         }
     }
 }

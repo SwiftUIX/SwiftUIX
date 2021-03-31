@@ -81,7 +81,27 @@ extension View {
         width: _GreedyFrameSize,
         alignment: Alignment = .center
     ) -> some View {
-        frame(idealWidth: .infinity, maxWidth: .infinity, alignment: alignment)
+        frame(
+            idealWidth: .infinity,
+            maxWidth: .infinity,
+            alignment: alignment
+        )
+    }
+    
+    @inlinable
+    public func frame(
+        width: _GreedyFrameSize,
+        height: CGFloat?,
+        alignment: Alignment = .center
+    ) -> some View {
+        frame(
+            idealWidth: .infinity,
+            maxWidth: .infinity,
+            minHeight: height,
+            idealHeight: height,
+            maxHeight: height,
+            alignment: alignment
+        )
     }
     
     @inlinable

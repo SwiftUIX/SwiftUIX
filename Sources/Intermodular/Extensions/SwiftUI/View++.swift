@@ -59,6 +59,17 @@ extension View {
     }
 }
 
+extension View {
+    @_disfavoredOverload
+    @inlinable
+    public func overlay<Overlay: View>(
+        alignment: Alignment = .center,
+        @ViewBuilder _ overlay: () -> Overlay
+    ) -> some View {
+        self.overlay(overlay(), alignment: alignment)
+    }
+}
+
 // MARK: View.hidden
 
 extension View {

@@ -45,7 +45,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         #endif
         
         #if !os(tvOS)
-        if case let .popover(permittedArrowDirections) = mainView.presentationStyle {
+        if case let .popover(permittedArrowDirections, sourceRect) = mainView.presentationStyle {
             popoverPresentationController?.delegate = presentationCoordinator
             popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
             
@@ -55,7 +55,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
             
             popoverPresentationController?.sourceView = presentingViewController?.view
             
-            if let sourceRect = sourceViewDescription?.globalBounds {
+            if let sourceRect = sourceRect ?? sourceViewDescription?.globalBounds {
                 popoverPresentationController?.sourceRect = sourceRect
             }
         }
@@ -75,7 +75,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         
         #if os(iOS) || targetEnvironment(macCatalyst)
         if modalPresentationStyle == .popover {
-            if preferredContentSize != UIView.layoutFittingExpandedSize {
+            if preferredContentSize == .zero {
                 preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
             }
         }

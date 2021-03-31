@@ -12,6 +12,7 @@ public struct AnyPresentationView: View {
     private var environmentBuilder: EnvironmentBuilder
     
     public private(set) var name: ViewName
+    public private(set) var _preferredSourceViewName: ViewName?
     public private(set) var modalPresentationStyle: ModalPresentationStyle = .automatic
     public private(set) var hidesBottomBarWhenPushed: Bool = false
     
@@ -41,7 +42,11 @@ extension AnyPresentationView: _opaque_View {
 
 extension AnyPresentationView: ModalPresentationView {
     public var preferredSourceViewName: ViewName? {
-        (base as? _opaque_ModalPresentationView)?.preferredSourceViewName ?? name
+        get {
+            _preferredSourceViewName ?? (base as? _opaque_ModalPresentationView)?.preferredSourceViewName
+        } set {
+            _preferredSourceViewName = newValue
+        }
     }
 
     public var presentationStyle: ModalPresentationStyle {
@@ -65,15 +70,15 @@ extension AnyPresentationView {
     public func name(_ name: ViewName) -> Self {
         then({ $0.name = name })
     }
-}
 
-extension AnyPresentationView {
+    public func preferredSourceViewName(_ name: ViewName) -> Self {
+        then({ $0.preferredSourceViewName = name })
+    }
+
     public func modalPresentationStyle(_ style: ModalPresentationStyle) -> Self {
         then({ $0.modalPresentationStyle = style })
     }
-}
 
-extension AnyPresentationView {
     public func hidesBottomBarWhenPushed(_ hidesBottomBarWhenPushed: Bool) -> Self {
         then({ $0.hidesBottomBarWhenPushed = hidesBottomBarWhenPushed })
     }

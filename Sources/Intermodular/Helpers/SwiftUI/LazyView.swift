@@ -37,7 +37,7 @@ public struct LazyAppearView<Body: View>: View {
     @_optimize(none)
     @inline(never)
     public var body: some View {
-        Group {
+        PassthroughView {
             if content == nil {
                 ZeroSizeView().onAppear {
                     self.content = self.destination()
