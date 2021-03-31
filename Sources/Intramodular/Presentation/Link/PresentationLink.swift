@@ -10,34 +10,21 @@ import SwiftUI
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
-    @usableFromInline
     @Environment(\.environmentBuilder) var environmentBuilder
-    @usableFromInline
     @Environment(\.managedObjectContext) var managedObjectContext
-    @usableFromInline
     @Environment(\.modalPresentationStyle) var modalPresentationStyle
-    @usableFromInline
     @Environment(\.presenter) var presenter
-    @usableFromInline
     @Environment(\.userInterfaceIdiom) var userInterfaceIdiom
     
-    @usableFromInline
     let _destination: Destination
-    @usableFromInline
     let onDismiss: (() -> ())?
-    @usableFromInline
     let _isPresented: Binding<Bool>?
-    @usableFromInline
     let label: Label
     
-    @usableFromInline
     @State var name = ViewName()
-    @usableFromInline
     @State var id = UUID()
-    @usableFromInline
     @State var _internal_isPresented: Bool = false
     
-    @usableFromInline
     var destination: some View {
         _destination
             .managedObjectContext(managedObjectContext)
@@ -45,12 +32,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             .modalPresentationStyle(modalPresentationStyle)
     }
     
-    @usableFromInline
     var isPresented: Binding<Bool> {
         _isPresented ?? $_internal_isPresented
     }
     
-    @inlinable
     public var body: some View {
         Group {
             if let presenter = presenter, _isPresented == nil, userInterfaceIdiom != .mac {
@@ -100,7 +85,6 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
 // MARK: - API -
 
 extension PresentationLink {
-    @inline(never)
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -112,7 +96,6 @@ extension PresentationLink {
         self.label = label()
     }
     
-    @inline(never)
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,
@@ -124,7 +107,6 @@ extension PresentationLink {
         self.label = label()
     }
     
-    @inline(never)
     public init<V: Hashable>(
         destination: Destination,
         tag: V,
@@ -149,13 +131,11 @@ extension PresentationLink {
 
 extension View {
     /// Adds a destination to present when this view is pressed.
-    @inlinable
     public func onPress<Destination: View>(present destination: Destination) -> some View {
         modifier(_PresentOnPressViewModifier(destination: destination))
     }
     
     /// Adds a destination to present when this view is pressed.
-    @inlinable
     public func onPress<Destination: View>(
         present destination: Destination,
         isPresented: Binding<Bool>
@@ -171,20 +151,15 @@ extension View {
 
 // MARK: - Auxiliary Implementation -
 
-@usableFromInline
 struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
-    @usableFromInline
     @Environment(\.presenter) var presenter
     
-    @usableFromInline
     let destination: Destination
     
-    @usableFromInline
     init(destination: Destination) {
         self.destination = destination
     }
     
-    @usableFromInline
     func body(content: Content) -> some View {
         presenter.ifSome { presenter in
             Button(action: { presenter.present(self.destination) }) {
@@ -201,11 +176,8 @@ struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
 }
 
 extension PresentationLink {
-    @usableFromInline
     struct _Presenter<Destination: View>: View {
-        @usableFromInline
         @Environment(\.environmentBuilder) var environmentBuilder
-        @usableFromInline
         @Environment(\.modalPresentationStyle) var modalPresentationStyle
         
         private let id: UUID
@@ -214,7 +186,6 @@ extension PresentationLink {
         private let isPresented: Binding<Bool>
         private let onDismiss: (() -> ())?
         
-        @usableFromInline
         init(
             id: UUID,
             name: ViewName,
@@ -229,7 +200,6 @@ extension PresentationLink {
             self.onDismiss = onDismiss
         }
         
-        @usableFromInline
         var presentation: AnyModalPresentation? {
             guard isPresented.wrappedValue else {
                 return nil
@@ -245,7 +215,6 @@ extension PresentationLink {
             )
         }
         
-        @usableFromInline
         var body: some View {
             Group {
                 if modalPresentationStyle == .automatic {
