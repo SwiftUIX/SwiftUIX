@@ -23,10 +23,10 @@ public enum ModalPresentationStyle: Equatable {
     #endif
     
     #if os(iOS) || targetEnvironment(macCatalyst)
-    case popover(permittedArrowDirections: UIPopoverArrowDirection, sourceRect: CGRect? = nil)
+    case popover(permittedArrowDirections: PopoverArrowDirection, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds))
     
     public static var popover: Self {
-        return .popover(permittedArrowDirections: .any)
+        return .popover(permittedArrowDirections: .all)
     }
     #endif
     
@@ -185,7 +185,9 @@ extension UIViewController {
             #endif
             #if os(iOS) || targetEnvironment(macCatalyst)
             case .popover:
-                return .popover(permittedArrowDirections: popoverPresentationController?.permittedArrowDirections ?? .any)
+                return .popover(
+                    permittedArrowDirections: .init(popoverPresentationController?.permittedArrowDirections ?? .any)
+                )
             #endif
             case .automatic:
                 return .automatic

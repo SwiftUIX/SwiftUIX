@@ -69,18 +69,18 @@ extension DynamicViewPresenter {
     public func present<V: View>(
         _ view: V,
         named name: ViewName? = nil,
-        onDismiss: (() -> Void)? = nil,
+        onDismiss: @escaping () -> Void = { },
         presentationStyle: ModalPresentationStyle? = nil,
         completion: @escaping () -> Void = { }
     ) {
+        // FIXME!!!
         present(
-            .init(
-                content: view,
-                name: name,
-                presentationStyle: presentationStyle,
-                onPresent: completion,
+            AnyModalPresentation(
+                content: AnyPresentationView(view)
+                    .name(name)
+                    .modalPresentationStyle(presentationStyle ?? .automatic),
                 onDismiss: onDismiss,
-                resetBinding: { }
+                reset: { }
             )
         )
     }
@@ -88,7 +88,7 @@ extension DynamicViewPresenter {
     public func presentOnTop<V: View>(
         _ view: V,
         named name: ViewName? = nil,
-        onDismiss: (() -> Void)? = nil,
+        onDismiss: @escaping () -> Void = { },
         presentationStyle: ModalPresentationStyle? = nil,
         completion: @escaping () -> () = { }
     ) {

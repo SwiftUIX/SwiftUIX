@@ -45,8 +45,20 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
 
 extension View {
     /// Set a name for `self`.
+    public func name<ID: Hashable>(_ name: ViewName, id: ID) -> some View {
+        _NameAssignmentView(
+            content: self,
+            name: name.withViewType(type(of: self)),
+            id: id
+        )
+    }
+    
+    /// Set a name for `self`.
     public func name(_ name: ViewName) -> some View {
-        _NameAssignmentView(content: self, name: name.withViewType(type(of: self)), id: nil)
+        _NameAssignmentView(
+            content: self,
+            name: name.withViewType(type(of: self)),
+            id: nil)
     }
     
     /// Set a name for `self`.

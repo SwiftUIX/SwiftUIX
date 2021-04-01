@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 extension UIHostingCollectionViewController {
     public enum DataSource: CustomStringConvertible {
         public struct IdentifierMap {
@@ -101,3 +103,5 @@ extension UIHostingCollectionViewController {
         }
     }
 }
+
+#endif

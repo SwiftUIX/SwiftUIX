@@ -37,17 +37,17 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         #if os(iOS) || targetEnvironment(macCatalyst)
         hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
         #endif
-        modalPresentationStyle = .init(mainView.presentationStyle)
+        modalPresentationStyle = .init(mainView.modalPresentationStyle)
         presentationController?.delegate = presentationCoordinator
-        _transitioningDelegate = mainView.presentationStyle.toTransitioningDelegate()
+        _transitioningDelegate = mainView.modalPresentationStyle.toTransitioningDelegate()
         #elseif os(macOS)
         fatalError("unimplemented")
         #endif
         
         #if !os(tvOS)
-        if case let .popover(permittedArrowDirections, sourceRect) = mainView.presentationStyle {
+        if case let .popover(permittedArrowDirections, attachmentAnchor) = mainView.modalPresentationStyle {
             popoverPresentationController?.delegate = presentationCoordinator
-            popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
+            popoverPresentationController?.permittedArrowDirections = .init(permittedArrowDirections)
             
             let sourceViewDescription = mainView.preferredSourceViewName.flatMap {
                 (presentingViewController as? _opaque_CocoaController)?._namedViewDescription(for: $0)
@@ -55,13 +55,25 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
             
             popoverPresentationController?.sourceView = presentingViewController?.view
             
-            if let sourceRect = sourceRect ?? sourceViewDescription?.globalBounds {
-                popoverPresentationController?.sourceRect = sourceRect
+            switch attachmentAnchor {
+                case .rect: do {
+                    if let sourceRect = mainView.popoverAttachmentAnchorBounds ?? sourceViewDescription?.globalBounds {
+                        guard let presentingViewController = presentingViewController, let coordinateSpace = presentingViewController.view.window?.coordinateSpace else {
+                            return
+                        }
+                        
+                        popoverPresentationController?.sourceRect = presentingViewController.view.convert(sourceRect, from: coordinateSpace)
+                    }
+                }
+                case .point(let point):
+                    popoverPresentationController?.sourceRect = .init(origin: .init(x: point.x, y: point.y), size: .init(width: 1, height: 1))
+                default:
+                    break
             }
         }
         #endif
         
-        if mainView.presentationStyle != .automatic {
+        if mainView.modalPresentationStyle != .automatic {
             view.backgroundColor = .clear
         }
     }
@@ -70,13 +82,13 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         fatalError("init(coder:) has not been implemented")
     }
     
-    override open func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override open func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
         #if os(iOS) || targetEnvironment(macCatalyst)
         if modalPresentationStyle == .popover {
             if preferredContentSize == .zero {
-                preferredContentSize = sizeThatFits(in: UIView.layoutFittingExpandedSize)
+                preferredContentSize = sizeThatFits(.init(targetSize: nil))
             }
         }
         #endif

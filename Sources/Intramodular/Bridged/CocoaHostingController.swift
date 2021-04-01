@@ -53,9 +53,9 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             #if os(iOS) || targetEnvironment(macCatalyst)
             hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
             #endif
-            modalPresentationStyle = .init(mainView.presentationStyle)
+            modalPresentationStyle = .init(mainView.modalPresentationStyle)
             presentationController?.delegate = presentationCoordinator
-            _transitioningDelegate = mainView.presentationStyle.toTransitioningDelegate()
+            _transitioningDelegate = mainView.modalPresentationStyle.toTransitioningDelegate()
             #elseif os(macOS)
             fatalError("unimplemented")
             #endif

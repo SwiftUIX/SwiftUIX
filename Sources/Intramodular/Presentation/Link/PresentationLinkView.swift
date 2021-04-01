@@ -10,7 +10,11 @@ public protocol PresentationLinkView: View {
     associatedtype Destination: View
     associatedtype Label: View
     
-    init(destination: Destination, onDismiss: (() -> Void)?, @ViewBuilder label: () -> Label)
+    init(
+        destination: Destination,
+        onDismiss: (() -> Void)?,
+        @ViewBuilder label: () -> Label
+    )
 }
 
 // MARK: - Extensions -

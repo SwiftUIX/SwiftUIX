@@ -212,6 +212,7 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
                     _appKitOrUIKitViewControllerBox = .init(viewController)
                 }
             }
+            .modifier(_UseCocoaPresentationCoordinator(coordinator: _appKitOrUIKitViewControllerBox.value?.presentationCoordinator))
         #else
         return content
         #endif
