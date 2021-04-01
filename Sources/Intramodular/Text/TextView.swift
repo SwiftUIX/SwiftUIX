@@ -12,12 +12,15 @@ public struct TextView<Label: View>: View {
     struct _Configuration {
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
-
+        
+        var isInitialFirstResponder: Bool?
+        var isFirstResponder: Bool?
+        
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
     }
-
+    
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
     
     private var label: Label
@@ -55,7 +58,7 @@ public struct TextView<Label: View>: View {
 
 fileprivate struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
-
+    
     let text: Binding<String>
     let configuration: Configuration
     
@@ -95,13 +98,17 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let result = customAppKitOrUIKitClass.init().then {
-            $0.delegate = context.coordinator
+        let uiView = customAppKitOrUIKitClass.init()
+        
+        uiView.delegate = context.coordinator
+        
+        if let isFirstResponder = configuration.isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
+            DispatchQueue.main.async {
+                uiView.becomeFirstResponder()
+            }
         }
         
-        updateUIView(result, context: context)
-        
-        return result
+        return uiView
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -147,7 +154,7 @@ extension _TextView: UIViewRepresentable {
             // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
             uiView.font = font
         }
-
+        
         if let textColor = configuration.textColor {
             uiView.textColor = textColor
         }
@@ -160,6 +167,16 @@ extension _TextView: UIViewRepresentable {
         // Reset the cursor offset if possible.
         if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
             uiView.selectedTextRange = textRange
+        }
+        
+        DispatchQueue.main.async {
+            if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+                    uiView.becomeFirstResponder()
+                } else if !isFirstResponder && uiView.isFirstResponder {
+                    uiView.resignFirstResponder()
+                }
+            }
         }
     }
     
@@ -287,11 +304,21 @@ extension TextView: DefaultTextInputType where Label == Text {
 }
 
 extension TextView {
+    public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
+        then({ $0.configuration.isInitialFirstResponder = isInitialFirstResponder })
+    }
+    
+    public func isFirstResponder(_ isFirstResponder: Bool) -> Self {
+        then({ $0.configuration.isFirstResponder = isFirstResponder })
+    }
+}
+
+extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
         then({ $0.customAppKitOrUIKitClass = type })
     }
-
+    
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
@@ -300,12 +327,12 @@ extension TextView {
     public func font(_ font: AppKitOrUIKitFont) -> Self {
         then({ $0.configuration.font = font })
     }
-
+    
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
     }
-
+    
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
         then({ $0.configuration.textContainerInset = textContainerInset })
     }
