@@ -144,7 +144,7 @@ public final class UIHostingCollectionViewController<
         
         super.init(nibName: nil, bundle: nil)
     }
-    
+        
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -183,13 +183,31 @@ public final class UIHostingCollectionViewController<
                 return cell
             }
             
+            let itemIdentifier = self.dataSourceConfiguration.identifierMap[item]
+            let sectionIdentifier = self.dataSourceConfiguration.identifierMap[section]
+            
+            let cellID = UICollectionViewCellType.Configuration.ID(
+                item: itemIdentifier,
+                section: sectionIdentifier
+            )
+            
+            let cellContent: CellContent
+            
+            if let (_cellID, _cellContent) = self.cache.indexPathToViewMap[indexPath], _cellID == cellID {
+                cellContent = _cellContent
+            } else {
+                cellContent = self.viewProvider.rowContent(section, item)
+                
+                self.cache.indexPathToViewMap[indexPath] = (cellID, cellContent)
+            }
+            
             cell.configuration = .init(
                 item: item,
                 section: section,
-                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
-                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
+                itemIdentifier: itemIdentifier,
+                sectionIdentifier: sectionIdentifier,
                 indexPath: indexPath,
-                content: self.viewProvider.rowContent(section, item),
+                content: cellContent,
                 maximumSize: self.maximumCellSize
             )
             
@@ -477,22 +495,6 @@ extension UIHostingCollectionViewController {
 }
 
 extension UIHostingCollectionViewController {
-    func _unsafelyUnwrappedSection(from indexPath: IndexPath) -> SectionType {
-        if case .static(let data) = dataSource {
-            return data[data.index(data.startIndex, offsetBy: indexPath.section)].model
-        } else {
-            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section]]
-        }
-    }
-    
-    func _unsafelyUnwrappedItem(at indexPath: IndexPath) -> ItemType {
-        if case .static(let data) = dataSource {
-            return data[indexPath]
-        } else {
-            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
-        }
-    }
-    
     func section(from indexPath: IndexPath) -> SectionType? {
         guard let dataSource = dataSource, dataSource.contains(indexPath) else {
             return nil
@@ -507,6 +509,22 @@ extension UIHostingCollectionViewController {
         }
         
         return _unsafelyUnwrappedItem(at: indexPath)
+    }
+    
+    func _unsafelyUnwrappedSection(from indexPath: IndexPath) -> SectionType {
+        if case .static(let data) = dataSource {
+            return data[data.index(data.startIndex, offsetBy: indexPath.section)].model
+        } else {
+            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section]]
+        }
+    }
+    
+    func _unsafelyUnwrappedItem(at indexPath: IndexPath) -> ItemType {
+        if case .static(let data) = dataSource {
+            return data[indexPath]
+        } else {
+            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
+        }
     }
     
     func cellForItem(at indexPath: IndexPath) -> UICollectionViewCellType? {
@@ -795,7 +813,6 @@ extension UIHostingCollectionViewController {
 }
 
 // MARK: - Auxiliary Implementation -
-
 
 fileprivate extension Dictionary where Key == Int, Value == [Int: CGSize] {
     subscript(_ indexPath: IndexPath) -> CGSize? {

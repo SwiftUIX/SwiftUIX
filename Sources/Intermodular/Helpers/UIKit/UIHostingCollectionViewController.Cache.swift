@@ -12,6 +12,8 @@ extension UIHostingCollectionViewController {
     class Cache: NSObject, UICollectionViewDelegateFlowLayout {
         unowned let parent: UIHostingCollectionViewController
         
+        var indexPathToViewMap: [IndexPath: (UICollectionViewCellType.Configuration.ID, CellContent)] = [:]
+
         private var cellIdentifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
         private var cellIdentifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
         private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
@@ -93,7 +95,7 @@ extension UIHostingCollectionViewController {
             
             let indexPathBasedSize = indexPathToSupplementaryViewContentSizeMap[kind]?[indexPath]
             let identifierBasedSize = supplementaryViewIdentifierToContentSizeMap[id]
-
+            
             if let size = identifierBasedSize, indexPathBasedSize == nil {
                 indexPathToSupplementaryViewContentSizeMap[kind]?[indexPath] = size
                 return size
@@ -163,7 +165,7 @@ extension UIHostingCollectionViewController.Cache {
         supplementaryViewIdentifierToContentSizeMap[configuration.id] = size
         supplementaryViewIdentifierToIndexPathMap[configuration.id] = indexPath
         indexPathToSupplementaryViewContentSizeMap[configuration.kind, default: [:]][configuration.indexPath] = size
-
+        
         return size
     }
     
