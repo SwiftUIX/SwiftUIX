@@ -18,6 +18,7 @@ public typealias AppKitOrUIKitButton = UIButton
 public typealias AppKitOrUIKitColor = UIColor
 public typealias AppKitOrUIKitControl = UIControl
 public typealias AppKitOrUIKitControlEvent = UIControl.Event
+public typealias AppKitOrUIKitEdgeInsets = UIEdgeInsets
 public typealias AppKitOrUIKitEvent = UIEvent
 public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>

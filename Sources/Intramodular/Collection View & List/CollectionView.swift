@@ -289,6 +289,12 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    public func contentInsets(_ inset: EdgeInsets) -> Self {
+        then({ $0._scrollViewConfiguration.contentInset = inset })
+    }
+}
+
+extension CollectionView {
     @available(tvOS, unavailable)
     public func onRefresh(_ body: @escaping () -> Void) -> Self {
         then({ $0._scrollViewConfiguration.onRefresh = body })

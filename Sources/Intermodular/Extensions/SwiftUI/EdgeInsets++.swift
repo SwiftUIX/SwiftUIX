@@ -34,3 +34,16 @@ extension EdgeInsets {
         }
     }
 }
+
+extension EdgeInsets {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public init(_ insets: UIEdgeInsets) {
+        self.init(
+            top: insets.top,
+            leading: insets.left, // FIXME
+            bottom: insets.bottom,
+            trailing: insets.right // FIXME
+        )
+    }
+    #endif
+}

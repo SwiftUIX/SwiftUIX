@@ -62,34 +62,20 @@ extension CocoaScrollView {
         then({ $0.configuration.contentOffset = contentOffset })
     }
     
-    public func contentInset(_ contentInset: UIEdgeInsets) -> Self {
+    public func contentInsets(_ contentInset: EdgeInsets) -> Self {
         then({ $0.configuration.contentInset = contentInset })
     }
     
-    public func contentInset(_ contentInset: EdgeInsets) -> Self {
-        self.contentInset(.init(
-            top: contentInset.top,
-            left: contentInset.leading,
-            bottom: contentInset.bottom,
-            right: contentInset.trailing
-        ))
+    @_disfavoredOverload
+    public func contentInsets(_ insets: UIEdgeInsets) -> Self {
+        contentInsets(EdgeInsets(insets))
     }
     
-    public func contentInset(_ edges: Edge.Set = .all, _ length: CGFloat = 0) -> Self {
-        var contentInset = self.configuration.contentInset
-        if edges.contains(.top) {
-            contentInset.top += length
-        }
-        if edges.contains(.leading) {
-            contentInset.left += length
-        }
-        if edges.contains(.bottom) {
-            contentInset.bottom += length
-        }
-        if edges.contains(.trailing) {
-            contentInset.right += length
-        }
-        return self.contentInset(contentInset)
+    public func contentInsets(
+        _ edges: Edge.Set = .all,
+        _ length: CGFloat = 0
+    ) -> Self {
+        contentInsets(EdgeInsets(edges, length))
     }
 }
 

@@ -198,46 +198,22 @@ extension CocoaList {
     }
     
     @inlinable
-    public func contentInset(_ contentInset: UIEdgeInsets) -> Self {
+    public func contentInsets(_ contentInset: EdgeInsets) -> Self {
         then({ $0.scrollViewConfiguration.contentInset = contentInset })
     }
     
+    @_disfavoredOverload
     @inlinable
-    public func contentInset(_ insets: EdgeInsets) -> Self {
-        contentInset(
-            .init(
-                top: insets.top,
-                left: insets.leading,
-                bottom: insets.bottom,
-                right: insets.trailing
-            )
-        )
+    public func contentInsets(_ insets: UIEdgeInsets) -> Self {
+        contentInsets(EdgeInsets(insets))
     }
     
     @inlinable
-    public func contentInset(
+    public func contentInsets(
         _ edges: Edge.Set = .all,
         _ length: CGFloat = 0
     ) -> Self {
-        var insets = self.scrollViewConfiguration.contentInset
-        
-        if edges.contains(.top) {
-            insets.top += length
-        }
-        
-        if edges.contains(.leading) {
-            insets.left += length
-        }
-        
-        if edges.contains(.bottom) {
-            insets.bottom += length
-        }
-        
-        if edges.contains(.trailing) {
-            insets.right += length
-        }
-        
-        return self.contentInset(insets)
+        contentInsets(EdgeInsets(edges, length))
     }
     
     @inlinable

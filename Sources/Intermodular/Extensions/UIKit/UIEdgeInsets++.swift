@@ -4,7 +4,7 @@
 
 #if canImport(UIKit)
 
-import Swift
+import SwiftUI
 import UIKit
 
 extension UIEdgeInsets {
@@ -31,6 +31,17 @@ extension UIEdgeInsets {
     
     public init(horizontal: CGFloat, vertical: CGFloat) {
         self.init(top: vertical / 2, left: horizontal / 2, bottom: vertical / 2, right: horizontal / 2)
+    }
+}
+
+extension UIEdgeInsets {
+    public init(_ insets: EdgeInsets) {
+        self.init(
+            top: insets.top,
+            left: insets.leading,
+            bottom: insets.bottom,
+            right: insets.trailing
+        )
     }
 }
 
