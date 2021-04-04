@@ -37,6 +37,10 @@ extension CocoaHostingView: AppKitOrUIKitViewControllerRepresentable {
     public func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
         let viewController = AppKitOrUIKitViewControllerType(mainView: mainView)
         
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        viewController.view.backgroundColor = .clear
+        #endif
+        
         if configuration.edgesIgnoringSafeArea {
             viewController._fixSafeAreaInsetsIfNecessary()
         }

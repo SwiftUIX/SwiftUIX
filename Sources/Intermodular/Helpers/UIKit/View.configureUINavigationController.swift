@@ -7,48 +7,28 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-@usableFromInline
-struct UINavigationControllerConfigurator: UIViewControllerRepresentable {
-    @usableFromInline
-    typealias UIViewControllerType = UIViewController
-    
-    @usableFromInline
-    let configure: (UINavigationController) -> Void
-    
-    @usableFromInline
-    init(configure: @escaping (UINavigationController) -> Void) {
-        self.configure = configure
-    }
-    
-    @usableFromInline
-    func makeUIViewController(context: Context) -> UIViewController {
-        UIViewControllerType()
-    }
-    
-    @usableFromInline
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.nearestNavigationController.map(configure)
-    }
-}
-
-// MARK: - API -
-
 extension View {
     @inlinable
     func configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
-        background(UINavigationControllerConfigurator(configure: configure))
+        onAppKitOrUIKitViewControllerResolution { viewController in
+            DispatchQueue.main.async {
+                guard let navigationController = viewController.navigationController else {
+                    return
+                }
+                
+                configure(navigationController)
+            }
+        }
     }
     
     @inlinable
     func configureUINavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
-        configureUINavigationController { navigationController in
-            DispatchQueue.main.async {
-                configure(navigationController.navigationBar)
-            }
+        configureUINavigationController {
+            configure($0.navigationBar)
         }
     }
 }
