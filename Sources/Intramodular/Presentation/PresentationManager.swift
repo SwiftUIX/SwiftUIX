@@ -33,6 +33,18 @@ extension PresentationMode {
     }
 }
 
+public struct BooleanPresentationManager: PresentationManager  {
+    @Binding public var isPresented: Bool
+    
+    public init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented
+    }
+    
+    public func dismiss() {
+        isPresented = false
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey {
@@ -49,7 +61,7 @@ extension EnvironmentValues {
     public var presentationManager: PresentationManager {
         get {
             #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-            if presentationMode.isPresented {
+            if navigator == nil && presentationMode.isPresented {
                 return presentationMode
             } else {
                 return self[_PresentationManagerEnvironmentKey.self]

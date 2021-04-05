@@ -35,6 +35,8 @@ extension Popover {
     }
 }
 
+// MARK: - API -
+
 extension PresentationLink {
     public init(
         destination: () -> Popover<Destination>,
@@ -56,12 +58,68 @@ extension PresentationLink {
         #endif
     }
     
+    public init(
+        isPresented: Binding<Bool>,
+        destination: () -> Popover<Destination>,
+        @ViewBuilder label: () -> Label
+    ) {
+        let destination = destination()
+        
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        self.init(
+            destination: destination.content,
+            isPresented: isPresented,
+            style: .popover(
+                permittedArrowDirections: destination.permittedArrowDirections,
+                attachmentAnchor: destination.attachmentAnchor
+            ),
+            label: label
+        )
+        #else
+        self.init(destination: destination.content, label: label)
+        #endif
+    }
+    
     public init<S: StringProtocol>(
         _ title: S,
         destination: () -> Popover<Destination>
     ) where Label == Text {
         self.init(destination: destination) {
             Text(title)
+        }
+    }
+}
+
+extension PresentationLink where Label == Image {
+    public init(
+        systemImage: SFSymbolName,
+        destination: @escaping () -> Popover<Destination>
+    ) {
+        self.init(destination: destination) {
+            Image(systemName: systemImage)
+        }
+    }
+    
+    public init(
+        systemImage: SFSymbolName,
+        isPresented: Binding<Bool>,
+        destination: @escaping () -> Popover<Destination>
+    ) {
+        self.init(isPresented: isPresented, destination: destination) {
+            Image(systemName: systemImage)
+        }
+    }
+}
+
+@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+extension PresentationLink where Label == SwiftUI.Label<Text, Image> {
+    public init<S: StringProtocol>(
+        _ title: S,
+        systemImage: SFSymbolName,
+        @ViewBuilder destination: @escaping () -> Popover<Destination>
+    ) {
+        self.init(destination: destination) {
+            Label(title, systemImage: systemImage)
         }
     }
 }

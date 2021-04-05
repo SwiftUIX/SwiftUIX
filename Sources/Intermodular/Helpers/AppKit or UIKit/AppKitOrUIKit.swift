@@ -202,7 +202,8 @@ public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType
 struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
-    
+    @State var _presentationCoordinator = WeakBox<CocoaPresentationCoordinator>(nil)
+
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
@@ -211,9 +212,10 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox = .init(viewController)
+                    _presentationCoordinator = .init(viewController.presentationCoordinator)
                 }
             }
-            .modifier(_UseCocoaPresentationCoordinator(coordinator: _appKitOrUIKitViewControllerBox.value?.presentationCoordinator))
+            .modifier(_UseCocoaPresentationCoordinator(coordinator: _presentationCoordinator.value))
         #else
         return content
         #endif

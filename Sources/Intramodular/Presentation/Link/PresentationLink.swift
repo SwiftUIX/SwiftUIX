@@ -28,16 +28,21 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     @State var id = UUID()
     @State var _internal_isPresented: Bool = false
     
+    var isPresented: Binding<Bool> {
+        _isPresented ?? $_internal_isPresented
+    }
+
     var presentation: AnyModalPresentation {
         let content = AnyPresentationView(
             _destination
                 .managedObjectContext(managedObjectContext)
+                .modifier(_ResolveAppKitOrUIKitViewController())
         )
         .modalPresentationStyle(_presentationStyle ?? modalPresentationStyle)
         .preferredSourceViewName(name)
         .mergeEnvironmentBuilder(environmentBuilder)
         
-        return AnyModalPresentation.init(
+        return AnyModalPresentation(
             id: id,
             content: content,
             onDismiss: _onDismiss,
@@ -45,14 +50,9 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
     }
     
-    var isPresented: Binding<Bool> {
-        _isPresented ?? $_internal_isPresented
-    }
-    
     public var body: some View {
         IntrinsicGeometryReader { proxy in
             if let presenter = presenter,
-               _isPresented == nil,
                userInterfaceIdiom != .mac,
                presentation.presentationStyle != .automatic
             {
@@ -130,6 +130,21 @@ extension PresentationLink {
         self.label = label()
     }
     
+    public init(
+        destination: Destination,
+        isPresented: Binding<Bool>,
+        onDismiss: @escaping () -> () = { },
+        style: ModalPresentationStyle,
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination
+        self._onDismiss = onDismiss
+        self._isPresented = isPresented
+        self._presentationStyle = style
+        
+        self.label = label()
+    }
+
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,
