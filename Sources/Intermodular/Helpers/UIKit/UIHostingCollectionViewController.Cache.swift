@@ -13,12 +13,12 @@ extension UIHostingCollectionViewController {
         unowned let parent: UIHostingCollectionViewController
         
         var indexPathToViewMap: [IndexPath: (UICollectionViewCellType.Configuration.ID, CellContent)] = [:]
-
+        
         private var cellIdentifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
         private var cellIdentifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
         private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToContentSizeMap: [IndexPath: CGSize] = [:]
-        private var indexPathToIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
+        private var indexPathToCellIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
         
         private var supplementaryViewIdentifierToContentSizeMap: [UICollectionViewSupplementaryViewType.Configuration.ID: CGSize] = [:]
         private var supplementaryViewIdentifierToIndexPathMap: [UICollectionViewSupplementaryViewType.Configuration.ID: IndexPath] = [:]
@@ -32,6 +32,20 @@ extension UIHostingCollectionViewController {
         
         init(parent: UIHostingCollectionViewController) {
             self.parent = parent
+        }
+        
+        func invalidate() {
+            cellIdentifierToContentSizeMap = [:]
+            cellIdentifierToPreferencesMap = [:]
+            cellIdentifierToIndexPathMap = [:]
+            indexPathToContentSizeMap = [:]
+            indexPathToCellIdentifierMap = [:]
+            
+            supplementaryViewIdentifierToContentSizeMap = [:]
+            supplementaryViewIdentifierToIndexPathMap = [:]
+            indexPathToSupplementaryViewContentSizeMap = [:]
+            
+            itemIdentifierHashToIndexPathMap = [:]
         }
         
         // MARK: - UICollectionViewDelegateFlowLayout -
@@ -141,7 +155,7 @@ extension UIHostingCollectionViewController.Cache {
         cellIdentifierToContentSizeMap[cellConfiguration.id] = size
         cellIdentifierToIndexPathMap[cellConfiguration.id] = indexPath
         indexPathToContentSizeMap[cellConfiguration.indexPath] = size
-        indexPathToIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
+        indexPathToCellIdentifierMap[cellConfiguration.indexPath] = .init(item: cellConfiguration.itemIdentifier, section: cellConfiguration.sectionIdentifier)
         itemIdentifierHashToIndexPathMap[cellConfiguration.itemIdentifier.hashValue] = indexPath
         
         return size
@@ -170,7 +184,7 @@ extension UIHostingCollectionViewController.Cache {
     }
     
     func invalidateCachedContentSize(forIndexPath indexPath: IndexPath) {
-        guard let id = indexPathToIdentifierMap[indexPath] else {
+        guard let id = indexPathToCellIdentifierMap[indexPath] else {
             return
         }
         
@@ -181,20 +195,13 @@ extension UIHostingCollectionViewController.Cache {
     func invalidateIndexPath(_ indexPath: IndexPath) {
         invalidateCachedContentSize(forIndexPath: indexPath)
         
-        guard let id = indexPathToIdentifierMap[indexPath] else {
+        guard let id = indexPathToCellIdentifierMap[indexPath] else {
             return
         }
         
         cellIdentifierToIndexPathMap[id] = nil
-        indexPathToIdentifierMap[indexPath] = nil
+        indexPathToCellIdentifierMap[indexPath] = nil
         itemIdentifierHashToIndexPathMap[id.item.hashValue] = nil
-    }
-    
-    func invalidate() {
-        cellIdentifierToContentSizeMap = [:]
-        indexPathToContentSizeMap = [:]
-        cellIdentifierToIndexPathMap = [:]
-        indexPathToIdentifierMap = [:]
     }
     
     func firstIndexPath(for identifier: AnyHashable) -> IndexPath? {
@@ -206,7 +213,7 @@ extension UIHostingCollectionViewController.Cache {
     }
     
     func identifier(for indexPath: IndexPath) -> UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID? {
-        indexPathToIdentifierMap[indexPath]
+        indexPathToCellIdentifierMap[indexPath]
     }
     
     subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {

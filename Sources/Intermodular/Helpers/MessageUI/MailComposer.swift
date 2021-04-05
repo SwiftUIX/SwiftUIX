@@ -170,7 +170,7 @@ extension MFMailComposeViewController {
         
         if let preferredSendingEmailAddress = configuration.preferredSendingEmailAddress {
             setPreferredSendingEmailAddress(preferredSendingEmailAddress)
-        } 
+        }
     }
 }
 

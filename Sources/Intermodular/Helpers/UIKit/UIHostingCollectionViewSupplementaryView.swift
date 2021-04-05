@@ -188,6 +188,8 @@ extension UIHostingCollectionViewSupplementaryView {
             
             super.init(mainView: nil)
             
+            view.backgroundColor = nil
+
             update()
         }
         

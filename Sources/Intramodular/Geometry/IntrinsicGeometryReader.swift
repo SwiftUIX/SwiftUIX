@@ -11,13 +11,16 @@ public struct IntrinsicGeometryProxy {
     private let localFrame: CGRect?
     private let globalFrame: CGRect?
     
-    public init(_ geometry: GeometryProxy?) {
-        localFrame = geometry?.frame(in: .local)
-        globalFrame = geometry?.frame(in: .global)
-    }
+    public let safeAreaInsets: EdgeInsets
     
     public var size: CGSize {
         localFrame?.size ?? .zero
+    }
+    
+    public init(_ geometry: GeometryProxy?) {
+        localFrame = geometry?.frame(in: .local)
+        globalFrame = geometry?.frame(in: .global)
+        safeAreaInsets = geometry?.safeAreaInsets ?? .zero
     }
     
     public func frame(in coordinateSpace: CoordinateSpace) -> CGRect {

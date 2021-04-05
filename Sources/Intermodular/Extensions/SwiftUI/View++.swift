@@ -55,7 +55,7 @@ extension View {
         _ fill: BackgroundFill,
         alignment: Alignment = .center
     ) -> some View {
-        background(fill, alignment: alignment)
+        background(fill.edgesIgnoringSafeArea(.all), alignment: alignment)
     }
 }
 
