@@ -49,7 +49,13 @@ open class UIHostingView<Content: View>: UIView {
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: targetSize)
+        rootViewHostingController.sizeThatFits(
+            .init(
+                targetSize: .init(targetSize),
+                horizontalFittingPriority: horizontalFittingPriority,
+                verticalFittingPriority: verticalFittingPriority
+            )
+        )
     }
     
     override open func sizeToFit() {

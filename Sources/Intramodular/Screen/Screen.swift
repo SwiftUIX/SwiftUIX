@@ -10,7 +10,7 @@ public class Screen: ObservableObject {
     public static let main = Screen()
     
     private let notificationCenter = NotificationCenter.default
-    
+        
     public var bounds: CGRect  {
         #if os(iOS) || os(tvOS)
         return UIScreen.main.bounds
@@ -31,6 +31,10 @@ public class Screen: ObservableObject {
         #endif
     }
     
+    public var orientation: DeviceOrientation {
+        .current
+    }
+
     var orientationObserver: NSObjectProtocol?
     
     private init() {

@@ -144,7 +144,7 @@ public final class UIHostingCollectionViewController<
         
         super.init(nibName: nil, bundle: nil)
     }
-        
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -417,11 +417,26 @@ extension UIHostingCollectionViewController {
             itemsForBeginning session: UIDragSession,
             at indexPath: IndexPath
         ) -> [UIDragItem] {
-            [UIDragItem(itemProvider: NSItemProvider())]
+            if let dragItems = parent.cache.preferences(itemAt: indexPath).wrappedValue?.dragItems {
+                return dragItems.map(UIDragItem.init)
+            }
+            
+            return [UIDragItem(itemProvider: NSItemProvider())]
         }
         
-        // MARK: - UICollectionViewDropDelegate -
+        func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+            .init()
+        }
         
+        func collectionView(
+            _ collectionView: UICollectionView,
+            dragSessionAllowsMoveOperation session: UIDragSession
+        ) -> Bool {
+            true
+        }
+
+        // MARK: - UICollectionViewDropDelegate -
+
         @objc
         func collectionView(
             _ collectionView: UICollectionView,
@@ -450,10 +465,12 @@ extension UIHostingCollectionViewController {
             dropSessionDidUpdate session: UIDropSession,
             withDestinationIndexPath destinationIndexPath: IndexPath?
         ) -> UICollectionViewDropProposal {
+            session.progressIndicatorStyle = .none
+
             if session.localDragSession == nil {
                 return .init(operation: .forbidden, intent: .unspecified)
             }
-            
+                    
             if collectionView.hasActiveDrag {
                 return .init(operation: .move, intent: .insertAtDestinationIndexPath)
             }

@@ -234,6 +234,13 @@ extension UIHostingCollectionViewController.Cache {
             }
         }
     }
+    
+    public func preferences(itemAt indexPath: IndexPath) -> Binding<UIHostingCollectionViewController.UICollectionViewCellType.Preferences?> {
+        .init(
+            get: { self.indexPathToCellIdentifierMap[indexPath].flatMap({ self[preferencesFor: $0 ]}) },
+            set: { newValue in self.indexPathToCellIdentifierMap[indexPath].map({ self[preferencesFor: $0] = newValue }) }
+        )
+    }
 }
 
 #endif

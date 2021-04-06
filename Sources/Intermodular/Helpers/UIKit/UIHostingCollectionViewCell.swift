@@ -36,6 +36,8 @@ extension UIHostingCollectionViewCell {
     struct Preferences {
         var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
         var _namedViewDescription: _NamedViewDescription?
+
+        var dragItems: [DragItem]?
         var relativeFrame: RelativeFrame?
     }
 }
@@ -288,6 +290,9 @@ extension UIHostingCollectionViewCell {
                     }
                     .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) {
                         preferences._namedViewDescription.wrappedValue = $0.last
+                    }
+                    .onPreferenceChange(DragItem.PreferenceKey.self) {
+                        preferences.dragItems.wrappedValue = $0
                     }
                     .onPreferenceChange(RelativeFrame.PreferenceKey.self) {
                         preferences.relativeFrame.wrappedValue = $0.last
