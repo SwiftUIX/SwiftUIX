@@ -119,6 +119,7 @@ private final class AnyCodableItemProvider<Item: Codable & Hashable>: NSObject, 
     }
 }
 
+@available(tvOS, unavailable)
 extension UIDragItem {
     public convenience init(_ item: DragItem) {
         self.init(itemProvider: item.itemProvider)
