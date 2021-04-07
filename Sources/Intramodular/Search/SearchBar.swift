@@ -83,7 +83,14 @@ extension SearchBar: UIViewRepresentable {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         context.coordinator.base = self
         
-        if let font = uiFont ?? context.environment.font?.toUIFont() {
+        _updateUISearchBar(uiView, environment: context.environment)
+    }
+    
+    func _updateUISearchBar(
+        _ uiView: UIViewType,
+        environment: EnvironmentValues
+    ) {
+        if let font = uiFont ?? environment.font?.toUIFont() {
             uiView._retrieveTextField()?.font = font
         }
         
@@ -94,7 +101,7 @@ extension SearchBar: UIViewRepresentable {
             uiView.text = text
         }
         
-        uiView.tintColor = context.environment.tintColor?.toUIColor()
+        uiView.tintColor = environment.tintColor?.toUIColor()
         
         uiView.setShowsCancelButton(showsCancelButton, animated: true)
         
@@ -145,6 +152,12 @@ extension SearchBar: UIViewRepresentable {
     
     public func makeCoordinator() -> Coordinator {
         return Coordinator(base: self)
+    }
+}
+
+extension UISearchBar {
+    func _configurate(with searchBar: SearchBar) {
+        
     }
 }
 
