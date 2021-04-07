@@ -28,6 +28,8 @@ fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>:
         context.coordinator.base = self
         context.coordinator.searchBarCoordinator.base = searchBar
         context.coordinator.uiViewController = uiViewController.navigationController?.topViewController
+        
+        searchBar._updateUISearchBar(context.coordinator.searchController.searchBar, environment: context.environment)
     }
     
     func makeCoordinator() -> Coordinator {
@@ -169,8 +171,6 @@ extension _NavigationSearchBarConfigurator {
         
         public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
             searchBarCoordinator.searchBarSearchButtonClicked(searchBar)
-            
-            searchController.isActive = false
         }
         
         // MARK: UISearchControllerDelegate
