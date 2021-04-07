@@ -62,7 +62,7 @@ open class UIHostingView<Content: View>: UIView {
         if let superview = superview {
             frame.size = rootViewHostingController.sizeThatFits(in: superview.frame.size)
         } else {
-            super.sizeToFit()
+            frame.size = rootViewHostingController.sizeThatFits(AppKitOrUIKitLayoutSizeProposal())
         }
     }
 }
