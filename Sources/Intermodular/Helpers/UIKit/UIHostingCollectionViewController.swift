@@ -464,18 +464,16 @@ extension UIHostingCollectionViewController {
             _ collectionView: UICollectionView,
             dropSessionDidUpdate session: UIDropSession,
             withDestinationIndexPath destinationIndexPath: IndexPath?
-        ) -> UICollectionViewDropProposal {
-            session.progressIndicatorStyle = .none
-
+        ) -> UICollectionViewDropProposal {            
             if session.localDragSession == nil {
-                return .init(operation: .forbidden, intent: .unspecified)
+                return .init(operation: .cancel, intent: .unspecified)
             }
-
+            
             if collectionView.hasActiveDrag {
                 return .init(operation: .move, intent: .insertAtDestinationIndexPath)
             }
-
-            return .init(operation: .forbidden)
+            
+            return .init(operation: .cancel)
         }
 
         @objc
