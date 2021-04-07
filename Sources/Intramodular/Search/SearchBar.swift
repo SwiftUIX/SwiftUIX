@@ -28,7 +28,7 @@ public struct SearchBar: DefaultTextInputType {
     private var searchBarStyle: UISearchBar.Style = .minimal
     #endif
     
-    private var showsCancelButton: Bool = false
+    private var showsCancelButton: Bool?
     private var onCancel: () -> Void = { }
     
     var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
@@ -103,7 +103,11 @@ extension SearchBar: UIViewRepresentable {
         
         uiView.tintColor = environment.tintColor?.toUIColor()
         
-        uiView.setShowsCancelButton(showsCancelButton, animated: true)
+        if let showsCancelButton = showsCancelButton {
+            if uiView.showsCancelButton != showsCancelButton {
+                uiView.setShowsCancelButton(showsCancelButton, animated: true)
+            }
+        }
         
         if let returnKeyType = returnKeyType {
             uiView.returnKeyType = returnKeyType
