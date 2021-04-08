@@ -103,14 +103,11 @@ public enum RelativeFrameDimension: Hashable {
     
     case absolute(CGFloat)
     case fractional(FractionalValue)
-    case proportional(CGFloat)
     
     func resolve(for dimensionType: FrameGroup.DimensionType, in size: CGSize) -> CGFloat {
         switch self {
             case .absolute(let value):
                 return value
-            case .proportional(let ratio):
-                return size.value(for: dimensionType.orthogonal) * ratio
             case .fractional(let value):
                 return value.resolve(in: size)
         }
@@ -136,9 +133,6 @@ public enum RelativeFrameDimension: Hashable {
                         constant: lhsValue.constant + rhs
                     )
                 )
-            case .proportional:
-                assertionFailure()
-                return lhs
         }
     }
 }
@@ -154,11 +148,11 @@ extension View {
     }
     
     public func proportionalFrame(width: CGFloat) -> some View {
-        relativeFrame(width: .proportional(width))
+        relativeFrame(width: .height(multipliedBy: width))
     }
     
     public func proportionalFrame(height: CGFloat) -> some View {
-        relativeFrame(height: .proportional(height))
+        relativeFrame(height: .height(multipliedBy: height))
     }
 }
 

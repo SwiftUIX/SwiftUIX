@@ -77,7 +77,13 @@ extension AppKitOrUIKitHostingControllerProtocol {
                 ? targetSize.height
                 : result.height
         )
-
+        
+        if result.width.isZero && !result.height.isZero {
+            result = .init(width: 1, height: result.height)
+        } else if !result.width.isZero && result.height.isZero {
+            result = .init(width: result.width, height: 1)
+        }
+        
         return result.clamping(to: sizeProposal.maximumSize)
     }
     
