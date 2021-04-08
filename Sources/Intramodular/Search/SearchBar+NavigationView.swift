@@ -79,7 +79,9 @@ extension _NavigationSearchBarConfigurator {
         fileprivate weak var uiViewController: UIViewController? {
             didSet {
                 if uiViewController == nil || uiViewController != oldValue {
-                    oldValue?.searchController = nil
+                    if oldValue?.searchController != nil {
+                        oldValue?.searchController = nil
+                    }
                 }
                 
                 updateSearchController()
@@ -213,12 +215,6 @@ extension _NavigationSearchBarConfigurator {
         
         override func willMove(toParent parent: UIViewController?) {
             super.willMove(toParent: parent)
-            
-            coordinator?.uiViewController = navigationController?.topViewController
-        }
-        
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
             
             coordinator?.uiViewController = navigationController?.topViewController
         }
