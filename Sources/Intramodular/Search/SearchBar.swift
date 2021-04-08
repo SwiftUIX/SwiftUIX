@@ -94,7 +94,10 @@ extension SearchBar: UIViewRepresentable {
             uiView._retrieveTextField()?.font = font
         }
         
-        uiView.placeholder = placeholder
+        if let placeholder = placeholder {
+            uiView.placeholder = placeholder
+        }
+        
         uiView.searchBarStyle = searchBarStyle
         
         if uiView.text != text {
