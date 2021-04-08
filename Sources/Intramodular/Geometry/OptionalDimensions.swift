@@ -85,6 +85,10 @@ extension View {
     public func preferredMaximumLayoutDimensions(_ size: CGSize) -> some View {
         preferredMaximumLayoutDimensions(.init(size))
     }
+    
+    public func frame(_ dimensions: OptionalDimensions) -> some View {
+        frame(width: dimensions.width, height: dimensions.height)
+    }
 }
 
 // MARK: - Auxiliary Implementation -
@@ -132,6 +136,8 @@ extension EnvironmentValues {
         }
     }
 }
+
+// MARK: - Helpers -
 
 extension CGSize {
     public init(_ dimensions: OptionalDimensions, default: CGSize) {

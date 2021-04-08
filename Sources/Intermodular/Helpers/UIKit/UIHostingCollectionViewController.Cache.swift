@@ -10,12 +10,13 @@ import UIKit
 
 extension UIHostingCollectionViewController {
     class Cache: NSObject, UICollectionViewDelegateFlowLayout {
-        unowned let parent: UIHostingCollectionViewController
+        typealias UICollectionViewCellType = UIHostingCollectionViewController.UICollectionViewCellType
         
-        var indexPathToViewMap: [IndexPath: (UICollectionViewCellType.Configuration.ID, CellContent)] = [:]
+        unowned let parent: UIHostingCollectionViewController
         
         private var cellIdentifierToContentSizeMap: [UICollectionViewCellType.Configuration.ID: CGSize] = [:]
         private var cellIdentifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
+        private var cellIdentifierToCacheMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Cache] = [:]
         private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToContentSizeMap: [IndexPath: CGSize] = [:]
         private var indexPathToCellIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
@@ -34,9 +35,19 @@ extension UIHostingCollectionViewController {
             self.parent = parent
         }
         
+        func preconfigure(cell: UICollectionViewCellType) {
+            guard let id = cell.configuration?.id else {
+                return
+            }
+            
+            cell.preferences = cellIdentifierToPreferencesMap[id] ?? cell.preferences
+            cell.cache = cellIdentifierToCacheMap[id] ?? cell.cache
+        }
+        
         func invalidate() {
             cellIdentifierToContentSizeMap = [:]
             cellIdentifierToPreferencesMap = [:]
+            cellIdentifierToCacheMap = [:]
             cellIdentifierToIndexPathMap = [:]
             indexPathToContentSizeMap = [:]
             indexPathToCellIdentifierMap = [:]
@@ -84,7 +95,7 @@ extension UIHostingCollectionViewController {
                         itemIdentifier: itemIdentifier,
                         sectionIdentifier: sectionIdentifier,
                         indexPath: indexPath,
-                        content: parent.viewProvider.rowContent(section, item),
+                        viewProvider: parent.viewProvider,
                         maximumSize: parent.maximumCellSize
                     )
                 )
@@ -137,13 +148,52 @@ extension UIHostingCollectionViewController {
 }
 
 extension UIHostingCollectionViewController.Cache {
+    public func cellCache(
+        for id: UICollectionViewCellType.Configuration.ID
+    ) -> Binding<UICollectionViewCellType.Cache?> {
+        .init(
+            get: { self.cellIdentifierToCacheMap[id] },
+            set: { self.cellIdentifierToCacheMap[id] = $0 }
+        )
+    }
+    
+    subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {
+        get {
+            cellIdentifierToPreferencesMap[id]
+        } set {
+            let oldValue = self[preferencesFor: id]
+            
+            cellIdentifierToPreferencesMap[id] = newValue
+            
+            guard let indexPath = cellIdentifierToIndexPathMap[id] else {
+                return
+            }
+            
+            if oldValue?.relativeFrame != newValue?.relativeFrame {
+                parent.cache.invalidateIndexPath(indexPath)
+                parent.invalidateLayout(includingCache: false)
+            }
+        }
+    }
+    
+    public func preferences(itemAt indexPath: IndexPath) -> Binding<UIHostingCollectionViewController.UICollectionViewCellType.Preferences?> {
+        .init(
+            get: { self.indexPathToCellIdentifierMap[indexPath].flatMap({ self[preferencesFor: $0 ]}) },
+            set: { newValue in self.indexPathToCellIdentifierMap[indexPath].map({ self[preferencesFor: $0] = newValue }) }
+        )
+    }
+}
+
+extension UIHostingCollectionViewController.Cache {
     private func sizeForItem(
         atIndexPath indexPath: IndexPath,
         withCellConfiguration cellConfiguration: UIHostingCollectionViewController.UICollectionViewCellType.Configuration
     ) -> CGSize {
         prototypeCell.configuration = cellConfiguration
-        prototypeCell.preferences = cellIdentifierToPreferencesMap[cellConfiguration.id] ?? .init()
         
+        preconfigure(cell: prototypeCell)
+        
+        prototypeCell.update()
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
         let size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
@@ -214,32 +264,6 @@ extension UIHostingCollectionViewController.Cache {
     
     func identifier(for indexPath: IndexPath) -> UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID? {
         indexPathToCellIdentifierMap[indexPath]
-    }
-    
-    subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {
-        get {
-            cellIdentifierToPreferencesMap[id]
-        } set {
-            let oldValue = self[preferencesFor: id]
-            
-            cellIdentifierToPreferencesMap[id] = newValue
-            
-            guard let indexPath = cellIdentifierToIndexPathMap[id] else {
-                return
-            }
-            
-            if oldValue?.relativeFrame != newValue?.relativeFrame {
-                parent.cache.invalidateIndexPath(indexPath)
-                parent.invalidateLayout(includingCache: false)
-            }
-        }
-    }
-    
-    public func preferences(itemAt indexPath: IndexPath) -> Binding<UIHostingCollectionViewController.UICollectionViewCellType.Preferences?> {
-        .init(
-            get: { self.indexPathToCellIdentifierMap[indexPath].flatMap({ self[preferencesFor: $0 ]}) },
-            set: { newValue in self.indexPathToCellIdentifierMap[indexPath].map({ self[preferencesFor: $0] = newValue }) }
-        )
     }
 }
 
