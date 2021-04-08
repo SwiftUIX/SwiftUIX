@@ -93,6 +93,8 @@ class UIHostingCollectionViewCell<
             
             self.cache.content = content
             
+            updateCollectionCache()
+            
             return content
         } else {
             fatalError()
@@ -316,7 +318,7 @@ extension UIHostingCollectionViewCell {
                 set: { [weak base] in base?.preferences = $0 }
             )
             cache = base.cache
-            updateCollectionCache = base.updateCollectionCache
+            updateCollectionCache = { [weak base] in base?.updateCollectionCache() }
         }
         
         public init(nilLiteral: ()) {
@@ -325,7 +327,6 @@ extension UIHostingCollectionViewCell {
         
         public var body: some View {
             if let content = content,
-               let configuration = configuration,
                let state = state,
                let preferences = preferences,
                let cache = cache,
@@ -377,7 +378,6 @@ extension UIHostingCollectionViewCell {
                         updateCollectionCache()
                     }
                     .edgesIgnoringSafeArea(.all)
-                    .id(configuration.id)
             }
         }
     }
