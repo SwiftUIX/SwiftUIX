@@ -223,6 +223,8 @@ extension UIViewController: DynamicViewPresenter {
                 attemptToFulfill(.success(true))
             } else if let presentingViewController = self.presentingViewController {
                 presentingViewController.dismiss(animated: animation != nil) {
+                    (self as? CocoaPresentationHostingController)?.presentation.reset()
+                    
                     attemptToFulfill(.success(true))
                 }
             } else {

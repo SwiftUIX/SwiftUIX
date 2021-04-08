@@ -65,7 +65,7 @@ extension EnvironmentValues {
                 return presentationMode
             } else {
                 return self[_PresentationManagerEnvironmentKey.self]
-                    ?? (_appKitOrUIKitViewController?.presentationCoordinator).map(CocoaPresentationMode.init)
+                    ?? (_appKitOrUIKitViewController?.presentationCoordinator).map({ CocoaPresentationMode(presentationCoordinatorBox: .init($0)) })
                     ?? presentationMode
             }
             #else

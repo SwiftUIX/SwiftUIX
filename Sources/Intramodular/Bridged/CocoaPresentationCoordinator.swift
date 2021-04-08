@@ -250,12 +250,16 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 #endif
 
 struct _UseCocoaPresentationCoordinator: ViewModifier {
-    let coordinator: CocoaPresentationCoordinator?
+    let presentationCoordinatorBox: WeakBox<CocoaPresentationCoordinator>
+    
+    var coordinator: CocoaPresentationCoordinator? {
+        presentationCoordinatorBox.value
+    }
     
     func body(content: Content) -> some View {
         content
             .environment(\.presenter, coordinator)
-            .environment(\.presentationManager, CocoaPresentationMode(coordinator: coordinator))
+            .environment(\.presentationManager, CocoaPresentationMode(presentationCoordinatorBox: presentationCoordinatorBox))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.coordinator?.viewController as? _opaque_CocoaController {
                     for description in $0 {

@@ -202,20 +202,20 @@ public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType
 struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
-    @State var _presentationCoordinator = WeakBox<CocoaPresentationCoordinator>(nil)
-
+    @State var presentationCoordinatorBox = WeakBox<CocoaPresentationCoordinator>(nil)
+    
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
+            .modifier(_UseCocoaPresentationCoordinator(presentationCoordinatorBox: presentationCoordinatorBox))
             .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
             .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox = .init(viewController)
-                    _presentationCoordinator = .init(viewController.presentationCoordinator)
+                    presentationCoordinatorBox = .init(viewController.presentationCoordinator)
                 }
             }
-            .modifier(_UseCocoaPresentationCoordinator(coordinator: _presentationCoordinator.value))
         #else
         return content
         #endif
