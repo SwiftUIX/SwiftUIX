@@ -241,6 +241,8 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
             return
         }
         
+        presentedViewController.invalidatePreferredContentSize()
+        
         rect.pointee = presentingViewController.view.convert(bounds, from: coordinateSpace)
     }
 }

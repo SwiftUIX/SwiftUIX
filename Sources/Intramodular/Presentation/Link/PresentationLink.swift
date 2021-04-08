@@ -31,7 +31,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     var isPresented: Binding<Bool> {
         _isPresented ?? $_internal_isPresented
     }
-
+    
     var presentation: AnyModalPresentation {
         let content = AnyPresentationView(
             _destination
@@ -57,7 +57,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                presentation.presentationStyle != .automatic
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
-                if presentation.presentationStyle == .popover {
+                if case .popover(_, _) = presentation.presentationStyle {
                     Button(
                         action: { isPresented.wrappedValue = true },
                         label: label
@@ -67,7 +67,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                         value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
                     )
                 } else {
-                    Button(action: { presenter.present(presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global))) }, label: label)
+                    Button(action: { presenter.present(presentation) }, label: label)
                 }
                 #else
                 Button(action: { presenter.present(presentation) }, label: label)
@@ -144,7 +144,7 @@ extension PresentationLink {
         
         self.label = label()
     }
-
+    
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,

@@ -86,10 +86,8 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         super.viewWillAppear(animated)
         
         #if os(iOS) || targetEnvironment(macCatalyst)
-        if modalPresentationStyle == .popover {
-            if preferredContentSize == .zero {
-                preferredContentSize = sizeThatFits(.init(targetSize: nil))
-            }
+        if preferredContentSize == .zero {
+            invalidatePreferredContentSize()
         }
         #endif
     }
@@ -98,6 +96,14 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         super.viewWillTransition(to: size, with: coordinator)
         
         view.frame.size = size
+    }
+    
+    open func invalidatePreferredContentSize() {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        if modalPresentationStyle == .popover {
+            preferredContentSize = sizeThatFits(.init(targetSize: nil))
+        }
+        #endif
     }
 }
 
