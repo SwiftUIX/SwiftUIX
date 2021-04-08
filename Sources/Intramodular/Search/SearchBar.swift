@@ -114,14 +114,20 @@ extension SearchBar: UIViewRepresentable {
         
         if let returnKeyType = returnKeyType {
             uiView.returnKeyType = returnKeyType
+        } else {
+            uiView.returnKeyType = .default
         }
         
         if let keyboardType = keyboardType {
             uiView.keyboardType = keyboardType
+        } else {
+            uiView.keyboardType = .default
         }
         
         if let enablesReturnKeyAutomatically = enablesReturnKeyAutomatically {
             uiView.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically
+        } else {
+            uiView.enablesReturnKeyAutomatically = false
         }
     }
     
