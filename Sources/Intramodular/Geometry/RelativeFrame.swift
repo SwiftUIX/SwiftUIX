@@ -84,7 +84,7 @@ public enum RelativeFrameDimension: Hashable {
         public init(
             dimension: FrameGroup.DimensionType,
             multiplier: CGFloat,
-            constant: CGFloat = 0.0
+            constant: CGFloat
         ) {
             self.dimension = dimension
             self.multiplier = multiplier
@@ -117,11 +117,29 @@ public enum RelativeFrameDimension: Hashable {
     }
     
     public static func width(multipliedBy multiplier: CGFloat) -> Self {
-        .fractional(.init(dimension: .width, multiplier: multiplier))
+        .fractional(.init(dimension: .width, multiplier: multiplier, constant: 0))
     }
     
     public static func height(multipliedBy multiplier: CGFloat) -> Self {
-        .fractional(.init(dimension: .height, multiplier: multiplier))
+        .fractional(.init(dimension: .height, multiplier: multiplier, constant: 0))
+    }
+    
+    public static func + (lhs: Self, rhs: CGFloat) -> Self {
+        switch lhs {
+            case .absolute(let lhsValue):
+                return .absolute(lhsValue + rhs)
+            case .fractional(let lhsValue):
+                return .fractional(
+                    .init(
+                        dimension: lhsValue.dimension,
+                        multiplier: lhsValue.multiplier,
+                        constant: lhsValue.constant + rhs
+                    )
+                )
+            case .proportional:
+                assertionFailure()
+                return lhs
+        }
     }
 }
 
