@@ -48,19 +48,34 @@ extension EnvironmentValues {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
+    public let axes: Axis.Set
     public let minimumLineSpacing: CGFloat?
     public let minimumInteritemSpacing: CGFloat?
     
     public init(
+        _ axes: Axis.Set = .vertical,
         minimumLineSpacing: CGFloat? = nil,
         minimumInteritemSpacing: CGFloat? = nil
     ) {
+        self.axes = axes
         self.minimumLineSpacing = minimumLineSpacing
         self.minimumInteritemSpacing = minimumInteritemSpacing
     }
     
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(axes.rawValue)
+        hasher.combine(minimumLineSpacing)
+        hasher.combine(minimumInteritemSpacing)
+    }
+
     public func _toUICollectionViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
+        
+        if axes == .horizontal {
+            layout.scrollDirection = .horizontal
+        } else if axes == .vertical {
+            layout.scrollDirection = .vertical
+        }
         
         if let minimumLineSpacing = minimumLineSpacing {
             layout.minimumLineSpacing = minimumLineSpacing
@@ -74,6 +89,10 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
         layout.itemSize = UICollectionViewFlowLayout.automaticSize
         
         return layout
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.hashValue == rhs.hashValue
     }
 }
 

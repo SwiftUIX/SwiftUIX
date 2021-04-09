@@ -250,6 +250,10 @@ extension UIHostingCollectionViewCell {
         disableAnimation: Bool = true,
         forced: Bool = false
     ) {
+        if forced {
+            cache.content = nil
+        }
+        
         if let contentHostingController = contentHostingController {
             contentHostingController.update(disableAnimation: disableAnimation, forced: forced)
         } else {

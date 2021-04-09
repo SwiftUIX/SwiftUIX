@@ -162,20 +162,23 @@ extension UIHostingCollectionViewSupplementaryView {
 
 extension UIHostingCollectionViewSupplementaryView {
     private struct RootView: ExpressibleByNilLiteral, View {
+        var id: AnyHashable
         var configuration: Configuration?
         var content: AnyView?
         
         init(base: UIHostingCollectionViewSupplementaryView?) {
+            id = UUID()
             configuration = base?.configuration
             content = configuration?.content
         }
         
         public init(nilLiteral: ()) {
-            
+            self.id = UUID()
         }
         
         public var body: some View {
             content?
+                .id(id)
                 .edgesIgnoringSafeArea(.all)
         }
     }

@@ -193,10 +193,12 @@ extension UIHostingCollectionViewController.Cache {
         
         preconfigure(cell: prototypeCell)
         
-        prototypeCell.update()
+        prototypeCell.update(forced: true)
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
-        let size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        var size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        
+        size.clamp(to: prototypeCell.configuration?.maximumSize ?? nil)
         
         guard !(size.width == 1 && size.height == 1) else {
             return size
