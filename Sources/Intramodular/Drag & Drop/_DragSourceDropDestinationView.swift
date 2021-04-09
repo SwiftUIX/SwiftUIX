@@ -97,8 +97,8 @@ struct _DragSourceDropDestinationView<
         lazy var dragInteraction = UIDragInteraction(delegate: self)
         lazy var dropInteraction = UIDropInteraction(delegate: self)
         
-        var defaultDragLiftPreviewView: UIView!
-        var defaultDragCancelPreviewView: UIView!
+        var defaultDragLiftPreviewView: UIView?
+        var defaultDragCancelPreviewView: UIView?
         
         // MARK: - UIDragInteractionDelegate -
         
@@ -107,7 +107,9 @@ struct _DragSourceDropDestinationView<
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, sessionDidMove session: UIDragSession) {
-            viewController.view.alpha = 0.0
+            if viewController.view.alpha != 0.0 {
+                viewController.view.alpha = 0.0
+            }
         }
         
         func dragInteraction(
@@ -115,7 +117,7 @@ struct _DragSourceDropDestinationView<
             previewForLifting item: UIDragItem,
             session: UIDragSession
         ) -> UITargetedDragPreview? {
-            dragPreview(ofType: .lift, forItem: item)
+            return dragPreview(ofType: .lift, forItem: item)
         }
         
         func dragInteraction(
@@ -123,18 +125,20 @@ struct _DragSourceDropDestinationView<
             previewForCancelling item: UIDragItem,
             withDefault defaultPreview: UITargetedDragPreview
         ) -> UITargetedDragPreview? {
-            dragPreview(ofType: .cancel, forItem: item)
+            if CancelPreview.self == EmptyView.self {
+               return defaultPreview
+            } else {
+                return dragPreview(ofType: .cancel, forItem: item)
+            }
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, willAnimateLiftWith animator: UIDragAnimating, session: UIDragSession) {
-            
+
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, item: UIDragItem, willAnimateCancelWith animator: UIDragAnimating) {
-            animator.addAnimations {
-                UIView.animate(withDuration: 0.1, delay: 0.4, options: .curveEaseOut) {
-                    self.viewController.view.alpha = 1.0
-                }
+            animator.addCompletion { _ in
+                self.viewController.view.alpha = 1.0
             }
         }
         
@@ -166,6 +170,8 @@ struct _DragSourceDropDestinationView<
                                 : base.liftPreview(.init(item)).eraseToAnyView()
                         )
                     }
+                    
+                    defaultDragLiftPreviewView = previewView
                 }
                 case .cancel: do {
                     if let defaultDragCancelPreviewView = defaultDragCancelPreviewView {
@@ -177,15 +183,17 @@ struct _DragSourceDropDestinationView<
                                 : base.cancelPreview(.init(item)).eraseToAnyView()
                         )
                     }
+                    
+                    defaultDragCancelPreviewView = previewView
                 }
             }
             
             previewView.sizeToFit()
-            
+                        
             let parameters = UIDragPreviewParameters()
             parameters.backgroundColor = UIColor.clear
             parameters.visiblePath = UIBezierPath(rect: previewView.bounds)
-            
+                                    
             if #available(iOS 14.0, *) {
                 parameters.shadowPath = UIBezierPath()
             }
@@ -193,12 +201,11 @@ struct _DragSourceDropDestinationView<
             let preview = UITargetedDragPreview(
                 view: previewView,
                 parameters: parameters,
-                target: .init(container: viewController.view, center: viewController.view.center)
+                target: .init(
+                    container: viewController.view,
+                    center: viewController.view.center
+                )
             )
-            
-            if #available(iOS 14.0, *) {
-                parameters.shadowPath = UIBezierPath()
-            }
             
             return preview
         }
@@ -230,6 +237,13 @@ struct _DragSourceDropDestinationView<
         func dropInteraction(_ interaction: UIDropInteraction, sessionDidEnd session: UIDropSession) {
             
         }
+    }
+    
+    public static func dismantleUIViewController(
+        _ uiViewController: UIViewControllerType,
+        coordinator: Coordinator
+    ) {
+        uiViewController.view.alpha = 1.0
     }
     
     public func makeCoordinator() -> Coordinator {
