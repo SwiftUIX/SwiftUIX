@@ -61,7 +61,7 @@ extension AppActivityView {
     }
     
     public func onComplete(perform action: @escaping (Result<(activity: UIActivity.ActivityType, items: [Any]?), Error>) -> Void) -> Self {
-        then({ $0.onComplete = onComplete })
+        then({ $0.onComplete = action })
     }
 }
 
