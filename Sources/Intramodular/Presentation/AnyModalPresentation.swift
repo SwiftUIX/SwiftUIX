@@ -61,7 +61,7 @@ extension View {
     public func isModalInPresentation(_ value: Bool) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return onAppKitOrUIKitViewControllerResolution {
-            $0.isModalInPresentation = value
+            ($0.root ?? $0).isModalInPresentation = value
         }
         .preference(key: IsModalInPresentation.self, value: value)
         #else
