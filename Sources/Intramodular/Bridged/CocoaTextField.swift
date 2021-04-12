@@ -429,6 +429,10 @@ extension CocoaTextField {
         then({ $0.configuration.keyboardType = keyboardType })
     }
     
+    public func smartQuotesType(_ smartQuotesType: UITextSmartQuotesType) -> Self {
+        then({ $0.configuration.smartQuotesType = smartQuotesType })
+    }
+    
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.configuration.placeholder = placeholder })
     }
