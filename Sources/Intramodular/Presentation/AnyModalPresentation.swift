@@ -59,23 +59,39 @@ extension AnyModalPresentation: Equatable {
 
 extension View {
     public func isModalInPresentation(_ value: Bool) -> some View {
-        #if os(iOS) || targetEnvironment(macCatalyst)
-        return onAppKitOrUIKitViewControllerResolution {
-            ($0.root ?? $0).isModalInPresentation = value
-        }
-        .preference(key: IsModalInPresentation.self, value: value)
-        #else
-        return preference(key: IsModalInPresentation.self, value: value)
-        #endif
+        modifier(_SetIsModalInPresentation(isModalInPresentation: value))
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-struct IsModalInPresentation: PreferenceKey {
+struct _IsModalInPresentation: PreferenceKey {
     static let defaultValue: Bool = false
     
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
         value = nextValue()
+    }
+}
+
+struct _SetIsModalInPresentation: ViewModifier {
+    let isModalInPresentation: Bool
+    
+    #if os(iOS) || targetEnvironment(macCatalyst)
+    @State var viewControllerBox = WeakReferenceBox<AppKitOrUIKitViewController>(nil)
+    #endif
+    
+    func body(content: Content) -> some View {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return content.onAppKitOrUIKitViewControllerResolution { viewController in
+            viewControllerBox.value = viewController.root ?? viewController
+            viewControllerBox.value?.isModalInPresentation = isModalInPresentation
+        }
+        .preference(key: _IsModalInPresentation.self, value: isModalInPresentation)
+        .onChange(of: isModalInPresentation) { isModalInPresentation in
+            viewControllerBox.value?.isModalInPresentation = isModalInPresentation
+        }
+        #else
+        return content.preference(key: _IsModalInPresentation.self, value: isModalInPresentation)
+        #endif
     }
 }
