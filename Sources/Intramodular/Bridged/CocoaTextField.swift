@@ -39,6 +39,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var inputView: AnyView?
         var kerning: CGFloat?
         var keyboardType: UIKeyboardType = .default
+        var smartQuotesType: UITextSmartQuotesType = .no
         var placeholder: String?
         var returnKeyType: UIReturnKeyType?
         var textColor: UIColor?
@@ -221,6 +222,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         
         uiView.isUserInteractionEnabled = context.environment.isEnabled
         uiView.keyboardType = configuration.keyboardType
+        uiView.smartQuotesType = configuration.smartQuotesType
         
         if let placeholder = configuration.placeholder {
             uiView.attributedPlaceholder = NSAttributedString(
