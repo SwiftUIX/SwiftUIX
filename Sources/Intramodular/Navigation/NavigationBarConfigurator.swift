@@ -234,14 +234,14 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         viewController.largeTrailing = largeTrailing
         viewController.largeTrailingAlignment = largeTrailingAlignment
         
-        viewController.updateNavigationBar(viewController: viewController.navigationController?.presentedViewController)
+        viewController.updateNavigationBar(viewController: viewController.navigationController?.topViewController)
     }
     
     @usableFromInline
     static func dismantleUIViewController(_ uiViewController: UIViewControllerType, coordinator: Coordinator) {
         uiViewController.largeTrailingAlignment = nil
         
-        uiViewController.updateNavigationBar(viewController: uiViewController.navigationController?.presentedViewController)
+        uiViewController.updateNavigationBar(viewController: uiViewController.navigationController?.topViewController)
     }
 }
 

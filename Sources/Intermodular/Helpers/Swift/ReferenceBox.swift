@@ -53,7 +53,7 @@ final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
             objectWillChange.send()
         }
     }
-    
+
     @usableFromInline
     init(_ value: T?) {
         self.value = value

@@ -14,6 +14,10 @@ import SwiftUI
     private let presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
+        guard let viewController = viewController else {
+            return nil
+        }
+        
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let presentingViewController = viewController.presentingViewController {
             return presentingViewController.presentationCoordinator
@@ -32,6 +36,10 @@ import SwiftUI
     }
     
     public var presentedCoordinator: CocoaPresentationCoordinator? {
+        guard let viewController = viewController else {
+            return nil
+        }
+        
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let presentedViewController = viewController.presentedViewController {
             return presentedViewController.presentationCoordinator
@@ -49,7 +57,7 @@ import SwiftUI
         #endif
     }
     
-    fileprivate weak var viewController: AppKitOrUIKitViewController!
+    fileprivate weak var viewController: AppKitOrUIKitViewController?
     
     public init(
         presentation: AnyModalPresentation? = nil,
@@ -68,6 +76,10 @@ import SwiftUI
     }
     
     func setIsModalInPresentation(_ isActive: Bool) {
+        guard let viewController = viewController else {
+            return
+        }
+        
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         viewController.isModalInPresentation = isActive
         #elseif os(macOS)
@@ -111,9 +123,13 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public func present(_ modal: AnyModalPresentation) {
+        guard let viewController = viewController else {
+            return
+        }
+        
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        if let viewController = viewController.presentedViewController as? CocoaPresentationHostingController, viewController.modalViewPresentationStyle == modal.content.modalPresentationStyle {
-            viewController.presentation = modal
+        if let presentedViewController = viewController.presentedViewController as? CocoaPresentationHostingController, presentedViewController.modalViewPresentationStyle == modal.content.modalPresentationStyle {
+            presentedViewController.presentation = modal
             return
         }
         
@@ -175,7 +191,11 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     
     @discardableResult
     public func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
-        viewController.dismissSelf(withAnimation: animation)
+        guard let viewController = viewController else {
+            return .init({ $0(.success(false)) })
+        }
+        
+        return viewController.dismissSelf(withAnimation: animation)
     }
 }
 
@@ -250,7 +270,7 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 #endif
 
 struct _UseCocoaPresentationCoordinator: ViewModifier {
-    let presentationCoordinatorBox: WeakBox<CocoaPresentationCoordinator>
+    @ObservedObject var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value

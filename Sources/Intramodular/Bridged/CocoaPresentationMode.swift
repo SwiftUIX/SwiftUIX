@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaPresentationMode: PresentationManager {
-    var presentationCoordinatorBox: WeakBox<CocoaPresentationCoordinator>
+    var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value

@@ -24,8 +24,15 @@ extension Alert {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    public func present() {
+    public func show() {
         _ = _AlertWindow(alert: self)
+    }
+    
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
+    public func present() {
+        show()
     }
 }
 

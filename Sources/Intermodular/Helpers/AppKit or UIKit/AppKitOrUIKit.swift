@@ -143,19 +143,15 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 extension EnvironmentValues {
-    var _appKitOrUIKitViewControllerBox: WeakBox<AppKitOrUIKitViewController> {
-        get {
-            self[DefaultEnvironmentKey<WeakBox<AppKitOrUIKitViewController>>] ?? WeakBox(nil)
-        } set {
-            self[DefaultEnvironmentKey<WeakBox<AppKitOrUIKitViewController>>] = newValue
-        }
-    }
-    
     public var _appKitOrUIKitViewController: AppKitOrUIKitViewController? {
         get {
-            _appKitOrUIKitViewControllerBox.value
+            _appKitOrUIKitViewControllerBox?.value
         } set {
-            _appKitOrUIKitViewControllerBox.value = newValue
+            if let box = _appKitOrUIKitViewControllerBox {
+                box.value = newValue
+            } else {
+                _appKitOrUIKitViewControllerBox = .init(newValue)
+            }
         }
     }
     
@@ -164,6 +160,14 @@ extension EnvironmentValues {
         _appKitOrUIKitViewController?.view.window?.windowScene
     }
     #endif
+    
+    var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>? {
+        get {
+            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>]
+        } set {
+            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>] = newValue
+        }
+    }
 }
 
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
@@ -201,8 +205,9 @@ public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType
 
 struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    @State var _appKitOrUIKitViewControllerBox = WeakBox<AppKitOrUIKitViewController>(nil)
-    @State var presentationCoordinatorBox = WeakBox<CocoaPresentationCoordinator>(nil)
+    @State var _appKitOrUIKitViewControllerBox = ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
+    @State var presentationCoordinatorBox =
+        ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
     
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -212,8 +217,8 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
             .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
-                    _appKitOrUIKitViewControllerBox = .init(viewController)
-                    presentationCoordinatorBox = .init(viewController.presentationCoordinator)
+                    _appKitOrUIKitViewControllerBox.value = viewController
+                    presentationCoordinatorBox.value = viewController.presentationCoordinator
                 }
             }
         #else
