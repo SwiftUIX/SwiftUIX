@@ -58,6 +58,7 @@ extension AnyModalPresentation: Equatable {
 // MARK: - API -
 
 extension View {
+    /// Adds a condition for whether the presented view hierarchy is dismissable.
     public func dismissDisabled(_ value: Bool) -> some View {
         modifier(_SetDismissDisabled(disabled: value))
     }

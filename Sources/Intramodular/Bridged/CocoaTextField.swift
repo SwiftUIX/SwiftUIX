@@ -451,7 +451,7 @@ extension CocoaTextField {
     public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
         then({ $0.configuration.returnKeyType = returnKeyType })
     }
-
+    
     @available(*, deprecated, renamed: "foregroundColor")
     public func textColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
