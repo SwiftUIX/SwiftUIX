@@ -24,10 +24,3 @@ public struct StackNavigationView<Content: View>: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
 }
-
-// MARK: - API -
-
-@available(*, deprecated, renamed: "StackNavigationView")
-@available(iOS 13.0, tvOS 13.0, watchOS 7.0, *)
-@available(macOS, unavailable)
-public typealias CustomNavigationView<Content: View> = StackNavigationView<Content>

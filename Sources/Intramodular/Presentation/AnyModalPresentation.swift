@@ -58,14 +58,19 @@ extension AnyModalPresentation: Equatable {
 // MARK: - API -
 
 extension View {
+    public func dismissDisabled(_ value: Bool) -> some View {
+        modifier(_SetDismissDisabled(disabled: value))
+    }
+    
+    @available(*, deprecated, renamed: "dismissDisabled")
     public func isModalInPresentation(_ value: Bool) -> some View {
-        modifier(_SetIsModalInPresentation(isModalInPresentation: value))
+        dismissDisabled(value)
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-struct _IsModalInPresentation: PreferenceKey {
+struct _DismissDisabled: PreferenceKey {
     static let defaultValue: Bool = false
     
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
@@ -73,8 +78,8 @@ struct _IsModalInPresentation: PreferenceKey {
     }
 }
 
-struct _SetIsModalInPresentation: ViewModifier {
-    let isModalInPresentation: Bool
+struct _SetDismissDisabled: ViewModifier {
+    let disabled: Bool
     
     #if os(iOS) || targetEnvironment(macCatalyst)
     @State var viewControllerBox = WeakReferenceBox<AppKitOrUIKitViewController>(nil)
@@ -84,14 +89,14 @@ struct _SetIsModalInPresentation: ViewModifier {
         #if os(iOS) || targetEnvironment(macCatalyst)
         return content.onAppKitOrUIKitViewControllerResolution { viewController in
             viewControllerBox.value = viewController.root ?? viewController
-            viewControllerBox.value?.isModalInPresentation = isModalInPresentation
+            viewControllerBox.value?.isModalInPresentation = disabled
         }
-        .preference(key: _IsModalInPresentation.self, value: isModalInPresentation)
-        .onChange(of: isModalInPresentation) { isModalInPresentation in
-            viewControllerBox.value?.isModalInPresentation = isModalInPresentation
+        .preference(key: _DismissDisabled.self, value: disabled)
+        .onChange(of: disabled) { disabled in
+            viewControllerBox.value?.isModalInPresentation = disabled
         }
         #else
-        return content.preference(key: _IsModalInPresentation.self, value: isModalInPresentation)
+        return content.preference(key: _DismissDisabled.self, value: disabled)
         #endif
     }
 }

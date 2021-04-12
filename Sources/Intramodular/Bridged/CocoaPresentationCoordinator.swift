@@ -290,11 +290,11 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in
                 self.coordinator?.setPresentation(presentation)
             }
-            .onPreferenceChange(_IsModalInPresentation.self) {
+            .onPreferenceChange(_DismissDisabled.self) {
                 self.coordinator?.setIsModalInPresentation($0)
             }
             .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
-            .preference(key: _IsModalInPresentation.self, value: false)
+            .preference(key: _DismissDisabled.self, value: false)
     }
 }
 
