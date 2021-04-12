@@ -39,7 +39,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var inputView: AnyView?
         var kerning: CGFloat?
         var keyboardType: UIKeyboardType = .default
-        var smartQuotesType: UITextSmartQuotesType = .no
+        var smartQuotesType: UITextSmartQuotesType = .default
         var placeholder: String?
         var returnKeyType: UIReturnKeyType?
         var textColor: UIColor?
