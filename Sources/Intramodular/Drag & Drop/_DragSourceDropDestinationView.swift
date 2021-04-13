@@ -18,7 +18,8 @@ struct _DragSourceDropDestinationView<
     
     let content: Content
     
-    var dragItems: [DragItem] = []
+    let dragDelegate: DragDelegate?
+    let dragItems: (() -> [DragItem])?
     let liftPreview: (DragItem) -> LiftPreview
     let cancelPreview: (DragItem) -> CancelPreview
     
@@ -27,6 +28,7 @@ struct _DragSourceDropDestinationView<
     
     init(
         content: Content,
+        dragDelegate: DragDelegate?,
         dragItems: (() -> [DragItem])?,
         liftPreview: @escaping (DragItem) -> LiftPreview,
         cancelPreview: @escaping (DragItem) -> CancelPreview,
@@ -34,7 +36,8 @@ struct _DragSourceDropDestinationView<
         onDrop: (([DragItem]) -> Void)?
     ) {
         self.content = content
-        self.dragItems = dragItems?() ?? []
+        self.dragDelegate = dragDelegate
+        self.dragItems = dragItems
         self.liftPreview = liftPreview
         self.cancelPreview = cancelPreview
         self.validateDrop = validateDrop
@@ -49,7 +52,7 @@ struct _DragSourceDropDestinationView<
         
         viewController.view.backgroundColor = nil
         
-        if !dragItems.isEmpty {
+        if dragItems != nil {
             context.coordinator.dragInteraction.isEnabled = true
             
             viewController.view.addInteraction(context.coordinator.dragInteraction)
@@ -103,13 +106,7 @@ struct _DragSourceDropDestinationView<
         // MARK: - UIDragInteractionDelegate -
         
         func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
-            base.dragItems.map(UIDragItem.init)
-        }
-        
-        func dragInteraction(_ interaction: UIDragInteraction, sessionDidMove session: UIDragSession) {
-            if viewController.view.alpha != 0.0 {
-                viewController.view.alpha = 0.0
-            }
+            (base.dragItems?() ?? []).map(UIDragItem.init)
         }
         
         func dragInteraction(
@@ -120,20 +117,32 @@ struct _DragSourceDropDestinationView<
             return dragPreview(ofType: .lift, forItem: item)
         }
         
+        func dragInteraction(_ interaction: UIDragInteraction, willAnimateLiftWith animator: UIDragAnimating, session: UIDragSession) {
+            
+        }
+        
+        func dragInteraction(_ interaction: UIDragInteraction, sessionWillBegin session: UIDragSession) {
+            base.dragDelegate?.dragBegan(info: .init(interaction: interaction, session: session))
+        }
+        
+        func dragInteraction(_ interaction: UIDragInteraction, sessionDidMove session: UIDragSession) {
+            if viewController.view.alpha != 0.0 {
+                viewController.view.alpha = 0.0
+            }
+            
+            base.dragDelegate?.dragUpdated(info: .init(interaction: interaction, session: session))
+        }
+        
         func dragInteraction(
             _ interaction: UIDragInteraction,
             previewForCancelling item: UIDragItem,
             withDefault defaultPreview: UITargetedDragPreview
         ) -> UITargetedDragPreview? {
             if CancelPreview.self == EmptyView.self {
-               return defaultPreview
+                return defaultPreview
             } else {
                 return dragPreview(ofType: .cancel, forItem: item)
             }
-        }
-        
-        func dragInteraction(_ interaction: UIDragInteraction, willAnimateLiftWith animator: UIDragAnimating, session: UIDragSession) {
-
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, item: UIDragItem, willAnimateCancelWith animator: UIDragAnimating) {
@@ -147,6 +156,8 @@ struct _DragSourceDropDestinationView<
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, session: UIDragSession, didEndWith operation: UIDropOperation) {
+            self.base.dragDelegate?.dragEnded(info: .init(interaction: interaction, session: session))
+            
             self.viewController.view.alpha = 1.0
             
             defaultDragLiftPreviewView?.removeFromSuperview()
@@ -189,11 +200,11 @@ struct _DragSourceDropDestinationView<
             }
             
             previewView.sizeToFit()
-                        
+            
             let parameters = UIDragPreviewParameters()
             parameters.backgroundColor = UIColor.clear
             parameters.visiblePath = UIBezierPath(rect: previewView.bounds)
-                                    
+            
             if #available(iOS 14.0, *) {
                 parameters.shadowPath = UIBezierPath()
             }
@@ -253,9 +264,10 @@ struct _DragSourceDropDestinationView<
 
 @available(tvOS, unavailable)
 extension View {
-    public func _onDrag(_ items: @escaping () -> [DragItem]) -> some View {
+    public func _onDrag(delegate: DragDelegate?, _ items: @escaping () -> [DragItem]) -> some View {
         _DragSourceDropDestinationView(
             content: self,
+            dragDelegate: delegate,
             dragItems: items,
             liftPreview: { _ in EmptyView() },
             cancelPreview: { _ in EmptyView() },
@@ -271,6 +283,7 @@ extension View {
     ) -> some View {
         _DragSourceDropDestinationView(
             content: self,
+            dragDelegate: nil,
             dragItems: nil,
             liftPreview: { _ in EmptyView() },
             cancelPreview: { _ in EmptyView() },
@@ -300,5 +313,12 @@ extension View {
     }
 }
 
-#endif
+// MARK: - Helpers -
 
+extension DragInfo {
+    public init(interaction: UIDragInteraction, session: UIDragSession) {
+        self.init(items: session.items.map(DragItem.init))
+    }
+}
+
+#endif
