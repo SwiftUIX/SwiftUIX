@@ -93,9 +93,13 @@ struct _DragSourceDropDestinationView<
             }
         }
         
-        var base: _DragSourceDropDestinationView!
+        var base: _DragSourceDropDestinationView
         
-        weak var viewController: UIViewControllerType!
+        init(base: _DragSourceDropDestinationView) {
+            self.base = base
+        }
+        
+        weak var viewController: UIViewControllerType?
         
         lazy var dragInteraction = UIDragInteraction(delegate: self)
         lazy var dropInteraction = UIDropInteraction(delegate: self)
@@ -126,7 +130,7 @@ struct _DragSourceDropDestinationView<
         }
         
         func dragInteraction(_ interaction: UIDragInteraction, sessionDidMove session: UIDragSession) {
-            if viewController.view.alpha != 0.0 {
+            if let viewController = viewController, viewController.view.alpha != 0.0 {
                 viewController.view.alpha = 0.0
             }
             
@@ -147,7 +151,9 @@ struct _DragSourceDropDestinationView<
         
         func dragInteraction(_ interaction: UIDragInteraction, item: UIDragItem, willAnimateCancelWith animator: UIDragAnimating) {
             animator.addCompletion { _ in
-                self.viewController.view.alpha = 1.0
+                if let viewController = self.viewController {
+                    viewController.view.alpha = 1.0
+                }
             }
         }
         
@@ -168,6 +174,10 @@ struct _DragSourceDropDestinationView<
             ofType type: _DragPreviewType,
             forItem item: UIDragItem
         ) -> UITargetedDragPreview? {
+            guard let viewController = viewController else {
+                return nil
+            }
+            
             let previewView: UIView
             
             switch type {
@@ -241,7 +251,9 @@ struct _DragSourceDropDestinationView<
         
         func dropInteraction(_ interaction: UIDropInteraction, item: UIDragItem, willAnimateDropWith animator: UIDragAnimating) {
             animator.addAnimations {
-                self.viewController.view.alpha = 1.0
+                if let viewController = self.viewController {
+                    viewController.view.alpha = 1.0
+                }
             }
         }
         
@@ -258,7 +270,7 @@ struct _DragSourceDropDestinationView<
     }
     
     public func makeCoordinator() -> Coordinator {
-        .init()
+        .init(base: self)
     }
 }
 
