@@ -11,7 +11,7 @@ public struct AnyPresentationView: View {
     
     private var environmentBuilder: EnvironmentBuilder
     
-    public private(set) var name: ViewName
+    public private(set) var name: ViewName?
     public private(set) var id: AnyHashable?
     public private(set) var popoverAttachmentAnchorBounds: CGRect?
     public private(set) var preferredSourceViewName: ViewName?
@@ -32,8 +32,6 @@ public struct AnyPresentationView: View {
             self.base = (view as? _opaque_View) ?? view.eraseToAnyView()
             self.environmentBuilder = .init()
         }
-        
-        self.name = ViewName()
     }
 }
 
