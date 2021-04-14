@@ -270,14 +270,13 @@ extension UIHostingCollectionViewCell {
             
             return
         }
-        
-        defer {
-            self.parentViewController = parentViewController
-        }
-        
+                
         if let parentViewController = parentViewController {
             if contentHostingController.parent == nil {
                 contentHostingController.move(toParent: parentViewController, ofCell: self)
+                self.parentViewController = parentViewController
+
+                updateCollectionCache()
             }
         } else if !isPrototype {
             assertionFailure()
@@ -294,7 +293,7 @@ extension UIHostingCollectionViewCell {
         }
         
         parentViewController.cache[preferencesFor: configuration.id] = preferences
-        parentViewController.cache.cellCache(for: configuration.id).wrappedValue = cache
+        parentViewController.cache.setCellCache(cache, for: configuration.id)
     }
 }
 

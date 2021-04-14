@@ -40,8 +40,8 @@ extension UIHostingCollectionViewController {
                 return
             }
             
-            cell.preferences = cellIdentifierToPreferencesMap[id] ?? cell.preferences
-            cell.cache = cellIdentifierToCacheMap[id] ?? cell.cache
+            cell.preferences = cellIdentifierToPreferencesMap[id] ?? .init()
+            cell.cache = cellIdentifierToCacheMap[id] ?? .init()
         }
         
         func invalidate() {
@@ -155,6 +155,13 @@ extension UIHostingCollectionViewController.Cache {
             get: { self.cellIdentifierToCacheMap[id] },
             set: { self.cellIdentifierToCacheMap[id] = $0 }
         )
+    }
+    
+    public func setCellCache(
+        _ cache: UICollectionViewCellType.Cache?,
+        for id: UICollectionViewCellType.Configuration.ID
+    ) {
+        cellIdentifierToCacheMap[id] = cache
     }
     
     subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {

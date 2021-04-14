@@ -204,6 +204,8 @@ extension UIHostingCollectionViewController {
         }
         
         if hasDataSourceChanged {
+            cache.invalidate()
+
             _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
         }
     }
