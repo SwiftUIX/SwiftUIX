@@ -9,10 +9,9 @@ import SwiftUI
 
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: CocoaView {
-    
     typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
     
-    public struct CharactersChange {
+    public struct CharactersChange: Hashable {
         public let range: NSRange
         public let replacement: String
     }
