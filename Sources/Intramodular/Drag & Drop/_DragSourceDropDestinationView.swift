@@ -164,7 +164,7 @@ struct _DragSourceDropDestinationView<
         func dragInteraction(_ interaction: UIDragInteraction, session: UIDragSession, didEndWith operation: UIDropOperation) {
             self.base.dragDelegate?.dragEnded(info: .init(interaction: interaction, session: session))
             
-            self.viewController.view.alpha = 1.0
+            self.viewController?.view.alpha = 1.0
             
             defaultDragLiftPreviewView?.removeFromSuperview()
             defaultDragCancelPreviewView?.removeFromSuperview()

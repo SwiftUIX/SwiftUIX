@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 /// An interface that you implement to observe a drag operation in a view modified to be draggble.
 public protocol DragDelegate {
     func dragBegan(info: DragInfo)
@@ -46,3 +48,5 @@ public struct AnyDragDelegate: DragDelegate {
         dragEndedImpl(info)
     }
 }
+
+#endif
