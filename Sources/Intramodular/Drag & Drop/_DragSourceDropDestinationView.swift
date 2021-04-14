@@ -327,7 +327,9 @@ extension View {
 
 // MARK: - Helpers -
 
+@available(tvOS, unavailable)
 extension DragInfo {
+    @available(tvOS, unavailable)
     public init(interaction: UIDragInteraction, session: UIDragSession) {
         self.init(items: session.items.map(DragItem.init))
     }
