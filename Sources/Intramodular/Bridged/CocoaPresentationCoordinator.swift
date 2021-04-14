@@ -11,7 +11,7 @@ import SwiftUI
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     public var environmentBuilder = EnvironmentBuilder()
     
-    private let presentation: AnyModalPresentation?
+    private var presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
         guard let viewController = viewController else {
@@ -117,7 +117,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public func setPresentation(_ presentation: AnyModalPresentation?) {
         if let presentation = presentation {
             present(presentation)
-        } else {
+        } else if self.presentation != nil {
             dismiss()
         }
     }
@@ -144,6 +144,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             animated: true
         ) {
             viewControllerToBePresented.presentationController?.delegate = self
+            
+            self.presentation = modal
             
             self.objectWillChange.send()
         }
@@ -225,6 +227,8 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        presentation = nil
+        
         (presentationController.presentedViewController as? CocoaPresentationHostingController)?.presentation.reset()
         
         presentationController.presentingViewController.presentationCoordinator.objectWillChange.send()
