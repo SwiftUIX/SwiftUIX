@@ -270,12 +270,12 @@ extension UIHostingCollectionViewCell {
             
             return
         }
-                
+        
         if let parentViewController = parentViewController {
             if contentHostingController.parent == nil {
                 contentHostingController.move(toParent: parentViewController, ofCell: self)
                 self.parentViewController = parentViewController
-
+                
                 updateCollectionCache()
             }
         } else if !isPrototype {
@@ -385,13 +385,13 @@ extension UIHostingCollectionViewCell {
         }
     }
     
-    private class ContentHostingController: CocoaHostingController<RootView> {
+    private class ContentHostingController: UIHostingController<RootView> {
         weak var base: UIHostingCollectionViewCell?
         
         init(base: UIHostingCollectionViewCell?) {
             self.base = base
             
-            super.init(mainView: nil)
+            super.init(rootView: nil)
             
             view.backgroundColor = nil
             
@@ -431,18 +431,28 @@ extension UIHostingCollectionViewCell {
                 }
                 
                 if self.parent == nil {
-                    self.willMove(toParent: parent)
-                    parent.addChild(self)
-                    cell.contentView.addSubview(view)
-                    view.frame = cell.contentView.bounds
-                    didMove(toParent: parent)
+                    withoutAnimation {
+                        let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
+                        
+                        self.willMove(toParent: parent)
+                        parent.addChild(self)
+                        cell.contentView.addSubview(view)
+                        view.frame = cell.contentView.bounds
+                        didMove(toParent: parent)
+                        
+                        if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
+                            navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
+                        }
+                    }
                 } else {
                     assertionFailure()
                 }
             } else {
-                willMove(toParent: nil)
-                view.removeFromSuperview()
-                removeFromParent()
+                withoutAnimation {
+                    willMove(toParent: nil)
+                    view.removeFromSuperview()
+                    removeFromParent()
+                }
             }
         }
         
@@ -451,12 +461,12 @@ extension UIHostingCollectionViewCell {
                 return
             }
             
-            let currentConfiguration = mainView.configuration
+            let currentConfiguration = rootView.configuration
             let newConfiguration = base.configuration
             
             if !forced {
                 if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration {
-                    guard currentConfiguration.id != newConfiguration.id || mainView.state != base.state else {
+                    guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state else {
                         return
                     }
                 }
@@ -465,11 +475,11 @@ extension UIHostingCollectionViewCell {
             let newMainView = RootView(base: base)
             
             if disableAnimation {
-                withAnimation(nil) {
-                    mainView = newMainView
+                withoutAnimation {
+                    rootView = newMainView
                 }
             } else {
-                mainView = newMainView
+                rootView = newMainView
             }
         }
     }

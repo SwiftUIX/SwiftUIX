@@ -5,47 +5,43 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 private struct HideNavigationBar: ViewModifier {
-    @Environment(\._appKitOrUIKitViewController) var _appKitOrUIKitViewController
-    
     @State var isNavigationBarHidden = false
     
     func body(content: Content) -> some View {
-        PassthroughView {
-            if isNavigationBarHidden {
-                ZeroSizeView()
-                    .navigationBarTitle("")
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        return content
+            .background {
+                if isNavigationBarHidden {
+                    ZeroSizeView()
+                        .navigationBarHidden(isNavigationBarHidden)
+                        .navigationBarTitle(Text(String()), displayMode: .inline)
+                }
             }
-            
-            content
-                .navigationBarHidden(isNavigationBarHidden)
-                .onAppear(perform: {
-                    self.isNavigationBarHidden = true
-                })
-                .onDisappear(perform: {
-                    self.isNavigationBarHidden = false
-                })
-        }
-        .onAppear {
-            _appKitOrUIKitViewController?.navigationController?.setNavigationBarHidden(true, animated: false)
-        }
+            .configureUINavigationController {
+                $0.setNavigationBarHidden(true, animated: false)
+            }
+            .onAppear {
+                isNavigationBarHidden = true
+            }
+            .onDisappear {
+                isNavigationBarHidden = false
+            }
+        #else
+        return content
+        #endif
     }
 }
 
 // MARK: - API -
 
 extension View {
+    @available(macOS, unavailable)
     @inline(never)
     public func hideNavigationBar() -> some View {
-        modifier(_ResolveAppKitOrUIKitViewController().concat( HideNavigationBar()))
+        modifier(HideNavigationBar())
     }
-}
-
-#endif
-
-extension View {
+    
     @inline(never)
     public func hideNavigationBarIfAvailable() -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)

@@ -151,6 +151,7 @@ public final class UIHostingCollectionViewController<
         collectionView.backgroundColor = .clear
         collectionView.backgroundView = UIView()
         collectionView.backgroundView?.backgroundColor = .clear
+        collectionView.contentInsetAdjustmentBehavior = .never
         
         collectionView.register(
             UICollectionViewCellType.self,
