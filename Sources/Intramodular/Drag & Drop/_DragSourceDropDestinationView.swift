@@ -6,9 +6,8 @@ import Swift
 import SwiftUI
 import UniformTypeIdentifiers
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
-@available(tvOS, unavailable)
 struct _DragSourceDropDestinationView<
     Content: View,
     LiftPreview: View,
@@ -76,7 +75,6 @@ struct _DragSourceDropDestinationView<
         context.coordinator.base = self
     }
     
-    @available(tvOS, unavailable)
     class Coordinator: NSObject, UIDragInteractionDelegate, UIDropInteractionDelegate {
         enum _DragPreviewType {
             case lift
@@ -274,7 +272,6 @@ struct _DragSourceDropDestinationView<
     }
 }
 
-@available(tvOS, unavailable)
 extension View {
     public func _onDrag(delegate: DragDelegate?, _ items: @escaping () -> [DragItem]) -> some View {
         _DragSourceDropDestinationView(
@@ -327,10 +324,8 @@ extension View {
 
 // MARK: - Helpers -
 
-@available(tvOS, unavailable)
 extension DragInfo {
-    @available(tvOS, unavailable)
-    public init(interaction: UIDragInteraction, session: UIDragSession) {
+	public init(interaction: UIDragInteraction, session: UIDragSession) {
         self.init(items: session.items.map(DragItem.init))
     }
 }

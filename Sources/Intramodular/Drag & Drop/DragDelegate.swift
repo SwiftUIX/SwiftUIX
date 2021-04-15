@@ -5,10 +5,9 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || targetEnvironment(macCatalyst)
 
 /// An interface that you implement to observe a drag operation in a view modified to be draggble.
-@available(tvOS, unavailable)
 public protocol DragDelegate {
     func dragBegan(info: DragInfo)
     func dragUpdated(info: DragInfo)
@@ -16,14 +15,12 @@ public protocol DragDelegate {
 }
 
 /// The current state of a drag.
-@available(tvOS, unavailable)
 public struct DragInfo {
     public let items: [DragItem]
 }
 
 // MARK: - Auxiliary Implementation -
 
-@available(tvOS, unavailable)
 public struct AnyDragDelegate: DragDelegate {
     let dragBeganImpl: (DragInfo) -> ()
     let dragUpdatedImpl: (DragInfo) -> ()
