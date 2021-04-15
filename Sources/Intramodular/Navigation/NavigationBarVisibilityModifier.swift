@@ -13,9 +13,14 @@ private struct HideNavigationBar: ViewModifier {
         return content
             .background {
                 if isNavigationBarHidden {
+                    #if os(iOS)
                     ZeroSizeView()
                         .navigationBarHidden(isNavigationBarHidden)
                         .navigationBarTitle(Text(String()), displayMode: .inline)
+                    #elseif os(tvOS)
+                    ZeroSizeView()
+                        .navigationBarHidden(isNavigationBarHidden)
+                    #endif
                 }
             }
             .configureUINavigationController {
