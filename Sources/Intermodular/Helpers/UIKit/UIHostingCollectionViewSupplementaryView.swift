@@ -267,6 +267,11 @@ extension UIHostingCollectionViewSupplementaryView {
             } else {
                 mainView = .init(base: base)
             }
+            
+            if forced {
+                view.setNeedsLayout()
+                view.setNeedsDisplay()
+            }
         }
     }
 }

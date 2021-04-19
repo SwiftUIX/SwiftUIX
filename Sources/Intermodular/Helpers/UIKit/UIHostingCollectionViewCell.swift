@@ -43,7 +43,13 @@ extension UIHostingCollectionViewCell {
     
     struct Cache {
         var content: Content?
-        var preferredContentSize: CGSize?
+        var preferredContentSize: CGSize? {
+            didSet {
+                if oldValue != preferredContentSize {
+                    content = nil
+                }
+            }
+        }
     }
 }
 
@@ -219,7 +225,7 @@ class UIHostingCollectionViewCell<
         super.isHighlighted = false
         super.isSelected = false
     }
-    
+        
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
@@ -242,6 +248,20 @@ class UIHostingCollectionViewCell<
             return layoutAttributes
         } else {
             return layoutAttributes
+        }
+    }
+    
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        
+        guard let contentHostingController = contentHostingController, let relativeFrame = preferences.relativeFrame else {
+            return
+        }
+        
+        if layoutAttributes.size != contentHostingController.view.frame.size {
+            self.cache.preferredContentSize = relativeFrame.resolve(in: layoutAttributes.size)
+            
+            contentHostingController.update(disableAnimation: true, forced: true)
         }
     }
 }
@@ -483,6 +503,12 @@ extension UIHostingCollectionViewCell {
                 }
             } else {
                 rootView = newMainView
+            }
+            
+            if forced {
+                view.setNeedsLayout()
+                view.setNeedsDisplay()
+                view.layoutIfNeeded()
             }
         }
     }
