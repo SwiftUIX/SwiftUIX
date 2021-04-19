@@ -54,32 +54,34 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public var body: some View {
-        IntrinsicGeometryReader { proxy in
+        PassthroughView {
             if let presenter = presenter,
                userInterfaceIdiom != .mac,
                presentation.presentationStyle != .automatic
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
                 if case .popover(_, _) = presentation.presentationStyle {
-                    if let presenter = presenter as? CocoaPresentationCoordinator {
-                        Button(
-                            action: { isPresented.wrappedValue.toggle() },
-                            label: label
-                        )
-                        .preference(
-                            key: AnyModalPresentation.PreferenceKey.self,
-                            value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
-                        )
-                        .modifier(_UseCocoaPresentationCoordinator(presentationCoordinatorBox: .init(presenter)))
-                    } else {
-                        Button(
-                            action: { isPresented.wrappedValue.toggle() },
-                            label: label
-                        )
-                        .preference(
-                            key: AnyModalPresentation.PreferenceKey.self,
-                            value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
-                        )
+                    IntrinsicGeometryReader { proxy in
+                        if let presenter = presenter as? CocoaPresentationCoordinator {
+                            Button(
+                                action: { isPresented.wrappedValue.toggle() },
+                                label: label
+                            )
+                            .preference(
+                                key: AnyModalPresentation.PreferenceKey.self,
+                                value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
+                            )
+                            .modifier(_UseCocoaPresentationCoordinator(presentationCoordinatorBox: .init(presenter)))
+                        } else {
+                            Button(
+                                action: { isPresented.wrappedValue.toggle() },
+                                label: label
+                            )
+                            .preference(
+                                key: AnyModalPresentation.PreferenceKey.self,
+                                value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
+                            )
+                        }
                     }
                 } else {
                     Button(action: { presenter.present(presentation) }, label: label)
@@ -106,7 +108,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     CocoaHostingView {
                         ZeroSizeView().preference(
                             key: AnyModalPresentation.PreferenceKey.self,
-                            value: isPresented.wrappedValue ? presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global)) : nil
+                            value: isPresented.wrappedValue ? presentation : nil
                         )
                     }
                 )
