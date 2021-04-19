@@ -232,6 +232,7 @@ class UIHostingCollectionViewCell<
             
             layoutAttributes.size = size
             
+            cache.content = nil
             cache.preferredContentSize = size
             
             updateCollectionCache()
@@ -330,6 +331,7 @@ extension UIHostingCollectionViewCell {
         
         public var body: some View {
             if let content = content,
+               let configuration = configuration,
                let state = state,
                let preferences = preferences,
                let cache = cache,
@@ -381,6 +383,7 @@ extension UIHostingCollectionViewCell {
                         updateCollectionCache()
                     }
                     .edgesIgnoringSafeArea(.all)
+                    .id(configuration.id)
             }
         }
     }

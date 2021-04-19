@@ -36,12 +36,20 @@ extension UIHostingCollectionViewController {
         }
         
         func preconfigure(cell: UICollectionViewCellType) {
+            cell.cache = .init()
+            cell.preferences = .init()
+            
             guard let id = cell.configuration?.id else {
                 return
             }
             
-            cell.preferences = cellIdentifierToPreferencesMap[id] ?? .init()
-            cell.cache = cellIdentifierToCacheMap[id] ?? .init()
+            if let cellCache = cellIdentifierToCacheMap[id] {
+                cell.cache = cellCache
+            }
+            
+            if let cellPreferences = cellIdentifierToPreferencesMap[id] {
+                cell.preferences = cellPreferences
+            }
         }
         
         func invalidate() {
