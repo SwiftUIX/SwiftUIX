@@ -19,7 +19,12 @@ public struct CocoaPresentationMode: PresentationManager {
     }
         
     public func dismiss() {
-        coordinator?.dismissSelf()
+        guard let coordinator = coordinator else {
+            return assertionFailure()
+        }
+        
+        coordinator.setPresentation(nil)
+        coordinator.dismissSelf()
     }
 }
 
