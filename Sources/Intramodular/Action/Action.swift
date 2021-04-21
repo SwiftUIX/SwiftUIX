@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 /// A convenience around a closure of the type `() -> Void`.
-public struct Action: Hashable {
+public struct Action: DynamicAction, Hashable {
     public static let empty = Action({ })
     
     private var value: @convention(block) () -> Void

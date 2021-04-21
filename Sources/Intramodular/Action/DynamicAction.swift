@@ -72,6 +72,10 @@ extension View {
         }
         .buttonStyle(PlainButtonStyle())
     }
+    
+    public func onPress(perform action: @escaping () -> Void) -> some View {
+        onPress(perform: Action(action))
+    }
 }
 
 // MARK: - Auxiliary Implementation -
