@@ -84,6 +84,7 @@ extension View {
                 onDisappear: { _ in },
                 onDeresolution: { _ in }
             )
+            .allowsHitTesting(false)
         )
     }
     
@@ -101,6 +102,7 @@ extension View {
                 onDisappear: onDisappear,
                 onDeresolution: deresolutionAction
             )
+            .allowsHitTesting(false)
         )
     }
 }
