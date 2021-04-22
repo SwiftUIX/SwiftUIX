@@ -215,6 +215,9 @@ extension UIHostingCollectionViewController.Cache {
         
         size.clamp(to: prototypeCell.configuration?.maximumSize ?? nil)
         
+        size.width = ceil(size.width)
+        size.height = ceil(size.height)
+        
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }

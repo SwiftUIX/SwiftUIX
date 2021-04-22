@@ -121,13 +121,19 @@ public final class UIHostingCollectionViewController<
     }()
     
     var maximumCellSize: OptionalDimensions {
-        let result = OptionalDimensions(
-            width: max(collectionView.contentSize.width - 0.001, 0),
-            height: max(collectionView.contentSize.height - 0.001, 0)
+        var result = OptionalDimensions(
+            width: max(floor(collectionView.contentSize.width - 0.001), 0),
+            height: max(floor(collectionView.contentSize.height - 0.001), 0)
         )
         
-        guard (result.width != 0 && result.height != 0) else {
+        guard result.width != 0 || result.height != 0 else {
             return nil
+        }
+
+        if result.width == 0 {
+            result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
+        } else if result.height == 0 {
+            result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
         }
         
         return result

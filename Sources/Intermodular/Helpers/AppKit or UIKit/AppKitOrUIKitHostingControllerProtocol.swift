@@ -50,12 +50,16 @@ extension AppKitOrUIKitHostingControllerProtocol {
         var result = sizeThatFits(in: fittingSize)
         
         switch (result.width, result.height)  {
-            case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude):
+            case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude), (.infinity, .infinity):
                 result = sizeThatFits(in: targetSize.clamping(to: sizeProposal.maximumSize))
-            case (AppKitOrUIKitView.layoutFittingExpandedSize.width, _), (.greatestFiniteMagnitude, _):
-                result = sizeThatFits(in: CGSize(width: targetSize.clamping(to: sizeProposal.maximumSize).width, height: fittingSize.height))
-            case (_, AppKitOrUIKitView.layoutFittingExpandedSize.height), (_, .greatestFiniteMagnitude):
-                result = sizeThatFits(in: CGSize(width: fittingSize.width, height: targetSize.clamping(to: sizeProposal.maximumSize).height))
+            case (AppKitOrUIKitView.layoutFittingExpandedSize.width, _), (.greatestFiniteMagnitude, _), (.infinity, _):
+                if !targetSize.width.isZero {
+                    result = sizeThatFits(in: CGSize(width: targetSize.clamping(to: sizeProposal.maximumSize).width, height: fittingSize.height))
+                }
+            case (_, AppKitOrUIKitView.layoutFittingExpandedSize.height), (_, .greatestFiniteMagnitude), (_, .infinity):
+                if !targetSize.height.isZero {
+                    result = sizeThatFits(in: CGSize(width: fittingSize.width, height: targetSize.clamping(to: sizeProposal.maximumSize).height))
+                }
             case (.zero, 1...): do {
                 result = sizeThatFits(in: CGSize(width: AppKitOrUIKitView.layoutFittingExpandedSize.width, height: fittingSize.height))
             }

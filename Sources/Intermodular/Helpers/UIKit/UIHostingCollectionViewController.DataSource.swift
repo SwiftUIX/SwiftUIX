@@ -57,6 +57,15 @@ extension UIHostingCollectionViewController {
             }
         }
         
+        public var numberOfItems: Int {
+            switch self {
+                case .diffableDataSource(let dataSource):
+                    return dataSource.wrappedValue?.snapshot().numberOfItems ?? 0
+                case .static(let data):
+                    return data.map({ $0.items.count }).reduce(into: 0, +=)
+            }
+        }
+        
         public var description: String {
             switch self {
                 case .diffableDataSource(let dataSource):
