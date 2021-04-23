@@ -225,7 +225,7 @@ class UIHostingCollectionViewCell<
         super.isHighlighted = false
         super.isSelected = false
     }
-        
+    
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
@@ -321,19 +321,15 @@ extension UIHostingCollectionViewCell {
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewCell {
-    private struct RootView: ExpressibleByNilLiteral, View {
-        var content: Content?
+    private struct RootView: View {
+        var content: Content
         var configuration: Configuration?
-        var state: State?
-        var preferences: Binding<Preferences>?
-        var cache: Cache?
-        var updateCollectionCache: (() -> Void)?
+        var state: State
+        var preferences: Binding<Preferences>
+        var cache: Cache
+        var updateCollectionCache: (() -> Void)
         
-        init(base: UIHostingCollectionViewCell?) {
-            guard let base = base else {
-                return
-            }
-            
+        init(base: UIHostingCollectionViewCell) {
             content = base.content
             configuration = base.configuration
             state = base.state
@@ -345,18 +341,8 @@ extension UIHostingCollectionViewCell {
             updateCollectionCache = { [weak base] in base?.updateCollectionCache() }
         }
         
-        public init(nilLiteral: ()) {
-            
-        }
-        
         public var body: some View {
-            if let content = content,
-               let configuration = configuration,
-               let state = state,
-               let preferences = preferences,
-               let cache = cache,
-               let updateCollectionCache = updateCollectionCache
-            {
+            if let configuration = configuration {
                 content
                     .transformEnvironment(\._relativeFrameResolvedValues) { value in
                         guard let relativeFrameID = preferences.wrappedValue.relativeFrame?.id else {
@@ -411,10 +397,10 @@ extension UIHostingCollectionViewCell {
     private class ContentHostingController: UIHostingController<RootView> {
         weak var base: UIHostingCollectionViewCell?
         
-        init(base: UIHostingCollectionViewCell?) {
+        init(base: UIHostingCollectionViewCell) {
             self.base = base
             
-            super.init(rootView: nil)
+            super.init(rootView: .init(base: base))
             
             view.backgroundColor = nil
             

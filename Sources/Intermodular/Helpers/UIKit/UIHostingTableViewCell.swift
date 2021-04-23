@@ -8,11 +8,25 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITableViewCell {
+    struct State: Hashable {
+        let isFocused: Bool
+        let isHighlighted: Bool
+        let isSelected: Bool
+    }
+    
     var tableViewController: UITableViewController!
     var indexPath: IndexPath?
     
     var item: ItemType!
     var makeContent: ((ItemType) -> Content)!
+    
+    var state: State {
+        .init(
+            isFocused: isFocused,
+            isHighlighted: isHighlighted,
+            isSelected: isSelected
+        )
+    }
     
     var contentHostingController: UIHostingController<RootView>!
     
@@ -56,7 +70,7 @@ extension UIHostingTableViewCell {
             layoutMargins = .zero
             selectedBackgroundView = .init()
             
-            contentHostingController = UIHostingController(rootView: RootView(uiTableViewCell: self))
+            contentHostingController = UIHostingController(rootView: RootView(base: self))
             contentHostingController.view.backgroundColor = .clear
             contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
             
@@ -72,7 +86,7 @@ extension UIHostingTableViewCell {
                 contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
             ])
         } else {
-            contentHostingController.rootView = RootView(uiTableViewCell: self)
+            contentHostingController.rootView = RootView(base: self)
             contentHostingController.view.invalidateIntrinsicContentSize()
         }
     }
@@ -92,10 +106,6 @@ extension UIHostingTableViewCell {
 extension UIHostingTableViewCell {
     struct RootView: View {
         private struct _ListRowManager: ListRowManager {
-            var isHighlighted: Bool {
-                false // FIXME!!!
-            }
-            
             weak var uiTableViewCell: UIHostingTableViewCell<ItemType, Content>?
             
             func _animate(_ action: () -> ()) {
@@ -109,20 +119,27 @@ extension UIHostingTableViewCell {
             }
         }
         
-        private let item: ItemType
-        private let makeContent: (ItemType) -> Content
+        private let id: AnyHashable
+        private let content: Content
+        private let state: State
+        
         private let listRowManager: _ListRowManager
         
-        init(uiTableViewCell: UIHostingTableViewCell<ItemType, Content>) {
-            self.item = uiTableViewCell.item
-            self.makeContent = uiTableViewCell.makeContent
-            self.listRowManager = .init(uiTableViewCell: uiTableViewCell)
+        init(base: UIHostingTableViewCell<ItemType, Content>) {
+            self.id = base.item.id
+            self.content = base.makeContent(base.item)
+            self.state = base.state
+            
+            self.listRowManager = .init(uiTableViewCell: base)
         }
         
         var body: some View {
-            makeContent(item)
+            content
                 .environment(\.listRowManager, listRowManager)
-                .id(item.id)
+                .environment(\.isCellFocused, state.isFocused)
+                .environment(\.isCellHighlighted, state.isHighlighted)
+                .environment(\.isCellSelected, state.isSelected)
+                .id(id)
         }
     }
 }

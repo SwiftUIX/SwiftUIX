@@ -13,11 +13,11 @@ public struct CocoaPresentationMode: PresentationManager {
     var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value
     }
-
+    
     public var isPresented: Bool {
         coordinator != nil
     }
-        
+    
     public func dismiss() {
         guard let coordinator = coordinator else {
             return assertionFailure()
