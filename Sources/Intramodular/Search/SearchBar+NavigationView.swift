@@ -215,11 +215,11 @@ extension _NavigationSearchBarConfigurator {
         override func willMove(toParent parent: UIViewController?) {
             super.willMove(toParent: parent)
             
-            coordinator?.uiViewController = navigationController?.topViewController
+            coordinator?.uiViewController = navigationController?.viewControllers.first
         }
         
         override func viewWillAppear(_ animated: Bool) {
-            coordinator?.uiViewController = navigationController?.topViewController
+            coordinator?.uiViewController = navigationController?.viewControllers.first
         }
     }
 }

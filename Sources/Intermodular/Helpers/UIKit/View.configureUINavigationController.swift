@@ -21,6 +21,7 @@ extension View {
                 configure(navigationController)
             }
         }
+//        .allowsHitTesting(false)
     }
     
     @inlinable
