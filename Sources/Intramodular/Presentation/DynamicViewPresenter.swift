@@ -218,7 +218,7 @@ extension UIViewController: DynamicViewPresenter {
         }
         
         return Future { attemptToFulfill in
-            if let navigationController = self.navigationController, navigationController.visibleViewController == self {
+            if let navigationController = self.navigationController, navigationController.viewControllers.count > 1, navigationController.topViewController == self {
                 navigationController.popViewController(animated: animation != nil)
                 attemptToFulfill(.success(true))
             } else if let presentingViewController = self.presentingViewController {
