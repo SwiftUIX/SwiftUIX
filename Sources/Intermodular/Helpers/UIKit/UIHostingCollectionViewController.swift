@@ -8,6 +8,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 protocol _opaque_UIHostingCollectionViewController: UIViewController {
+    var collectionViewContentSize: CGSize { get }
+    
     func scrollToTop(anchor: UnitPoint?, animated: Bool)
     
     func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
@@ -119,6 +121,10 @@ public final class UIHostingCollectionViewController<
         
         return collectionView
     }()
+    
+    var collectionViewContentSize: CGSize {
+        collectionView.contentSize
+    }
     
     var maximumCellSize: OptionalDimensions {
         var result = OptionalDimensions(
@@ -419,6 +425,14 @@ extension UIHostingCollectionViewController {
         
         func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
             .init()
+        }
+        
+        func collectionView(_ collectionView: UICollectionView, dragSessionWillBegin session: UIDragSession) {
+            parent.configuration.isDragActive?.wrappedValue = true
+        }
+        
+        func collectionView(_ collectionView: UICollectionView, dragSessionDidEnd session: UIDragSession) {
+            parent.configuration.isDragActive?.wrappedValue = false
         }
         
         func collectionView(

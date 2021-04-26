@@ -20,9 +20,13 @@ public struct CollectionViewProxy {
         }
     }
     
+    public var contentSize: CGSize {
+        hostingCollectionViewController?.collectionViewContentSize ?? .zero
+    }
+    
     public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
         _assertResolutionOfCollectionView()
-
+        
         hostingCollectionViewController?.scrollToTop(anchor: anchor, animated: animated)
     }
     

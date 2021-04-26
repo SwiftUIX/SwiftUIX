@@ -256,6 +256,11 @@ extension CollectionView {
         return self
         #endif
     }
+    
+    /// Binds the collection view's drag state to a boolean value.
+    public func isDragActive(_ isDragActive: Binding<Bool>) -> Self {
+        then({ $0._collectionViewConfiguration.isDragActive = isDragActive })
+    }
 }
 
 extension CollectionView {

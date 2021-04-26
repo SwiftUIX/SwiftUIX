@@ -13,6 +13,7 @@ struct _CollectionViewConfiguration {
     #if !os(tvOS)
     var reorderingCadence: UICollectionView.ReorderingCadence = .immediate
     #endif
+    var isDragActive: Binding<Bool>? = nil
 }
 
 // MARK: - Auxiliary Implementation -
