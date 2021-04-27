@@ -42,6 +42,7 @@ extension View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isReorderable = reorderable
         }
+        .moveDisabled(!reorderable)
     }
     
     public func cellSelectable(_ selectable: Bool) -> some View {

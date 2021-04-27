@@ -8,22 +8,22 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaList<
-    SectionModel: Identifiable,
+    SectionType: Identifiable,
     ItemType: Identifiable,
     Data: RandomAccessCollection,
     SectionHeader: View,
     SectionFooter: View,
     RowContent: View
->: UIViewControllerRepresentable where Data.Element == ListSection<SectionModel, ItemType> {
+>: UIViewControllerRepresentable where Data.Element == ListSection<SectionType, ItemType> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
-    public typealias UIViewControllerType = UIHostingTableViewController<SectionModel, ItemType, Data, SectionHeader, SectionFooter, RowContent>
+    public typealias UIViewControllerType = UIHostingTableViewController<SectionType, ItemType, Data, SectionHeader, SectionFooter, RowContent>
     
     @usableFromInline
     let data: Data
     @usableFromInline
-    let sectionHeader: (SectionModel) -> SectionHeader
+    let sectionHeader: (SectionType) -> SectionHeader
     @usableFromInline
-    let sectionFooter: (SectionModel) -> SectionFooter
+    let sectionFooter: (SectionType) -> SectionFooter
     @usableFromInline
     let rowContent: (ItemType) -> RowContent
     
@@ -40,8 +40,8 @@ public struct CocoaList<
     
     public init(
         _ data: Data,
-        sectionHeader: @escaping (SectionModel) -> SectionHeader,
-        sectionFooter: @escaping (SectionModel) -> SectionFooter,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
         rowContent: @escaping (ItemType) -> RowContent
     ) {
         self.data = data
@@ -81,8 +81,8 @@ public struct CocoaList<
 extension CocoaList {
     public init<_Item: Hashable>(
         _ data: Data,
-        sectionHeader: @escaping (SectionModel) -> SectionHeader,
-        sectionFooter: @escaping (SectionModel) -> SectionFooter,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
     ) where ItemType == HashIdentifiableValue<_Item> {
         self.data = data
@@ -91,24 +91,24 @@ extension CocoaList {
         self.rowContent = { rowContent($0.value) }
     }
     
-    public init<_SectionModel: Hashable, _Item: Hashable>(
+    public init<_SectionType: Hashable, _Item: Hashable>(
         _ data: Data,
-        sectionHeader: @escaping (_SectionModel) -> SectionHeader,
-        sectionFooter: @escaping (_SectionModel) -> SectionFooter,
+        sectionHeader: @escaping (_SectionType) -> SectionHeader,
+        sectionFooter: @escaping (_SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
-    ) where SectionModel == HashIdentifiableValue<_SectionModel>, ItemType == HashIdentifiableValue<_Item> {
+    ) where SectionType == HashIdentifiableValue<_SectionType>, ItemType == HashIdentifiableValue<_Item> {
         self.data = data
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
         self.rowContent = { rowContent($0.value) }
     }
     
-    public init<_SectionModel: Hashable, _Item: Hashable>(
-        _ data: [ListSection<_SectionModel, _Item>],
-        sectionHeader: @escaping (_SectionModel) -> SectionHeader,
-        sectionFooter: @escaping (_SectionModel) -> SectionFooter,
+    public init<_SectionType: Hashable, _Item: Hashable>(
+        _ data: [ListSection<_SectionType, _Item>],
+        sectionHeader: @escaping (_SectionType) -> SectionHeader,
+        sectionFooter: @escaping (_SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
-    ) where Data == Array<ListSection<SectionModel, ItemType>>, SectionModel == HashIdentifiableValue<_SectionModel>, ItemType == HashIdentifiableValue<_Item> {
+    ) where Data == Array<ListSection<SectionType, ItemType>>, SectionType == HashIdentifiableValue<_SectionType>, ItemType == HashIdentifiableValue<_Item> {
         self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
@@ -116,7 +116,35 @@ extension CocoaList {
     }
 }
 
-extension CocoaList where Data: RangeReplaceableCollection, SectionModel == KeyPathHashIdentifiableValue<Int, Int>, SectionHeader == Never, SectionFooter == Never {
+extension CocoaList where
+    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionHeader == Never,
+    SectionFooter == Never
+{
+    public init<
+        _ItemType,
+        _ItemID,
+        Items: RandomAccessCollection
+    >(
+        _ items: Items,
+        id: KeyPath<_ItemType, _ItemID>,
+        @ViewBuilder rowContent: @escaping (_ItemType) -> RowContent
+    ) where Data == AnyRandomAccessCollection<ListSection<SectionType, ItemType>>, Items.Element == _ItemType, ItemType == KeyPathHashIdentifiableValue<_ItemType, _ItemID> {
+        self.init(
+            AnyRandomAccessCollection([ListSection(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items.elements(identifiedBy: id))]),
+            sectionHeader: Never.produce,
+            sectionFooter: Never.produce,
+            rowContent: { rowContent($0.value) }
+        )
+    }
+}
+
+extension CocoaList where
+    Data: RangeReplaceableCollection,
+    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionHeader == Never,
+    SectionFooter == Never
+{
     public init<Items: RandomAccessCollection>(
         _ items: Items,
         @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
@@ -135,7 +163,7 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionModel == KeyP
     
     public init<Items: RandomAccessCollection>(
         @ViewBuilder content: @escaping () -> ForEach<Items, ItemType.ID, RowContent>
-    ) where Items.Element == ItemType, Data == Array<ListSection<SectionModel, ItemType>> {
+    ) where Items.Element == ItemType, Data == Array<ListSection<SectionType, ItemType>> {
         var data = Data.init()
         
         let content = content()
@@ -151,7 +179,12 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionModel == KeyP
     }
 }
 
-extension CocoaList where Data == Array<ListSection<SectionModel, ItemType>>, SectionModel == KeyPathHashIdentifiableValue<Int, Int>, SectionHeader == Never, SectionFooter == Never {
+extension CocoaList where
+    Data == Array<ListSection<SectionType, ItemType>>,
+    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionHeader == Never,
+    SectionFooter == Never
+{
     public init<Items: RandomAccessCollection>(
         _ items: Items,
         @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
