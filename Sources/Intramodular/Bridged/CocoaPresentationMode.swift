@@ -23,7 +23,6 @@ public struct CocoaPresentationMode: PresentationManager {
             return assertionFailure()
         }
         
-        coordinator.setPresentation(nil)
         coordinator.dismissSelf()
     }
 }

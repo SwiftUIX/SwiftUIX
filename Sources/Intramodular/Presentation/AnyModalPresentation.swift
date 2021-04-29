@@ -7,8 +7,6 @@ import Swift
 import SwiftUI
 
 public struct AnyModalPresentation: Identifiable {
-    public typealias PreferenceKey = TakeLastPreferenceKey<AnyModalPresentation>
-    
     public var id: AnyHashable
     public var content: AnyPresentationView
     public var onDismiss: () -> Void
@@ -70,6 +68,15 @@ extension View {
 }
 
 // MARK: - Auxiliary Implementation -
+
+extension AnyModalPresentation {
+    struct PreferenceKeyValue: Equatable {
+        let presentationID: AnyHashable
+        let presentation: AnyModalPresentation?
+    }
+    
+    typealias PreferenceKey = TakeLastPreferenceKey<PreferenceKeyValue>
+}
 
 struct _DismissDisabled: PreferenceKey {
     static let defaultValue: Bool = false

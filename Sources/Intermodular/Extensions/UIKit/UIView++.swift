@@ -8,6 +8,16 @@ import Swift
 import UIKit
 
 extension UIView {
+    var _parentViewController: UIViewController? {
+        guard let result = nearestResponder(ofKind: UIViewController.self), result.view == self else {
+            return nil
+        }
+        
+        return result
+    }
+}
+
+extension UIView {
     func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
         guard !subviews.isEmpty else {
             return nil

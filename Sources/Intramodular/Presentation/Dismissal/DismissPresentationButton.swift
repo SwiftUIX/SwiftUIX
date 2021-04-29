@@ -20,7 +20,7 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
     public init(@ViewBuilder label: () -> Label) {
         self.init(action: .empty, label: label)
     }
-
+    
     public var body: some View {
         Button(action: dismiss, label: { label })
     }

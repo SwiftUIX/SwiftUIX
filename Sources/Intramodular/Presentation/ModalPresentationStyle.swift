@@ -23,11 +23,7 @@ public enum ModalPresentationStyle: Equatable {
     #endif
     
     #if os(iOS) || targetEnvironment(macCatalyst)
-    case popover(permittedArrowDirections: PopoverArrowDirection, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds))
-    
-    public static var popover: Self {
-        return .popover(permittedArrowDirections: .all)
-    }
+    case popover(permittedArrowDirections: PopoverArrowDirection = .all, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds))
     #endif
     
     case automatic
@@ -96,6 +92,25 @@ extension View {
 }
 
 // MARK: - Auxiliary Implementation -
+
+extension ModalPresentationStyle {
+    public enum _Comparison {
+        case popover
+    }
+    
+    public static func == (lhs: Self, rhs: _Comparison) -> Bool {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        switch (lhs, rhs) {
+            case (.popover, .popover):
+                return true
+            default:
+                return false
+        }
+        #else
+        return false
+        #endif
+    }
+}
 
 extension ModalPresentationStyle {
     @usableFromInline

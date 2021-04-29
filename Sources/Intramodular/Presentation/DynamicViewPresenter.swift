@@ -8,6 +8,11 @@ import SwiftUI
 
 /// A type that manages view presentation.
 public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider {
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    /// The presentation coordinator for this presenter.
+    var _cocoaPresentationCoordinator: CocoaPresentationCoordinator { get }
+    #endif
+    
     /// The presented item.
     var presented: DynamicViewPresentable? { get }
     
@@ -169,7 +174,11 @@ extension EnvironmentValues {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController: DynamicViewPresenter {
-    private static var presentationCoordinatorKey: Void = ()
+    private static var presentationCoordinatorKey: UInt = 0
+    
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        presentationCoordinator
+    }
     
     @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &UIViewController.presentationCoordinatorKey) {
@@ -235,6 +244,10 @@ extension UIViewController: DynamicViewPresenter {
 }
 
 extension UIWindow: DynamicViewPresenter {
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        rootViewController?.presentationCoordinator ?? .init()
+    }
+    
     public var presented: DynamicViewPresentable? {
         rootViewController?.presented
     }
@@ -267,8 +280,12 @@ extension UIWindow: DynamicViewPresenter {
 #elseif os(macOS)
 
 extension NSViewController: DynamicViewPresenter {
-    private static var presentationCoordinatorKey: Void = ()
-    
+    private static var presentationCoordinatorKey: UInt = 0
+
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        presentationCoordinator
+    }
+
     @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &NSViewController.presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
@@ -329,6 +346,10 @@ extension NSViewController: DynamicViewPresenter {
 }
 
 extension NSWindow: DynamicViewPresenter {
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        contentViewController?.presentationCoordinator ?? .init()
+    }
+
     public var presented: DynamicViewPresentable? {
         contentViewController?.presented
     }

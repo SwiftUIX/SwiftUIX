@@ -92,9 +92,11 @@ import SwiftUI
 extension CocoaPresentationCoordinator {
     public override var description: String {
         if let name = presentationName {
-            return "Bridged Presentation Coordinator (" + name.description + ")"
+            return "Presentation Coordinator (" + name.description + ")"
+        } else if let viewController = viewController {
+            return "Presentation Coordinator for \(viewController)"
         } else {
-            return "Bridged Presentation Coordinator"
+            return "Presentation Coordinator"
         }
     }
 }
@@ -102,6 +104,10 @@ extension CocoaPresentationCoordinator {
 // MARK: - Conformances -
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        self
+    }
+    
     public var presenter: DynamicViewPresenter? {
         presentingCoordinator
     }
@@ -114,14 +120,14 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentation?.content._opaque_getViewName()
     }
     
-    public func setPresentation(_ presentation: AnyModalPresentation?) {
-        if let presentation = presentation {
+    func update(with value: AnyModalPresentation.PreferenceKeyValue) {
+        if let presentation = value.presentation {
             present(presentation)
-        } else if self.presentedCoordinator?.presentation != nil {
+        } else if let presentedCoordinator = presentedCoordinator, let presentation = presentedCoordinator.presentation, value.presentationID == presentation.id {
             dismiss()
         }
         
-        self.presentation = presentation
+        self.presentation = value.presentation
     }
     
     public func present(_ modal: AnyModalPresentation) {
@@ -276,15 +282,25 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 #endif
 
 struct _UseCocoaPresentationCoordinator: ViewModifier {
+    @Environment(\.presenter) var presenter
+    
     @ObservedObject var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
-    var coordinator: CocoaPresentationCoordinator? {
+    init(coordinator: ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
+        self._presentationCoordinatorBox = .init(initialValue: coordinator)
+    }
+    
+    init(coordinator: CocoaPresentationCoordinator) {
+        self._presentationCoordinatorBox = .init(initialValue: .init(coordinator))
+    }
+    
+    private var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value
     }
     
     func body(content: Content) -> some View {
         content
-            .environment(\.presenter, coordinator)
+            .environment(\.presenter, presentationCoordinatorBox.value?.presentingCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(presentationCoordinatorBox: presentationCoordinatorBox))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
                 if let parent = self.coordinator?.viewController as? _opaque_CocoaController {
@@ -293,11 +309,13 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
                     }
                 }
             })
-            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { presentation in
-                self.coordinator?.setPresentation(presentation)
+            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { value in
+                if let value = value {
+                    self.presentationCoordinatorBox.value?.update(with: value)
+                }
             }
             .onPreferenceChange(_DismissDisabled.self) {
-                self.coordinator?.setIsModalInPresentation($0)
+                self.presentationCoordinatorBox.value?.setIsModalInPresentation($0)
             }
             .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
             .preference(key: _DismissDisabled.self, value: false)
