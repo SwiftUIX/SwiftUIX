@@ -10,12 +10,20 @@ import SwiftUI
 public struct CocoaPresentationMode: PresentationManager {
     var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
-    var coordinator: CocoaPresentationCoordinator? {
+    private var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value
     }
     
     public var isPresented: Bool {
         coordinator != nil
+    }
+    
+    init(coordinator: ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
+        self.presentationCoordinatorBox = coordinator
+    }
+    
+    init(coordinator: CocoaPresentationCoordinator) {
+        self.presentationCoordinatorBox = .init(coordinator)
     }
     
     public func dismiss() {

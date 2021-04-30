@@ -159,7 +159,7 @@ extension EnvironmentValues {
     public var presenter: DynamicViewPresenter? {
         get {
             #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-            return self[DynamicViewPresenterEnvironmentKey.self] ?? _appKitOrUIKitViewController
+            return self[DynamicViewPresenterEnvironmentKey.self] 
             #else
             return self[DynamicViewPresenterEnvironmentKey.self]
             #endif

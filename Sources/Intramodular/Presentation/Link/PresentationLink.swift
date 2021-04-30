@@ -10,6 +10,8 @@ import SwiftUI
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
+    @Environment(\._appKitOrUIKitViewController) var _appKitOrUIKitViewController
+    @Environment(\.cocoaPresentationContext) var cocoaPresentationContext
     @Environment(\.environmentBuilder) var environmentBuilder
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.modalPresentationStyle) var _environment_modalPresentationStyle
@@ -62,7 +64,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 #if os(iOS) || targetEnvironment(macCatalyst)
                 if case .popover(_, _) = presentation.presentationStyle {
                     IntrinsicGeometryReader { proxy in
-                        if let presenter = presenter as? CocoaPresentationCoordinator {
+                        if presenter is CocoaPresentationCoordinator {
                             Button(
                                 action: { isPresented.wrappedValue.toggle() },
                                 label: label
@@ -76,7 +78,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                                         : nil
                                 )
                             )
-                            .modifier(_UseCocoaPresentationCoordinator(coordinator: presenter))
+                            .modifier(_ResolveAppKitOrUIKitViewController())
                         } else {
                             Button(
                                 action: { isPresented.wrappedValue.toggle() },
@@ -100,15 +102,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 Button(action: { presenter.present(presentation) }, label: label)
                 #endif
             } else if presentation.presentationStyle == .automatic {
-                Button(
-                    action: { isPresented.wrappedValue.toggle() },
-                    label: label
-                )
-                .sheet(
-                    isPresented: isPresented,
-                    onDismiss: _onDismiss,
-                    content: { presentation.content }
-                )
+                _sheetPresentationButton
             } else if
                 presentation.presentationStyle == .popover,
                 userInterfaceIdiom == .pad || userInterfaceIdiom == .mac
@@ -123,58 +117,42 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                         presentation.content
                     }
                 #else
-                Button(
-                    action: { isPresented.wrappedValue.toggle() },
-                    label: label
-                )
-                .sheet(
-                    isPresented: isPresented,
-                    onDismiss: _onDismiss,
-                    content: { presentation.content }
-                )
+                _sheetPresentationButton
                 #endif
             } else {
                 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-                if let presenter = presenter {
-                    Button(
-                        action: { isPresented.wrappedValue.toggle() },
-                        label: label
-                    )
-                    .preference(
-                        key: AnyModalPresentation.PreferenceKey.self,
-                        value: .init(
-                            presentationID: id,
-                            presentation: isPresented.wrappedValue ?
-                                presentation
-                                : nil
-                        )
-                    )
-                    .modifier(_UseCocoaPresentationCoordinator(coordinator: presenter._cocoaPresentationCoordinator))
-                } else {
-                    Button(
-                        action: { isPresented.wrappedValue.toggle() },
-                        label: label
-                    )
-                    .sheet(
-                        isPresented: isPresented,
-                        onDismiss: _onDismiss,
-                        content: { presentation.content }
-                    )
-                }
-                #else
                 Button(
                     action: { isPresented.wrappedValue.toggle() },
                     label: label
                 )
-                .sheet(
-                    isPresented: isPresented,
-                    onDismiss: _onDismiss,
-                    content: { presentation.content }
+                .preference(
+                    key: AnyModalPresentation.PreferenceKey.self,
+                    value: .init(
+                        presentationID: id,
+                        presentation: isPresented.wrappedValue ?
+                            presentation
+                            : nil
+                    )
                 )
+                .modifier(_ResolveAppKitOrUIKitViewController())
+                #else
+                _sheetPresentationButton
                 #endif
             }
         }
         .name(name, id: id)
+    }
+    
+    private var _sheetPresentationButton: some View {
+        Button(
+            action: { isPresented.wrappedValue.toggle() },
+            label: label
+        )
+        .sheet(
+            isPresented: isPresented,
+            onDismiss: _onDismiss,
+            content: { presentation.content }
+        )
     }
 }
 

@@ -212,9 +212,9 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
-            .modifier(_UseCocoaPresentationCoordinator(coordinator: presentationCoordinatorBox))
             .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
             .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
+            .modifier(_UseCocoaPresentationCoordinator(coordinator: presentationCoordinatorBox))
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox.value = viewController
