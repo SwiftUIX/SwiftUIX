@@ -10,15 +10,12 @@ public struct ImagePicker: UIViewControllerRepresentable {
     
     @Environment(\.presentationManager) var presentationManager
     
-    @usableFromInline
     @Binding var data: Data?
-    @usableFromInline
+    
     let encoding: Image.Encoding
-    @usableFromInline
     var allowsEditing = false
-    @usableFromInline
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
-    @usableFromInline
+    var mediaTypes: [String] = []
     var onCancel: (() -> Void)?
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
@@ -32,6 +29,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
         
         uiViewController.allowsEditing = allowsEditing
         uiViewController.sourceType = sourceType
+        uiViewController.mediaTypes = mediaTypes
     }
     
     public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -94,14 +92,16 @@ extension ImagePicker {
 }
 
 extension ImagePicker {
-    @inlinable
     public func allowsEditing(_ allowsEditing: Bool) -> Self {
         then({ $0.allowsEditing = allowsEditing })
     }
     
-    @inlinable
     public func sourceType(_ sourceType: UIImagePickerController.SourceType) -> Self {
         then({ $0.sourceType = sourceType })
+    }
+    
+    public func mediaTypes(_ mediaTypes: [String]) -> Self {
+        then({ $0.mediaTypes = mediaTypes })
     }
 }
 

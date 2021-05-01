@@ -109,6 +109,12 @@ extension ListSection: Equatable where SectionType: Equatable, ItemType: Equatab
     }
 }
 
+extension ListSection: Comparable where SectionType: Comparable, ItemType: Equatable {
+    public static func < (lhs: ListSection, rhs: ListSection) -> Bool {
+        lhs.model < rhs.model
+    }
+}
+
 extension ListSection: Hashable where SectionType: Hashable, ItemType: Hashable {
     public func hash(into hasher: inout Hasher) {
         if SectionType.self != Never.self {
