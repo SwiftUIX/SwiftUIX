@@ -118,10 +118,6 @@ extension UIHostingCollectionViewController {
         ) -> CGSize {
             let indexPath = IndexPath(row: -1, section: section)
             
-            guard let dataSource = parent.dataSource, dataSource.contains(indexPath) else {
-                return .init(width: 1.0, height: 1.0)
-            }
-            
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
             let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
             let id = UICollectionViewSupplementaryViewType.Configuration.ID(kind: kind, item: nil, section: sectionIdentifier)
@@ -135,8 +131,6 @@ extension UIHostingCollectionViewController {
             } else if let size = indexPathBasedSize, size == identifierBasedSize {
                 return size
             } else {
-                // invalidateCachedContentSize(forIndexPath: indexPath)
-                
                 return sizeForSupplementaryView(
                     atIndexPath: indexPath,
                     withConfiguration: .init(

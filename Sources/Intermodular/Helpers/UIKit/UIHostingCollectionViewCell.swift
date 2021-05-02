@@ -247,10 +247,10 @@ class UIHostingCollectionViewCell<
             
             return layoutAttributes
         } else {
-            return layoutAttributes
+            return super.preferredLayoutAttributesFitting(layoutAttributes)
         }
     }
-    
+
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
@@ -271,6 +271,10 @@ extension UIHostingCollectionViewCell {
         disableAnimation: Bool = true,
         forced: Bool = false
     ) {
+        guard configuration != nil else {
+            return
+        }
+        
         if forced {
             cache.content = nil
         }
