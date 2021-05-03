@@ -6,6 +6,8 @@ import Combine
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 extension CocoaPresentationCoordinator {
     struct PresentationContext {
         let presentingCoordinator: CocoaPresentationCoordinator
@@ -28,3 +30,5 @@ extension EnvironmentValues {
         }
     }
 }
+
+#endif
