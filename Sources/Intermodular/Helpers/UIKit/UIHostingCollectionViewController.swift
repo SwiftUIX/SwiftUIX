@@ -9,6 +9,7 @@ import SwiftUI
 
 protocol _opaque_UIHostingCollectionViewController: UIViewController {
     var collectionViewContentSize: CGSize { get }
+    var maximumCollectionViewCellSize: OptionalDimensions { get }
     
     func scrollToTop(anchor: UnitPoint?, animated: Bool)
     
@@ -126,16 +127,21 @@ public final class UIHostingCollectionViewController<
         collectionView.contentSize
     }
     
-    var maximumCellSize: OptionalDimensions {
+    var maximumCollectionViewCellSize: OptionalDimensions {
+        let contentSize = CGSize(
+            width: collectionView.contentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
+            height: collectionView.contentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
+        )
+        
         var result = OptionalDimensions(
-            width: max(floor(collectionView.contentSize.width - 0.001), 0),
-            height: max(floor(collectionView.contentSize.height - 0.001), 0)
+            width: max(floor(contentSize.width - 0.001), 0),
+            height: max(floor(contentSize.height - 0.001), 0)
         )
         
         guard result.width != 0 || result.height != 0 else {
             return nil
         }
-
+        
         if result.width == 0 {
             result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
         } else if result.height == 0 {
@@ -203,7 +209,7 @@ public final class UIHostingCollectionViewController<
                 sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
                 indexPath: indexPath,
                 viewProvider: self.viewProvider,
-                maximumSize: self.maximumCellSize
+                maximumSize: self.maximumCollectionViewCellSize
             )
             
             self.cache.preconfigure(cell: cell)
@@ -242,7 +248,7 @@ public final class UIHostingCollectionViewController<
                 sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
                 indexPath: indexPath,
                 viewProvider: self.viewProvider,
-                maximumSize: self.maximumCellSize
+                maximumSize: self.maximumCollectionViewCellSize
             )
             
             view.supplementaryViewWillDisplay(inParent: self)

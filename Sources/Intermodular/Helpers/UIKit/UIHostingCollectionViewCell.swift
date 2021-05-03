@@ -326,6 +326,7 @@ extension UIHostingCollectionViewCell {
 
 extension UIHostingCollectionViewCell {
     private struct RootView: View {
+        var _collectionViewProxy: CollectionViewProxy
         var content: Content
         var configuration: Configuration?
         var state: State
@@ -334,6 +335,7 @@ extension UIHostingCollectionViewCell {
         var updateCollectionCache: (() -> Void)
         
         init(base: UIHostingCollectionViewCell) {
+            _collectionViewProxy = .init(base.parentViewController)
             content = base.content
             configuration = base.configuration
             state = base.state
@@ -348,6 +350,7 @@ extension UIHostingCollectionViewCell {
         public var body: some View {
             if let configuration = configuration {
                 content
+                    .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
                     .transformEnvironment(\._relativeFrameResolvedValues) { value in
                         guard let relativeFrameID = preferences.wrappedValue.relativeFrame?.id else {
                             if let preferredContentSize = cache.preferredContentSize {
@@ -447,12 +450,14 @@ extension UIHostingCollectionViewCell {
                     withoutAnimation {
                         let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
                         
+                        rootView._collectionViewProxy = .init(parent)
+
                         self.willMove(toParent: parent)
                         parent.addChild(self)
                         cell.contentView.addSubview(view)
                         view.frame = cell.contentView.bounds
                         didMove(toParent: parent)
-                        
+                                                
                         if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
                             navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
                         }
@@ -462,6 +467,8 @@ extension UIHostingCollectionViewCell {
                 }
             } else {
                 withoutAnimation {
+                    rootView._collectionViewProxy = .init()
+
                     willMove(toParent: nil)
                     view.removeFromSuperview()
                     removeFromParent()

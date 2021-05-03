@@ -27,23 +27,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
     var rowContent: (ItemType) -> RowContent
     
     var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
-        didSet {
-            #if os(iOS) || targetEnvironment(macCatalyst)
-            if scrollViewConfiguration.setupRefreshControl == nil {
-                scrollViewConfiguration.setupRefreshControl = { [weak self] in
-                    guard let `self` = self else  {
-                        return
-                    }
-                    
-                    $0.addTarget(
-                        self,
-                        action: #selector(self.refreshChanged),
-                        for: .valueChanged
-                    )
-                }
-            }
-            #endif
-            
+        didSet {            
             tableView?.configure(with: scrollViewConfiguration)
         }
     }
@@ -361,13 +345,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
     ) -> IndexPath? {
         nil
     }
-    
-    #if !os(tvOS)
-    @objc public func refreshChanged(_ control: UIRefreshControl) {
-        control.refreshChanged(with: scrollViewConfiguration)
-    }
-    #endif
-    
+        
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         

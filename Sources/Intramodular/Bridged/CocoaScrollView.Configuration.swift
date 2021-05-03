@@ -35,10 +35,6 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
     var refreshControlTintColor: UIColor?
     
-    @available(tvOS, unavailable)
-    @usableFromInline
-    var setupRefreshControl: ((UIRefreshControl) -> Void)?
-    
     @usableFromInline
     var contentOffset: Binding<CGPoint>? = nil
     @usableFromInline
@@ -62,22 +58,6 @@ extension CocoaScrollViewConfiguration {
 
 // MARK: - Auxiliary Implementation -
 
-#if !os(tvOS)
-
-extension UIRefreshControl {
-    func refreshChanged<Content: View>(
-        with configuration: CocoaScrollViewConfiguration<Content>
-    ) {
-        configuration.onRefresh?()
-        
-        if let isRefreshing = configuration.isRefreshing, !isRefreshing {
-            endRefreshing()
-        }
-    }
-}
-
-#endif
-
 extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
@@ -99,17 +79,28 @@ extension UIScrollView {
         
         #if !os(tvOS)
         if configuration.onRefresh != nil || configuration.isRefreshing != nil {
-            let refreshControl = self.refreshControl ?? UIRefreshControl().then {
-                configuration.setupRefreshControl?($0)
+            let refreshControl: _UIRefreshControl
+            
+            if let _refreshControl = self.refreshControl as? _UIRefreshControl {
+                _refreshControl.onRefresh = configuration.onRefresh ?? { }
                 
-                self.refreshControl = $0
+                refreshControl = _refreshControl
+            } else {
+                refreshControl = _UIRefreshControl(onRefresh: configuration.onRefresh ?? { })
+                
+                self.alwaysBounceVertical = true
+                self.refreshControl = refreshControl
+                
+                if refreshControl.superview == nil {
+                    addSubview(refreshControl)
+                }
             }
             
             refreshControl.tintColor = configuration.refreshControlTintColor
             
             if let isRefreshing = configuration.isRefreshing, refreshControl.isRefreshing != isRefreshing {
                 if isRefreshing {
-                    refreshControl.beginRefreshing()
+                    refreshControl.beginRefreshingWithoutUserInput()
                 } else {
                     refreshControl.endRefreshing()
                 }
@@ -124,6 +115,75 @@ extension UIScrollView {
         }
     }
 }
+
+#if !os(tvOS)
+
+final class _UIRefreshControl: UIRefreshControl {
+    var onRefresh: () -> Void
+    
+    var isRefreshingWithoutUserInteraction: Bool = false
+    var lastContentInset: UIEdgeInsets?
+    
+    init(onRefresh: @escaping () -> Void) {
+        self.onRefresh = onRefresh
+        
+        super.init()
+        
+        addTarget(
+            self,
+            action: #selector(self.refreshChanged),
+            for: .valueChanged
+        )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func beginRefreshing() {
+        super.beginRefreshing()
+    }
+    
+    func beginRefreshingWithoutUserInput() {
+        if let superview = superview as? UIScrollView {
+            lastContentInset = superview.contentInset
+        }
+        
+        beginRefreshing()
+        
+        isRefreshingWithoutUserInteraction = true
+        
+        if let superview = superview as? UIScrollView {
+            superview.setContentOffset(CGPoint(x: 0, y: superview.contentOffset.y - frame.height), animated: true)
+        }
+        
+        sendActions(for: .valueChanged)
+    }
+    
+    override func endRefreshing() {
+        super.endRefreshing()
+        
+        if isRefreshingWithoutUserInteraction {
+            isRefreshingWithoutUserInteraction = false
+        }
+        
+        if let superview = superview as? UIScrollView {
+            if let lastContentInset = lastContentInset, superview.contentInset != lastContentInset {
+                superview.contentInset = lastContentInset
+            }
+        }
+    }
+    
+    @objc func refreshChanged(_ sender: UIRefreshControl) {
+        guard !isRefreshingWithoutUserInteraction else {
+            return
+        }
+        
+        onRefresh()
+    }
+}
+
+#endif
 
 extension EnvironmentValues {
     struct _ScrollViewConfiguration: EnvironmentKey {

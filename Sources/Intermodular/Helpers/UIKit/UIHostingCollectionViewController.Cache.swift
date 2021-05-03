@@ -104,7 +104,7 @@ extension UIHostingCollectionViewController {
                         sectionIdentifier: sectionIdentifier,
                         indexPath: indexPath,
                         viewProvider: parent.viewProvider,
-                        maximumSize: parent.maximumCellSize
+                        maximumSize: parent.maximumCollectionViewCellSize
                     )
                 )
             }
@@ -141,7 +141,7 @@ extension UIHostingCollectionViewController {
                         sectionIdentifier: sectionIdentifier,
                         indexPath: indexPath,
                         viewProvider: parent.viewProvider,
-                        maximumSize: parent.maximumCellSize
+                        maximumSize: parent.maximumCollectionViewCellSize
                     )
                 )
             }
@@ -207,10 +207,10 @@ extension UIHostingCollectionViewController.Cache {
         
         var size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         
-        size.clamp(to: prototypeCell.configuration?.maximumSize ?? nil)
-        
         size.width = ceil(size.width)
         size.height = ceil(size.height)
+        
+        size.clamp(to: prototypeCell.configuration?.maximumSize ?? nil)
         
         guard !(size.width == 1 && size.height == 1) else {
             return size

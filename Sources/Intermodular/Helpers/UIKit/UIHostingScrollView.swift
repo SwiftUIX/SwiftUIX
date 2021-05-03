@@ -44,21 +44,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
     private var dragStartContentOffset: CGPoint = .zero
     
     public var configuration = CocoaScrollViewConfiguration<Content>() {
-        didSet {
-            #if os(iOS) || targetEnvironment(macCatalyst)
-            configuration.setupRefreshControl = { [weak self] in
-                guard let `self` = self else {
-                    return
-                }
-                
-                $0.addTarget(
-                    self,
-                    action: #selector(self.refreshChanged),
-                    for: .valueChanged
-                )
-            }
-            #endif
-            
+        didSet {            
             configure(with: configuration)
         }
     }
@@ -154,12 +140,6 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
             }
         }
     }
-
-    #if !os(tvOS)
-    @objc public func refreshChanged(_ control: UIRefreshControl) {
-        control.refreshChanged(with: configuration)
-    }
-    #endif
     
     // MARK: - UIScrollViewDelegate -
     

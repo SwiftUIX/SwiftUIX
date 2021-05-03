@@ -118,13 +118,14 @@ struct _CollectionView<
             }
         }
 
-        uiViewController.dataSource = dataSource
-        uiViewController.dataSourceConfiguration = dataSourceConfiguration
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
         uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
+        uiViewController.dataSourceConfiguration = dataSourceConfiguration
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
-        
+
+        uiViewController.dataSource = dataSource
+
         uiViewController.refreshVisibleCellsAndSupplementaryViews()
     }
 }

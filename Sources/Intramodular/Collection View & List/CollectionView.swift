@@ -297,6 +297,10 @@ extension CollectionView {
     public func contentInsets(_ inset: EdgeInsets) -> Self {
         then({ $0._scrollViewConfiguration.contentInset = inset })
     }
+    
+    public func contentInsets(_ edges: Edge.Set, _ length: CGFloat?) -> Self {
+        contentInsets(.init(edges, length))
+    }
 }
 
 extension CollectionView {
@@ -344,17 +348,21 @@ fileprivate struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: H
     }
 }
 
-fileprivate struct _IdentifierHashedValue<Value: Identifiable>: Hashable, Identifiable {
+fileprivate struct _IdentifierHashedValue<Value: Identifiable>: CustomStringConvertible, Hashable, Identifiable {
     let value: Value
     
-    init(_ value: Value) {
-        self.value = value
+    var description: String {
+        String(describing: value)
     }
     
     var id: Value.ID {
         value.id
     }
-    
+
+    init(_ value: Value) {
+        self.value = value
+    }
+        
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

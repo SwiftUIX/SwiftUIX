@@ -10,7 +10,7 @@ import SwiftUI
 
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CollectionViewProxy {
-    private let _hostingCollectionViewController = WeakReferenceBox<AnyObject>(nil)
+    private let _hostingCollectionViewController: WeakReferenceBox<AnyObject>
     
     var hostingCollectionViewController: _opaque_UIHostingCollectionViewController? {
         get {
@@ -22,6 +22,14 @@ public struct CollectionViewProxy {
     
     public var contentSize: CGSize {
         hostingCollectionViewController?.collectionViewContentSize ?? .zero
+    }
+    
+    public var maximumCellSize: OptionalDimensions {
+        hostingCollectionViewController?.maximumCollectionViewCellSize ?? nil
+    }
+    
+    init(_ base: _opaque_UIHostingCollectionViewController? = nil) {
+        self._hostingCollectionViewController = .init(base)
     }
     
     public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
@@ -73,20 +81,20 @@ public struct CollectionViewProxy {
 
 /// A view whose child is defined as a function of a `CollectionViewProxy` targeting the collection views within the child.
 public struct CollectionViewReader<Content: View>: View {
+    @Environment(\._collectionViewProxy) var _environment_collectionViewProxy
+
     public let content: (CollectionViewProxy) -> Content
+        
+    @State var _collectionViewProxy = CollectionViewProxy()
     
-    @State public var _collectionViewProxy = CollectionViewProxy()
-    
-    @inlinable
     public init(
         @ViewBuilder content: @escaping (CollectionViewProxy) -> Content
     ) {
         self.content = content
     }
     
-    @inlinable
     public var body: some View {
-        content(_collectionViewProxy)
+        content(_environment_collectionViewProxy?.wrappedValue ?? _collectionViewProxy)
             .environment(\._collectionViewProxy, $_collectionViewProxy)
     }
 }
