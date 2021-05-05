@@ -82,9 +82,9 @@ public struct CollectionViewProxy {
 /// A view whose child is defined as a function of a `CollectionViewProxy` targeting the collection views within the child.
 public struct CollectionViewReader<Content: View>: View {
     @Environment(\._collectionViewProxy) var _environment_collectionViewProxy
-
+    
     public let content: (CollectionViewProxy) -> Content
-        
+    
     @State var _collectionViewProxy = CollectionViewProxy()
     
     public init(

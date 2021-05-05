@@ -117,7 +117,7 @@ class UIHostingCollectionViewSupplementaryView<
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        return layoutAttributes
+        return super.preferredLayoutAttributesFitting(layoutAttributes)
     }
 }
 
