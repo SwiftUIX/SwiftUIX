@@ -5,34 +5,39 @@
 import Swift
 import SwiftUI
 
-// Modified from https://stackoverflow.com/questions/58363563/swiftui-get-notified-when-binding-value-changes
-public struct ChangeObserver<Base: View, Value: Equatable>: View {
-    let base: Base
-    let value: Value
-    @State private var oldValue: Value?
-    let action: (Value) -> Void
-
-    @State var model = Model()
-
-    public var body: some View {
-        if model.update(value: value) {
-            DispatchQueue.main.async {
-                self.action(self.value)
-                oldValue = value
-            }
-        }
-        return base
-    }
-
-    class Model {
+// A modified implementation based on https://stackoverflow.com/questions/58363563/swiftui-get-notified-when-binding-value-changes
+private struct OnChangeOfValue<Base: View, Value: Equatable>: View {
+    class ValueBox {
         private var savedValue: Value?
+        
         func update(value: Value) -> Bool {
             guard value != savedValue else {
                 return false
             }
+            
             savedValue = value
+            
             return true
         }
+    }
+    
+    let base: Base
+    let value: Value
+    let action: (Value) -> Void
+    
+    @State private var valueBox = ValueBox()
+    @State private var oldValue: Value?
+    
+    public var body: some View {
+        if valueBox.update(value: value) {
+            DispatchQueue.main.async {
+                action(value)
+                
+                oldValue = value
+            }
+        }
+        
+        return base
     }
 }
 
@@ -42,7 +47,7 @@ extension View {
         of value: V,
         perform action: @escaping (V) -> Void
     ) -> some View {
-        ChangeObserver(base: self, value: value, action: action)
+        OnChangeOfValue(base: self, value: value, action: action)
     }
     
     @_disfavoredOverload
