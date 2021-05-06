@@ -11,6 +11,8 @@ protocol _opaque_UIHostingCollectionViewController: UIViewController {
     var collectionViewContentSize: CGSize { get }
     var maximumCollectionViewCellSize: OptionalDimensions { get }
     
+    func invalidateLayout()
+    
     func scrollToTop(anchor: UnitPoint?, animated: Bool)
     
     func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
@@ -37,7 +39,7 @@ public final class UIHostingCollectionViewController<
     SectionHeaderContent: View,
     SectionFooterContent: View,
     CellContent: View
->: UIViewController, _opaque_UIHostingCollectionViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+>: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     typealias _SwiftUIType = _CollectionView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>
     typealias UICollectionViewCellType = UIHostingCollectionViewCell<
         SectionType,
@@ -122,35 +124,7 @@ public final class UIHostingCollectionViewController<
         
         return collectionView
     }()
-    
-    var collectionViewContentSize: CGSize {
-        collectionView.contentSize
-    }
-    
-    var maximumCollectionViewCellSize: OptionalDimensions {
-        let contentSize = CGSize(
-            width: collectionView.contentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
-            height: collectionView.contentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
-        )
         
-        var result = OptionalDimensions(
-            width: max(floor(contentSize.width - 0.001), 0),
-            height: max(floor(contentSize.height - 0.001), 0)
-        )
-        
-        guard result.width != 0 || result.height != 0 else {
-            return nil
-        }
-        
-        if result.width == 0 {
-            result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
-        } else if result.height == 0 {
-            result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
-        }
-        
-        return result
-    }
-    
     init(
         dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration,
         viewProvider: _SwiftUIType.ViewProvider,
@@ -569,9 +543,41 @@ extension UIHostingCollectionViewController {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Conformances -
 
-extension UIHostingCollectionViewController {
+extension UIHostingCollectionViewController: _opaque_UIHostingCollectionViewController {
+    var collectionViewContentSize: CGSize {
+        collectionView.contentSize
+    }
+    
+    var maximumCollectionViewCellSize: OptionalDimensions {
+        let contentSize = CGSize(
+            width: collectionView.contentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
+            height: collectionView.contentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
+        )
+        
+        var result = OptionalDimensions(
+            width: max(floor(contentSize.width - 0.001), 0),
+            height: max(floor(contentSize.height - 0.001), 0)
+        )
+        
+        guard result.width != 0 || result.height != 0 else {
+            return nil
+        }
+        
+        if result.width == 0 {
+            result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
+        } else if result.height == 0 {
+            result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
+        }
+        
+        return result
+    }
+
+    public func invalidateLayout() {
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
     public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
         collectionView.setContentOffset(.zero, animated: animated)
     }

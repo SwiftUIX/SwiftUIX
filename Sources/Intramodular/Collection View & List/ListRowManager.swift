@@ -5,26 +5,42 @@
 import Swift
 import SwiftUI
 
-public protocol ListRowManager {
-    /// Animate and invoke `action`.
-    func _animate(_ action: () -> ())
+protocol _CellProxyBase {
+    func performWithAnimation(_: @escaping () -> Void)
+}
+
+public struct CellProxy {
+    let base: _CellProxyBase?
+}
+
+public struct CellReader<Content: View>: View {
+    @Environment(\._cellProxy) var _cellProxy
     
-    /// Trigger a reload.
-    func _reload()
+    public let content: (CellProxy) -> Content
+    
+    public init(
+        @ViewBuilder content: @escaping (CellProxy) -> Content
+    ) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(_cellProxy ?? .init(base: nil))
+    }
 }
 
 // MARK: - Auxiliary Implementation -
 
-struct ListRowManagerEnvironmentKey: EnvironmentKey {
-    static let defaultValue: ListRowManager? = nil
+struct CellProxyEnvironmentKey: EnvironmentKey {
+    static let defaultValue: CellProxy? = nil
 }
 
 extension EnvironmentValues {
-    public var listRowManager: ListRowManager? {
+    var _cellProxy: CellProxy? {
         get {
-            self[ListRowManagerEnvironmentKey]
+            self[CellProxyEnvironmentKey]
         } set {
-            self[ListRowManagerEnvironmentKey] = newValue
+            self[CellProxyEnvironmentKey] = newValue
         }
     }
 }

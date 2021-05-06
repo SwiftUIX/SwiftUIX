@@ -32,6 +32,12 @@ public struct CollectionViewProxy {
         self._hostingCollectionViewController = .init(base)
     }
     
+    public func invalidateLayout() {
+        _assertResolutionOfCollectionView()
+        
+        hostingCollectionViewController?.invalidateLayout()
+    }
+    
     public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
         _assertResolutionOfCollectionView()
         

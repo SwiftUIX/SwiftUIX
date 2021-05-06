@@ -247,7 +247,15 @@ class UIHostingCollectionViewCell<
             
             return layoutAttributes
         } else {
-            return super.preferredLayoutAttributesFitting(layoutAttributes)
+            let result = super.preferredLayoutAttributesFitting(layoutAttributes)
+            
+            if result.size != bounds.size {
+                cache.preferredContentSize = result.size
+            }
+            
+            updateCollectionCache()
+
+            return result
         }
     }
 
@@ -324,8 +332,15 @@ extension UIHostingCollectionViewCell {
 
 // MARK: - Auxiliary Implementation -
 
+extension UIHostingCollectionViewCell: _CellProxyBase {
+    public func performWithAnimation(_: @escaping () -> Void) {
+        
+    }
+}
+
 extension UIHostingCollectionViewCell {
     private struct RootView: View {
+        var _cellProxyBase: _CellProxyBase
         var _collectionViewProxy: CollectionViewProxy
         var content: Content
         var configuration: Configuration?
@@ -335,6 +350,7 @@ extension UIHostingCollectionViewCell {
         var updateCollectionCache: (() -> Void)
         
         init(base: UIHostingCollectionViewCell) {
+            _cellProxyBase = base
             _collectionViewProxy = .init(base.parentViewController)
             content = base.content
             configuration = base.configuration

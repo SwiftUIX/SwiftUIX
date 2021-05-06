@@ -105,37 +105,31 @@ extension UIHostingTableViewCell {
 
 extension UIHostingTableViewCell {
     struct RootView: View {
-        private struct _ListRowManager: ListRowManager {
-            weak var uiTableViewCell: UIHostingTableViewCell<ItemType, Content>?
+        private struct _CellProxyBase: SwiftUIX._CellProxyBase {
+            weak var base: UIHostingTableViewCell<ItemType, Content>?
             
-            func _animate(_ action: () -> ()) {
-                uiTableViewCell?.tableViewController.tableView.beginUpdates()
+            func performWithAnimation(_ action: () -> ()) {
+                base?.tableViewController.tableView.beginUpdates()
                 action()
-                uiTableViewCell?.tableViewController.tableView.endUpdates()
-            }
-            
-            func _reload() {
-                uiTableViewCell?.reload(with: .none)
+                base?.tableViewController.tableView.endUpdates()
             }
         }
         
+        private let _cellProxyBase: _CellProxyBase
         private let id: AnyHashable
         private let content: Content
         private let state: State
         
-        private let listRowManager: _ListRowManager
-        
         init(base: UIHostingTableViewCell<ItemType, Content>) {
+            self._cellProxyBase = .init(base: base)
             self.id = base.item.id
             self.content = base.makeContent(base.item)
             self.state = base.state
-            
-            self.listRowManager = .init(uiTableViewCell: base)
         }
         
         var body: some View {
             content
-                .environment(\.listRowManager, listRowManager)
+                .environment(\._cellProxy, .init(base: _cellProxyBase))
                 .environment(\.isCellFocused, state.isFocused)
                 .environment(\.isCellHighlighted, state.isHighlighted)
                 .environment(\.isCellSelected, state.isSelected)
