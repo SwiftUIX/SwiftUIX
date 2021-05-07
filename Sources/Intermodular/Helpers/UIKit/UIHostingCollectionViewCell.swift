@@ -43,6 +43,7 @@ extension UIHostingCollectionViewCell {
     
     struct Cache {
         var content: Content?
+        var contentSize: CGSize?
         var preferredContentSize: CGSize? {
             didSet {
                 if oldValue != preferredContentSize {
@@ -333,8 +334,12 @@ extension UIHostingCollectionViewCell {
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewCell: _CellProxyBase {
-    public func performWithAnimation(_: @escaping () -> Void) {
+    public func invalidateLayout() {
+        cache.contentSize = nil
+    
+        updateCollectionCache()
         
+        parentViewController?.invalidateLayout()
     }
 }
 

@@ -6,11 +6,15 @@ import Swift
 import SwiftUI
 
 protocol _CellProxyBase {
-    func performWithAnimation(_: @escaping () -> Void)
+    func invalidateLayout()
 }
 
 public struct CellProxy {
     let base: _CellProxyBase?
+    
+    public func invalidateLayout() {
+        base?.invalidateLayout()
+    }
 }
 
 public struct CellReader<Content: View>: View {

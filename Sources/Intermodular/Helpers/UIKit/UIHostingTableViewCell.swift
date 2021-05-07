@@ -108,6 +108,10 @@ extension UIHostingTableViewCell {
         private struct _CellProxyBase: SwiftUIX._CellProxyBase {
             weak var base: UIHostingTableViewCell<ItemType, Content>?
             
+            func invalidateLayout() {
+                fatalError("unimplemented")
+            }
+            
             func performWithAnimation(_ action: () -> ()) {
                 base?.tableViewController.tableView.beginUpdates()
                 action()

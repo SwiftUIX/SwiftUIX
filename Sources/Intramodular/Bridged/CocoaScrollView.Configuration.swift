@@ -123,6 +123,7 @@ final class _UIRefreshControl: UIRefreshControl {
     
     var isRefreshingWithoutUserInteraction: Bool = false
     var lastContentInset: UIEdgeInsets?
+    var lastContentOffset: CGPoint?
     
     init(onRefresh: @escaping () -> Void) {
         self.onRefresh = onRefresh
@@ -141,14 +142,15 @@ final class _UIRefreshControl: UIRefreshControl {
     }
     
     override func beginRefreshing() {
+        if let superview = superview as? UIScrollView {
+            lastContentInset = superview.contentInset
+            lastContentOffset = superview.contentOffset
+        }
+
         super.beginRefreshing()
     }
     
     func beginRefreshingWithoutUserInput() {
-        if let superview = superview as? UIScrollView {
-            lastContentInset = superview.contentInset
-        }
-        
         beginRefreshing()
         
         isRefreshingWithoutUserInteraction = true
@@ -170,6 +172,10 @@ final class _UIRefreshControl: UIRefreshControl {
         if let superview = superview as? UIScrollView {
             if let lastContentInset = lastContentInset, superview.contentInset != lastContentInset {
                 superview.contentInset = lastContentInset
+            }
+            
+            if let lastContentOffset = lastContentOffset {
+                superview.setContentOffset(lastContentOffset, animated: true)
             }
         }
     }
