@@ -9,11 +9,11 @@ import SwiftUI
 import UIKit
 
 extension UICollectionView {
-    public enum ElementKind: String {
+    enum ElementKind: String {
         case sectionHeader
         case sectionFooter
         
-        public var rawValue: String {
+        var rawValue: String {
             switch self {
                 case .sectionHeader:
                     return UICollectionView.elementKindSectionHeader
@@ -22,7 +22,7 @@ extension UICollectionView {
             }
         }
         
-        public init?(rawValue: String) {
+        init?(rawValue: String) {
             switch rawValue {
                 case UICollectionView.elementKindSectionHeader:
                     self = .sectionHeader
