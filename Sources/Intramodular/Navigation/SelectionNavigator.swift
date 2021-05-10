@@ -73,8 +73,7 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
 extension View {
     public func navigate<Destination: View>(
         to destination: Destination,
-        isActive: Binding<Bool>,
-        onDismiss: (() -> ())? = nil
+        isActive: Binding<Bool>
     ) -> some View {
         background(
             NavigationLink(
@@ -85,12 +84,34 @@ extension View {
         )
     }
     
+    public func navigate<Destination: View, Selection: Equatable>(
+        to destination: Destination,
+        tag: Selection,
+        selection: Binding<Selection?>
+    ) -> some View {
+        background(
+            NavigationLink(
+                destination: destination,
+                isActive: .init(
+                    get: { selection.wrappedValue == tag },
+                    set: { newValue in
+                        if newValue {
+                            selection.wrappedValue = tag
+                        } else {
+                            selection.wrappedValue = nil
+                        }
+                    }
+                ),
+                label: { ZeroSizeView() }
+            )
+        )
+    }
+        
     public func navigate<Destination: View>(
         isActive: Binding<Bool>,
-        onDismiss: (() -> ())? = nil,
         @ViewBuilder destination: () -> Destination
     ) -> some View {
-        navigate(to: destination(), isActive: isActive, onDismiss: onDismiss)
+        navigate(to: destination(), isActive: isActive)
     }
 }
 
