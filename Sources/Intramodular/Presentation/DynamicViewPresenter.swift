@@ -306,8 +306,8 @@ extension NSViewController: DynamicViewPresenter {
         presentationCoordinator.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation) {
-        presentationCoordinator.present(presentation)
+    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+        presentationCoordinator.present(presentation, completion: completion)
     }
     
     @discardableResult
@@ -358,8 +358,8 @@ extension NSWindow: DynamicViewPresenter {
         contentViewController?.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation) {
-        contentViewController?.present(presentation)
+    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+        contentViewController?.present(presentation, completion: completion)
     }
     
     @discardableResult

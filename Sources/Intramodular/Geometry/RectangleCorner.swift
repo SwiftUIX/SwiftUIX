@@ -95,4 +95,26 @@ extension UIRectCorner {
     }
 }
 
+extension Array where Element == RectangleCorner {
+    public init(_ corners: UIRectCorner) {
+        self.init()
+        
+        if corners.contains(.topLeft) {
+            append(.topLeft)
+        }
+        
+        if corners.contains(.topRight) {
+            append(.topRight)
+        }
+        
+        if corners.contains(.bottomLeft) {
+            append(.bottomLeft)
+        }
+        
+        if corners.contains(.bottomRight) {
+            append(.bottomRight)
+        }
+    }
+}
+
 #endif

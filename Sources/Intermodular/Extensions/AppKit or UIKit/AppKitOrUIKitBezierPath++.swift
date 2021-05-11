@@ -9,13 +9,13 @@ import SwiftUI
 extension AppKitOrUIKitBezierPath {
     public convenience init(
         roundedRect rect: CGRect,
-        byRoundingCorners corners: UIRectCorner,
+        byRoundingCorners corners: [RectangleCorner],
         cornerRadii: CGFloat
     ) {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         self.init(
             roundedRect: rect,
-            byRoundingCorners: corners,
+            byRoundingCorners: .init(corners),
             cornerRadii: .init(width: cornerRadii, height: cornerRadii)
         )
         #elseif os(macOS)
