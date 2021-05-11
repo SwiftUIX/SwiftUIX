@@ -17,7 +17,7 @@ public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvide
     var presented: DynamicViewPresentable? { get }
     
     /// Presents a new item.
-    func present(_ item: AnyModalPresentation)
+    func present(_ item: AnyModalPresentation, completion: () -> Void)
     
     /// Dismisses the currently presented item (if any).
     func dismiss(withAnimation _: Animation?) -> Future<Bool, Never>
@@ -67,6 +67,10 @@ extension DynamicViewPresenter {
 // MARK: - Extensions -
 
 extension DynamicViewPresenter {
+    public func present(_ modal: AnyModalPresentation) {
+        present(modal, completion: { })
+    }
+
     public func present<Content: View>(@ViewBuilder content: () -> Content) {
         present(content())
     }
@@ -78,7 +82,6 @@ extension DynamicViewPresenter {
         presentationStyle: ModalPresentationStyle? = nil,
         completion: @escaping () -> Void = { }
     ) {
-        // FIXME!!!
         present(
             AnyModalPresentation(
                 content: AnyPresentationView(view)
@@ -86,7 +89,8 @@ extension DynamicViewPresenter {
                     .modalPresentationStyle(presentationStyle ?? .automatic),
                 onDismiss: onDismiss,
                 reset: { }
-            )
+            ),
+            completion: completion
         )
     }
     
@@ -196,8 +200,8 @@ extension UIViewController: DynamicViewPresenter {
         presentationCoordinator.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation) {
-        presentationCoordinator.present(presentation)
+    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+        presentationCoordinator.present(presentation, completion: completion)
     }
     
     @discardableResult
@@ -252,8 +256,8 @@ extension UIWindow: DynamicViewPresenter {
         rootViewController?.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation) {
-        rootViewController?.present(presentation)
+    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+        rootViewController?.present(presentation, completion: completion)
     }
     
     @discardableResult
