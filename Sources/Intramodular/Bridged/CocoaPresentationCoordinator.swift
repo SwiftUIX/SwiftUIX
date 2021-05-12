@@ -116,7 +116,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentation?.content._opaque_getViewName()
     }
     
-    public func present(_ modal: AnyModalPresentation, completion: () -> Void) {
+    public func present(_ modal: AnyModalPresentation, completion: @escaping () -> Void) {
         guard let viewController = viewController else {
             return
         }
@@ -141,6 +141,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             viewControllerToBePresented.presentationCoordinator.presentation = modal
             
             self.objectWillChange.send()
+            
+            completion()
         }
         #elseif os(macOS)
         fatalError("unimplemented")

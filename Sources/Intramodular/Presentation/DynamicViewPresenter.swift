@@ -17,7 +17,7 @@ public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvide
     var presented: DynamicViewPresentable? { get }
     
     /// Presents a new item.
-    func present(_ item: AnyModalPresentation, completion: () -> Void)
+    func present(_ item: AnyModalPresentation, completion: @escaping () -> Void)
     
     /// Dismisses the currently presented item (if any).
     func dismiss(withAnimation _: Animation?) -> Future<Bool, Never>
@@ -200,7 +200,7 @@ extension UIViewController: DynamicViewPresenter {
         presentationCoordinator.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+    public func present(_ presentation: AnyModalPresentation, completion: @escaping () -> Void) {
         presentationCoordinator.present(presentation, completion: completion)
     }
     
@@ -256,7 +256,7 @@ extension UIWindow: DynamicViewPresenter {
         rootViewController?.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+    public func present(_ presentation: AnyModalPresentation, completion: @escaping () -> Void) {
         rootViewController?.present(presentation, completion: completion)
     }
     
@@ -306,7 +306,7 @@ extension NSViewController: DynamicViewPresenter {
         presentationCoordinator.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+    public func present(_ presentation: AnyModalPresentation, completion: @escaping () -> Void) {
         presentationCoordinator.present(presentation, completion: completion)
     }
     
@@ -358,7 +358,7 @@ extension NSWindow: DynamicViewPresenter {
         contentViewController?.presented
     }
     
-    public func present(_ presentation: AnyModalPresentation, completion: () -> Void) {
+    public func present(_ presentation: AnyModalPresentation, completion: @escaping () -> Void) {
         contentViewController?.present(presentation, completion: completion)
     }
     
