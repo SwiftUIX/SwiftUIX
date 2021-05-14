@@ -218,7 +218,11 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox.value = viewController
-                    presentationCoordinatorBox.value = viewController.presentationCoordinator
+                }
+                
+                if !(presentationCoordinatorBox.value === viewController._cocoaPresentationCoordinator) {
+                    presentationCoordinatorBox.value =
+                        viewController.presentationCoordinator
                 }
             }
         #else

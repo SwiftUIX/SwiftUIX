@@ -10,12 +10,14 @@ public struct ImagePicker: UIViewControllerRepresentable {
     
     @Environment(\.presentationManager) var presentationManager
     
-    @Binding var data: Data?
-    
-    let encoding: Image.Encoding
+    let image: Binding<AppKitOrUIKitImage?>?
+    let data: Binding<Data?>?
+
+    let encoding: Image.Encoding?
     var allowsEditing = false
+    var cameraDevice: UIImagePickerController.CameraDevice?
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
-    var mediaTypes: [String] = []
+    var mediaTypes: [String]?
     var onCancel: (() -> Void)?
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
@@ -29,7 +31,14 @@ public struct ImagePicker: UIViewControllerRepresentable {
         
         uiViewController.allowsEditing = allowsEditing
         uiViewController.sourceType = sourceType
-        uiViewController.mediaTypes = mediaTypes
+        
+        if let mediaTypes = mediaTypes, uiViewController.mediaTypes != mediaTypes  {
+            uiViewController.mediaTypes = mediaTypes
+        }
+        
+        if uiViewController.sourceType == .camera {
+            uiViewController.cameraDevice = cameraDevice ?? .rear
+        }
     }
     
     public class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -45,8 +54,9 @@ public struct ImagePicker: UIViewControllerRepresentable {
         ) {
             let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
             
-            base.data = (image?._fixOrientation() ?? image)?.data(using: base.encoding)
-            
+            base.image?.wrappedValue = image
+            base.data?.wrappedValue = (image?._fixOrientation() ?? image)?.data(using: base.encoding ?? .png)
+
             base.presentationManager.dismiss()
         }
         
@@ -68,24 +78,23 @@ public struct ImagePicker: UIViewControllerRepresentable {
 
 extension ImagePicker {
     public init(
-        data: Binding<Data?>,
-        encoding: Image.Encoding,
+        image: Binding<AppKitOrUIKitImage?>,
+        encoding: Image.Encoding? = nil,
         onCancel: (() -> Void)? = nil
     ) {
-        self._data = data
+        self.image = image
+        self.data = nil
         self.encoding = encoding
         self.onCancel = onCancel
     }
     
     public init(
-        image: Binding<AppKitOrUIKitImage?>,
-        encoding: Image.Encoding,
+        data: Binding<Data?>,
+        encoding: Image.Encoding? = nil,
         onCancel: (() -> Void)? = nil
     ) {
-        self._data = .init(
-            get: { image.wrappedValue.flatMap({ $0.data(using: encoding) }) },
-            set: { image.wrappedValue = $0.flatMap(AppKitOrUIKitImage.init(data:)) }
-        )
+        self.image = nil
+        self.data = data
         self.encoding = encoding
         self.onCancel = onCancel
     }
@@ -96,6 +105,10 @@ extension ImagePicker {
         then({ $0.allowsEditing = allowsEditing })
     }
     
+    public func cameraDevice(_ sourceType: UIImagePickerController.CameraDevice?) -> Self {
+        then({ $0.cameraDevice = cameraDevice })
+    }
+
     public func sourceType(_ sourceType: UIImagePickerController.SourceType) -> Self {
         then({ $0.sourceType = sourceType })
     }

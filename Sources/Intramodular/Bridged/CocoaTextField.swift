@@ -267,6 +267,7 @@ extension CocoaTextField where Label == Text {
         self.text = text
         self.isEditing = .constant(false)
         self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
+        self.configuration.placeholder = String(title)
     }
     
     public init<S: StringProtocol>(
