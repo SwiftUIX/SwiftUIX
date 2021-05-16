@@ -271,6 +271,14 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    /// Adds a condition whether for whether the collection view disables bouncing when scrolling reaches the end of the content
+    public func scrollBounceDisabled(_ disabled: Bool) -> Self {
+        then {
+            $0._scrollViewConfiguration.alwaysBounceHorizontal = !disabled
+            $0._scrollViewConfiguration.alwaysBounceVertical = !disabled
+        }
+    }
+    
     /// Sets the collection view's scroll content-offset behavior.
     public func scrollContentOffsetBehavior(_ contentOffsetBehavior: ScrollContentOffsetBehavior) -> Self {
         then({ $0._scrollViewConfiguration.contentOffsetBehavior = contentOffsetBehavior })
@@ -364,11 +372,11 @@ fileprivate struct _IdentifierHashedValue<Value: Identifiable>: CustomStringConv
     var id: Value.ID {
         value.id
     }
-
+    
     init(_ value: Value) {
         self.value = value
     }
-        
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

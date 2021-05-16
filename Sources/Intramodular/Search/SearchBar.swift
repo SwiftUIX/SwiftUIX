@@ -304,7 +304,6 @@ extension SearchBar {
 // MARK: - Auxiliary Implementation -
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-
 extension UISearchBar {
     /// Retrieves the UITextField contained inside the UISearchBar.
     ///
@@ -313,7 +312,17 @@ extension UISearchBar {
         findSubview(ofKind: UITextField.self)
     }
 }
+#endif
 
 #endif
 
+// MARK: - Development Preview -
+
+#if os(iOS) || targetEnvironment(macCatalyst)
+struct SearchBar_Previews: PreviewProvider {
+    static var previews: some View {
+        SearchBar("Search...", text: .constant(""))
+            .searchBarStyle(.minimal)
+    }
+}
 #endif
