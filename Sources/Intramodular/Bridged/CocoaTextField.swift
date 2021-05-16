@@ -202,11 +202,12 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
                 uiView.attributedPlaceholder = NSAttributedString(
                     string: placeholder,
                     attributes: [
-                        .font: configuration.uiFont ?? context.environment.font?.toUIFont() as Any,
+                        .font: configuration.uiFont ?? context.environment.font?.toUIFont() ?? uiView.font,
                         .paragraphStyle: NSMutableParagraphStyle().then {
                             $0.alignment = .init(context.environment.multilineTextAlignment)
                         }
                     ]
+                    .compactMapValues({ $0 })
                 )
             } else {
                 uiView.attributedPlaceholder = nil
