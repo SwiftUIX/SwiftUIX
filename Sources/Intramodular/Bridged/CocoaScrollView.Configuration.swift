@@ -10,41 +10,111 @@ import SwiftUI
 /// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
-    var initialContentAlignment: Alignment?
-    @usableFromInline
-    var axes: Axis.Set = [.horizontal, .vertical]
+    var isVanilla: Bool = true
     
     @usableFromInline
-    var showsIndicators: Bool = true
+    var initialContentAlignment: Alignment? {
+        didSet {
+            isVanilla = false
+        }
+    }
     @usableFromInline
-    var alwaysBounceVertical: Bool? = nil
-    @usableFromInline
-    var alwaysBounceHorizontal: Bool = false
-    @usableFromInline
-    var isDirectionalLockEnabled: Bool = false
-    @usableFromInline
-    var isPagingEnabled: Bool = false
-    @usableFromInline
-    var isScrollEnabled: Bool = true
-    @usableFromInline
-    var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in }
-    @usableFromInline
-    var onRefresh: (() -> Void)?
-    @usableFromInline
-    var isRefreshing: Bool?
-    @usableFromInline
-    var refreshControlTintColor: UIColor?
+    var axes: Axis.Set = [.horizontal, .vertical] {
+        didSet {
+            isVanilla = false
+        }
+    }
     
     @usableFromInline
-    var contentOffset: Binding<CGPoint>? = nil
+    var showsIndicators: Bool = true {
+        didSet {
+            isVanilla = false
+        }
+    }
     @usableFromInline
-    var contentInset: EdgeInsets = .zero
+    var alwaysBounceVertical: Bool? = nil {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var alwaysBounceHorizontal: Bool = false {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var isDirectionalLockEnabled: Bool = false {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var isPagingEnabled: Bool = false {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var isScrollEnabled: Bool = true {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in } {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var onRefresh: (() -> Void)? {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var isRefreshing: Bool? {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var refreshControlTintColor: UIColor? {
+        didSet {
+            isVanilla = false
+        }
+    }
+    
+    @usableFromInline
+    var contentOffset: Binding<CGPoint>? = nil {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var contentInset: EdgeInsets = .zero {
+        didSet {
+            isVanilla = false
+        }
+    }
+    @usableFromInline
+    var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
+        didSet {
+            isVanilla = false
+        }
+    }
 }
 
 extension CocoaScrollViewConfiguration {
     mutating func update(from environment: EnvironmentValues) {
-        initialContentAlignment = environment.initialContentAlignment
-        isScrollEnabled = environment.isScrollEnabled
+        if let initialContentAlignment = environment.initialContentAlignment {
+            self.initialContentAlignment = initialContentAlignment
+        }
+        
+        if !environment.isScrollEnabled {
+            isScrollEnabled = false
+        }
     }
     
     func updating(from environment: EnvironmentValues) -> Self {
@@ -58,10 +128,30 @@ extension CocoaScrollViewConfiguration {
 
 // MARK: - Auxiliary Implementation -
 
+public struct ScrollContentOffsetBehavior: OptionSet {
+    public static let maintainOnChangeOfBounds = Self(rawValue: 1 << 0)
+    public static let maintainOnChangeOfContentSize = Self(rawValue: 1 << 1)
+    public static let maintainOnChangeOfKeyboardFrame = Self(rawValue: 1 << 2)
+    
+    public let rawValue: Int8
+    
+    public init(rawValue: Int8) {
+        self.rawValue = rawValue
+    }
+}
+
 extension UIScrollView {
+    var isScrolling: Bool {
+        layer.animation(forKey: "bounds") != nil
+    }
+    
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
+        guard !configuration.isVanilla else {
+            return
+        }
+        
         if let alwaysBounceVertical = configuration.alwaysBounceVertical {
             self.alwaysBounceVertical = alwaysBounceVertical
         }
@@ -71,7 +161,10 @@ extension UIScrollView {
         isScrollEnabled = configuration.isScrollEnabled
         showsVerticalScrollIndicator = configuration.showsIndicators && configuration.axes.contains(.vertical)
         showsHorizontalScrollIndicator = configuration.showsIndicators && configuration.axes.contains(.horizontal)
-        contentInset = .init(configuration.contentInset)
+        
+        if contentInset != .init(configuration.contentInset) {
+            contentInset = .init(configuration.contentInset)
+        }
         
         #if os(iOS) || targetEnvironment(macCatalyst)
         isPagingEnabled = configuration.isPagingEnabled
@@ -100,7 +193,9 @@ extension UIScrollView {
             
             if let isRefreshing = configuration.isRefreshing, refreshControl.isRefreshing != isRefreshing {
                 if isRefreshing {
-                    refreshControl.beginRefreshingWithoutUserInput()
+                    if !configuration.contentOffsetBehavior.contains(.maintainOnChangeOfContentSize) {
+                        refreshControl.beginRefreshingWithoutUserInput(adjustContentOffset: !(configuration.initialContentAlignment == .bottom))
+                    }
                 } else {
                     refreshControl.endRefreshing()
                 }
@@ -112,6 +207,33 @@ extension UIScrollView {
             if self.contentOffset.ceil != contentOffset.ceil {
                 setContentOffset(contentOffset, animated: true)
             }
+        }
+    }
+    
+    func updateContentSizeWithoutChangingContentOffset(_ update: () -> Void) {
+        if isScrolling {
+            setContentOffset(contentOffset, animated: false)
+        }
+        
+        let beforeContentSize = contentSize
+        
+        update()
+        
+        let afterContentSize = contentSize
+        
+        var deltaX = contentOffset.x + (afterContentSize.width - beforeContentSize.width)
+        var deltaY = contentOffset.y + (afterContentSize.height - beforeContentSize.height)
+        
+        deltaX = beforeContentSize.width == 0 ? 0 : max(0, deltaX)
+        deltaY = beforeContentSize.height == 0 ? 0 : max(0, deltaY)
+        
+        let newOffset = CGPoint(
+            x: contentOffset.x + deltaX,
+            y: contentOffset.y + deltaY
+        )
+        
+        if contentOffset != newOffset {
+            setContentOffset(newOffset, animated: true)
         }
     }
 }
@@ -146,36 +268,42 @@ final class _UIRefreshControl: UIRefreshControl {
             lastContentInset = superview.contentInset
             lastContentOffset = superview.contentOffset
         }
-
+        
         super.beginRefreshing()
     }
     
-    func beginRefreshingWithoutUserInput() {
+    func beginRefreshingWithoutUserInput(adjustContentOffset: Bool) {
         beginRefreshing()
         
         isRefreshingWithoutUserInteraction = true
         
         if let superview = superview as? UIScrollView {
-            superview.setContentOffset(CGPoint(x: 0, y: superview.contentOffset.y - frame.height), animated: true)
+            if adjustContentOffset {
+                superview.setContentOffset(CGPoint(x: 0, y: superview.contentOffset.y - frame.height), animated: true)
+            } else {
+                self.lastContentOffset = nil
+            }
         }
         
         sendActions(for: .valueChanged)
     }
     
     override func endRefreshing() {
-        super.endRefreshing()
-        
-        if isRefreshingWithoutUserInteraction {
+        defer {
             isRefreshingWithoutUserInteraction = false
         }
+        
+        super.endRefreshing()
         
         if let superview = superview as? UIScrollView {
             if let lastContentInset = lastContentInset, superview.contentInset != lastContentInset {
                 superview.contentInset = lastContentInset
             }
             
-            if let lastContentOffset = lastContentOffset {
+            if let lastContentOffset = lastContentOffset, isRefreshingWithoutUserInteraction {
                 superview.setContentOffset(lastContentOffset, animated: true)
+                
+                self.lastContentOffset = nil
             }
         }
     }
@@ -198,7 +326,11 @@ extension EnvironmentValues {
     
     var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
         get {
-            self[_ScrollViewConfiguration]
+            var result = self[_ScrollViewConfiguration]
+            
+            result.update(from: self)
+            
+            return result
         } set {
             self[_ScrollViewConfiguration] = newValue
         }

@@ -271,6 +271,12 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    /// Sets the collection view's scroll content-offset behavior.
+    public func scrollContentOffsetBehavior(_ contentOffsetBehavior: ScrollContentOffsetBehavior) -> Self {
+        then({ $0._scrollViewConfiguration.contentOffsetBehavior = contentOffsetBehavior })
+    }
+    
+    /// Performs an action upon scroll content-offset change.
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0._scrollViewConfiguration.onOffsetChange = body })
     }

@@ -10,6 +10,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
     
     @Environment(\.presentationManager) var presentationManager
     
+    let info: Binding<[UIImagePickerController.InfoKey: Any]?>?
     let image: Binding<AppKitOrUIKitImage?>?
     let data: Binding<Data?>?
 
@@ -78,10 +79,22 @@ public struct ImagePicker: UIViewControllerRepresentable {
 
 extension ImagePicker {
     public init(
+        info: Binding<[UIImagePickerController.InfoKey: Any]?>,
+        onCancel: (() -> Void)? = nil
+    ) {
+        self.info = info
+        self.image = nil
+        self.data = nil
+        self.encoding = nil
+        self.onCancel = onCancel
+    }
+
+    public init(
         image: Binding<AppKitOrUIKitImage?>,
         encoding: Image.Encoding? = nil,
         onCancel: (() -> Void)? = nil
     ) {
+        self.info = nil
         self.image = image
         self.data = nil
         self.encoding = encoding
@@ -93,6 +106,7 @@ extension ImagePicker {
         encoding: Image.Encoding? = nil,
         onCancel: (() -> Void)? = nil
     ) {
+        self.info = nil
         self.image = nil
         self.data = data
         self.encoding = encoding

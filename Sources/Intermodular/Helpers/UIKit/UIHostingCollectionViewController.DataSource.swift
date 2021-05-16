@@ -2,10 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 import Swift
 import SwiftUI
-
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIHostingCollectionViewController {
     public enum DataSource: CustomStringConvertible {
@@ -177,9 +177,13 @@ extension UIHostingCollectionViewController {
             newValue?.reset(
                 _internalDataSource,
                 withConfiguration: dataSourceConfiguration,
-                animatingDifferences: _animateDataSourceDifferences
+                animatingDifferences: false
             )
             
+            if _scrollViewConfiguration.initialContentAlignment == .bottom {
+                scrollToLast(animated: false)
+            }
+
             return
         }
         
@@ -188,7 +192,9 @@ extension UIHostingCollectionViewController {
             
             snapshot.deleteAllItems()
             
-            _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+            maintainScrollContentOffsetBehavior {
+                _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+            }
             
             return
         }
@@ -236,11 +242,13 @@ extension UIHostingCollectionViewController {
                 )
                 
                 if !itemDifferencesApplied {
-                    newValue?.reset(
-                        _internalDataSource,
-                        withConfiguration: dataSourceConfiguration,
-                        animatingDifferences: _animateDataSourceDifferences
-                    )
+                    maintainScrollContentOffsetBehavior {
+                        newValue?.reset(
+                            _internalDataSource,
+                            withConfiguration: dataSourceConfiguration,
+                            animatingDifferences: _animateDataSourceDifferences
+                        )
+                    }
                 }
                 
                 hasDataSourceChanged = true
@@ -250,7 +258,19 @@ extension UIHostingCollectionViewController {
         if hasDataSourceChanged {
             cache.invalidate()
             
-            _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+            maintainScrollContentOffsetBehavior {
+                _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
+            }
+        }
+    }
+    
+    func maintainScrollContentOffsetBehavior(_ update: () -> Void) {
+        if _scrollViewConfiguration.contentOffsetBehavior.contains(.maintainOnChangeOfContentSize) {
+            collectionView.updateContentSizeWithoutChangingContentOffset {
+                update()
+            }
+        } else {
+            update()
         }
     }
 }

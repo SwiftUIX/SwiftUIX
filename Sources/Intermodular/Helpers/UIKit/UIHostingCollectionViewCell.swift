@@ -19,7 +19,7 @@ extension UIHostingCollectionViewCell {
         let itemIdentifier: ItemIdentifierType
         let sectionIdentifier: SectionIdentifierType
         let indexPath: IndexPath
-        let viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
+        var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
         let maximumSize: OptionalDimensions?
         
         var id: ID {
@@ -461,7 +461,7 @@ extension UIHostingCollectionViewCell {
             )
         }
         
-        func move(toParent parent: _opaque_UIHostingCollectionViewController?, ofCell cell: UIHostingCollectionViewCell) {
+        func move(toParent parent: ParentViewControllerType?, ofCell cell: UIHostingCollectionViewCell) {
             if let parent = parent {
                 if let existingParent = self.parent, existingParent !== parent {
                     move(toParent: nil, ofCell: cell)
@@ -497,7 +497,10 @@ extension UIHostingCollectionViewCell {
             }
         }
         
-        func update(disableAnimation: Bool = true, forced: Bool = false) {
+        func update(
+            disableAnimation: Bool = true,
+            forced: Bool = false
+        ) {
             guard let base = base else {
                 return
             }

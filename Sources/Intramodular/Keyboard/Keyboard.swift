@@ -17,6 +17,7 @@ public final class Keyboard: ObservableObject {
     public static let main = Keyboard()
     
     @Published public var state: State = .default
+    @Published public private(set) var isShown: Bool = false
     
     /// A Boolean value that determines whether the keyboard is showing on-screen.
     public var isShowing: Bool {
@@ -25,6 +26,9 @@ public final class Keyboard: ObservableObject {
     
     private var keyboardWillChangeFrameSubscription: AnyCancellable?
     private var keyboardDidChangeFrameSubscription: AnyCancellable?
+    private var keyboardWillShowSubscription: AnyCancellable?
+    private var keyboardDidShowSubscription: AnyCancellable?
+    private var keyboardWillHideSubscription: AnyCancellable?
     private var keyboardDidHideSubscription: AnyCancellable?
     
     public init(notificationCenter: NotificationCenter = .default) {
@@ -41,9 +45,27 @@ public final class Keyboard: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
         
+        self.keyboardWillShowSubscription = notificationCenter
+            .publisher(for: UIResponder.keyboardWillShowNotification)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { _ in self.objectWillChange.send() })
+        
+        self.keyboardDidShowSubscription = notificationCenter
+            .publisher(for: UIResponder.keyboardDidShowNotification)
+            .compactMap({ Keyboard.State(notification: $0, screen: .main) })
+            .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { _ in self.isShown = true })
+            .assign(to: \.state, on: self)
+        
+        self.keyboardWillHideSubscription = notificationCenter
+            .publisher(for: UIResponder.keyboardWillHideNotification)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { _ in self.objectWillChange.send() })
+        
         self.keyboardDidHideSubscription = notificationCenter
             .publisher(for: UIResponder.keyboardDidHideNotification)
             .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { _ in self.isShown = false })
             .map({ _ in .init() })
             .assign(to: \.state, on: self)
         #endif
@@ -120,73 +142,33 @@ extension Keyboard {
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
-struct HiddenIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard = .main
-    
-    func body(content: Content) -> some View {
-        content.hidden(keyboard.isShowing)
-    }
-}
-
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
-struct VisibleIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard = .main
-    
-    func body(content: Content) -> some View {
-        content.hidden(!keyboard.isShowing)
-    }
-}
-
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
-struct RemoveIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard = .main
-    
-    func body(content: Content) -> some View {
-        content.frame(
-            width: keyboard.isShowing ? 0 : nil,
-            height: keyboard.isShowing ? 0 : nil,
-            alignment: .center
-        ).clipped()
-    }
-}
-
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
-struct AddIfKeyboardActive: ViewModifier {
-    @ObservedObject var keyboard: Keyboard = .main
-    
-    func body(content: Content) -> some View {
-        content.frame(
-            width: keyboard.isShowing ? nil : 0,
-            height: keyboard.isShowing ? nil : 0,
-            alignment: .center
-        ).clipped()
-    }
-}
-
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
 extension View {
     public func hiddenIfKeyboardActive() -> some View {
-        modifier(HiddenIfKeyboardActive())
+        withInlineObservedObject(Keyboard.main) { keyboard in
+            self.hidden(keyboard.isShowing)
+        }
     }
     
     public func visibleIfKeyboardActive() -> some View {
-        modifier(VisibleIfKeyboardActive())
+        withInlineObservedObject(Keyboard.main) { keyboard in
+            self.visible(keyboard.isShowing)
+        }
     }
     
     public func removeIfKeyboardActive() -> some View {
-        modifier(RemoveIfKeyboardActive())
+        withInlineObservedObject(Keyboard.main) { keyboard in
+            if !keyboard.isShowing {
+                self
+            }
+        }
     }
     
     public func addIfKeyboardActive() -> some View {
-        modifier(AddIfKeyboardActive())
+        withInlineObservedObject(Keyboard.main) { keyboard in
+            if keyboard.isShowing {
+                self
+            }
+        }
     }
 }
 

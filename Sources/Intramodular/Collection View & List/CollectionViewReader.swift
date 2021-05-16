@@ -8,80 +8,111 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
+    var collectionViewContentSize: CGSize { get }
+    var maximumCollectionViewCellSize: OptionalDimensions { get }
+    
+    func invalidateLayout()
+    
+    func scrollToTop(anchor: UnitPoint?, animated: Bool)
+    func scrollToLast(anchor: UnitPoint?, animated: Bool)
+    
+    func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
+    func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint?)
+    func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint?)
+    
+    func select<ID: Hashable>(_ id: ID, anchor: UnitPoint?)
+    func select<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint?)
+    func select<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint?)
+    
+    func selectNextItem(anchor: UnitPoint?)
+    func selectPreviousItem(anchor: UnitPoint?)
+    
+    func deselect<ID: Hashable>(_ id: ID)
+    
+    func selection<ID: Hashable>(for id: ID) -> Binding<Bool>
+}
+
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CollectionViewProxy {
-    private let _hostingCollectionViewController: WeakReferenceBox<AnyObject>
+    private let _baseBox: WeakReferenceBox<AnyObject>
     
-    var hostingCollectionViewController: _opaque_UIHostingCollectionViewController? {
+    var base: _CollectionViewProxyBase? {
         get {
-            _hostingCollectionViewController.value as? _opaque_UIHostingCollectionViewController
+            _baseBox.value as? _CollectionViewProxyBase
         } set {
-            _hostingCollectionViewController.value = newValue
+            _baseBox.value = newValue
         }
     }
     
     public var contentSize: CGSize {
-        hostingCollectionViewController?.collectionViewContentSize ?? .zero
+        base?.collectionViewContentSize ?? .zero
     }
     
     public var maximumCellSize: OptionalDimensions {
-        hostingCollectionViewController?.maximumCollectionViewCellSize ?? nil
+        base?.maximumCollectionViewCellSize ?? nil
     }
     
-    init(_ base: _opaque_UIHostingCollectionViewController? = nil) {
-        self._hostingCollectionViewController = .init(base)
+    init(_ base: _CollectionViewProxyBase? = nil) {
+        self._baseBox = .init(base)
     }
     
     public func invalidateLayout() {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.invalidateLayout()
+        base?.invalidateLayout()
     }
     
     public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.scrollToTop(anchor: anchor, animated: animated)
+        base?.scrollToTop(anchor: anchor, animated: animated)
+    }
+    
+    public func scrollToLast(anchor: UnitPoint? = nil, animated: Bool = true) {
+        _assertResolutionOfCollectionView()
+        
+        base?.scrollToLast(anchor: anchor, animated: animated)
     }
     
     public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.scrollTo(id, anchor: anchor)
+        base?.scrollTo(id, anchor: anchor)
     }
     
     public func selection<ID: Hashable>(for id: ID) -> Binding<Bool> {
         _assertResolutionOfCollectionView()
         
-        return hostingCollectionViewController?.selection(for: id) ?? .constant(false)
+        return base?.selection(for: id) ?? .constant(false)
     }
     
     public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.select(id, anchor: anchor)
+        base?.select(id, anchor: anchor)
     }
     
     public func selectNextItem(anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.selectNextItem(anchor: anchor)
+        base?.selectNextItem(anchor: anchor)
     }
     
     public func selectPreviousItem(anchor: UnitPoint? = nil) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.selectPreviousItem(anchor: anchor)
+        base?.selectPreviousItem(anchor: anchor)
     }
     
     public func deselect<ID: Hashable>(_ id: ID) {
         _assertResolutionOfCollectionView()
         
-        hostingCollectionViewController?.deselect(id)
+        base?.deselect(id)
     }
     
     private func _assertResolutionOfCollectionView() {
-        // assert(hostingCollectionViewController != nil, "CollectionViewProxy couldn't resolve a collection view")
+        // assert(base != nil, "CollectionViewProxy couldn't resolve a collection view")
     }
 }
 

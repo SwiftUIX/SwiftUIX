@@ -99,9 +99,9 @@ struct _CollectionView<
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         populateCollectionViewProxy: do {
             if let _collectionViewProxy = context.environment._collectionViewProxy {
-                if _collectionViewProxy.wrappedValue.hostingCollectionViewController !== uiViewController {
+                if _collectionViewProxy.wrappedValue.base !== uiViewController {
                     DispatchQueue.main.async {
-                        _collectionViewProxy.wrappedValue.hostingCollectionViewController = uiViewController
+                        _collectionViewProxy.wrappedValue.base = uiViewController
                     }
                 }
             }
@@ -117,15 +117,16 @@ struct _CollectionView<
                 uiViewController.collectionViewLayout = collectionViewLayout
             }
         }
-
+        
+        uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
         uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
         uiViewController.dataSourceConfiguration = dataSourceConfiguration
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
-
+        
         uiViewController.dataSource = dataSource
-
+        
         uiViewController.refreshVisibleCellsAndSupplementaryViews()
     }
 }

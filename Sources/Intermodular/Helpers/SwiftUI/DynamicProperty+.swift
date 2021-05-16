@@ -23,6 +23,24 @@ private struct WithInlineState<Value, Content: View>: View {
     }
 }
 
+private struct WithInlineObservedObject<Object: ObservableObject, Content: View>: View {
+    @ObservedObject var object: Object
+    
+    let content: (Object) -> Content
+    
+    init(
+        _ object: Object,
+        @ViewBuilder content: @escaping (Object) -> Content
+    ) {
+        self._object = .init(wrappedValue: object)
+        self.content = content
+    }
+    
+    var body: some View {
+        content(object)
+    }
+}
+
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 private struct WithInlineStateObject<Object: ObservableObject, Content: View>: View {
     @StateObject var object: Object
@@ -47,6 +65,13 @@ public func withInlineState<Value, Content: View>(
     @ViewBuilder content: @escaping (Binding<Value>) -> Content
 ) -> some View {
     WithInlineState(initialValue: initialValue, content: content)
+}
+
+public func withInlineObservedObject<Object: ObservableObject, Content: View>(
+    _ object: @autoclosure @escaping () -> Object,
+    @ViewBuilder content: @escaping (Object) -> Content
+) -> some View {
+    WithInlineObservedObject(object(), content: content)
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)

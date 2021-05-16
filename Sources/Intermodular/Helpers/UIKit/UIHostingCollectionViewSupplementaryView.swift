@@ -223,7 +223,7 @@ extension UIHostingCollectionViewSupplementaryView {
         }
         
         func move(
-            toParent parent: _opaque_UIHostingCollectionViewController?,
+            toParent parent: ParentViewControllerType?,
             ofSupplementaryView supplementaryView: UIHostingCollectionViewSupplementaryView
         ) {
             if let parent = parent {
