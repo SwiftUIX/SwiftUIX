@@ -7,6 +7,8 @@ import SwiftUI
 
 /// A model suitable for representing sections of a list.
 public struct ListSection<SectionType, ItemType> {
+    public typealias Items = AnyRandomAccessCollection<ItemType>
+    
     private let _model: SectionType?
     
     public var model: SectionType {

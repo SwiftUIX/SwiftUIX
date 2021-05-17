@@ -55,7 +55,7 @@ extension CollectionView {
                 CollectionOfOne(ListSection(0, items: data.lazy.map(_IdentifierHashedValue.init))),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
-                rowContent: { rowContent($0.value) }
+                rowContent: { rowContent($1.value) }
             )
             .eraseToAnyView()
         )
@@ -71,7 +71,7 @@ extension CollectionView {
                 CollectionOfOne(ListSection(0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
-                rowContent: { rowContent($0.value.value) }
+                rowContent: { rowContent($1.value.value) }
             )
             .eraseToAnyView()
         )
@@ -79,6 +79,30 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    public init<
+        Data: RandomAccessCollection,
+        SectionType: Identifiable,
+        ItemType: Identifiable,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ data: Data,
+        @ViewBuilder rowContent: @escaping (SectionType, ListSection<SectionType, ItemType>.Items) -> Section<Header, ForEach<Data.Element.Items, ItemType.ID, RowContent>, Footer>
+    ) where Data.Element == ListSection<SectionType, ItemType> {
+        self.init(
+            internalBody: _CollectionView(
+                data.lazy.map { section in
+                    ListSection(section, items: section.items)
+                },
+                sectionHeader: { rowContent($0.model, $0.items).header },
+                sectionFooter: { rowContent($0.model, $0.items).footer },
+                rowContent: { rowContent($0.model, $0.items).content.content($1) }
+            )
+            .eraseToAnyView()
+        )
+    }
+
     public init<
         Data: RandomAccessCollection,
         ID: Hashable,
@@ -344,7 +368,7 @@ extension CollectionView {
 
 // MARK: - Auxiliary Implementation -
 
-fileprivate struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: Hashable>: Hashable, Identifiable {
+struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: Hashable>: Hashable, Identifiable {
     let item: Item
     let section: SectionID
     
@@ -362,7 +386,7 @@ fileprivate struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: H
     }
 }
 
-fileprivate struct _IdentifierHashedValue<Value: Identifiable>: CustomStringConvertible, Hashable, Identifiable {
+struct _IdentifierHashedValue<Value: Identifiable>: CustomStringConvertible, Hashable, Identifiable {
     let value: Value
     
     var description: String {

@@ -13,19 +13,29 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
     }
     
     var maximumCollectionViewCellSize: OptionalDimensions {
+        var baseContentSize = collectionView.contentSize
+        
+        if let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            if collectionViewLayout.scrollDirection == .vertical {
+                if baseContentSize.width == 0, collectionView.frame.width > 0 {
+                    baseContentSize.width = collectionView.frame.width - collectionView.contentInset.horizontal
+                }
+            } else if collectionViewLayout.scrollDirection == .horizontal {
+                if baseContentSize.height == 0, collectionView.frame.height > 0 {
+                    baseContentSize.height = collectionView.frame.height - collectionView.contentInset.vertical
+                }
+            }
+        }
+        
         let contentSize = CGSize(
-            width: collectionView.contentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
-            height: collectionView.contentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
+            width: baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
+            height: baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
         )
         
         var result = OptionalDimensions(
             width: max(floor(contentSize.width - 0.001), 0),
             height: max(floor(contentSize.height - 0.001), 0)
         )
-        
-        guard result.width != 0 || result.height != 0 else {
-            return nil
-        }
         
         if result.width == 0 {
             result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
@@ -59,7 +69,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             item: collectionView.numberOfItems(inSection: lastSection) - 1,
             section: lastSection
         )
-            
+        
         if collectionView.contentSize.minimumDimensionLength == 0 {
             let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
             

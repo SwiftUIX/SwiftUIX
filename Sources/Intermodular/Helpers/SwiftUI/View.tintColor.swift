@@ -24,7 +24,7 @@ extension EnvironmentValues {
 extension View {
     /// Sets the tint color of the elements displayed by this view.
     @inlinable
-    public func tintColor(_ color: Color) -> some View {
+    public func tintColor(_ color: Color?) -> some View {
         environment(\.tintColor, color)
     }
 }

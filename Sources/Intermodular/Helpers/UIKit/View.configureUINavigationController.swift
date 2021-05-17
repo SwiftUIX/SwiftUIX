@@ -20,8 +20,15 @@ extension View {
                 
                 configure(navigationController)
             }
+        } onAppear: { viewController in
+            DispatchQueue.main.async {
+                guard let navigationController = viewController.navigationController else {
+                    return
+                }
+                
+                configure(navigationController)
+            }
         }
-//        .allowsHitTesting(false)
     }
     
     @inlinable
@@ -49,7 +56,7 @@ extension View {
             navigationBar.barTintColor = color.toUIColor()
         }
     }
-
+    
     /// Configures the translucency of the navigation bar for this view.
     ///
     /// This modifier only takes effect when this view is inside of and visible
