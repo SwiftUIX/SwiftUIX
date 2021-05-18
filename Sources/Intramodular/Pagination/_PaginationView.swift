@@ -302,7 +302,7 @@ extension _PaginationView {
                 assertionFailure("Could not resolve a pagination view")
                 return
             }
-
+            
             guard
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,

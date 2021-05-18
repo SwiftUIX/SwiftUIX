@@ -7,10 +7,12 @@ import SwiftUI
 
 extension Transaction {
     public var isAnimated: Bool {
-        guard !disablesAnimations else {
+        if _areAnimationsDisabled {
             return false
+        } else if disablesAnimations {
+            return false
+        } else {
+            return true
         }
-        
-        return true
     }
 }

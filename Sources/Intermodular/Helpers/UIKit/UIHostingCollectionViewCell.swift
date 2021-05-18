@@ -191,6 +191,16 @@ class UIHostingCollectionViewCell<
     }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        var targetSize = targetSize
+        
+        if let maximumSize = configuration?.maximumSize, let dimensions = content._precomputedDimensionsThatFit(in: maximumSize) {
+            if let size = CGSize(dimensions), size.fits(targetSize) {
+                return size
+            } else {
+                targetSize = CGSize(dimensions, default: targetSize).clamping(to: maximumSize)
+            }
+        }
+        
         guard let contentHostingController = contentHostingController else {
             return .init(width: 1, height: 1)
         }
@@ -203,6 +213,16 @@ class UIHostingCollectionViewCell<
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
+        var targetSize = targetSize
+        
+        if let maximumSize = configuration?.maximumSize, let dimensions = content._precomputedDimensionsThatFit(in: maximumSize) {
+            if let size = CGSize(dimensions), size.fits(targetSize) {
+                return size
+            } else {
+                targetSize = CGSize(dimensions, default: targetSize).clamping(to: maximumSize)
+            }
+        }
+        
         guard let contentHostingController = contentHostingController else {
             return .init(width: 1, height: 1)
         }
@@ -235,7 +255,7 @@ class UIHostingCollectionViewCell<
             
             return layoutAttributes
         } else if let relativeFrame = preferences.relativeFrame {
-            let size = relativeFrame.resolve(in: layoutAttributes.size)
+            let size = relativeFrame.sizeThatFits(in: layoutAttributes.size)
             
             layoutAttributes.size = size
             
@@ -255,11 +275,11 @@ class UIHostingCollectionViewCell<
             }
             
             updateCollectionCache()
-
+            
             return result
         }
     }
-
+    
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
@@ -268,7 +288,7 @@ class UIHostingCollectionViewCell<
         }
         
         if layoutAttributes.size != contentHostingController.view.frame.size {
-            self.cache.preferredContentSize = relativeFrame.resolve(in: layoutAttributes.size)
+            self.cache.preferredContentSize = relativeFrame.sizeThatFits(in: layoutAttributes.size)
             
             contentHostingController.update(disableAnimation: true, forced: true)
         }
@@ -336,7 +356,7 @@ extension UIHostingCollectionViewCell {
 extension UIHostingCollectionViewCell: _CellProxyBase {
     public func invalidateLayout() {
         cache.contentSize = nil
-    
+        
         updateCollectionCache()
         
         parentViewController?.invalidateLayout()
@@ -472,13 +492,13 @@ extension UIHostingCollectionViewCell {
                         let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
                         
                         rootView._collectionViewProxy = .init(parent)
-
+                        
                         self.willMove(toParent: parent)
                         parent.addChild(self)
                         cell.contentView.addSubview(view)
                         view.frame = cell.contentView.bounds
                         didMove(toParent: parent)
-                                                
+                        
                         if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
                             navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
                         }
@@ -489,7 +509,7 @@ extension UIHostingCollectionViewCell {
             } else {
                 withoutAnimation {
                     rootView._collectionViewProxy = .init()
-
+                    
                     willMove(toParent: nil)
                     view.removeFromSuperview()
                     removeFromParent()

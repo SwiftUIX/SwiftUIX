@@ -162,7 +162,7 @@ extension _CollectionView {
             rowContent: rowContent
         )
     }
-
+    
     init(
         _ dataSource: UIViewControllerType.DataSource,
         sectionHeader: @escaping (SectionType) -> SectionHeader,

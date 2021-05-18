@@ -51,13 +51,24 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
         self.height = .width(multipliedBy: height)
     }
     
-    public func resolve(in size: CGSize) -> CGSize {
+    @inlinable
+    public func dimensionsThatFit(in size: OptionalDimensions) -> OptionalDimensions {
         .init(
-            width: width?.resolve(for: .width, in: size) ?? size.width,
-            height: height?.resolve(for: .height, in: size) ?? size.height
+            width:  width?.resolve(for: .width, in: size),
+            height: height?.resolve(for: .height, in: size)
         )
     }
     
+    @inlinable
+    public func dimensionsThatFit(in size: CGSize) -> OptionalDimensions {
+        dimensionsThatFit(in: .init(size))
+    }
+    
+    @usableFromInline
+    func sizeThatFits(in size: CGSize) -> CGSize {
+        .init(dimensionsThatFit(in: size), default: size)
+    }
+
     public func id(_ id: AnyHashable?) -> Self {
         var result = self
         
@@ -91,12 +102,12 @@ public enum RelativeFrameDimension: Hashable {
             self.constant = constant
         }
         
-        func resolve(in size: CGSize) -> CGFloat {
+        func resolve(in dimensions: OptionalDimensions) -> CGFloat? {
             switch dimension {
                 case .width:
-                    return (size.width * multiplier) + constant
+                    return dimensions.width.map({ ($0 * multiplier) + constant })
                 case .height:
-                    return (size.height * multiplier) + constant
+                    return dimensions.height.map({ ($0 * multiplier) + constant })
             }
         }
     }
@@ -104,12 +115,16 @@ public enum RelativeFrameDimension: Hashable {
     case absolute(CGFloat)
     case fractional(FractionalValue)
     
-    func resolve(for dimensionType: FrameGroup.DimensionType, in size: CGSize) -> CGFloat {
+    @usableFromInline
+    func resolve(
+        for dimensionType: FrameGroup.DimensionType,
+        in dimensions: OptionalDimensions
+    ) -> CGFloat? {
         switch self {
             case .absolute(let value):
                 return value
             case .fractional(let value):
-                return value.resolve(in: size)
+                return value.resolve(in: dimensions)
         }
     }
     
@@ -176,11 +191,14 @@ extension EnvironmentValues {
     }
 }
 
-public struct RelativeFrameModifier: ViewModifier {
+@usableFromInline
+struct RelativeFrameModifier: _opaque_FrameModifier, ViewModifier {
     @Environment(\._relativeFrameResolvedValues) var _relativeFrameResolvedValues
     
+    @usableFromInline
     let frame: RelativeFrame
     
+    @usableFromInline
     @State var id: AnyHashable = UUID()
     
     var resolvedDimensions: OptionalDimensions {
@@ -193,6 +211,11 @@ public struct RelativeFrameModifier: ViewModifier {
         content
             .preference(key: RelativeFrame.PreferenceKey.self, value: [frame.id(id)])
             .frame(resolvedDimensions)
+    }
+    
+    @usableFromInline
+    func dimensionsThatFit(in dimensions: OptionalDimensions) -> OptionalDimensions {
+        frame.dimensionsThatFit(in: dimensions)
     }
 }
 

@@ -5,19 +5,23 @@
 import Swift
 import SwiftUI
 
+@_frozen
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     public var width: CGFloat?
     public var height: CGFloat?
     
+    @inlinable
     public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
     }
     
+    @inlinable
     public init(_ size: CGSize) {
         self.init(width: size.width, height: size.height)
     }
     
+    @inlinable
     public init(_ size: CGSize?) {
         if let size = size {
             self.init(size)
@@ -26,10 +30,12 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
         }
     }
     
+    @inlinable
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
     }
     
+    @inlinable
     public init() {
         
     }
@@ -144,6 +150,17 @@ extension CGSize {
         self.init(
             width: dimensions.width ?? `default`.width,
             height: dimensions.height ?? `default`.height
+        )
+    }
+    
+    public init?(_ dimensions: OptionalDimensions) {
+        guard let width = dimensions.width, let height = dimensions.height else {
+            return nil
+        }
+        
+        self.init(
+            width: width,
+            height: height
         )
     }
     

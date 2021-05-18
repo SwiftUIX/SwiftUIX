@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {
+public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {    
     func sizeThatFits(in _: CGSize) -> CGSize
 }
 

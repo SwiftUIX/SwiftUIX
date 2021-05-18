@@ -28,9 +28,10 @@ extension View {
     @_disfavoredOverload
     @inlinable
     public func background<Background: View>(
+        alignment: Alignment = .center,
         @ViewBuilder _ background: () -> Background
     ) -> some View {
-        self.background(background())
+        self.background(background(), alignment: alignment)
     }
     
     @_disfavoredOverload

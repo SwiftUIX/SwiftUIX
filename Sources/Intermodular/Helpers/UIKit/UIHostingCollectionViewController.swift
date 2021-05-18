@@ -235,6 +235,8 @@ public final class UIHostingCollectionViewController<
                 }
             }
         }
+        
+        preferredContentSize = collectionView.collectionViewLayout.collectionViewContentSize
     }
     
     override public func viewSafeAreaInsetsDidChange()  {

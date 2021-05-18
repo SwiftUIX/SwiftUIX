@@ -56,28 +56,40 @@ extension CGSize {
                 break
         }
     }
+    
+    func fits(_ other: CGSize) -> Bool {
+        guard width <= other.width else {
+            return false
+        }
+        
+        guard height <= other.height else {
+            return false
+        }
+        
+        return true
+    }
 }
 
 extension CGSize {
-    public static func * (lhs: Self, rhs: CGFloat) -> Self {
+    static func * (lhs: Self, rhs: CGFloat) -> Self {
         .init(
             width: lhs.width * rhs,
             height: lhs.height * rhs
         )
     }
     
-    public static func *= (lhs: inout Self, rhs: CGFloat) {
+    static func *= (lhs: inout Self, rhs: CGFloat) {
         lhs = lhs * rhs
     }
     
-    public static func / (lhs: Self, rhs: CGFloat) -> Self {
+    static func / (lhs: Self, rhs: CGFloat) -> Self {
         .init(
             width: lhs.width / rhs,
             height: lhs.height / rhs
         )
     }
     
-    public static func /= (lhs: inout Self, rhs: CGFloat) {
+    static func /= (lhs: inout Self, rhs: CGFloat) {
         lhs = lhs / rhs
     }
 }

@@ -192,7 +192,7 @@ extension UIHostingCollectionViewSupplementaryView {
             super.init(mainView: nil)
             
             view.backgroundColor = nil
-
+            
             update()
         }
         
@@ -261,7 +261,7 @@ extension UIHostingCollectionViewSupplementaryView {
             }
             
             if disableAnimation {
-                withAnimation(nil) {
+                withoutAnimation {
                     mainView = .init(base: base)
                 }
             } else {
@@ -271,6 +271,7 @@ extension UIHostingCollectionViewSupplementaryView {
             if forced {
                 view.setNeedsLayout()
                 view.setNeedsDisplay()
+                view.layoutIfNeeded()
             }
         }
     }

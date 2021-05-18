@@ -28,4 +28,11 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     }
 }
 
+extension CocoaHostingControllerContent: _opaque_FrameModifiedContent where Content: _opaque_FrameModifiedContent {
+    @usableFromInline
+    var _opaque_frameModifier: _opaque_FrameModifier {
+        content._opaque_frameModifier
+    }
+}
+
 #endif
