@@ -19,6 +19,8 @@ struct _CollectionViewConfiguration {
     #endif
     @usableFromInline
     var isDragActive: Binding<Bool>? = nil
+    @usableFromInline
+    var _ignorePreferredCellLayoutAttributes: Bool = false
 }
 
 // MARK: - Auxiliary Implementation -

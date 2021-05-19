@@ -268,15 +268,19 @@ class UIHostingCollectionViewCell<
             
             return layoutAttributes
         } else {
-            let result = super.preferredLayoutAttributesFitting(layoutAttributes)
-            
-            if result.size != bounds.size {
-                cache.preferredContentSize = result.size
+            if !(parentViewController?.configuration._ignorePreferredCellLayoutAttributes ?? false) {
+                let result = super.preferredLayoutAttributesFitting(layoutAttributes)
+                
+                if result.size != bounds.size {
+                    cache.preferredContentSize = result.size
+                }
+                
+                updateCollectionCache()
+                
+                return result
+            } else {
+                return layoutAttributes
             }
-            
-            updateCollectionCache()
-            
-            return result
         }
     }
     

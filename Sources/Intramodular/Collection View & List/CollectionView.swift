@@ -364,6 +364,12 @@ extension CollectionView {
     }
 }
 
+extension CollectionView {
+    public func _ignorePreferredCellLayoutAttributes() -> Self {
+        then({ $0._collectionViewConfiguration._ignorePreferredCellLayoutAttributes = true })
+    }
+}
+
 #endif
 
 // MARK: - Auxiliary Implementation -

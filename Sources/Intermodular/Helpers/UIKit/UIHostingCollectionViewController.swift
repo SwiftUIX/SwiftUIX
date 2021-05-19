@@ -236,7 +236,7 @@ public final class UIHostingCollectionViewController<
             }
         }
         
-        preferredContentSize = collectionView.collectionViewLayout.collectionViewContentSize
+        // preferredContentSize = collectionView.collectionViewLayout.collectionViewContentSize
     }
     
     override public func viewSafeAreaInsetsDidChange()  {
@@ -379,6 +379,16 @@ public final class UIHostingCollectionViewController<
             referenceSizeForHeaderOrFooterInSection: section,
             kind: UICollectionView.elementKindSectionFooter
         )
+    }
+    
+    // MARK: UIScrollViewDelegate
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        _scrollViewConfiguration.onOffsetChange(
+            scrollView.contentOffset(forContentType: AnyView.self)
+        )
+        
+        _scrollViewConfiguration.contentOffset?.wrappedValue = collectionView.contentOffset
     }
 }
 
