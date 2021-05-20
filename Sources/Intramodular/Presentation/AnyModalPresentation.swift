@@ -26,7 +26,7 @@ public struct AnyModalPresentation: Identifiable {
 }
 
 extension AnyModalPresentation {
-    public var presentationStyle: ModalPresentationStyle {
+    public var style: ModalPresentationStyle {
         content.modalPresentationStyle
     }
     

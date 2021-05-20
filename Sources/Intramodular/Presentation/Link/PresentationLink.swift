@@ -62,14 +62,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         PassthroughView {
             if let presenter = presenter,
                userInterfaceIdiom != .mac,
-               presentation.presentationStyle != .automatic
+               presentation.style != .automatic
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
-                if case .popover(_, _) = presentation.presentationStyle {
+                if case .popover(_, _) = presentation.style {
                     IntrinsicGeometryReader { proxy in
                         if presenter is CocoaPresentationCoordinator {
                             Button(
-                                action: { isPresented.wrappedValue.toggle() },
+                                action: togglePresentation,
                                 label: label
                             )
                             .preference(
@@ -84,7 +84,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             .modifier(_ResolveAppKitOrUIKitViewController())
                         } else {
                             Button(
-                                action: { isPresented.wrappedValue.toggle() },
+                                action: togglePresentation,
                                 label: label
                             )
                             .preference(
@@ -99,15 +99,15 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                         }
                     }
                 } else {
-                    Button(action: { presenter.present(presentation) }, label: label)
+                    Button(action: { presenter.presentOnTop(presentation) }, label: label)
                 }
                 #else
                 Button(action: { presenter.present(presentation) }, label: label)
                 #endif
-            } else if presentation.presentationStyle == .automatic {
+            } else if presentation.style == .automatic {
                 _sheetPresentationButton
             } else if
-                presentation.presentationStyle == .popover,
+                presentation.style == .popover,
                 userInterfaceIdiom == .pad || userInterfaceIdiom == .mac
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
@@ -125,7 +125,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             } else {
                 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
                 Button(
-                    action: { isPresented.wrappedValue.toggle() },
+                    action: togglePresentation,
                     label: label
                 )
                 .preference(
@@ -148,7 +148,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     private var _sheetPresentationButton: some View {
         Button(
-            action: { isPresented.wrappedValue.toggle() },
+            action: togglePresentation,
             label: label
         )
         .sheet(
@@ -156,6 +156,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             onDismiss: _onDismiss,
             content: { presentation.content }
         )
+    }
+    
+    private func togglePresentation() {
+        isPresented.wrappedValue.toggle()
     }
 }
 

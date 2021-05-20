@@ -70,6 +70,10 @@ extension DynamicViewPresenter {
     public func present(_ modal: AnyModalPresentation) {
         present(modal, completion: { })
     }
+    
+    public func presentOnTop(_ modal: AnyModalPresentation) {
+        topmostPresenter.present(modal, completion: { })
+    }
 
     public func present<Content: View>(@ViewBuilder content: () -> Content) {
         present(content())
