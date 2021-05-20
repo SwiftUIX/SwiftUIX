@@ -69,27 +69,3 @@ extension CGSize {
         return true
     }
 }
-
-extension CGSize {
-    static func * (lhs: Self, rhs: CGFloat) -> Self {
-        .init(
-            width: lhs.width * rhs,
-            height: lhs.height * rhs
-        )
-    }
-    
-    static func *= (lhs: inout Self, rhs: CGFloat) {
-        lhs = lhs * rhs
-    }
-    
-    static func / (lhs: Self, rhs: CGFloat) -> Self {
-        .init(
-            width: lhs.width / rhs,
-            height: lhs.height / rhs
-        )
-    }
-    
-    static func /= (lhs: inout Self, rhs: CGFloat) {
-        lhs = lhs / rhs
-    }
-}
