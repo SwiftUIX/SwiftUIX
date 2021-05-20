@@ -148,10 +148,12 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        configuration.onOffsetChange(
-            scrollView.contentOffset(forContentType: Content.self)
-        )
-        
+        if let onOffsetChange = configuration.onOffsetChange {
+            onOffsetChange(
+                scrollView.contentOffset(forContentType: Content.self)
+            )
+        }
+
         configuration.contentOffset?.wrappedValue = contentOffset
     }
     

@@ -184,8 +184,11 @@ class UIHostingCollectionViewCell<
         if let contentHostingController = contentHostingController {
             if contentHostingController.view.frame != contentView.bounds {
                 contentHostingController.view.frame = contentView.bounds
-                contentHostingController.view.setNeedsLayout()
-                contentHostingController.view.layoutIfNeeded()
+                
+                if contentHostingController.view.frame.rounded(.up) != contentView.bounds.rounded(.up) {
+                    contentHostingController.view.setNeedsLayout()
+                    contentHostingController.view.layoutIfNeeded()
+                }
             }
         }
     }

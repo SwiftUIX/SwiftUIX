@@ -226,13 +226,11 @@ public final class UIHostingCollectionViewController<
     override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        DispatchQueue.main.async {
-            if self._scrollViewConfiguration.initialContentAlignment == .bottom {
-                if !self.isInitialContentAlignmentSet {
-                    self.scrollToLast(animated: false)
-                    
-                    self.isInitialContentAlignmentSet = true
-                }
+        if self._scrollViewConfiguration.initialContentAlignment == .bottom {
+            if !self.isInitialContentAlignmentSet {
+                self.scrollToLast(animated: false)
+                
+                self.isInitialContentAlignmentSet = true
             }
         }
         
@@ -384,9 +382,11 @@ public final class UIHostingCollectionViewController<
     // MARK: UIScrollViewDelegate
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        _scrollViewConfiguration.onOffsetChange(
-            scrollView.contentOffset(forContentType: AnyView.self)
-        )
+        if let onOffsetChange = _scrollViewConfiguration.onOffsetChange {
+            onOffsetChange(
+                scrollView.contentOffset(forContentType: AnyView.self)
+            )
+        }
         
         _scrollViewConfiguration.contentOffset?.wrappedValue = collectionView.contentOffset
     }

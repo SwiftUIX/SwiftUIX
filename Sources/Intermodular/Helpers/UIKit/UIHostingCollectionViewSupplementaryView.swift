@@ -80,8 +80,11 @@ class UIHostingCollectionViewSupplementaryView<
         if let contentHostingController = contentHostingController {
             if contentHostingController.view.frame != bounds {
                 contentHostingController.view.frame = bounds
-                contentHostingController.view.setNeedsLayout()
-                contentHostingController.view.layoutIfNeeded()
+                
+                if contentHostingController.view.frame.rounded(.up) != bounds.rounded(.up) {
+                    contentHostingController.view.setNeedsLayout()
+                    contentHostingController.view.layoutIfNeeded()
+                }
             }
         }
     }

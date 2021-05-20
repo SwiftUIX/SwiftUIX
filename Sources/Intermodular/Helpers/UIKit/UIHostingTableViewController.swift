@@ -327,9 +327,11 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
             }
         }
         
-        scrollViewConfiguration.onOffsetChange(
-            scrollView.contentOffset(forContentType: AnyView.self)
-        )
+        if let onOffsetChange = scrollViewConfiguration.onOffsetChange {
+            onOffsetChange(
+                scrollView.contentOffset(forContentType: AnyView.self)
+            )
+        }
     }
     
     override public func tableView(

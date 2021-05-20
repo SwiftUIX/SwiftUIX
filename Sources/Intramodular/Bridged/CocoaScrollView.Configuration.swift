@@ -62,7 +62,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
         }
     }
     @usableFromInline
-    var onOffsetChange: (ScrollView<Content>.ContentOffset) -> () = { _ in } {
+    var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
         didSet {
             isVanilla = false
         }
