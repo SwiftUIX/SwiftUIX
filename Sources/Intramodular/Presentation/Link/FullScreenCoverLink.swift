@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 public struct FullScreenCoverLink<Destination: View, Label: View>: PresentationLinkView {
