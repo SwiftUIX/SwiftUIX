@@ -34,7 +34,7 @@ protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
 }
 
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
-public struct CollectionViewProxy {
+public struct CollectionViewProxy: Hashable {
     private let _baseBox: WeakReferenceBox<AnyObject>
     
     var base: _CollectionViewProxyBase? {
@@ -55,6 +55,10 @@ public struct CollectionViewProxy {
     
     init(_ base: _CollectionViewProxyBase? = nil) {
         self._baseBox = .init(base)
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(base?.hashValue)
     }
     
     public func invalidateLayout() {
@@ -113,6 +117,10 @@ public struct CollectionViewProxy {
     
     private func _assertResolutionOfCollectionView() {
         // assert(base != nil, "CollectionViewProxy couldn't resolve a collection view")
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.base === rhs.base
     }
 }
 

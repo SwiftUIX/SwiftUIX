@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
-protocol _opaque_UIHostingPageViewController: AnyObject {
+protocol _opaque_UIHostingPageViewController: NSObject {
     
 }
 
