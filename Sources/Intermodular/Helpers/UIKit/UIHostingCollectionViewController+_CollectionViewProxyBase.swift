@@ -39,7 +39,9 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         
         if result.width == 0 {
             result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
-        } else if result.height == 0 {
+        }
+        
+        if result.height == 0 {
             result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
         }
         

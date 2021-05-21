@@ -9,15 +9,13 @@ var _areAnimationsDisabled: Bool = false
 
 public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
-        body()
-        
-        return
+        return body()
     }
     
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    CATransaction.begin()
-    CATransaction.disableActions()
-    #endif
+    /*#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+     CATransaction.begin()
+     CATransaction.disableActions()
+     #endif*/
     
     _areAnimationsDisabled = true
     
@@ -29,7 +27,7 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
         _areAnimationsDisabled = false
     }
     
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    CATransaction.commit()
-    #endif
+    /*#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+     CATransaction.commit()
+     #endif*/
 }

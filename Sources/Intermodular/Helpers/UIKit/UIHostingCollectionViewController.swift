@@ -90,7 +90,11 @@ public final class UIHostingCollectionViewController<
         let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout._toUICollectionViewLayout())
         
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+        collectionView.backgroundColor = .clear
+        collectionView.backgroundView = UIView()
+        collectionView.backgroundView?.backgroundColor = .clear
+        collectionView.isPrefetchingEnabled = false
+
         view.addSubview(collectionView)
         
         collectionView.delegate = self
@@ -117,12 +121,7 @@ public final class UIHostingCollectionViewController<
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        collectionView.backgroundColor = .clear
-        collectionView.backgroundView = UIView()
-        collectionView.backgroundView?.backgroundColor = .clear
-        collectionView.contentInsetAdjustmentBehavior = .never
-        
+                
         collectionView.register(
             UICollectionViewCellType.self,
             forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier

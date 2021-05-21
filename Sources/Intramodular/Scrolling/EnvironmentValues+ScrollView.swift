@@ -5,6 +5,22 @@
 import SwiftUI
 
 extension EnvironmentValues {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    @available(tvOS, unavailable)
+    struct KeyboardDismissModeKey: EnvironmentKey {
+        static let defaultValue: UIScrollView.KeyboardDismissMode = .none
+    }
+    
+    @available(tvOS, unavailable)
+    public var keyboardDismissMode: UIScrollView.KeyboardDismissMode {
+        get {
+            self[KeyboardDismissModeKey]
+        } set {
+            self[KeyboardDismissModeKey] = newValue
+        }
+    }
+    #endif
+    
     private struct IsScrollEnabledEnvironmentKey: EnvironmentKey {
         static let defaultValue = true
     }
@@ -21,6 +37,14 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    /// Sets the keyboard dismiss mode for this view.
+    @available(tvOS, unavailable)
+    public func keyboardDismissMode(_ keyboardDismissMode: UIScrollView.KeyboardDismissMode) -> some View {
+        environment(\.keyboardDismissMode, keyboardDismissMode)
+    }
+    #endif
+    
     /// Adds a condition that controls whether users can scroll within this view.
     public func scrollDisabled(_ disabled: Bool) -> some View {
         environment(\.isScrollEnabled, !disabled)

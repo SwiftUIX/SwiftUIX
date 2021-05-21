@@ -373,18 +373,26 @@ extension UIHostingCollectionViewCell {
 
 // MARK: - Auxiliary Implementation -
 
-extension UIHostingCollectionViewCell: _CellProxyBase {
-    public func invalidateLayout() {
-        cache.contentSize = nil
-        
-        updateCollectionCache()
-        
-        parentViewController?.invalidateLayout()
-    }
-}
-
 extension UIHostingCollectionViewCell {
     private struct RootView: View {
+        struct _CellProxyBase: SwiftUIX._CellProxyBase {
+            weak var base: UIHostingCollectionViewCell?
+            
+            var globalFrame: CGRect {
+                base?.globalFrame ?? .zero
+            }
+            
+            func invalidateLayout() {
+                base?.cache.contentSize = nil
+                base?.updateCollectionCache()
+                base?.parentViewController?.invalidateLayout()
+            }
+            
+            func performWithAnimation(_ action: () -> ()) {
+                
+            }
+        }
+
         var _cellProxyBase: _CellProxyBase
         var _collectionViewProxy: CollectionViewProxy
         var content: Content
@@ -395,7 +403,7 @@ extension UIHostingCollectionViewCell {
         var updateCollectionCache: (() -> Void)
         
         init(base: UIHostingCollectionViewCell) {
-            _cellProxyBase = base
+            _cellProxyBase = _CellProxyBase(base: base)
             _collectionViewProxy = .init(base.parentViewController)
             content = base.content
             configuration = base.configuration
@@ -411,6 +419,7 @@ extension UIHostingCollectionViewCell {
         public var body: some View {
             if let configuration = configuration {
                 content
+                    .environment(\._cellProxy, .init(base: _cellProxyBase))
                     .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
                     .transformEnvironment(\._relativeFrameResolvedValues) { value in
                         guard let relativeFrameID = preferences.wrappedValue.relativeFrame?.id else {

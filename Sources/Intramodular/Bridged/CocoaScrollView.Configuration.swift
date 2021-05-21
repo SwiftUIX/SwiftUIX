@@ -12,96 +12,156 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
     var isVanilla: Bool = true
     
+    // MARK: General
+    
     @usableFromInline
     var initialContentAlignment: Alignment? {
         didSet {
-            isVanilla = false
+            if oldValue != initialContentAlignment {
+                isVanilla = false
+            }
         }
     }
+    
     @usableFromInline
     var axes: Axis.Set = [.horizontal, .vertical] {
         didSet {
-            isVanilla = false
+            if oldValue != axes {
+                isVanilla = false
+            }
         }
     }
     
     @usableFromInline
     var showsIndicators: Bool = true {
         didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var alwaysBounceVertical: Bool? = nil {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var alwaysBounceHorizontal: Bool = false {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var isDirectionalLockEnabled: Bool = false {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var isPagingEnabled: Bool = false {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var isScrollEnabled: Bool = true {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var onRefresh: (() -> Void)? {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var isRefreshing: Bool? {
-        didSet {
-            isVanilla = false
-        }
-    }
-    @usableFromInline
-    var refreshControlTintColor: UIColor? {
-        didSet {
-            isVanilla = false
+            if oldValue != showsIndicators {
+                isVanilla = false
+            }
         }
     }
     
     @usableFromInline
-    var contentOffset: Binding<CGPoint>? = nil {
+    var alwaysBounceVertical: Bool? = nil {
         didSet {
-            isVanilla = false
+            if oldValue != alwaysBounceVertical {
+                isVanilla = false
+            }
         }
     }
+    
+    @usableFromInline
+    var alwaysBounceHorizontal: Bool? = nil {
+        didSet {
+            if oldValue != alwaysBounceHorizontal {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var isDirectionalLockEnabled: Bool = false {
+        didSet {
+            if oldValue != isDirectionalLockEnabled {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var isPagingEnabled: Bool = false {
+        didSet {
+            if oldValue != isPagingEnabled {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var isScrollEnabled: Bool = true {
+        didSet {
+            if oldValue != isScrollEnabled {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
+        didSet {
+            if (oldValue == nil) != (onOffsetChange == nil) {
+                isVanilla = false
+            }
+        }
+    }
+    
+    // MARK: Content
+    
+    @usableFromInline
+    var contentOffset: Binding<CGPoint>? = nil {
+        didSet {
+            if (oldValue == nil) != (contentOffset == nil) {
+                isVanilla = false
+            }
+        }
+    }
+    
     @usableFromInline
     var contentInset: EdgeInsets = .zero {
         didSet {
-            isVanilla = false
+            if oldValue != contentInset {
+                isVanilla = false
+            }
         }
     }
+    
     @usableFromInline
     var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
         didSet {
-            isVanilla = false
+            if oldValue != contentOffsetBehavior {
+                isVanilla = false
+            }
+        }
+    }
+    
+    // MARK: Refresh
+    
+    @usableFromInline
+    var onRefresh: (() -> Void)? {
+        didSet {
+            if (oldValue == nil) != (onRefresh == nil) {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var isRefreshing: Bool? {
+        didSet {
+            if oldValue != isRefreshing {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var refreshControlTintColor: UIColor? {
+        didSet {
+            if oldValue != refreshControlTintColor {
+                isVanilla = false
+            }
+        }
+    }
+    
+    // MARK: Keyboard
+    
+    @usableFromInline
+    @available(tvOS, unavailable)
+    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none {
+        didSet {
+            if oldValue != keyboardDismissMode {
+                isVanilla = false
+            }
         }
     }
 }
@@ -115,6 +175,10 @@ extension CocoaScrollViewConfiguration {
         if !environment.isScrollEnabled {
             isScrollEnabled = false
         }
+        
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        keyboardDismissMode = environment.keyboardDismissMode
+        #endif
     }
     
     func updating(from environment: EnvironmentValues) -> Self {
@@ -156,7 +220,10 @@ extension UIScrollView {
             self.alwaysBounceVertical = alwaysBounceVertical
         }
         
-        alwaysBounceHorizontal = configuration.alwaysBounceHorizontal
+        if let alwaysBounceHorizontal = configuration.alwaysBounceHorizontal {
+            self.alwaysBounceHorizontal = alwaysBounceHorizontal
+        }
+        
         isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
         isScrollEnabled = configuration.isScrollEnabled
         showsVerticalScrollIndicator = configuration.showsIndicators && configuration.axes.contains(.vertical)
@@ -169,6 +236,16 @@ extension UIScrollView {
         #if os(iOS) || targetEnvironment(macCatalyst)
         isPagingEnabled = configuration.isPagingEnabled
         #endif
+        
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        keyboardDismissMode = configuration.keyboardDismissMode
+        #endif
+        
+        if let contentOffset = configuration.contentOffset?.wrappedValue {
+            if self.contentOffset.ceil != contentOffset.ceil {
+                setContentOffset(contentOffset, animated: true)
+            }
+        }
         
         #if !os(tvOS)
         if configuration.onRefresh != nil || configuration.isRefreshing != nil {
@@ -202,12 +279,6 @@ extension UIScrollView {
             }
         }
         #endif
-        
-        if let contentOffset = configuration.contentOffset?.wrappedValue {
-            if self.contentOffset.ceil != contentOffset.ceil {
-                setContentOffset(contentOffset, animated: true)
-            }
-        }
     }
     
     func updateContentSizeWithoutChangingContentOffset(_ update: () -> Void) {

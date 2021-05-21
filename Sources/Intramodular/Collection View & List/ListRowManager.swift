@@ -6,6 +6,8 @@ import Swift
 import SwiftUI
 
 protocol _CellProxyBase {
+    var globalFrame: CGRect { get }
+    
     func invalidateLayout()
 }
 

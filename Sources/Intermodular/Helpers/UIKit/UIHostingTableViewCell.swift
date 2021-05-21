@@ -108,6 +108,14 @@ extension UIHostingTableViewCell {
         private struct _CellProxyBase: SwiftUIX._CellProxyBase {
             weak var base: UIHostingTableViewCell<ItemType, Content>?
             
+            var globalFrame: CGRect {
+                guard let base = base, let parentViewController = base._parentViewController, let coordinateSpace = parentViewController.view.window?.coordinateSpace else {
+                    return .zero
+                }
+                
+                return parentViewController.view.convert(base.frame, to: coordinateSpace)
+            }
+            
             func invalidateLayout() {
                 fatalError("unimplemented")
             }

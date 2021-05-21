@@ -42,6 +42,13 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
 }
 
 extension OptionalDimensions {
+    public func rounded(_ rule: FloatingPointRoundingRule) -> Self {
+        .init(
+            width: width?.rounded(rule),
+            height: height?.rounded(rule)
+        )
+    }
+
     public mutating func clamp(to dimensions: OptionalDimensions) {
         if let maxWidth = dimensions.width {
             if let width = self.width {
