@@ -56,8 +56,19 @@ extension CGSize {
                 break
         }
     }
-    
-    func fits(_ other: CGSize) -> Bool {
+}
+
+extension CGSize {
+    func rounded(_ rule: FloatingPointRoundingRule) -> Self {
+        .init(
+            width: width.rounded(rule),
+            height: height.rounded(rule)
+        )
+    }
+}
+
+extension CGSize {
+    func fits(_ other: Self) -> Bool {
         guard width <= other.width else {
             return false
         }

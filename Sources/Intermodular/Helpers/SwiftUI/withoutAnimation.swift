@@ -7,7 +7,13 @@ import SwiftUI
 
 var _areAnimationsDisabled: Bool = false
 
-public func withoutAnimation(_ body: () -> ()) {
+public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
+    guard flag else {
+        body()
+        
+        return
+    }
+    
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     CATransaction.begin()
     CATransaction.disableActions()

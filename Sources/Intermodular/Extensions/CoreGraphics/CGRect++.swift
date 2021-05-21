@@ -75,7 +75,7 @@ extension CGRect {
 }
 
 extension CGRect {
-    public func inflate(by factor: CGFloat) -> CGRect {
+    func inflate(by factor: CGFloat) -> CGRect {
         let x = origin.x
         let y = origin.y
         let w = width

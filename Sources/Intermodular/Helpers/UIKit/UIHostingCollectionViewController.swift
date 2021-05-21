@@ -203,7 +203,9 @@ public final class UIHostingCollectionViewController<
                 maximumSize: self.maximumCollectionViewCellSize
             )
             
-            view.supplementaryViewWillDisplay(inParent: self)
+            self.cache.preconfigure(supplementaryView: view)
+
+            view.update()
             
             return view
         }
@@ -263,10 +265,18 @@ public final class UIHostingCollectionViewController<
         (cell as? UICollectionViewCellType)?.cellWillDisplay(inParent: self)
     }
     
+    public func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+        (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewWillDisplay(inParent: self)
+    }
+
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? UICollectionViewCellType)?.cellDidEndDisplaying()
     }
-    
+
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
+        (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewDidEndDisplaying()
+    }
+
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
         cellForItem(at: indexPath)?.isHighlightable ?? false
     }
@@ -311,11 +321,15 @@ public final class UIHostingCollectionViewController<
     
     public func collectionView(_ collectionView: UICollectionView, shouldUpdateFocusIn context: UICollectionViewFocusUpdateContext) -> Bool {
         if let previousCell = context.previouslyFocusedView as? UICollectionViewCellType {
-            previousCell.isFocused = false
+            if previousCell.isFocused {
+                previousCell.isFocused = false
+            }
         }
         
         if let nextCell = context.nextFocusedView as? UICollectionViewCellType {
-            nextCell.isFocused = true
+            if nextCell.isFocused {
+                nextCell.isFocused = true
+            }
         }
         
         return true
@@ -383,12 +397,12 @@ public final class UIHostingCollectionViewController<
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if let onOffsetChange = _scrollViewConfiguration.onOffsetChange {
-            onOffsetChange(
-                scrollView.contentOffset(forContentType: AnyView.self)
-            )
+            onOffsetChange(scrollView.contentOffset(forContentType: AnyView.self))
         }
         
-        _scrollViewConfiguration.contentOffset?.wrappedValue = collectionView.contentOffset
+        if let contentOffset = _scrollViewConfiguration.contentOffset {
+            contentOffset.wrappedValue = collectionView.contentOffset
+        }
     }
 }
 

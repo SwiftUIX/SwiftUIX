@@ -164,17 +164,17 @@ extension CGSize {
         )
     }
     
-    public mutating func clamp(to dimensions: OptionalDimensions) {
-        if let maxWidth = dimensions.width {
+    public mutating func clamp(to dimensions: OptionalDimensions?) {
+        if let maxWidth = dimensions?.width {
             width = min(width, maxWidth)
         }
         
-        if let maxHeight = dimensions.height {
+        if let maxHeight = dimensions?.height {
             height = min(height, maxHeight)
         }
     }
     
-    public func clamping(to dimensions: OptionalDimensions) -> Self {
+    public func clamped(to dimensions: OptionalDimensions?) -> Self {
         var result = self
         
         result.clamp(to: dimensions)

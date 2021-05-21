@@ -51,14 +51,14 @@ extension AppKitOrUIKitHostingControllerProtocol {
         
         switch (result.width, result.height)  {
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude), (.infinity, .infinity):
-                result = sizeThatFits(in: targetSize.clamping(to: sizeProposal.maximumSize))
+                result = sizeThatFits(in: targetSize.clamped(to: sizeProposal.maximumSize))
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, _), (.greatestFiniteMagnitude, _), (.infinity, _):
                 if !targetSize.width.isZero {
-                    result = sizeThatFits(in: CGSize(width: targetSize.clamping(to: sizeProposal.maximumSize).width, height: fittingSize.height))
+                    result = sizeThatFits(in: CGSize(width: targetSize.clamped(to: sizeProposal.maximumSize).width, height: fittingSize.height))
                 }
             case (_, AppKitOrUIKitView.layoutFittingExpandedSize.height), (_, .greatestFiniteMagnitude), (_, .infinity):
                 if !targetSize.height.isZero {
-                    result = sizeThatFits(in: CGSize(width: fittingSize.width, height: targetSize.clamping(to: sizeProposal.maximumSize).height))
+                    result = sizeThatFits(in: CGSize(width: fittingSize.width, height: targetSize.clamped(to: sizeProposal.maximumSize).height))
                 }
             case (.zero, 1...): do {
                 result = sizeThatFits(in: CGSize(width: AppKitOrUIKitView.layoutFittingExpandedSize.width, height: fittingSize.height))
@@ -88,7 +88,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
             result = .init(width: result.width, height: 1)
         }
         
-        return result.clamping(to: sizeProposal.maximumSize)
+        return result.clamped(to: sizeProposal.maximumSize)
     }
     
     public func sizeThatFits(

@@ -11,7 +11,8 @@ import UIKit
 extension UIHostingCollectionViewController {
     class Cache: NSObject, UICollectionViewDelegateFlowLayout {
         typealias UICollectionViewCellType = UIHostingCollectionViewController.UICollectionViewCellType
-        
+        typealias UICollectionViewSupplementaryViewType = UIHostingCollectionViewController.UICollectionViewSupplementaryViewType
+
         unowned let parent: UIHostingCollectionViewController
         
         private var cellIdentifierToCacheMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Cache] = [:]
@@ -19,6 +20,7 @@ extension UIHostingCollectionViewController {
         private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToCellIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
         
+        private var supplementaryViewIdentifierToCacheMap: [UICollectionViewSupplementaryViewType.Configuration.ID: UICollectionViewSupplementaryViewType.Cache] = [:]
         private var supplementaryViewIdentifierToContentSizeMap: [UICollectionViewSupplementaryViewType.Configuration.ID: CGSize] = [:]
         private var supplementaryViewIdentifierToIndexPathMap: [UICollectionViewSupplementaryViewType.Configuration.ID: IndexPath] = [:]
         private var indexPathToSupplementaryViewContentSizeMap: [String: [IndexPath: CGSize]] = [:]
@@ -50,6 +52,18 @@ extension UIHostingCollectionViewController {
             }
         }
         
+        func preconfigure(supplementaryView: UICollectionViewSupplementaryViewType) {
+            supplementaryView.cache = .init()
+            
+            guard let id = supplementaryView.configuration?.id else {
+                return
+            }
+            
+            if let supplementaryViewCache = supplementaryViewIdentifierToCacheMap[id] {
+                supplementaryView.cache = supplementaryViewCache
+            }
+        }
+        
         func invalidate() {
             cellIdentifierToCacheMap = [:]
             cellIdentifierToPreferencesMap = [:]
@@ -57,6 +71,7 @@ extension UIHostingCollectionViewController {
             
             indexPathToCellIdentifierMap = [:]
             
+            supplementaryViewIdentifierToCacheMap = [:]
             supplementaryViewIdentifierToContentSizeMap = [:]
             supplementaryViewIdentifierToIndexPathMap = [:]
             indexPathToSupplementaryViewContentSizeMap = [:]
@@ -157,6 +172,13 @@ extension UIHostingCollectionViewController.Cache {
         cellIdentifierToCacheMap[id] = cache
     }
     
+    public func setSupplementaryViewCache(
+        _ cache: UICollectionViewSupplementaryViewType.Cache?,
+        for id: UICollectionViewSupplementaryViewType.Configuration.ID
+    ) {
+        supplementaryViewIdentifierToCacheMap[id] = cache
+    }
+    
     subscript(preferencesFor id: UIHostingCollectionViewController.UICollectionViewCellType.Configuration.ID) -> UIHostingCollectionViewController.UICollectionViewCellType.Preferences? {
         get {
             cellIdentifierToPreferencesMap[id]
@@ -228,15 +250,15 @@ extension UIHostingCollectionViewController.Cache {
         prototypeCell.update(forced: true)
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
-        var size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        let size = prototypeCell
+            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .rounded(.up)
+            .clamped(to: prototypeCell.configuration?.maximumSize ?? nil)
         
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }
-        
-        size = .init(width: ceil(size.width), height: ceil(size.height))
-        size.clamp(to: prototypeCell.configuration?.maximumSize ?? nil)
-        
+                
         prototypeCell.cache.contentSize = size
         
         cellIdentifierToCacheMap[configuration.id]?.contentSize = size
@@ -254,10 +276,17 @@ extension UIHostingCollectionViewController.Cache {
         let prototypeView = configuration.kind == UICollectionView.elementKindSectionHeader ? prototypeHeaderView : prototypeFooterView
         
         prototypeView.configuration = configuration
+        
+        preconfigure(cell: prototypeCell)
+
+        prototypeView.update(forced: true)
         prototypeView.supplementaryViewWillDisplay(inParent: nil, isPrototype: true)
         
-        let size = prototypeView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        
+        let size = prototypeView
+            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            .rounded(.up)
+            .clamped(to: configuration.maximumSize)
+
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }

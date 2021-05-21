@@ -9,7 +9,7 @@ import UniformTypeIdentifiers
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A representation of an underlying data item being dragged from one location to another.
-public struct DragItem: Equatable {
+public struct DragItem: Hashable {
     public final class PreferenceKey: TakeLastPreferenceKey<[DragItem]> {
         
     }
@@ -40,6 +40,10 @@ public struct DragItem: Equatable {
         self.itemProvider = NSItemProvider()
         
         itemProvider.registerObject(base, visibility: .all)
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
