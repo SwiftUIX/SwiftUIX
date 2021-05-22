@@ -31,17 +31,23 @@ protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
     func deselect<ID: Hashable>(_ id: ID)
     
     func selection<ID: Hashable>(for id: ID) -> Binding<Bool>
+    
+    func _snapshot() -> AppKitOrUIKitImage?
 }
 
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CollectionViewProxy: Hashable {
     private let _baseBox: WeakReferenceBox<AnyObject>
     
+    @ReferenceBox var onBaseChange: (() -> Void)? = nil
+    
     var base: _CollectionViewProxyBase? {
         get {
             _baseBox.value as? _CollectionViewProxyBase
         } set {
             _baseBox.value = newValue
+            
+            onBaseChange?()
         }
     }
     
@@ -115,6 +121,12 @@ public struct CollectionViewProxy: Hashable {
         base?.deselect(id)
     }
     
+    public func _snapshot() -> AppKitOrUIKitImage? {
+        _assertResolutionOfCollectionView()
+        
+        return base?._snapshot()
+    }
+    
     private func _assertResolutionOfCollectionView() {
         // assert(base != nil, "CollectionViewProxy couldn't resolve a collection view")
     }
@@ -131,6 +143,7 @@ public struct CollectionViewReader<Content: View>: View {
     public let content: (CollectionViewProxy) -> Content
     
     @State var _collectionViewProxy = CollectionViewProxy()
+    @State var invalidate: Bool = false
     
     public init(
         @ViewBuilder content: @escaping (CollectionViewProxy) -> Content
@@ -141,6 +154,14 @@ public struct CollectionViewReader<Content: View>: View {
     public var body: some View {
         content(_environment_collectionViewProxy?.wrappedValue ?? _collectionViewProxy)
             .environment(\._collectionViewProxy, $_collectionViewProxy)
+            .background {
+                PerformAction {
+                    _collectionViewProxy.onBaseChange = {
+                        invalidate.toggle()
+                    }
+                }
+                .id(invalidate)
+            }
     }
 }
 

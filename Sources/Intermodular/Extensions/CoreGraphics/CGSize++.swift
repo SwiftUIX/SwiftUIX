@@ -13,7 +13,7 @@ extension CGSize {
             height: CGFloat.greatestFiniteMagnitude
         )
     }
-    
+        
     public var minimumDimensionLength: CGFloat {
         min(width, height)
     }
@@ -22,6 +22,12 @@ extension CGSize {
         max(width, height)
     }
     
+    var isAreaZero: Bool {
+        minimumDimensionLength.isZero
+    }
+}
+
+extension CGSize {
     public func dimensionLength(for axis: Axis) -> CGFloat {
         switch axis {
             case .horizontal:

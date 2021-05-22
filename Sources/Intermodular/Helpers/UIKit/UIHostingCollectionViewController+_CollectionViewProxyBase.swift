@@ -258,6 +258,31 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             }
         )
     }
+    
+    public func _snapshot() -> AppKitOrUIKitImage? {
+        let originalBounds = collectionView.bounds
+        
+        collectionView.bounds = .init(origin: .zero, size: collectionView.insetAdjustedContentSize)
+        
+        UIGraphicsBeginImageContextWithOptions(collectionViewContentSize, true, Screen.main.scale)
+        
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return nil
+        }
+        
+        collectionView.layer.render(in: context)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        collectionView.bounds = originalBounds
+        
+        collectionView.setNeedsLayout()
+        collectionView.layoutIfNeeded()
+        
+        return image
+    }
 }
 
 // MARK: - Auxiliary Implementation -

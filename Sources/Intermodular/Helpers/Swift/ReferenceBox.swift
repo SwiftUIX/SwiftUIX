@@ -13,23 +13,54 @@ struct WeakBox<T: AnyObject> {
     }
 }
 
+@propertyWrapper
 @usableFromInline
 final class ReferenceBox<T> {
     @usableFromInline
     var value: T
     
     @usableFromInline
+    var wrappedValue: T {
+        get {
+            value
+        } set {
+            value = newValue
+        }
+    }
+    
+    @usableFromInline
     init(_ value: T) {
+        self.value = value
+    }
+    
+    @usableFromInline
+    init(wrappedValue value: T) {
         self.value = value
     }
 }
 
+@propertyWrapper
+@usableFromInline
 final class WeakReferenceBox<T: AnyObject> {
     @usableFromInline
     weak var value: T?
     
     @usableFromInline
+    var wrappedValue: T? {
+        get {
+            value
+        } set {
+            value = newValue
+        }
+    }
+
+    @usableFromInline
     init(_ value: T?) {
+        self.value = value
+    }
+    
+    @usableFromInline
+    init(wrappedValue value: T?) {
         self.value = value
     }
 }
@@ -53,7 +84,7 @@ final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
             objectWillChange.send()
         }
     }
-
+    
     @usableFromInline
     init(_ value: T?) {
         self.value = value
