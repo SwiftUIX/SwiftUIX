@@ -171,6 +171,10 @@ extension UIHostingCollectionViewSupplementaryView {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        if contentHostingController == nil {
+            update()
+        }
+        
         guard let contentHostingController = contentHostingController else {
             assertionFailure()
             

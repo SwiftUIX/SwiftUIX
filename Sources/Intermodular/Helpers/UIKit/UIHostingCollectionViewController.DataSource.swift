@@ -10,7 +10,7 @@ import SwiftUI
 extension UIHostingCollectionViewController {
     public enum DataSource: CustomStringConvertible {
         public typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
-
+        
         public struct IdentifierMap {
             var getSectionID: (SectionType) -> SectionIdentifierType
             var getSectionFromID: (SectionIdentifierType) -> SectionType
@@ -183,7 +183,7 @@ extension UIHostingCollectionViewController {
             if _scrollViewConfiguration.initialContentAlignment == .bottom {
                 scrollToLast(animated: false)
             }
-
+            
             return
         }
         
@@ -361,7 +361,7 @@ fileprivate extension NSDiffableDataSourceSnapshot {
                         
                         return false
                     }
-
+                    
                     insertItems([element], beforeItem: items[offset])
                 } else {
                     appendItems([element])
