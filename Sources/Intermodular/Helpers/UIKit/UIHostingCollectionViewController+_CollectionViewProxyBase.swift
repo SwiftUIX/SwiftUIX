@@ -9,7 +9,9 @@ import SwiftUI
 
 extension UIHostingCollectionViewController: _CollectionViewProxyBase {
     var collectionViewContentSize: CGSize {
-        collectionView.contentSize
+        collectionView.contentSize.isAreaZero
+            ? collectionView.contentSize
+            : collectionView.collectionViewLayout.collectionViewContentSize
     }
     
     var maximumCollectionViewCellSize: OptionalDimensions {

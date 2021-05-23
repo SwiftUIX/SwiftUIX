@@ -7,17 +7,25 @@ import Swift
 
 extension UserDefaults {
     func decode<Value: Codable>(_ type: Value.Type = Value.self, forKey key: String) throws -> Value? {
+        try decode(Value.self, from: object(forKey: key))
+    }
+    
+    func decode<Value: Codable>(_ type: Value.Type, from object: Any?) throws -> Value? {
+        guard let object = object else {
+            return nil
+        }
+        
         if type is URL.Type || type is Optional<URL>.Type {
-            return url(forKey: key) as? Value
-        } else if let value = value(forKey: key) as? Value {
+            return object as? Value
+        } else if let value = object as? Value {
             return value
-        } else if let data = value(forKey: key) as? Data {
+        } else if let data = object as? Data {
             return try PropertyListDecoder().decode(Value.self, from: data)
         } else {
             return nil
         }
     }
-    
+
     func encode<Value: Codable>(_ value: Value, forKey key: String) throws {
         if let value = value as? _opaque_Optional, !value.isNotNil {
             removeObject(forKey: key)
