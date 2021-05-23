@@ -35,18 +35,25 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var borderStyle: UITextField.BorderStyle = .none
         var clearButtonMode: UITextField.ViewMode?
         var uiFont: UIFont?
-        var enablesReturnKeyAutomatically: Bool?
-        var inputAccessoryView: AnyView?
         var inputView: AnyView?
         var kerning: CGFloat?
-        var keyboardType: UIKeyboardType = .default
         var placeholder: String?
         var smartDashesType: UITextSmartDashesType?
         var smartQuotesType: UITextSmartQuotesType?
-        var returnKeyType: UIReturnKeyType?
         var secureTextEntry: Bool?
         var textColor: UIColor?
         var textContentType: UITextContentType?
+        
+        // MARK: Input Accessory
+        
+        var inputAccessoryView: AnyView?
+        
+        // MARK: Keyboard
+        
+        var dismissKeyboardOnReturn: Bool = true
+        var enablesReturnKeyAutomatically: Bool?
+        var keyboardType: UIKeyboardType = .default
+        var returnKeyType: UIReturnKeyType?
     }
     
     @Environment(\.font) var font
@@ -124,25 +131,12 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            var nextField: UIView?
-            
-            if textField.tag != 0 {
-                let nextTag = textField.tag + 1
-                var parentView = textField.superview
-                
-                while nextField == nil && parentView != nil {
-                    nextField = parentView?.viewWithTag(nextTag)
-                    parentView = parentView?.superview
-                }
-            }
-            
-            if let nextField = nextField {
-                nextField.becomeFirstResponder()
-            } else {
+            if configuration.dismissKeyboardOnReturn {
                 textField.resignFirstResponder()
             }
             
             configuration.onCommit()
+            
             return true
         }
     }
@@ -381,22 +375,6 @@ extension CocoaTextField {
         then({ $0.configuration.uiFont = uiFont })
     }
     
-    public func inputAccessoryView<InputAccessoryView: View>(_ view: InputAccessoryView) -> Self {
-        then({ $0.configuration.inputAccessoryView = .init(view) })
-    }
-    
-    public func inputView<InputView: View>(_ view: InputView) -> Self {
-        then({ $0.configuration.inputView = .init(view) })
-    }
-    
-    public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
-        then({ $0.configuration.inputAccessoryView = .init(view()) })
-    }
-    
-    public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
-        then({ $0.configuration.keyboardType = keyboardType })
-    }
-    
     public func placeholder(_ placeholder: String) -> Self {
         then({ $0.configuration.placeholder = placeholder })
     }
@@ -408,10 +386,6 @@ extension CocoaTextField {
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: UIColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
-    }
-    
-    public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
-        then({ $0.configuration.returnKeyType = returnKeyType })
     }
     
     public func smartQuotesType(_ smartQuotesType: UITextSmartQuotesType) -> Self {
@@ -439,8 +413,36 @@ extension CocoaTextField {
         then({ $0.configuration.clearButtonMode = clearButtonMode })
     }
     
+    // MARK: - Input Accessory -
+    
+    public func inputAccessoryView<InputAccessoryView: View>(_ view: InputAccessoryView) -> Self {
+        then({ $0.configuration.inputAccessoryView = .init(view) })
+    }
+    
+    public func inputView<InputView: View>(_ view: InputView) -> Self {
+        then({ $0.configuration.inputView = .init(view) })
+    }
+    
+    public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
+        then({ $0.configuration.inputAccessoryView = .init(view()) })
+    }
+    
+    // MARK: Keyboard
+    
+    public func dismissKeyboardOnReturn(_ dismissKeyboardOnReturn: Bool) -> Self {
+        then({ $0.configuration.dismissKeyboardOnReturn = dismissKeyboardOnReturn })
+    }
+    
     public func enablesReturnKeyAutomatically(_ enablesReturnKeyAutomatically: Bool) -> Self {
         then({ $0.configuration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
+    }
+    
+    public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
+        then({ $0.configuration.keyboardType = keyboardType })
+    }
+    
+    public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
+        then({ $0.configuration.returnKeyType = returnKeyType })
     }
 }
 

@@ -119,7 +119,7 @@ extension ImagePicker {
         then({ $0.allowsEditing = allowsEditing })
     }
     
-    public func cameraDevice(_ sourceType: UIImagePickerController.CameraDevice?) -> Self {
+    public func cameraDevice(_ cameraDevice: UIImagePickerController.CameraDevice?) -> Self {
         then({ $0.cameraDevice = cameraDevice })
     }
 
