@@ -94,7 +94,7 @@ public final class UIHostingCollectionViewController<
         collectionView.backgroundView = UIView()
         collectionView.backgroundView?.backgroundColor = .clear
         collectionView.isPrefetchingEnabled = false
-
+        
         view.addSubview(collectionView)
         
         collectionView.delegate = self
@@ -121,7 +121,7 @@ public final class UIHostingCollectionViewController<
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         collectionView.register(
             UICollectionViewCellType.self,
             forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier
@@ -203,7 +203,7 @@ public final class UIHostingCollectionViewController<
             )
             
             self.cache.preconfigure(supplementaryView: view)
-
+            
             view.update()
             
             return view
@@ -267,15 +267,15 @@ public final class UIHostingCollectionViewController<
     public func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
         (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewWillDisplay(inParent: self)
     }
-
+    
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? UICollectionViewCellType)?.cellDidEndDisplaying()
     }
-
+    
     public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
         (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewDidEndDisplaying()
     }
-
+    
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
         cellForItem(at: indexPath)?.isHighlightable ?? false
     }

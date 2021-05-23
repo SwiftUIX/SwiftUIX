@@ -229,7 +229,7 @@ class UIHostingCollectionViewCell<
                     .clamped(to: configuration?.maximumSize)
             }
         }
-
+        
         guard let contentHostingController = contentHostingController else {
             return .init(width: 1, height: 1)
         }
@@ -261,13 +261,13 @@ class UIHostingCollectionViewCell<
             layoutAttributes.size = size
                 .rounded(.up)
                 .clamped(to: configuration?.maximumSize)
-
+            
             return layoutAttributes
         } else if let relativeFrame = preferences.relativeFrame {
             let size = relativeFrame.sizeThatFits(in: layoutAttributes.size)
                 .rounded(.up)
                 .clamped(to: configuration?.maximumSize)
-
+            
             layoutAttributes.size = size
             
             cache.content = nil
@@ -309,7 +309,7 @@ class UIHostingCollectionViewCell<
                 .sizeThatFits(in: layoutAttributes.size)
                 .rounded(.up)
                 .clamped(to: configuration?.maximumSize)
-
+            
             contentHostingController.update(disableAnimation: true, forced: true)
         }
     }
@@ -342,7 +342,7 @@ extension UIHostingCollectionViewCell {
         if contentHostingController == nil {
             update()
         }
-
+        
         guard let contentHostingController = contentHostingController else {
             assertionFailure()
             
@@ -396,7 +396,7 @@ extension UIHostingCollectionViewCell {
                 
             }
         }
-
+        
         var _cellProxyBase: _CellProxyBase
         var _collectionViewProxy: CollectionViewProxy
         var content: Content
@@ -582,7 +582,7 @@ extension UIHostingCollectionViewCell {
                     }
                 }
             }
-                        
+            
             withoutAnimation(disableAnimation) {
                 rootView = .init(base: base)
                 
