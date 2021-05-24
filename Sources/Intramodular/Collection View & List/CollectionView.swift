@@ -281,9 +281,18 @@ extension CollectionView {
         #endif
     }
     
-    /// Binds the collection view's drag state to a boolean value.
-    public func isDragActive(_ isDragActive: Binding<Bool>) -> Self {
-        then({ $0._collectionViewConfiguration.isDragActive = isDragActive })
+    @available(iOS 13.4, *)
+    @available(tvOS, unavailable)
+    public func onDrop(delegate: CollectionViewDropDelegate) -> Self {
+        then({ $0._dynamicViewContentTraitValues.collectionViewDropDelegate = delegate })
+    }
+
+    @available(iOS 13.4, *)
+    @available(tvOS, unavailable)
+    public func onDrop(
+        perform action: (([DragItem], Int) -> Void)?
+    ) -> Self {
+        then({ $0._dynamicViewContentTraitValues.onDrop = action })
     }
 }
 
@@ -291,6 +300,11 @@ extension CollectionView {
     /// Sets whether the collection view allows multiple selection.
     public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
         then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
+    }
+    
+    /// Binds the collection view's drag state to a boolean value.
+    public func isDragActive(_ isDragActive: Binding<Bool>) -> Self {
+        then({ $0._collectionViewConfiguration.isDragActive = isDragActive })
     }
 }
 

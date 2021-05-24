@@ -8,6 +8,12 @@ import SwiftUI
 struct _DynamicViewContentTraitValues {
     var onDelete: ((IndexSet) -> Void)? = nil
     var onMove: ((IndexSet, Int) -> Void)? = nil
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    var onDrop: (([DragItem], Int) -> Void)? = nil
+    @available(tvOS, unavailable)
+    var collectionViewDropDelegate: CollectionViewDropDelegate?
+    #endif
 }
 
 // MARK: - Auxiliary Implementation -

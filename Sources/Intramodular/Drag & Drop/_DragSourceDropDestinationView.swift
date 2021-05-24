@@ -273,7 +273,10 @@ struct _DragSourceDropDestinationView<
 }
 
 extension View {
-    public func _onDrag(delegate: DragDelegate?, _ items: @escaping () -> [DragItem]) -> some View {
+    public func _onDrag(
+        delegate: DragDelegate? = nil,
+        _ items: @escaping () -> [DragItem]
+    ) -> some View {
         _DragSourceDropDestinationView(
             content: self,
             dragDelegate: delegate,

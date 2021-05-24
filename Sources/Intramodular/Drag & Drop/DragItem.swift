@@ -18,6 +18,10 @@ public struct DragItem: Hashable {
     public let base: Any?
     public let itemProvider: NSItemProvider
     
+    public var localItem: Any? {
+        base
+    }
+    
     @_disfavoredOverload
     public init<Item: Identifiable>(_ base: Item) {
         self.id = base.id
