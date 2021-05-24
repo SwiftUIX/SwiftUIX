@@ -102,7 +102,7 @@ extension CollectionView {
             .eraseToAnyView()
         )
     }
-
+    
     public init<
         Data: RandomAccessCollection,
         ID: Hashable,
@@ -286,7 +286,7 @@ extension CollectionView {
     public func onDrop(delegate: CollectionViewDropDelegate) -> Self {
         then({ $0._dynamicViewContentTraitValues.collectionViewDropDelegate = delegate })
     }
-
+    
     @available(iOS 13.4, *)
     @available(tvOS, unavailable)
     public func onDrop(
