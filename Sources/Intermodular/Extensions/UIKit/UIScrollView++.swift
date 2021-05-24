@@ -10,9 +10,9 @@ import UIKit
 
 extension UIScrollView {
     var insetAdjustedContentSize: CGSize {
-        let contentSize = contentSize.isAreaZero
+        let contentSize = self.contentSize.isAreaZero
             ? ((self as? UICollectionView)?.collectionViewLayout.collectionViewContentSize) ?? .zero
-            : contentSize
+            : self.contentSize
         
         return CGSize(
             width: contentSize.width + adjustedContentInset.left + adjustedContentInset.right,
