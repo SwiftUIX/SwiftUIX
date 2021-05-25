@@ -50,15 +50,15 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         return result
     }
     
-    public func invalidateLayout() {
+    func invalidateLayout() {
         collectionView.collectionViewLayout.invalidateLayout()
     }
     
-    public func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
+    func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
         collectionView.setContentOffset(.zero, animated: animated)
     }
     
-    public func scrollToLast(anchor: UnitPoint? = nil, animated: Bool) {
+    func scrollToLast(anchor: UnitPoint? = nil, animated: Bool) {
         guard collectionView.numberOfSections > 0 else {
             return
         }
@@ -95,7 +95,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         }
     }
     
-    public func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
+    func scrollTo<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cache.firstIndexPath(for: id) else {
             return
         }
@@ -107,7 +107,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
+    func scrollTo<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cache.firstIndexPath(for: id).map(collectionView.indexPath(before:)), collectionView.contains(indexPath) else {
             return
         }
@@ -119,7 +119,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
+    func scrollTo<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cache.firstIndexPath(for: id).map(collectionView.indexPath(after:)), collectionView.contains(indexPath) else {
             return
         }
@@ -131,7 +131,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
+    func select<ID: Hashable>(_ id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = indexPath(for: id) else {
             return
         }
@@ -143,7 +143,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func select<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
+    func select<ID: Hashable>(itemBefore id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cache.firstIndexPath(for: id).map(collectionView.indexPath(before:)), collectionView.contains(indexPath) else {
             return
         }
@@ -155,7 +155,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func select<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
+    func select<ID: Hashable>(itemAfter id: ID, anchor: UnitPoint? = nil) {
         guard let indexPath = cache.firstIndexPath(for: id).map(collectionView.indexPath(after:)), collectionView.contains(indexPath) else {
             return
         }
@@ -167,7 +167,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func selectNextItem(anchor: UnitPoint?) {
+    func selectNextItem(anchor: UnitPoint?) {
         guard !configuration.allowsMultipleSelection else {
             assertionFailure("selectNextItem(anchor:) is unavailable when multiple selection is allowed.")
             
@@ -199,7 +199,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func selectPreviousItem(anchor: UnitPoint?) {
+    func selectPreviousItem(anchor: UnitPoint?) {
         guard !configuration.allowsMultipleSelection else {
             assertionFailure("selectPreviousItem(anchor:) is unavailable when multiple selection is allowed.")
             
@@ -231,7 +231,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func deselect<ID: Hashable>(_ id: ID) {
+    func deselect<ID: Hashable>(_ id: ID) {
         guard let indexPath = indexPath(for: id) else {
             return
         }
@@ -242,11 +242,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    private func indexPath<ID: Hashable>(for id: ID) -> IndexPath? {
-        cache.firstIndexPath(for: id)
-    }
-    
-    public func selection<ID: Hashable>(for id: ID) -> Binding<Bool> {
+    func selection<ID: Hashable>(for id: ID) -> Binding<Bool> {
         let indexPath = cache.firstIndexPath(for: id)
         
         return .init(
@@ -261,7 +257,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         )
     }
     
-    public func _snapshot() -> AppKitOrUIKitImage? {
+    func _snapshot() -> AppKitOrUIKitImage? {
         let originalBounds = collectionView.bounds
         
         collectionView.bounds = .init(origin: .zero, size: collectionView.insetAdjustedContentSize)
@@ -284,6 +280,10 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         collectionView.layoutIfNeeded()
         
         return image
+    }
+    
+    private func indexPath<ID: Hashable>(for id: ID) -> IndexPath? {
+        cache.firstIndexPath(for: id)
     }
 }
 

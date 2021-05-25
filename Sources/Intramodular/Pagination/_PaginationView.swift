@@ -9,12 +9,9 @@ import SwiftUI
 import UIKit
 
 /// A SwiftUI port of `UIPageViewController`.
-@usableFromInline
 struct _PaginationView<Page: View> {
-    @usableFromInline
     let content: AnyForEach<Page>
     
-    @usableFromInline
     struct Configuration {
         let axis: Axis
         let transitionStyle: UIPageViewController.TransitionStyle
@@ -27,13 +24,9 @@ struct _PaginationView<Page: View> {
     
     let configuration: Configuration
     
-    @usableFromInline
     @Binding var currentPageIndex: Int
-    
-    @usableFromInline
     @Binding var progressionController: ProgressionController?
     
-    @usableFromInline
     init(
         content: AnyForEach<Page>,
         configuration: Configuration,
@@ -50,10 +43,8 @@ struct _PaginationView<Page: View> {
 // MARK: - Conformances -
 
 extension _PaginationView: UIViewControllerRepresentable {
-    @usableFromInline
     typealias UIViewControllerType = UIHostingPageViewController<Page>
     
-    @usableFromInline
     func makeUIViewController(context: Context) -> UIViewControllerType {
         let uiViewController = UIViewControllerType(
             transitionStyle: configuration.transitionStyle,
@@ -266,13 +257,41 @@ extension _PaginationView {
 extension _PaginationView {
     @usableFromInline
     struct _ProgressionController: ProgressionController {
-        @usableFromInline
         weak var base: UIHostingPageViewController<Page>?
         
-        @usableFromInline
         var currentPageIndex: Binding<Int>
         
-        @usableFromInline
+        func scrollTo(_ id: AnyHashable) {
+            guard let base = base else {
+                assertionFailure("Could not resolve a pagination view")
+                return
+            }
+            
+            guard let currentPageIndex = base.currentPageIndexOffset, let data = base.content?.data, let index = data.firstIndex(where: { $0.id == id }).map({ data.distance(from: data.startIndex, to: $0) }) else {
+                return
+            }
+                        
+            guard
+                let baseDataSource = base.dataSource,
+                let currentViewController = base.viewControllers?.first,
+                let nextViewController = baseDataSource.pageViewController(base, viewControllerAfter: currentViewController)
+            else {
+                return
+            }
+            
+            base.setViewControllers(
+                [nextViewController],
+                direction: index > currentPageIndex ? .forward : .reverse,
+                animated: true
+            ) { finished in
+                guard finished else {
+                    return
+                }
+                
+                self.syncCurrentPageIndex()
+            }
+        }
+
         func moveToNext() {
             guard let base = base else {
                 assertionFailure("Could not resolve a pagination view")
@@ -296,7 +315,6 @@ extension _PaginationView {
             }
         }
         
-        @usableFromInline
         func moveToPrevious() {
             guard let base = base else {
                 assertionFailure("Could not resolve a pagination view")
@@ -320,8 +338,7 @@ extension _PaginationView {
             }
         }
         
-        @usableFromInline
-        func syncCurrentPageIndex() {
+        private func syncCurrentPageIndex() {
             if let currentPageIndex = base?.currentPageIndexOffset {
                 self.currentPageIndex.wrappedValue = currentPageIndex
             }

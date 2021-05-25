@@ -32,6 +32,10 @@ public struct PaginationViewProxy: Hashable {
         hasher.combine(hostingPageViewController?.hashValue)
     }
     
+    public func scrollTo(_ id: AnyHashable) {
+        progressionController.scrollTo(id)
+    }
+
     public func moveToPrevious() {
         progressionController.moveToPrevious()
     }
@@ -39,7 +43,7 @@ public struct PaginationViewProxy: Hashable {
     public func moveToNext() {
         progressionController.moveToNext()
     }
-    
+        
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.hostingPageViewController === rhs.hostingPageViewController
     }

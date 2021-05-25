@@ -6,16 +6,19 @@ import Swift
 import SwiftUI
 
 /// A convenience around a closure of the type `() -> Void`.
-public struct Action: DynamicAction, Hashable {
-    public static let empty = Action({ })
+public struct Action: DynamicAction, Hashable, Identifiable {
+    private let value: @convention(block) () -> Void
     
-    private var value: @convention(block) () -> Void
+    public let id: AnyHashable
     
     public init(_ value: @escaping () -> Void) {
         self.value = value
+        self.id = UUID()
     }
     
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        
         unsafeBitCast((value as AnyObject), to: UnsafeRawPointer.self).hash(into: &hasher)
     }
     
@@ -26,7 +29,9 @@ public struct Action: DynamicAction, Hashable {
     public func perform() {
         value()
     }
-    
+}
+
+extension Action {
     public func map(_ transform: (Action) -> Action) -> Action {
         transform(self)
     }
@@ -39,10 +44,7 @@ public struct Action: DynamicAction, Hashable {
     }
     
     public func insert(_ action: @escaping () -> Void) -> Action {
-        .init {
-            action()
-            self.perform()
-        }
+        insert(Action(action))
     }
     
     public func append(_ action: Action) -> Action {
@@ -53,10 +55,7 @@ public struct Action: DynamicAction, Hashable {
     }
     
     public func append(_ action: @escaping () -> Void) -> Action {
-        .init {
-            self.perform()
-            action()
-        }
+        append(Action(action))
     }
     
     public func add(_ action: Action) -> Action {
@@ -65,6 +64,12 @@ public struct Action: DynamicAction, Hashable {
 }
 
 // MARK: - API -
+
+extension Action {
+    public static let empty = Action {
+        // do nothing
+    }
+}
 
 public struct PerformAction: ActionInitiable, PerformActionView {
     private let action: Action
@@ -90,7 +95,7 @@ public struct PerformAction: ActionInitiable, PerformActionView {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Auxiliary Implementaton -
 
 public protocol ActionInitiable {
     init(action: Action)

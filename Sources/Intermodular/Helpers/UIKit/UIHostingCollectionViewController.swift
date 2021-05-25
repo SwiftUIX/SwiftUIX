@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public final class UIHostingCollectionViewController<
+final class UIHostingCollectionViewController<
     SectionType,
     SectionIdentifierType: Hashable,
     ItemType,

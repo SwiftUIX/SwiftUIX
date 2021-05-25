@@ -88,7 +88,7 @@ class UIHostingCollectionViewSupplementaryView<
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         
         if let contentHostingController = contentHostingController {
@@ -219,7 +219,7 @@ extension UIHostingCollectionViewSupplementaryView {
             configuration = base.configuration
         }
         
-        public var body: some View {
+        var body: some View {
             if let configuration = configuration, let content = configuration.content {
                 content
                     .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
@@ -242,11 +242,11 @@ extension UIHostingCollectionViewSupplementaryView {
             update(disableAnimation: true)
         }
         
-        @objc required public init?(coder aDecoder: NSCoder) {
+        @objc required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
-        public func systemLayoutSizeFitting(
+        func systemLayoutSizeFitting(
             _ targetSize: CGSize
         ) -> CGSize {
             sizeThatFits(
@@ -258,7 +258,7 @@ extension UIHostingCollectionViewSupplementaryView {
             .clamped(to: base?.configuration?.maximumSize)
         }
         
-        public func systemLayoutSizeFitting(
+        func systemLayoutSizeFitting(
             _ targetSize: CGSize,
             withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
             verticalFittingPriority: UILayoutPriority

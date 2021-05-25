@@ -6,6 +6,8 @@ import Swift
 import SwiftUI
 
 public protocol ProgressionController: ViewInteractor {
+    func scrollTo(_ id: AnyHashable)
+
     func moveToNext()
     func moveToPrevious()
 }

@@ -12,7 +12,7 @@ protocol _opaque_UIHostingPageViewController: NSObject {
     
 }
 
-public class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController {
+class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
         var page: Page

@@ -111,7 +111,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 userInterfaceIdiom == .pad || userInterfaceIdiom == .mac
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
-                Button(action: { isPresented.wrappedValue.toggle() }, label: label)
+                Button(action: togglePresentation, label: label)
                     .popover(isPresented: isPresented.onChange { newValue in
                         if !newValue {
                             _onDismiss()

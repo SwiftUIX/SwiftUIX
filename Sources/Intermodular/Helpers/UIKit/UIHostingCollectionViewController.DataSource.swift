@@ -8,10 +8,10 @@ import Swift
 import SwiftUI
 
 extension UIHostingCollectionViewController {
-    public enum DataSource: CustomStringConvertible {
-        public typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
-
-        public struct IdentifierMap {
+    enum DataSource: CustomStringConvertible {
+        typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+        
+        struct IdentifierMap {
             var getSectionID: (SectionType) -> SectionIdentifierType
             var getSectionFromID: (SectionIdentifierType) -> SectionType
             var getItemID: (ItemType) -> ItemIdentifierType
@@ -44,7 +44,7 @@ extension UIHostingCollectionViewController {
 }
 
 extension UIHostingCollectionViewController.DataSource {
-    public var isEmpty: Bool {
+    var isEmpty: Bool {
         switch self {
             case .diffableDataSource(let dataSource):
                 return (dataSource.wrappedValue?.snapshot().numberOfItems ?? 0) == 0
@@ -53,7 +53,7 @@ extension UIHostingCollectionViewController.DataSource {
         }
     }
     
-    public var numerOfSections: Int {
+    var numerOfSections: Int {
         switch self {
             case .diffableDataSource(let dataSource):
                 return dataSource.wrappedValue?.snapshot().numberOfSections ?? 0
@@ -62,7 +62,7 @@ extension UIHostingCollectionViewController.DataSource {
         }
     }
     
-    public var numberOfItems: Int {
+    var numberOfItems: Int {
         switch self {
             case .diffableDataSource(let dataSource):
                 return dataSource.wrappedValue?.snapshot().numberOfItems ?? 0
@@ -71,7 +71,7 @@ extension UIHostingCollectionViewController.DataSource {
         }
     }
     
-    public var description: String {
+    var description: String {
         switch self {
             case .diffableDataSource(let dataSource):
                 return "Diffable Data Source (\((dataSource.wrappedValue?.snapshot().itemIdentifiers.count).map({ "\($0) items" }) ?? "nil")"
@@ -183,7 +183,7 @@ extension UIHostingCollectionViewController {
             if _scrollViewConfiguration.initialContentAlignment == .bottom {
                 scrollToLast(animated: false)
             }
-
+            
             return
         }
         
@@ -361,7 +361,7 @@ fileprivate extension NSDiffableDataSourceSnapshot {
                         
                         return false
                     }
-
+                    
                     insertItems([element], beforeItem: items[offset])
                 } else {
                     appendItems([element])
