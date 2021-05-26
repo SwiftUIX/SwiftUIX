@@ -341,11 +341,11 @@ struct GreedyFrameModifer: _opaque_FrameModifier, ViewModifier {
     func body(content: Content) -> some View {
         content.frame(
             minWidth: width?.fixedValue,
-            idealWidth: width?.resolve(in: .infinite),
-            maxWidth: width?.resolve(in: .infinite),
+            idealWidth: width?.resolve(in: .greatestFiniteDimensions),
+            maxWidth: width?.resolve(in: .greatestFiniteDimensions),
             minHeight: height?.fixedValue,
-            idealHeight: height?.resolve(in: .infinite),
-            maxHeight: height?.resolve(in: .infinite),
+            idealHeight: height?.resolve(in: .greatestFiniteDimensions),
+            maxHeight: height?.resolve(in: .greatestFiniteDimensions),
             alignment: alignment
         )
     }
@@ -357,6 +357,10 @@ struct GreedyFrameModifer: _opaque_FrameModifier, ViewModifier {
 }
 
 extension OptionalDimensions {
+    fileprivate static var greatestFiniteDimensions: OptionalDimensions {
+        .init(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
+    }
+
     fileprivate static var infinite: OptionalDimensions {
         .init(width: .infinity, height: .infinity)
     }
