@@ -183,6 +183,11 @@ While the project itself is stable and heavily being used in production, its doc
 - `UserInterfaceIdiom` - A SwiftUI port for `UIUserInterfaceIdiom`.
 - `UserInterfaceOrientation` - A SwiftUI port for `UserInterfaceOrientation`.
 
+### Scroll 
+
+- `ScrollIndicatorStyle` -  A type that specifies the appearance and interaction of all scroll indicators within a view hierarchy
+  - `HiddenScrollViewIndicatorStyle` - A scroll indicator style that hides all scroll view indicators within a view hierarchy.
+
 ### Status Bar
 
 - `View/statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked

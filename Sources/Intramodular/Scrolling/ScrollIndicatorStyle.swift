@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+/// A type that specifies the appearance and interaction of all scroll indicators within a view hierarchy.
 public protocol ScrollIndicatorStyle {
     
 }
@@ -16,10 +17,16 @@ public struct DefaultScrollViewIndicatorStyle: Hashable, ScrollIndicatorStyle {
     }
 }
 
+/// A scroll indicator style that hides all scroll view indicators within a view hierarchy.
+///
+/// `HiddenScrollViewIndicatorStyle/init(vertical:horizontal:)` allows you to specify
 public struct HiddenScrollViewIndicatorStyle: Hashable, ScrollIndicatorStyle {
     public let vertical: Bool
     public let horizontal: Bool
     
+    /// - Parameters:
+    ///   - vertical: A Boolean value that indicates whether the vertical scroll indicator should be hidden.
+    ///   - horizontal: A Boolean value that indicates whether the horizontal scroll indicator should be hidden.
     public init(vertical: Bool = true, horizontal: Bool = true) {
         self.vertical = vertical
         self.horizontal = horizontal
