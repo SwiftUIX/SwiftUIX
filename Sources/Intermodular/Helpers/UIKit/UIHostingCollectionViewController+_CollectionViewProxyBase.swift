@@ -55,7 +55,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
     }
     
     func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
-        collectionView.setContentOffset(.zero, animated: animated)
+        collectionView.setContentOffset(CGPoint(x: collectionView.contentOffset.x, y: -collectionView.contentInset.top), animated: animated)
     }
     
     func scrollToLast(anchor: UnitPoint? = nil, animated: Bool) {

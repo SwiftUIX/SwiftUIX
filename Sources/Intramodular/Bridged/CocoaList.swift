@@ -68,7 +68,11 @@ public struct CocoaList<
         
         uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
-        uiViewController.scrollViewConfiguration = scrollViewConfiguration.updating(from: context.environment)
+        var scrollViewConfiguration = self.scrollViewConfiguration
+        
+        scrollViewConfiguration.update(from: context.environment)
+        
+        uiViewController.scrollViewConfiguration = scrollViewConfiguration
         
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle

@@ -33,9 +33,18 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     }
     
     @usableFromInline
-    var showsIndicators: Bool = true {
+    var showsVerticalScrollIndicator: Bool = true {
         didSet {
-            if oldValue != showsIndicators {
+            if oldValue != showsVerticalScrollIndicator {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
+    var showsHorizontalScrollIndicator: Bool = true {
+        didSet {
+            if oldValue != showsHorizontalScrollIndicator {
                 isVanilla = false
             }
         }
@@ -189,14 +198,12 @@ extension CocoaScrollViewConfiguration {
         contentInsetAdjustmentBehavior = environment.contentInsetAdjustmentBehavior
         keyboardDismissMode = environment.keyboardDismissMode
         #endif
-    }
-    
-    func updating(from environment: EnvironmentValues) -> Self {
-        var result = self
         
-        result.update(from: environment)
-        
-        return result
+        if let scrollIndicatorStyle = environment.scrollIndicatorStyle as?
+            HiddenScrollViewIndicatorStyle {
+            showsVerticalScrollIndicator = !scrollIndicatorStyle.vertical
+            showsHorizontalScrollIndicator = !scrollIndicatorStyle.horizontal
+        }
     }
 }
 
@@ -236,8 +243,8 @@ extension UIScrollView {
         
         isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
         isScrollEnabled = configuration.isScrollEnabled
-        showsVerticalScrollIndicator = configuration.showsIndicators && configuration.axes.contains(.vertical)
-        showsHorizontalScrollIndicator = configuration.showsIndicators && configuration.axes.contains(.horizontal)
+        showsVerticalScrollIndicator = configuration.showsVerticalScrollIndicator
+        showsHorizontalScrollIndicator = configuration.showsHorizontalScrollIndicator
         
         if contentInset != .init(configuration.contentInset) {
             contentInset = .init(configuration.contentInset)

@@ -6,20 +6,20 @@ import SwiftUI
 
 extension EnvironmentValues {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    struct ContentInsetAdjustmentBehavior: EnvironmentKey {
+    private struct ContentInsetAdjustmentBehaviorKey: EnvironmentKey {
         static let defaultValue: UIScrollView.ContentInsetAdjustmentBehavior? = nil
     }
     
     public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
         get {
-            self[ContentInsetAdjustmentBehavior]
+            self[ContentInsetAdjustmentBehaviorKey]
         } set {
-            self[ContentInsetAdjustmentBehavior] = newValue
+            self[ContentInsetAdjustmentBehaviorKey] = newValue
         }
     }
 
     @available(tvOS, unavailable)
-    struct KeyboardDismissModeKey: EnvironmentKey {
+    private struct KeyboardDismissModeKey: EnvironmentKey {
         static let defaultValue: UIScrollView.KeyboardDismissMode = .none
     }
     
