@@ -412,7 +412,9 @@ extension UIHostingCollectionViewController {
                 return
             }
             
+            view.cache.content = nil
             view.configuration?.viewProvider = viewProvider
+            
             view.update(forced: true)
         }
         
@@ -421,7 +423,9 @@ extension UIHostingCollectionViewController {
                 return
             }
             
+            cell.cache.content = nil
             cell.configuration?.viewProvider = viewProvider
+            
             cell.update(forced: false)
         }
         
@@ -430,7 +434,9 @@ extension UIHostingCollectionViewController {
                 return
             }
             
+            view.cache.content = nil
             view.configuration?.viewProvider = viewProvider
+            
             view.update(forced: true)
         }
     }

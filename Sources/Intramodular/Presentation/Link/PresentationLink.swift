@@ -37,13 +37,17 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         _isPresented ?? $_internal_isPresented
     }
     
+    var presentationStyle: ModalPresentationStyle {
+        _presentationStyle ?? _environment_modalPresentationStyle
+    }
+    
     var presentation: AnyModalPresentation {
         let content = AnyPresentationView(
             _destination
                 .managedObjectContext(managedObjectContext)
                 .modifier(_ResolveAppKitOrUIKitViewController())
         )
-        .modalPresentationStyle(_presentationStyle ?? _environment_modalPresentationStyle)
+        .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
         .mergeEnvironmentBuilder(environmentBuilder)
         
@@ -62,10 +66,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         PassthroughView {
             if let presenter = presenter,
                userInterfaceIdiom != .mac,
-               presentation.style != .automatic
+               presentationStyle != .automatic
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
-                if case .popover(_, _) = presentation.style {
+                if case .popover(_, _) = presentationStyle {
                     IntrinsicGeometryReader { proxy in
                         if presenter is CocoaPresentationCoordinator {
                             Button(
@@ -104,10 +108,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 #else
                 Button(action: { presenter.present(presentation) }, label: label)
                 #endif
-            } else if presentation.style == .automatic {
+            } else if presentationStyle == .automatic {
                 _sheetPresentationButton
             } else if
-                presentation.style == .popover,
+                presentationStyle == .popover,
                 userInterfaceIdiom == .pad || userInterfaceIdiom == .mac
             {
                 #if os(iOS) || targetEnvironment(macCatalyst)
@@ -208,6 +212,19 @@ extension PresentationLink {
     }
     
     public init(
+        isPresented: Binding<Bool>,
+        onDismiss: @escaping () -> () = { },
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination()
+        self._onDismiss = onDismiss
+        self._isPresented = isPresented
+        
+        self.label = label()
+    }
+
+    public init(
         destination: Destination,
         isPresented: Binding<Bool>,
         @ViewBuilder label: () -> Label
@@ -226,7 +243,7 @@ extension PresentationLink {
         @ViewBuilder label: () -> Label
     ) {
         self._destination = destination
-        self._onDismiss = { }
+        self._onDismiss = { selection.wrappedValue = nil }
         self._isPresented = .init(
             get: { selection.wrappedValue == tag },
             set: { newValue in

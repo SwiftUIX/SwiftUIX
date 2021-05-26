@@ -6,6 +6,18 @@ import SwiftUI
 
 extension EnvironmentValues {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    struct ContentInsetAdjustmentBehavior: EnvironmentKey {
+        static let defaultValue: UIScrollView.ContentInsetAdjustmentBehavior? = nil
+    }
+    
+    public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
+        get {
+            self[ContentInsetAdjustmentBehavior]
+        } set {
+            self[ContentInsetAdjustmentBehavior] = newValue
+        }
+    }
+
     @available(tvOS, unavailable)
     struct KeyboardDismissModeKey: EnvironmentKey {
         static let defaultValue: UIScrollView.KeyboardDismissMode = .none
@@ -38,6 +50,10 @@ extension EnvironmentValues {
 
 extension View {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func contentInsetAdjustmentBehavior(_ behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> some View {
+        environment(\.contentInsetAdjustmentBehavior, behavior)
+    }
+    
     /// Sets the keyboard dismiss mode for this view.
     @available(tvOS, unavailable)
     public func keyboardDismissMode(_ keyboardDismissMode: UIScrollView.KeyboardDismissMode) -> some View {

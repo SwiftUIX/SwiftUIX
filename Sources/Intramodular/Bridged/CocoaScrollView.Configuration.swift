@@ -116,6 +116,15 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     }
     
     @usableFromInline
+    var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
+        didSet {
+            if oldValue != contentInsetAdjustmentBehavior {
+                isVanilla = false
+            }
+        }
+    }
+    
+    @usableFromInline
     var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
         didSet {
             if oldValue != contentOffsetBehavior {
@@ -177,6 +186,7 @@ extension CocoaScrollViewConfiguration {
         }
         
         #if os(iOS) || targetEnvironment(macCatalyst)
+        contentInsetAdjustmentBehavior = environment.contentInsetAdjustmentBehavior
         keyboardDismissMode = environment.keyboardDismissMode
         #endif
     }
@@ -231,6 +241,12 @@ extension UIScrollView {
         
         if contentInset != .init(configuration.contentInset) {
             contentInset = .init(configuration.contentInset)
+        }
+        
+        if let contentInsetAdjustmentBehavior = configuration.contentInsetAdjustmentBehavior {
+            self.contentInsetAdjustmentBehavior = contentInsetAdjustmentBehavior
+        } else {
+            self.contentInsetAdjustmentBehavior = .automatic
         }
         
         #if os(iOS) || targetEnvironment(macCatalyst)
