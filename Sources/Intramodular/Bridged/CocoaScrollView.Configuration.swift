@@ -24,7 +24,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     }
     
     @usableFromInline
-    var axes: Axis.Set = [.horizontal, .vertical] {
+    var axes: Axis.Set = [.vertical] {
         didSet {
             if oldValue != axes {
                 isVanilla = false
