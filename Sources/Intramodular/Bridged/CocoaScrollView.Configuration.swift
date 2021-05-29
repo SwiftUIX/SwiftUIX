@@ -10,7 +10,7 @@ import SwiftUI
 /// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View> {
     @usableFromInline
-    var isVanilla: Bool = true
+    var hasChanged: Bool = true
     
     // MARK: General
     
@@ -18,7 +18,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var initialContentAlignment: Alignment? {
         didSet {
             if oldValue != initialContentAlignment {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -27,7 +27,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var axes: Axis.Set = [.vertical] {
         didSet {
             if oldValue != axes {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -36,7 +36,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var showsVerticalScrollIndicator: Bool = true {
         didSet {
             if oldValue != showsVerticalScrollIndicator {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -45,7 +45,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var showsHorizontalScrollIndicator: Bool = true {
         didSet {
             if oldValue != showsHorizontalScrollIndicator {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -54,7 +54,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceVertical: Bool? = nil {
         didSet {
             if oldValue != alwaysBounceVertical {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -63,7 +63,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceHorizontal: Bool? = nil {
         didSet {
             if oldValue != alwaysBounceHorizontal {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -72,7 +72,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isDirectionalLockEnabled: Bool = false {
         didSet {
             if oldValue != isDirectionalLockEnabled {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -81,7 +81,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isPagingEnabled: Bool = false {
         didSet {
             if oldValue != isPagingEnabled {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -90,7 +90,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isScrollEnabled: Bool = true {
         didSet {
             if oldValue != isScrollEnabled {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -99,7 +99,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
         didSet {
             if (oldValue == nil) != (onOffsetChange == nil) {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -110,7 +110,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentOffset: Binding<CGPoint>? = nil {
         didSet {
             if (oldValue == nil) != (contentOffset == nil) {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -119,7 +119,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentInset: EdgeInsets = .zero {
         didSet {
             if oldValue != contentInset {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -128,7 +128,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
         didSet {
             if oldValue != contentInsetAdjustmentBehavior {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -137,7 +137,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
         didSet {
             if oldValue != contentOffsetBehavior {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -148,7 +148,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var onRefresh: (() -> Void)? {
         didSet {
             if (oldValue == nil) != (onRefresh == nil) {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -157,7 +157,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isRefreshing: Bool? {
         didSet {
             if oldValue != isRefreshing {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -166,7 +166,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var refreshControlTintColor: UIColor? {
         didSet {
             if oldValue != refreshControlTintColor {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -178,7 +178,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none {
         didSet {
             if oldValue != keyboardDismissMode {
-                isVanilla = false
+                hasChanged = false
             }
         }
     }
@@ -213,6 +213,7 @@ public struct ScrollContentOffsetBehavior: OptionSet {
     public static let maintainOnChangeOfBounds = Self(rawValue: 1 << 0)
     public static let maintainOnChangeOfContentSize = Self(rawValue: 1 << 1)
     public static let maintainOnChangeOfKeyboardFrame = Self(rawValue: 1 << 2)
+    public static let smartAlignOnChangeOfContentSize = Self(rawValue: 1 << 3)
     
     public let rawValue: Int8
     
@@ -229,7 +230,7 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
-        guard !configuration.isVanilla else {
+        guard !configuration.hasChanged else {
             return
         }
         
@@ -304,30 +305,43 @@ extension UIScrollView {
         #endif
     }
     
-    func updateContentSizeWithoutChangingContentOffset(_ update: () -> Void) {
-        if isScrolling {
-            setContentOffset(contentOffset, animated: false)
+    func maintainScrollContentOffsetBehavior(
+        _ behavior: ScrollContentOffsetBehavior,
+        animated: Bool,
+        _ update: () -> Void
+    ) {
+        if behavior.contains(.maintainOnChangeOfContentSize) {
+            if isScrolling {
+                setContentOffset(contentOffset, animated: false)
+            }
         }
         
+        let beforeVerticalAlignment = currentVerticalAlignment
         let beforeContentSize = contentSize
         
         update()
         
         let afterContentSize = contentSize
         
-        var deltaX = contentOffset.x + (afterContentSize.width - beforeContentSize.width)
-        var deltaY = contentOffset.y + (afterContentSize.height - beforeContentSize.height)
-        
-        deltaX = beforeContentSize.width == 0 ? 0 : max(0, deltaX)
-        deltaY = beforeContentSize.height == 0 ? 0 : max(0, deltaY)
-        
-        let newOffset = CGPoint(
-            x: contentOffset.x + deltaX,
-            y: contentOffset.y + deltaY
-        )
-        
-        if contentOffset != newOffset {
-            setContentOffset(newOffset, animated: true)
+        if behavior.contains(.maintainOnChangeOfContentSize) {
+            var deltaX = contentOffset.x + (afterContentSize.width - beforeContentSize.width)
+            var deltaY = contentOffset.y + (afterContentSize.height - beforeContentSize.height)
+            
+            deltaX = beforeContentSize.width == 0 ? 0 : max(0, deltaX)
+            deltaY = beforeContentSize.height == 0 ? 0 : max(0, deltaY)
+            
+            let newOffset = CGPoint(
+                x: contentOffset.x + deltaX,
+                y: contentOffset.y + deltaY
+            )
+            
+            if contentOffset != newOffset {
+                setContentOffset(newOffset, animated: animated)
+            }
+        } else if behavior.contains(.smartAlignOnChangeOfContentSize) {
+            if beforeVerticalAlignment == .bottom {
+                setContentAlignment(.bottom, animated: animated)
+            }
         }
     }
 }

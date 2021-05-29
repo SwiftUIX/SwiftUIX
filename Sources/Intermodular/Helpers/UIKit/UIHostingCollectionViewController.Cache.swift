@@ -86,14 +86,14 @@ extension UIHostingCollectionViewController {
             layout collectionViewLayout: UICollectionViewLayout,
             sizeForItemAt indexPath: IndexPath
         ) -> CGSize {
-            guard let dataSource = parent.dataSource, dataSource.contains(indexPath) else {
+            guard parent.dataSource.contains(indexPath) else {
                 return .init(width: 1.0, height: 1.0)
             }
             
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
-            let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
+            let sectionIdentifier = parent.dataSource.identifierMap[section]
             let item = parent._unsafelyUnwrappedItem(at: indexPath)
-            let itemIdentifier = parent.dataSourceConfiguration.identifierMap[item]
+            let itemIdentifier = parent.dataSource.identifierMap[item]
             let id = UICollectionViewCellType.Configuration.ID(item: itemIdentifier, section: sectionIdentifier)
             
             if let size = cellIdentifierToCacheMap[id]?.contentSize {
@@ -125,7 +125,7 @@ extension UIHostingCollectionViewController {
             let indexPath = IndexPath(row: -1, section: section)
             
             let section = parent._unsafelyUnwrappedSection(from: indexPath)
-            let sectionIdentifier = parent.dataSourceConfiguration.identifierMap[section]
+            let sectionIdentifier = parent.dataSource.identifierMap[section]
             let id = UICollectionViewSupplementaryViewType.Configuration.ID(kind: kind, item: nil, section: sectionIdentifier)
             
             let indexPathBasedSize = indexPathToSupplementaryViewContentSizeMap[kind]?[indexPath]

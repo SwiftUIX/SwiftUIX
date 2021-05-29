@@ -11,11 +11,10 @@ import SwiftUI
 public struct AttributedText: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitLabel
     
-    public let content: NSAttributedString
-    
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    fileprivate var uiFont: UIFont?
-    #endif
+    struct Configuration: Hashable {
+        var appKitOrUIKitFont: AppKitOrUIKitFont?
+        var appKitOrUIKitForegroundColor: AppKitOrUIKitColor?
+    }
     
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
     @Environment(\.adjustsFontSizeToFitWidth) var adjustsFontSizeToFitWidth
@@ -26,10 +25,13 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     @Environment(\.lineLimit) var lineLimit
     @Environment(\.minimumScaleFactor) var minimumScaleFactor
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
-    
     #if os(macOS)
     @Environment(\.layoutDirection) var layoutDirection
     #endif
+    
+    public let content: NSAttributedString
+    
+    var configuration = Configuration()
     
     public init(_ content: NSAttributedString) {
         self.content = content
@@ -50,26 +52,33 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
 
 // MARK: - API -
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AttributedText {
-    public func font(_ uiFont: UIFont) -> AttributedText {
-        then({ $0.uiFont = uiFont })
+    public func font(_ font: AppKitOrUIKitFont) -> Self {
+        then({ $0.configuration.appKitOrUIKitFont = font })
+    }
+    
+    public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
+        then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor })
+    }
+    
+    public func foregroundColor(_ foregroundColor: Color) -> Self {
+        then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
     }
 }
-#endif
 
-// MARK: - Helpers -
+// MARK: - Auxiliary Implementation -
 
 extension AppKitOrUIKitLabel {
     func configure(with attributedText: AttributedText) {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
         #endif
-        
+        self.font = attributedText.configuration.appKitOrUIKitFont ?? self.font
         self.adjustsFontSizeToFitWidth = attributedText.adjustsFontSizeToFitWidth
         self.lineBreakMode = attributedText.lineBreakMode
         self.minimumScaleFactor = attributedText.minimumScaleFactor
         self.numberOfLines = attributedText.lineLimit ?? 0
+        self.textColor = attributedText.configuration.appKitOrUIKitForegroundColor ?? self.textColor
         
         #if os(macOS)
         self.setAccessibilityEnabled(attributedText.accessibilityEnabled)
@@ -77,10 +86,10 @@ extension AppKitOrUIKitLabel {
         #endif
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        if let uiFont = attributedText.uiFont {
+        if let font = attributedText.configuration.appKitOrUIKitFont ?? attributedText.font?.toUIFont() {
             let string = NSMutableAttributedString(attributedString: attributedText.content)
             
-            string.addAttribute(.font, value: uiFont, range: .init(location: 0, length: string.length))
+            string.addAttribute(.font, value: font, range: .init(location: 0, length: string.length))
             
             self.attributedText = attributedText.content
         } else {
@@ -104,36 +113,6 @@ extension AppKitOrUIKitLabel {
         setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultLow, for: .vertical)
-    }
-}
-
-private class AppKitOrUIKitLabelWrapper: AppKitOrUIKitView {
-    private var label = AppKitOrUIKitLabel()
-    
-    init() {
-        super.init(frame: .zero)
-        
-        self.addSubview(label)
-        
-        #if os(macOS)
-        label.autoresizingMask = [.width, .height]
-        #else
-        label.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        #endif
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-    
-    #if !os(macOS)
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
-    #endif
-    
-    func configure(with attributedText: AttributedText) {
-        label.configure(with: attributedText)
     }
 }
 

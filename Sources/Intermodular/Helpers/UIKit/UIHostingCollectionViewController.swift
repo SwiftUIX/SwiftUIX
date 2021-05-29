@@ -37,13 +37,12 @@ final class UIHostingCollectionViewController<
         CellContent
     >
     
-    var dataSource: DataSource? = nil {
+    var dataSource: DataSource {
         didSet {
             updateDataSource(oldValue: oldValue, newValue: dataSource)
         }
     }
     
-    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration
     var viewProvider: _SwiftUIType.ViewProvider
     
     var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
@@ -108,13 +107,13 @@ final class UIHostingCollectionViewController<
     }()
     
     init(
-        dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration,
+        configuration: _SwiftUIType.Configuration,
         viewProvider: _SwiftUIType.ViewProvider,
-        configuration: _SwiftUIType.Configuration
+        dataSource: DataSource
     ) {
-        self.dataSourceConfiguration = dataSourceConfiguration
-        self.viewProvider = viewProvider
         self.configuration = configuration
+        self.viewProvider = viewProvider
+        self.dataSource = dataSource
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -140,7 +139,7 @@ final class UIHostingCollectionViewController<
         )
         
         let diffableDataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>(collectionView: collectionView) { [weak self] collectionView, indexPath, sectionIdentifier in
-            guard let self = self, self.dataSource != nil else {
+            guard let self = self else {
                 return nil
             }
             
@@ -156,8 +155,8 @@ final class UIHostingCollectionViewController<
             cell.configuration = .init(
                 item: item,
                 section: section,
-                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
-                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
+                itemIdentifier: self.dataSource.identifierMap[item],
+                sectionIdentifier: self.dataSource.identifierMap[section],
                 indexPath: indexPath,
                 viewProvider: self.viewProvider,
                 maximumSize: self.maximumCollectionViewCellSize
@@ -171,7 +170,7 @@ final class UIHostingCollectionViewController<
         }
         
         diffableDataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            guard let self = self, self.dataSource != nil else {
+            guard let self = self else {
                 return nil
             }
             
@@ -195,8 +194,8 @@ final class UIHostingCollectionViewController<
                 kind: kind,
                 item: item,
                 section: section,
-                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
-                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
+                itemIdentifier: self.dataSource.identifierMap[item],
+                sectionIdentifier: self.dataSource.identifierMap[section],
                 indexPath: indexPath,
                 viewProvider: self.viewProvider,
                 maximumSize: self.maximumCollectionViewCellSize
@@ -444,7 +443,7 @@ extension UIHostingCollectionViewController {
 
 extension UIHostingCollectionViewController {
     func section(from indexPath: IndexPath) -> SectionType? {
-        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+        guard dataSource.contains(indexPath) else {
             return nil
         }
         
@@ -452,7 +451,7 @@ extension UIHostingCollectionViewController {
     }
     
     func item(at indexPath: IndexPath) -> ItemType? {
-        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
+        guard dataSource.contains(indexPath) else {
             return nil
         }
         
@@ -460,18 +459,18 @@ extension UIHostingCollectionViewController {
     }
     
     func _unsafelyUnwrappedSection(from indexPath: IndexPath) -> SectionType {
-        if case .static(let data) = dataSource {
+        if case .static(let data) = dataSource.payload {
             return data[data.index(data.startIndex, offsetBy: indexPath.section)].model
         } else {
-            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section]]
+            return dataSource.identifierMap[_internalDiffableDataSource!.snapshot().sectionIdentifiers[indexPath.section]]
         }
     }
     
     func _unsafelyUnwrappedItem(at indexPath: IndexPath) -> ItemType {
-        if case .static(let data) = dataSource {
+        if case .static(let data) = dataSource.payload {
             return data[indexPath]
         } else {
-            return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
+            return dataSource.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
         }
     }
     
@@ -481,7 +480,7 @@ extension UIHostingCollectionViewController {
             .compactMap({ $0 as? UICollectionViewCellType})
             .first(where: { $0.configuration?.indexPath == indexPath })
         
-        if let dataSource = dataSource, !dataSource.contains(indexPath) {
+        if !dataSource.contains(indexPath) {
             return nil
         }
         

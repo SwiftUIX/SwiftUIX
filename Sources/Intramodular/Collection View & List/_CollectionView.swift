@@ -27,6 +27,140 @@ struct _CollectionView<
         RowContent
     >
     
+    typealias Configuration = _CollectionViewConfiguration
+    
+    private let dataSource: UIViewControllerType.DataSource
+    private let viewProvider: ViewProvider
+    
+    @Environment(\._collectionViewConfiguration) var configuration: Configuration
+    
+    public func makeUIViewController(context: Context) -> UIViewControllerType {
+        .init(
+            configuration: configuration,
+            viewProvider: viewProvider,
+            dataSource: dataSource
+        )
+    }
+    
+    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        populateCollectionViewProxy: do {
+            if let _collectionViewProxy = context.environment._collectionViewProxy {
+                if _collectionViewProxy.wrappedValue.base !== uiViewController {
+                    DispatchQueue.main.async {
+                        _collectionViewProxy.wrappedValue.base = uiViewController
+                    }
+                }
+            }
+        }
+        
+        updateCollectionViewLayout: do {
+            let collectionViewLayout = _CollectionViewLayout(
+                collectionViewController: uiViewController,
+                base: context.environment.collectionViewLayout
+            )
+            
+            if uiViewController.collectionViewLayout.hashValue != collectionViewLayout.hashValue {
+                uiViewController.collectionViewLayout = collectionViewLayout
+            }
+        }
+        
+        uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
+        uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
+        uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
+        uiViewController.configuration = context.environment._collectionViewConfiguration
+        uiViewController.viewProvider = viewProvider
+        
+        uiViewController.dataSource = dataSource
+        
+        uiViewController.refreshVisibleCellsAndSupplementaryViews()
+    }
+}
+
+// MARK: - Initializers -
+
+extension _CollectionView {
+    @_disfavoredOverload
+    init<Data: RandomAccessCollection>(
+        _ data: Data,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
+        rowContent: @escaping (SectionType, ItemType) -> RowContent
+    ) where
+        SectionType: Identifiable,
+        SectionIdentifierType == _IdentifierHashedValue<SectionType>,
+        ItemType: Identifiable,
+        ItemIdentifierType == _IdentifierHashedValue<ItemType>,
+        Data.Element == ListSection<SectionType, ItemType>
+    {
+        self.dataSource = .init(
+            payload: .static(.init(data)),
+            identifierMap: .init(
+                getSectionID: { .init($0) },
+                getSectionFromID: { $0.value },
+                getItemID: { .init($0) },
+                getItemFromID: { $0.value }
+            )
+        )
+        
+        self.viewProvider = .init(
+            sectionHeader: sectionHeader,
+            sectionFooter: sectionFooter,
+            rowContent: rowContent
+        )
+    }
+    
+    init(
+        _ data: UIViewControllerType.DataSource.Payload,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
+        rowContent: @escaping (SectionType, ItemType) -> RowContent
+    ) where
+        SectionType: Hashable,
+        ItemType: Hashable,
+        SectionIdentifierType == SectionType,
+        ItemIdentifierType == ItemType
+    {
+        self.dataSource = .init(
+            payload: data,
+            identifierMap: .init(
+                getSectionID: { $0 },
+                getSectionFromID: { $0 },
+                getItemID: { $0 },
+                getItemFromID: { $0 }
+            )
+        )
+        
+        self.viewProvider = .init(
+            sectionHeader: sectionHeader,
+            sectionFooter: sectionFooter,
+            rowContent: rowContent
+        )
+    }
+    
+    init<Data: RandomAccessCollection>(
+        _ data: Data,
+        sectionHeader: @escaping (SectionType) -> SectionHeader,
+        sectionFooter: @escaping (SectionType) -> SectionFooter,
+        rowContent: @escaping (SectionType, ItemType) -> RowContent
+    ) where
+        SectionType: Hashable,
+        ItemType: Hashable,
+        SectionIdentifierType == SectionType,
+        ItemIdentifierType == ItemType,
+        Data.Element == ListSection<SectionType, ItemType>
+    {
+        self.init(
+            .static(.init(data)),
+            sectionHeader: sectionHeader,
+            sectionFooter: sectionFooter,
+            rowContent: { rowContent($0, $1) }
+        )
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension _CollectionView {
     public struct _CollectionViewLayout: CollectionViewLayout, Hashable {
         weak var collectionViewController: NSObject?
         
@@ -44,10 +178,6 @@ struct _CollectionView<
         public static func == (lhs: Self, rhs: Self) -> Bool {
             lhs.hashValue == rhs.hashValue
         }
-    }
-    
-    struct DataSourceConfiguration {
-        let identifierMap: UIViewControllerType.DataSource.IdentifierMap
     }
     
     struct ViewProvider {
@@ -78,136 +208,6 @@ struct _CollectionView<
                 }
             }
         }
-    }
-    
-    typealias Configuration = _CollectionViewConfiguration
-    
-    private let dataSource: UIViewControllerType.DataSource
-    private let dataSourceConfiguration: DataSourceConfiguration
-    private let viewProvider: ViewProvider
-    
-    @Environment(\._collectionViewConfiguration) var configuration: Configuration
-    
-    public func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(
-            dataSourceConfiguration: dataSourceConfiguration,
-            viewProvider: viewProvider,
-            configuration: configuration
-        )
-    }
-    
-    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        populateCollectionViewProxy: do {
-            if let _collectionViewProxy = context.environment._collectionViewProxy {
-                if _collectionViewProxy.wrappedValue.base !== uiViewController {
-                    DispatchQueue.main.async {
-                        _collectionViewProxy.wrappedValue.base = uiViewController
-                    }
-                }
-            }
-        }
-        
-        updateCollectionViewLayout: do {
-            let collectionViewLayout = _CollectionViewLayout(
-                collectionViewController: uiViewController,
-                base: context.environment.collectionViewLayout
-            )
-            
-            if uiViewController.collectionViewLayout.hashValue != collectionViewLayout.hashValue {
-                uiViewController.collectionViewLayout = collectionViewLayout
-            }
-        }
-        
-        uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
-        uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
-        uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
-        uiViewController.dataSourceConfiguration = dataSourceConfiguration
-        uiViewController.configuration = context.environment._collectionViewConfiguration
-        uiViewController.viewProvider = viewProvider
-        
-        uiViewController.dataSource = dataSource
-        
-        uiViewController.refreshVisibleCellsAndSupplementaryViews()
-    }
-}
-
-// MARK: - Initializers -
-
-extension _CollectionView {
-    @_disfavoredOverload
-    init<Data: RandomAccessCollection>(
-        _ data: Data,
-        sectionHeader: @escaping (SectionType) -> SectionHeader,
-        sectionFooter: @escaping (SectionType) -> SectionFooter,
-        rowContent: @escaping (SectionType, ItemType) -> RowContent
-    ) where
-        SectionType: Identifiable,
-        SectionIdentifierType == _IdentifierHashedValue<SectionType>,
-        ItemType: Identifiable,
-        ItemIdentifierType == _IdentifierHashedValue<ItemType>,
-        Data.Element == ListSection<SectionType, ItemType>
-    {
-        self.dataSource = .static(.init(data))
-        self.dataSourceConfiguration = .init(
-            identifierMap: .init(
-                getSectionID: { .init($0) },
-                getSectionFromID: { $0.value },
-                getItemID: { .init($0) },
-                getItemFromID: { $0.value }
-            )
-        )
-        self.viewProvider = .init(
-            sectionHeader: sectionHeader,
-            sectionFooter: sectionFooter,
-            rowContent: rowContent
-        )
-    }
-    
-    init(
-        _ dataSource: UIViewControllerType.DataSource,
-        sectionHeader: @escaping (SectionType) -> SectionHeader,
-        sectionFooter: @escaping (SectionType) -> SectionFooter,
-        rowContent: @escaping (SectionType, ItemType) -> RowContent
-    ) where
-        SectionType: Hashable,
-        ItemType: Hashable,
-        SectionIdentifierType == SectionType,
-        ItemIdentifierType == ItemType
-    {
-        self.dataSource = dataSource
-        self.dataSourceConfiguration = .init(
-            identifierMap: .init(
-                getSectionID: { $0 },
-                getSectionFromID: { $0 },
-                getItemID: { $0 },
-                getItemFromID: { $0 }
-            )
-        )
-        self.viewProvider = .init(
-            sectionHeader: sectionHeader,
-            sectionFooter: sectionFooter,
-            rowContent: rowContent
-        )
-    }
-    
-    init<Data: RandomAccessCollection>(
-        _ data: Data,
-        sectionHeader: @escaping (SectionType) -> SectionHeader,
-        sectionFooter: @escaping (SectionType) -> SectionFooter,
-        rowContent: @escaping (SectionType, ItemType) -> RowContent
-    ) where
-        SectionType: Hashable,
-        ItemType: Hashable,
-        SectionIdentifierType == SectionType,
-        ItemIdentifierType == ItemType,
-        Data.Element == ListSection<SectionType, ItemType>
-    {
-        self.init(
-            .static(.init(data)),
-            sectionHeader: sectionHeader,
-            sectionFooter: sectionFooter,
-            rowContent: { rowContent($0, $1) }
-        )
     }
 }
 

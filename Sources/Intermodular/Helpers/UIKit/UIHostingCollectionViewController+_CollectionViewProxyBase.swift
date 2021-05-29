@@ -20,11 +20,11 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
         if let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             if collectionViewLayout.scrollDirection == .vertical {
                 if baseContentSize.width == 0, collectionView.frame.width > 0 {
-                    baseContentSize.width = collectionView.frame.width - collectionView.contentInset.horizontal
+                    baseContentSize.width = collectionView.frame.width - collectionView.adjustedContentInset.horizontal
                 }
             } else if collectionViewLayout.scrollDirection == .horizontal {
                 if baseContentSize.height == 0, collectionView.frame.height > 0 {
-                    baseContentSize.height = collectionView.frame.height - collectionView.contentInset.vertical
+                    baseContentSize.height = collectionView.frame.height - collectionView.adjustedContentInset.vertical
                 }
             }
         }
@@ -55,7 +55,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
     }
     
     func scrollToTop(anchor: UnitPoint? = nil, animated: Bool = true) {
-        collectionView.setContentOffset(CGPoint(x: collectionView.contentOffset.x, y: -collectionView.contentInset.top), animated: animated)
+        collectionView.setContentOffset(CGPoint(x: collectionView.contentOffset.x, y: -collectionView.adjustedContentInset.top), animated: animated)
     }
     
     func scrollToLast(anchor: UnitPoint? = nil, animated: Bool) {
@@ -84,7 +84,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             
             let newContentOffset = CGPoint(
                 x: collectionView.contentOffset.x,
-                y: max(-collectionView.contentInset.top, contentSize.height - (collectionView.bounds.size.height - collectionView.contentInset.bottom))
+                y: max(-collectionView.adjustedContentInset.top, contentSize.height - (collectionView.bounds.size.height - collectionView.adjustedContentInset.bottom))
             )
             
             if collectionView.contentOffset != newContentOffset, newContentOffset.y >= 0 {

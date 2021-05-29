@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import Swift
 
 extension ScrollView {
     public struct ContentOffset {
@@ -13,6 +14,7 @@ extension ScrollView {
         
         fileprivate var containerBounds: CGRect
         fileprivate var contentSize: CGSize
+        fileprivate var contentInsets: EdgeInsets
         fileprivate var contentOffset: CGPoint
     }
 }
@@ -38,7 +40,7 @@ extension ScrollView.ContentOffset {
                 return .topTrailing
             case contentOffset(for: .bottomTrailing):
                 return .topTrailing
-            
+                
             default:
                 return nil
         }
@@ -90,7 +92,7 @@ extension ScrollView.ContentOffset {
             case .center:
                 offset.y = (contentSize.height - containerBounds.size.height) / 2
             case .bottom:
-                offset.y = contentSize.height - containerBounds.size.height
+                offset.y = max(-contentInsets.top, contentSize.height - (containerBounds.size.height - contentInsets.bottom))
             default:
                 fatalError()
         }
@@ -104,10 +106,34 @@ extension ScrollView.ContentOffset {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIScrollView {
+    var currentVerticalAlignment: VerticalAlignment? {
+        let currentOffset = contentOffset.y
+        
+        if contentSize.height > frame.height {
+            let topContentOffset = -contentInset.top
+            let bottomContentOffset = contentSize.height - (frame.height - adjustedContentInset.bottom)
+            
+            if abs(bottomContentOffset - currentOffset) < 5 {
+                return .bottom
+            } else if abs(topContentOffset - currentOffset) < 5 {
+                return .top
+            }
+        } else {
+            return .center
+        }
+        
+        return nil
+    }
+    
     func contentOffset<Content: View>(
         forContentType type: Content.Type
     ) -> ScrollView<Content>.ContentOffset {
-        .init(containerBounds: bounds, contentSize: contentSize, contentOffset: contentOffset)
+        .init(
+            containerBounds: bounds,
+            contentSize: contentSize,
+            contentInsets: .init(contentInset),
+            contentOffset: contentOffset
+        )
     }
     
     func setContentOffset<Content: View>(_ offset: ScrollView<Content>.ContentOffset, animated: Bool) {

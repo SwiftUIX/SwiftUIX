@@ -8,10 +8,19 @@ import Swift
 import SwiftUI
 
 extension UIHostingCollectionViewController {
-    enum DataSource: CustomStringConvertible {
+    struct DataSource {
         typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
         
+        public enum Payload {
+            typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+            
+            case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
+            case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
+        }
+        
         struct IdentifierMap {
+            typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+            
             var getSectionID: (SectionType) -> SectionIdentifierType
             var getSectionFromID: (SectionIdentifierType) -> SectionType
             var getItemID: (ItemType) -> ItemIdentifierType
@@ -38,14 +47,14 @@ extension UIHostingCollectionViewController {
             }
         }
         
-        case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
-        case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
+        let payload: Payload
+        let identifierMap: IdentifierMap
     }
 }
 
 extension UIHostingCollectionViewController.DataSource {
     var isEmpty: Bool {
-        switch self {
+        switch payload {
             case .diffableDataSource(let dataSource):
                 return (dataSource.wrappedValue?.snapshot().numberOfItems ?? 0) == 0
             case .static(let data):
@@ -54,7 +63,7 @@ extension UIHostingCollectionViewController.DataSource {
     }
     
     var numerOfSections: Int {
-        switch self {
+        switch payload {
             case .diffableDataSource(let dataSource):
                 return dataSource.wrappedValue?.snapshot().numberOfSections ?? 0
             case .static(let data):
@@ -63,7 +72,7 @@ extension UIHostingCollectionViewController.DataSource {
     }
     
     var numberOfItems: Int {
-        switch self {
+        switch payload {
             case .diffableDataSource(let dataSource):
                 return dataSource.wrappedValue?.snapshot().numberOfItems ?? 0
             case .static(let data):
@@ -72,7 +81,7 @@ extension UIHostingCollectionViewController.DataSource {
     }
     
     var description: String {
-        switch self {
+        switch payload {
             case .diffableDataSource(let dataSource):
                 return "Diffable Data Source (\((dataSource.wrappedValue?.snapshot().itemIdentifiers.count).map({ "\($0) items" }) ?? "nil")"
             case .static(let data):
@@ -81,7 +90,7 @@ extension UIHostingCollectionViewController.DataSource {
     }
     
     func contains(_ indexPath: IndexPath) -> Bool {
-        switch self {
+        switch payload {
             case .static(let data): do {
                 guard indexPath.section < data.count else {
                     return false
@@ -116,31 +125,28 @@ extension UIHostingCollectionViewController.DataSource {
         }
     }
     
-    func reset(
-        _ diffableDataSource: UICollectionViewDiffableDataSourceType,
-        withConfiguration configuration:
-            UIHostingCollectionViewController._SwiftUIType.DataSourceConfiguration,
-        animatingDifferences: Bool
-    ) {
-        guard case .static(let data) = self else {
+    func reset(_ dataSource: UICollectionViewDiffableDataSourceType, animated: Bool) {
+        guard case .static(let data) = payload else {
             return
         }
         
-        var snapshot = diffableDataSource.snapshot()
+        var snapshot = dataSource.snapshot()
         
         snapshot.deleteAllItemsIfNecessary()
-        snapshot.appendSections(data.map({ configuration.identifierMap[$0.model] }))
+        snapshot.appendSections(data.map({ identifierMap[$0.model] }))
         
         for element in data {
             snapshot.appendItems(
-                element.items.map({ configuration.identifierMap[$0] }),
-                toSection: configuration.identifierMap[element.model]
+                element.items.map({ identifierMap[$0] }),
+                toSection: identifierMap[element.model]
             )
         }
         
-        diffableDataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+        dataSource.apply(snapshot, animatingDifferences: animated)
     }
 }
+
+// MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewController {
     func updateDataSource(
@@ -159,7 +165,7 @@ extension UIHostingCollectionViewController {
             return
         }
         
-        if case .diffableDataSource(let binding) = newValue {
+        if case .diffableDataSource(let binding) = newValue?.payload {
             DispatchQueue.main.async {
                 if binding.wrappedValue !== _internalDataSource {
                     binding.wrappedValue = _internalDataSource
@@ -170,15 +176,11 @@ extension UIHostingCollectionViewController {
         }
         
         guard let oldValue = oldValue else {
-            guard case let .static(newData) = newValue, !newData.isEmpty else {
+            guard case let .static(newData) = newValue?.payload, !newData.isEmpty else {
                 return
             }
             
-            newValue?.reset(
-                _internalDataSource,
-                withConfiguration: dataSourceConfiguration,
-                animatingDifferences: false
-            )
+            newValue?.reset(_internalDataSource, animated: false)
             
             if _scrollViewConfiguration.initialContentAlignment == .bottom {
                 scrollToLast(animated: false)
@@ -187,7 +189,7 @@ extension UIHostingCollectionViewController {
             return
         }
         
-        guard case let (.static(data), .static(oldData)) = (newValue, oldValue) else {
+        guard case let (.static(data), .static(oldData)) = (newValue?.payload, oldValue.payload) else {
             var snapshot = _internalDataSource.snapshot()
             
             snapshot.deleteAllItems()
@@ -205,10 +207,8 @@ extension UIHostingCollectionViewController {
         var snapshot = _internalDataSource.snapshot()
         
         let sectionDifference = sections.lazy
-            .map({ self.dataSourceConfiguration.identifierMap[$0] })
-            .difference(
-                from: oldSections.map({ self.dataSourceConfiguration.identifierMap[$0] })
-            )
+            .map({ self.dataSource.identifierMap[$0] })
+            .difference(from: oldSections.map({ self.dataSource.identifierMap[$0] }))
         
         snapshot.applySectionDifference(sectionDifference)
         
@@ -221,33 +221,26 @@ extension UIHostingCollectionViewController {
         for sectionData in data {
             let section = sectionData.model
             let sectionItems = sectionData.items
-            let oldSectionData = oldData.first(where: { self.dataSourceConfiguration.identifierMap[$0.model] == self.dataSourceConfiguration.identifierMap[sectionData.model] })
+            let oldSectionData = oldData.first(where: { self.dataSource.identifierMap[$0.model] == self.dataSource.identifierMap[sectionData.model] })
             let oldSectionItems = oldSectionData?.items ?? AnyRandomAccessCollection([])
             
             let difference = sectionItems.lazy
-                .map({ self.dataSourceConfiguration.identifierMap[$0] })
-                .difference(from: oldSectionItems.lazy.map { self.dataSourceConfiguration.identifierMap[$0]
+                .map({ self.dataSource.identifierMap[$0] })
+                .difference(from: oldSectionItems.lazy.map { self.dataSource.identifierMap[$0]
                 })
             
             if !difference.isEmpty {
-                let sectionIdentifier = self.dataSourceConfiguration.identifierMap[section]
+                let sectionIdentifier = self.dataSource.identifierMap[section]
                 
                 if !snapshot.sectionIdentifiers.contains(sectionIdentifier) {
                     snapshot.appendSections([sectionIdentifier])
                 }
                 
-                let itemDifferencesApplied = snapshot.applyItemDifference(
-                    difference,
-                    inSection: sectionIdentifier
-                )
+                let itemDifferencesApplied = snapshot.applyItemDifference(difference, inSection: sectionIdentifier)
                 
                 if !itemDifferencesApplied {
                     maintainScrollContentOffsetBehavior {
-                        newValue?.reset(
-                            _internalDataSource,
-                            withConfiguration: dataSourceConfiguration,
-                            animatingDifferences: _animateDataSourceDifferences
-                        )
+                        newValue?.reset(_internalDataSource, animated: _animateDataSourceDifferences)
                     }
                 }
                 
@@ -264,18 +257,12 @@ extension UIHostingCollectionViewController {
         }
     }
     
-    func maintainScrollContentOffsetBehavior(_ update: () -> Void) {
-        if _scrollViewConfiguration.contentOffsetBehavior.contains(.maintainOnChangeOfContentSize) {
-            collectionView.updateContentSizeWithoutChangingContentOffset {
-                update()
-            }
-        } else {
+    private func maintainScrollContentOffsetBehavior(_ update: () -> Void) {
+        collectionView.maintainScrollContentOffsetBehavior(_scrollViewConfiguration.contentOffsetBehavior, animated: false) {
             update()
         }
     }
 }
-
-// MARK: - Auxiliary Implementation -
 
 fileprivate extension CollectionDifference where ChangeElement: Equatable {
     var singleItemReorder: (source: Int, target: Int)? {
