@@ -18,7 +18,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var initialContentAlignment: Alignment? {
         didSet {
             if oldValue != initialContentAlignment {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -27,7 +27,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var axes: Axis.Set = [.vertical] {
         didSet {
             if oldValue != axes {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -36,7 +36,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var showsVerticalScrollIndicator: Bool = true {
         didSet {
             if oldValue != showsVerticalScrollIndicator {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -45,7 +45,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var showsHorizontalScrollIndicator: Bool = true {
         didSet {
             if oldValue != showsHorizontalScrollIndicator {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -54,7 +54,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceVertical: Bool? = nil {
         didSet {
             if oldValue != alwaysBounceVertical {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -63,7 +63,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var alwaysBounceHorizontal: Bool? = nil {
         didSet {
             if oldValue != alwaysBounceHorizontal {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -72,7 +72,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isDirectionalLockEnabled: Bool = false {
         didSet {
             if oldValue != isDirectionalLockEnabled {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -81,7 +81,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isPagingEnabled: Bool = false {
         didSet {
             if oldValue != isPagingEnabled {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -90,7 +90,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isScrollEnabled: Bool = true {
         didSet {
             if oldValue != isScrollEnabled {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -99,7 +99,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
         didSet {
             if (oldValue == nil) != (onOffsetChange == nil) {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -110,7 +110,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentOffset: Binding<CGPoint>? = nil {
         didSet {
             if (oldValue == nil) != (contentOffset == nil) {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -119,7 +119,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentInset: EdgeInsets = .zero {
         didSet {
             if oldValue != contentInset {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -128,7 +128,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
         didSet {
             if oldValue != contentInsetAdjustmentBehavior {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -137,7 +137,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
         didSet {
             if oldValue != contentOffsetBehavior {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -148,7 +148,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var onRefresh: (() -> Void)? {
         didSet {
             if (oldValue == nil) != (onRefresh == nil) {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -157,7 +157,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var isRefreshing: Bool? {
         didSet {
             if oldValue != isRefreshing {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -166,7 +166,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var refreshControlTintColor: UIColor? {
         didSet {
             if oldValue != refreshControlTintColor {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -178,7 +178,7 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none {
         didSet {
             if oldValue != keyboardDismissMode {
-                hasChanged = false
+                hasChanged = true
             }
         }
     }
@@ -230,7 +230,7 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
-        guard !configuration.hasChanged else {
+        guard configuration.hasChanged else {
             return
         }
         
