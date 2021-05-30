@@ -61,9 +61,11 @@ extension AttributedText {
         then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor })
     }
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
     }
+    #endif
 }
 
 // MARK: - Auxiliary Implementation -
