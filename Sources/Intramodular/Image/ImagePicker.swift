@@ -4,6 +4,8 @@
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+import SwiftUI
+
 /// A SwiftUI port of `UIImagePickerController`.
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
@@ -13,7 +15,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
     let info: Binding<[UIImagePickerController.InfoKey: Any]?>?
     let image: Binding<AppKitOrUIKitImage?>?
     let data: Binding<Data?>?
-
+    
     let encoding: Image.Encoding?
     var allowsEditing = false
     var cameraDevice: UIImagePickerController.CameraDevice?
@@ -57,7 +59,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
             
             base.image?.wrappedValue = image
             base.data?.wrappedValue = (image?._fixOrientation() ?? image)?.data(using: base.encoding ?? .png)
-
+            
             base.presentationManager.dismiss()
         }
         
@@ -88,7 +90,7 @@ extension ImagePicker {
         self.encoding = nil
         self.onCancel = onCancel
     }
-
+    
     public init(
         image: Binding<AppKitOrUIKitImage?>,
         encoding: Image.Encoding? = nil,
@@ -122,7 +124,7 @@ extension ImagePicker {
     public func cameraDevice(_ cameraDevice: UIImagePickerController.CameraDevice?) -> Self {
         then({ $0.cameraDevice = cameraDevice })
     }
-
+    
     public func sourceType(_ sourceType: UIImagePickerController.SourceType) -> Self {
         then({ $0.sourceType = sourceType })
     }

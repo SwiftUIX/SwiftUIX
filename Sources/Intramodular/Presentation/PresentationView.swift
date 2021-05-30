@@ -15,8 +15,7 @@ public struct PresentationView<Content: View>: View {
     
     public var body: some View {
         #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-        content
-            .modifier(_ResolveAppKitOrUIKitViewController())
+        content.modifier(_ResolveAppKitOrUIKitViewController())
         #else
         content
         #endif

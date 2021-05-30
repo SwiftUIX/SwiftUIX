@@ -171,7 +171,7 @@ extension _NavigationSearchBarConfigurator {
         public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
             searchBarCoordinator.searchBarSearchButtonClicked(searchBar)
         }
-
+        
         // MARK: UISearchControllerDelegate
         
         func willPresentSearchController(_ searchController: UISearchController) {

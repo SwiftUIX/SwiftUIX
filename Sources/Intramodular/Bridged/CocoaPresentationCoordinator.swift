@@ -282,9 +282,7 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 
 #endif
 
-struct _UseCocoaPresentationCoordinator: ViewModifier {
-    @Environment(\.presenter) var presenter
-    
+struct _UseCocoaPresentationCoordinator: ViewModifier {    
     @ObservedObject var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     private var coordinator: CocoaPresentationCoordinator? {
