@@ -57,8 +57,18 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
     var content: AnyForEach<Page>? {
         didSet {
             if let content = content {
-                for viewController in (viewControllers ?? []).map({ $0 as! PageContentController }) {
-                    viewController.rootView.page = content.content(content.data[viewController.rootView.index])
+                if let oldValue = oldValue, oldValue.count != content.count {
+                    if let firstViewController = viewController(for: content.data.startIndex) {
+                        setViewControllers(
+                            [firstViewController],
+                            direction: .forward,
+                            animated: false
+                        )
+                    }
+                } else {
+                    for viewController in (viewControllers ?? []).map({ $0 as! PageContentController }) {
+                        viewController.rootView.page = content.content(content.data[viewController.rootView.index])
+                    }
                 }
             }
         }
@@ -136,6 +146,10 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
 extension UIHostingPageViewController {
     func viewController(for index: AnyIndex) -> UIViewController? {
         guard let content = content else {
+            return nil
+        }
+        
+        guard index < content.data.endIndex else {
             return nil
         }
         

@@ -115,6 +115,8 @@ extension _PaginationView: UIViewControllerRepresentable {
             }
         }
         
+        let oldContentDataEndIndex = uiViewController.content?.data.endIndex
+        
         uiViewController._isAnimated = context.transaction.isAnimated
         uiViewController.content = content
         
@@ -127,7 +129,19 @@ extension _PaginationView: UIViewControllerRepresentable {
             
             uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex)
         } else {
-            uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: self.currentPageIndex)
+            var currentPageIndex = self.currentPageIndex
+            
+            if let oldContentDataEndIndex = oldContentDataEndIndex {
+                if content.data.endIndex < oldContentDataEndIndex, !(content.data.index(content.data.startIndex, offsetBy: currentPageIndex) < content.data.endIndex) {
+                    currentPageIndex = max(content.data.count - 1, 0)
+                    
+                    DispatchQueue.main.async {
+                        self.currentPageIndex = currentPageIndex
+                    }
+                }
+            }
+            
+            uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: currentPageIndex)
         }
         
         if uiViewController.pageControl?.currentPage != currentPageIndex {
@@ -270,7 +284,7 @@ extension _PaginationView {
             guard let currentPageIndex = base.currentPageIndexOffset, let data = base.content?.data, let index = data.firstIndex(where: { $0.id == id }).map({ data.distance(from: data.startIndex, to: $0) }) else {
                 return
             }
-                        
+            
             guard
                 let baseDataSource = base.dataSource,
                 let currentViewController = base.viewControllers?.first,
@@ -291,7 +305,7 @@ extension _PaginationView {
                 self.syncCurrentPageIndex()
             }
         }
-
+        
         func moveToNext() {
             guard let base = base else {
                 assertionFailure("Could not resolve a pagination view")
