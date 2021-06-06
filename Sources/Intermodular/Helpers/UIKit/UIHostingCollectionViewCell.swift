@@ -89,7 +89,12 @@ class UIHostingCollectionViewCell<
         )
     }
     
-    var preferences = Preferences()
+    var preferences = Preferences() {
+        didSet {
+            clipsToBounds = preferences._collectionOrListCellPreferences.isClipped
+        }
+    }
+    
     var cache = Cache()
     
     var content: Content {

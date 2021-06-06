@@ -12,7 +12,7 @@ extension UIHostingCollectionViewController {
     class Cache: NSObject, UICollectionViewDelegateFlowLayout {
         typealias UICollectionViewCellType = UIHostingCollectionViewController.UICollectionViewCellType
         typealias UICollectionViewSupplementaryViewType = UIHostingCollectionViewController.UICollectionViewSupplementaryViewType
-
+        
         unowned let parent: UIHostingCollectionViewController
         
         private var cellIdentifierToCacheMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Cache] = [:]
@@ -258,7 +258,7 @@ extension UIHostingCollectionViewController.Cache {
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }
-                
+        
         prototypeCell.cache.contentSize = size
         
         cellIdentifierToCacheMap[configuration.id]?.contentSize = size
@@ -278,7 +278,7 @@ extension UIHostingCollectionViewController.Cache {
         prototypeView.configuration = configuration
         
         preconfigure(cell: prototypeCell)
-
+        
         prototypeView.update(forced: true)
         prototypeView.supplementaryViewWillDisplay(inParent: nil, isPrototype: true)
         
@@ -286,7 +286,7 @@ extension UIHostingCollectionViewController.Cache {
             .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
             .rounded(.up)
             .clamped(to: configuration.maximumSize)
-
+        
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }

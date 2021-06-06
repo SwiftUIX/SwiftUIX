@@ -8,6 +8,7 @@ import SwiftUI
 /// An internal structure used to manage cell preferences for `CocoaList` and `CollectionView`.
 @usableFromInline
 struct _CollectionOrListCellPreferences: Hashable {
+    var isClipped = false
     var isFocusable = true
     var isHighlightable = true
     var isReorderable = true
@@ -26,6 +27,12 @@ extension _CollectionOrListCellPreferences {
 }
 
 extension View {
+    public func cellClipped() -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            value.isClipped = true
+        }
+    }
+
     public func cellFocusable(_ focusable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isFocusable = focusable
