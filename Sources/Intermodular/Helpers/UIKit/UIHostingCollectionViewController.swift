@@ -227,15 +227,28 @@ final class UIHostingCollectionViewController<
     override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if self._scrollViewConfiguration.initialContentAlignment == .bottom {
-            if !self.isInitialContentAlignmentSet {
-                self.scrollToLast(animated: false)
-                
-                self.isInitialContentAlignmentSet = true
+        applyInitialAlignment: do {
+            if self._scrollViewConfiguration.initialContentAlignment == .bottom {
+                if !self.isInitialContentAlignmentSet {
+                    self.scrollToLast(animated: false)
+                    
+                    self.isInitialContentAlignmentSet = true
+                }
             }
         }
         
-        // preferredContentSize = collectionView.collectionViewLayout.collectionViewContentSize
+        configurePreferredContentSize: do {
+            if configuration.fixedSize.horizontal && configuration.fixedSize.vertical {
+                let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
+                
+                if !contentSize.isAreaZero {
+                    preferredContentSize = .init(
+                        width: contentSize.width,
+                        height: contentSize.height
+                    )
+                }
+            }
+        }
     }
     
     override public func viewSafeAreaInsetsDidChange()  {

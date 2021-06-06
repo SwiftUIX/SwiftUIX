@@ -234,6 +234,13 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
+    /// Fixes this view at its ideal size.
+    public func fixedSize() -> Self {
+        then({ $0._collectionViewConfiguration.fixedSize = (true, true) })
+    }
+}
+
+extension CollectionView {
     /// Sets the deletion action for the dynamic view.
     ///
     /// - Parameter action: The action that you want SwiftUI to perform when

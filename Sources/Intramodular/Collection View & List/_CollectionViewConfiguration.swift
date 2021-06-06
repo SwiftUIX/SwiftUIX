@@ -10,6 +10,8 @@ import SwiftUI
 @usableFromInline
 struct _CollectionViewConfiguration {
     @usableFromInline
+    var fixedSize: (vertical: Bool, horizontal: Bool) = (false, false)
+    @usableFromInline
     var allowsMultipleSelection: Bool = false
     @usableFromInline
     var disableAnimatingDifferences: Bool = false
