@@ -15,8 +15,10 @@ extension Never {
     }
 }
 
+#if swift(<5.5)
 extension Never: Identifiable {
     public var id: Never {
         Self.produce()
     }
 }
+#endif

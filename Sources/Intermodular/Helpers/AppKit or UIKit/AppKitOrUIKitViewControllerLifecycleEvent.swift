@@ -16,7 +16,7 @@ public enum AppKitOrUIKitViewControllerLifecycleEvent {
     case layoutSubviews
 }
 
-struct _AppKitOrUIKitViewControllerLifecycleEventView<Content: View>: UIViewControllerRepresentable {
+struct _AppKitOrUIKitViewControllerLifecycleEventView: UIViewControllerRepresentable {
     struct Callbacks {
         var onDidLoad: ((UIViewController) -> Void)?
         var onWillAppear: ((UIViewController) -> Void)?
@@ -47,7 +47,7 @@ struct _AppKitOrUIKitViewControllerLifecycleEventView<Content: View>: UIViewCont
         }
     }
     
-    class UIViewControllerType: UIHostingController<Content> {
+    class UIViewControllerType: UIViewController {
         var callbacks: Callbacks?
         
         override func viewDidLoad() {
