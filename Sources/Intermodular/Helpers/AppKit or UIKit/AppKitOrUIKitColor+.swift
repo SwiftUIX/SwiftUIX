@@ -98,6 +98,14 @@ extension Color {
             }
         }
         
+        if String(describing: type(of: base)) == "OpacityColor" {
+            let baseOpacity = Mirror(reflecting: base)
+            if let opacity = baseOpacity.descendant("opacity") as? Double,
+               let colorBase = baseOpacity.descendant("base") as? Color {
+                return colorBase.toUIColor()?.withAlphaComponent(CGFloat(opacity))
+            }
+        }
+        
         var baseValue: String = ""
         
         dump(base, to: &baseValue)
