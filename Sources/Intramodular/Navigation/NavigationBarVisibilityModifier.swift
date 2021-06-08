@@ -23,7 +23,7 @@ private struct HideNavigationBar: ViewModifier {
                     #endif
                 }
             }
-            .configureUINavigationController {
+            ._configureUINavigationController {
                 $0.setNavigationBarHidden(true, animated: false)
             }
             .onAppear {

@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
     @inlinable
-    func configureUINavigationController(
+    public func _configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
         onAppKitOrUIKitViewControllerResolution { viewController in
@@ -32,10 +32,10 @@ extension View {
     }
     
     @inlinable
-    func configureUINavigationBar(
+    public func _configureUINavigationBar(
         _ configure: @escaping (UINavigationBar) -> Void
     ) -> some View {
-        configureUINavigationController {
+        _configureUINavigationController {
             configure($0.navigationBar)
         }
     }
@@ -51,7 +51,7 @@ extension View {
     ///     - color: The color to use for the navigation bar.
     @inlinable
     public func navigationBarColor(_ color: Color) -> some View {
-        configureUINavigationBar { navigationBar in
+        _configureUINavigationBar { navigationBar in
             navigationBar.backgroundColor = color.toUIColor()
             navigationBar.barTintColor = color.toUIColor()
         }
@@ -66,7 +66,7 @@ extension View {
     ///     - isTranslucent: A Boolean value that indicates whether the navigation bar is translucent.
     @inlinable
     public func navigationBarTranslucent(_ translucent: Bool) -> some View {
-        configureUINavigationBar { navigationBar in
+        _configureUINavigationBar { navigationBar in
             navigationBar.isTranslucent = translucent
         }
     }
@@ -86,7 +86,7 @@ extension View {
     ///     - isTransparent: A Boolean value that indicates whether the navigation bar is transparent.
     @inlinable
     public func navigationBarTransparent(_ transparent: Bool) -> some View {
-        configureUINavigationBar { navigationBar in
+        _configureUINavigationBar { navigationBar in
             navigationBar.isDefaultTransparent = transparent
         }
     }
