@@ -24,8 +24,10 @@ public struct SearchBar: DefaultTextInputType {
     private var placeholder: String?
     
     #if os(iOS) || targetEnvironment(macCatalyst)
-    private var uiFont: UIFont?
+    private var appKitOrUIKitFont: UIFont?
+    private var appKitOrUIKitForegroundColor: UIColor?
     private var searchBarStyle: UISearchBar.Style = .minimal
+    private var iconImageConfiguration: [UISearchBar.Icon: AppKitOrUIKitImage] = [:]
     #endif
     
     private var showsCancelButton: Bool?
@@ -90,44 +92,64 @@ extension SearchBar: UIViewRepresentable {
         _ uiView: UIViewType,
         environment: EnvironmentValues
     ) {
-        if let font = uiFont ?? environment.font?.toUIFont() {
-            uiView._retrieveTextField()?.font = font
-        }
-        
-        if let placeholder = placeholder {
-            uiView.placeholder = placeholder
-        }
-        
-        uiView.searchBarStyle = searchBarStyle
-        
-        if uiView.text != text {
-            uiView.text = text
-        }
-        
-        uiView.tintColor = environment.tintColor?.toUIColor()
-        
-        if let showsCancelButton = showsCancelButton {
-            if uiView.showsCancelButton != showsCancelButton {
-                uiView.setShowsCancelButton(showsCancelButton, animated: true)
+        style: do {
+            if (appKitOrUIKitFont != nil || environment.font != nil) || appKitOrUIKitForegroundColor != nil {
+                if let textField = uiView._retrieveTextField() {
+                    if let font = appKitOrUIKitFont ?? environment.font?.toUIFont() {
+                        textField.font = font
+                    }
+                    
+                    if let foregroundColor = appKitOrUIKitForegroundColor {
+                        textField.textColor = foregroundColor
+                    }
+                }
+            }
+            
+            if let placeholder = placeholder {
+                uiView.placeholder = placeholder
+            }
+            
+            uiView.searchBarStyle = searchBarStyle
+            
+            for (icon, image) in iconImageConfiguration {
+                if uiView.image(for: icon, state: .normal) == nil { // FIXME: This is a performance hack.
+                    uiView.setImage(image, for: icon, state: .normal)
+                }
+            }
+            
+            uiView.tintColor = environment.tintColor?.toUIColor()
+            
+            if let showsCancelButton = showsCancelButton {
+                if uiView.showsCancelButton != showsCancelButton {
+                    uiView.setShowsCancelButton(showsCancelButton, animated: true)
+                }
             }
         }
         
-        if let returnKeyType = returnKeyType {
-            uiView.returnKeyType = returnKeyType
-        } else {
-            uiView.returnKeyType = .default
+        keyboard: do {
+            if let returnKeyType = returnKeyType {
+                uiView.returnKeyType = returnKeyType
+            } else {
+                uiView.returnKeyType = .default
+            }
+            
+            if let keyboardType = keyboardType {
+                uiView.keyboardType = keyboardType
+            } else {
+                uiView.keyboardType = .default
+            }
+            
+            if let enablesReturnKeyAutomatically = enablesReturnKeyAutomatically {
+                uiView.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically
+            } else {
+                uiView.enablesReturnKeyAutomatically = false
+            }
         }
         
-        if let keyboardType = keyboardType {
-            uiView.keyboardType = keyboardType
-        } else {
-            uiView.keyboardType = .default
-        }
-        
-        if let enablesReturnKeyAutomatically = enablesReturnKeyAutomatically {
-            uiView.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically
-        } else {
-            uiView.enablesReturnKeyAutomatically = false
+        data: do {
+            if uiView.text != text {
+                uiView.text = text
+            }
         }
     }
     
@@ -165,12 +187,6 @@ extension SearchBar: UIViewRepresentable {
     
     public func makeCoordinator() -> Coordinator {
         return Coordinator(base: self)
-    }
-}
-
-extension UISearchBar {
-    func _configurate(with searchBar: SearchBar) {
-        
     }
 }
 
@@ -264,11 +280,19 @@ extension SearchBar {
     
     #if os(iOS) || targetEnvironment(macCatalyst)
     public func font(_ font: UIFont) -> Self {
-        then({ $0.uiFont = font })
+        then({ $0.appKitOrUIKitFont = font })
+    }
+    
+    public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
+        then({ $0.appKitOrUIKitForegroundColor = foregroundColor })
     }
     
     public func searchBarStyle(_ searchBarStyle: UISearchBar.Style) -> Self {
         then({ $0.searchBarStyle = searchBarStyle })
+    }
+    
+    public func iconImage(_ icon: UISearchBar.Icon, _ image: AppKitOrUIKitImage) -> Self {
+        then({ $0.iconImageConfiguration[icon] = image })
     }
     
     public func showsCancelButton(_ showsCancelButton: Bool) -> Self {
