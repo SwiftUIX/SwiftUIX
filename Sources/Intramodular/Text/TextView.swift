@@ -10,43 +10,53 @@ import SwiftUI
 /// A control that displays an editable text interface.
 public struct TextView<Label: View>: View {
     struct _Configuration {
+        var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
-        
-        var isInitialFirstResponder: Bool?
-        var isFirstResponder: Bool?
-        
+            
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
+
+        var isSelectable: Bool = true
+
+        var isInitialFirstResponder: Bool?
+        var isFirstResponder: Bool?
     }
     
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
     
     private var label: Label
-    private var text: Binding<String>
+    private var text: Binding<String>?
+    private var attributedText: Binding<NSAttributedString>?
     private var configuration: _Configuration
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var customAppKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
     #endif
     
+    private var isEmpty: Bool {
+        text?.wrappedValue.isEmpty ?? attributedText!.wrappedValue.string.isEmpty
+    }
+    
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
             label
-                .visible(text.wrappedValue.isEmpty)
+                .visible(isEmpty)
                 .animation(.none)
                 .padding(configuration.textContainerInset.edgeInsets)
             
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             _TextView<Label>(
                 text: text,
+                attributedText: attributedText,
                 configuration: configuration,
                 customAppKitOrUIKitClass: customAppKitOrUIKitClass
             )
             #else
             _TextView<Label>(
                 text: text,
+                attributedText: attributedText,
                 configuration: configuration
             )
             #endif
@@ -59,7 +69,8 @@ public struct TextView<Label: View>: View {
 fileprivate struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
     
-    let text: Binding<String>
+    let text: Binding<String>?
+    let attributedText: Binding<NSAttributedString>?
     let configuration: Configuration
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -75,11 +86,17 @@ extension _TextView: UIViewRepresentable {
     typealias UIViewType = UITextView
     
     class Coordinator: NSObject, UITextViewDelegate {
-        var text: Binding<String>
+        var text: Binding<String>?
+        var attributedText: Binding<NSAttributedString>?
         var configuration: Configuration
         
-        init(text: Binding<String>, configuration: Configuration) {
+        init(
+            text: Binding<String>?,
+            attributedText: Binding<NSAttributedString>?,
+            configuration: Configuration
+        ) {
             self.text = text
+            self.attributedText = attributedText
             self.configuration = configuration
         }
         
@@ -88,7 +105,11 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            text.wrappedValue = textView.text
+            if let text = text {
+                text.wrappedValue = textView.text
+            } else {
+                attributedText?.wrappedValue = textView.attributedText
+            }
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
@@ -124,12 +145,12 @@ extension _TextView: UIViewRepresentable {
         let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         
         #if !os(tvOS)
-        uiView.isEditable = context.environment.isEnabled
+        uiView.isEditable = configuration.isConstant ? false : context.environment.isEnabled
         #endif
         uiView.isScrollEnabled = context.environment.isScrollEnabled
-        uiView.isSelectable = true
+        uiView.isSelectable = configuration.isSelectable
         
-        if context.environment.requiresAttributedText {
+        if context.environment.requiresAttributedText || attributedText != nil {
             let paragraphStyle = NSMutableParagraphStyle()
             
             paragraphStyle.lineBreakMode = context.environment.lineBreakMode
@@ -139,19 +160,20 @@ extension _TextView: UIViewRepresentable {
                 paragraphStyle.paragraphSpacing = $0
             }
             
-            uiView.attributedText = NSAttributedString(
-                string: text.wrappedValue,
-                attributes: [
-                    NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                    NSAttributedString.Key.font: font
-                ]
-            )
+            if let text = text {
+                uiView.attributedText = NSAttributedString(
+                    string: text.wrappedValue,
+                    attributes: [
+                        NSAttributedString.Key.paragraphStyle: paragraphStyle,
+                        NSAttributedString.Key.font: font
+                    ]
+                )
+            } else {
+                uiView.attributedText = attributedText!.wrappedValue
+            }
             
         } else {
-            uiView.text = text.wrappedValue
-            
-            // `UITextView`'s default font is smaller than SwiftUI's default font.
-            // `.preferredFont(forTextStyle: .body)` is used when `context.environment.font` is nil.
+            uiView.text = text!.wrappedValue
             uiView.font = font
         }
         
@@ -160,6 +182,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         uiView.textContainer.lineFragmentPadding = .zero
+        uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
         uiView.textContainerInset = configuration.textContainerInset
         
         (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
@@ -181,7 +204,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        .init(text: text, configuration: configuration)
+        .init(text: text, attributedText: attributedText, configuration: configuration)
     }
 }
 
@@ -204,7 +227,13 @@ extension _TextView: NSViewRepresentable {
                 return
             }
             
-            view.text.wrappedValue = textView.string
+            if let text = view.text {
+                text.wrappedValue = textView.string
+            } else if let attributedText = view.attributedText {
+                attributedText.wrappedValue = textView.attributedString()
+            } else {
+                assertionFailure()
+            }
             
             view.configuration.onEditingChanged(true)
         }
@@ -214,7 +243,13 @@ extension _TextView: NSViewRepresentable {
                 return
             }
             
-            view.text.wrappedValue = textView.string
+            if let text = view.text {
+                text.wrappedValue = textView.string
+            } else if let attributedText = view.attributedText {
+                attributedText.wrappedValue = textView.attributedString()
+            } else {
+                assertionFailure()
+            }
         }
         
         func textDidEndEditing(_ notification: Notification) {
@@ -239,7 +274,14 @@ extension _TextView: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSViewType, context: Context) {
-        nsView.string = text.wrappedValue
+        if let text = text {
+            if nsView.string != text.wrappedValue {
+                nsView.string = text.wrappedValue
+            }
+        } else if let attributedText = attributedText {
+            nsView.textStorage?.setAttributedString(attributedText.wrappedValue)
+        }
+        
         nsView.textColor = configuration.textColor
     }
 }
@@ -260,7 +302,11 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.text = text
-        self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
+        self.configuration = .init(
+            isConstant: false,
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
     }
     
     public init(
@@ -274,6 +320,18 @@ extension TextView where Label == EmptyView {
             onCommit: onCommit
         )
     }
+    
+    public init(
+        _ text: NSAttributedString
+    ) {
+        self.label = EmptyView()
+        self.attributedText = .constant(text)
+        self.configuration = .init(
+            isConstant: true,
+            onEditingChanged: { _ in },
+            onCommit: { }
+        )
+    }
 }
 
 extension TextView: DefaultTextInputType where Label == Text {
@@ -285,7 +343,11 @@ extension TextView: DefaultTextInputType where Label == Text {
     ) {
         self.label = Text(title).foregroundColor(.placeholderText)
         self.text = text
-        self.configuration = .init(onEditingChanged: onEditingChanged, onCommit: onCommit)
+        self.configuration = .init(
+            isConstant: true,
+            onEditingChanged: onEditingChanged,
+            onCommit: onCommit
+        )
     }
     
     public init<S: StringProtocol>(
@@ -335,6 +397,12 @@ extension TextView {
     
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
         then({ $0.configuration.textContainerInset = textContainerInset })
+    }
+}
+
+extension TextView {
+    public func isSelectable(_ isSelectable: Bool) -> Self {
+        then({ $0.configuration.isSelectable = isSelectable })
     }
 }
 

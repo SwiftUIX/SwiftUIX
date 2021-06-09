@@ -6,12 +6,9 @@ import Combine
 import Swift
 import SwiftUI
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
-    final class ValueBox: ObservableObject {
-        let objectWillChange = Empty<Never, Never>(completeImmediately: false)
-        
+    private final class ValueBox {
         var value: Value
         
         init(_ value: Value) {
@@ -19,7 +16,7 @@ public struct ViewStorage<Value>: DynamicProperty {
         }
     }
     
-    @StateObject private var valueBox: ValueBox
+    @State private var valueBox: ValueBox
     
     public var wrappedValue: Value {
         get {
@@ -29,7 +26,7 @@ public struct ViewStorage<Value>: DynamicProperty {
         }
     }
     
-    public init(wrappedValue thunk: @autoclosure @escaping () -> Value) {
-        self._valueBox = StateObject(wrappedValue: .init(thunk()))
+    public init(wrappedValue value: @autoclosure @escaping () -> Value) {
+        self._valueBox = .init(wrappedValue: ValueBox(value()))
     }
 }

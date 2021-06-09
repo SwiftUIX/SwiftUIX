@@ -98,4 +98,49 @@ extension View {
     }
 }
 
+extension View {
+    @available(tvOS, unavailable)
+    @ViewBuilder
+    public func _inlineNavigationBar() -> some View {
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            self
+                ._configureUINavigationBar { navigationBar in
+                    navigationBar.prefersLargeTitles = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                        navigationBar.prefersLargeTitles = false
+                    }
+                    
+                    navigationBar.prefersLargeTitles = false
+                }
+                .onAppKitOrUIKitViewControllerResolution { viewController in
+                    viewController.navigationController?.navigationBar.prefersLargeTitles = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                        viewController.navigationController?.navigationBar.prefersLargeTitles = false
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            self
+                ._configureUINavigationBar { navigationBar in
+                    navigationBar.prefersLargeTitles = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                        navigationBar.prefersLargeTitles = false
+                    }
+                    
+                    navigationBar.prefersLargeTitles = false
+                }
+                .onAppKitOrUIKitViewControllerResolution { viewController in
+                    viewController.navigationController?.navigationBar.prefersLargeTitles = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                        viewController.navigationController?.navigationBar.prefersLargeTitles = false
+                    }
+                }
+        }
+    }
+}
+
 #endif

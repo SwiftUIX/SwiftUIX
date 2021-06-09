@@ -20,17 +20,36 @@ public class UIHostingTextView<Label: View>: UITextView {
     
     open var preferredMaximumLayoutWidth: CGFloat? {
         didSet {
+            let desiredContentHuggingPriority = preferredMaximumLayoutWidth == nil
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
+            
+            if contentHuggingPriority(for: .horizontal) != desiredContentHuggingPriority {
+                setContentHuggingPriority(
+                    desiredContentHuggingPriority,
+                    for: .horizontal
+                )
+            }
+            
             if preferredMaximumLayoutWidth != oldValue {
                 invalidateIntrinsicContentSize()
+                
+                setNeedsLayout()
+                layoutIfNeeded()
             }
         }
     }
     
     override open var intrinsicContentSize: CGSize {
         if let preferredMaximumLayoutWidth = preferredMaximumLayoutWidth {
-            return .init(width: min(bounds.width, preferredMaximumLayoutWidth), height: textHeightForWidth(preferredMaximumLayoutWidth))
+            return sizeThatFits(
+                CGSize(
+                    width: preferredMaximumLayoutWidth,
+                    height: AppKitOrUIKitView.layoutFittingCompressedSize.height
+                )
+            )
         } else if !isScrollEnabled {
-            return .init(width: bounds.width, height: textHeightForWidth(bounds.width))
+            return .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
         } else {
             return super.intrinsicContentSize
         }
@@ -56,11 +75,11 @@ public class UIHostingTextView<Label: View>: UITextView {
     
     override open func layoutSubviews() {
         super.layoutSubviews()
-                
+        
         if lastBounds != bounds.size {
-            invalidateIntrinsicContentSize()
-            
             lastBounds = bounds.size
+            
+            invalidateIntrinsicContentSize()
         }
     }
     
@@ -88,7 +107,7 @@ public class UIHostingTextView<Label: View>: UITextView {
 // MARK: - Helpers -
 
 fileprivate extension UITextView {
-    func textHeightForWidth(_ width: CGFloat) -> CGFloat {
+    func textHeight(forWidth width: CGFloat) -> CGFloat {
         let storage = NSTextStorage(attributedString: attributedText)
         let width = bounds.width - textContainerInset.horizontal
         let containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
