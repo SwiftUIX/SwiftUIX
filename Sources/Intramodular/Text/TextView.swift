@@ -13,13 +13,13 @@ public struct TextView<Label: View>: View {
         var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
-            
+        
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
-
+        
         var isSelectable: Bool = true
-
+        
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
     }
