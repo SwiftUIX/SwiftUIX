@@ -18,13 +18,10 @@ public enum DeviceOrientation: CaseIterable, HashIdentifiable {
 }
 
 extension DeviceOrientation {
+    #if os(iOS) 
     public static var current: Self {
         get {
-            #if os(iOS)
-            return .init(UIDevice.current.orientation)
-            #else
-            return .portrait
-            #endif
+            .portrait
         } set {
             guard newValue != current else {
                 return
@@ -39,6 +36,11 @@ extension DeviceOrientation {
             UIViewController.attemptRotationToDeviceOrientation()
         }
     }
+    #else
+    public static var current: Self {
+        .portrait
+    }
+    #endif
     
     #if os(iOS)
     public init(_ orientation: UIDeviceOrientation) {
