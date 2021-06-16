@@ -38,7 +38,12 @@ public struct DocumentPicker: UIViewControllerRepresentable {
     }
     
     public class Coordinator: NSObject, UIDocumentPickerDelegate {
-        var base: DocumentPicker?
+        let base: DocumentPicker
+        
+        init(parent: DocumentPicker) {
+            self.base = parent
+            super.init()
+        }
         
         public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             urls.forEach({ _ = $0.startAccessingSecurityScopedResource() })
@@ -47,7 +52,7 @@ public struct DocumentPicker: UIViewControllerRepresentable {
                 urls.forEach({ $0.stopAccessingSecurityScopedResource() })
             }
             
-            base?.onCompletion(.success(urls))
+            base.onCompletion(.success(urls))
         }
         
         public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
@@ -56,7 +61,7 @@ public struct DocumentPicker: UIViewControllerRepresentable {
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(parent: self)
     }
 }
 
@@ -72,7 +77,7 @@ extension DocumentPicker {
         onCompletion: @escaping (Result<[URL], Error>) -> Void
     ) {
         self.mode = mode
-        self.allowedContentTypes = allowedContentTypes.map({ $0.identifier })
+        self.allowedContentTypes = allowedContentTypes.map { $0.identifier }
         self.onCompletion = onCompletion
     }
 }
