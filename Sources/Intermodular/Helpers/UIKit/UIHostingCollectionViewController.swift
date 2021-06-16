@@ -419,6 +419,14 @@ final class UIHostingCollectionViewController<
 }
 
 extension UIHostingCollectionViewController {
+    func refresh() {
+        guard let dataSource = _internalDiffableDataSource else {
+            return
+        }
+        
+        dataSource.apply(dataSource.snapshot(), animatingDifferences: true)
+    }
+    
     func refreshVisibleCellsAndSupplementaryViews() {
         collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader).forEach { view in
             guard let view = view as? UICollectionViewSupplementaryViewType else {

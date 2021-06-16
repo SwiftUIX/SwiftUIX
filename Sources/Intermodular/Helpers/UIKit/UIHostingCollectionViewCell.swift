@@ -392,13 +392,19 @@ extension UIHostingCollectionViewCell {
             }
             
             func invalidateLayout() {
-                base?.cache.contentSize = nil
-                base?.updateCollectionCache()
-                base?.parentViewController?.invalidateLayout()
-            }
-            
-            func performWithAnimation(_ action: () -> ()) {
+                guard let base = base, let parentViewController = base.parentViewController else {
+                    return
+                }
                 
+                base.setNeedsDisplay()
+                base.setNeedsLayout()
+                
+                base.cache.contentSize = nil
+                base.cache.preferredContentSize = nil
+                
+                base.updateCollectionCache()
+                
+                parentViewController.refresh()
             }
         }
         

@@ -114,7 +114,9 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
                 return
             }
             
-            text.wrappedValue = textField.text ?? ""
+            DispatchQueue.main.async {
+                self.text.wrappedValue = textField.text ?? ""
+            }
         }
         
         func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {

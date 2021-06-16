@@ -129,6 +129,19 @@ extension Binding {
             }
         )
     }
+    
+    public static func boolean<T: Equatable>(_ value: Binding<T?>, equals some: T) -> Binding<Bool> where Value == Bool {
+        .init(
+            get: { value.wrappedValue == some },
+            set: { newValue in
+                if newValue {
+                    value.wrappedValue = some
+                } else {
+                    value.wrappedValue = nil
+                }
+            }
+        )
+    }
 }
 
 extension Binding {
