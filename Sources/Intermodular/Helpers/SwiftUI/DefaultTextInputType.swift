@@ -69,10 +69,84 @@ extension DefaultTextInputType {
             onCommit: onCommit
         )
     }
+    
+    public init(
+        text: Binding<String>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text,
+            onEditingChanged: { isEditing.wrappedValue = $0 },
+            onCommit: onCommit
+        )
+    }
+    
+    public init(
+        text: Binding<String?>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text,
+            onEditingChanged: { isEditing.wrappedValue = $0 },
+            onCommit: onCommit
+        )
+    }
+    
+    public init(
+        text: Binding<String>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text,
+            onEditingChanged: { _ in },
+            onCommit: onCommit
+        )
+    }
+    
+    public init(
+        text: Binding<String?>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text,
+            onEditingChanged: { _ in },
+            onCommit: onCommit
+        )
+    }
 }
 
 // MARK: - Conformances -
 
 extension TextField: DefaultTextInputType where Label == Text {
     
+}
+
+extension SecureField where Label == Text {
+    public init(
+        text: Binding<String>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text,
+            onCommit: onCommit
+        )
+    }
+    
+    public init(
+        text: Binding<String?>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.init(
+            String(),
+            text: text.withDefaultValue(String()),
+            onCommit: onCommit
+        )
+    }
 }
