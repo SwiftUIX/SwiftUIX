@@ -76,13 +76,7 @@ extension View {
 extension View {
     @inlinable
     public func hidden(_ isHidden: Bool) -> some View {
-        Group {
-            if isHidden {
-                hidden()
-            } else {
-                self
-            }
-        }
+        opacity(isHidden ? 0 : 1)
     }
 }
 
