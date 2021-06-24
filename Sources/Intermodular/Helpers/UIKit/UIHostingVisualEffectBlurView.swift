@@ -8,13 +8,28 @@ import SwiftUI
 #if os(iOS) || targetEnvironment(macCatalyst)
 
 open class UIHostingVisualEffectBlurView<Content: View>: UIView {
-    var blurStyle: UIBlurEffect.Style
-    var vibrancyStyle: UIVibrancyEffectStyle?
+    private let vibrancyView = UIVisualEffectView()
+    private let blurView = UIVisualEffectView()
+    private let hostingController: UIHostingController<Content>
     
-    let vibrancyView = UIVisualEffectView()
-    let blurView = UIVisualEffectView()
-    let hostingController: UIHostingController<Content>
+    var blurStyle: UIBlurEffect.Style {
+        didSet {
+            // TODO: Implement
+        }
+    }
     
+    var vibrancyStyle: UIVibrancyEffectStyle? {
+        didSet {
+            // TODO: Implement
+        }
+    }
+    
+    var vibrancyTintColor: UIColor? {
+        didSet {
+            vibrancyView.tintColor = vibrancyTintColor
+        }
+    }
+
     public var rootView: Content {
         get {
             hostingController.rootView

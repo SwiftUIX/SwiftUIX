@@ -32,6 +32,8 @@ public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
     public func updateUIView(_ view: UIViewType, context: Context) {
         view.blurStyle = blurStyle
         view.vibrancyStyle = vibrancyStyle
+        view.tintColor = context.environment.tintColor?.toUIColor()
+        
         view.rootView = content
     }
 }

@@ -24,9 +24,7 @@ extension ForEach where Content: View {
             content($0.value)
         }
     }
-}
 
-extension ForEach where Content: View {
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         id: KeyPath<Elements.Element, ID>,
@@ -45,9 +43,7 @@ extension ForEach where Content: View {
             rowContent($0.offset, $0.element)
         }
     }
-}
 
-extension ForEach where Content: View {
     public init<Elements: MutableCollection & RandomAccessCollection>(
         _ data: Binding<Elements>,
         @ViewBuilder rowContent: @escaping (Binding<Elements.Element>) -> Content
