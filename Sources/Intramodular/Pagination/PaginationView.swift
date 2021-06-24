@@ -233,6 +233,181 @@ extension PaginationView {
             showsIndicators: showsIndicators
         )
     }
+  
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View, C5: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4, C5)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView(),
+                content.value.5.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View, C5: View, C6: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4, C5, C6)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView(),
+                content.value.5.eraseToAnyView(),
+                content.value.6.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View, C5: View, C6: View, C7: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4, C5, C6, C7)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView(),
+                content.value.5.eraseToAnyView(),
+                content.value.6.eraseToAnyView(),
+                content.value.7.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View, C5: View, C6: View, C7: View, C8: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4, C5, C6, C7, C8)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView(),
+                content.value.5.eraseToAnyView(),
+                content.value.6.eraseToAnyView(),
+                content.value.7.eraseToAnyView(),
+                content.value.8.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
+    
+    @inlinable
+    public init<C0: View, C1: View, C2: View, C3: View, C4: View, C5: View, C6: View, C7: View, C8: View, C9: View>(
+        axis: Axis = .horizontal,
+        transitionStyle: UIPageViewController.TransitionStyle = .scroll,
+        showsIndicators: Bool = true,
+        @ViewBuilder content: () -> TupleView<(C0, C1, C2, C3, C4, C5, C6, C7, C8, C9)>
+    ) where Page == AnyView {
+        let content = content()
+        
+        self.init(
+            pages: [
+                content.value.0.eraseToAnyView(),
+                content.value.1.eraseToAnyView(),
+                content.value.2.eraseToAnyView(),
+                content.value.3.eraseToAnyView(),
+                content.value.4.eraseToAnyView(),
+                content.value.5.eraseToAnyView(),
+                content.value.6.eraseToAnyView(),
+                content.value.7.eraseToAnyView(),
+                content.value.8.eraseToAnyView(),
+                content.value.9.eraseToAnyView()
+            ],
+            axis: axis,
+            transitionStyle: transitionStyle,
+            showsIndicators: showsIndicators
+        )
+    }
 }
 
 // MARK: - API -
