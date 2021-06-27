@@ -24,4 +24,13 @@ extension NavigationLink where Label == Text {
     public init<S: StringProtocol>(_ title: S, @ViewBuilder destination: () -> Destination) {
         self.init(title, destination: destination())
     }
+    
+    @_disfavoredOverload
+    public init(
+        _ title: String,
+        isActive: Binding<Bool>,
+        @ViewBuilder destination: () -> Destination
+    ) {
+        self.init(title, destination: destination(), isActive: isActive)
+    }
 }

@@ -7,6 +7,7 @@ import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
 public struct DismissPresentationButton<Label: View>: ActionLabelView {
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.presentationManager) private var presentationManager
     
     private let action: Action
@@ -26,8 +27,15 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
     }
     
     public func dismiss() {
-        action.perform()
-        presentationManager.dismiss()
+        defer {
+            action.perform()
+        }
+        
+        if presentationMode.isPresented {
+            presentationMode.dismiss()
+        } else {
+            presentationManager.dismiss()
+        }
     }
 }
 
@@ -36,6 +44,14 @@ extension DismissPresentationButton where Label == Image {
     public init(action: @escaping () -> Void = { }) {
         self.init(action: action) {
             Image(systemName: .xmarkCircleFill)
+        }
+    }
+}
+
+extension DismissPresentationButton where Label == Text {
+    public init<S: StringProtocol>(_ title: S) {
+        self.init {
+            Text(title)
         }
     }
 }

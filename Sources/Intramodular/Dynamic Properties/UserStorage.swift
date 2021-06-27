@@ -7,6 +7,26 @@ import Foundation
 import Swift
 import SwiftUI
 
+extension View {
+    public func userStorageKeyPrefix(_ prefix: String) -> some View {
+        environment(\.userStorageKeyPrefix, prefix)
+    }
+}
+
+extension EnvironmentValues {
+    struct UserStorageKeyPrefix: EnvironmentKey {
+        static let defaultValue: String? = nil
+    }
+    
+    var userStorageKeyPrefix: String? {
+        get {
+            self[UserStorageKeyPrefix]
+        } set {
+            self[UserStorageKeyPrefix] = newValue
+        }
+    }
+}
+
 @propertyWrapper
 public struct UserStorage<Value: Codable>: DynamicProperty {
     private class ValueBox: ObservableObject {
@@ -15,14 +35,15 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         let store: UserDefaults
         let _isStrict: Bool
         
-        @Published var storedValue: Value?
-        
+        var storedValue: Value?
         var storeSubscription: AnyCancellable?
         
         var value: Value {
             get {
                 storedValue ?? defaultValue
             } set {
+                objectWillChange.send()
+                
                 do {
                     try store.encode(newValue, forKey: key)
                     
@@ -74,6 +95,10 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         }
     }
     
+    @Environment(\.userStorageKeyPrefix) var userStorageKeyPrefix
+    
+    @State private var dummy: Bool = false
+    
     @PersistentObject private var valueBox: ValueBox
     
     public var wrappedValue: Value {
@@ -81,6 +106,8 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
             valueBox.value
         } nonmutating set {
             valueBox.value = newValue
+            
+            dummy.toggle()
         }
     }
     
@@ -106,6 +133,10 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                 _isStrict: _isStrict
             )
         )
+    }
+    
+    public mutating func update() {
+        
     }
 }
 
