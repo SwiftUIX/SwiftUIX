@@ -94,7 +94,7 @@ extension SearchBar: UIViewRepresentable {
         environment: EnvironmentValues
     ) {
         style: do {
-            if (appKitOrUIKitFont != nil || environment.font != nil) || appKitOrUIKitForegroundColor != nil {
+            if (appKitOrUIKitFont != nil || environment.font != nil) || appKitOrUIKitForegroundColor != nil || appKitOrUIKitSearchFieldBackgroundColor != nil {
                 if let font = appKitOrUIKitFont ?? environment.font?.toUIFont() {
                     uiView.searchTextField.font = font
                 }
@@ -290,10 +290,16 @@ extension SearchBar {
         then({ $0.appKitOrUIKitForegroundColor = foregroundColor })
     }
     
+    @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
     }
     
+    public func textFieldBackgroundColor(_ backgroundColor: UIColor) -> Self {
+        then({ $0.appKitOrUIKitSearchFieldBackgroundColor = backgroundColor })
+    }
+
+    @_disfavoredOverload
     public func textFieldBackgroundColor(_ backgroundColor: Color) -> Self {
         then({ $0.appKitOrUIKitSearchFieldBackgroundColor = backgroundColor.toUIColor() })
     }
