@@ -236,8 +236,10 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             }
             
             if configuration.inputAssistantDisabled {
+                #if os(iOS)
                 uiView.inputAssistantItem.leadingBarButtonGroups = [UIBarButtonItemGroup()]
                 uiView.inputAssistantItem.trailingBarButtonGroups = [UIBarButtonItemGroup()]
+                #endif
             }
         }
         
@@ -435,6 +437,7 @@ extension CocoaTextField {
         then({ $0.configuration.inputAccessoryView = .init(view()) })
     }
     
+    @available(tvOS, unavailable)
     public func inputAssistantDisabled(_ isDisabled: Bool) -> some View {
         then({ $0.configuration.inputAssistantDisabled = isDisabled })
     }
