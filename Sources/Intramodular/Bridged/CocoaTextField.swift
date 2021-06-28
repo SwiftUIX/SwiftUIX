@@ -47,6 +47,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
         // MARK: Input Accessory
         
         var inputAccessoryView: AnyView?
+        var inputAssistantDisabled: Bool = false
         
         // MARK: Keyboard
         
@@ -232,6 +233,11 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
                 }
             } else {
                 uiView.inputView = nil
+            }
+            
+            if configuration.inputAssistantDisabled {
+                uiView.inputAssistantItem.leadingBarButtonGroups = [UIBarButtonItemGroup()]
+                uiView.inputAssistantItem.trailingBarButtonGroups = [UIBarButtonItemGroup()]
             }
         }
         
@@ -427,6 +433,10 @@ extension CocoaTextField {
     
     public func inputAccessoryView<InputAccessoryView: View>(@ViewBuilder _ view: () -> InputAccessoryView) -> Self {
         then({ $0.configuration.inputAccessoryView = .init(view()) })
+    }
+    
+    public func inputAssistantDisabled(_ isDisabled: Bool) -> some View {
+        then({ $0.configuration.inputAssistantDisabled = isDisabled })
     }
     
     // MARK: Keyboard

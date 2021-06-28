@@ -12,10 +12,10 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
         return body()
     }
     
-    /*#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-     CATransaction.begin()
-     CATransaction.disableActions()
-     #endif*/
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    CATransaction.begin()
+    CATransaction.disableActions()
+    #endif
     
     _areAnimationsDisabled = true
     
@@ -27,7 +27,7 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
         _areAnimationsDisabled = false
     }
     
-    /*#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-     CATransaction.commit()
-     #endif*/
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    CATransaction.commit()
+    #endif
 }

@@ -11,7 +11,11 @@ import SwiftUI
 @propertyWrapper
 public struct TimerState: DynamicProperty {
     private class ValueBox: ObservableObject {
-        @Published var value: Int
+        var value: Int {
+            willSet {
+                objectWillChange.send()
+            }
+        }
         
         init(_ value: Int) {
             self.value = value
