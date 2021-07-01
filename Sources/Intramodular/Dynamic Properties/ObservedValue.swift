@@ -49,4 +49,8 @@ extension ObservedValue {
     public init<Root: ObservableObject>(_ keyPath: ReferenceWritableKeyPath<Root, Value>, on root: Root) {
         self.init(ObservableObjectMember(root: root, keyPath: keyPath))
     }
+    
+    public static func constant(_ value: Value) -> ObservedValue<Value> {
+        self.init(ObservableValueRoot(root: value))
+    }
 }
