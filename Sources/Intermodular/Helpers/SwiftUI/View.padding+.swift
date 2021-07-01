@@ -40,7 +40,13 @@ extension View {
             case .none:
                 padding(edges)
             case .some(.small):
+                #if os(iOS)
                 padding(edges, 8)
+                #elseif os(watchOS)
+                padding(edges, 4)
+                #else
+                padding(edges, 8)
+                #endif
             case .some(.regular):
                 padding(edges)
             case .some(.large):
