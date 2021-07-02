@@ -86,23 +86,16 @@ final class UIHostingCollectionViewController<
     lazy var dragAndDropDelegate = DragAndDropDelegate(parent: self)
     #endif
     
-    lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout._toUICollectionViewLayout())
-        
-        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        collectionView.backgroundColor = .clear
-        collectionView.backgroundView = UIView()
-        collectionView.backgroundView?.backgroundColor = .clear
-        collectionView.isPrefetchingEnabled = false
-        
-        view.addSubview(collectionView)
-        
+    lazy var collectionView: _UICollectionView = {
+        let collectionView = _UICollectionView(parent: self)
+                
         collectionView.delegate = self
-        
         #if !os(tvOS)
         collectionView.dragDelegate = dragAndDropDelegate
         collectionView.dropDelegate = dragAndDropDelegate
         #endif
+        
+        view.addSubview(collectionView)
         
         return collectionView
     }()
@@ -511,6 +504,79 @@ extension UIHostingCollectionViewController {
 }
 
 // MARK: - Auxiliary Implementation -
+
+extension UIHostingCollectionViewController {
+    class _UICollectionView: UICollectionView, UICollectionViewDelegateFlowLayout {
+        weak var parent: UIHostingCollectionViewController?
+        
+        init(parent: UIHostingCollectionViewController) {
+            self.parent = parent
+            
+            super.init(
+                frame: parent.view.bounds,
+                collectionViewLayout: parent.collectionViewLayout._toUICollectionViewLayout()
+            )
+            
+            autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            backgroundColor = .clear
+            backgroundView = UIView()
+            backgroundView?.backgroundColor = .clear
+            isPrefetchingEnabled = false
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            layout collectionViewLayout: UICollectionViewLayout,
+            sizeForItemAt indexPath: IndexPath
+        ) -> CGSize {
+            guard let parent = parent else {
+                return UICollectionViewFlowLayout.automaticSize
+            }
+            
+            return parent.collectionView(
+                self,
+                layout: collectionViewLayout,
+                sizeForItemAt: indexPath
+            )
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            layout collectionViewLayout: UICollectionViewLayout,
+            referenceSizeForHeaderInSection section: Int
+        ) -> CGSize {
+            guard let parent = parent else {
+                return UICollectionViewFlowLayout.automaticSize
+            }
+            
+            return parent.collectionView(
+                self,
+                layout: collectionViewLayout,
+                referenceSizeForHeaderInSection: section
+            )
+        }
+        
+        func collectionView(
+            _ collectionView: UICollectionView,
+            layout collectionViewLayout: UICollectionViewLayout,
+            referenceSizeForFooterInSection section: Int
+        ) -> CGSize {
+            guard let parent = parent else {
+                return UICollectionViewFlowLayout.automaticSize
+            }
+
+            return parent.collectionView(
+                self,
+                layout: collectionViewLayout,
+                referenceSizeForFooterInSection: section
+            )
+        }
+    }
+}
 
 fileprivate extension Dictionary where Key == Int, Value == [Int: CGSize] {
     subscript(_ indexPath: IndexPath) -> CGSize? {

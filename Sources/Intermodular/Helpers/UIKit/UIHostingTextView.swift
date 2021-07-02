@@ -12,9 +12,11 @@ public class UIHostingTextView<Label: View>: UITextView {
     
     open var adjustsFontSizeToFitWidth: Bool = false {
         didSet {
-            if adjustsFontSizeToFitWidth != oldValue {
-                invalidateIntrinsicContentSize()
+            guard adjustsFontSizeToFitWidth != oldValue else {
+                return
             }
+            
+            invalidateIntrinsicContentSize()
         }
     }
     
@@ -76,7 +78,7 @@ public class UIHostingTextView<Label: View>: UITextView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         
-        if lastBounds != bounds.size {
+        if lastBounds.rounded(.up) != bounds.size.rounded(.up) {
             lastBounds = bounds.size
             
             invalidateIntrinsicContentSize()

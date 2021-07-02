@@ -19,12 +19,10 @@ extension UIHostingCollectionViewController {
         private var cellIdentifierToPreferencesMap: [UICollectionViewCellType.Configuration.ID: UICollectionViewCellType.Preferences] = [:]
         private var cellIdentifierToIndexPathMap: [UICollectionViewCellType.Configuration.ID: IndexPath] = [:]
         private var indexPathToCellIdentifierMap: [IndexPath: UICollectionViewCellType.Configuration.ID] = [:]
-        
         private var supplementaryViewIdentifierToCacheMap: [UICollectionViewSupplementaryViewType.Configuration.ID: UICollectionViewSupplementaryViewType.Cache] = [:]
         private var supplementaryViewIdentifierToContentSizeMap: [UICollectionViewSupplementaryViewType.Configuration.ID: CGSize] = [:]
         private var supplementaryViewIdentifierToIndexPathMap: [UICollectionViewSupplementaryViewType.Configuration.ID: IndexPath] = [:]
         private var indexPathToSupplementaryViewContentSizeMap: [String: [IndexPath: CGSize]] = [:]
-        
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
         
         private let prototypeHeaderView = UICollectionViewSupplementaryViewType()

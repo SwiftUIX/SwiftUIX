@@ -74,12 +74,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             section: lastSection
         )
         
-        if collectionView.contentSize.minimumDimensionLength == 0 {
-            withoutAnimation {
-                collectionView.setNeedsLayout()
-                collectionView.layoutIfNeeded()
-            }
-            
+        if collectionView.contentSize.minimumDimensionLength == 0 && collectionView.collectionViewLayout.collectionViewContentSize.minimumDimensionLength != 0 {
             let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
             
             let newContentOffset = CGPoint(

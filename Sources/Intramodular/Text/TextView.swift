@@ -13,13 +13,10 @@ public struct TextView<Label: View>: View {
         var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
-        
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
-        
         var isSelectable: Bool = true
-        
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
     }
@@ -184,7 +181,7 @@ extension _TextView: UIViewRepresentable {
         uiView.textContainer.lineFragmentPadding = .zero
         uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
         uiView.textContainerInset = configuration.textContainerInset
-        
+            
         (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
         
         // Reset the cursor offset if possible.
@@ -442,5 +439,12 @@ extension EnvironmentValues {
 }
 
 private extension CGSize {
-    var edgeInsets: EdgeInsets { .init(top: height / 2, leading: width / 2, bottom: height / 2, trailing: width / 2) }
+    var edgeInsets: EdgeInsets {
+        .init(
+            top: height / 2,
+            leading: width / 2,
+            bottom: height / 2,
+            trailing: width / 2
+        )
+    }
 }
