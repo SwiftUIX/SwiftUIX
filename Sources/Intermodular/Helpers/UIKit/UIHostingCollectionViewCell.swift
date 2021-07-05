@@ -405,6 +405,7 @@ extension UIHostingCollectionViewCell {
                 base.updateCollectionCache()
                 
                 parentViewController.refresh()
+                parentViewController.invalidateLayout()
             }
         }
         
