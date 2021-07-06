@@ -245,7 +245,7 @@ extension UIHostingCollectionViewController.Cache {
         
         preconfigure(cell: prototypeCell)
         
-        prototypeCell.update(forced: true)
+        prototypeCell.update(disableAnimation: true, forced: true)
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
         let size = prototypeCell

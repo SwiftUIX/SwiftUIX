@@ -74,7 +74,7 @@ extension DynamicViewPresenter {
     public func presentOnTop(_ modal: AnyModalPresentation) {
         topmostPresenter.present(modal, completion: { })
     }
-
+    
     public func present<Content: View>(@ViewBuilder content: () -> Content) {
         present(content())
     }
@@ -167,7 +167,7 @@ extension EnvironmentValues {
     public var presenter: DynamicViewPresenter? {
         get {
             #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-            return self[DynamicViewPresenterEnvironmentKey.self] 
+            return self[DynamicViewPresenterEnvironmentKey.self]
             #else
             return self[DynamicViewPresenterEnvironmentKey.self]
             #endif
@@ -289,11 +289,11 @@ extension UIWindow: DynamicViewPresenter {
 
 extension NSViewController: DynamicViewPresenter {
     private static var presentationCoordinatorKey: UInt = 0
-
+    
     public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
         presentationCoordinator
     }
-
+    
     @objc open var presentationCoordinator: CocoaPresentationCoordinator {
         if let coordinator = objc_getAssociatedObject(self, &NSViewController.presentationCoordinatorKey) {
             return coordinator as! CocoaPresentationCoordinator
@@ -357,7 +357,7 @@ extension NSWindow: DynamicViewPresenter {
     public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
         contentViewController?.presentationCoordinator ?? .init()
     }
-
+    
     public var presented: DynamicViewPresentable? {
         contentViewController?.presented
     }
