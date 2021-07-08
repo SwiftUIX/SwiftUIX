@@ -29,6 +29,15 @@ extension Section where Parent: View, Content: View, Footer: View {
     }
 }
 
+extension Section where Parent: View, Content: View, Footer == EmptyView {
+    public init(
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder header: () -> Parent
+    ) {
+        self.init(header: header(), footer: EmptyView(), content: content)
+    }
+}
+
 extension Section where Parent == Text, Content: View, Footer == EmptyView {
     public init<S: StringProtocol>(header: S, @ViewBuilder content: () -> Content) {
         self.init(header: Text(header), content: content)

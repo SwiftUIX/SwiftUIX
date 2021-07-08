@@ -11,6 +11,8 @@ import SwiftUI
 public struct SearchBar: DefaultTextInputType {
     @Binding fileprivate var text: String
     
+    fileprivate var searchTokens: Binding<[SearchToken]>?
+    
     #if os(iOS) || targetEnvironment(macCatalyst)
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
@@ -153,6 +155,16 @@ extension SearchBar: UIViewRepresentable {
             if uiView.text != text {
                 uiView.text = text
             }
+            
+            if let searchTokens = searchTokens?.wrappedValue {
+                if uiView.searchTextField.tokens.map(\._SwiftUIX_text) == searchTokens.map(\.text) {
+                    
+                }
+            } else {
+                if !uiView.searchTextField.tokens.isEmpty {
+                    uiView.searchTextField.tokens = []
+                }
+            }
         }
     }
     
@@ -268,6 +280,15 @@ extension SearchBar: NSViewRepresentable {
 extension SearchBar {
     public func customAppKitOrUIKitClass(_ cls: AppKitOrUIKitSearchBar.Type) -> Self {
         then({ $0.customAppKitOrUIKitClass = cls })
+    }
+}
+
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
+extension SearchBar {
+    public func searchTokens(_ tokens: Binding<[SearchToken]>) -> Self {
+        then({ $0.searchTokens = tokens })
     }
 }
 
