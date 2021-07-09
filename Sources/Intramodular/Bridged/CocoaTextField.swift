@@ -186,6 +186,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             uiView.textAlignment = .init(context.environment.multilineTextAlignment)
             uiView.textColor = configuration.textColor ?? uiView.textColor
             uiView.textContentType = configuration.textContentType
+            uiView.tintColor = context.environment.tintColor?.toUIColor()
             
             if let kerning = configuration.kerning {
                 uiView.defaultTextAttributes.updateValue(kerning, forKey: .kern)

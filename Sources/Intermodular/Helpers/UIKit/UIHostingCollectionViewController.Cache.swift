@@ -250,8 +250,7 @@ extension UIHostingCollectionViewController.Cache {
         
         let size = prototypeCell
             .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-            .rounded(.up)
-            .clamped(to: prototypeCell.configuration?.maximumSize ?? nil)
+            .clamped(to: (prototypeCell.configuration?.maximumSize ?? nil).rounded(.down))
         
         guard !(size.width == 1 && size.height == 1) else {
             return size
@@ -282,8 +281,7 @@ extension UIHostingCollectionViewController.Cache {
         
         let size = prototypeView
             .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-            .rounded(.up)
-            .clamped(to: configuration.maximumSize)
+            .clamped(to: configuration.maximumSize?.rounded(.down))
         
         guard !(size.width == 1 && size.height == 1) else {
             return size

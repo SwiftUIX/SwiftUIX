@@ -74,6 +74,13 @@ extension OptionalDimensions {
         
         return result
     }
+    
+    public func drop(_ axes: Axis.Set) -> Self {
+        Self.init(
+            width: axes.contains(.horizontal) ? nil : 0,
+            height: axes.contains(.vertical) ? nil : 0
+        )
+    }
 }
 
 // MARK: - API -

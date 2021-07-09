@@ -206,7 +206,6 @@ class UIHostingCollectionViewCell<
                 return size
             } else {
                 targetSize = CGSize(dimensions, default: targetSize)
-                    .rounded(.up)
                     .clamped(to: configuration?.maximumSize?.rounded(.down))
             }
         }
@@ -230,7 +229,6 @@ class UIHostingCollectionViewCell<
                 return size
             } else {
                 targetSize = CGSize(dimensions, default: targetSize)
-                    .rounded(.up)
                     .clamped(to: configuration?.maximumSize?.rounded(.down))
             }
         }
@@ -293,7 +291,6 @@ class UIHostingCollectionViewCell<
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
                     cache.preferredContentSize = result.size
-                        .rounded(.up)
                         .clamped(to: configuration?.maximumSize?.rounded(.down))
                 }
                 
