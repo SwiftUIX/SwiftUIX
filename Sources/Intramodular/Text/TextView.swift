@@ -341,7 +341,7 @@ extension TextView: DefaultTextInputType where Label == Text {
         self.label = Text(title).foregroundColor(.placeholderText)
         self.text = text
         self.configuration = .init(
-            isConstant: true,
+            isConstant: false,
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
         )
