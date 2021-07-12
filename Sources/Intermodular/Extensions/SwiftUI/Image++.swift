@@ -57,6 +57,12 @@ extension Image {
             }
         }
     }
+    
+    public func sizeToFit(_ size: CGSize? = nil) -> some View {
+        resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(size)
+    }
 }
 
 #if os(macOS) && swift(<5.3)
