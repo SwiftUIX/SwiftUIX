@@ -28,6 +28,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
+        var isFocused: Binding<Bool>? = nil
         
         var focusRingType: FocusRingType = .none
         
@@ -165,6 +166,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         context.coordinator.text = text
         context.coordinator.configuration = configuration
         
+        uiView.isFirstResponderBinding = configuration.isFocused
         uiView.onDeleteBackward = configuration.onDeleteBackward
         uiView.textRect = configuration.textRect
         uiView.editingRect = configuration.editingRect
@@ -244,12 +246,24 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             }
         }
         
-        DispatchQueue.main.async {
-            if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
-                if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+        if let isFocused = configuration.isFocused, uiView.window != nil {
+            if isFocused.wrappedValue && !uiView.isFirstResponder {
+                DispatchQueue.main.async {
                     uiView.becomeFirstResponder()
-                } else if !isFirstResponder && uiView.isFirstResponder {
+                }
+            } else if !isFocused.wrappedValue && uiView.isFirstResponder {
+                DispatchQueue.main.async {
                     uiView.resignFirstResponder()
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                    if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+                        uiView.becomeFirstResponder()
+                    } else if !isFirstResponder && uiView.isFirstResponder {
+                        uiView.resignFirstResponder()
+                    }
                 }
             }
         }
@@ -353,7 +367,7 @@ extension CocoaTextField {
         then({ $0.configuration.onCharactersChange = action })
     }
     
-    /// Adds an action to perform when characters are changed in this text field.
+    /// AddsUIText an action to perform when characters are changed in this text field.
     public func onCharactersChange(perform action: @escaping (CharactersChange) -> Void) -> Self {
         then({ $0.configuration.onCharactersChange = { change in action(change); return true } })
     }
@@ -366,6 +380,10 @@ extension CocoaTextField {
     
     public func isFirstResponder(_ isFirstResponder: Bool) -> Self {
         then({ $0.configuration.isFirstResponder = isFirstResponder })
+    }
+    
+    public func focused(_ isFocused: Binding<Bool>) -> Self {
+        then({ $0.configuration.isFocused = isFocused })
     }
 }
 
@@ -481,18 +499,38 @@ extension CocoaTextField where Label == Text {
 // MARK: - Auxiliary Implementation -
 
 private final class _UITextField: UITextField {
+    var isFirstResponderBinding: Binding<Bool>?
+
     var onDeleteBackward: () -> Void = { }
     
     var textRect: CocoaTextField<AnyView>.Rect?
     var editingRect: CocoaTextField<AnyView>.Rect?
     var clearButtonRect: CocoaTextField<AnyView>.Rect?
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+
+        isFirstResponderBinding?.wrappedValue = result
+        
+        return result
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        let result = super.resignFirstResponder()
+        
+        isFirstResponderBinding?.wrappedValue = !result
+        
+        return result
     }
     
     override func deleteBackward() {
