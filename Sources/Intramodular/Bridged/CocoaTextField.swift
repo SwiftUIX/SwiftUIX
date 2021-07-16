@@ -247,12 +247,10 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
         
         if let isFocused = configuration.isFocused, uiView.window != nil {
-            if isFocused.wrappedValue && !uiView.isFirstResponder {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if isFocused.wrappedValue && !uiView.isFirstResponder {
                     uiView.becomeFirstResponder()
-                }
-            } else if !isFocused.wrappedValue && uiView.isFirstResponder {
-                DispatchQueue.main.async {
+                } else if !isFocused.wrappedValue && uiView.isFirstResponder {
                     uiView.resignFirstResponder()
                 }
             }
