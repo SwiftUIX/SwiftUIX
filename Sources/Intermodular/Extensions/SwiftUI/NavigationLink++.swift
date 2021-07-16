@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 extension NavigationLink {
+    @_disfavoredOverload
     public init(
         @ViewBuilder destination: () -> Destination,
         @ViewBuilder label: () -> Label
