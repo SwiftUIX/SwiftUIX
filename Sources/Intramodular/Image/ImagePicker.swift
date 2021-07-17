@@ -57,6 +57,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
         ) {
             let image = (info[UIImagePickerController.InfoKey.editedImage] as? UIImage) ?? (info[UIImagePickerController.InfoKey.originalImage] as? UIImage)
             
+            base.info?.wrappedValue = info
             base.image?.wrappedValue = image
             base.data?.wrappedValue = (image?._fixOrientation() ?? image)?.data(using: base.encoding ?? .png)
             
