@@ -143,7 +143,7 @@ extension ListSection: Identifiable where SectionType: Identifiable, ItemType: I
 
 // MARK: - Helpers -
 
-extension Collection  {
+extension Collection {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     subscript<SectionType, ItemType>(
         _ indexPath: IndexPath

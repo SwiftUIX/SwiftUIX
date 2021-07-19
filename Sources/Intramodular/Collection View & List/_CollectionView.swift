@@ -125,9 +125,26 @@ struct _CollectionView<
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
         
-        uiViewController.dataSource = dataSource
+        if let oldUpdateToken = context.coordinator.dataSourceUpdateToken, let currentUpdateToken =
+            context.environment._collectionViewConfiguration.dataSourceUpdateToken {
+            if oldUpdateToken != currentUpdateToken {
+                uiViewController.dataSource = dataSource
+                uiViewController.refreshVisibleCellsAndSupplementaryViews()
+            }
+        } else {
+            uiViewController.dataSource = dataSource
+            uiViewController.refreshVisibleCellsAndSupplementaryViews()
+        }
         
-        uiViewController.refreshVisibleCellsAndSupplementaryViews()
+        context.coordinator.dataSourceUpdateToken = context.environment._collectionViewConfiguration.dataSourceUpdateToken
+    }
+    
+    class Coordinator {
+        var dataSourceUpdateToken: AnyHashable?
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        .init()
     }
 }
 

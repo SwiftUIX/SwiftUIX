@@ -10,7 +10,7 @@ import SwiftUI
 public class UIHostingTextView<Label: View>: UITextView {
     private var lastBounds: CGSize = .zero
     
-    open var adjustsFontSizeToFitWidth: Bool = false {
+    public var adjustsFontSizeToFitWidth: Bool = false {
         didSet {
             guard adjustsFontSizeToFitWidth != oldValue else {
                 return
@@ -20,7 +20,7 @@ public class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
-    open var preferredMaximumLayoutWidth: CGFloat? {
+    public var preferredMaximumLayoutWidth: CGFloat? {
         didSet {
             let desiredContentHuggingPriority = preferredMaximumLayoutWidth == nil
                 ? AppKitOrUIKitLayoutPriority.defaultLow
@@ -33,7 +33,7 @@ public class UIHostingTextView<Label: View>: UITextView {
                 )
             }
             
-            if preferredMaximumLayoutWidth != oldValue {
+            if let oldValue = oldValue, preferredMaximumLayoutWidth != oldValue {
                 invalidateIntrinsicContentSize()
                 
                 setNeedsLayout()
@@ -42,29 +42,8 @@ public class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
-    override open var intrinsicContentSize: CGSize {
-        if let preferredMaximumLayoutWidth = preferredMaximumLayoutWidth {
-            return sizeThatFits(
-                CGSize(
-                    width: preferredMaximumLayoutWidth,
-                    height: AppKitOrUIKitView.layoutFittingCompressedSize.height
-                )
-            )
-        } else if !isScrollEnabled {
-            return .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
-        } else {
-            return super.intrinsicContentSize
-        }
-    }
-    
-    override open var isScrollEnabled: Bool {
-        didSet {
-            guard isScrollEnabled != oldValue else {
-                return
-            }
-            
-            invalidateIntrinsicContentSize()
-        }
+    override public var intrinsicContentSize: CGSize {
+        computeIntrinsicContentSize() ?? super.intrinsicContentSize
     }
     
     public init() {
@@ -75,17 +54,32 @@ public class UIHostingTextView<Label: View>: UITextView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override open func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
-        
-        if lastBounds.rounded(.up) != bounds.size.rounded(.up) {
-            lastBounds = bounds.size
-            
-            invalidateIntrinsicContentSize()
-        }
     }
     
-    open func adjustFontSizeToFitWidth() {
+    override public func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
+    }
+    
+    private func computeIntrinsicContentSize() -> CGSize? {
+        var _intrinsicContentSize: CGSize?
+        
+        if let preferredMaximumLayoutWidth = preferredMaximumLayoutWidth {
+            _intrinsicContentSize = sizeThatFits(
+                CGSize(
+                    width: preferredMaximumLayoutWidth,
+                    height: AppKitOrUIKitView.layoutFittingCompressedSize.height
+                )
+            )
+        } else if !isScrollEnabled {
+            _intrinsicContentSize = .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
+        }
+
+        return _intrinsicContentSize
+    }
+    
+    public func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
         }

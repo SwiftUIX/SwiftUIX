@@ -439,7 +439,7 @@ extension UIHostingCollectionViewController {
             
             cell.cache.content = nil
             cell.configuration?.viewProvider = viewProvider
-                        
+            
             cell.update(disableAnimation: true, forced: false, refresh: true)
         }
         

@@ -23,6 +23,8 @@ struct _CollectionViewConfiguration {
     var isDragActive: Binding<Bool>? = nil
     @usableFromInline
     var _ignorePreferredCellLayoutAttributes: Bool = false
+    @usableFromInline
+    var dataSourceUpdateToken: AnyHashable?
 }
 
 // MARK: - Auxiliary Implementation -

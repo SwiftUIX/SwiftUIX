@@ -16,7 +16,7 @@ public struct CollectionView: View {
     private var _collectionViewConfiguration = _CollectionViewConfiguration()
     private var _dynamicViewContentTraitValues = _DynamicViewContentTraitValues()
     private var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
-    
+
     public var body: some View {
         internalBody
             .environment(\._collectionViewConfiguration, _collectionViewConfiguration)
@@ -234,12 +234,16 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
-    public func _ignorePreferredCellLayoutAttributes() -> Self {
-        then({ $0._collectionViewConfiguration._ignorePreferredCellLayoutAttributes = true })
+    public func updateOnChange<T: Hashable>(of value: T) -> Self {
+        then({ $0._collectionViewConfiguration.dataSourceUpdateToken = value })
     }
 }
 
 extension CollectionView {
+    public func _ignorePreferredCellLayoutAttributes() -> Self {
+        then({ $0._collectionViewConfiguration._ignorePreferredCellLayoutAttributes = true })
+    }
+
     /// Fixes this view at its ideal size.
     public func fixedSize() -> Self {
         then({ $0._collectionViewConfiguration.fixedSize = (true, true) })

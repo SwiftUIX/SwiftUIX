@@ -16,6 +16,7 @@ public struct TextView<Label: View>: View {
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
+        var isEditable: Bool = true
         var isSelectable: Bool = true
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
@@ -142,7 +143,13 @@ extension _TextView: UIViewRepresentable {
         let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
         
         #if !os(tvOS)
-        uiView.isEditable = configuration.isConstant ? false : context.environment.isEnabled
+        if !configuration.isEditable {
+            uiView.isEditable = false
+        } else {
+            uiView.isEditable = configuration.isConstant
+                ? false
+                : context.environment.isEnabled && configuration.isEditable
+        }
         #endif
         uiView.isScrollEnabled = context.environment.isScrollEnabled
         uiView.isSelectable = configuration.isSelectable
@@ -165,8 +172,10 @@ extension _TextView: UIViewRepresentable {
                         NSAttributedString.Key.font: font
                     ]
                 )
-            } else {
-                uiView.attributedText = attributedText!.wrappedValue
+            } else if let attributedText = attributedText {
+                if uiView.attributedText != attributedText.wrappedValue {
+                    uiView.attributedText = attributedText.wrappedValue
+                }
             }
             
         } else {
@@ -181,7 +190,7 @@ extension _TextView: UIViewRepresentable {
         uiView.textContainer.lineFragmentPadding = .zero
         uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
         uiView.textContainerInset = configuration.textContainerInset
-            
+        
         (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
         
         // Reset the cursor offset if possible.
@@ -398,6 +407,10 @@ extension TextView {
 }
 
 extension TextView {
+    public func isEditable(_ isEditable: Bool) -> Self {
+        then({ $0.configuration.isEditable = isEditable })
+    }
+    
     public func isSelectable(_ isSelectable: Bool) -> Self {
         then({ $0.configuration.isSelectable = isSelectable })
     }
