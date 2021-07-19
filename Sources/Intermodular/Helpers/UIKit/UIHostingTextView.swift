@@ -8,8 +8,9 @@ import Swift
 import SwiftUI
 
 public class UIHostingTextView<Label: View>: UITextView {
+    private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
-    
+
     public var adjustsFontSizeToFitWidth: Bool = false {
         didSet {
             guard adjustsFontSizeToFitWidth != oldValue else {
@@ -59,24 +60,28 @@ public class UIHostingTextView<Label: View>: UITextView {
     }
     
     override public func invalidateIntrinsicContentSize() {
+        _cachedIntrinsicContentSize = nil
+        
         super.invalidateIntrinsicContentSize()
     }
     
     private func computeIntrinsicContentSize() -> CGSize? {
-        var _intrinsicContentSize: CGSize?
+        if let _cachedIntrinsicContentSize = _cachedIntrinsicContentSize {
+            return _cachedIntrinsicContentSize
+        }
         
         if let preferredMaximumLayoutWidth = preferredMaximumLayoutWidth {
-            _intrinsicContentSize = sizeThatFits(
+            self._cachedIntrinsicContentSize = sizeThatFits(
                 CGSize(
                     width: preferredMaximumLayoutWidth,
                     height: AppKitOrUIKitView.layoutFittingCompressedSize.height
                 )
             )
         } else if !isScrollEnabled {
-            _intrinsicContentSize = .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
+            self._cachedIntrinsicContentSize = .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
         }
-
-        return _intrinsicContentSize
+        
+        return self._cachedIntrinsicContentSize
     }
     
     public func adjustFontSizeToFitWidth() {
