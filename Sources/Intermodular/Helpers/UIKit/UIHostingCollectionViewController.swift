@@ -400,6 +400,12 @@ final class UIHostingCollectionViewController<
     
     // MARK: UIScrollViewDelegate
     
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if _scrollViewConfiguration.keyboardDismissMode == .onDrag {
+            Keyboard.dismiss()
+        }
+    }
+    
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if let onOffsetChange = _scrollViewConfiguration.onOffsetChange {
             onOffsetChange(scrollView.contentOffset(forContentType: AnyView.self))
