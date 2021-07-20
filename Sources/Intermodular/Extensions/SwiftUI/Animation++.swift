@@ -8,7 +8,6 @@ import SwiftUI
 extension Animation {
     public static func interpolatingSpring(
         mass: Double = 1.0,
-        stiffness: Double,
         friction: Double,
         tension: Double,
         initialVelocity: Double = 0
@@ -17,7 +16,7 @@ extension Animation {
         
         return interpolatingSpring(
             mass: mass,
-            stiffness: stiffness,
+            stiffness: friction,
             damping: damping,
             initialVelocity: initialVelocity
         )
