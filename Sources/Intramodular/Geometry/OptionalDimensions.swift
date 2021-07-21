@@ -87,12 +87,12 @@ extension OptionalDimensions {
 
 extension View {
     /// Sets the preferred maximum layout width for the view.
-    public func preferredMaximumLayoutWidth(_ preferredMaximumLayoutWidth: CGFloat) -> some View {
+    public func preferredMaximumLayoutWidth(_ preferredMaximumLayoutWidth: CGFloat?) -> some View {
         environment(\.preferredMaximumLayoutWidth, preferredMaximumLayoutWidth)
     }
     
     /// Sets the preferred maximum layout height for the view.
-    public func preferredMaximumLayoutHeight(_ preferredMaximumLayoutHeight: CGFloat) -> some View {
+    public func preferredMaximumLayoutHeight(_ preferredMaximumLayoutHeight: CGFloat?) -> some View {
         environment(\.preferredMaximumLayoutHeight, preferredMaximumLayoutHeight)
     }
     

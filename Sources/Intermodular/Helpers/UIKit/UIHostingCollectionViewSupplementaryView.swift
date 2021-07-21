@@ -23,18 +23,14 @@ extension UIHostingCollectionViewSupplementaryView {
         var indexPath: IndexPath
         var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
         var maximumSize: OptionalDimensions?
-        
-        var content: AnyView? {
-            viewProvider.sectionContent(for: kind)?(section)
-        }
-        
+                
         var id: ID {
             .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
         }
     }
     
     struct Cache {
-        var content: Content?
+        var content: AnyView?
         var contentSize: CGSize?
         var preferredContentSize: CGSize? {
             didSet {
@@ -73,6 +69,22 @@ class UIHostingCollectionViewSupplementaryView<
     
     var cache = Cache()
     
+    var content: AnyView? {
+        if let content = cache.content {
+            return content
+        } else if let configuration = configuration {
+            let content = configuration.viewProvider.sectionContent(for: configuration.kind)?(configuration.section)
+            
+            self.cache.content = content
+            
+            updateCollectionCache()
+            
+            return content
+        } else {
+            fatalError()
+        }
+    }
+
     private var contentHostingController: ContentHostingController?
     
     private weak var parentViewController: ParentViewControllerType?
@@ -112,10 +124,21 @@ class UIHostingCollectionViewSupplementaryView<
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
+        var targetSize = targetSize
+        
+        if let maximumSize = configuration?.maximumSize, let dimensions = content._precomputedDimensionsThatFit(in: maximumSize) {
+            if let size = CGSize(dimensions), size.fits(targetSize) {
+                return size
+            } else {
+                targetSize = CGSize(dimensions, default: targetSize)
+                    .clamped(to: configuration?.maximumSize?.rounded(.down))
+            }
+        }
+        
         guard let contentHostingController = contentHostingController else {
             return .init(width: 1, height: 1)
         }
-        
+
         return contentHostingController.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
@@ -212,15 +235,17 @@ extension UIHostingCollectionViewSupplementaryView {
 extension UIHostingCollectionViewSupplementaryView {
     private struct RootView: View {
         var _collectionViewProxy: CollectionViewProxy
+        var content: AnyView?
         var configuration: Configuration?
         
         init(base: UIHostingCollectionViewSupplementaryView) {
             _collectionViewProxy = .init(base.parentViewController)
+            content = base.content
             configuration = base.configuration
         }
         
         var body: some View {
-            if let configuration = configuration, let content = configuration.content {
+            if let content = content, let configuration = configuration {
                 content
                     .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
                     .edgesIgnoringSafeArea(.all)

@@ -199,22 +199,11 @@ class UIHostingCollectionViewCell<
     }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        var targetSize = targetSize
-        
-        if let maximumSize = configuration?.maximumSize, let dimensions = content._precomputedDimensionsThatFit(in: maximumSize) {
-            if let size = CGSize(dimensions), size.fits(targetSize) {
-                return size
-            } else {
-                targetSize = CGSize(dimensions, default: targetSize)
-                    .clamped(to: configuration?.maximumSize?.rounded(.down))
-            }
-        }
-        
-        guard let contentHostingController = contentHostingController else {
-            return .init(width: 1, height: 1)
-        }
-        
-        return contentHostingController.systemLayoutSizeFitting(targetSize)
+        systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: contentHuggingPriority(for: .horizontal),
+            verticalFittingPriority: contentHuggingPriority(for: .vertical)
+        )
     }
     
     override func systemLayoutSizeFitting(
