@@ -7,26 +7,6 @@ import Foundation
 import Swift
 import SwiftUI
 
-extension View {
-    public func userStorageKeyPrefix(_ prefix: String) -> some View {
-        environment(\.userStorageKeyPrefix, prefix)
-    }
-}
-
-extension EnvironmentValues {
-    struct UserStorageKeyPrefix: EnvironmentKey {
-        static let defaultValue: String? = nil
-    }
-    
-    var userStorageKeyPrefix: String? {
-        get {
-            self[UserStorageKeyPrefix]
-        } set {
-            self[UserStorageKeyPrefix] = newValue
-        }
-    }
-}
-
 @propertyWrapper
 public struct UserStorage<Value: Codable>: DynamicProperty {
     private class ValueBox: ObservableObject {
@@ -94,8 +74,6 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                 }
         }
     }
-    
-    @Environment(\.userStorageKeyPrefix) var userStorageKeyPrefix
     
     @State private var dummy: Bool = false
     

@@ -13,6 +13,8 @@ public struct SearchBar: DefaultTextInputType {
     
     fileprivate var searchTokens: Binding<[SearchToken]>?
     
+    var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
+    
     #if os(iOS) || targetEnvironment(macCatalyst)
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
@@ -22,6 +24,7 @@ public struct SearchBar: DefaultTextInputType {
     
     private let onEditingChanged: (Bool) -> Void
     private let onCommit: () -> Void
+    private var isFocused: Binding<Bool>? = nil
     
     private var placeholder: String?
     
@@ -35,8 +38,6 @@ public struct SearchBar: DefaultTextInputType {
     
     private var showsCancelButton: Bool?
     private var onCancel: () -> Void = { }
-    
-    var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
     
     #if os(iOS) || targetEnvironment(macCatalyst)
     private var returnKeyType: UIReturnKeyType?
@@ -78,7 +79,7 @@ extension SearchBar: UIViewRepresentable {
     public typealias UIViewType = UISearchBar
     
     public func makeUIView(context: Context) -> UIViewType {
-        let uiView = UIViewType()
+        let uiView = _UISearchBar()
         
         uiView.delegate = context.coordinator
         
@@ -163,6 +164,22 @@ extension SearchBar: UIViewRepresentable {
             } else {
                 if !uiView.searchTextField.tokens.isEmpty {
                     uiView.searchTextField.tokens = []
+                }
+            }
+        }
+        
+        updateResponderChain: do {
+            if let uiView = uiView as? _UISearchBar {
+                if let isFocused = isFocused, uiView.window != nil {
+                    uiView.isFirstResponderBinding = isFocused
+
+                    DispatchQueue.main.async {
+                        if isFocused.wrappedValue && !uiView.isFirstResponder {
+                            uiView.becomeFirstResponder()
+                        } else if !isFocused.wrappedValue && uiView.isFirstResponder {
+                            uiView.resignFirstResponder()
+                        }
+                    }
                 }
             }
         }
@@ -283,6 +300,12 @@ extension SearchBar {
     }
 }
 
+extension SearchBar {
+    public func focused(_ isFocused: Binding<Bool>) -> Self {
+        then({ $0.isFocused = isFocused })
+    }
+}
+
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
@@ -319,7 +342,7 @@ extension SearchBar {
     public func textFieldBackgroundColor(_ backgroundColor: UIColor) -> Self {
         then({ $0.appKitOrUIKitSearchFieldBackgroundColor = backgroundColor })
     }
-
+    
     @_disfavoredOverload
     public func textFieldBackgroundColor(_ backgroundColor: Color) -> Self {
         then({ $0.appKitOrUIKitSearchFieldBackgroundColor = backgroundColor.toUIColor() })
@@ -366,12 +389,33 @@ extension SearchBar {
 // MARK: - Auxiliary Implementation -
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-extension UISearchBar {
-    /// Retrieves the UITextField contained inside the UISearchBar.
-    ///
-    /// - Returns: the UITextField inside the UISearchBar
-    func _retrieveTextField() -> UITextField? {
-        findSubview(ofKind: UITextField.self)
+private final class _UISearchBar: UISearchBar {
+    var isFirstResponderBinding: Binding<Bool>?
+        
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+        
+        isFirstResponderBinding?.wrappedValue = result
+        
+        return result
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        let result = super.resignFirstResponder()
+        
+        isFirstResponderBinding?.wrappedValue = !result
+        
+        return result
     }
 }
 #endif

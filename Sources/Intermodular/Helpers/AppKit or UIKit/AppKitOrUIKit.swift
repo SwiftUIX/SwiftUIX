@@ -40,7 +40,9 @@ public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
 
 extension UIEdgeInsets {
-    var edgeInsets: EdgeInsets { .init(top: top, leading: left, bottom: bottom, trailing: right) }
+    var edgeInsets: EdgeInsets {
+        .init(top: top, leading: left, bottom: bottom, trailing: right)
+    }
 }
 
 #endif

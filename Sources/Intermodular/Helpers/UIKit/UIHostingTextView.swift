@@ -10,31 +10,44 @@ import SwiftUI
 public class UIHostingTextView<Label: View>: UITextView {
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
-
-    public var adjustsFontSizeToFitWidth: Bool = false {
+    
+    public override var attributedText: NSAttributedString! {
         didSet {
-            guard adjustsFontSizeToFitWidth != oldValue else {
-                return
+            if preferredMaximumDimensions.height != nil {
+                if isScrollEnabled {
+                    DispatchQueue.main.async {
+                        self.invalidateIntrinsicContentSize()
+                    }
+                }
             }
-            
-            invalidateIntrinsicContentSize()
         }
     }
     
-    public var preferredMaximumLayoutWidth: CGFloat? {
+    public var preferredMaximumDimensions: OptionalDimensions = nil {
         didSet {
-            let desiredContentHuggingPriority = preferredMaximumLayoutWidth == nil
+            let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
                 ? AppKitOrUIKitLayoutPriority.defaultLow
                 : AppKitOrUIKitLayoutPriority.defaultHigh
             
-            if contentHuggingPriority(for: .horizontal) != desiredContentHuggingPriority {
+            if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
-                    desiredContentHuggingPriority,
+                    desiredHorizontalContentHuggingPriority,
                     for: .horizontal
                 )
             }
             
-            if let oldValue = oldValue, preferredMaximumLayoutWidth != oldValue {
+            let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
+            
+            if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
+                setContentHuggingPriority(
+                    desiredVerticalContentHuggingPriority,
+                    for: .vertical
+                )
+            }
+            
+            if (oldValue.width != nil || oldValue.height != nil), preferredMaximumDimensions != oldValue {
                 invalidateIntrinsicContentSize()
                 
                 setNeedsLayout()
@@ -70,21 +83,33 @@ public class UIHostingTextView<Label: View>: UITextView {
             return _cachedIntrinsicContentSize
         }
         
-        if let preferredMaximumLayoutWidth = preferredMaximumLayoutWidth {
+        if let preferredMaximumLayoutWidth = preferredMaximumDimensions.width {
             self._cachedIntrinsicContentSize = sizeThatFits(
                 CGSize(
                     width: preferredMaximumLayoutWidth,
                     height: AppKitOrUIKitView.layoutFittingCompressedSize.height
                 )
+                .clamped(to: preferredMaximumDimensions)
             )
         } else if !isScrollEnabled {
-            self._cachedIntrinsicContentSize = .init(width: bounds.width, height: textHeight(forWidth: bounds.width))
+            self._cachedIntrinsicContentSize = .init(
+                width: bounds.width,
+                height: textHeight(forWidth: bounds.width)
+            )
+        } else {
+            self._cachedIntrinsicContentSize = .init(
+                width: UIView.noIntrinsicMetric,
+                height: min(
+                    preferredMaximumDimensions.height ?? contentSize.height,
+                    contentSize.height
+                )
+            )
         }
         
         return self._cachedIntrinsicContentSize
     }
     
-    public func adjustFontSizeToFitWidth() {
+    private func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
         }

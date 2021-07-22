@@ -246,21 +246,23 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             }
         }
         
-        if let isFocused = configuration.isFocused, uiView.window != nil {
-            DispatchQueue.main.async {
-                if isFocused.wrappedValue && !uiView.isFirstResponder {
-                    uiView.becomeFirstResponder()
-                } else if !isFocused.wrappedValue && uiView.isFirstResponder {
-                    uiView.resignFirstResponder()
-                }
-            }
-        } else {
-            DispatchQueue.main.async {
-                if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
-                    if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+        updateResponderChain: do {
+            if let isFocused = configuration.isFocused, uiView.window != nil {
+                DispatchQueue.main.async {
+                    if isFocused.wrappedValue && !uiView.isFirstResponder {
                         uiView.becomeFirstResponder()
-                    } else if !isFirstResponder && uiView.isFirstResponder {
+                    } else if !isFocused.wrappedValue && uiView.isFirstResponder {
                         uiView.resignFirstResponder()
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                        if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+                            uiView.becomeFirstResponder()
+                        } else if !isFirstResponder && uiView.isFirstResponder {
+                            uiView.resignFirstResponder()
+                        }
                     }
                 }
             }

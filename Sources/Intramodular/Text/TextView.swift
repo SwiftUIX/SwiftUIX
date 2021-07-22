@@ -13,13 +13,28 @@ public struct TextView<Label: View>: View {
         var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
+        
+        var isInitialFirstResponder: Bool?
+        var isFirstResponder: Bool?
+        
+        var isEditable: Bool = true
+        var isSelectable: Bool = true
+        
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        var autocapitalization: UITextAutocapitalizationType?
+        #endif
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
-        var isEditable: Bool = true
-        var isSelectable: Bool = true
-        var isInitialFirstResponder: Bool?
-        var isFirstResponder: Bool?
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        var textContentType: UITextContentType?
+        #endif
+        var dismissKeyboardOnReturn: Bool = false
+        var enablesReturnKeyAutomatically: Bool?
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        var keyboardType: UIKeyboardType = .default
+        var returnKeyType: UIReturnKeyType?
+        #endif
     }
     
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
@@ -83,6 +98,117 @@ import UIKit
 extension _TextView: UIViewRepresentable {
     typealias UIViewType = UITextView
     
+    func makeUIView(context: Context) -> UIViewType {
+        let uiView = customAppKitOrUIKitClass.init()
+        
+        uiView.delegate = context.coordinator
+        uiView.backgroundColor = nil
+        
+        if let isFirstResponder = configuration.isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
+            DispatchQueue.main.async {
+                uiView.becomeFirstResponder()
+            }
+        }
+        
+        return uiView
+    }
+    
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        var cursorOffset: Int?
+        
+        // Record the current cursor offset.
+        if let selectedRange = uiView.selectedTextRange {
+            cursorOffset = uiView.offset(from: uiView.beginningOfDocument, to: selectedRange.start)
+        }
+        
+        updateUserInteractability: do {
+            #if !os(tvOS)
+            if !configuration.isEditable {
+                uiView.isEditable = false
+            } else {
+                uiView.isEditable = configuration.isConstant
+                    ? false
+                    : context.environment.isEnabled && configuration.isEditable
+            }
+            #endif
+            uiView.isScrollEnabled = context.environment.isScrollEnabled
+            uiView.isSelectable = configuration.isSelectable
+        }
+        
+        updateLayoutConfiguration: do {
+            (uiView as? UIHostingTextView<Label>)?.preferredMaximumDimensions = context.environment.preferredMaximumLayoutDimensions
+        }
+        
+        updateTextAndGeneralConfiguration: do {
+            uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
+            
+            let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
+            
+            if let textColor = configuration.textColor {
+                uiView.textColor = textColor
+            }
+            
+            uiView.textContentType = configuration.textContentType
+            
+            uiView.textContainer.lineFragmentPadding = .zero
+            uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
+            uiView.textContainerInset = configuration.textContainerInset
+            
+            if context.environment.requiresAttributedText || attributedText != nil {
+                let paragraphStyle = NSMutableParagraphStyle()
+                
+                paragraphStyle.lineBreakMode = context.environment.lineBreakMode
+                paragraphStyle.lineSpacing = context.environment.lineSpacing
+                
+                context.environment._paragraphSpacing.map {
+                    paragraphStyle.paragraphSpacing = $0
+                }
+                
+                if let text = text {
+                    uiView.attributedText = NSAttributedString(
+                        string: text.wrappedValue,
+                        attributes: [
+                            NSAttributedString.Key.paragraphStyle: paragraphStyle,
+                            NSAttributedString.Key.font: font
+                        ]
+                    )
+                } else if let attributedText = attributedText {
+                    if uiView.attributedText != attributedText.wrappedValue {
+                        uiView.attributedText = attributedText.wrappedValue
+                    }
+                }
+            } else {
+                uiView.text = text!.wrappedValue
+                uiView.font = font
+            }
+        }
+        
+        correctCursorOffset: do {
+            // Reset the cursor offset if possible.
+            if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
+                uiView.selectedTextRange = textRange
+            }
+        }
+        
+        updateKeyboardConfiguration: do {
+            uiView.enablesReturnKeyAutomatically = configuration.enablesReturnKeyAutomatically ?? false
+            uiView.keyboardType = configuration.keyboardType
+            uiView.returnKeyType = configuration.returnKeyType ?? .default
+        }
+        
+        updateResponderChain: do {
+            DispatchQueue.main.async {
+                if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                    if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+                        uiView.becomeFirstResponder()
+                    } else if !isFirstResponder && uiView.isFirstResponder {
+                        uiView.resignFirstResponder()
+                    }
+                }
+            }
+        }
+    }
+    
     class Coordinator: NSObject, UITextViewDelegate {
         var text: Binding<String>?
         var attributedText: Binding<NSAttributedString>?
@@ -110,102 +236,21 @@ extension _TextView: UIViewRepresentable {
             }
         }
         
+        func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+            if configuration.dismissKeyboardOnReturn {
+                if text == "\n" {
+                    configuration.onCommit()
+                    
+                    return false
+                }
+            }
+            
+            return true
+        }
+        
         func textViewDidEndEditing(_ textView: UITextView) {
             configuration.onEditingChanged(false)
             configuration.onCommit()
-        }
-    }
-    
-    func makeUIView(context: Context) -> UIViewType {
-        let uiView = customAppKitOrUIKitClass.init()
-        
-        uiView.delegate = context.coordinator
-        
-        if let isFirstResponder = configuration.isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
-            DispatchQueue.main.async {
-                uiView.becomeFirstResponder()
-            }
-        }
-        
-        return uiView
-    }
-    
-    func updateUIView(_ uiView: UIViewType, context: Context) {
-        var cursorOffset: Int?
-        
-        // Record the current cursor offset.
-        if let selectedRange = uiView.selectedTextRange {
-            cursorOffset = uiView.offset(from: uiView.beginningOfDocument, to: selectedRange.start)
-        }
-        
-        uiView.backgroundColor = nil
-        
-        let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
-        
-        #if !os(tvOS)
-        if !configuration.isEditable {
-            uiView.isEditable = false
-        } else {
-            uiView.isEditable = configuration.isConstant
-                ? false
-                : context.environment.isEnabled && configuration.isEditable
-        }
-        #endif
-        uiView.isScrollEnabled = context.environment.isScrollEnabled
-        uiView.isSelectable = configuration.isSelectable
-        
-        if context.environment.requiresAttributedText || attributedText != nil {
-            let paragraphStyle = NSMutableParagraphStyle()
-            
-            paragraphStyle.lineBreakMode = context.environment.lineBreakMode
-            paragraphStyle.lineSpacing = context.environment.lineSpacing
-            
-            context.environment._paragraphSpacing.map {
-                paragraphStyle.paragraphSpacing = $0
-            }
-            
-            if let text = text {
-                uiView.attributedText = NSAttributedString(
-                    string: text.wrappedValue,
-                    attributes: [
-                        NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                        NSAttributedString.Key.font: font
-                    ]
-                )
-            } else if let attributedText = attributedText {
-                if uiView.attributedText != attributedText.wrappedValue {
-                    uiView.attributedText = attributedText.wrappedValue
-                }
-            }
-            
-        } else {
-            uiView.text = text!.wrappedValue
-            uiView.font = font
-        }
-        
-        if let textColor = configuration.textColor {
-            uiView.textColor = textColor
-        }
-        
-        uiView.textContainer.lineFragmentPadding = .zero
-        uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
-        uiView.textContainerInset = configuration.textContainerInset
-        
-        (uiView as? UIHostingTextView<Label>)?.preferredMaximumLayoutWidth = context.environment.preferredMaximumLayoutWidth
-        
-        // Reset the cursor offset if possible.
-        if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
-            uiView.selectedTextRange = textRange
-        }
-        
-        DispatchQueue.main.async {
-            if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
-                if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
-                    uiView.becomeFirstResponder()
-                } else if !isFirstResponder && uiView.isFirstResponder {
-                    uiView.resignFirstResponder()
-                }
-            }
         }
     }
     
@@ -372,6 +417,14 @@ extension TextView: DefaultTextInputType where Label == Text {
 }
 
 extension TextView {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
+        then({ $0.customAppKitOrUIKitClass = type })
+    }
+    #endif
+}
+
+extension TextView {
     public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
         then({ $0.configuration.isInitialFirstResponder = isInitialFirstResponder })
     }
@@ -383,8 +436,8 @@ extension TextView {
 
 extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
-        then({ $0.customAppKitOrUIKitClass = type })
+    public func autocapitalization(_ autocapitalization: UITextAutocapitalizationType) -> Self {
+        then({ $0.configuration.autocapitalization = autocapitalization })
     }
     
     public func foregroundColor(_ foregroundColor: Color) -> Self {
@@ -404,6 +457,12 @@ extension TextView {
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
         then({ $0.configuration.textContainerInset = textContainerInset })
     }
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func textContentType(_ textContentType: UITextContentType?) -> Self {
+        then({ $0.configuration.textContentType = textContentType })
+    }
+    #endif
 }
 
 extension TextView {
@@ -414,6 +473,26 @@ extension TextView {
     public func isSelectable(_ isSelectable: Bool) -> Self {
         then({ $0.configuration.isSelectable = isSelectable })
     }
+}
+
+extension TextView {
+    public func dismissKeyboardOnReturn(_ dismissKeyboardOnReturn: Bool) -> Self {
+        then({ $0.configuration.dismissKeyboardOnReturn = dismissKeyboardOnReturn })
+    }
+    
+    public func enablesReturnKeyAutomatically(_ enablesReturnKeyAutomatically: Bool) -> Self {
+        then({ $0.configuration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
+    }
+    
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
+        then({ $0.configuration.keyboardType = keyboardType })
+    }
+    
+    public func returnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
+        then({ $0.configuration.returnKeyType = returnKeyType })
+    }
+    #endif
 }
 
 #endif
