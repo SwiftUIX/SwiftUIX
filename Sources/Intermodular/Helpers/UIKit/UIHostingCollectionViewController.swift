@@ -407,7 +407,7 @@ final class UIHostingCollectionViewController<
         }
         #endif
     }
-
+    
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if let onOffsetChange = _scrollViewConfiguration.onOffsetChange {
             onOffsetChange(scrollView.contentOffset(forContentType: AnyView.self))
