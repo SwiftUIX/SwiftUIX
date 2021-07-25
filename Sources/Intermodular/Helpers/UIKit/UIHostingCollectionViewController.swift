@@ -402,8 +402,10 @@ final class UIHostingCollectionViewController<
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         #if os(iOS)
-        if _scrollViewConfiguration.keyboardDismissMode == .onDrag {
-            Keyboard.dismiss()
+        if #available(iOS 13.0, *) {
+            if _scrollViewConfiguration.keyboardDismissMode == .onDrag {
+                Keyboard.dismiss()
+            }
         }
         #endif
     }
