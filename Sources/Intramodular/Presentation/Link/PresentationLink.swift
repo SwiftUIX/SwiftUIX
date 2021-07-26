@@ -147,6 +147,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 #endif
             }
         }
+        .background(ZeroSizeView().id(isPresented.wrappedValue))
         .name(name, id: id)
     }
     
@@ -223,7 +224,7 @@ extension PresentationLink {
         
         self.label = label()
     }
-
+    
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,

@@ -405,7 +405,7 @@ final class UIHostingCollectionViewController<
         
         self.perform(Selector(_scrollViewWillBeginDragging_dismissKeyboard))
     }
-
+    
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
