@@ -51,6 +51,7 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
                     label: { ZeroSizeView() }
                 )
                 .id(selection.id)
+                .accessibility(hidden: true)
             }
         )
         #else
@@ -62,6 +63,7 @@ fileprivate struct SelectionNavigator<Selection: Identifiable, Destination: View
                     label: { ZeroSizeView() }
                 )
                 .id(selection.id)
+                .accessibility(hidden: true)
             }
         )
         #endif
@@ -81,6 +83,7 @@ extension View {
                 isActive: isActive,
                 label: { ZeroSizeView() }
             )
+            .accessibility(hidden: true)
         )
     }
     
@@ -104,6 +107,7 @@ extension View {
                 ),
                 label: { ZeroSizeView() }
             )
+            .accessibility(hidden: true)
         )
     }
         
@@ -179,6 +183,7 @@ fileprivate struct NavigateOnPress<Destination: View>: ViewModifier {
                 label: { EmptyView() }
             )
             .hidden()
+            .accessibility(hidden: true)
         )
     }
 }
