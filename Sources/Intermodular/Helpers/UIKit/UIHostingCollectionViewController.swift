@@ -401,6 +401,15 @@ final class UIHostingCollectionViewController<
     // MARK: UIScrollViewDelegate
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        let _scrollViewWillBeginDragging_dismissKeyboard = "_scrollViewWillBeginDragging_dismissKeyboard"
+        
+        self.perform(Selector(_scrollViewWillBeginDragging_dismissKeyboard))
+    }
+
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
+    @objc(_scrollViewWillBeginDragging_dismissKeyboard) func _scrollViewWillBeginDragging_dismissKeyboard() {
         #if os(iOS)
         if #available(iOS 13.0, *) {
             if _scrollViewConfiguration.keyboardDismissMode == .onDrag {

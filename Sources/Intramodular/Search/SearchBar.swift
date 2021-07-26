@@ -301,6 +301,9 @@ extension SearchBar {
 }
 
 extension SearchBar {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     public func focused(_ isFocused: Binding<Bool>) -> Self {
         then({ $0.isFocused = isFocused })
     }
