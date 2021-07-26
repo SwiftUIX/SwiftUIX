@@ -347,6 +347,10 @@ extension UIHostingCollectionViewCell {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        guard configuration != nil else {
+            return
+        }
+
         if contentHostingController == nil {
             update(disableAnimation: true, forced: false)
         }

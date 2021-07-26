@@ -61,12 +61,7 @@ class UIHostingCollectionViewSupplementaryView<
         Content
     >
     
-    var configuration: Configuration? {
-        didSet {
-            update()
-        }
-    }
-    
+    var configuration: Configuration?
     var cache = Cache()
     
     var content: AnyView? {
@@ -183,6 +178,14 @@ class UIHostingCollectionViewSupplementaryView<
 
 extension UIHostingCollectionViewSupplementaryView {
     func update(disableAnimation: Bool = true, forced: Bool = false) {
+        guard configuration != nil else {
+            return
+        }
+        
+        if forced {
+            cache.content = nil
+        }
+
         if let contentHostingController = contentHostingController {
             contentHostingController.update(disableAnimation: disableAnimation, forced: forced)
         } else {
@@ -194,8 +197,12 @@ extension UIHostingCollectionViewSupplementaryView {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        guard configuration != nil else {
+            return
+        }
+
         if contentHostingController == nil {
-            update()
+            update(disableAnimation: true, forced: false)
         }
         
         guard let contentHostingController = contentHostingController else {
@@ -204,13 +211,12 @@ extension UIHostingCollectionViewSupplementaryView {
             return
         }
         
-        defer {
-            self.parentViewController = parentViewController
-        }
-        
         if let parentViewController = parentViewController {
             if contentHostingController.parent == nil {
                 contentHostingController.move(toParent: parentViewController, ofSupplementaryView: self)
+                self.parentViewController = parentViewController
+                
+                updateCollectionCache()
             }
         } else if !isPrototype {
             assertionFailure()

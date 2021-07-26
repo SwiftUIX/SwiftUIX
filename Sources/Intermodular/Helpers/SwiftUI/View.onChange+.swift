@@ -144,14 +144,21 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
     
     func body(content: Content) -> some View {
         content.onChange(of: value) { newValue in
-            if subscription == nil {
-                let subscription = transform(valuePublisher.eraseToAnyPublisher())
-                
-                self.subscription = subscription
-                self.cancellable = .init(subscription.cancel)
-            }
+            subscribeIfNecessary()
             
             valuePublisher.send(newValue)
+        }
+        .onAppear {
+            subscribeIfNecessary()
+        }
+    }
+    
+    private func subscribeIfNecessary() {
+        if subscription == nil {
+            let subscription = transform(valuePublisher.eraseToAnyPublisher())
+            
+            self.subscription = subscription
+            self.cancellable = .init(subscription.cancel)
         }
     }
 }
