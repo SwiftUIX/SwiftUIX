@@ -43,6 +43,18 @@ open class UIHostingView<Content: View>: UIView {
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+        
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: superview)
+        
+        rootViewHostingController._navigationController = superview?.nearestViewController?.nearestNavigationController ?? (superview?.nearestViewController as? UINavigationController)
+    }
+    
+    override open func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        
+        rootViewHostingController._navigationController = superview?.nearestViewController?.nearestNavigationController ?? (superview?.nearestViewController as? UINavigationController)
+    }
     
     override open func sizeThatFits(_ size: CGSize) -> CGSize {
         rootViewHostingController.sizeThatFits(in: size)
@@ -51,36 +63,7 @@ open class UIHostingView<Content: View>: UIView {
     override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
         rootViewHostingController.sizeThatFits(in: targetSize)
     }
-    
-    override open func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: superview)
-        
-        rootViewHostingController._navigationController = superview?.nearestViewController?.nearestNavigationController ?? (superview?.nearestViewController as? UINavigationController)
-        
-        /*if let newSuperview = newSuperview {
-            if let parent = newSuperview._parentViewController {
-                rootViewHostingController.willMove(toParent: parent)
-                parent.addChild(rootViewHostingController)
-            }
-        } else if rootViewHostingController.parent != nil {
-            rootViewHostingController.willMove(toParent: nil)
-        }*/
-    }
-    
-    override open func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        
-        rootViewHostingController._navigationController = superview?.nearestViewController?.nearestNavigationController ?? (superview?.nearestViewController as? UINavigationController)
 
-        /*if let newSuperview = superview {
-            if let parent = newSuperview._parentViewController {
-                rootViewHostingController.didMove(toParent: parent)
-            }
-        } else if rootViewHostingController.parent != nil {
-            rootViewHostingController.removeFromParent()
-        }*/
-    }
-    
     override open func systemLayoutSizeFitting(
         _ targetSize: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
