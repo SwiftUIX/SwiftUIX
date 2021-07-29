@@ -33,11 +33,13 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         viewController.content = content
         
         viewController.updateWindow()
-        
+
+        #if os(iOS)
         if let window = viewController.contentWindow {
             window.overrideUserInterfaceStyle = context.environment.colorScheme == .light ? .light : .dark
             window.rootViewController?.overrideUserInterfaceStyle = window.overrideUserInterfaceStyle
         }
+        #endif
     }
     
     @usableFromInline
