@@ -33,6 +33,11 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         viewController.content = content
         
         viewController.updateWindow()
+        
+        if let window = viewController.contentWindow {
+            window.overrideUserInterfaceStyle = context.environment.colorScheme == .light ? .light : .dark
+            window.rootViewController?.overrideUserInterfaceStyle = window.overrideUserInterfaceStyle
+        }
     }
     
     @usableFromInline
@@ -130,7 +135,7 @@ extension WindowOverlay {
                 #endif
             }
         }
-                
+        
         @usableFromInline
         @objc required dynamic init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
