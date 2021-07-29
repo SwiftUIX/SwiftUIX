@@ -47,9 +47,9 @@ extension EnvironmentValues {
     
     var scrollIndicatorStyle: ScrollIndicatorStyle {
         get {
-            self[ScrollIndicatorStyleKey]
+            self[ScrollIndicatorStyleKey.self]
         } set {
-            self[ScrollIndicatorStyleKey] = newValue
+            self[ScrollIndicatorStyleKey.self] = newValue
         }
     }
 }

@@ -184,9 +184,9 @@ extension RelativeFrame {
 extension EnvironmentValues {
     var _relativeFrameResolvedValues: RelativeFrame.ResolvedValues {
         get {
-            self[RelativeFrame.ResolvedValuesEnvironmentKey]
+            self[RelativeFrame.ResolvedValuesEnvironmentKey.self]
         } set {
-            self[RelativeFrame.ResolvedValuesEnvironmentKey] = newValue
+            self[RelativeFrame.ResolvedValuesEnvironmentKey.self] = newValue
         }
     }
 }

@@ -51,9 +51,9 @@ public enum UserInterfaceIdiom: Hashable {
 extension EnvironmentValues {
     public var userInterfaceIdiom: UserInterfaceIdiom {
         get {
-            self[DefaultEnvironmentKey<UserInterfaceIdiom>] ?? .current
+            self[DefaultEnvironmentKey<UserInterfaceIdiom>.self] ?? .current
         } set {
-            self[DefaultEnvironmentKey<UserInterfaceIdiom>] = newValue
+            self[DefaultEnvironmentKey<UserInterfaceIdiom>.self] = newValue
         }
     }
 }

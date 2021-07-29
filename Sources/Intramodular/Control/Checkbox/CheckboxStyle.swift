@@ -55,9 +55,9 @@ extension EnvironmentValues {
     @available(OSX 10.16, *)
     var _checkboxStyle: _CheckboxStyle {
         get {
-            self[_CheckboxStyle.EnvironmentKey]
+            self[_CheckboxStyle.EnvironmentKey.self]
         } set {
-            self[_CheckboxStyle.EnvironmentKey] = newValue
+            self[_CheckboxStyle.EnvironmentKey.self] = newValue
         }
     }
 }

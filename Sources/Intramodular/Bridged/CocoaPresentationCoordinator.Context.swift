@@ -24,9 +24,9 @@ extension CocoaPresentationCoordinator.PresentationContext {
 extension EnvironmentValues {
     var cocoaPresentationContext: CocoaPresentationCoordinator.PresentationContext? {
         get {
-            self[CocoaPresentationCoordinator.PresentationContext.EnvironmentKey]
+            self[CocoaPresentationCoordinator.PresentationContext.EnvironmentKey.self]
         } set {
-            self[CocoaPresentationCoordinator.PresentationContext.EnvironmentKey] = newValue
+            self[CocoaPresentationCoordinator.PresentationContext.EnvironmentKey.self] = newValue
         }
     }
 }

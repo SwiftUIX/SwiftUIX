@@ -36,9 +36,9 @@ private struct _CollectionViewLayoutEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     var collectionViewLayout: CollectionViewLayout {
         get {
-            self[_CollectionViewLayoutEnvironmentKey]
+            self[_CollectionViewLayoutEnvironmentKey.self]
         } set {
-            self[_CollectionViewLayoutEnvironmentKey] = newValue
+            self[_CollectionViewLayoutEnvironmentKey.self] = newValue
         }
     }
 }

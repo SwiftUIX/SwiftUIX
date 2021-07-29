@@ -12,9 +12,9 @@ private struct InitialContentAlignmentEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     public var initialContentAlignment: Alignment? {
         get {
-            self[InitialContentAlignmentEnvironmentKey]
+            self[InitialContentAlignmentEnvironmentKey.self]
         } set {
-            self[InitialContentAlignmentEnvironmentKey] = newValue
+            self[InitialContentAlignmentEnvironmentKey.self] = newValue
         }
     }
 }

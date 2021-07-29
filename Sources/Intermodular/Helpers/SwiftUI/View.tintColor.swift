@@ -12,9 +12,9 @@ extension EnvironmentValues {
     
     public var tintColor: Color? {
         get {
-            self[TintColor]
+            self[TintColor.self]
         } set {
-            self[TintColor] = newValue
+            self[TintColor.self] = newValue
         }
     }
 }

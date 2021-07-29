@@ -12,9 +12,9 @@ private struct LineBreakMode: EnvironmentKey {
 extension EnvironmentValues {
     public var lineBreakMode: NSLineBreakMode {
         get {
-            self[LineBreakMode]
+            self[LineBreakMode.self]
         } set {
-            self[LineBreakMode] = newValue
+            self[LineBreakMode.self] = newValue
         }
     }
 }

@@ -434,13 +434,13 @@ extension EnvironmentValues {
     
     var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
         get {
-            var result = self[_ScrollViewConfiguration]
+            var result = self[_ScrollViewConfiguration.self]
             
             result.update(from: self)
             
             return result
         } set {
-            self[_ScrollViewConfiguration] = newValue
+            self[_ScrollViewConfiguration.self] = newValue
         }
     }
 }

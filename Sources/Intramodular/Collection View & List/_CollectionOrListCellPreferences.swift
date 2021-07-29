@@ -77,27 +77,27 @@ extension EnvironmentValues {
     /// Returns whether the nearest focusable cell has focus.
     public var isCellFocused: Bool {
         get {
-            self[IsCellFocused]
+            self[IsCellFocused.self]
         } set {
-            self[IsCellFocused] = newValue
+            self[IsCellFocused.self] = newValue
         }
     }
     
     /// A Boolean value that indicates whether the cell associated with this environment is highlighted.
     public var isCellHighlighted: Bool {
         get {
-            self[IsCellHighlighted]
+            self[IsCellHighlighted.self]
         } set {
-            self[IsCellHighlighted] = newValue
+            self[IsCellHighlighted.self] = newValue
         }
     }
     
     /// A Boolean value that indicates whether the cell associated with this environment is selected.
     public var isCellSelected: Bool {
         get {
-            self[IsCellSelected]
+            self[IsCellSelected.self]
         } set {
-            self[IsCellSelected] = newValue
+            self[IsCellSelected.self] = newValue
         }
     }
 }

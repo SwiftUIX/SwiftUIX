@@ -12,9 +12,9 @@ extension EnvironmentValues {
     
     public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
         get {
-            self[ContentInsetAdjustmentBehaviorKey]
+            self[ContentInsetAdjustmentBehaviorKey.self]
         } set {
-            self[ContentInsetAdjustmentBehaviorKey] = newValue
+            self[ContentInsetAdjustmentBehaviorKey.self] = newValue
         }
     }
     
@@ -26,9 +26,9 @@ extension EnvironmentValues {
     @available(tvOS, unavailable)
     public var keyboardDismissMode: UIScrollView.KeyboardDismissMode {
         get {
-            self[KeyboardDismissModeKey]
+            self[KeyboardDismissModeKey.self]
         } set {
-            self[KeyboardDismissModeKey] = newValue
+            self[KeyboardDismissModeKey.self] = newValue
         }
     }
     #endif
@@ -39,9 +39,9 @@ extension EnvironmentValues {
     
     public var isScrollEnabled: Bool {
         get {
-            self[IsScrollEnabledEnvironmentKey]
+            self[IsScrollEnabledEnvironmentKey.self]
         } set {
-            self[IsScrollEnabledEnvironmentKey] = newValue
+            self[IsScrollEnabledEnvironmentKey.self] = newValue
         }
     }
 }

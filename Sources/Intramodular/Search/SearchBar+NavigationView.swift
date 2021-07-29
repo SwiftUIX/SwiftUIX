@@ -248,9 +248,9 @@ extension EnvironmentValues {
     
     var _hidesNavigationSearchBarWhenScrolling: Bool? {
         get {
-            self[_HidesNavigationSearchBarWhenScrolling]
+            self[_HidesNavigationSearchBarWhenScrolling.self]
         } set {
-            self[_HidesNavigationSearchBarWhenScrolling] = newValue
+            self[_HidesNavigationSearchBarWhenScrolling.self] = newValue
         }
     }
 }

@@ -177,9 +177,9 @@ extension EnvironmentValues {
     @usableFromInline
     var _collectionViewProxy: Binding<CollectionViewProxy>? {
         get {
-            self[CollectionViewProxy.EnvironmentKey]
+            self[CollectionViewProxy.EnvironmentKey.self]
         } set {
-            self[CollectionViewProxy.EnvironmentKey] = newValue
+            self[CollectionViewProxy.EnvironmentKey.self] = newValue
         }
     }
 }

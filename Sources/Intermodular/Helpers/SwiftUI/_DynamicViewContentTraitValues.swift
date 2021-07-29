@@ -25,9 +25,9 @@ struct _DynamicViewContentTraitValuesEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     var _dynamicViewContentTraitValues: _DynamicViewContentTraitValues {
         get {
-            self[_DynamicViewContentTraitValuesEnvironmentKey]
+            self[_DynamicViewContentTraitValuesEnvironmentKey.self]
         } set {
-            self[_DynamicViewContentTraitValuesEnvironmentKey] = newValue
+            self[_DynamicViewContentTraitValuesEnvironmentKey.self] = newValue
         }
     }
 }

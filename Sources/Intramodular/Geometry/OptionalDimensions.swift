@@ -123,9 +123,9 @@ extension EnvironmentValues {
     /// The default value is nil.
     public var preferredMaximumLayoutWidth: CGFloat? {
         get {
-            self[PreferredMaximumLayoutWidth]
+            self[PreferredMaximumLayoutWidth.self]
         } set {
-            self[PreferredMaximumLayoutWidth] = newValue
+            self[PreferredMaximumLayoutWidth.self] = newValue
         }
     }
     
@@ -138,9 +138,9 @@ extension EnvironmentValues {
     /// The default value is nil.
     public var preferredMaximumLayoutHeight: CGFloat? {
         get {
-            self[PreferredMaximumLayoutHeight]
+            self[PreferredMaximumLayoutHeight.self]
         } set {
-            self[PreferredMaximumLayoutHeight] = newValue
+            self[PreferredMaximumLayoutHeight.self] = newValue
         }
     }
     

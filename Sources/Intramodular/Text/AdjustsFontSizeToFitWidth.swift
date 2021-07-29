@@ -12,9 +12,9 @@ private struct AdjustsFontSizeToFitWidth: EnvironmentKey {
 extension EnvironmentValues {
     public var adjustsFontSizeToFitWidth: Bool {
         get {
-            self[AdjustsFontSizeToFitWidth]
+            self[AdjustsFontSizeToFitWidth.self]
         } set {
-            self[AdjustsFontSizeToFitWidth] = newValue
+            self[AdjustsFontSizeToFitWidth.self] = newValue
         }
     }
 }

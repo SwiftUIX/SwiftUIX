@@ -11,9 +11,9 @@ extension EnvironmentValues {
     
     public var isEdgePanGestureEnabled: Bool {
         get {
-            self[IsEdgePanGestureEnabled]
+            self[IsEdgePanGestureEnabled.self]
         } set {
-            self[IsEdgePanGestureEnabled] = newValue
+            self[IsEdgePanGestureEnabled.self] = newValue
         }
     }
 }
@@ -25,9 +25,9 @@ extension EnvironmentValues {
 
     public var isPanGestureEnabled: Bool {
         get {
-            self[IsPanGestureEnabled]
+            self[IsPanGestureEnabled.self]
         } set {
-            self[IsPanGestureEnabled] = newValue
+            self[IsPanGestureEnabled.self] = newValue
         }
     }
 }
@@ -39,9 +39,9 @@ extension EnvironmentValues {
     
     public var isTapGestureEnabled: Bool {
         get {
-            self[IsTapGestureEnabled]
+            self[IsTapGestureEnabled.self]
         } set {
-            self[IsTapGestureEnabled] = newValue
+            self[IsTapGestureEnabled.self] = newValue
         }
     }
 }

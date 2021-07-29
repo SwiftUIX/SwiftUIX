@@ -165,9 +165,9 @@ extension EnvironmentValues {
     
     var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>? {
         get {
-            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>]
+            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>.self]
         } set {
-            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>] = newValue
+            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>.self] = newValue
         }
     }
 }

@@ -44,9 +44,9 @@ struct CellProxyEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     var _cellProxy: CellProxy? {
         get {
-            self[CellProxyEnvironmentKey]
+            self[CellProxyEnvironmentKey.self]
         } set {
-            self[CellProxyEnvironmentKey] = newValue
+            self[CellProxyEnvironmentKey.self] = newValue
         }
     }
 }

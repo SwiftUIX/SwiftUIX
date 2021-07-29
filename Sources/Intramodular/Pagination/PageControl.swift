@@ -148,27 +148,27 @@ extension EnvironmentValues {
     @inlinable
     public var pageControlBackgroundStyle: UIPageControl.BackgroundStyle? {
         get {
-            self[PageControl.BackgroundStyleEnvironmentKey]
+            self[PageControl.BackgroundStyleEnvironmentKey.self]
         } set {
-            self[PageControl.BackgroundStyleEnvironmentKey] = newValue
+            self[PageControl.BackgroundStyleEnvironmentKey.self] = newValue
         }
     }
     
     @inlinable
     public var pageIndicatorTintColor: Color? {
         get {
-            self[PageControl.TintColorEnvironmentKey]
+            self[PageControl.TintColorEnvironmentKey.self]
         } set {
-            self[PageControl.TintColorEnvironmentKey] = newValue
+            self[PageControl.TintColorEnvironmentKey.self] = newValue
         }
     }
     
     @inlinable
     public var currentPageIndicatorTintColor: Color? {
         get {
-            self[PageControl.CurrentTintColorEnvironmentKey]
+            self[PageControl.CurrentTintColorEnvironmentKey.self]
         } set {
-            self[PageControl.CurrentTintColorEnvironmentKey] = newValue
+            self[PageControl.CurrentTintColorEnvironmentKey.self] = newValue
         }
     }
 }

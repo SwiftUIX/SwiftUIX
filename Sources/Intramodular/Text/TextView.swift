@@ -506,9 +506,9 @@ extension EnvironmentValues {
     
     var _paragraphSpacing: CGFloat? {
         get {
-            self[_ParagraphSpacing]
+            self[_ParagraphSpacing.self]
         } set {
-            self[_ParagraphSpacing] = newValue
+            self[_ParagraphSpacing.self] = newValue
         }
     }
 }

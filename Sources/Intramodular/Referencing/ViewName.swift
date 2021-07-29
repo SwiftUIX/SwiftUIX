@@ -88,9 +88,9 @@ extension EnvironmentValues {
     @usableFromInline
     var _name: ViewName? {
         get {
-            self[DefaultEnvironmentKey<ViewName>]
+            self[DefaultEnvironmentKey<ViewName>.self]
         } set {
-            self[DefaultEnvironmentKey<ViewName>] = newValue
+            self[DefaultEnvironmentKey<ViewName>.self] = newValue
         }
     }
 }

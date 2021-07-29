@@ -131,9 +131,9 @@ private final class ErrorContextEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     public var errorContext: ErrorContext {
         get {
-            self[ErrorContextEnvironmentKey]
+            self[ErrorContextEnvironmentKey.self]
         } set {
-            self[ErrorContextEnvironmentKey] = newValue
+            self[ErrorContextEnvironmentKey.self] = newValue
         }
     }
 }

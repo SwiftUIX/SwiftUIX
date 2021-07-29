@@ -166,9 +166,9 @@ extension EnvironmentBuilder {
 extension EnvironmentValues {
     public var environmentBuilder: EnvironmentBuilder {
         get {
-            self[EnvironmentBuilder.EnvironmentKey]
+            self[EnvironmentBuilder.EnvironmentKey.self]
         } set {
-            self[EnvironmentBuilder.EnvironmentKey] = newValue
+            self[EnvironmentBuilder.EnvironmentKey.self] = newValue
         }
     }
 }

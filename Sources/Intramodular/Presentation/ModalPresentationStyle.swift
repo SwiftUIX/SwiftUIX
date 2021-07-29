@@ -126,9 +126,9 @@ extension ModalPresentationStyle {
 extension EnvironmentValues {
     public var modalPresentationStyle: ModalPresentationStyle {
         get {
-            self[ModalPresentationStyle.EnvironmentKey]
+            self[ModalPresentationStyle.EnvironmentKey.self]
         } set {
-            self[ModalPresentationStyle.EnvironmentKey] = newValue
+            self[ModalPresentationStyle.EnvironmentKey.self] = newValue
         }
     }
 }

@@ -15,9 +15,9 @@ enum PresentationTransitionType {
 extension EnvironmentValues {
     var presentationTransitionType: PresentationTransitionType? {
         get {
-            self[DefaultEnvironmentKey<PresentationTransitionType>]
+            self[DefaultEnvironmentKey<PresentationTransitionType>.self]
         } set {
-            self[DefaultEnvironmentKey<PresentationTransitionType>] = newValue
+            self[DefaultEnvironmentKey<PresentationTransitionType>.self] = newValue
         }
     }
 }
