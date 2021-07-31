@@ -271,6 +271,12 @@ class UIHostingCollectionViewCell<
             
             return layoutAttributes
         } else {
+//            let fitSize = systemLayoutSizeFitting(CGSize(width: layoutAttributes.size.width,
+//                                           height: 99999999))
+//
+//            layoutAttributes.size = fitSize
+//            return layoutAttributes
+            
             guard let parentViewController = parentViewController else {
                 return layoutAttributes
             }

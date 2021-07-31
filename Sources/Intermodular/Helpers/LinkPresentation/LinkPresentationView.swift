@@ -136,8 +136,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @State var isFetchingMetadata: Bool = false
     @usableFromInline
     @State var fetchedMetadata: LPLinkMetadata?
-    @usableFromInline
-    @State var proposedMinHeight: CGFloat?
     
     @usableFromInline
     var id: some Hashable {
@@ -153,11 +151,9 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
         ZStack {
             _LPLinkViewRepresentable<Placeholder>(
                 url: url,
-                metadata: (fetchedMetadata ?? metadata),
-                proposedMinHeight: $proposedMinHeight
+                metadata: (fetchedMetadata ?? metadata)
             )
             .equatable()
-            .frame(minHeight: proposedMinHeight)
             .visible(!isPlaceholderVisible)
             
             placeholder
@@ -206,7 +202,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
             DispatchQueue.asyncOnMainIfNecessary {
                 self.fetchedMetadata = metadata
                 self.isFetchingMetadata = false
-                self.proposedMinHeight = nil
                 
                 if let metadata = metadata {
                     self.onMetadataFetchCompletion?(.success(metadata))
@@ -236,84 +231,48 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
 
 @usableFromInline
 struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentable, Equatable {
-    public typealias AppKitOrUIKitViewType = MutableAppKitOrUIKitViewWrapper<LPLinkView>
+    public typealias AppKitOrUIKitViewType = LPLinkView
     
     @usableFromInline
     var url: URL?
     @usableFromInline
     var metadata: LPLinkMetadata?
-    @usableFromInline
-    @Binding var proposedMinHeight: CGFloat?
     
     @usableFromInline
     init(
         url: URL?,
-        metadata: LPLinkMetadata?,
-        proposedMinHeight: Binding<CGFloat?>
+        metadata: LPLinkMetadata?
     ) {
         self.url = url
         self.metadata = metadata
-        self._proposedMinHeight = proposedMinHeight
     }
     
     @usableFromInline
     func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
-        DispatchQueue.main.async {
-            self.proposedMinHeight = nil
-        }
-        
+        let linkView: LPLinkView
         if let metadata = metadata {
-            return .init(base: LPLinkView(metadata: metadata))
+            linkView = LPLinkView(metadata: metadata)
         } else if let url = url {
-            return .init(base: LPLinkView(url: url))
+            linkView = LPLinkView(url: url)
         } else {
             assertionFailure()
-            
-            return .init(base: LPLinkView(metadata: LPLinkMetadata()))
+            linkView = LPLinkView(metadata: LPLinkMetadata())
         }
+        
+        linkView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        linkView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        return linkView
     }
     
     @usableFromInline
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         if let metadata = metadata {
-            let wasMetadataPresent = view.base?.metadata.title != nil
-            
-            view.base?.metadata = metadata
-            
-            if !wasMetadataPresent {
-                DispatchQueue.main.async {
-                    self.proposeMinimumHeight(for: view)
-                }
-            }
-        }
-        
-        self.proposeMinimumHeight(for: view)
-    }
-    
-    private func proposeMinimumHeight(for view: AppKitOrUIKitViewType) {
-        guard view.frame.minimumDimensionLength != 0 else {
-            return
-        }
-        
-        if view.frame.height == 0 && proposedMinHeight == nil {
-            #if os(iOS) || targetEnvironment(macCatalyst)
-            view.base!._UIKit_only_sizeToFit()
-            #endif
-            
-            #if os(iOS) || targetEnvironment(macCatalyst)
-            DispatchQueue.main.async {
-                self.proposedMinHeight = view.base!.sizeThatFits(view.frame.size).height
-            }
-            #endif
+            view.metadata = metadata
         }
     }
     
     @usableFromInline
     static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs.proposedMinHeight == rhs.proposedMinHeight else {
-            return false
-        }
-        
         if let lhsUrl = lhs.url, let rhsUrl = rhs.url {
             guard lhsUrl == rhsUrl else {
                 return false
