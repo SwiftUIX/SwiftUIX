@@ -5,9 +5,8 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 extension Font.TextStyle {
+    #if canImport(UIKit)
     public var defaultMetrics: (weight: Font.Weight, size: CGFloat, leading: CGFloat) {
         switch self {
             case .largeTitle:
@@ -50,9 +49,11 @@ extension Font.TextStyle {
             }
         }
     }
+    #endif
 }
 
 extension Font.TextStyle {
+    #if canImport(UIKit)
     public func toUIFontTextStyle() -> UIFont.TextStyle? {
         switch self {
             #if !os(tvOS)
@@ -97,6 +98,5 @@ extension Font.TextStyle {
             }
         }
     }
+    #endif
 }
-
-#endif
