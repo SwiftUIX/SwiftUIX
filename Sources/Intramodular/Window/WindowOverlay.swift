@@ -134,6 +134,7 @@ extension WindowOverlay {
                 #else
                 contentWindow?.isHidden = true
                 contentWindow?.isUserInteractionEnabled = false
+                contentWindow = nil
                 #endif
             }
         }

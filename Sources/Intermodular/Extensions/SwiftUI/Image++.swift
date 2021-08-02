@@ -58,10 +58,15 @@ extension Image {
         }
     }
     
-    public func sizeToFit(_ size: CGSize? = nil) -> some View {
+    public func sizeToFit(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
         resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(size)
+            .frame(width: width, height: height)
+    }
+    
+    @_disfavoredOverload
+    public func sizeToFit(_ size: CGSize? = nil) -> some View {
+        sizeToFit(width: size?.width, height: size?.height)
     }
 }
 
