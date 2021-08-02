@@ -107,31 +107,4 @@ extension View {
     }
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-extension View {
-    public func onUIViewControllerResolution(
-        perform action: @escaping (UIViewController) -> ()
-    ) -> some View {
-        onAppKitOrUIKitViewControllerResolution(perform: action)
-    }
-    
-    @_disfavoredOverload
-    public func onUIViewControllerResolution(
-        perform resolutionAction: @escaping (UIViewController) -> (),
-        onAppear: @escaping (UIViewController) -> () = { _ in },
-        onDisappear: @escaping (UIViewController) -> () = { _ in },
-        onDeresolution deresolutionAction: @escaping (UIViewController) -> () = { _ in }
-    ) -> some View {
-        onAppKitOrUIKitViewControllerResolution(
-            perform: resolutionAction,
-            onAppear: onAppear,
-            onDisappear: onDisappear,
-            onDeresolution: deresolutionAction
-        )
-    }
-}
-
-#endif
-
 #endif
