@@ -45,6 +45,19 @@ extension UIEdgeInsets {
     }
 }
 
+extension UIUserInterfaceStyle {
+    public init(from colorScheme: ColorScheme) {
+        switch colorScheme {
+            case .light:
+                self = .light
+            case .dark:
+                self = .dark
+            default:
+                self = .unspecified
+        }
+    }
+}
+
 #endif
 
 #if os(macOS)

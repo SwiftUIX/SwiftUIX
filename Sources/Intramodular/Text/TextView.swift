@@ -25,6 +25,7 @@ public struct TextView<Label: View>: View {
         #endif
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
+        var linkForegroundColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         var textContentType: UITextContentType?
@@ -140,12 +141,22 @@ extension _TextView: UIViewRepresentable {
         }
         
         updateTextAndGeneralConfiguration: do {
+            if #available(iOS 14.0, *) {
+                uiView.overrideUserInterfaceStyle = .init(context.environment.colorScheme)
+            }
+            
             uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
             
             let font: UIFont = configuration.font ?? context.environment.font?.toUIFont() ?? .preferredFont(forTextStyle: .body)
             
             if let textColor = configuration.textColor {
                 uiView.textColor = textColor
+            }
+            
+            if let linkForegroundColor = configuration.linkForegroundColor {
+                uiView.linkTextAttributes[.foregroundColor] = linkForegroundColor
+            } else {
+                uiView.linkTextAttributes[.foregroundColor] = nil
             }
             
             uiView.textContentType = configuration.textContentType
@@ -443,6 +454,11 @@ extension TextView {
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
+    
+    public func linkForegroundColor(_ linkForegroundColor: Color?) -> Self {
+        then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toUIColor() })
+    }
+
     #endif
     
     public func font(_ font: AppKitOrUIKitFont) -> Self {
