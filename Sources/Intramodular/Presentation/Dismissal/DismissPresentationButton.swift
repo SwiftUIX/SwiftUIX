@@ -31,10 +31,10 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
             action.perform()
         }
         
-        if presentationMode.isPresented {
-            presentationMode.dismiss()
-        } else {
+        if presentationManager.isPresented {
             presentationManager.dismiss()
+        } else {
+            presentationMode.dismiss()
         }
     }
 }
