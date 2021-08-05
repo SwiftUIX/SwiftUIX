@@ -65,7 +65,7 @@ public struct CocoaTextField<Label: View>: CocoaView {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    @ObservedObject private var keyboard = Keyboard.main
+    private let keyboard = Keyboard.main
     #endif
     
     private var label: Label
@@ -74,7 +74,12 @@ public struct CocoaTextField<Label: View>: CocoaView {
     private var configuration: _Configuration
     
     public var body: some View {
-        return ZStack(alignment: Alignment(horizontal: .init(from: multilineTextAlignment), vertical: .top)) {
+        ZStack(
+            alignment: Alignment(
+                horizontal: .init(from: multilineTextAlignment),
+                vertical: .top
+            )
+        ) {
             if configuration.placeholder == nil {
                 label
                     .font(configuration.uiFont.map(Font.init) ?? font)
@@ -82,8 +87,14 @@ public struct CocoaTextField<Label: View>: CocoaView {
                     .animation(nil)
             }
             
-            _CocoaTextField<Label>(text: text, isEditing: isEditing, configuration: configuration)
+            _CocoaTextField<Label>(
+                text: text,
+                isEditing: isEditing,
+                configuration:
+                    configuration
+            )
         }
+        .background(ZeroSizeView().id(configuration.isFocused?.wrappedValue))
     }
 }
 
@@ -247,23 +258,29 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
         
         updateResponderChain: do {
-            if let isFocused = configuration.isFocused, uiView.window != nil {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if let isFocused = configuration.isFocused, uiView.window != nil {
                     if isFocused.wrappedValue && !uiView.isFirstResponder {
                         uiView.becomeFirstResponder()
                     } else if !isFocused.wrappedValue && uiView.isFirstResponder {
                         uiView.resignFirstResponder()
                     }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
-                        if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
-                            uiView.becomeFirstResponder()
-                        } else if !isFirstResponder && uiView.isFirstResponder {
-                            uiView.resignFirstResponder()
-                        }
+                } else if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                    if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
+                        uiView.becomeFirstResponder()
+                    } else if !isFirstResponder && uiView.isFirstResponder {
+                        uiView.resignFirstResponder()
                     }
+                }
+            }
+        }
+    }
+    
+    static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator) {
+        if let isFocused = coordinator.configuration.isFocused {
+            if isFocused.wrappedValue {
+                DispatchQueue.main.async {
+                    isFocused.wrappedValue = false
                 }
             }
         }
