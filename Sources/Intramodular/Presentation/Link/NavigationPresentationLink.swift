@@ -33,7 +33,7 @@ public struct NavigationPresentationLink<Label: View, Destination: View>: View {
 public struct NavigationPresentationManager: PresentationManager {
     let isActive: Binding<Bool>
     
-    init(isActive: Binding<Bool>) {
+    public init(isActive: Binding<Bool>) {
         self.isActive = isActive
     }
     
