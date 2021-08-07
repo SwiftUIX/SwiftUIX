@@ -7,50 +7,49 @@ import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
-open class UIHostingVisualEffectBlurView<Content: View>: UIView {
+class UIHostingVisualEffectBlurView<Content: View>: UIView {
     private let vibrancyView = UIVisualEffectView()
     private let blurView = UIVisualEffectView()
     private let hostingController: UIHostingController<Content>
     
+    override var tintColor: UIColor? {
+        didSet {
+            blurView.tintColor = tintColor
+        }
+    }
+    
+    var rootView: Content {
+        get {
+            hostingController.rootView
+        } set {
+            hostingController.rootView = newValue
+        }
+    }
+    
+    var oldBlurStyle: UIBlurEffect.Style?
+    var oldVibrancyStyle: UIVibrancyEffectStyle?
+
     var blurStyle: UIBlurEffect.Style {
         didSet {
-            // TODO: Implement
+            guard blurStyle != oldValue else {
+                return
+            }
+            
+            updateBlurAndVibrancyEffect()
         }
     }
     
     var vibrancyStyle: UIVibrancyEffectStyle? {
         didSet {
-            // TODO: Implement
-        }
-    }
-    
-    var vibrancyTintColor: UIColor? {
-        didSet {
-            vibrancyView.tintColor = vibrancyTintColor
-        }
-    }
-
-    public var rootView: Content {
-        get {
-            hostingController.rootView
-        } set {
-            hostingController.rootView = newValue
-            
-            let blurEffect = UIBlurEffect(style: blurStyle)
-            
-            blurView.effect = blurEffect
-            
-            if let vibrancyStyle = vibrancyStyle {
-                vibrancyView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)
-            } else {
-                vibrancyView.effect = nil
+            guard vibrancyStyle != oldValue else {
+                return
             }
             
-            hostingController.view.setNeedsDisplay()
+            updateBlurAndVibrancyEffect()
         }
     }
     
-    public init(
+    init(
         blurStyle: UIBlurEffect.Style,
         vibrancyStyle: UIVibrancyEffectStyle?,
         rootView: Content
@@ -72,10 +71,26 @@ open class UIHostingVisualEffectBlurView<Content: View>: UIView {
         
         addSubview(blurView)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        updateBlurAndVibrancyEffect()
     }
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func updateBlurAndVibrancyEffect() {
+        let blurEffect = UIBlurEffect(style: blurStyle)
+        
+        blurView.effect = blurEffect
+        
+        if let vibrancyStyle = vibrancyStyle {
+            vibrancyView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)
+        } else {
+            vibrancyView.effect = nil
+        }
+        
+        hostingController.view.setNeedsDisplay()
     }
 }
 
