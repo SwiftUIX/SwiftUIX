@@ -8,25 +8,12 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate {
-    struct RootViewContainer: View {
-        weak var base: UIHostingScrollView<Content>?
-        
-        var content: Content
-        
-        var body: some View {
-            Group {
-                if base?._isPagingEnabled ?? false {
-                    content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
-                        self.base?.pages = page
-                    })
-                } else {
-                    content
-                }
-            }
-        }
-    }
+    var _isUpdating: Bool = false
     
-    let hostingContentView: UIHostingView<RootViewContainer>
+    private let hostingContentView: UIHostingView<RootViewContainer>
+    private var pages: [_CocoaScrollViewPage] = []
+    private var isInitialContentAlignmentSet: Bool = false
+    private var dragStartContentOffset: CGPoint = .zero
     
     public var rootView: Content {
         get {
@@ -38,13 +25,8 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         }
     }
     
-    var pages: [_CocoaScrollViewPage] = []
-    
-    private var isInitialContentAlignmentSet: Bool = false
-    private var dragStartContentOffset: CGPoint = .zero
-    
     public var configuration = CocoaScrollViewConfiguration<Content>() {
-        didSet {            
+        didSet {
             configure(with: configuration)
         }
     }
@@ -82,12 +64,22 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
     }
     
     func update() {
+        guard !frame.size.isAreaZero else {
+            DispatchQueue.main.async {
+                if !self.frame.size.isAreaZero {
+                    self.update()
+                }
+            }
+            
+            return
+        }
+        
         let maximumContentSize: CGSize = .init(
             width: configuration.axes.contains(.horizontal)
-                ? 0
+                ? AppKitOrUIKitView.layoutFittingCompressedSize.width
                 : frame.width,
             height: configuration.axes.contains(.vertical)
-                ? 0
+                ? AppKitOrUIKitView.layoutFittingCompressedSize.height
                 : frame.height
         )
         
@@ -107,8 +99,11 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         
         self.contentSize = contentSize
         
-        frame.size.width = min(frame.size.width, contentSize.width)
-        frame.size.height = min(frame.size.height, contentSize.height)
+        if configuration.axes.contains(.vertical) {
+            frame.size.width = min(frame.size.width, contentSize.width)
+        } else {
+            frame.size.height = min(frame.size.height, contentSize.height)
+        }
         
         if let initialContentAlignment = configuration.initialContentAlignment {
             if !isInitialContentAlignmentSet {
@@ -144,16 +139,24 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
     // MARK: - UIScrollViewDelegate -
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        guard !_isUpdating else {
+            return
+        }
+        
         dragStartContentOffset = scrollView.contentOffset
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !_isUpdating else {
+            return
+        }
+        
         if let onOffsetChange = configuration.onOffsetChange {
             onOffsetChange(
                 scrollView.contentOffset(forContentType: Content.self)
             )
         }
-
+        
         configuration.contentOffset?.wrappedValue = contentOffset
     }
     
@@ -162,31 +165,59 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         withVelocity velocity: CGPoint,
         targetContentOffset: UnsafeMutablePointer<CGPoint>
     ) {
-        guard let currentIndex = pageIndex(forContentOffset: dragStartContentOffset) else {
+        guard !_isUpdating else {
             return
         }
         
-        guard var targetIndex = pageIndex(forContentOffset: targetContentOffset.pointee) else {
-            return
+        if _isPagingEnabled {
+            guard let currentIndex = pageIndex(forContentOffset: dragStartContentOffset) else {
+                return
+            }
+            
+            guard var targetIndex = pageIndex(forContentOffset: targetContentOffset.pointee) else {
+                return
+            }
+            
+            if targetIndex != currentIndex {
+                targetIndex = currentIndex + (targetIndex - currentIndex).signum()
+            } else if abs(velocity.x) > 0.25 {
+                targetIndex = currentIndex + (velocity.x > 0 ? 1 : 0)
+            }
+            
+            if targetIndex < 0 {
+                targetIndex = 0
+            } else if targetIndex >= pages.count {
+                targetIndex = max(pages.count - 1, 0)
+            }
+            
+            guard targetIndex != currentIndex else {
+                return
+            }
+            
+            targetContentOffset.pointee = contentOffset(forPageIndex: targetIndex)
         }
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension UIHostingScrollView {
+    struct RootViewContainer: View {
+        weak var base: UIHostingScrollView<Content>?
         
-        if targetIndex != currentIndex {
-            targetIndex = currentIndex + (targetIndex - currentIndex).signum()
-        } else if abs(velocity.x) > 0.25 {
-            targetIndex = currentIndex + (velocity.x > 0 ? 1 : 0)
+        var content: Content
+        
+        var body: some View {
+            PassthroughView {
+                if base?._isPagingEnabled ?? false {
+                    content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
+                        self.base?.pages = page
+                    })
+                } else {
+                    content
+                }
+            }
         }
-        
-        if targetIndex < 0 {
-            targetIndex = 0
-        } else if targetIndex >= pages.count {
-            targetIndex = max(pages.count - 1, 0)
-        }
-        
-        guard targetIndex != currentIndex else {
-            return
-        }
-        
-        targetContentOffset.pointee = contentOffset(forPageIndex: targetIndex)
     }
 }
 

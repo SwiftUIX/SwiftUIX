@@ -33,6 +33,12 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        uiView._isUpdating = true
+        
+        defer {
+            uiView._isUpdating = false
+        }
+        
         uiView.isUserInteractionEnabled = context.environment.isEnabled
         
         var configuration = self.configuration

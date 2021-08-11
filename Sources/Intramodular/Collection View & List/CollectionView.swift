@@ -16,7 +16,7 @@ public struct CollectionView: View {
     private var _collectionViewConfiguration = _CollectionViewConfiguration()
     private var _dynamicViewContentTraitValues = _DynamicViewContentTraitValues()
     private var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
-
+    
     public var body: some View {
         internalBody
             .environment(\._collectionViewConfiguration, _collectionViewConfiguration)
@@ -243,7 +243,7 @@ extension CollectionView {
     public func _ignorePreferredCellLayoutAttributes() -> Self {
         then({ $0._collectionViewConfiguration._ignorePreferredCellLayoutAttributes = true })
     }
-
+    
     /// Fixes this view at its ideal size.
     public func fixedSize() -> Self {
         then({ $0._collectionViewConfiguration.fixedSize = (true, true) })
@@ -311,7 +311,7 @@ extension CollectionView {
     ) -> Self {
         then({ $0._dynamicViewContentTraitValues.onDrop = action })
     }
-
+    
     /// Sets whether the collection view allows multiple selection.
     public func allowsMultipleSelection(_ allowsMultipleSelection: Bool) -> Self {
         then({ $0._collectionViewConfiguration.allowsMultipleSelection = allowsMultipleSelection })
