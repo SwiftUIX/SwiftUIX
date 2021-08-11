@@ -294,11 +294,11 @@ class UIHostingCollectionViewCell<
     
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
-
+        
         guard let parentViewController = parentViewController, !parentViewController.configuration._ignorePreferredCellLayoutAttributes else {
             return
         }
-
+        
         guard let contentHostingController = contentHostingController, let relativeFrame = preferences.relativeFrame else {
             return
         }
@@ -350,7 +350,7 @@ extension UIHostingCollectionViewCell {
         guard configuration != nil else {
             return
         }
-
+        
         if contentHostingController == nil {
             update(disableAnimation: true, forced: false)
         }
@@ -554,26 +554,24 @@ extension UIHostingCollectionViewCell {
                 }
                 
                 if self.parent == nil {
-                    withoutAnimation {
-                        let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
-                        
-                        rootView._collectionViewProxy = .init(parent)
-                        
-                        self.willMove(toParent: parent)
-                        parent.addChild(self)
-                        cell.contentView.addSubview(view)
-                        view.frame = cell.contentView.bounds
-                        didMove(toParent: parent)
-                        
-                        if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
-                            navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
-                        }
+                    let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
+                    
+                    rootView._collectionViewProxy = .init(parent)
+                    
+                    self.willMove(toParent: parent)
+                    parent.addChild(self)
+                    cell.contentView.addSubview(view)
+                    view.frame = cell.contentView.bounds
+                    didMove(toParent: parent)
+                    
+                    if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
+                        navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
                     }
                 } else {
                     assertionFailure()
                 }
             } else {
-                withoutAnimation {
+                withAnimation(.none) {
                     rootView._collectionViewProxy = .init()
                     
                     willMove(toParent: nil)
@@ -601,7 +599,7 @@ extension UIHostingCollectionViewCell {
                         if refresh {
                             rootView = .init(base: base)
                         }
-
+                        
                         return
                     }
                 }
