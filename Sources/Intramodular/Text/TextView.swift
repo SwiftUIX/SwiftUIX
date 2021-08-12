@@ -141,7 +141,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         updateTextAndGeneralConfiguration: do {
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.0, tvOS 14.0, *) {
                 uiView.overrideUserInterfaceStyle = .init(context.environment.colorScheme)
             }
             
