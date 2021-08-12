@@ -7,24 +7,32 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-@usableFromInline
-struct _CollectionViewConfiguration {
-    @usableFromInline
+public struct _CollectionViewConfiguration {
+    public struct UnsafeFlags: OptionSet {
+        public let rawValue: Int
+        
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+        
+        public static let _disableCellHostingControllerEmbed = Self(rawValue: 1 << 1)
+        public static let _ignorePreferredCellLayoutAttributes = Self(rawValue: 1 << 0)
+    }
+    
+    var unsafeFlags = UnsafeFlags()
+    
     var fixedSize: (vertical: Bool, horizontal: Bool) = (false, false)
-    @usableFromInline
     var allowsMultipleSelection: Bool = false
-    @usableFromInline
     var disableAnimatingDifferences: Bool = false
     #if !os(tvOS)
-    @usableFromInline
     var reorderingCadence: UICollectionView.ReorderingCadence = .immediate
     #endif
-    @usableFromInline
     var isDragActive: Binding<Bool>? = nil
-    @usableFromInline
-    var _ignorePreferredCellLayoutAttributes: Bool = false
-    @usableFromInline
     var dataSourceUpdateToken: AnyHashable?
+    
+    var _ignorePreferredCellLayoutAttributes: Bool {
+        unsafeFlags.contains(._ignorePreferredCellLayoutAttributes)
+    }
 }
 
 // MARK: - Auxiliary Implementation -

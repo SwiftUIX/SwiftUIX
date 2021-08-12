@@ -7,7 +7,7 @@ import SwiftUI
 
 extension Transaction {
     public var isAnimated: Bool {
-        if _areAnimationsDisabled {
+        if _areAnimationsDisabledGlobally {
             return false
         } else if disablesAnimations {
             return false

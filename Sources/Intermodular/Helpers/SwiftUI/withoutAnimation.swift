@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-var _areAnimationsDisabled: Bool = false
+var _areAnimationsDisabledGlobally: Bool = false
 
 public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
@@ -17,15 +17,13 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     CATransaction.disableActions()
     #endif
     
-    _areAnimationsDisabled = true
+    _areAnimationsDisabledGlobally = true
     
     withAnimation(.none) {
         body()
     }
     
-    DispatchQueue.main.async {
-        _areAnimationsDisabled = false
-    }
+    _areAnimationsDisabledGlobally = false
     
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     CATransaction.commit()

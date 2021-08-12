@@ -7,13 +7,37 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate {
+protocol _opaque_UIHostingScrollView: UIScrollView {
+    func scrollTo(_ edge: Edge)
+}
+
+open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingScrollView, UIScrollViewDelegate {
     var _isUpdating: Bool = false
     
     private let hostingContentView: UIHostingView<RootViewContainer>
     private var pages: [_CocoaScrollViewPage] = []
     private var isInitialContentAlignmentSet: Bool = false
     private var dragStartContentOffset: CGPoint = .zero
+    
+    override open var intrinsicContentSize: CGSize {
+        guard !contentSize.isAreaZero else {
+            return super.intrinsicContentSize
+        }
+        
+        if configuration.axes == .horizontal {
+            return .init(
+                width: super.intrinsicContentSize.width,
+                height: contentSize.height
+            )
+        } else if configuration.axes == .vertical {
+            return .init(
+                width: contentSize.width,
+                height: super.intrinsicContentSize.height
+            )
+        } else {
+            return super.intrinsicContentSize
+        }
+    }
     
     public var rootView: Content {
         get {
@@ -63,7 +87,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         .zero
     }
     
-    func update() {
+    private func update() {
         guard !frame.size.isAreaZero else {
             DispatchQueue.main.async {
                 if !self.frame.size.isAreaZero {
@@ -87,8 +111,18 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         let proposedContentSize = hostingContentView.sizeThatFits(maximumContentSize)
         
         let contentSize = CGSize(
-            width: min(proposedContentSize.width, maximumContentSize.width != 0 ? maximumContentSize.width : proposedContentSize.width),
-            height: min(proposedContentSize.height, maximumContentSize.height != 0 ? maximumContentSize.height : proposedContentSize.height)
+            width: min(
+                proposedContentSize.width,
+                maximumContentSize.width != 0
+                    ? maximumContentSize.width
+                    : proposedContentSize.width
+            ),
+            height: min(
+                proposedContentSize.height,
+                maximumContentSize.height != 0
+                    ? maximumContentSize.height
+                    : proposedContentSize.height
+            )
         )
         
         guard oldContentSize != contentSize else {
@@ -96,15 +130,35 @@ open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegat
         }
         
         hostingContentView.frame.size = contentSize
-        
+       
         self.contentSize = contentSize
-        
-        if configuration.axes.contains(.vertical) {
-            frame.size.width = min(frame.size.width, contentSize.width)
-        } else {
-            frame.size.height = min(frame.size.height, contentSize.height)
+
+        hostingContentView.setNeedsDisplay()
+        hostingContentView.setNeedsLayout()
+        hostingContentView.layoutIfNeeded()
+                
+        if configuration.axes == .vertical {
+            if contentHuggingPriority(for: .horizontal) != .defaultHigh {
+                setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            }
+            
+            if contentHuggingPriority(for: .vertical) != .defaultLow {
+                setContentHuggingPriority(.defaultLow, for: .horizontal)
+            }
+        } else if configuration.axes == .horizontal {
+            if contentHuggingPriority(for: .horizontal) != .defaultLow {
+                setContentHuggingPriority(.defaultLow, for: .horizontal)
+            }
+            
+            if contentHuggingPriority(for: .vertical) != .defaultHigh {
+                setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            }
         }
         
+        if configuration.axes == .horizontal || configuration.axes == .vertical {
+            invalidateIntrinsicContentSize()
+        }
+                
         if let initialContentAlignment = configuration.initialContentAlignment {
             if !isInitialContentAlignmentSet {
                 if contentSize != .zero && frame.size != .zero {
@@ -216,6 +270,49 @@ extension UIHostingScrollView {
                 } else {
                     content
                 }
+            }
+        }
+    }
+}
+
+// MARK: - Conformances -
+
+extension UIHostingScrollView {
+    public func scrollTo(_ edge: Edge) {
+        let animated = _areAnimationsDisabledGlobally ? false : true
+        
+        switch edge {
+            case .top: do {
+                setContentOffset(
+                    CGPoint(x: contentOffset.x, y: -contentInset.top),
+                    animated: animated
+                )
+            }
+            case .leading: do {
+                guard contentSize.width > frame.width else {
+                    return
+                }
+
+                setContentOffset(
+                    CGPoint(x: contentInset.left, y: contentOffset.y),
+                    animated: animated
+                )
+            }
+            case .bottom: do {
+                setContentOffset(
+                    CGPoint(x: contentOffset.x, y: (contentSize.height - bounds.size.height) + contentInset.bottom),
+                    animated: animated
+                )
+            }
+            case .trailing: do {
+                guard contentSize.width > frame.width else {
+                    return
+                }
+                
+                setContentOffset(
+                    CGPoint(x: (contentSize.width - bounds.size.width) + contentInset.right, y: contentOffset.y),
+                    animated: animated
+                )
             }
         }
     }

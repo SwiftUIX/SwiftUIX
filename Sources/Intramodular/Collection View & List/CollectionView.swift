@@ -240,8 +240,13 @@ extension CollectionView {
 }
 
 extension CollectionView {
+    /// Set unsafe flags for the collection view.
+    public func unsafeFlags(_ flags: _CollectionViewConfiguration.UnsafeFlags) -> Self {
+        then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(flags) })
+    }
+    
     public func _ignorePreferredCellLayoutAttributes() -> Self {
-        then({ $0._collectionViewConfiguration._ignorePreferredCellLayoutAttributes = true })
+        then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(._ignorePreferredCellLayoutAttributes) })
     }
     
     /// Fixes this view at its ideal size.

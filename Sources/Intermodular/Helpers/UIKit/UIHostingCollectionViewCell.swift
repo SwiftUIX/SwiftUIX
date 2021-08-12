@@ -554,15 +554,23 @@ extension UIHostingCollectionViewCell {
                 }
                 
                 if self.parent == nil {
+                    let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(._disableCellHostingControllerEmbed)
+                    
                     let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
                     
                     rootView._collectionViewProxy = .init(parent)
                     
-                    self.willMove(toParent: parent)
-                    parent.addChild(self)
+                    if hostAsChildViewController {
+                        self.willMove(toParent: parent)
+                        parent.addChild(self)
+                    }
+                    
                     cell.contentView.addSubview(view)
                     view.frame = cell.contentView.bounds
-                    didMove(toParent: parent)
+                    
+                    if hostAsChildViewController {
+                        didMove(toParent: parent)
+                    }
                     
                     if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
                         navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
