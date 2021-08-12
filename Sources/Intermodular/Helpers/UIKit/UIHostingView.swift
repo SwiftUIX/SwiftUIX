@@ -43,7 +43,7 @@ open class UIHostingView<Content: View>: UIView {
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
+    
     override open func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: superview)
         
@@ -56,14 +56,10 @@ open class UIHostingView<Content: View>: UIView {
         rootViewHostingController._navigationController = superview?.nearestViewController?.nearestNavigationController ?? (superview?.nearestViewController as? UINavigationController)
     }
     
-    override open func sizeThatFits(_ size: CGSize) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: size)
+    override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        rootViewHostingController.sizeThatFits(.init(targetSize: .init(targetSize)))
     }
     
-    override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        rootViewHostingController.sizeThatFits(in: targetSize)
-    }
-
     override open func systemLayoutSizeFitting(
         _ targetSize: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
@@ -76,6 +72,10 @@ open class UIHostingView<Content: View>: UIView {
                 verticalFittingPriority: verticalFittingPriority
             )
         )
+    }
+    
+    override open func sizeThatFits(_ size: CGSize) -> CGSize {
+        systemLayoutSizeFitting(size)
     }
     
     override open func sizeToFit() {

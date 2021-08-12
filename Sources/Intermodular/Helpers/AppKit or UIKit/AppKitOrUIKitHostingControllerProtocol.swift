@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {    
+public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {
     func sizeThatFits(in _: CGSize) -> CGSize
 }
 
@@ -113,6 +113,18 @@ public struct AppKitOrUIKitLayoutSizeProposal {
     var maximumSize: OptionalDimensions = nil
     var horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
     var verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
+    
+    public init(
+        targetSize: OptionalDimensions = nil,
+        maximumSize: OptionalDimensions = nil,
+        horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
+        verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
+    ) {
+        self.targetSize = targetSize
+        self.maximumSize = maximumSize
+        self.horizontalFittingPriority = horizontalFittingPriority
+        self.verticalFittingPriority = verticalFittingPriority
+    }
     
     var allowsSelfSizing: Bool {
         if horizontalFittingPriority == .required && verticalFittingPriority == .required {
