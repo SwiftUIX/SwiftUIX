@@ -15,6 +15,7 @@ public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
     private let vibrancyStyle: UIVibrancyEffectStyle?
     private let content: Content
     
+    private var intensity: Double = 1.0
     private var opacity: Double = 1.0
     
     public init(
@@ -31,7 +32,8 @@ public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
         UIHostingVisualEffectBlurView<Content>(
             blurStyle: blurStyle,
             vibrancyStyle: vibrancyStyle,
-            rootView: content
+            rootView: content,
+            intensity: intensity
         )
     }
     
@@ -46,7 +48,7 @@ public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
         view.vibrancyStyle = vibrancyStyle
         view.alpha = .init(opacity)
         view.tintColor = context.environment.tintColor?.toUIColor()
-        
+        view.intensity = intensity
         view.rootView = content
     }
 }
@@ -60,6 +62,11 @@ extension VisualEffectBlurView where Content == EmptyView {
 }
 
 extension VisualEffectBlurView {
+    /// Sets the intensity of the blur effect.
+    public func intensity(_ intensity: Double) -> Self {
+        then({ $0.intensity = intensity })
+    }
+    
     /// Sets the transparency of this view.
     public func opacity(_ opacity: Double) -> Self {
         then({ $0.opacity = opacity })

@@ -11,6 +11,9 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
     private let vibrancyView = UIVisualEffectView()
     private let blurView = UIVisualEffectView()
     private let hostingController: UIHostingController<Content>
+    private var oldBlurStyle: UIBlurEffect.Style?
+    private var oldVibrancyStyle: UIVibrancyEffectStyle?
+    private var blurEffectAnimator: UIViewPropertyAnimator? = UIViewPropertyAnimator(duration: 1, curve: .linear)
     
     override var tintColor: UIColor? {
         didSet {
@@ -26,9 +29,6 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
         }
     }
     
-    var oldBlurStyle: UIBlurEffect.Style?
-    var oldVibrancyStyle: UIVibrancyEffectStyle?
-
     var blurStyle: UIBlurEffect.Style {
         didSet {
             guard blurStyle != oldValue else {
@@ -49,13 +49,23 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
         }
     }
     
+    var intensity: Double {
+        didSet {
+            if let animator = blurEffectAnimator {
+                animator.fractionComplete = .init(intensity)
+            }
+        }
+    }
+    
     init(
         blurStyle: UIBlurEffect.Style,
         vibrancyStyle: UIVibrancyEffectStyle?,
-        rootView: Content
+        rootView: Content,
+        intensity: Double
     ) {
         self.blurStyle = blurStyle
         self.vibrancyStyle = vibrancyStyle
+        self.intensity = intensity
         
         hostingController = UIHostingController(rootView: rootView)
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -80,9 +90,18 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
     }
     
     private func updateBlurAndVibrancyEffect() {
+        blurView.effect = nil
+        vibrancyView.effect = nil
+        
+        blurEffectAnimator = UIViewPropertyAnimator(duration: 1, curve: .linear)
+        
+        blurEffectAnimator?.stopAnimation(true)
+        
         let blurEffect = UIBlurEffect(style: blurStyle)
         
-        blurView.effect = blurEffect
+        blurEffectAnimator?.addAnimations {
+            self.blurView.effect = blurEffect
+        }
         
         if let vibrancyStyle = vibrancyStyle {
             vibrancyView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)

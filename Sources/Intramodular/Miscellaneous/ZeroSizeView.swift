@@ -47,6 +47,9 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
         view.isHidden = true
         view.isOpaque = true
         view.isUserInteractionEnabled = false
+        
+        view.setContentHuggingPriority(.required, for: .horizontal)
+        view.setContentHuggingPriority(.required, for: .vertical)
         #endif
         
         view.frame.size = .zero
@@ -63,7 +66,7 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
 public struct ZeroSizeView: View {
     public var body: some View {
         _ZeroSizeView()
-            .frameZeroClipped()
+            .frame(width: 0, height: 0)
             .accessibility(hidden: true)
             .allowsHitTesting(false)
     }
@@ -80,7 +83,7 @@ public struct ZeroSizeView: View {
     @inlinable
     public var body: some View {
         Color.almostClear
-            .frameZeroClipped()
+            .frame(width: 0, height: 0)
             .accessibility(hidden: true)
             .allowsHitTesting(false)
     }
