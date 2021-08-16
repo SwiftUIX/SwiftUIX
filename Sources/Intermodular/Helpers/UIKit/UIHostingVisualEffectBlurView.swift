@@ -111,6 +111,11 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
         
         hostingController.view.setNeedsDisplay()
     }
+    
+    deinit {
+        blurEffectAnimator?.stopAnimation(true)
+        blurEffectAnimator = nil
+    }
 }
 
 #endif
