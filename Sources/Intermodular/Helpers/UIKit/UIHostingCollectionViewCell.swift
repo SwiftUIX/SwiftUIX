@@ -347,6 +347,10 @@ extension UIHostingCollectionViewCell {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        UIView.performWithoutAnimation {
+            contentHostingController?.view.alpha = 1.0
+        }
+        
         guard configuration != nil else {
             return
         }
@@ -374,7 +378,9 @@ extension UIHostingCollectionViewCell {
     }
     
     func cellDidEndDisplaying() {
-        
+        UIView.performWithoutAnimation {
+            contentHostingController?.view.alpha = 0.0
+        }
     }
     
     func updateCollectionCache() {

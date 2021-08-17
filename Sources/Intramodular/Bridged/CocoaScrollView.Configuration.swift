@@ -51,6 +51,15 @@ public struct CocoaScrollViewConfiguration<Content: View> {
     }
     
     @usableFromInline
+    var scrollIndicatorInsets: (horizontal: EdgeInsets, vertical: EdgeInsets) = (.zero, .zero) {
+        didSet {
+            if oldValue != scrollIndicatorInsets {
+                hasChanged = true
+            }
+        }
+    }
+    
+    @usableFromInline
     var alwaysBounceVertical: Bool? = nil {
         didSet {
             if oldValue != alwaysBounceVertical {
@@ -203,6 +212,8 @@ extension CocoaScrollViewConfiguration {
             HiddenScrollViewIndicatorStyle {
             showsVerticalScrollIndicator = !scrollIndicatorStyle.vertical
             showsHorizontalScrollIndicator = !scrollIndicatorStyle.horizontal
+        } else if let scrollIndicatorStyle = environment.scrollIndicatorStyle as? InsetScrollViewIndicatorStyle {
+            scrollIndicatorInsets = scrollIndicatorStyle.insets
         }
     }
 }
@@ -246,7 +257,9 @@ extension UIScrollView {
         isScrollEnabled = configuration.isScrollEnabled
         showsVerticalScrollIndicator = configuration.showsVerticalScrollIndicator
         showsHorizontalScrollIndicator = configuration.showsHorizontalScrollIndicator
-        
+        horizontalScrollIndicatorInsets = .init(configuration.scrollIndicatorInsets.horizontal)
+        verticalScrollIndicatorInsets = .init(configuration.scrollIndicatorInsets.vertical)
+
         if contentInset != .init(configuration.contentInset) {
             contentInset = .init(configuration.contentInset)
         }

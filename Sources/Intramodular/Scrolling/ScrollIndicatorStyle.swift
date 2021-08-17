@@ -33,6 +33,29 @@ public struct HiddenScrollViewIndicatorStyle: Hashable, ScrollIndicatorStyle {
     }
 }
 
+public struct InsetScrollViewIndicatorStyle: Hashable, ScrollIndicatorStyle {
+    public let insets: (horizontal: EdgeInsets, vertical: EdgeInsets)
+    
+    public init(_ insets: EdgeInsets) {
+        self.insets = (insets, insets)
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(insets.horizontal.top)
+        hasher.combine(insets.horizontal.leading)
+        hasher.combine(insets.horizontal.bottom)
+        hasher.combine(insets.horizontal.trailing)
+        hasher.combine(insets.vertical.top)
+        hasher.combine(insets.vertical.leading)
+        hasher.combine(insets.vertical.bottom)
+        hasher.combine(insets.vertical.trailing)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.insets == rhs.insets
+    }
+}
+
 extension View {
     public func scrollIndicatorStyle<Style: ScrollIndicatorStyle>(_ scrollIndicatorStyle: Style) -> some View {
         environment(\.scrollIndicatorStyle, scrollIndicatorStyle)
