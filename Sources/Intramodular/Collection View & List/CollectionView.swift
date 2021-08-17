@@ -245,8 +245,8 @@ extension CollectionView {
         then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(flags) })
     }
     
-    public func _ignorePreferredCellLayoutAttributes() -> Self {
-        then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(._ignorePreferredCellLayoutAttributes) })
+    public func ignorePreferredCellLayoutAttributes() -> Self {
+        then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(.ignorePreferredCellLayoutAttributes) })
     }
     
     /// Fixes this view at its ideal size.

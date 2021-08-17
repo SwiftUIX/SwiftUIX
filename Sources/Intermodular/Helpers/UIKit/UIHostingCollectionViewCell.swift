@@ -251,13 +251,11 @@ class UIHostingCollectionViewCell<
     ) -> UICollectionViewLayoutAttributes {
         if let size = cache.preferredContentSize {
             layoutAttributes.size = size
-                .rounded(.up)
                 .clamped(to: configuration?.maximumSize?.rounded(.down))
             
             return layoutAttributes
         } else if let relativeFrame = preferences.relativeFrame {
             let size = relativeFrame.sizeThatFits(in: layoutAttributes.size)
-                .rounded(.up)
                 .clamped(to: configuration?.maximumSize?.rounded(.down))
             
             layoutAttributes.size = size
@@ -275,7 +273,7 @@ class UIHostingCollectionViewCell<
                 return layoutAttributes
             }
             
-            if !parentViewController.configuration._ignorePreferredCellLayoutAttributes {
+            if !parentViewController.configuration.ignorePreferredCellLayoutAttributes {
                 let result = super.preferredLayoutAttributesFitting(layoutAttributes)
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
@@ -295,7 +293,7 @@ class UIHostingCollectionViewCell<
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
-        guard let parentViewController = parentViewController, !parentViewController.configuration._ignorePreferredCellLayoutAttributes else {
+        guard let parentViewController = parentViewController, !parentViewController.configuration.ignorePreferredCellLayoutAttributes else {
             return
         }
         
@@ -306,7 +304,6 @@ class UIHostingCollectionViewCell<
         if layoutAttributes.size != contentHostingController.view.frame.size {
             self.cache.preferredContentSize = relativeFrame
                 .sizeThatFits(in: layoutAttributes.size)
-                .rounded(.up)
                 .clamped(to: configuration?.maximumSize?.rounded(.down))
             
             contentHostingController.update(
@@ -348,7 +345,7 @@ extension UIHostingCollectionViewCell {
         isPrototype: Bool = false
     ) {
         UIView.performWithoutAnimation {
-            contentHostingController?.view.alpha = 1.0
+            contentHostingController?.view.isHidden = false
         }
         
         guard configuration != nil else {
@@ -379,7 +376,7 @@ extension UIHostingCollectionViewCell {
     
     func cellDidEndDisplaying() {
         UIView.performWithoutAnimation {
-            contentHostingController?.view.alpha = 0.0
+            contentHostingController?.view.isHidden = true
         }
     }
     
@@ -535,7 +532,6 @@ extension UIHostingCollectionViewCell {
                 withHorizontalFittingPriority: nil,
                 verticalFittingPriority: nil
             )
-            .rounded(.up)
             .clamped(to: base?.configuration?.maximumSize?.rounded(.down))
         }
         
@@ -549,7 +545,6 @@ extension UIHostingCollectionViewCell {
                 withHorizontalFittingPriority: horizontalFittingPriority,
                 verticalFittingPriority: verticalFittingPriority
             )
-            .rounded(.up)
             .clamped(to: base?.configuration?.maximumSize?.rounded(.down))
         }
         
@@ -560,7 +555,7 @@ extension UIHostingCollectionViewCell {
                 }
                 
                 if self.parent == nil {
-                    let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(._disableCellHostingControllerEmbed)
+                    let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
                     
                     let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
                     

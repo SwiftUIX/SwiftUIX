@@ -15,8 +15,8 @@ public struct _CollectionViewConfiguration {
             self.rawValue = rawValue
         }
         
-        public static let _disableCellHostingControllerEmbed = Self(rawValue: 1 << 1)
-        public static let _ignorePreferredCellLayoutAttributes = Self(rawValue: 1 << 0)
+        public static let disableCellHostingControllerEmbed = Self(rawValue: 1 << 1)
+        public static let ignorePreferredCellLayoutAttributes = Self(rawValue: 1 << 0)
     }
     
     var unsafeFlags = UnsafeFlags()
@@ -30,8 +30,8 @@ public struct _CollectionViewConfiguration {
     var isDragActive: Binding<Bool>? = nil
     var dataSourceUpdateToken: AnyHashable?
     
-    var _ignorePreferredCellLayoutAttributes: Bool {
-        unsafeFlags.contains(._ignorePreferredCellLayoutAttributes)
+    var ignorePreferredCellLayoutAttributes: Bool {
+        unsafeFlags.contains(.ignorePreferredCellLayoutAttributes)
     }
 }
 

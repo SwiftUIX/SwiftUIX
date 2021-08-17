@@ -157,7 +157,7 @@ class UIHostingCollectionViewSupplementaryView<
             
             return layoutAttributes
         } else {
-            if !(parentViewController?.configuration._ignorePreferredCellLayoutAttributes ?? false) {
+            if !(parentViewController?.configuration.ignorePreferredCellLayoutAttributes ?? false) {
                 let result = super.preferredLayoutAttributesFitting(layoutAttributes)
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
