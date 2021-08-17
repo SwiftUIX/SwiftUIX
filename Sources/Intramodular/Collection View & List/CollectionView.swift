@@ -245,7 +245,7 @@ extension CollectionView {
         then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(flags) })
     }
     
-    public func ignorePreferredCellLayoutAttributes() -> Self {
+    public func _ignorePreferredCellLayoutAttributes() -> Self {
         then({ $0._collectionViewConfiguration.unsafeFlags.formUnion(.ignorePreferredCellLayoutAttributes) })
     }
     
