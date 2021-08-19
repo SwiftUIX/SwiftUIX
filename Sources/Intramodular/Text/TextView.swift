@@ -113,8 +113,18 @@ extension _TextView: UIViewRepresentable {
         
         return uiView
     }
-    
+
     func updateUIView(_ uiView: UIViewType, context: Context) {
+        if context.transaction.isAnimated {
+            _updateUIView(uiView, context: context)
+        } else {
+            UIView.performWithoutAnimation {
+                _updateUIView(uiView, context: context)
+            }
+        }
+    }
+    
+    private func _updateUIView(_ uiView: UIViewType, context: Context) {
         var cursorOffset: Int?
         
         // Record the current cursor offset.

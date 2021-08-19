@@ -16,7 +16,8 @@ public struct _CollectionViewConfiguration {
         }
         
         public static let disableCellHostingControllerEmbed = Self(rawValue: 1 << 1)
-        public static let ignorePreferredCellLayoutAttributes = Self(rawValue: 1 << 0)
+        public static let ignorePreferredCellLayoutAttributes = Self(rawValue: 1 << 1)
+        public static let reuseCellRender = Self(rawValue: 1 << 2)
     }
     
     var unsafeFlags = UnsafeFlags()

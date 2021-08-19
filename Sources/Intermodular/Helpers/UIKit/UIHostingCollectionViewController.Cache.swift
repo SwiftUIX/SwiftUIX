@@ -191,7 +191,7 @@ extension UIHostingCollectionViewController.Cache {
             
             if oldValue?.relativeFrame != newValue?.relativeFrame {
                 parent.cache.invalidateIndexPath(indexPath)
-                parent.invalidateLayout(includingCache: false)
+                parent.invalidateLayout(includingCache: false, animated: false)
             }
         }
     }
@@ -222,7 +222,7 @@ extension UIHostingCollectionViewController.Cache {
                 
                 if oldValue?.relativeFrame != newValue?.relativeFrame {
                     self.parent.cache.invalidateIndexPath(indexPath)
-                    self.parent.invalidateLayout(includingCache: false)
+                    self.parent.invalidateLayout(includingCache: false, animated: false)
                 }
             }
         )

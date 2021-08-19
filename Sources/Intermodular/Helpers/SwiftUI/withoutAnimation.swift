@@ -11,12 +11,7 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
         return body()
     }
-    
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    CATransaction.begin()
-    CATransaction.disableActions()
-    #endif
-    
+        
     _areAnimationsDisabledGlobally = true
     
     withAnimation(.none) {
@@ -24,8 +19,4 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     }
     
     _areAnimationsDisabledGlobally = false
-    
-    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    CATransaction.commit()
-    #endif
 }

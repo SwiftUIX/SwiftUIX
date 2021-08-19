@@ -99,13 +99,9 @@ class UIHostingCollectionViewSupplementaryView<
         super.layoutSubviews()
         
         if let contentHostingController = contentHostingController {
-            if contentHostingController.view.frame != bounds {
-                contentHostingController.view.frame = bounds
-                
-                if contentHostingController.view.frame.rounded(.up) != bounds.rounded(.up) {
-                    contentHostingController.view.setNeedsLayout()
-                    contentHostingController.view.layoutIfNeeded()
-                }
+            if contentHostingController.view.frame.size != bounds.size {
+                contentHostingController.view.frame.size = bounds.size
+                contentHostingController.view.layoutIfNeeded()
             }
         }
     }
@@ -126,7 +122,7 @@ class UIHostingCollectionViewSupplementaryView<
                 return size
             } else {
                 targetSize = CGSize(dimensions, default: targetSize)
-                    .clamped(to: configuration?.maximumSize?.rounded(.down))
+                    .clamped(to: configuration?.maximumSize)
             }
         }
         
@@ -161,9 +157,7 @@ class UIHostingCollectionViewSupplementaryView<
                 let result = super.preferredLayoutAttributesFitting(layoutAttributes)
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
-                    cache.preferredContentSize = result.size
-                        .rounded(.up)
-                        .clamped(to: configuration?.maximumSize)
+                    cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
                 }
                 
                 updateCollectionCache()
@@ -197,6 +191,10 @@ extension UIHostingCollectionViewSupplementaryView {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
+        UIView.performWithoutAnimation {
+            contentHostingController?.view.isHidden = false
+        }
+
         guard configuration != nil else {
             return
         }
@@ -224,7 +222,9 @@ extension UIHostingCollectionViewSupplementaryView {
     }
     
     func supplementaryViewDidEndDisplaying() {
-        
+        UIView.performWithoutAnimation {
+            contentHostingController?.view.isHidden = true
+        }
     }
     
     func updateCollectionCache() {
@@ -285,7 +285,6 @@ extension UIHostingCollectionViewSupplementaryView {
                 withHorizontalFittingPriority: nil,
                 verticalFittingPriority: nil
             )
-            .rounded(.up)
             .clamped(to: base?.configuration?.maximumSize)
         }
         
@@ -299,7 +298,6 @@ extension UIHostingCollectionViewSupplementaryView {
                 withHorizontalFittingPriority: horizontalFittingPriority,
                 verticalFittingPriority: verticalFittingPriority
             )
-            .rounded(.up)
             .clamped(to: base?.configuration?.maximumSize)
         }
         
@@ -313,7 +311,7 @@ extension UIHostingCollectionViewSupplementaryView {
                 }
                 
                 if self.parent == nil {
-                    withoutAnimation {
+                    UIView.performWithoutAnimation {
                         self.willMove(toParent: parent)
                         parent.addChild(self)
                         supplementaryView.addSubview(view)
@@ -324,7 +322,7 @@ extension UIHostingCollectionViewSupplementaryView {
                     assertionFailure()
                 }
             } else {
-                withoutAnimation {
+                UIView.performWithoutAnimation {
                     willMove(toParent: nil)
                     view.removeFromSuperview()
                     removeFromParent()

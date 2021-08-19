@@ -8,7 +8,7 @@ import Swift
 import SwiftUI
 
 extension UIHostingCollectionViewController {
-    enum DataSource: CustomStringConvertible {
+    struct DataSource {
         typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
         
         struct IdentifierMap {
@@ -38,12 +38,14 @@ extension UIHostingCollectionViewController {
             }
         }
         
-        case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
-        case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
+        enum Payload {
+            case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
+            case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
+        }
     }
 }
 
-extension UIHostingCollectionViewController.DataSource {
+extension UIHostingCollectionViewController.DataSource.Payload: CustomStringConvertible {
     var isEmpty: Bool {
         switch self {
             case .diffableDataSource(let dataSource):
@@ -117,7 +119,7 @@ extension UIHostingCollectionViewController.DataSource {
     }
     
     func reset(
-        _ diffableDataSource: UICollectionViewDiffableDataSourceType,
+        _ diffableDataSource: UIHostingCollectionViewController.DataSource.UICollectionViewDiffableDataSourceType,
         withConfiguration configuration:
             UIHostingCollectionViewController._SwiftUIType.DataSourceConfiguration,
         animatingDifferences: Bool
@@ -144,8 +146,8 @@ extension UIHostingCollectionViewController.DataSource {
 
 extension UIHostingCollectionViewController {
     func updateDataSource(
-        oldValue: DataSource?,
-        newValue: DataSource?
+        oldValue: DataSource.Payload?,
+        newValue: DataSource.Payload?
     ) {
         if configuration.disableAnimatingDifferences {
             _animateDataSourceDifferences = false
@@ -272,44 +274,6 @@ extension UIHostingCollectionViewController {
 }
 
 // MARK: - Auxiliary Implementation -
-
-fileprivate extension CollectionDifference where ChangeElement: Equatable {
-    var singleItemReorder: (source: Int, target: Int)? {
-        guard count == 2 else {
-            return nil
-        }
-        
-        guard case .remove(let sourceOffset, let removedElement, _) = first(where: {
-            if case .remove = $0 {
-                return true
-            } else {
-                return false
-            }
-        }) else {
-            return nil
-        }
-        
-        guard case .insert(var targetOffset, let insertedElement, _) = first(where: {
-            if case .insert = $0 {
-                return true
-            } else {
-                return false
-            }
-        }) else {
-            return nil
-        }
-        
-        guard insertedElement == removedElement else {
-            return nil
-        }
-        
-        if sourceOffset < targetOffset {
-            targetOffset += 1
-        }
-        
-        return (sourceOffset, targetOffset)
-    }
-}
 
 fileprivate extension NSDiffableDataSourceSnapshot {
     mutating func deleteAllItemsIfNecessary() {
