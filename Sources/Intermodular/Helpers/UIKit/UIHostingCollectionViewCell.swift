@@ -132,7 +132,7 @@ class UIHostingCollectionViewCell<
             
             _isFocused = newValue
             
-            update(disableAnimation: true, forced: false)
+            update(disableAnimation: true)
         }
     }
     
@@ -142,7 +142,7 @@ class UIHostingCollectionViewCell<
                 return
             }
             
-            update(disableAnimation: true, forced: false)
+            update(disableAnimation: true)
         }
     }
     
@@ -152,7 +152,7 @@ class UIHostingCollectionViewCell<
                 return
             }
             
-            update(disableAnimation: true, forced: false)
+            update(disableAnimation: true)
         }
     }
     
@@ -264,7 +264,7 @@ class UIHostingCollectionViewCell<
             
             updateCollectionCache()
             
-            update(disableAnimation: true, forced: true)
+            update(disableAnimation: true)
             
             return layoutAttributes
         } else {
@@ -307,7 +307,6 @@ class UIHostingCollectionViewCell<
             
             contentHostingController.update(
                 disableAnimation: true,
-                forced: false,
                 refresh: false
             )
         }
@@ -317,21 +316,15 @@ class UIHostingCollectionViewCell<
 extension UIHostingCollectionViewCell {
     func update(
         disableAnimation: Bool,
-        forced: Bool,
         refresh: Bool = false
     ) {
         guard configuration != nil else {
             return
         }
         
-        if forced {
-            cache.content = nil
-        }
-        
         if let contentHostingController = contentHostingController {
             contentHostingController.update(
                 disableAnimation: disableAnimation,
-                forced: forced,
                 refresh: refresh
             )
         } else {
@@ -352,7 +345,7 @@ extension UIHostingCollectionViewCell {
         }
         
         if contentHostingController == nil {
-            update(disableAnimation: true, forced: false)
+            update(disableAnimation: true)
         }
         
         guard let contentHostingController = contentHostingController else {
@@ -528,7 +521,7 @@ extension UIHostingCollectionViewCell {
             
             view.backgroundColor = nil
             
-            update(disableAnimation: true, forced: false, refresh: false)
+            update(disableAnimation: true, refresh: false)
         }
         
         @objc required public init?(coder aDecoder: NSCoder) {
@@ -601,7 +594,6 @@ extension UIHostingCollectionViewCell {
         
         func update(
             disableAnimation: Bool,
-            forced: Bool,
             refresh: Bool
         ) {
             guard let base = base else {
@@ -611,28 +603,14 @@ extension UIHostingCollectionViewCell {
             let currentConfiguration = rootView.configuration
             let newConfiguration = base.configuration
             
-            if !forced {
-                if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration {
-                    guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state else {
-                        if refresh {
-                            withoutAnimation(disableAnimation) {
-                                rootView = .init(base: base)
-                            }
-                        }
-                        
-                        return
-                    }
+            if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration {
+                guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state, !refresh else {
+                    return
                 }
             }
             
             withoutAnimation(disableAnimation) {
                 rootView = .init(base: base)
-                
-                if forced {
-                    view.setNeedsLayout()
-                    view.setNeedsDisplay()
-                    view.layoutIfNeeded()
-                }
             }
         }
     }

@@ -87,4 +87,10 @@ open class UIHostingView<Content: View>: UIView {
     }
 }
 
+extension UIHostingView {
+    public func _fixSafeAreaInsets() {
+        rootViewHostingController._fixSafeAreaInsets()
+    }
+}
+
 #endif

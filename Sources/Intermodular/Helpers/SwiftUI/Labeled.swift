@@ -40,7 +40,7 @@ extension Labeled where Label == Text {
         _ title: Text,
         @ViewBuilder control: () -> Control
     ) {
-        self.init(control: control, label: { title })
+        self.init(control: control, label: { title.fontWeight(.regular) })
     }
     
     @inlinable

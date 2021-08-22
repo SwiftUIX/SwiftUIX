@@ -139,7 +139,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         ) {
             viewControllerToBePresented.presentationController?.delegate = self
             viewControllerToBePresented.presentationCoordinator.presentation = modal
-                        
+            
             completion()
         }
         #elseif os(macOS)
@@ -197,7 +197,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     
     func update(with value: AnyModalPresentation.PreferenceKeyValue) {
         if let presentation = value.presentation {
-            present(presentation)
+            present(presentation, completion: { })
         } else if let presentedCoordinator = presentedCoordinator, let presentation = presentedCoordinator.presentation, value.presentationID == presentation.id {
             dismiss()
         }
@@ -226,10 +226,7 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-        if let presentation = (presentationController.presentedViewController as? CocoaPresentationHostingController)?.presentation {
-            presentation.onDismiss()
-            presentation.reset()
-        }
+        
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
@@ -282,7 +279,7 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 
 #endif
 
-struct _UseCocoaPresentationCoordinator: ViewModifier {    
+struct _UseCocoaPresentationCoordinator: ViewModifier {
     @ObservedObject var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     private var coordinator: CocoaPresentationCoordinator? {

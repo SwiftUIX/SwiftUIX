@@ -127,11 +127,19 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         guard !_safeAreaInsetsAreFixed else {
             return
         }
-        
+               
+        _fixSafeAreaInsets()
+        #endif
+    }
+}
+
+extension AppKitOrUIKitHostingController {
+    /// https://twitter.com/b3ll/status/1193747288302075906
+    func _fixSafeAreaInsets() {
         guard let viewClass = object_getClass(view) else {
             return
         }
-        
+
         let className = String(cString: class_getName(viewClass)).appending("_SwiftUIX_patched")
         
         if let viewSubclass = NSClassFromString(className) {
@@ -166,7 +174,6 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             view.setNeedsLayout()
             view.layoutIfNeeded()
         }
-        #endif
     }
 }
 

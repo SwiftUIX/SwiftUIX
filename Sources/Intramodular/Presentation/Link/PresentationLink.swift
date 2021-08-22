@@ -11,41 +11,48 @@ import SwiftUI
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    @Environment(\._appKitOrUIKitViewController) var _appKitOrUIKitViewController
-    @Environment(\.cocoaPresentationContext) var cocoaPresentationContext
+    @Environment(\._appKitOrUIKitViewController) private var _appKitOrUIKitViewController
+    @Environment(\.cocoaPresentationContext) private var cocoaPresentationContext
     #endif
     
-    @Environment(\.environmentBuilder) var environmentBuilder
-    @Environment(\.managedObjectContext) var managedObjectContext
-    @Environment(\.modalPresentationStyle) var _environment_modalPresentationStyle
-    @Environment(\.presenter) var presenter
-    @Environment(\.userInterfaceIdiom) var userInterfaceIdiom
+    @Environment(\.environmentBuilder) private var environmentBuilder
+    @Environment(\.managedObjectContext) private var managedObjectContext
+    @Environment(\.modalPresentationStyle) private var _environment_modalPresentationStyle
+    @Environment(\.presenter) private var presenter
+    @Environment(\.userInterfaceIdiom) private var userInterfaceIdiom
     
-    let _destination: Destination
-    let _isPresented: Binding<Bool>?
-    let _onDismiss: () -> Void
+    private let _destination: Destination
+    private let _isPresented: Binding<Bool>?
+    private let _onDismiss: () -> Void
     
-    var _presentationStyle: ModalPresentationStyle?
+    private var _presentationStyle: ModalPresentationStyle?
     
-    let label: Label
+    private let label: Label
     
-    @State var name = ViewName()
-    @State var id: AnyHashable = UUID()
-    @State var _internal_isPresented: Bool = false
+    @State private var name = ViewName()
+    @State private var id: AnyHashable = UUID()
+    @State private var _internal_isPresented: Bool = false
     
-    var isPresented: Binding<Bool> {
-        _isPresented ?? $_internal_isPresented
+    private var isPresented: Binding<Bool> {
+        let base = (_isPresented ?? $_internal_isPresented)
+        
+        return Binding(
+            get: {
+                base.wrappedValue
+            },
+            set: { newValue in
+                base.wrappedValue = newValue
+            }
+        )
     }
     
-    var presentationStyle: ModalPresentationStyle {
+    private var presentationStyle: ModalPresentationStyle {
         _presentationStyle ?? _environment_modalPresentationStyle
     }
     
     var presentation: AnyModalPresentation {
         let content = AnyPresentationView(
-            _destination
-                .managedObjectContext(managedObjectContext)
-                .modifier(_ResolveAppKitOrUIKitViewController())
+            _destination.managedObjectContext(managedObjectContext)
         )
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
@@ -132,22 +139,33 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     action: togglePresentation,
                     label: label
                 )
-                .preference(
-                    key: AnyModalPresentation.PreferenceKey.self,
-                    value: .init(
-                        presentationID: id,
-                        presentation: isPresented.wrappedValue ?
-                            presentation
-                            : nil
-                    )
-                )
-                .modifier(_ResolveAppKitOrUIKitViewController())
+                .background {
+                    CocoaHostingView {
+                        ZeroSizeView()
+                            .preference(
+                                key: AnyModalPresentation.PreferenceKey.self,
+                                value: .init(
+                                    presentationID: id,
+                                    presentation: isPresented.wrappedValue ?
+                                        presentation
+                                        : nil
+                                )
+                            )
+                    }
+                    .accessibility(hidden: true)
+                    .allowsHitTesting(false)
+                }
                 #else
                 _sheetPresentationButton
                 #endif
             }
         }
-        .background(ZeroSizeView().id(isPresented.wrappedValue))
+        .background(
+            ZeroSizeView()
+                .id(isPresented.wrappedValue)
+                .accessibility(hidden: true)
+                .allowsHitTesting(false)
+        )
         .name(name, id: id)
     }
     

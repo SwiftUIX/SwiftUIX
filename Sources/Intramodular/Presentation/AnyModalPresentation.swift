@@ -23,6 +23,14 @@ public struct AnyModalPresentation: Identifiable {
         self.onDismiss = onDismiss
         self.reset = reset
     }
+    
+    public func environment<T>(_ key: WritableKeyPath<EnvironmentValues, T>, _ value: T) -> Self {
+        var result = self
+        
+        result.content.mergeEnvironmentBuilderInPlace(.value(value, forKey: key))
+        
+        return result
+    }
 }
 
 extension AnyModalPresentation {

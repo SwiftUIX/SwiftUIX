@@ -22,7 +22,7 @@ public struct CocoaPresentationMode: PresentationManager {
         self.presentationCoordinatorBox = coordinator
     }
     
-    init(coordinator: CocoaPresentationCoordinator) {
+    init(coordinator: CocoaPresentationCoordinator?) {
         self.presentationCoordinatorBox = .init(coordinator)
     }
     

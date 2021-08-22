@@ -171,17 +171,13 @@ class UIHostingCollectionViewSupplementaryView<
 }
 
 extension UIHostingCollectionViewSupplementaryView {
-    func update(disableAnimation: Bool = true, forced: Bool = false) {
+    func update(disableAnimation: Bool = true) {
         guard configuration != nil else {
             return
         }
         
-        if forced {
-            cache.content = nil
-        }
-
         if let contentHostingController = contentHostingController {
-            contentHostingController.update(disableAnimation: disableAnimation, forced: forced)
+            contentHostingController.update(disableAnimation: disableAnimation)
         } else {
             contentHostingController = ContentHostingController(base: self)
         }
@@ -200,7 +196,7 @@ extension UIHostingCollectionViewSupplementaryView {
         }
 
         if contentHostingController == nil {
-            update(disableAnimation: true, forced: false)
+            update(disableAnimation: true)
         }
         
         guard let contentHostingController = contentHostingController else {

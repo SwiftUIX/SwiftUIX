@@ -165,7 +165,7 @@ final class UIHostingCollectionViewController<
             
             self.cache.preconfigure(cell: cell)
             
-            cell.update(disableAnimation: true, forced: false)
+            cell.update(disableAnimation: true)
             
             return cell
         }
@@ -269,13 +269,13 @@ final class UIHostingCollectionViewController<
         }
         
         CATransaction.begin()
-
+        
         if !animated {
             CATransaction.setDisableActions(true)
         }
-
+        
         collectionView.collectionViewLayout.invalidateLayout()
-
+        
         CATransaction.commit()
     }
     
@@ -455,7 +455,7 @@ extension UIHostingCollectionViewController {
             view.cache = .init()
             view.configuration?.viewProvider = viewProvider
             
-            view.update(disableAnimation: true, forced: false)
+            view.update(disableAnimation: true)
         }
         
         for cell in collectionView.visibleCells {
@@ -466,7 +466,7 @@ extension UIHostingCollectionViewController {
             cell.cache = .init()
             cell.configuration?.viewProvider = viewProvider
             
-            cell.update(disableAnimation: true, forced: false, refresh: true)
+            cell.update(disableAnimation: true, refresh: true)
         }
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {
@@ -477,7 +477,7 @@ extension UIHostingCollectionViewController {
             view.cache = .init()
             view.configuration?.viewProvider = viewProvider
             
-            view.update(disableAnimation: true, forced: false)
+            view.update(disableAnimation: true)
         }
     }
 }

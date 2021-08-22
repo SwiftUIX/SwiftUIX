@@ -128,7 +128,7 @@ extension DynamicViewPresenter {
 extension DynamicViewPresenter {
     @discardableResult
     public func dismissTopmost(withAnimation animation: Animation?) -> Future<Bool, Never> {
-        topmostPresenter.presenter?.dismissSelf(withAnimation: animation) ?? .init({ $0(.success(false) )})
+        (topmostPresenter.presented as? DynamicViewPresenter ?? topmostPresenter).dismissSelf(withAnimation: animation)
     }
     
     @discardableResult
@@ -245,6 +245,8 @@ extension UIViewController: DynamicViewPresenter {
                     attemptToFulfill(.success(true))
                 }
             } else {
+                self.dismiss(animated: animation != nil, completion: nil)
+                
                 attemptToFulfill(.success(true))
             }
         }

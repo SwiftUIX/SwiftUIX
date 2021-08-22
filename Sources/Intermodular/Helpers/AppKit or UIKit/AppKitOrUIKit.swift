@@ -250,3 +250,19 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     }
     #endif
 }
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+func withAppKitOrUIKitViewController<Content: View>(
+    _ content: @escaping (AppKitOrUIKitViewController?) -> Content
+) -> some View {
+    withInlineState(initialValue: Optional<AppKitOrUIKitViewController>.none) { viewController in
+        content(viewController.wrappedValue)
+            .onAppKitOrUIKitViewControllerResolution { _viewController in
+                if _viewController !== viewController.wrappedValue {
+                    viewController.wrappedValue = _viewController
+                }
+            }
+    }
+}
+
+#endif
