@@ -152,8 +152,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                                 )
                             )
                     }
-                    .accessibility(hidden: true)
                     .allowsHitTesting(false)
+                    .accessibility(hidden: true)
                 }
                 #else
                 _sheetPresentationButton
@@ -163,8 +163,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         .background(
             ZeroSizeView()
                 .id(isPresented.wrappedValue)
-                .accessibility(hidden: true)
                 .allowsHitTesting(false)
+                .accessibility(hidden: true)
         )
         .name(name, id: id)
     }

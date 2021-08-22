@@ -84,8 +84,8 @@ extension View {
                 onDisappear: { _ in },
                 onDeresolution: { _ in }
             )
-            .accessibility(hidden: true)
             .allowsHitTesting(false)
+            .accessibility(hidden: true)
         )
     }
     
@@ -103,8 +103,8 @@ extension View {
                 onDisappear: onDisappear,
                 onDeresolution: deresolutionAction
             )
-            .accessibility(hidden: true)
             .allowsHitTesting(false)
+            .accessibility(hidden: true)
         )
     }
 }

@@ -84,8 +84,8 @@ public struct ZeroSizeView: View {
     public var body: some View {
         Color.almostClear
             .frame(width: 0, height: 0)
-            .accessibility(hidden: true)
             .allowsHitTesting(false)
+            .accessibility(hidden: true)
     }
     
     @inlinable

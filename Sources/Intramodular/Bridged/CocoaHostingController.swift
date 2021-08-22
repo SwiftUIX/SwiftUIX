@@ -119,7 +119,6 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     
     /// https://twitter.com/b3ll/status/1193747288302075906
     public func _fixSafeAreaInsetsIfNecessary() {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         defer {
             _safeAreaInsetsAreFixed = true
         }
@@ -129,13 +128,13 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
                
         _fixSafeAreaInsets()
-        #endif
     }
 }
 
 extension AppKitOrUIKitHostingController {
     /// https://twitter.com/b3ll/status/1193747288302075906
     func _fixSafeAreaInsets() {
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         guard let viewClass = object_getClass(view) else {
             return
         }
@@ -174,6 +173,7 @@ extension AppKitOrUIKitHostingController {
             view.setNeedsLayout()
             view.layoutIfNeeded()
         }
+        #endif
     }
 }
 

@@ -252,7 +252,7 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-func withAppKitOrUIKitViewController<Content: View>(
+public func withAppKitOrUIKitViewController<Content: View>(
     _ content: @escaping (AppKitOrUIKitViewController?) -> Content
 ) -> some View {
     withInlineState(initialValue: Optional<AppKitOrUIKitViewController>.none) { viewController in

@@ -17,13 +17,13 @@ private struct HideNavigationBar: ViewModifier {
                     .navigationBarTitle(Text(String()), displayMode: .inline)
                     .navigationBarBackButtonHidden(true)
                     .navigationBarHidden(true)
-                    .accessibility(hidden: true)
                     .allowsHitTesting(false)
+                    .accessibility(hidden: true)
                 #elseif os(tvOS)
                 ZeroSizeView()
                     .navigationBarHidden(true)
-                    .accessibility(hidden: true)
                     .allowsHitTesting(false)
+                    .accessibility(hidden: true)
                 #endif
             }
             .onAppKitOrUIKitViewControllerResolution(
