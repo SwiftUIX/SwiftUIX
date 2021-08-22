@@ -8,7 +8,7 @@ import SwiftUI
 import UIKit
 
 private struct EditMenuPresenter: ViewModifier {
-    @Binding var isPresented: Bool
+    @Binding var isVisible: Bool
     
     let attachmentAnchor: UnitPoint?
     let editMenuItems: () -> [EditMenuItem]
@@ -16,7 +16,7 @@ private struct EditMenuPresenter: ViewModifier {
     func body(content: Content) -> some View {
         content.background {
             _BackgroundPresenterView(
-                isPresented: $isPresented,
+                isVisible: $isVisible,
                 attachmentAnchor: attachmentAnchor,
                 editMenuItems: editMenuItems
             )
@@ -26,7 +26,7 @@ private struct EditMenuPresenter: ViewModifier {
     }
     
     struct _BackgroundPresenterView: AppKitOrUIKitViewRepresentable {
-        @Binding var isPresented: Bool
+        @Binding var isVisible: Bool
         
         let attachmentAnchor: UnitPoint?
         let editMenuItems: () -> [EditMenuItem]
@@ -36,11 +36,11 @@ private struct EditMenuPresenter: ViewModifier {
         }
         
         func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-            view.isPresented = $isPresented
+            view.isVisible = $isVisible
             view.attachmentAnchor = attachmentAnchor
             view.editMenuItems = editMenuItems
             
-            if isPresented {
+            if isVisible {
                 view.showMenu(sender: nil)
             }
         }
@@ -61,12 +61,12 @@ public struct EditMenuItem {
 
 extension View {
     public func editMenu(
-        isPresented: Binding<Bool>,
+        isVisible: Binding<Bool>,
         @ArrayBuilder<EditMenuItem> content: @escaping () -> [EditMenuItem]
     ) -> some View {
         modifier(
             EditMenuPresenter(
-                isPresented: isPresented,
+                isVisible: isVisible,
                 attachmentAnchor: nil,
                 editMenuItems: content
             )
@@ -78,7 +78,7 @@ extension View {
 
 extension EditMenuPresenter._BackgroundPresenterView {
     class AppKitOrUIKitViewType: UIView {
-        var isPresented: Binding<Bool>?
+        var isVisible: Binding<Bool>?
         var attachmentAnchor: UnitPoint?
         var editMenuItems: () -> [EditMenuItem] = { [] }
         
@@ -134,9 +134,9 @@ extension EditMenuPresenter._BackgroundPresenterView {
         }
         
         @objc func didHideEditMenu(_ sender: AnyObject?) {
-            if let isPresented = isPresented, isPresented.wrappedValue {
+            if let isVisible = isVisible, isVisible.wrappedValue {
                 DispatchQueue.main.async {
-                    isPresented.wrappedValue = false
+                    isVisible.wrappedValue = false
                 }
                 
                 if isFirstResponder {
