@@ -83,7 +83,7 @@ extension EditMenuPresenter._BackgroundPresenterView {
         var editMenuItems: () -> [EditMenuItem] = { [] }
         
         private var menuController: UIMenuController? = nil
-        private var itemTitleToActionMap: [String: Action]?
+        private var itemIndexToActionMap: [Int: Action]?
         
         override var canBecomeFirstResponder: Bool {
             true
@@ -112,17 +112,19 @@ extension EditMenuPresenter._BackgroundPresenterView {
             
             becomeFirstResponder()
             
-            itemTitleToActionMap = [:]
+            itemIndexToActionMap = [:]
             
             let items = editMenuItems()
             let menuController = UIMenuController()
             
-            menuController.menuItems = items.map { item in
-                itemTitleToActionMap?[item.title] = item.action
+            menuController.menuItems = items.enumerated().map { (index, item) in
+                let selector = Selector("performActionForEditMenuItemAtIndex\(index.description)")
+                
+                itemIndexToActionMap?[index] = item.action
                 
                 let item = UIMenuItem(
                     title: item.title,
-                    action: #selector(performMenuItemAction)
+                    action: selector
                 )
                 
                 return item
@@ -147,16 +149,47 @@ extension EditMenuPresenter._BackgroundPresenterView {
             menuController = nil
         }
         
-        @objc func performMenuItemAction(_ sender: AnyObject?) {
-            guard let sender = sender as? UIMenuItem else {
-                return
-            }
-            
-            itemTitleToActionMap?[sender.title]?.perform()
+        override func canPerformAction(_ action: Selector, withSender _: Any?) -> Bool {
+            NSStringFromSelector(action).hasPrefix("performActionForEditMenuItemAtIndex")
         }
         
-        override func canPerformAction(_ action: Selector, withSender _: Any?) -> Bool {
-            action == #selector(performMenuItemAction)
+        @objc func performActionForEditMenuItemAtIndex(_ index: Int) {
+            itemIndexToActionMap?[index]?.perform()
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex0)
+        private func performActionForEditMenuItemAtIndex0() {
+            performActionForEditMenuItemAtIndex(0)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex1)
+        private func performActionForEditMenuItemAtIndex1() {
+            performActionForEditMenuItemAtIndex(1)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex2)
+        private func performActionForEditMenuItemAtIndex2() {
+            performActionForEditMenuItemAtIndex(2)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex3)
+        private func performActionForEditMenuItemAtIndex3() {
+            performActionForEditMenuItemAtIndex(3)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex4)
+        func performActionForEditMenuItemAtIndex4() {
+            performActionForEditMenuItemAtIndex(4)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex5)
+        private func performActionForEditMenuItemAtIndex5() {
+            performActionForEditMenuItemAtIndex(5)
+        }
+        
+        @objc(performActionForEditMenuItemAtIndex6)
+        private func performActionForEditMenuItemAtIndex6() {
+            performActionForEditMenuItemAtIndex(6)
         }
     }
 }
