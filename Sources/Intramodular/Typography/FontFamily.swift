@@ -40,3 +40,17 @@ extension Font {
     }
     #endif
 }
+
+extension Text {
+    /// Sets the default font for text in the view.
+    public func font<F: FontFamily>(_ font: F, size: CGFloat) -> Text {
+        self.font(.custom(font.rawValue, size: size))
+    }
+}
+
+extension View {
+    /// Sets the default font for text in this view.
+    public func font<F: FontFamily>(_ font: F, size: CGFloat) -> some View {
+        self.font(.custom(font.rawValue, size: size))
+    }
+}
