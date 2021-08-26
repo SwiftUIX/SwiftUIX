@@ -466,7 +466,7 @@ extension UIHostingCollectionViewController {
             cell.cache = .init()
             cell.configuration?.viewProvider = viewProvider
             
-            cell.update(disableAnimation: true, refresh: true)
+            cell.update(disableAnimation: true)
         }
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {

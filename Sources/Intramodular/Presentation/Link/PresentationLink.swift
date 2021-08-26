@@ -50,7 +50,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         _presentationStyle ?? _environment_modalPresentationStyle
     }
     
-    var presentation: AnyModalPresentation {
+    private var presentation: AnyModalPresentation {
         let content = AnyPresentationView(
             _destination.managedObjectContext(managedObjectContext)
         )
@@ -71,93 +71,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     public var body: some View {
         PassthroughView {
-            if let presenter = presenter,
-               userInterfaceIdiom != .mac,
-               presentationStyle != .automatic
-            {
-                #if os(iOS) || targetEnvironment(macCatalyst)
-                if case .popover(_, _) = presentationStyle {
-                    IntrinsicGeometryReader { proxy in
-                        if presenter is CocoaPresentationCoordinator {
-                            Button(
-                                action: togglePresentation,
-                                label: label
-                            )
-                            .preference(
-                                key: AnyModalPresentation.PreferenceKey.self,
-                                value: .init(
-                                    presentationID: id,
-                                    presentation: isPresented.wrappedValue ?
-                                        presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global))
-                                        : nil
-                                )
-                            )
-                            .modifier(_ResolveAppKitOrUIKitViewController())
-                        } else {
-                            Button(
-                                action: togglePresentation,
-                                label: label
-                            )
-                            .preference(
-                                key: AnyModalPresentation.PreferenceKey.self,
-                                value: .init(
-                                    presentationID: id,
-                                    presentation: isPresented.wrappedValue ?
-                                        presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global))
-                                        : nil
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    Button(action: { presenter.presentOnTop(presentation) }, label: label)
-                }
-                #else
-                Button(action: { presenter.present(presentation) }, label: label)
-                #endif
+            if let presenter = presenter, userInterfaceIdiom != .mac,  presentationStyle != .automatic {
+                customPopoverPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
-                _sheetPresentationButton
-            } else if
-                presentationStyle == .popover,
-                userInterfaceIdiom == .pad || userInterfaceIdiom == .mac
-            {
-                #if os(iOS) || targetEnvironment(macCatalyst)
-                Button(action: togglePresentation, label: label)
-                    .popover(isPresented: isPresented.onChange { newValue in
-                        if !newValue {
-                            _onDismiss()
-                        }
-                    }) {
-                        presentation.content
-                    }
-                #else
-                _sheetPresentationButton
-                #endif
+                systemSheetPresentationButton
+            } else if presentationStyle == .popover, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
+                systemPopoverPresentationButton
             } else {
-                #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-                Button(
-                    action: togglePresentation,
-                    label: label
-                )
-                .background {
-                    CocoaHostingView {
-                        ZeroSizeView()
-                            .preference(
-                                key: AnyModalPresentation.PreferenceKey.self,
-                                value: .init(
-                                    presentationID: id,
-                                    presentation: isPresented.wrappedValue ?
-                                        presentation
-                                        : nil
-                                )
-                            )
-                    }
-                    .allowsHitTesting(false)
-                    .accessibility(hidden: true)
-                }
-                #else
-                _sheetPresentationButton
-                #endif
+                customPresentationButton
             }
         }
         .background(
@@ -169,7 +90,67 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         .name(name, id: id)
     }
     
-    private var _sheetPresentationButton: some View {
+    @ViewBuilder
+    private func customPopoverPresentationButton(presenter: DynamicViewPresenter) -> some View {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        if case .popover(_, _) = presentationStyle {
+            IntrinsicGeometryReader { proxy in
+                if presenter is CocoaPresentationCoordinator {
+                    Button(
+                        action: togglePresentation,
+                        label: label
+                    )
+                    .preference(
+                        key: AnyModalPresentation.PreferenceKey.self,
+                        value: .init(
+                            presentationID: id,
+                            presentation: isPresented.wrappedValue ?
+                                presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global))
+                                : nil
+                        )
+                    )
+                    .modifier(_ResolveAppKitOrUIKitViewController())
+                } else {
+                    Button(
+                        action: togglePresentation,
+                        label: label
+                    )
+                    .preference(
+                        key: AnyModalPresentation.PreferenceKey.self,
+                        value: .init(
+                            presentationID: id,
+                            presentation: isPresented.wrappedValue ?
+                                presentation.popoverAttachmentAnchorBounds(proxy.frame(in: .global))
+                                : nil
+                        )
+                    )
+                }
+            }
+        } else {
+            Button(action: { presenter.presentOnTop(presentation) }, label: label)
+        }
+        #else
+        Button(action: { presenter.present(presentation) }, label: label)
+        #endif
+    }
+    
+    @ViewBuilder
+    private var systemPopoverPresentationButton: some View {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        Button(action: togglePresentation, label: label)
+            .popover(isPresented: isPresented.onChange { newValue in
+                if !newValue {
+                    _onDismiss()
+                }
+            }) {
+                presentation.content
+            }
+        #else
+        systemSheetPresentationButton
+        #endif
+    }
+    
+    private var systemSheetPresentationButton: some View {
         Button(
             action: togglePresentation,
             label: label
@@ -179,6 +160,34 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             onDismiss: _onDismiss,
             content: { presentation.content }
         )
+    }
+    
+    @ViewBuilder
+    private var customPresentationButton: some View {
+        #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        Button(
+            action: togglePresentation,
+            label: label
+        )
+        .background {
+            CocoaHostingView {
+                ZeroSizeView()
+                    .preference(
+                        key: AnyModalPresentation.PreferenceKey.self,
+                        value: .init(
+                            presentationID: id,
+                            presentation: isPresented.wrappedValue ?
+                                presentation
+                                : nil
+                        )
+                    )
+            }
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
+        }
+        #else
+        systemSheetPresentationButton
+        #endif
     }
     
     private func togglePresentation() {

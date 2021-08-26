@@ -305,10 +305,7 @@ class UIHostingCollectionViewCell<
                 .sizeThatFits(in: layoutAttributes.size)
                 .clamped(to: configuration?.maximumSize)
             
-            contentHostingController.update(
-                disableAnimation: true,
-                refresh: false
-            )
+            contentHostingController.update(disableAnimation: true)
         }
     }
 }
@@ -316,17 +313,14 @@ class UIHostingCollectionViewCell<
 extension UIHostingCollectionViewCell {
     func update(
         disableAnimation: Bool,
-        refresh: Bool = false
+        forced: Bool = false
     ) {
         guard configuration != nil else {
             return
         }
         
         if let contentHostingController = contentHostingController {
-            contentHostingController.update(
-                disableAnimation: disableAnimation,
-                refresh: refresh
-            )
+            contentHostingController.update(disableAnimation: disableAnimation)
         } else {
             contentHostingController = ContentHostingController(base: self)
         }
@@ -521,7 +515,7 @@ extension UIHostingCollectionViewCell {
             
             view.backgroundColor = nil
             
-            update(disableAnimation: true, refresh: false)
+            update(disableAnimation: true)
         }
         
         @objc required public init?(coder aDecoder: NSCoder) {
@@ -592,10 +586,7 @@ extension UIHostingCollectionViewCell {
             }
         }
         
-        func update(
-            disableAnimation: Bool,
-            refresh: Bool
-        ) {
+        func update(disableAnimation: Bool) {
             guard let base = base else {
                 return
             }
@@ -603,8 +594,8 @@ extension UIHostingCollectionViewCell {
             let currentConfiguration = rootView.configuration
             let newConfiguration = base.configuration
             
-            if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration {
-                guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state, !refresh else {
+            if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration, base.cache.content != nil {
+                guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state else {
                     return
                 }
             }
