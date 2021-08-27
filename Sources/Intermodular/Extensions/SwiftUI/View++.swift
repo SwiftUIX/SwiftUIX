@@ -58,6 +58,14 @@ extension View {
     ) -> some View {
         background(fill.edgesIgnoringSafeArea(.all), alignment: alignment)
     }
+    
+    @inlinable
+    public func backgroundFill<BackgroundFill: View>(
+        alignment: Alignment = .center,
+        @ViewBuilder _ fill: () -> BackgroundFill
+    ) -> some View {
+        backgroundFill(fill())
+    }
 }
 
 extension View {

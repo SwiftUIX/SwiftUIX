@@ -24,6 +24,16 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         }
     }
     
+    var isKeyAndVisible: Binding<Bool> = .constant(true)
+    
+    #if os(iOS)
+    override public var isHidden: Bool {
+        didSet {
+            rootHostingViewController.rootView.content.isPresented = !isHidden
+        }
+    }
+    #endif
+    
     #if os(macOS)
     public convenience init(rootView: Content) {
         let contentViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: nil, content: rootView))
@@ -80,36 +90,45 @@ final class WindowPositionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
 
 fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @usableFromInline
-    weak var window: AppKitOrUIKitWindow?
+    weak var window: AppKitOrUIKitHostingWindow<Content>?
     
     @usableFromInline
     var content: Content
     
+    @usableFromInline
+    var isPresented: Bool = false
+    
+    private var presentationManager: _PresentationManager {
+        _PresentationManager(window: window)
+    }
+    
     @inlinable
     public var body: some View {
-        content.onPreferenceChange(WindowPositionPreferenceKey.self) { value in
-            if let window = self.window, let value = value {
-                if window.frame.origin != value {
-                    #if os(macOS)
-                    window.setFrameOrigin(value)
-                    #else
-                    UIView.animate(withDuration: 0.2) {
-                        window.frame.origin = value
+        content
+            .onPreferenceChange(WindowPositionPreferenceKey.self) { value in
+                if let window = self.window, let value = value {
+                    if window.frame.origin != value {
+                        #if os(macOS)
+                        window.setFrameOrigin(value)
+                        #else
+                        UIView.animate(withDuration: 0.2) {
+                            window.frame.origin = value
+                        }
+                        #endif
                     }
-                    #endif
                 }
             }
-        }
-        .environment(\.presentationManager, _PresentationManager(window: window))
+            .environment(\.presentationManager, presentationManager)
+            .background(ZeroSizeView().id(isPresented))
     }
     
     @usableFromInline
     struct _PresentationManager: PresentationManager {
         @usableFromInline
-        var window: AppKitOrUIKitWindow?
+        var window: AppKitOrUIKitHostingWindow<Content>?
         
         @usableFromInline
-        init(window: AppKitOrUIKitWindow?) {
+        init(window: AppKitOrUIKitHostingWindow<Content>?) {
             self.window = window
         }
         
@@ -125,6 +144,8 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             #else
             window?.isHidden = true
             #endif
+            
+            window?.isKeyAndVisible.wrappedValue = false
         }
     }
 }

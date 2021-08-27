@@ -18,7 +18,7 @@ public struct LazyView<Body: View>: View {
     @_optimize(none)
     @inline(never)
     public var body: some View {
-        return destination()
+        destination()
     }
 }
 
@@ -37,14 +37,16 @@ public struct LazyAppearView<Body: View>: View {
     @_optimize(none)
     @inline(never)
     public var body: some View {
-        PassthroughView {
-            if content == nil {
-                ZeroSizeView().onAppear {
-                    self.content = self.destination()
-                }
-            } else {
-                content!.onDisappear {
-                    self.content = nil
+        LazyView {
+            PassthroughView {
+                if content == nil {
+                    ZeroSizeView().onAppear {
+                        self.content = self.destination()
+                    }
+                } else {
+                    content!.onDisappear {
+                        self.content = nil
+                    }
                 }
             }
         }

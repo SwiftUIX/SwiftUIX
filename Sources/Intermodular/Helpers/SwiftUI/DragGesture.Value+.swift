@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@available(tvOS, unavailable)
 extension DragGesture.Value {
     public struct Direction: OptionSet {
         public static let top = Self(rawValue: 1 << 0)

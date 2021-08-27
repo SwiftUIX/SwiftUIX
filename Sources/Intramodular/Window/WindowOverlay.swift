@@ -116,6 +116,7 @@ extension WindowOverlay {
                 #endif
                 
                 contentWindow.rootView = content
+                contentWindow.isKeyAndVisible = isKeyAndVisible
                 
                 #if os(macOS)
                 contentWindow.title = ""
