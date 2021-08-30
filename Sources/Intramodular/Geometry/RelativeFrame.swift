@@ -5,22 +5,18 @@
 import Swift
 import SwiftUI
 
-public enum FrameGroup {
-    public enum DimensionType: Hashable {
-        case width
-        case height
-        
-        public var orthogonal: Self {
-            switch self {
-                case .width:
-                    return .height
-                case .height:
-                    return .width
-            }
+public enum FrameDimensionType: Hashable {
+    case width
+    case height
+    
+    public var orthogonal: Self {
+        switch self {
+            case .width:
+                return .height
+            case .height:
+                return .width
         }
     }
-    
-    public typealias ID = AnyHashable
 }
 
 public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
@@ -33,7 +29,7 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
     }
     
     public var id: AnyHashable?
-    public var group: FrameGroup.ID?
+    public var group: AnyHashable?
     public var width: RelativeFrameDimension?
     public var height: RelativeFrameDimension?
     
@@ -68,7 +64,7 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
     func sizeThatFits(in size: CGSize) -> CGSize {
         .init(dimensionsThatFit(in: size), default: size)
     }
-
+    
     public func id(_ id: AnyHashable?) -> Self {
         var result = self
         
@@ -77,7 +73,7 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
         return result
     }
     
-    public func group(_ group: FrameGroup.ID?) -> Self {
+    public func group(_ group: AnyHashable) -> Self {
         var result = self
         
         result.group = group
@@ -88,12 +84,12 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
 
 public enum RelativeFrameDimension: Hashable {
     public struct FractionalValue: Hashable {
-        let dimension: FrameGroup.DimensionType
+        let dimension: FrameDimensionType
         let multiplier: CGFloat
         let constant: CGFloat
         
         public init(
-            dimension: FrameGroup.DimensionType,
+            dimension: FrameDimensionType,
             multiplier: CGFloat,
             constant: CGFloat
         ) {
@@ -117,7 +113,7 @@ public enum RelativeFrameDimension: Hashable {
     
     @usableFromInline
     func resolve(
-        for dimensionType: FrameGroup.DimensionType,
+        for dimensionType: FrameDimensionType,
         in dimensions: OptionalDimensions
     ) -> CGFloat? {
         switch self {
@@ -161,14 +157,6 @@ extension View {
     ) -> some View {
         modifier(RelativeFrameModifier(frame: .init(width: width, height: height)))
     }
-    
-    public func proportionalFrame(width: CGFloat) -> some View {
-        relativeFrame(width: .height(multipliedBy: width))
-    }
-    
-    public func proportionalFrame(height: CGFloat) -> some View {
-        relativeFrame(height: .height(multipliedBy: height))
-    }
 }
 
 // MARK: - Auxiliary Implementation -
@@ -198,6 +186,7 @@ struct RelativeFrameModifier: _opaque_FrameModifier, ViewModifier {
     @usableFromInline
     let frame: RelativeFrame
     
+    /// The identifier for this relative frame. Required to propagate values via preference keys.
     @usableFromInline
     @State var id: AnyHashable = UUID()
     
@@ -222,7 +211,7 @@ struct RelativeFrameModifier: _opaque_FrameModifier, ViewModifier {
 // MARK: - Helpers -
 
 extension CGSize {
-    fileprivate func value(for dimensionType: FrameGroup.DimensionType) -> CGFloat {
+    fileprivate func value(for dimensionType: FrameDimensionType) -> CGFloat {
         switch dimensionType {
             case .width:
                 return width

@@ -10,11 +10,18 @@ import SwiftUI
 fileprivate struct _NameAssignmentView<Content: View>: View {
     private let content: Content
     private let name: ViewName
+    private let _namespace: Any?
     private let id: AnyHashable?
     
-    init(content: Content, name: ViewName, id: AnyHashable?) {
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    var namespace: Namespace.ID? {
+        _namespace as? Namespace.ID
+    }
+    
+    init(content: Content, name: ViewName, namespace: Any?, id: AnyHashable?) {
         self.content = content
         self.name = name
+        self._namespace = namespace
         self.id = id
     }
     
@@ -49,20 +56,34 @@ extension View {
         _NameAssignmentView(
             content: self,
             name: name.withViewType(type(of: self)),
+            namespace: nil,
             id: id
         )
     }
-    
+        
     /// Set a name for `self`.
     public func name(_ name: ViewName) -> some View {
         _NameAssignmentView(
             content: self,
             name: name.withViewType(type(of: self)),
-            id: nil)
+            namespace: nil,
+            id: nil
+        )
     }
     
     /// Set a name for `self`.
     public func name<H: Hashable>(_ name: H) -> some View {
         self.name(ViewName(name))
+    }
+    
+    /// Set a name for `self`.
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    public func name<H: Hashable>(_ name: H, in namespace: Namespace.ID) -> some View {
+        _NameAssignmentView(
+            content: self,
+            name: .init(name),
+            namespace: namespace,
+            id: nil
+        )
     }
 }
