@@ -213,9 +213,15 @@ class UIHostingCollectionViewCell<
     ) -> CGSize {
         var targetSize = targetSize
         
-        if let maximumSize = configuration?.maximumSize, let dimensions = content._precomputedDimensionsThatFit(in: maximumSize) {
-            if let size = CGSize(dimensions), size.fits(targetSize) {
-                return size
+        if let maximumSize = configuration?.maximumSize,
+           let dimensions = content._precomputedDimensionsThatFit(in: maximumSize)
+        {
+            if let size = CGSize(dimensions), !size.isAreaZero {
+                if size.fits(targetSize) {
+                    return size
+                } else {
+                    return size.clamped(to: maximumSize)
+                }
             } else {
                 targetSize = CGSize(dimensions, default: targetSize)
             }

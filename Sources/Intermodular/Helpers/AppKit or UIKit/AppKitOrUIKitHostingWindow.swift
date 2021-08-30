@@ -119,7 +119,7 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
                 }
             }
             .environment(\.presentationManager, presentationManager)
-            .background(ZeroSizeView().id(isPresented))
+            .id(isPresented)
     }
     
     @usableFromInline

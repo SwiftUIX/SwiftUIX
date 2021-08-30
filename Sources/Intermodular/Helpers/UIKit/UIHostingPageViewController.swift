@@ -12,52 +12,26 @@ protocol _opaque_UIHostingPageViewController: NSObject {
     
 }
 
-class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController {
-    struct PageContainer: View {
-        let index: AnyIndex
-        var page: Page
-        
-        var body: some View {
-            page.modifier(_ResolveAppKitOrUIKitViewController())
-        }
-    }
+class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController, UIScrollViewDelegate {
+    var internalScrollView: UIScrollView?
+    var cachedChildren: [Int: PageContentController] = [:]
     
-    class PageContentController: UIHostingController<PageContainer> {
-        override init(rootView: PageContainer) {
-            super.init(rootView: rootView)
-            
-            view.backgroundColor = .clear
-        }
-        
-        @objc required dynamic init?(coder aDecoder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
-        override open func viewDidLoad() {
-            super.viewDidLoad()
-            
-            view.backgroundColor = .clear
-        }
-        
-        override open func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            
-            view.backgroundColor = .clear
-        }
-        
-        override open func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            
-            view.backgroundColor = .clear
-        }
-    }
-    
+    var _isSwiftUIRuntimeUpdateActive: Bool = false
     var _isAnimated: Bool = true
+    var cyclesPages: Bool = false
+    var internalPaginationState = PaginationState() {
+        didSet {
+            paginationState?.wrappedValue = internalPaginationState
+        }
+    }
+    var paginationState: Binding<PaginationState>?
     
     var content: AnyForEach<Page>? {
         didSet {
             if let content = content {
                 if let oldValue = oldValue, oldValue.count != content.count {
+                    cachedChildren = [:]
+                    
                     if let firstViewController = viewController(for: content.data.startIndex) {
                         setViewControllers(
                             [firstViewController],
@@ -65,16 +39,18 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
                             animated: false
                         )
                     }
+                    
+                    for index in content.data.indices {
+                        _ = viewController(for: index)
+                    }
                 } else {
                     for viewController in (viewControllers ?? []).map({ $0 as! PageContentController }) {
-                        viewController.rootView.page = content.content(content.data[viewController.rootView.index])
+                        viewController.mainView.page = content.content(content.data[viewController.mainView.index])
                     }
                 }
             }
         }
     }
-    
-    var cyclesPages: Bool = false
     
     var currentPageIndex: AnyIndex? {
         get {
@@ -82,7 +58,7 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
                 return nil
             }
             
-            return currentViewController.rootView.index
+            return currentViewController.mainView.index
         } set {
             guard let newValue = newValue else {
                 return setViewControllers([], direction: .forward, animated: _isAnimated, completion: nil)
@@ -104,12 +80,14 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
                 direction = .forward
             }
             
-            if let viewController = viewController(for: newValue) {
-                setViewControllers(
-                    [viewController],
-                    direction: direction,
-                    animated: _isAnimated
-                )
+            if internalPaginationState.activePageTransitionProgress == 0.0 {
+                if let viewController = viewController(for: newValue) {
+                    setViewControllers(
+                        [viewController],
+                        direction: direction,
+                        animated: _isAnimated
+                    )
+                }
             }
         }
     }
@@ -141,6 +119,27 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
         
         return content?.data.index(after: currentPageIndex)
     }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        for subview in view.subviews {
+            if let scrollView = subview as? UIScrollView {
+                internalScrollView = scrollView
+                scrollView.delegate = self
+            }
+        }
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !_isSwiftUIRuntimeUpdateActive else {
+            return
+        }
+        
+        let activePageTransitionProgress = abs(scrollView.contentOffset.x - view.frame.size.width) / view.frame.size.width
+        
+        internalPaginationState.activePageTransitionProgress = .init(activePageTransitionProgress)
+    }
 }
 
 extension UIHostingPageViewController {
@@ -153,7 +152,17 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        return PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+        let indexOffset = content.data.distance(from: content.data.startIndex, to: index)
+        
+        if let cachedResult = cachedChildren[indexOffset] {
+            return cachedResult
+        }
+        
+        let result = PageContentController(mainView: PageContainer(index: index, page: content.content(content.data[index])))
+        
+        cachedChildren[indexOffset] = result
+        
+        return result
     }
     
     func viewController(before viewController: UIViewController) -> UIViewController? {
@@ -167,12 +176,12 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        let index = viewController.rootView.index == content.data.startIndex
+        let index = viewController.mainView.index == content.data.startIndex
             ? (cyclesPages ? content.data.indices.last : nil)
-            : content.data.index(before: viewController.rootView.index)
+            : content.data.index(before: viewController.mainView.index)
         
-        return index.map { index in
-            PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+        return index.flatMap { index in
+            self.viewController(for: index)
         }
     }
     
@@ -187,12 +196,37 @@ extension UIHostingPageViewController {
             return nil
         }
         
-        let index = content.data.index(after: viewController.rootView.index) == content.data.endIndex
+        let index = content.data.index(after: viewController.mainView.index) == content.data.endIndex
             ? (cyclesPages ? content.data.startIndex :  nil)
-            : content.data.index(after: viewController.rootView.index)
+            : content.data.index(after: viewController.mainView.index)
         
-        return index.map { index in
-            PageContentController(rootView: PageContainer(index: index, page: content.content(content.data[index])))
+        return index.flatMap { index in
+            self.viewController(for: index)
+        }
+    }
+}
+
+extension UIHostingPageViewController {
+    struct PageContainer: View {
+        let index: AnyIndex
+        var page: Page
+        
+        var body: some View {
+            page
+        }
+    }
+    
+    class PageContentController: CocoaHostingController<PageContainer> {
+        init(mainView: PageContainer) {
+            super.init(mainView: mainView)
+            
+            _fixSafeAreaInsetsIfNecessary()
+            
+            view.backgroundColor = .clear
+        }
+        
+        @objc required dynamic init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
     }
 }
