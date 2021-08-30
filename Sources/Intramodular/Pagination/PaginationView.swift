@@ -8,6 +8,14 @@ import Swift
 import SwiftUI
 import UIKit
 
+public struct PaginationState {
+    public var activePageTransitionProgress: Double = 0.0
+    
+    public init() {
+        
+    }
+}
+
 /// A view that paginates its children along a given axis.
 public struct PaginationView<Page: View>: View {
     @usableFromInline
@@ -39,6 +47,8 @@ public struct PaginationView<Page: View>: View {
     @inlinable
     @DelayedState public var _progressionController: ProgressionController?
     
+    var paginationState: Binding<PaginationState>?
+        
     @inlinable
     public init(
         content: AnyForEach<Page>,
@@ -88,7 +98,8 @@ public struct PaginationView<Page: View>: View {
                         pageIndicatorAlignment: pageIndicatorAlignment,
                         interPageSpacing: interPageSpacing,
                         cyclesPages: cyclesPages,
-                        initialPageIndex: initialPageIndex
+                        initialPageIndex: initialPageIndex,
+                        paginationState: paginationState
                     ),
                     currentPageIndex: currentPageIndex ?? $_currentPageIndex,
                     progressionController: $_progressionController
@@ -438,6 +449,12 @@ extension PaginationView {
     @inlinable
     public func currentPageIndex(_ currentPageIndex: Binding<Int>) -> Self {
         then({ $0.currentPageIndex = currentPageIndex })
+    }
+}
+
+extension PaginationView {
+    public func paginationState(_ paginationState: Binding<PaginationState>) -> Self {
+        then({ $0.paginationState = paginationState })
     }
 }
 

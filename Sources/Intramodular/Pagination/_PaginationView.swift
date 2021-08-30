@@ -20,6 +20,7 @@ struct _PaginationView<Page: View> {
         let interPageSpacing: CGFloat?
         let cyclesPages: Bool
         let initialPageIndex: Int?
+        let paginationState: Binding<PaginationState>?
     }
     
     let configuration: Configuration
@@ -56,6 +57,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController.view.backgroundColor = UIColor.clear
         #endif
         
+        uiViewController.paginationState = configuration.paginationState
         uiViewController.content = content
         
         uiViewController.dataSource = .some(context.coordinator as! UIPageViewControllerDataSource)
@@ -102,8 +104,11 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     @usableFromInline
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController._isSwiftUIRuntimeUpdateActive = true
+        
         defer {
             uiViewController._isAnimated = true
+            uiViewController._isSwiftUIRuntimeUpdateActive = false
         }
         
         if let _paginationViewProxy = context.environment._paginationViewProxy {
@@ -120,6 +125,12 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController._isAnimated = context.transaction.isAnimated
         uiViewController.content = content
         
+        updateScrollViewConfiguration: do {
+            let scrollViewConfiguration = context.environment._scrollViewConfiguration
+            
+            uiViewController.internalScrollView?.isScrollEnabled = scrollViewConfiguration.isScrollEnabled
+        }
+        
         if let initialPageIndex = configuration.initialPageIndex, !context.coordinator.isInitialPageIndexApplied {
             DispatchQueue.main.async {
                 context.coordinator.isInitialPageIndexApplied = true
@@ -131,17 +142,27 @@ extension _PaginationView: UIViewControllerRepresentable {
         } else {
             var currentPageIndex = self.currentPageIndex
             
-            if let oldContentDataEndIndex = oldContentDataEndIndex {
-                if content.data.endIndex < oldContentDataEndIndex, !(content.data.index(content.data.startIndex, offsetBy: currentPageIndex) < content.data.endIndex) {
-                    currentPageIndex = max(content.data.count - 1, 0)
-                    
-                    DispatchQueue.main.async {
-                        self.currentPageIndex = currentPageIndex
+            clampPageIndexIfNecessary: do {
+                if let oldContentDataEndIndex = oldContentDataEndIndex {
+                    if content.data.endIndex < oldContentDataEndIndex, !(content.data.index(content.data.startIndex, offsetBy: currentPageIndex) < content.data.endIndex) {
+                        currentPageIndex = max(content.data.count - 1, 0)
+                        
+                        DispatchQueue.main.async {
+                            self.currentPageIndex = currentPageIndex
+                        }
                     }
                 }
             }
             
-            uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: currentPageIndex)
+            if !context.coordinator.isTransitioning {
+                DispatchQueue.main.async {
+                    if context.coordinator.didJustCompleteTransition {
+                        context.coordinator.didJustCompleteTransition = false
+                    } else {
+                        uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: currentPageIndex)
+                    }
+                }
+            }
         }
         
         if uiViewController.pageControl?.currentPage != currentPageIndex {
@@ -183,6 +204,8 @@ extension _PaginationView {
     class Coordinator: NSObject {
         var parent: _PaginationView
         var isInitialPageIndexApplied: Bool = false
+        var isTransitioning: Bool = false
+        var didJustCompleteTransition: Bool = false
         
         @usableFromInline
         init(_ parent: _PaginationView) {
@@ -220,6 +243,15 @@ extension _PaginationView {
         }
         
         @usableFromInline
+        @objc(pageViewController:willTransitionToViewControllers:)
+        func pageViewController(
+            _ pageViewController: UIPageViewController,
+            willTransitionTo pendingViewControllers: [UIViewController]
+        ) {
+            isTransitioning = true
+        }
+        
+        @usableFromInline
         @objc(pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:)
         func pageViewController(
             _ pageViewController: UIPageViewController,
@@ -227,19 +259,21 @@ extension _PaginationView {
             previousViewControllers: [UIViewController],
             transitionCompleted completed: Bool
         ) {
-            guard completed else {
-                return
-            }
-            
-            guard let pageViewController = pageViewController as? UIViewControllerType else {
-                assertionFailure()
+            if completed {
+                guard let pageViewController = pageViewController as? UIViewControllerType else {
+                    assertionFailure()
+                    
+                    return
+                }
                 
-                return
+                if let offset = pageViewController.currentPageIndexOffset {
+                    self.parent.currentPageIndex = offset
+                }
+                
+                didJustCompleteTransition = true
             }
-            
-            if let offset = pageViewController.currentPageIndexOffset {
-                self.parent.currentPageIndex = offset
-            }
+                        
+            isTransitioning = false
         }
     }
     
