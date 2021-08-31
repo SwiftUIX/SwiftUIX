@@ -92,7 +92,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if let window = view.window, window.canResizeToFitContent {
+        if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero {
             window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
         }
     }

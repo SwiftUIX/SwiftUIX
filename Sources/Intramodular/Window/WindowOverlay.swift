@@ -128,6 +128,8 @@ extension WindowOverlay {
                 contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
                 
                 contentWindow.makeKeyAndVisible()
+                
+                contentWindow.rootViewController?.view.setNeedsDisplay()
                 #endif
             } else {
                 #if os(macOS)

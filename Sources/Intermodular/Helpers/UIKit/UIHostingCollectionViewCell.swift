@@ -606,7 +606,7 @@ extension UIHostingCollectionViewCell {
                 }
             }
             
-            withoutAnimation(disableAnimation) {
+            _withoutAnimation(disableAnimation) {
                 rootView = .init(base: base)
             }
         }

@@ -23,7 +23,7 @@ extension UIHostingCollectionViewSupplementaryView {
         var indexPath: IndexPath
         var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
         var maximumSize: OptionalDimensions?
-                
+        
         var id: ID {
             .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
         }
@@ -79,7 +79,7 @@ class UIHostingCollectionViewSupplementaryView<
             fatalError()
         }
     }
-
+    
     private var contentHostingController: ContentHostingController?
     
     private weak var parentViewController: ParentViewControllerType?
@@ -129,7 +129,7 @@ class UIHostingCollectionViewSupplementaryView<
         guard let contentHostingController = contentHostingController else {
             return .init(width: 1, height: 1)
         }
-
+        
         return contentHostingController.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
@@ -190,11 +190,11 @@ extension UIHostingCollectionViewSupplementaryView {
         UIView.performWithoutAnimation {
             contentHostingController?.view.isHidden = false
         }
-
+        
         guard configuration != nil else {
             return
         }
-
+        
         if contentHostingController == nil {
             update(disableAnimation: true)
         }
@@ -342,7 +342,7 @@ extension UIHostingCollectionViewSupplementaryView {
                 }
             }
             
-            withoutAnimation(disableAnimation) {
+            _withoutAnimation(disableAnimation) {
                 rootView = .init(base: base)
                 
                 if forced {
