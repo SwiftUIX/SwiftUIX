@@ -116,6 +116,9 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
 // MARK: - API -
 
 extension View {
+    /// Resolve the nearest `UIViewController` or `NSViewController` in the view hierarchy.
+    ///
+    /// This usually tends to be SwiftUI's platform-specific adaptor.
     public func onAppKitOrUIKitViewControllerResolution(
         perform action: @escaping (AppKitOrUIKitViewController) -> ()
     ) -> some View {
