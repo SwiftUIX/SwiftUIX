@@ -8,12 +8,12 @@ import SwiftUI
 
 fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControllerRepresentable {
     class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
-        var onResolution: (AppKitOrUIKitViewController) -> Void = { _ in }
+        var onInsertion: (AppKitOrUIKitViewController) -> Void = { _ in }
         var onAppear: (AppKitOrUIKitViewController) -> Void = { _ in }
         var onDisappear: (AppKitOrUIKitViewController) -> Void = { _ in }
-        var onDeresolution: (AppKitOrUIKitViewController) -> Void = { _ in }
+        var onRemoval: (AppKitOrUIKitViewController) -> Void = { _ in }
         
-        weak var resolvedParent: AppKitOrUIKitViewController?
+        private weak var resolvedParent: AppKitOrUIKitViewController?
         
         private func resolveIfNecessary(withParent parent: AppKitOrUIKitViewController?) {
             guard let parent = parent, resolvedParent == nil else {
@@ -22,7 +22,7 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
             
             resolvedParent = parent
             
-            onResolution(parent)
+            onInsertion(parent)
         }
         
         private func deresolveIfNecessary() {
@@ -30,9 +30,7 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
                 return
             }
             
-            onDeresolution(parent)
-            
-            resolvedParent = nil
+            onRemoval(parent)
         }
         
         #if os(iOS) || os(tvOS)
@@ -55,9 +53,7 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
         override func viewDidDisappear(_ animated: Bool) {
             super.viewDidDisappear(animated)
             
-            if let parent = parent {
-                onDisappear(parent)
-            }
+            resolvedParent.map(onDisappear)
         }
         #elseif os(macOS)
         override func loadView() {
@@ -92,10 +88,10 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
         }
     }
     
-    var onResolution: (AppKitOrUIKitViewController) -> Void
+    var onInsertion: (AppKitOrUIKitViewController) -> Void
     var onAppear: (AppKitOrUIKitViewController) -> Void
     var onDisappear: (AppKitOrUIKitViewController) -> Void
-    var onDeresolution: (AppKitOrUIKitViewController) -> Void
+    var onRemoval: (AppKitOrUIKitViewController) -> Void
     
     func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
         #if os(iOS) || os(tvOS)
@@ -106,10 +102,10 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
     }
     
     func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
-        viewController.onResolution = onResolution
+        viewController.onInsertion = onInsertion
         viewController.onAppear = onAppear
         viewController.onDisappear = onDisappear
-        viewController.onDeresolution = onDeresolution
+        viewController.onRemoval = onRemoval
     }
 }
 
@@ -124,10 +120,10 @@ extension View {
     ) -> some View {
         background(
             AppKitOrUIKitViewControllerResolver(
-                onResolution: action,
+                onInsertion: action,
                 onAppear: { _ in },
                 onDisappear: { _ in },
-                onDeresolution: { _ in }
+                onRemoval: { _ in }
             )
             .allowsHitTesting(false)
             .accessibility(hidden: true)
@@ -139,14 +135,14 @@ extension View {
         perform resolutionAction: @escaping (AppKitOrUIKitViewController) -> (),
         onAppear: @escaping (AppKitOrUIKitViewController) -> () = { _ in },
         onDisappear: @escaping (AppKitOrUIKitViewController) -> () = { _ in },
-        onDeresolution deresolutionAction: @escaping (AppKitOrUIKitViewController) -> () = { _ in }
+        onRemoval deresolutionAction: @escaping (AppKitOrUIKitViewController) -> () = { _ in }
     ) -> some View {
         background(
             AppKitOrUIKitViewControllerResolver(
-                onResolution: resolutionAction,
+                onInsertion: resolutionAction,
                 onAppear: onAppear,
                 onDisappear: onDisappear,
-                onDeresolution: deresolutionAction
+                onRemoval: deresolutionAction
             )
             .allowsHitTesting(false)
             .accessibility(hidden: true)
