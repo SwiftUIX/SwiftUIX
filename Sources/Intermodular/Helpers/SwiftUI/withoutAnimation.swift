@@ -17,11 +17,12 @@ func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     }
 }
 
+/// Returns the result of recomputing the view’s body with animations disabled.
 public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
         return body()
     }
-        
+    
     _areAnimationsDisabledGlobally = true
     
     withAnimation(.none) {
