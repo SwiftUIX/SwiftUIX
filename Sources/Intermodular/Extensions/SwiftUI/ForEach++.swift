@@ -24,7 +24,7 @@ extension ForEach where Content: View {
             content($0.value)
         }
     }
-
+    
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         id: KeyPath<Elements.Element, ID>,
@@ -43,7 +43,7 @@ extension ForEach where Content: View {
             rowContent($0.offset, $0.element)
         }
     }
-
+    
     public init<Elements: MutableCollection & RandomAccessCollection>(
         _ data: Binding<Elements>,
         @ViewBuilder rowContent: @escaping (Binding<Elements.Element>) -> Content
@@ -107,7 +107,48 @@ extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.El
     }
 }
 
-// MARK: - Helpers -
+extension ForEach where Content: View {
+    @_disfavoredOverload
+    public init<_Data: MutableCollection>(
+        _ data: Binding<_Data>,
+        id: KeyPath<_Data.Element, ID>,
+        @ViewBuilder content: @escaping (Binding<_Data.Element>) -> Content
+    ) where Data == LazyMapSequence<LazySequence<_Data.Indices>.Elements, Binding<_Data.Element>> {
+        let collection = data.wrappedValue.indices.lazy.map { index -> Binding<_Data.Element> in
+            let element = data.wrappedValue[index]
+            
+            return Binding(
+                get: { element },
+                set: {
+                    if index < data.wrappedValue.endIndex {
+                        data.wrappedValue[index] = $0
+                    }
+                }
+            )
+        }
+        
+        self.init(collection, id: \._bindingIdentifiableKeyPathAdaptor[keyPath: id]) {
+            content($0)
+        }
+    }
+}
+
+
+// MARK: - Auxiliary Implementation -
+
+extension Binding {
+    fileprivate struct _BindingIdentifiableKeyPathAdaptor {
+        let base: Binding<Value>
+        
+        subscript<ID>(keyPath keyPath: KeyPath<Value, ID>) -> ID {
+            base.wrappedValue[keyPath: keyPath]
+        }
+    }
+    
+    fileprivate var _bindingIdentifiableKeyPathAdaptor: _BindingIdentifiableKeyPathAdaptor {
+        .init(base: self)
+    }
+}
 
 extension RandomAccessCollection {
     public func elements<ID>(

@@ -7,11 +7,16 @@
 import Swift
 import SwiftUI
 
-public class UIHostingTextView<Label: View>: UITextView {
+final class UIHostingTextView<Label: View>: UITextView {
+    var _isSwiftUIRuntimeUpdateActive: Bool = false
+    var _isSwiftUIRuntimeDismantled: Bool = false
+    
+    var configuration: TextView<Label>._Configuration
+
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
     
-    public override var attributedText: NSAttributedString! {
+    override var attributedText: NSAttributedString! {
         didSet {
             if preferredMaximumDimensions.height != nil {
                 if isScrollEnabled {
@@ -23,7 +28,21 @@ public class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
-    public var preferredMaximumDimensions: OptionalDimensions = nil {
+    var numberOfLinesDisplayed: Int {
+        let numberOfGlyphs = layoutManager.numberOfGlyphs
+        var index = 0, numberOfLines = 0
+        var lineRange = NSRange(location: NSNotFound, length: 0)
+        
+        while index < numberOfGlyphs {
+            layoutManager.lineFragmentRect(forGlyphAt: index, effectiveRange: &lineRange)
+            index = NSMaxRange(lineRange)
+            numberOfLines += 1
+        }
+        
+        return numberOfLines
+    }
+    
+    var preferredMaximumDimensions: OptionalDimensions = nil {
         didSet {
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
                 ? AppKitOrUIKitLayoutPriority.defaultLow
@@ -56,26 +75,54 @@ public class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
-    override public var intrinsicContentSize: CGSize {
+    override var intrinsicContentSize: CGSize {
         computeIntrinsicContentSize() ?? super.intrinsicContentSize
     }
     
-    public init() {
+    required init(configuration: TextView<Label>._Configuration) {
+        self.configuration = configuration
+        
         super.init(frame: .zero, textContainer: nil)
     }
     
-    public required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
     }
     
-    override public func invalidateIntrinsicContentSize() {
+    override func invalidateIntrinsicContentSize() {
         _cachedIntrinsicContentSize = nil
         
         super.invalidateIntrinsicContentSize()
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        defer {
+            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled {
+                if configuration.isFocused?.wrappedValue != isFirstResponder {
+                    configuration.isFocused?.wrappedValue = isFirstResponder
+                }
+            }
+        }
+        
+        return super.becomeFirstResponder()
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        defer {
+            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled  {
+                if configuration.isFocused?.wrappedValue != isFirstResponder {
+                    configuration.isFocused?.wrappedValue = isFirstResponder
+                }
+            }
+        }
+        
+        return super.resignFirstResponder()
     }
     
     private func computeIntrinsicContentSize() -> CGSize? {

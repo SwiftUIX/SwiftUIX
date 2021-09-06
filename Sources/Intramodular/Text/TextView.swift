@@ -16,7 +16,8 @@ public struct TextView<Label: View>: View {
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
-        
+        var isFocused: Binding<Bool>? = nil
+
         var isEditable: Bool = true
         var isSelectable: Bool = true
         
@@ -100,7 +101,13 @@ extension _TextView: UIViewRepresentable {
     typealias UIViewType = UITextView
     
     func makeUIView(context: Context) -> UIViewType {
-        let uiView = customAppKitOrUIKitClass.init()
+        let uiView: UIViewType
+        
+        if let customAppKitOrUIKitClass = customAppKitOrUIKitClass as? UIHostingTextView<Label>.Type {
+            uiView = customAppKitOrUIKitClass.init(configuration: configuration)
+        } else {
+            uiView = customAppKitOrUIKitClass.init()
+        }
         
         uiView.delegate = context.coordinator
         uiView.backgroundColor = nil
@@ -115,12 +122,18 @@ extension _TextView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIViewType, context: Context) {
-        if context.transaction.isAnimated {
-            _updateUIView(uiView, context: context)
-        } else {
-            UIView.performWithoutAnimation {
-                _updateUIView(uiView, context: context)
+        _withoutAnimation_AppKitOrUIKit(context.transaction.isAnimated) {
+            if let uiView = uiView as? UIHostingTextView<Label> {
+                uiView._isSwiftUIRuntimeUpdateActive = true
+                
+                defer {
+                    uiView._isSwiftUIRuntimeUpdateActive = false
+                }
+                
+                uiView.configuration = configuration
             }
+
+            _updateUIView(uiView, context: context)
         }
     }
     
@@ -219,7 +232,13 @@ extension _TextView: UIViewRepresentable {
         
         updateResponderChain: do {
             DispatchQueue.main.async {
-                if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
+                if let isFocused = configuration.isFocused, uiView.window != nil {
+                    if isFocused.wrappedValue && !uiView.isFirstResponder {
+                        uiView.becomeFirstResponder()
+                    } else if !isFocused.wrappedValue && uiView.isFirstResponder {
+                        uiView.resignFirstResponder()
+                    }
+                } else if let isFirstResponder = configuration.isFirstResponder, uiView.window != nil {
                     if isFirstResponder && !uiView.isFirstResponder, context.environment.isEnabled {
                         uiView.becomeFirstResponder()
                     } else if !isFirstResponder && uiView.isFirstResponder {
@@ -227,6 +246,12 @@ extension _TextView: UIViewRepresentable {
                     }
                 }
             }
+        }
+    }
+    
+    static func dismantleUIView(_ uiView: UITextView, coordinator: Coordinator) {
+        if let uiView = uiView as? UIHostingTextView<Label> {
+            uiView._isSwiftUIRuntimeDismantled = true
         }
     }
     
@@ -262,6 +287,10 @@ extension _TextView: UIViewRepresentable {
                 if text == "\n" {
                     configuration.onCommit()
                     
+                    #if os(iOS)
+                    Keyboard.dismiss()
+                    #endif
+
                     return false
                 }
             }
@@ -452,6 +481,10 @@ extension TextView {
     
     public func isFirstResponder(_ isFirstResponder: Bool) -> Self {
         then({ $0.configuration.isFirstResponder = isFirstResponder })
+    }
+    
+    public func focused(_ isFocused: Binding<Bool>) -> Self {
+        then({ $0.configuration.isFocused = isFocused })
     }
 }
 
