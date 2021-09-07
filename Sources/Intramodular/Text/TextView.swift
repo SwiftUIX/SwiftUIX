@@ -13,6 +13,7 @@ public struct TextView<Label: View>: View {
         var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
+        var onDeleteBackward: () -> Void = { }
         
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
@@ -472,6 +473,12 @@ extension TextView {
         then({ $0.customAppKitOrUIKitClass = type })
     }
     #endif
+}
+
+extension TextView {
+    public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
+        then({ $0.configuration.onDeleteBackward = action })
+    }
 }
 
 extension TextView {

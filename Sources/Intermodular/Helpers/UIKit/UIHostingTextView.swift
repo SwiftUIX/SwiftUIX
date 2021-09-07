@@ -12,7 +12,7 @@ final class UIHostingTextView<Label: View>: UITextView {
     var _isSwiftUIRuntimeDismantled: Bool = false
     
     var configuration: TextView<Label>._Configuration
-
+    
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
     
@@ -99,32 +99,6 @@ final class UIHostingTextView<Label: View>: UITextView {
         super.invalidateIntrinsicContentSize()
     }
     
-    @discardableResult
-    override func becomeFirstResponder() -> Bool {
-        defer {
-            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled {
-                if configuration.isFocused?.wrappedValue != isFirstResponder {
-                    configuration.isFocused?.wrappedValue = isFirstResponder
-                }
-            }
-        }
-        
-        return super.becomeFirstResponder()
-    }
-    
-    @discardableResult
-    override func resignFirstResponder() -> Bool {
-        defer {
-            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled  {
-                if configuration.isFocused?.wrappedValue != isFirstResponder {
-                    configuration.isFocused?.wrappedValue = isFirstResponder
-                }
-            }
-        }
-        
-        return super.resignFirstResponder()
-    }
-    
     private func computeIntrinsicContentSize() -> CGSize? {
         if let _cachedIntrinsicContentSize = _cachedIntrinsicContentSize {
             return _cachedIntrinsicContentSize
@@ -174,6 +148,38 @@ final class UIHostingTextView<Label: View>: UITextView {
                 font = font!.withSize(font!.pointSize + 1)
             }
         }
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        defer {
+            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled {
+                if configuration.isFocused?.wrappedValue != isFirstResponder {
+                    configuration.isFocused?.wrappedValue = isFirstResponder
+                }
+            }
+        }
+        
+        return super.becomeFirstResponder()
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        defer {
+            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled  {
+                if configuration.isFocused?.wrappedValue != isFirstResponder {
+                    configuration.isFocused?.wrappedValue = isFirstResponder
+                }
+            }
+        }
+        
+        return super.resignFirstResponder()
+    }
+    
+    override func deleteBackward() {
+        super.deleteBackward()
+        
+        configuration.onDeleteBackward()
     }
 }
 
