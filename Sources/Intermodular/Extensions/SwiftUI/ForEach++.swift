@@ -118,7 +118,13 @@ extension ForEach where Content: View {
             let element = data.wrappedValue[index]
             
             return Binding(
-                get: { element },
+                get: { () -> _Data.Element in
+                    if index < data.wrappedValue.endIndex {
+                        return data.wrappedValue[index]
+                    } else {
+                        return element
+                    }
+                },
                 set: {
                     if index < data.wrappedValue.endIndex {
                         data.wrappedValue[index] = $0
