@@ -20,6 +20,13 @@ extension Text {
 }
 
 extension Text {
+    /// Applies a semi-bold font weight to the text.
+    public func semibold() -> Text {
+        fontWeight(.semibold)
+    }
+}
+
+extension Text {
     /// Applies a linear foreground gradient to the text.
     public func foregroundLinearGradient(
         _ gradient: Gradient,
