@@ -12,7 +12,7 @@ public struct WebView: View {
     private let configuration: _WebView.Configuration
     private var placeholder: AnyView?
     
-    @StateObject private var coordinator = _WebView.Coordinator()
+    @PersistentObject private var coordinator = _WebView.Coordinator()
     
     public var body: some View {
         _WebView(configuration: configuration, coordinator: coordinator)
