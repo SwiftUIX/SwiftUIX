@@ -24,6 +24,7 @@ public struct PresentationView<Content: View>: View {
             .onAppKitOrUIKitViewControllerResolution {
                 self.presenter = $0
             }
+        #else
         content
         #endif
     }
