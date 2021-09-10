@@ -8,7 +8,13 @@ import Swift
 import SwiftUI
 import UIKit
 
-public struct PaginationState {
+public struct PaginationState: Hashable {
+    public enum TransitionDirection: Hashable {
+        case backward
+        case forward
+    }
+    
+    public var activePageTransitionDirection: TransitionDirection?
     public var activePageTransitionProgress: Double = 0.0
     
     public init() {

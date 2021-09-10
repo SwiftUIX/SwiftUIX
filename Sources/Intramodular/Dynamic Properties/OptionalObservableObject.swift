@@ -45,6 +45,12 @@ fileprivate final class OptionalObservableObject<ObjectType: ObservableObject>: 
     
     var base: ObjectType? {
         didSet {
+            if let oldValue = oldValue, let base = base {
+                if oldValue === base {
+                    return
+                }
+            }
+            
             subscribe()
         }
     }

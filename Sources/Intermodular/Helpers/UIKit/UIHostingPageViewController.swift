@@ -9,10 +9,16 @@ import SwiftUI
 import UIKit
 
 protocol _opaque_UIHostingPageViewController: NSObject {
+    var _pageUpdateDriver: _PageUpdateDriver { get }
+    var internalPaginationState: PaginationState { get }
+}
+
+class _PageUpdateDriver: ObservableObject {
     
 }
 
 class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIHostingPageViewController, UIScrollViewDelegate {
+    var _pageUpdateDriver = _PageUpdateDriver()
     var internalScrollView: UIScrollView?
     var cachedChildren: [Int: PageContentController] = [:]
     
@@ -136,9 +142,19 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
             return
         }
         
-        let activePageTransitionProgress = abs(scrollView.contentOffset.x - view.frame.size.width) / view.frame.size.width
+        let activePageTransitionProgress = (scrollView.contentOffset.x - view.frame.size.width) / view.frame.size.width
+    
+        if paginationState != nil {
+            _pageUpdateDriver.objectWillChange.send()
+        }
         
-        internalPaginationState.activePageTransitionProgress = .init(activePageTransitionProgress)
+        if activePageTransitionProgress == 0 {
+            internalPaginationState.activePageTransitionDirection = nil
+        } else {
+            internalPaginationState.activePageTransitionDirection = activePageTransitionProgress < 0 ? .backward : .forward
+        }
+        
+        internalPaginationState.activePageTransitionProgress = abs(Double(activePageTransitionProgress))
     }
 }
 
@@ -158,7 +174,13 @@ extension UIHostingPageViewController {
             return cachedResult
         }
         
-        let result = PageContentController(mainView: PageContainer(index: index, page: content.content(content.data[index])))
+        let result = PageContentController(
+            mainView: PageContainer(
+                index: index,
+                page: content.content(content.data[index]),
+                _updateDriver: _pageUpdateDriver
+            )
+        )
         
         cachedChildren[indexOffset] = result
         
@@ -210,7 +232,9 @@ extension UIHostingPageViewController {
     struct PageContainer: View {
         let index: AnyIndex
         var page: Page
-        
+
+        @ObservedObject var _updateDriver: _PageUpdateDriver
+
         var body: some View {
             page
         }
