@@ -30,7 +30,9 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                     storedValue = defaultValue
                 } catch {
                     if _isStrict {
-                        assertionFailure(error.localizedDescription)
+                        assertionFailure(String(describing: error))
+                    } else {
+                        print(String(describing: error))
                     }
                 }
             }
