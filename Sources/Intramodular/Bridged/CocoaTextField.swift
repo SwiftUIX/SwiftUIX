@@ -164,12 +164,14 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         
         uiView.delegate = context.coordinator
         
-        if let isFirstResponder = configuration.isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
+        if context.environment.isEnabled {
             DispatchQueue.main.async {
-                uiView.becomeFirstResponder()
+                if (configuration.isInitialFirstResponder ?? configuration.isFocused?.wrappedValue) ?? false {
+                    uiView.becomeFirstResponder()
+                }
             }
         }
-        
+
         return uiView
     }
     
@@ -279,9 +281,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator) {
         if let isFocused = coordinator.configuration.isFocused {
             if isFocused.wrappedValue {
-                DispatchQueue.main.async {
-                    isFocused.wrappedValue = false
-                }
+                isFocused.wrappedValue = false
             }
         }
     }
@@ -534,20 +534,24 @@ private final class _UITextField: UITextField {
     
     @discardableResult
     override func becomeFirstResponder() -> Bool {
-        let result = super.becomeFirstResponder()
+        defer {
+            if isFirstResponderBinding?.wrappedValue != isFirstResponder {
+                isFirstResponderBinding?.wrappedValue = isFirstResponder
+            }
+        }
 
-        isFirstResponderBinding?.wrappedValue = result
-        
-        return result
+        return super.becomeFirstResponder()
     }
     
     @discardableResult
     override func resignFirstResponder() -> Bool {
-        let result = super.resignFirstResponder()
+        defer {
+            if isFirstResponderBinding?.wrappedValue != isFirstResponder {
+                isFirstResponderBinding?.wrappedValue = isFirstResponder
+            }
+        }
         
-        isFirstResponderBinding?.wrappedValue = !result
-        
-        return result
+       return super.resignFirstResponder()
     }
     
     override func deleteBackward() {

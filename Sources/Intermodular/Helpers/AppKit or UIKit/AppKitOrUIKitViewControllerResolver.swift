@@ -69,11 +69,13 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
         }
         
         override func viewDidAppear() {
+            super.viewDidAppear()
+            
             resolvedParent.map(onAppear)
         }
         
         override func viewWillDisappear() {
-            super.viewWillAppear()
+            super.viewWillDisappear()
             
             resolvedParent.map(onDisappear)
             
@@ -192,6 +194,7 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     @State var _appKitOrUIKitViewControllerBox = ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
     @State var presentationCoordinatorBox =
         ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
+    #endif
     
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -213,9 +216,4 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
         return content
         #endif
     }
-    #else
-    func body(content: Content) -> some View {
-        content
-    }
-    #endif
 }

@@ -18,7 +18,7 @@ public struct TextView<Label: View>: View {
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
         var isFocused: Binding<Bool>? = nil
-
+        
         var isEditable: Bool = true
         var isSelectable: Bool = true
         
@@ -113,15 +113,17 @@ extension _TextView: UIViewRepresentable {
         uiView.delegate = context.coordinator
         uiView.backgroundColor = nil
         
-        if let isFirstResponder = configuration.isInitialFirstResponder, isFirstResponder, context.environment.isEnabled {
+        if context.environment.isEnabled {
             DispatchQueue.main.async {
-                uiView.becomeFirstResponder()
+                if (configuration.isInitialFirstResponder ?? configuration.isFocused?.wrappedValue) ?? false {
+                    uiView.becomeFirstResponder()
+                }
             }
         }
         
         return uiView
     }
-
+    
     func updateUIView(_ uiView: UIViewType, context: Context) {
         _withoutAnimation_AppKitOrUIKit(context.transaction.isAnimated) {
             if let uiView = uiView as? UIHostingTextView<Label> {
@@ -133,7 +135,7 @@ extension _TextView: UIViewRepresentable {
                 
                 uiView.configuration = configuration
             }
-
+            
             _updateUIView(uiView, context: context)
         }
     }
@@ -291,7 +293,7 @@ extension _TextView: UIViewRepresentable {
                     #if os(iOS)
                     Keyboard.dismiss()
                     #endif
-
+                    
                     return false
                 }
             }
@@ -508,7 +510,7 @@ extension TextView {
     public func linkForegroundColor(_ linkForegroundColor: Color?) -> Self {
         then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toUIColor() })
     }
-
+    
     #endif
     
     public func font(_ font: AppKitOrUIKitFont) -> Self {
