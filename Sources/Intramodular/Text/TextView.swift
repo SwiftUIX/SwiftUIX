@@ -291,7 +291,7 @@ extension _TextView: UIViewRepresentable {
                     configuration.onCommit()
                     
                     #if os(iOS)
-                    Keyboard.dismiss()
+                    textView.resignFirstResponder()
                     #endif
                     
                     return false

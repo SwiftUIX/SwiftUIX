@@ -130,9 +130,9 @@ extension EnvironmentValues {
     @usableFromInline
     var pathControlStyle: PathControlStyle {
         get {
-            self[DefaultEnvironmentKey<PathControlStyle>] ?? StandardPathControlStyle()
+            self[DefaultEnvironmentKey<PathControlStyle>.self] ?? StandardPathControlStyle()
         } set {
-            self[DefaultEnvironmentKey<PathControlStyle>] = newValue
+            self[DefaultEnvironmentKey<PathControlStyle>.self] = newValue
         }
     }
 }
