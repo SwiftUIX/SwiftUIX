@@ -63,6 +63,7 @@ public struct TextView<Label: View>: View {
     public var body: some View {
         return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
             label
+                .font(configuration.font.map(Font.init))
                 .visible(isEmpty)
                 .animation(.none)
                 .padding(configuration.textContainerInset.edgeInsets)
