@@ -8,40 +8,44 @@ import SwiftUI
 
 /// A view that eventually produces its content.
 public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View>: View {
-    public enum SubscriptionPolicy {
-        case immediate
-        case delayed
-    }
+    public typealias SubscriptionPolicy = PublisherObserver<P, DispatchQueue>.SubscriptionPolicy
     
-    @ObservedObject private var observer: PublisherObserver<P, DispatchQueue>
+    @PersistentObject private var observer: PublisherObserver<P, DispatchQueue>
     
-    private let policy: SubscriptionPolicy
+    private let subscriptionPolicy: SubscriptionPolicy
     private let placeholder: Placeholder
     private let makeContent: (Result<P.Output, P.Failure>) -> Content
     
     public init(
         publisher: P,
-        policy: SubscriptionPolicy = .immediate,
+        policy subscriptionPolicy: SubscriptionPolicy = .immediate,
         placeholder: Placeholder,
         @ViewBuilder content: @escaping (Result<P.Output, P.Failure>) -> Content
     ) {
-        self.observer = .init(publisher: publisher, scheduler: DispatchQueue.main)
-        self.policy = policy
+        self._observer = .init(
+            wrappedValue: .init(
+                publisher: publisher,
+                scheduler: DispatchQueue.main,
+                subscriptionPolicy: subscriptionPolicy
+            )
+        )
+        self.subscriptionPolicy = subscriptionPolicy
         self.placeholder = placeholder
         self.makeContent = content
-        
-        if self.policy == .immediate {
-            self.observer.attach()
-        }
     }
     
     public var body: some View {
-        Group {
-            observer.lastValue.map(makeContent) ?? placeholder
-        }
-        .onAppear {
-            if self.policy == .delayed {
-                self.observer.attach()
+        ZStack {
+            ZeroSizeView().onAppear {
+                if subscriptionPolicy == .delayed {
+                    observer.attach()
+                }
+            }
+            
+            if let lastValue = observer.lastValue {
+                makeContent(lastValue)
+            } else {
+                placeholder
             }
         }
     }

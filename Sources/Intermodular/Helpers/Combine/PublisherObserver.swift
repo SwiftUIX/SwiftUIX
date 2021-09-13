@@ -7,17 +7,26 @@ import Swift
 import SwiftUI
 
 public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
+    public enum SubscriptionPolicy {
+        case immediate
+        case delayed
+    }
+    
     public typealias Input = P.Output
     
     private let publisher: P
     private let scheduler: S
     private var subscription: Subscription?
     
-    @Published(initialValue: nil) public var lastValue: Result<P.Output, P.Failure>?
+    @Published public var lastValue: Result<P.Output, P.Failure>?
     
-    public init(publisher: P, scheduler: S) {
+    public init(publisher: P, scheduler: S, subscriptionPolicy: SubscriptionPolicy) {
         self.publisher = publisher
         self.scheduler = scheduler
+        
+        if subscriptionPolicy == .immediate {
+            attach()
+        }
     }
     
     public func receive(subscription: Subscription) {
@@ -35,7 +44,7 @@ public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObje
     public func receive(completion: Subscribers.Completion<P.Failure>) {
         switch completion {
             case .finished:
-                lastValue = nil
+                break
             case .failure(let failure):
                 lastValue = .failure(failure)
         }
@@ -43,6 +52,10 @@ public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObje
     
     /// Attach the receiver to the target publisher.
     public func attach() {
+        guard subscription == nil else {
+            return
+        }
+        
         publisher
             .subscribe(on: scheduler)
             .receive(subscriber: self)
