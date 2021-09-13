@@ -21,9 +21,9 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
     
     public init(
         publisher: P,
-        policy: SubscriptionPolicy,
+        policy: SubscriptionPolicy = .immediate,
         placeholder: Placeholder,
-        content: @escaping (Result<P.Output, P.Failure>) -> Content
+        @ViewBuilder content: @escaping (Result<P.Output, P.Failure>) -> Content
     ) {
         self.observer = .init(publisher: publisher, scheduler: DispatchQueue.main)
         self.policy = policy
@@ -44,5 +44,38 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
                 self.observer.attach()
             }
         }
+    }
+}
+
+extension PublisherOutputView where P.Failure == Never {
+    public init(
+        publisher: P,
+        policy: SubscriptionPolicy = .immediate,
+        placeholder: Placeholder,
+        @ViewBuilder content: @escaping (P.Output) -> Content
+    ) {
+        self.init(
+            publisher: publisher,
+            policy: policy,
+            placeholder: placeholder
+        ) { result in
+            switch result {
+                case .success(let value):
+                    content(value)
+            }
+        }
+    }
+    
+    public init(
+        publisher: P,
+        policy: SubscriptionPolicy = .immediate,
+        @ViewBuilder content: @escaping (P.Output) -> Content
+    ) where Placeholder == EmptyView {
+        self.init(
+            publisher: publisher,
+            policy: policy,
+            placeholder: EmptyView(),
+            content: content
+        )
     }
 }
