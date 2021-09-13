@@ -24,6 +24,10 @@ public final class Keyboard: ObservableObject {
         state.height.map({ $0 != 0 }) ?? false
     }
     
+    public var isActive: Bool {
+        isShowing || isShown
+    }
+    
     private var keyboardWillChangeFrameSubscription: AnyCancellable?
     private var keyboardDidChangeFrameSubscription: AnyCancellable?
     private var keyboardWillShowSubscription: AnyCancellable?
