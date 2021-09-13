@@ -65,7 +65,7 @@ extension TitlebarItem {
     
     #if os(macOS) || targetEnvironment(macCatalyst)
     
-    func toNSToolbarItem() -> NSToolbarItem {        
+    func toNSToolbarItem() -> NSToolbarItem {
         var result = NSToolbarItem(itemIdentifier: .init(rawValue: id))
         let target = NSToolbarItem._ActionTarget(action: action)
         
