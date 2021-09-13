@@ -33,28 +33,28 @@ public struct TitlebarItem {
         case none
     }
     
-    private(set) var itemIdentifier: String
+    private(set) var id: String
     private(set) var content: Content
-    private(set) var action: () -> () = { }
     private(set) var label: String?
     private(set) var title: String?
+    private(set) var action: () -> () = { }
     
     private(set) var isBordered: Bool = false
     
     public init(
-        itemIdentifier: String,
+        id: String,
         content: Content = .none
     ) {
-        self.itemIdentifier = itemIdentifier
+        self.id = id
         self.content = content
     }
     
     #if os(macOS)
     public init<Content: View>(
-        itemIdentifier: String,
+        id: String,
         @ViewBuilder content: () -> Content
     ) {
-        self.itemIdentifier = itemIdentifier
+        self.id = id
         self.content = .view(content().eraseToAnyView())
     }
     #endif
@@ -65,8 +65,8 @@ extension TitlebarItem {
     
     #if os(macOS) || targetEnvironment(macCatalyst)
     
-    func toNSToolbarItem() -> NSToolbarItem {
-        var result = NSToolbarItem(itemIdentifier: .init(rawValue: itemIdentifier))
+    func toNSToolbarItem() -> NSToolbarItem {        
+        var result = NSToolbarItem(itemIdentifier: .init(rawValue: id))
         let target = NSToolbarItem._ActionTarget(action: action)
         
         switch content {
@@ -84,7 +84,7 @@ extension TitlebarItem {
                 result.image = AppKitOrUIKitImage(systemName: name.rawValue)
             case let .systemItem(item): do {
                 result = NSToolbarItem(
-                    itemIdentifier: .init(rawValue: itemIdentifier),
+                    itemIdentifier: .init(rawValue: id),
                     barButtonItem: UIBarButtonItem(
                         barButtonSystemItem: item,
                         target: target,
@@ -122,7 +122,7 @@ extension TitlebarItem {
 
 extension TitlebarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.itemIdentifier == rhs.itemIdentifier
+        return lhs.id == rhs.id
     }
 }
 
@@ -174,7 +174,11 @@ extension View {
     public func titlebar(
         @ArrayBuilder<TitlebarItem> items: () -> [TitlebarItem]
     ) -> some View {
-        preference(key: TitlebarConfigurationViewItemsPreferenceKey.self, value: items())
+        background {
+            TitlebarConfigurationView {
+                ZeroSizeView().preference(key: TitlebarConfigurationViewItemsPreferenceKey.self, value: items())
+            }
+        }
     }
 }
 
@@ -193,7 +197,6 @@ public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
 }
 
 #if os(macOS) || targetEnvironment(macCatalyst)
-
 extension NSToolbarItem {
     class _ActionTarget: NSObject {
         private let action: () -> ()
@@ -207,7 +210,6 @@ extension NSToolbarItem {
         }
     }
 }
-
 #endif
 
 #endif

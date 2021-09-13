@@ -152,9 +152,9 @@ extension View {
     }
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) ||  os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 public func withAppKitOrUIKitViewController<Content: View>(
-    _ content: @escaping (AppKitOrUIKitViewController?) -> Content
+    @ViewBuilder _ content: @escaping (AppKitOrUIKitViewController?) -> Content
 ) -> some View {
     withInlineState(initialValue: Optional<AppKitOrUIKitViewController>.none) { viewController in
         content(viewController.wrappedValue)
