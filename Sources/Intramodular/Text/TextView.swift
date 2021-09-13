@@ -27,6 +27,7 @@ public struct TextView<Label: View>: View {
         #endif
         var font: AppKitOrUIKitFont?
         var textColor: AppKitOrUIKitColor?
+        var kerning: CGFloat?
         var linkForegroundColor: AppKitOrUIKitColor?
         var textContainerInset: AppKitOrUIKitInsets = .zero
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -38,6 +39,10 @@ public struct TextView<Label: View>: View {
         var keyboardType: UIKeyboardType = .default
         var returnKeyType: UIReturnKeyType?
         #endif
+        
+        var requiresAttributedText: Bool {
+            kerning != nil
+        }
     }
     
     @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
@@ -191,7 +196,12 @@ extension _TextView: UIViewRepresentable {
             uiView.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
             uiView.textContainerInset = configuration.textContainerInset
             
-            if context.environment.requiresAttributedText || attributedText != nil {
+            let requiresAttributedText = false
+                || context.environment.requiresAttributedText
+                || configuration.requiresAttributedText
+                || attributedText != nil
+            
+            if requiresAttributedText {
                 let paragraphStyle = NSMutableParagraphStyle()
                 
                 paragraphStyle.lineBreakMode = context.environment.lineBreakMode
@@ -202,12 +212,23 @@ extension _TextView: UIViewRepresentable {
                 }
                 
                 if let text = text {
+                    var attributes: [NSAttributedString.Key: Any] = [
+                        NSAttributedString.Key.paragraphStyle: paragraphStyle,
+                        NSAttributedString.Key.font: font
+                    ]
+                    
+                    if let kerning = configuration.kerning {
+                        attributes[.kern] = kerning
+                    }
+                    
+                    if let textColor = configuration.textColor {
+                        attributes[.foregroundColor] = textColor
+                    }
+                    
                     uiView.attributedText = NSAttributedString(
                         string: text.wrappedValue,
-                        attributes: [
-                            NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                            NSAttributedString.Key.font: font
-                        ]
+                        attributes: attributes
+                        
                     )
                 } else if let attributedText = attributedText {
                     if uiView.attributedText != attributedText.wrappedValue {
@@ -520,6 +541,10 @@ extension TextView {
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
+    }
+    
+    public func kerning(_ kerning: CGFloat) -> Self {
+        then({ $0.configuration.kerning = kerning })
     }
     
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
