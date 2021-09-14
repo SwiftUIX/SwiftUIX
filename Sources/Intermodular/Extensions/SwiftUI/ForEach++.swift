@@ -112,7 +112,8 @@ extension ForEach where Content: View {
     public init<_Data: MutableCollection>(
         _ data: Binding<_Data>,
         id: KeyPath<_Data.Element, ID>,
-        @ViewBuilder content: @escaping (Binding<_Data.Element>) -> Content
+        @ViewBuilder content: @escaping (Binding<_Data.Element>) -> Content,
+        _: () = ()
     ) where Data == LazyMapSequence<LazySequence<_Data.Indices>.Elements, Binding<_Data.Element>> {
         let collection = data.wrappedValue.indices.lazy.map { index -> Binding<_Data.Element> in
             let element = data.wrappedValue[index]
