@@ -33,7 +33,7 @@ public struct HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, H
     public var description: String {
         .init(describing: value)
     }
-
+    
     @inlinable
     public init(_ value: Value) {
         self.value = value
@@ -51,7 +51,7 @@ public struct KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringCon
     public var id: ID {
         value[keyPath: keyPath]
     }
-
+    
     public init(value: Value, keyPath: KeyPath<Value, ID>) {
         self.value = value
         self.keyPath = keyPath
