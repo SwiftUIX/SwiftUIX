@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension List {
-    #if swift(>=5.5)
+    #if swift(>=5.5) && !os(macOS)
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
