@@ -104,6 +104,14 @@ extension _PaginationView: UIViewControllerRepresentable {
     
     @usableFromInline
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        var shouldUpdateContent = true
+        
+        defer {
+            if shouldUpdateContent {
+                uiViewController.content = content
+            }
+        }
+        
         uiViewController._isSwiftUIRuntimeUpdateActive = true
         
         defer {
@@ -123,7 +131,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         let oldContentDataEndIndex = uiViewController.content?.data.endIndex
         
         uiViewController._isAnimated = context.transaction.isAnimated
-        uiViewController.content = content
+
         
         updateScrollViewConfiguration: do {
             let scrollViewConfiguration = context.environment._scrollViewConfiguration
@@ -135,7 +143,9 @@ extension _PaginationView: UIViewControllerRepresentable {
             DispatchQueue.main.async {
                 context.coordinator.isInitialPageIndexApplied = true
                 
-                currentPageIndex = initialPageIndex
+                if currentPageIndex != initialPageIndex {
+                    currentPageIndex = initialPageIndex
+                }
             }
             
             uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: initialPageIndex)
@@ -154,13 +164,19 @@ extension _PaginationView: UIViewControllerRepresentable {
                 }
             }
             
+            let newCurrentPageIndex = content.data.index(content.data.startIndex, offsetBy: currentPageIndex)
+            
+            if uiViewController.currentPageIndex != newCurrentPageIndex, uiViewController.content?.count == content.count {
+                shouldUpdateContent = false
+            }
+            
             if !context.coordinator.isTransitioning {
-                DispatchQueue.main.async {
-                    if context.coordinator.didJustCompleteTransition {
+                if context.coordinator.didJustCompleteTransition {
+                    DispatchQueue.main.async {
                         context.coordinator.didJustCompleteTransition = false
-                    } else {
-                        uiViewController.currentPageIndex = content.data.index(content.data.startIndex, offsetBy: currentPageIndex)
                     }
+                } else {
+                    uiViewController.currentPageIndex = newCurrentPageIndex
                 }
             }
         }
