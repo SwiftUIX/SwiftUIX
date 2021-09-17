@@ -39,7 +39,9 @@ func _withoutAnimation_AppKitOrUIKit(_ flag: Bool = true, _ body: () -> ()) {
     
     #if os(iOS)
     UIView.performWithoutAnimation {
-        body()
+        withAnimation(.none) {
+            body()
+        }
     }
     #else
     body()
