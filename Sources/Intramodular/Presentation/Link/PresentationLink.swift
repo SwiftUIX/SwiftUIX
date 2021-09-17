@@ -51,8 +51,18 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     private var presentation: AnyModalPresentation {
+        func reset() {
+            self.id = UUID()
+            self.isPresented.wrappedValue = false
+        }
+        
         let content = AnyPresentationView(
-            _destination.managedObjectContext(managedObjectContext)
+            _destination
+                .managedObjectContext(managedObjectContext)
+                .onAppKitOrUIKitViewControllerResolution(
+                    onDisappear: { _ in reset() },
+                    onRemoval: { _ in reset() }
+                )
         )
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
@@ -62,10 +72,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             id: id,
             content: content,
             onDismiss: _onDismiss,
-            reset: {
-                self.id = UUID()
-                self.isPresented.wrappedValue = false
-            }
+            reset: reset
         )
     }
     
@@ -176,8 +183,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                         key: AnyModalPresentation.PreferenceKey.self,
                         value: .init(
                             presentationID: id,
-                            presentation: isPresented.wrappedValue ?
-                                presentation
+                            presentation: isPresented.wrappedValue
+                                ? presentation
                                 : nil
                         )
                     )

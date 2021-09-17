@@ -134,7 +134,7 @@ extension View {
     
     @_disfavoredOverload
     public func onAppKitOrUIKitViewControllerResolution(
-        perform resolutionAction: @escaping (AppKitOrUIKitViewController) -> (),
+        perform resolutionAction: @escaping (AppKitOrUIKitViewController) -> () = { _ in },
         onAppear: @escaping (AppKitOrUIKitViewController) -> () = { _ in },
         onDisappear: @escaping (AppKitOrUIKitViewController) -> () = { _ in },
         onRemoval deresolutionAction: @escaping (AppKitOrUIKitViewController) -> () = { _ in }
