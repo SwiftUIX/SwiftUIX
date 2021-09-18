@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 /// A proxy for access to the size and coordinate space (for anchor resolution) of the content view.
-public struct IntrinsicGeometryProxy {
+public struct IntrinsicGeometryProxy: Equatable {
     private let localFrame: CGRect?
     private let globalFrame: CGRect?
     
@@ -30,7 +30,8 @@ public struct IntrinsicGeometryProxy {
             case .global:
                 return globalFrame ?? .init()
             case .named:
-                assertionFailure("CoordinateSpace.named(_:) is currently unsupported")
+                assertionFailure("CoordinateSpace.named(_:) is currently unsupported in IntrinsicGeometryProxy.")
+                
                 return .init()
             default:
                 return .init()
@@ -53,7 +54,13 @@ public struct IntrinsicGeometryReader<Content: View>: View {
         content(proxy).background(
             GeometryReader { geometry in
                 PerformAction {
-                    self.proxy = .init(geometry)
+                    DispatchQueue.asyncOnMainIfNecessary {
+                        let proxy = IntrinsicGeometryProxy(geometry)
+                        
+                        if self.proxy != proxy {
+                            self.proxy = proxy
+                        }
+                    }
                 }
             }
         )
