@@ -36,17 +36,27 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         
         #if os(iOS)
         if let window = viewController.contentWindow {
-            window.overrideUserInterfaceStyle = context.environment.colorScheme == .light ? .light : .dark
-            window.rootViewController?.overrideUserInterfaceStyle = window.overrideUserInterfaceStyle
+            let userInterfaceStyle: UIUserInterfaceStyle = context.environment.colorScheme == .light ? .light : .dark
+            
+            if window.overrideUserInterfaceStyle != userInterfaceStyle {
+                window.overrideUserInterfaceStyle = userInterfaceStyle
+                window.rootViewController?.overrideUserInterfaceStyle = userInterfaceStyle
+            }
         }
         #endif
     }
     
     @usableFromInline
     static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
-        viewController.isKeyAndVisible.wrappedValue = false
-        viewController.updateWindow()
-        viewController.contentWindow = nil
+        DispatchQueue.asyncOnMainIfNecessary {
+            _withoutAnimation_AppKitOrUIKit {
+                if viewController.contentWindow != nil {
+                    viewController.isKeyAndVisible.wrappedValue = false
+                    viewController.updateWindow()
+                    viewController.contentWindow = nil
+                }
+            }
+        }
     }
 }
 
