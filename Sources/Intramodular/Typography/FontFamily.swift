@@ -54,3 +54,21 @@ extension View {
         self.font(.custom(font.rawValue, size: size))
     }
 }
+
+#if os(iOS)
+
+extension CocoaTextField {
+    /// Sets the default font for text in the view.
+    public func font<F: FontFamily>(_ font: F, size: CGFloat) -> Self {
+        self.font(AppKitOrUIKitFont(name: font.rawValue, size: size))
+    }
+}
+
+extension TextView {
+    /// Sets the default font for text in the view.
+    public func font<F: FontFamily>(_ font: F, size: CGFloat) -> Self {
+        self.font(AppKitOrUIKitFont(name: font.rawValue, size: size))
+    }
+}
+
+#endif

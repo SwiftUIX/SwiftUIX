@@ -44,6 +44,10 @@ final class UIHostingTextView<Label: View>: UITextView {
     
     var preferredMaximumDimensions: OptionalDimensions = nil {
         didSet {
+            guard preferredMaximumDimensions != oldValue else {
+                return
+            }
+            
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
                 ? AppKitOrUIKitLayoutPriority.defaultLow
                 : AppKitOrUIKitLayoutPriority.defaultHigh

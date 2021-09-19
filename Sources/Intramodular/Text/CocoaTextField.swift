@@ -417,7 +417,7 @@ extension CocoaTextField {
         then({ $0.configuration.borderStyle = borderStyle })
     }
     
-    public func font(_ uiFont: UIFont) -> Self {
+    public func font(_ uiFont: UIFont?) -> Self {
         then({ $0.configuration.uiFont = uiFont })
     }
     

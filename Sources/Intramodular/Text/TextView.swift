@@ -188,7 +188,9 @@ extension _TextView: UIViewRepresentable {
             if let linkForegroundColor = configuration.linkForegroundColor {
                 uiView.linkTextAttributes[.foregroundColor] = linkForegroundColor
             } else {
-                uiView.linkTextAttributes[.foregroundColor] = nil
+                if uiView.linkTextAttributes[.foregroundColor] != nil {
+                    uiView.linkTextAttributes[.foregroundColor] = nil
+                }
             }
             
             uiView.textContentType = configuration.textContentType
@@ -535,7 +537,7 @@ extension TextView {
     
     #endif
     
-    public func font(_ font: AppKitOrUIKitFont) -> Self {
+    public func font(_ font: AppKitOrUIKitFont?) -> Self {
         then({ $0.configuration.font = font })
     }
     
