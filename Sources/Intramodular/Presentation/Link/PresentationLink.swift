@@ -56,6 +56,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             self.isPresented.wrappedValue = false
         }
         
+        #if !os(watchOS)
         let content = AnyPresentationView(
             _destination
                 .managedObjectContext(managedObjectContext)
@@ -67,6 +68,15 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
         .mergeEnvironmentBuilder(environmentBuilder)
+        #else
+        let content = AnyPresentationView(
+            _destination
+                .managedObjectContext(managedObjectContext)
+        )
+        .modalPresentationStyle(presentationStyle)
+        .preferredSourceViewName(name)
+        .mergeEnvironmentBuilder(environmentBuilder)
+        #endif
         
         return AnyModalPresentation(
             id: id,
