@@ -218,7 +218,7 @@ extension SearchBar: UIViewRepresentable {
     }
     
     public func makeCoordinator() -> Coordinator {
-        return Coordinator(base: self)
+        Coordinator(base: self)
     }
 }
 
