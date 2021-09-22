@@ -60,10 +60,6 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         let content = AnyPresentationView(
             _destination
                 .managedObjectContext(managedObjectContext)
-                .onAppKitOrUIKitViewControllerResolution(
-                    onDisappear: { _ in reset() },
-                    onRemoval: { _ in reset() }
-                )
         )
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)

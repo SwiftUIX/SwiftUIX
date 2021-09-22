@@ -131,7 +131,6 @@ extension _PaginationView: UIViewControllerRepresentable {
         let oldContentDataEndIndex = uiViewController.content?.data.endIndex
         
         uiViewController._isAnimated = context.transaction.isAnimated
-
         
         updateScrollViewConfiguration: do {
             let scrollViewConfiguration = context.environment._scrollViewConfiguration

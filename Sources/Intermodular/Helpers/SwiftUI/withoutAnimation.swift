@@ -38,11 +38,10 @@ func _withoutAnimation_AppKitOrUIKit(_ flag: Bool = true, _ body: () -> ()) {
     }
     
     #if os(iOS)
-    UIView.performWithoutAnimation {
-        withAnimation(.none) {
-            body()
-        }
-    }
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    body()
+    CATransaction.commit()
     #else
     body()
     #endif
