@@ -24,8 +24,40 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         }
     }
     
+    #if os(iOS)
+    open override var frame: CGRect {
+        get {
+            super.frame
+        } set {
+            guard newValue != frame else {
+                return
+            }
+            
+            super.frame = newValue
+            
+            setWindowOrigin()
+        }
+    }
+    #endif
+             
     var isKeyAndVisible: Binding<Bool> = .constant(true)
     
+    var windowPosition: CGPoint? {
+        didSet {
+            #if os(iOS)
+            if oldValue == nil {
+                setWindowOrigin()
+            } else {
+                UIView.animate(withDuration: 0.2) {
+                    self.setWindowOrigin()
+                }
+            }
+            #else
+            setWindowOrigin()
+            #endif
+        }
+    }
+
     #if os(iOS)
     override public var isHidden: Bool {
         didSet {
@@ -61,6 +93,24 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         fatalError("init(coder:) has not been implemented")
     }
     #endif
+    
+    private func setWindowOrigin() {
+        guard let windowPosition = windowPosition else {
+            return
+        }
+
+        let originX = (windowPosition.x - self.frame.size.width / 2)
+        let originY = (windowPosition.y - self.frame.size.height / 2)
+        
+        #if os(iOS)
+            self.frame.origin = .init(
+                x: originX,
+                y: originY
+            )
+        #elseif os(macOS)
+        setFrameOrigin(.init(x: originX, y: originY))
+        #endif
+    }
 }
 
 // MARK: - API -
@@ -105,17 +155,9 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @inlinable
     public var body: some View {
         content
-            .onPreferenceChange(WindowPositionPreferenceKey.self) { value in
-                if let window = self.window, let value = value {
-                    if window.frame.origin != value {
-                        #if os(macOS)
-                        window.setFrameOrigin(value)
-                        #else
-                        UIView.animate(withDuration: 0.2) {
-                            window.frame.origin = value
-                        }
-                        #endif
-                    }
+            .onPreferenceChange(WindowPositionPreferenceKey.self) { windowPosition in
+                if let window = self.window {
+                    window.windowPosition = windowPosition
                 }
             }
             .environment(\.presentationManager, presentationManager)

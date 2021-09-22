@@ -18,7 +18,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
     }
     #endif
-    
+    var _isResizingParentWindow: Bool = false
+
     public var mainView: Content {
         get {
             rootView.content
@@ -92,8 +93,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero {
-            window.frame.size = sizeThatFits(in: Screen.main.bounds.size)
+        DispatchQueue.main.async {
+            self.resizeParentWindowIfNecessary()
         }
     }
     
@@ -128,6 +129,26 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
                
         _fixSafeAreaInsets()
+    }
+        
+    private func resizeParentWindowIfNecessary() {
+        guard !_isResizingParentWindow else {
+            return
+        }
+
+        _isResizingParentWindow = true
+        
+        defer {
+            _isResizingParentWindow = false
+        }
+        
+        #if os(iOS)
+        if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero || view.frame.size == Screen.size {
+            _fixSafeAreaInsets()
+            
+            window.frame.size = sizeThatFits(AppKitOrUIKitLayoutSizeProposal(targetSize: Screen.main.bounds.size))
+        }
+        #endif
     }
 }
 

@@ -126,6 +126,20 @@ public struct AppKitOrUIKitLayoutSizeProposal {
         self.verticalFittingPriority = verticalFittingPriority
     }
     
+    public init(
+        targetSize: CGSize,
+        maximumSize: OptionalDimensions = nil,
+        horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
+        verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
+    ) {
+        self.init(
+            targetSize: .init(targetSize),
+            maximumSize: maximumSize,
+            horizontalFittingPriority: horizontalFittingPriority,
+            verticalFittingPriority: verticalFittingPriority
+        )
+    }
+    
     var allowsSelfSizing: Bool {
         if horizontalFittingPriority == .required && verticalFittingPriority == .required {
             return false
