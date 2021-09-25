@@ -51,8 +51,6 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         DispatchQueue.asyncOnMainIfNecessary {
             _withoutAnimation_AppKitOrUIKit {
                 if viewController.contentWindow != nil {
-                    viewController.isKeyAndVisible.wrappedValue = false
-                    viewController.updateWindow()
                     viewController.contentWindow = nil
                 }
             }
