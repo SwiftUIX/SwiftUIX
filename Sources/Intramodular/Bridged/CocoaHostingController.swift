@@ -19,7 +19,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     #endif
     var _isResizingParentWindow: Bool = false
-
+    var _didResizeParentWindowOnce: Bool = false
+    
     public var mainView: Content {
         get {
             rootView.content
@@ -132,6 +133,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
         
     private func resizeParentWindowIfNecessary() {
+        guard !_didResizeParentWindowOnce else {
+            return
+        }
+        
         guard !_isResizingParentWindow else {
             return
         }
@@ -146,7 +151,9 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero || view.frame.size == Screen.size {
             _fixSafeAreaInsets()
             
-            window.frame.size = sizeThatFits(AppKitOrUIKitLayoutSizeProposal(targetSize: Screen.main.bounds.size))
+            window.frame.size = self.sizeThatFits(AppKitOrUIKitLayoutSizeProposal(targetSize: Screen.main.bounds.size))
+            
+            _didResizeParentWindowOnce = true
         }
         #endif
     }
