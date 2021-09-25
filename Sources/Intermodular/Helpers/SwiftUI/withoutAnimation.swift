@@ -37,12 +37,24 @@ func _withoutAnimation_AppKitOrUIKit(_ flag: Bool = true, _ body: () -> ()) {
         return body()
     }
     
-    #if os(iOS)
+#if os(iOS)
     CATransaction.begin()
     CATransaction.setDisableActions(true)
     body()
     CATransaction.commit()
-    #else
+#else
     body()
-    #endif
+#endif
+}
+
+public func withAnimation(
+    _ animation: Animation = .default,
+    after delay: DispatchTimeInterval,
+    body: @escaping () -> Void
+) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        withAnimation(animation) {
+            body()
+        }
+    }
 }
