@@ -28,7 +28,7 @@ extension List {
             rowContent(element, selection.wrappedValue.contains(element))
         })
     }
-    #else
+    #elseif !targetEnvironment(macCatalyst)
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
