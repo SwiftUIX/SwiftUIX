@@ -63,7 +63,9 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
     }
     
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-        
+        if view.url != configuration.url {
+            view.load(URLRequest(url: configuration.url))
+        }
     }
     
     func makeCoordinator() -> Coordinator {
@@ -75,7 +77,17 @@ extension _WebView {
     class Coordinator: NSObject, ObservableObject, WKNavigationDelegate {
         @Published var isLoading: Bool = true
         
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(
+            _ webView: WKWebView,
+            didStartProvisionalNavigation navigation: WKNavigation!
+        ) {
+
+        }
+        
+        func webView(
+            _ webView: WKWebView,
+            didFinish navigation: WKNavigation!
+        ) {
             if webView.url?.absoluteString != nil {
                 isLoading = false
             }
