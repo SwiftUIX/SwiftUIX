@@ -43,20 +43,6 @@ extension ForEach where Content: View {
             rowContent($0.offset, $0.element)
         }
     }
-    
-    public init<Elements: MutableCollection & RandomAccessCollection>(
-        _ data: Binding<Elements>,
-        @ViewBuilder rowContent: @escaping (Binding<Elements.Element>) -> Content
-    ) where Data == AnyRandomAccessCollection<_IdentifiableElementOffsetPair<Elements.Element, Elements.Index>>, ID == Elements.Element.ID {
-        self.init(AnyRandomAccessCollection(data.wrappedValue.indices.lazy.map({ _IdentifiableElementOffsetPair(element: data.wrappedValue[$0], offset: $0) }))) { pair in
-            rowContent(
-                Binding(
-                    get: { data.wrappedValue[pair.offset] },
-                    set: { data.wrappedValue[pair.offset] = $0 }
-                )
-            )
-        }
-    }
 }
 
 extension ForEach where Data.Element: Identifiable, Content: View, ID == Data.Element.ID {

@@ -18,7 +18,7 @@ open class ArrayReducePreferenceKey<Element>: PreferenceKey {
     }
 }
 
-open class TakeFirstPreferenceKey<T>: PreferenceKey {
+open class TakeFirstPreferenceKey<T: Equatable>: PreferenceKey {
     public typealias Value = T?
     
     public static var defaultValue: Value {
@@ -26,11 +26,15 @@ open class TakeFirstPreferenceKey<T>: PreferenceKey {
     }
     
     public static func reduce(value: inout Value, nextValue: () -> Value) {
-        value = value ?? nextValue()
+        let newValue = value ?? nextValue()
+        
+        if value != newValue {
+            value = newValue
+        }
     }
 }
 
-open class TakeLastPreferenceKey<T>: PreferenceKey {
+open class TakeLastPreferenceKey<T: Equatable>: PreferenceKey {
     public typealias Value = T?
     
     public static var defaultValue: Value {
@@ -38,6 +42,10 @@ open class TakeLastPreferenceKey<T>: PreferenceKey {
     }
     
     public static func reduce(value: inout Value, nextValue: () -> Value) {
-        value = nextValue() ?? value
+        let newValue = nextValue() ?? value
+        
+        if value != newValue {
+            value = newValue
+        }
     }
 }
