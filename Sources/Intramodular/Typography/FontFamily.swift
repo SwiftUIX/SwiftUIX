@@ -54,6 +54,7 @@ extension View {
         self.font(.custom(font.rawValue, size: size))
     }
     
+    #if os(iOS)
     /// Sets the default font for text in this view.
     public func font<F: FontFamily>(
         _ font: F,
@@ -62,6 +63,7 @@ extension View {
     ) -> some View {
         modifier(SetFontWithLineHeight(font: font, fontSize: size, lineHeight: lineHeight))
     }
+    #endif
 }
 
 #if os(iOS)
