@@ -55,13 +55,19 @@ extension CocoaNavigationView {
                 
                 super.setNavigationBarHidden(configuration.navigationBarHidden, animated: animated)
             }
+            
+            override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+                super.pushViewController(viewController, animated: true)
+            }
         }
         
         let content: Content
         let configuration: Configuration
         
         func makeUIViewController(context: Context) -> UIViewControllerType {
-            let viewController = UIViewControllerType(rootViewController: CocoaHostingController(mainView: content))
+            let viewController = UIViewControllerType()
+            
+            viewController.setViewControllers([CocoaHostingController(mainView: _ChildContainer(parent: viewController, rootView: content))], animated: false)
             
             viewController.configuration = configuration
             
@@ -71,9 +77,25 @@ extension CocoaNavigationView {
         func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
             uiViewController.configuration = configuration
             
-            if let controller = uiViewController.viewControllers.first as? CocoaHostingController<Content> {
-                controller.mainView = content
+            if let controller = uiViewController.viewControllers.first as? CocoaHostingController<_ChildContainer> {
+                controller.mainView = .init(parent: uiViewController, rootView: content)
             }
+        }
+    }
+    
+    struct _ChildContainer: View {
+        unowned let parent: UINavigationController
+        
+        var rootView: AnyView
+        
+        init<T: View>(parent: UINavigationController, rootView: T) {
+            self.parent = parent
+            self.rootView = rootView.eraseToAnyView()
+        }
+        
+        var body: some View {
+            rootView
+                .environment(\.navigator, parent)
         }
     }
 }

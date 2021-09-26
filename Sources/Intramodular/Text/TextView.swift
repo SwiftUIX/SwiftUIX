@@ -302,6 +302,10 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidChange(_ textView: UITextView) {
+            if let textView = textView as? UIHostingTextView<Label>, textView._isSwiftUIRuntimeDismantled {
+                return
+            }
+            
             if let text = text {
                 text.wrappedValue = textView.text
             } else {
