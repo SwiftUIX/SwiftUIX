@@ -487,7 +487,7 @@ extension UIHostingCollectionViewCell {
                     }
                 }
                 .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) {
-                    if preferences._namedViewDescription.wrappedValue != $0.last {
+                    if preferences._namedViewDescription.wrappedValue?.name != $0.last?.name {
                         preferences._namedViewDescription.wrappedValue = $0.last
                         
                         updateCollectionCache()
@@ -522,6 +522,8 @@ extension UIHostingCollectionViewCell {
             view.backgroundColor = nil
             
             update(disableAnimation: true)
+            
+            _fixSafeAreaInsets()
         }
         
         @objc required public init?(coder aDecoder: NSCoder) {
