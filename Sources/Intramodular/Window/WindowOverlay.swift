@@ -49,7 +49,7 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     @usableFromInline
     static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
         DispatchQueue.asyncOnMainIfNecessary {
-            _withoutAnimation_AppKitOrUIKit {
+            _withoutAppKitOrUIKitAnimation {
                 if viewController.contentWindow != nil {
                     viewController.contentWindow = nil
                 }

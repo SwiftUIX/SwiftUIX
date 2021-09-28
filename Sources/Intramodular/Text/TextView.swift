@@ -131,7 +131,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
-        _withoutAnimation_AppKitOrUIKit(context.transaction.isAnimated) {
+        _withoutAppKitOrUIKitAnimation(context.transaction.isAnimated) {
             if let uiView = uiView as? UIHostingTextView<Label> {
                 uiView._isSwiftUIRuntimeUpdateActive = true
                 

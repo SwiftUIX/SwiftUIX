@@ -40,12 +40,14 @@ extension AppKitOrUIKitHostingControllerProtocol {
             return targetSize
         }
         
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-        #elseif os(macOS)
-        view.layout()
-        #endif
+        _withoutAppKitOrUIKitAnimation {
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+            #elseif os(macOS)
+            view.layout()
+            #endif
+        }
         
         var result = sizeThatFits(in: fittingSize)
         

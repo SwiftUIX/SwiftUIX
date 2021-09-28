@@ -7,6 +7,31 @@ import SwiftUI
 
 var _areAnimationsDisabledGlobally: Bool = false
 
+func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
+    guard flag else {
+        return body()
+    }
+    
+    withAnimation(.none) {
+        body()
+    }
+}
+
+func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()) {
+    guard flag else {
+        return body()
+    }
+    
+    #if os(iOS)
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    body()
+    CATransaction.commit()
+    #else
+    body()
+    #endif
+}
+
 /// Returns the result of recomputing the view’s body with animations disabled.
 public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
@@ -20,31 +45,6 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     }
     
     _areAnimationsDisabledGlobally = false
-}
-
-func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
-    guard flag else {
-        return body()
-    }
-    
-    withAnimation(.none) {
-        body()
-    }
-}
-
-func _withoutAnimation_AppKitOrUIKit(_ flag: Bool = true, _ body: () -> ()) {
-    guard flag else {
-        return body()
-    }
-    
-#if os(iOS)
-    CATransaction.begin()
-    CATransaction.setDisableActions(true)
-    body()
-    CATransaction.commit()
-#else
-    body()
-#endif
 }
 
 public func withAnimation(
