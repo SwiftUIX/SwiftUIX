@@ -97,6 +97,8 @@ extension SearchBar: UIViewRepresentable {
         environment: EnvironmentValues
     ) {
         style: do {
+            uiView.searchTextField.autocorrectionType = environment.disableAutocorrection.map({ $0 ? .no : .yes }) ?? .default
+            
             if (appKitOrUIKitFont != nil || environment.font != nil) || appKitOrUIKitForegroundColor != nil || appKitOrUIKitSearchFieldBackgroundColor != nil {
                 if let font = appKitOrUIKitFont ?? environment.font?.toUIFont() {
                     uiView.searchTextField.font = font
