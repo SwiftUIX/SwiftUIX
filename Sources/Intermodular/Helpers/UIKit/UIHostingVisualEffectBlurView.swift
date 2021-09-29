@@ -51,8 +51,14 @@ class UIHostingVisualEffectBlurView<Content: View>: UIView {
     
     var intensity: Double {
         didSet {
-            if let animator = blurEffectAnimator {
-                animator.fractionComplete = .init(intensity)
+            DispatchQueue.asyncOnMainIfNecessary {
+                if let animator = blurEffectAnimator {
+                    guard animator.fractionComplete != CGFloat(intensity) else {
+                        return
+                    }
+                    
+                    animator.fractionComplete = CGFloat(intensity)
+                }
             }
         }
     }
