@@ -30,6 +30,7 @@ public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
 public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
 public typealias AppKitOrUIKitResponder = UIResponder
+public typealias AppKitOrUIKitScrollView = UIScrollView
 public typealias AppKitOrUIKitSearchBar = UISearchBar
 public typealias AppKitOrUIKitTableView = UITableView
 public typealias AppKitOrUIKitTableViewController = UITableViewController

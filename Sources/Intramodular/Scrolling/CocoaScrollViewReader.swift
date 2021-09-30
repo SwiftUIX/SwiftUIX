@@ -23,6 +23,12 @@ public struct CocoaScrollViewProxy: Hashable {
         }
     }
     
+    #if os(iOS)
+    public var underlyingAppKitOrUIKitScrollView: AppKitOrUIKitScrollView? {
+        base
+    }
+    #endif
+    
     init(_ base: _opaque_UIHostingScrollView? = nil) {
         self._baseBox = .init(base)
     }
