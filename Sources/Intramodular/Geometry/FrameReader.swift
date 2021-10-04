@@ -54,6 +54,10 @@ extension View {
     }
     
     public func captureSize(in binding: Binding<CGSize>) -> some View {
-        captureSize(in: SetBinding(binding))
+        captureSize(in: SetBinding { newValue in
+            if binding.wrappedValue != newValue {
+                binding.wrappedValue = newValue
+            }
+        })
     }
 }
