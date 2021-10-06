@@ -7,7 +7,7 @@ import SwiftUI
 
 var _areAnimationsDisabledGlobally: Bool = false
 
-func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
+public func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
         return body()
     }
@@ -17,7 +17,7 @@ func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     }
 }
 
-func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()) {
+public func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()) {
     guard flag else {
         return body()
     }

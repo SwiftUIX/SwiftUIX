@@ -15,7 +15,20 @@ extension View {
                     return
                 }
                 
-                $0.navigationController?.nearestResponder(ofKind: UISplitViewController.self)?.primaryBackgroundStyle = .sidebar
+                guard let navigationController = $0.nearestNavigationController else {
+                    return
+                }
+                
+                navigationController.splitViewController?.primaryBackgroundStyle = .sidebar
+                
+                if #available(iOS 14.0, *) {
+                    #if !targetEnvironment(macCatalyst)
+                    UIView.performWithoutAnimation {
+                        navigationController.splitViewController?.show(.primary)
+                        navigationController.splitViewController?.hide(.primary)
+                    }
+                    #endif
+                }
                 
                 isFixed.wrappedValue = true
             }
