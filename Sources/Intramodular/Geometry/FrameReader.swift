@@ -5,12 +5,6 @@
 import Swift
 import SwiftUI
 
-public struct FrameReaderProxy {
-    public func frame(for identifier: AnyHashable) -> CGRect {
-        .zero // TODO: Implement
-    }
-}
-
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 /*public*/ struct FrameReader<Content: View>: View {
     public let namespace: Namespace.ID
@@ -26,6 +20,12 @@ public struct FrameReaderProxy {
     
     public var body: some View {
         content(FrameReaderProxy())
+    }
+}
+
+public struct FrameReaderProxy {
+    public func frame(for identifier: AnyHashable) -> CGRect {
+        .zero // TODO: Implement
     }
 }
 
