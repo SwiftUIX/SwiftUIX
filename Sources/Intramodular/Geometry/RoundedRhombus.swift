@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct RoundedRhombus: Shape {
     public let cornerRadius: CGFloat
