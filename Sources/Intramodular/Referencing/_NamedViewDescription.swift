@@ -10,25 +10,21 @@ import SwiftUI
 /// The description is composed of two things - the view's name and the view's frame.
 public struct _NamedViewDescription: Hashable {
     @usableFromInline
-    let name: ViewName
+    let name: AnyHashable
     @usableFromInline
     let id: AnyHashable?
-    @usableFromInline
-    let bounds: Anchor<CGRect>
     @usableFromInline
     let globalBounds: CGRect
     
     @usableFromInline
     init(
-        name: ViewName,
+        name: AnyHashable,
         id: AnyHashable?,
-        bounds: Anchor<CGRect>,
-        globalBounds: CGRect
+        geometry: GeometryProxy
     ) {
         self.name = name
         self.id = id
-        self.bounds = bounds
-        self.globalBounds = globalBounds
+        self.globalBounds = geometry.frame(in: .global)
     }
     
     public func hash(into hasher: inout Hasher) {
@@ -55,49 +51,5 @@ public struct _NamedViewDescription: Hashable {
         }
         
         return true
-    }
-}
-
-extension _NamedViewDescription {
-    struct PreferenceKey: SwiftUI.PreferenceKey {
-        struct Value: Equatable, Sequence {
-            typealias Element = _NamedViewDescription
-            
-            var allAsArray: [Element]
-            var allAsDictionary: [ViewName: Element]
-            
-            var first: Element? {
-                allAsArray.first
-            }
-            
-            var last: Element? {
-                allAsArray.last
-            }
-            
-            init(_ element: Element) {
-                self.allAsArray = [element]
-                self.allAsDictionary = [element.name: element]
-            }
-            
-            init() {
-                self.allAsArray = []
-                self.allAsDictionary = [:]
-            }
-            
-            func makeIterator() -> AnyIterator<Element> {
-                .init(allAsArray.makeIterator())
-            }
-        }
-        
-        static var defaultValue: Value {
-            Value()
-        }
-        
-        static func reduce(value: inout Value, nextValue: () -> Value) {
-            let nextValue = nextValue()
-            
-            value.allAsArray.append(contentsOf: nextValue.allAsArray)
-            value.allAsDictionary.merge(nextValue.allAsDictionary, uniquingKeysWith: { lhs, rhs in lhs })
-        }
     }
 }

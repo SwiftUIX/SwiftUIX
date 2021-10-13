@@ -29,7 +29,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     private let label: Label
     
-    @State private var name = ViewName()
+    @State private var name: AnyHashable = UUID()
     @State private var id: AnyHashable = UUID()
     @State private var _internal_isPresented: Bool = false
     

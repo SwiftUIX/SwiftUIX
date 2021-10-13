@@ -9,7 +9,7 @@ import SwiftUI
 
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
     var _safeAreaInsetsAreFixed: Bool = false
-    var _namedViewDescriptions: [ViewName: _NamedViewDescription] = [:]
+    var _namedViewDescriptions: [AnyHashable: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var _transitioningDelegate: UIViewControllerTransitioningDelegate? {
@@ -111,11 +111,11 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     #endif
     
-    public func _namedViewDescription(for name: ViewName) -> _NamedViewDescription? {
+    public func _namedViewDescription(for name: AnyHashable) -> _NamedViewDescription? {
         _namedViewDescriptions[name]
     }
     
-    public func _setNamedViewDescription(_ description: _NamedViewDescription?, for name: ViewName) {
+    public func _setNamedViewDescription(_ description: _NamedViewDescription?, for name: AnyHashable) {
         _namedViewDescriptions[name] = description
     }
     

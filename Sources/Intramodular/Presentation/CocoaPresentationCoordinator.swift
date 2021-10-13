@@ -112,7 +112,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         presentedCoordinator
     }
     
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         presentation?.content._opaque_getViewName()
     }
     

@@ -7,7 +7,7 @@ import SwiftUI
 
 public protocol DynamicViewPresentable {
     /// The view's presentation name (if any).
-    var presentationName: ViewName? { get }
+    var presentationName: AnyHashable? { get }
     
     var presenter: DynamicViewPresenter? { get }
 }
@@ -17,7 +17,7 @@ public protocol DynamicViewPresentable {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIView: DynamicViewPresentable {
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         return nil
     }
     
@@ -27,7 +27,7 @@ extension UIView: DynamicViewPresentable {
 }
 
 extension UIViewController: DynamicViewPresentable {
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         presentationCoordinator.presentationName
     }
     
@@ -39,7 +39,7 @@ extension UIViewController: DynamicViewPresentable {
 #elseif os(macOS)
 
 extension NSView: DynamicViewPresentable {
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         return nil
     }
     
@@ -49,7 +49,7 @@ extension NSView: DynamicViewPresentable {
 }
 
 extension NSViewController: DynamicViewPresentable {
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         presentationCoordinator.presentationName
     }
     
@@ -59,7 +59,7 @@ extension NSViewController: DynamicViewPresentable {
 }
 
 extension NSWindow: DynamicViewPresentable {
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         return nil
     }
     

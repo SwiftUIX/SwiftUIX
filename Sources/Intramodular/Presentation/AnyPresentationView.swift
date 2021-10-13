@@ -11,10 +11,10 @@ public struct AnyPresentationView: View {
     
     private var environmentBuilder: EnvironmentBuilder
     
-    public private(set) var name: ViewName?
+    public private(set) var name: AnyHashable?
     public private(set) var id: AnyHashable?
     public private(set) var popoverAttachmentAnchorBounds: CGRect?
-    public private(set) var preferredSourceViewName: ViewName?
+    public private(set) var preferredSourceViewName: AnyHashable?
     public private(set) var modalPresentationStyle: ModalPresentationStyle = .automatic
     public private(set) var hidesBottomBarWhenPushed: Bool = false
     
@@ -38,7 +38,7 @@ public struct AnyPresentationView: View {
 // MARK: - Conformances -
 
 extension AnyPresentationView: _opaque_View {
-    public func _opaque_getViewName() -> ViewName? {
+    public func _opaque_getViewName() -> AnyHashable? {
         name
     }
 }
@@ -46,7 +46,7 @@ extension AnyPresentationView: _opaque_View {
 // MARK: - API -
 
 extension AnyPresentationView {
-    public func name(_ name: ViewName?) -> Self {
+    public func name(_ name: AnyHashable?) -> Self {
         then({ $0.name = name ?? $0.name })
     }
     
@@ -54,7 +54,7 @@ extension AnyPresentationView {
         then({ $0.popoverAttachmentAnchorBounds = bounds })
     }
     
-    public func preferredSourceViewName(_ name: ViewName) -> Self {
+    public func preferredSourceViewName(_ name: AnyHashable) -> Self {
         then({ $0.preferredSourceViewName = name })
     }
     

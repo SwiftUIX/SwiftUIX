@@ -48,10 +48,10 @@ public struct IntrinsicGeometryReader<Content: View>: View {
         self.content = content
     }
     
-    @DelayedState var proxy = IntrinsicGeometryProxy(nil)
+    @DelayedState private var proxy = IntrinsicGeometryProxy(nil)
     
     public var body: some View {
-        content(proxy).background(
+        content(proxy).background {
             GeometryReader { geometry in
                 PerformAction {
                     DispatchQueue.asyncOnMainIfNecessary {
@@ -63,6 +63,6 @@ public struct IntrinsicGeometryReader<Content: View>: View {
                     }
                 }
             }
-        )
+        }
     }
 }

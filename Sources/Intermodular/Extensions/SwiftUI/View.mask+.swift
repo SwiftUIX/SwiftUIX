@@ -6,6 +6,13 @@ import Swift
 import SwiftUI
 
 extension View {
+    /// Masks this view using the alpha channel of the given view.
+    @_disfavoredOverload
+    @inlinable
+    public func mask<T: View>(_ view: () -> T) -> some View {
+        self.mask(view())
+    }
+
     /// Masks the given view using the alpha channel of this view.
     @inlinable
     public func masking<T: View>(_ view: T) -> some View {
