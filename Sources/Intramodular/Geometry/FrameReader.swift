@@ -112,6 +112,16 @@ public struct FrameReaderProxy {
         
         return xFrame.intersection(yFrame).size
     }
+    
+    public func percentageIntersection(between x: AnyHashable, and y: AnyHashable) -> CGFloat {
+        let intersectionSize = self.intersectionSize(between: x, and: y)
+        let xSize = size(for: x)
+        
+        let xSizeArea = xSize.width * xSize.height
+        let intersectionSizeArea = intersectionSize.width * intersectionSize.height
+        
+        return Double(intersectionSizeArea / xSizeArea)
+    }
 }
 
 // MARK: - API -
