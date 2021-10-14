@@ -24,7 +24,7 @@ public struct FrameReader<Content: View>: View {
             .environment(\._frameReaderProxy, $proxy)
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) { value in
                 DispatchQueue.asyncOnMainIfNecessary {
-                    proxy.preferenceData = value.allAsDictionary
+                    proxy.preferenceData = value.base
                 }
             }
     }

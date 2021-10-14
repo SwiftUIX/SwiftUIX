@@ -34,9 +34,7 @@ extension UIHostingCollectionViewCell {
     }
     
     struct Preferences: Hashable {
-        var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
-        var _namedViewDescription: _NamedViewDescription?
-        
+        var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()        
         var dragItems: [DragItem]?
         var relativeFrame: RelativeFrame?
     }
@@ -482,13 +480,6 @@ extension UIHostingCollectionViewCell {
                 .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self) {
                     if preferences._collectionOrListCellPreferences.wrappedValue != $0 {
                         preferences._collectionOrListCellPreferences.wrappedValue = $0
-                        
-                        updateCollectionCache()
-                    }
-                }
-                .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) {
-                    if preferences._namedViewDescription.wrappedValue?.name != $0.last?.name {
-                        preferences._namedViewDescription.wrappedValue = $0.last
                         
                         updateCollectionCache()
                     }

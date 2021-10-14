@@ -89,37 +89,26 @@ public struct _NamedViewDescriptionPreferenceKey: SwiftUI.PreferenceKey {
     public struct Value: Hashable, Sequence {
         public typealias Element = _NamedViewDescription
         
-        var allAsArray: [Element]
-        var allAsDictionary: [AnyHashable: Element]
-        
-        var first: Element? {
-            allAsArray.first
-        }
-        
-        var last: Element? {
-            allAsArray.last
-        }
+        var base: [AnyHashable: Element]
         
         init(_ element: Element) {
-            self.allAsArray = [element]
-            self.allAsDictionary = [element.name: element]
+            self.base = [element.name: element]
         }
         
         init() {
-            self.allAsArray = []
-            self.allAsDictionary = [:]
+            self.base = Dictionary()
         }
         
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(allAsDictionary)
+            hasher.combine(base)
         }
         
         public func makeIterator() -> AnyIterator<Element> {
-            .init(allAsArray.makeIterator())
+            .init(base.values.makeIterator())
         }
         
         subscript(_ key: AnyHashable) -> _NamedViewDescription? {
-            allAsDictionary[key]
+            base[key]
         }
     }
     
@@ -131,8 +120,11 @@ public struct _NamedViewDescriptionPreferenceKey: SwiftUI.PreferenceKey {
         var _value = value
         let nextValue = nextValue()
         
-        _value.allAsArray.append(contentsOf: nextValue.allAsArray)
-        _value.allAsDictionary.merge(nextValue.allAsDictionary, uniquingKeysWith: { lhs, rhs in lhs })
+        guard !nextValue.base.isEmpty else {
+            return
+        }
+        
+        _value.base.merge(nextValue.base, uniquingKeysWith: { lhs, rhs in lhs })
         
         value = _value
     }
