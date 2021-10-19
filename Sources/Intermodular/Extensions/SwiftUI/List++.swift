@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension List {
-    #if swift(>=5.5) && !os(macOS) && !targetEnvironment(macCatalyst)
+    #if canImport(GroupActivities)
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
@@ -28,7 +28,7 @@ extension List {
             rowContent(element, selection.wrappedValue.contains(element))
         })
     }
-    #elseif !targetEnvironment(macCatalyst)
+    #else
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
