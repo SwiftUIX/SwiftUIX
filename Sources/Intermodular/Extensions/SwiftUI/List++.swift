@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension List {
-    #if canImport(GroupActivities)
+    #if canImport(GroupActivities) || os(watchOS)
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
