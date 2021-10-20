@@ -5,45 +5,47 @@
 import SwiftUI
 import Swift
 
-extension ScrollView {
-    public struct ContentOffset: Hashable {
-        public enum Origin {
-            case topLeading
-            case bottomTrailing
-        }
-        
-        var containerBounds: CGRect
-        var contentSize: CGSize
-        var contentInsets: EdgeInsets
-        var contentOffset: CGPoint
-        
-        public init(
-            containerBounds: CGRect,
-            contentSize: CGSize,
-            contentInsets: EdgeInsets,
-            contentOffset: CGPoint
-        ) {
-            self.containerBounds = containerBounds
-            self.contentSize = contentSize
-            self.contentInsets = contentInsets
-            self.contentOffset = contentOffset
-        }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(containerBounds.origin.x)
-            hasher.combine(containerBounds.origin.y)
-            hasher.combine(containerBounds.width)
-            hasher.combine(containerBounds.height)
-            hasher.combine(contentSize.width)
-            hasher.combine(contentSize.height)
-            hasher.combine(contentInsets.top)
-            hasher.combine(contentInsets.leading)
-            hasher.combine(contentInsets.bottom)
-            hasher.combine(contentInsets.trailing)
-            hasher.combine(contentOffset.x)
-            hasher.combine(contentOffset.y)
-        }
+public struct ScrollViewContentOffset: Hashable {
+    public enum Origin {
+        case topLeading
+        case bottomTrailing
     }
+    
+    var containerBounds: CGRect
+    var contentSize: CGSize
+    var contentInsets: EdgeInsets
+    var contentOffset: CGPoint
+    
+    public init(
+        containerBounds: CGRect,
+        contentSize: CGSize,
+        contentInsets: EdgeInsets,
+        contentOffset: CGPoint
+    ) {
+        self.containerBounds = containerBounds
+        self.contentSize = contentSize
+        self.contentInsets = contentInsets
+        self.contentOffset = contentOffset
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(containerBounds.origin.x)
+        hasher.combine(containerBounds.origin.y)
+        hasher.combine(containerBounds.width)
+        hasher.combine(containerBounds.height)
+        hasher.combine(contentSize.width)
+        hasher.combine(contentSize.height)
+        hasher.combine(contentInsets.top)
+        hasher.combine(contentInsets.leading)
+        hasher.combine(contentInsets.bottom)
+        hasher.combine(contentInsets.trailing)
+        hasher.combine(contentOffset.x)
+        hasher.combine(contentOffset.y)
+    }
+}
+
+extension ScrollView {
+    public typealias ContentOffset = ScrollViewContentOffset
 }
 
 extension ScrollView.ContentOffset {
@@ -167,7 +169,7 @@ extension UIScrollView {
         )
     }
     
-    func setContentOffset<Content: View>(_ offset: ScrollView<Content>.ContentOffset, animated: Bool) {
+    func setContentOffset(_ offset: ScrollViewContentOffset, animated: Bool) {
         setContentOffset(offset.contentOffset, animated: animated)
     }
     

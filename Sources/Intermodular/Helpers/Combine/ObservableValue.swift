@@ -16,7 +16,7 @@ public class ObservableValue<Value>: ObservableObject {
         }
     }
     
-    fileprivate init() {
+    internal init() {
         
     }
     

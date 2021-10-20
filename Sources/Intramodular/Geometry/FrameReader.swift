@@ -120,6 +120,10 @@ public struct FrameReaderProxy {
         let xSizeArea = xSize.width * xSize.height
         let intersectionSizeArea = intersectionSize.width * intersectionSize.height
         
+        if xSizeArea.isZero || intersectionSizeArea.isZero {
+            return 0
+        }
+        
         return Double(intersectionSizeArea / xSizeArea)
     }
 }

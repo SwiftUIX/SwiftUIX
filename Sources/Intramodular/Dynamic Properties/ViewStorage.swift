@@ -8,15 +8,25 @@ import SwiftUI
 
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
-    private final class ValueBox: ObservableObject {
+    fileprivate final class ValueBox: ObservableValue<Value> {
         @Published var value: Value
+        
+        override var wrappedValue: Value {
+            get {
+                value
+            } set {
+                value = newValue
+            }
+        }
         
         init(_ value: Value) {
             self.value = value
+            
+            super.init()
         }
     }
     
-    @State private var valueBox: ValueBox
+    @State fileprivate var valueBox: ValueBox
     
     public var wrappedValue: Value {
         get {
@@ -35,6 +45,8 @@ public struct ViewStorage<Value>: DynamicProperty {
     }
 }
 
+// MARK: - API -
+
 extension ViewStorage {
     public var binding: Binding<Value> {
         .init(
@@ -45,5 +57,11 @@ extension ViewStorage {
     
     public var publisher: Published<Value>.Publisher {
         valueBox.$value
+    }
+}
+
+extension ObservedValue {
+    public init(_ storage: ViewStorage<Value>) {
+        self.init(base: storage.valueBox)
     }
 }
