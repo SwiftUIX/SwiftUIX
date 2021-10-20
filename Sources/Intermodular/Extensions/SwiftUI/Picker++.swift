@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 extension Picker {
+    #if canImport(GroupActivities)
     public init<Data: RandomAccessCollection, ID: Hashable, RowContent: View>(
         _ data: Data,
         id: KeyPath<Data.Element, ID>,
@@ -49,6 +50,7 @@ extension Picker {
             EmptyView()
         }
     }
+    #endif
 }
 
 extension Picker where Label == Text, SelectionValue: CaseIterable & CustomStringConvertible & Hashable, SelectionValue.AllCases: RandomAccessCollection, Content == AnyView {
