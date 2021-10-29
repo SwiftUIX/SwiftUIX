@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension List {
-    #if canImport(GroupActivities) || os(watchOS)
+    #if swift(>=5.5.1) || (swift(>=5.5) && !targetEnvironment(macCatalyst) && !os(macOS))
     @available(watchOS, unavailable)
     public init<Data: RandomAccessCollection, RowContent: View>(
         _ data: Data,
