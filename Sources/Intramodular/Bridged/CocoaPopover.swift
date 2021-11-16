@@ -43,38 +43,6 @@ extension View {
 }
 
 private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresentable {
-    @Binding var isPresented: Bool
-    
-    let onDismiss: (() -> Void)?
-    
-    @ViewBuilder let content: () -> Content
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(parent: self, content: self.content())
-    }
-    
-    func makeUIViewController(context: Context) -> UIViewController {
-        return UIViewController()
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        let host = context.coordinator.host
-        host.rootView = content()
-        
-        if host.viewIfLoaded?.window == nil && self.isPresented {
-            host.preferredContentSize = host.sizeThatFits(in: CGSize(width: Int.max, height: Int.max))
-            host.modalPresentationStyle = UIModalPresentationStyle.popover
-            host.popoverPresentationController?.delegate = context.coordinator
-            host.popoverPresentationController?.sourceView = uiViewController.view
-            host.popoverPresentationController?.sourceRect = uiViewController.view.bounds
-            
-            uiViewController.present(host, animated: true, completion: nil)
-            
-        } else if self.isPresented == false {
-            host.dismiss(animated: true, completion: nil)
-        }
-    }
-    
     class Coordinator: NSObject, UIPopoverPresentationControllerDelegate {
         let host: UIHostingController<Content>
         
@@ -95,6 +63,38 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
         func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
             return .none
         }
+    }
+    
+    @Binding var isPresented: Bool
+    
+    let onDismiss: (() -> Void)?
+    
+    @ViewBuilder let content: () -> Content
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        UIViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        let host = context.coordinator.host
+        host.rootView = content()
+        
+        if host.viewIfLoaded?.window == nil && self.isPresented {
+            host.preferredContentSize = host.sizeThatFits(in: CGSize(width: Int.max, height: Int.max))
+            host.modalPresentationStyle = UIModalPresentationStyle.popover
+            host.popoverPresentationController?.delegate = context.coordinator
+            host.popoverPresentationController?.sourceView = uiViewController.view
+            host.popoverPresentationController?.sourceRect = uiViewController.view.bounds
+            
+            uiViewController.present(host, animated: true, completion: nil)
+            
+        } else if self.isPresented == false {
+            host.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self, content: self.content())
     }
 }
 

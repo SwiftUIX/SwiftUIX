@@ -31,7 +31,7 @@ public struct PaginationViewProxy: Hashable {
     public var paginationState: PaginationState {
         hostingPageViewController?.internalPaginationState ?? .init()
     }
-        
+    
     public func hash(into hasher: inout Hasher) {
         hasher.combine(hostingPageViewController?.hashValue)
     }
