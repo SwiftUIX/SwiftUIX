@@ -25,7 +25,8 @@ public struct CocoaTextField<Label: View>: CocoaView {
         var textRect: Rect?
         var editingRect: Rect?
         var clearButtonRect: Rect?
-        
+        var clearButtonImage: AppKitOrUIKitImage?
+
         var isInitialFirstResponder: Bool?
         var isFirstResponder: Bool?
         var isFocused: Binding<Bool>? = nil
@@ -184,7 +185,14 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         uiView.textRect = configuration.textRect
         uiView.editingRect = configuration.editingRect
         uiView.clearButtonRect = configuration.clearButtonRect
-        
+
+        if let clearButtonImage = configuration.clearButtonImage, let clearButton = uiView.clearButton {
+            if clearButton.image(for: .normal) !== clearButtonImage {
+                clearButton.setImage(clearButtonImage, for: .normal)
+                clearButton.setImage(clearButtonImage, for: .highlighted)
+            }
+        }
+
         setConfiguration: do {
             uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
             uiView.autocorrectionType = context.environment.disableAutocorrection.map({ $0 ? .no : .yes }) ?? .default
@@ -458,6 +466,10 @@ extension CocoaTextField {
     public func clearButtonMode(_ clearButtonMode: UITextField.ViewMode) -> Self {
         then({ $0.configuration.clearButtonMode = clearButtonMode })
     }
+
+    public func clearButtonImage(_ clearButtonImage: AppKitOrUIKitImage) -> Self {
+        then({ $0.configuration.clearButtonImage = clearButtonImage })
+    }
     
     // MARK: - Input Accessory -
     
@@ -523,7 +535,9 @@ private final class _UITextField: UITextField {
     var textRect: CocoaTextField<AnyView>.Rect?
     var editingRect: CocoaTextField<AnyView>.Rect?
     var clearButtonRect: CocoaTextField<AnyView>.Rect?
-        
+
+    lazy var clearButton: UIButton? = value(forKeyPath: "_clearButton") as? UIButton
+
     override init(frame: CGRect) {
         super.init(frame: frame)
     }

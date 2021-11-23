@@ -43,6 +43,8 @@ extension CocoaNavigationView {
             }
             
             override func viewWillAppear(_ animated: Bool) {
+                self.view.backgroundColor = nil
+                
                 super.viewWillAppear(animated)
                 
                 setNavigationBarHidden(configuration.navigationBarHidden, animated: false)

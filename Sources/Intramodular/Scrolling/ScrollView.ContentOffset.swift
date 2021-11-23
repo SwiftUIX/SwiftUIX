@@ -88,7 +88,7 @@ extension ScrollView.ContentOffset {
         }
     }
     
-    public func relativeValue(from origin: Origin) -> CGPoint {
+    public func fractionalValue(from origin: Origin) -> CGPoint {
         return .init(
             x: value(from: origin).x == 0
                 ? 0
