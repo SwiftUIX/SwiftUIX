@@ -79,7 +79,7 @@ final class UIHostingCollectionViewController<
     
     lazy var _animateDataSourceDifferences: Bool = true
     lazy var _internalDiffableDataSource: UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>? = nil
-    
+
     lazy var cache = Cache(parent: self)
     
     #if !os(tvOS)
@@ -100,6 +100,8 @@ final class UIHostingCollectionViewController<
         return collectionView
     }()
     
+    private lazy var lastViewSafeAreaInsets: UIEdgeInsets = view.safeAreaInsets
+
     init(
         dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration,
         viewProvider: _SwiftUIType.ViewProvider,
@@ -250,14 +252,30 @@ final class UIHostingCollectionViewController<
             }
         }
     }
-    
+        
     override public func viewSafeAreaInsetsDidChange()  {
         super.viewSafeAreaInsetsDidChange()
+        
+        let newSafeAreaInsets = UIEdgeInsets(
+            top: view.safeAreaInsets.top.rounded(.up),
+            left: view.safeAreaInsets.left.rounded(.up),
+            bottom: view.safeAreaInsets.bottom.rounded(.up),
+            right: view.safeAreaInsets.right.rounded(.up)
+        )
+        
+        guard lastViewSafeAreaInsets != newSafeAreaInsets else {
+            return
+        }
+        
+        lastViewSafeAreaInsets = newSafeAreaInsets
         
         invalidateLayout(includingCache: false, animated: true)
     }
     
-    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    public override func viewWillTransition(
+        to size: CGSize,
+        with coordinator: UIViewControllerTransitionCoordinator
+    ) {
         super.viewWillTransition(to: size, with: coordinator)
         
         invalidateLayout(includingCache: true, animated: true)
@@ -364,9 +382,7 @@ final class UIHostingCollectionViewController<
     }
     
     // MARK: - UICollectionViewDelegateFlowLayout -
-    
-    private let prototypeCell = UICollectionViewCellType()
-    
+        
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,

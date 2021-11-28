@@ -51,17 +51,20 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
     public let axes: Axis.Set
     public let minimumLineSpacing: CGFloat?
     public let minimumInteritemSpacing: CGFloat?
+    public let itemSize: CGSize?
     public let sectionInsets: EdgeInsets?
     
     public init(
         _ axes: Axis.Set = .vertical,
         minimumLineSpacing: CGFloat? = nil,
         minimumInteritemSpacing: CGFloat? = nil,
+        itemSize: CGSize? = nil,
         sectionInsets: EdgeInsets? = nil
     ) {
         self.axes = axes
         self.minimumLineSpacing = minimumLineSpacing
         self.minimumInteritemSpacing = minimumInteritemSpacing
+        self.itemSize = itemSize
         self.sectionInsets = sectionInsets
     }
     
@@ -70,6 +73,8 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
         hasher.combine(minimumLineSpacing)
         hasher.combine(minimumInteritemSpacing)
         hasher.combine(sectionInsets?.top)
+        hasher.combine(itemSize?.width)
+        hasher.combine(itemSize?.height)
         hasher.combine(sectionInsets?.leading)
         hasher.combine(sectionInsets?.bottom)
         hasher.combine(sectionInsets?.trailing)
@@ -96,8 +101,12 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
             layout.sectionInset = .init(sectionInsets)
         }
         
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        layout.itemSize = UICollectionViewFlowLayout.automaticSize
+        if let itemSize = itemSize {
+            layout.itemSize = itemSize
+        } else {
+            layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            layout.itemSize = UICollectionViewFlowLayout.automaticSize
+        }
         
         return layout
     }

@@ -12,7 +12,11 @@ public func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
         return body()
     }
     
-    withAnimation(.none) {
+    var transaction = Transaction(animation: .none)
+    
+    transaction.disablesAnimations = true
+    
+    withTransaction(transaction) {
         body()
     }
 }
@@ -40,7 +44,7 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
     
     _areAnimationsDisabledGlobally = true
     
-    withAnimation(.none) {
+    _withoutAnimation {
         body()
     }
     
