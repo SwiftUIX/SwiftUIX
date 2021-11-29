@@ -27,10 +27,9 @@ public func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()
     }
     
     #if os(iOS)
-    CATransaction.begin()
-    CATransaction.setDisableActions(true)
-    body()
-    CATransaction.commit()
+    UIView.performWithoutAnimation {
+        body()
+    }
     #else
     body()
     #endif
