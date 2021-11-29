@@ -35,13 +35,15 @@ extension AppKitOrUIKitHostingControllerProtocol {
     public func sizeThatFits(_ sizeProposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize {
         let targetSize = sizeProposal.appKitOrUIKitTargetSize
         let fittingSize = sizeProposal.appKitOrUIKitFittingSize
-        
+
         guard sizeProposal.allowsSelfSizing else {
             return targetSize
         }
 
         if #available(iOS 15.0, *) {
-            view.layoutIfNeeded()
+            _withoutAppKitOrUIKitAnimation {
+                view.layoutIfNeeded()
+            }
         } else {
             _withoutAppKitOrUIKitAnimation {
                 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -53,8 +55,8 @@ extension AppKitOrUIKitHostingControllerProtocol {
             }
         }
 
-        var result = sizeThatFits(in: fittingSize)
-        
+        var result: CGSize = sizeThatFits(in: fittingSize)
+
         switch (result.width, result.height)  {
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude), (.infinity, .infinity):
                 result = sizeThatFits(in: targetSize.clamped(to: sizeProposal.maximumSize))
@@ -78,7 +80,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
             default:
                 break
         }
-        
+
         result = CGSize(
             width: sizeProposal.horizontalFittingPriority == .required
                 ? targetSize.width
@@ -87,16 +89,16 @@ extension AppKitOrUIKitHostingControllerProtocol {
                 ? targetSize.height
                 : result.height
         )
-        
+
         if result.width.isZero && !result.height.isZero {
             result = .init(width: 1, height: result.height)
         } else if !result.width.isZero && result.height.isZero {
             result = .init(width: result.width, height: 1)
         }
-        
+
         return result.clamped(to: sizeProposal.maximumSize)
     }
-    
+
     public func sizeThatFits(
         in size: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
