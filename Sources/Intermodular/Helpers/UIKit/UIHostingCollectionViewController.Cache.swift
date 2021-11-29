@@ -99,7 +99,7 @@ extension UIHostingCollectionViewController {
             } else {
                 invalidateCachedContentSize(forIndexPath: indexPath)
                 
-                return sizeForItem(
+                let size = sizeForItem(
                     atIndexPath: indexPath,
                     withCellConfiguration: .init(
                         item: item,
@@ -111,6 +111,8 @@ extension UIHostingCollectionViewController {
                         maximumSize: parent.maximumCollectionViewCellSize
                     )
                 )
+                
+                return size
             }
         }
         
@@ -248,10 +250,8 @@ extension UIHostingCollectionViewController.Cache {
         prototypeCell.update(disableAnimation: true)
         prototypeCell.cellWillDisplay(inParent: nil, isPrototype: true)
         
-        let size = prototypeCell
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-            .clamped(to: (prototypeCell.configuration?.maximumSize ?? nil).rounded(.down))
-        
+        let size = prototypeCell.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize.clamped(to: configuration.maximumSize?.rounded(.down)))
+
         guard !(size.width == 1 && size.height == 1) else {
             return size
         }
@@ -279,9 +279,7 @@ extension UIHostingCollectionViewController.Cache {
         prototypeView.update(disableAnimation: true)
         prototypeView.supplementaryViewWillDisplay(inParent: nil, isPrototype: true)
         
-        let size = prototypeView
-            .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-            .clamped(to: configuration.maximumSize?.rounded(.down))
+        let size = prototypeView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize.clamped(to: configuration.maximumSize?.rounded(.down)))
         
         guard !(size.width == 1 && size.height == 1) else {
             return size

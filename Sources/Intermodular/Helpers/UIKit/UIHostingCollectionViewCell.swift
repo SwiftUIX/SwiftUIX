@@ -209,7 +209,7 @@ class UIHostingCollectionViewCell<
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        var targetSize = targetSize
+        var newTargetSize = targetSize
         
         if let maximumSize = configuration?.maximumSize,
            let dimensions = content._precomputedDimensionsThatFit(in: maximumSize)
@@ -221,7 +221,7 @@ class UIHostingCollectionViewCell<
                     return size.clamped(to: maximumSize)
                 }
             } else {
-                targetSize = CGSize(dimensions, default: targetSize)
+                newTargetSize = CGSize(dimensions, default: targetSize)
             }
         }
         
@@ -230,7 +230,7 @@ class UIHostingCollectionViewCell<
         }
         
         return contentHostingController.systemLayoutSizeFitting(
-            targetSize,
+            newTargetSize,
             withHorizontalFittingPriority: horizontalFittingPriority,
             verticalFittingPriority: verticalFittingPriority
         )
