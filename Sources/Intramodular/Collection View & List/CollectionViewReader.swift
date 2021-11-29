@@ -45,8 +45,12 @@ public struct CollectionViewProxy: Hashable {
         get {
             _baseBox.value as? _CollectionViewProxyBase
         } set {
+            guard _baseBox.value !== newValue else {
+                return
+            }
+
             _baseBox.value = newValue
-            
+
             onBaseChange?()
         }
     }
@@ -156,8 +160,10 @@ public struct CollectionViewReader<Content: View>: View {
             .environment(\._collectionViewProxy, $_collectionViewProxy)
             .background {
                 PerformAction {
-                    _collectionViewProxy.onBaseChange = {
-                        invalidate.toggle()
+                    if _collectionViewProxy.onBaseChange == nil {
+                        _collectionViewProxy.onBaseChange = {
+                            invalidate.toggle()
+                        }
                     }
                 }
                 .id(invalidate)

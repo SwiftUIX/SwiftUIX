@@ -277,11 +277,13 @@ extension UIHostingCollectionViewSupplementaryView {
             _ targetSize: CGSize
         ) -> CGSize {
             sizeThatFits(
-                in: targetSize,
-                withHorizontalFittingPriority: nil,
-                verticalFittingPriority: nil
+                AppKitOrUIKitLayoutSizeProposal(
+                    targetSize: targetSize,
+                    maximumSize: base?.configuration?.maximumSize ?? nil,
+                    horizontalFittingPriority: nil,
+                    verticalFittingPriority: nil
+                )
             )
-            .clamped(to: base?.configuration?.maximumSize)
         }
         
         func systemLayoutSizeFitting(
@@ -290,11 +292,13 @@ extension UIHostingCollectionViewSupplementaryView {
             verticalFittingPriority: UILayoutPriority
         ) -> CGSize {
             sizeThatFits(
-                in: targetSize,
-                withHorizontalFittingPriority: horizontalFittingPriority,
-                verticalFittingPriority: verticalFittingPriority
+                AppKitOrUIKitLayoutSizeProposal(
+                    targetSize: targetSize,
+                    maximumSize: base?.configuration?.maximumSize ?? nil,
+                    horizontalFittingPriority: horizontalFittingPriority,
+                    verticalFittingPriority: verticalFittingPriority
+                )
             )
-            .clamped(to: base?.configuration?.maximumSize)
         }
         
         func move(

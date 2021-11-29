@@ -7,16 +7,16 @@ import SwiftUI
 
 var _areAnimationsDisabledGlobally: Bool = false
 
-public func _withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
+public func _withoutAnimation<T>(_ flag: Bool = true, _ body: () -> T) -> T {
     guard flag else {
         return body()
     }
-    
+
     var transaction = Transaction(animation: .none)
-    
+
     transaction.disablesAnimations = true
-    
-    withTransaction(transaction) {
+
+    return withTransaction(transaction) {
         body()
     }
 }

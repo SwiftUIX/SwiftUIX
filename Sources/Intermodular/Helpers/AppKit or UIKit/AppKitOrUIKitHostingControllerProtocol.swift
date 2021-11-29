@@ -39,16 +39,20 @@ extension AppKitOrUIKitHostingControllerProtocol {
         guard sizeProposal.allowsSelfSizing else {
             return targetSize
         }
-        
-        _withoutAppKitOrUIKitAnimation {
-            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-            view.setNeedsLayout()
-            view.layoutIfNeeded()
-            #elseif os(macOS)
-            view.layout()
-            #endif
+
+        if #available(iOS 15.0, *) {
+            // do nothing
+        } else {
+            _withoutAppKitOrUIKitAnimation {
+                #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+                view.setNeedsLayout()
+                view.layoutIfNeeded()
+                #elseif os(macOS)
+                view.layout()
+                #endif
+            }
         }
-        
+
         var result = sizeThatFits(in: fittingSize)
         
         switch (result.width, result.height)  {
@@ -98,7 +102,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
         withHorizontalFittingPriority horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
         verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
     ) -> CGSize {
-        return sizeThatFits(
+        sizeThatFits(
             .init(
                 targetSize: .init(size),
                 horizontalFittingPriority: horizontalFittingPriority,

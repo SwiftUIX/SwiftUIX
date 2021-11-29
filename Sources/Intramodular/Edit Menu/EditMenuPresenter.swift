@@ -178,7 +178,7 @@ extension EditMenuPresenter._BackgroundPresenterView {
         }
         
         @objc(performActionForEditMenuItemAtIndex4)
-        func performActionForEditMenuItemAtIndex4() {
+        private func performActionForEditMenuItemAtIndex4() {
             performActionForEditMenuItemAtIndex(4)
         }
         

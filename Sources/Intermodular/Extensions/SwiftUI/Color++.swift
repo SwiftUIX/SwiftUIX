@@ -85,25 +85,11 @@ extension Color {
 }
 
 extension Color {
-    public static var systemGray2: Color {
-        .init(.systemGray2)
-    }
-    
-    public static var systemGray3: Color {
-        .init(.systemGray3)
-    }
-    
-    public static var systemGray4: Color {
-        .init(.systemGray4)
-    }
-    
-    public static var systemGray5: Color {
-        .init(.systemGray5)
-    }
-    
-    public static var systemGray6: Color {
-        .init(.systemGray6)
-    }
+    public static let systemGray2: Color = Color(.systemGray2)
+    public static let systemGray3: Color = Color(.systemGray3)
+    public static let systemGray4: Color = Color(.systemGray4)
+    public static let systemGray5: Color = Color(.systemGray5)
+    public static let systemGray6: Color = Color(.systemGray6)
 }
 
 #endif

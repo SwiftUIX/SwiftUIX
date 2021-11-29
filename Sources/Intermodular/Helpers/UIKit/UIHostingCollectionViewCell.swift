@@ -280,8 +280,7 @@ class UIHostingCollectionViewCell<
                 let result = super.preferredLayoutAttributesFitting(layoutAttributes)
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
-                    cache.preferredContentSize = result.size
-                        .clamped(to: configuration?.maximumSize)
+                    cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
                 }
                 
                 updateCollectionCache()
@@ -305,10 +304,8 @@ class UIHostingCollectionViewCell<
         }
         
         if layoutAttributes.size != contentHostingController.view.frame.size {
-            self.cache.preferredContentSize = relativeFrame
-                .sizeThatFits(in: layoutAttributes.size)
-                .clamped(to: configuration?.maximumSize)
-            
+            self.cache.preferredContentSize = relativeFrame.sizeThatFits(in: layoutAttributes.size.clamped(to: configuration?.maximumSize))
+
             contentHostingController.update(disableAnimation: true)
         }
     }
@@ -520,16 +517,22 @@ extension UIHostingCollectionViewCell {
         @objc required public init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
+
+        override func viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews()
+        }
+
         public func systemLayoutSizeFitting(
             _ targetSize: CGSize
         ) -> CGSize {
             sizeThatFits(
-                in: targetSize,
-                withHorizontalFittingPriority: nil,
-                verticalFittingPriority: nil
+                AppKitOrUIKitLayoutSizeProposal(
+                    targetSize: targetSize,
+                    maximumSize: base?.configuration?.maximumSize ?? nil,
+                    horizontalFittingPriority: nil,
+                    verticalFittingPriority: nil
+                )
             )
-            .clamped(to: base?.configuration?.maximumSize)
         }
         
         public func systemLayoutSizeFitting(
@@ -538,11 +541,13 @@ extension UIHostingCollectionViewCell {
             verticalFittingPriority: UILayoutPriority
         ) -> CGSize {
             sizeThatFits(
-                in: targetSize,
-                withHorizontalFittingPriority: horizontalFittingPriority,
-                verticalFittingPriority: verticalFittingPriority
+                AppKitOrUIKitLayoutSizeProposal(
+                    targetSize: targetSize,
+                    maximumSize: base?.configuration?.maximumSize ?? nil,
+                    horizontalFittingPriority: horizontalFittingPriority,
+                    verticalFittingPriority: verticalFittingPriority
+                )
             )
-            .clamped(to: base?.configuration?.maximumSize)
         }
         
         func move(toParent parent: ParentViewControllerType?, ofCell cell: UIHostingCollectionViewCell) {
