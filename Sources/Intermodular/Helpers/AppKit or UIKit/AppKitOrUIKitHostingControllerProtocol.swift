@@ -41,18 +41,14 @@ extension AppKitOrUIKitHostingControllerProtocol {
         }
 
         if #available(iOS 15.0, *) {
-            _withoutAppKitOrUIKitAnimation {
-                view.layoutIfNeeded()
-            }
+            view.layoutIfNeeded()
         } else {
-            _withoutAppKitOrUIKitAnimation {
-                #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-                view.setNeedsLayout()
-                view.layoutIfNeeded()
-                #elseif os(macOS)
-                view.layout()
-                #endif
-            }
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+            #elseif os(macOS)
+            view.layout()
+            #endif
         }
 
         var result: CGSize = sizeThatFits(in: fittingSize)
