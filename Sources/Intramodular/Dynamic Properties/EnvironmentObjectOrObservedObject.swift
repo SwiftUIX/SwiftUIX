@@ -22,17 +22,9 @@ public struct EnvironmentObjectOrObservedObject<Value: ObservableObject>: Dynami
                 
                 return defaultValue()
             }
-        } nonmutating set {
+        } set {
             _wrappedValue1 = newValue
         }
-    }
-    
-    /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
-    public var projectedValue: Binding<Value> {
-        return .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
     }
     
     /// Initialize with the provided initial value.
