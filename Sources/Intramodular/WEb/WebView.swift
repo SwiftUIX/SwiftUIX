@@ -12,16 +12,18 @@ public struct WebView: View {
     private let configuration: _WebView.Configuration
     private var placeholder: AnyView?
     
-    @PersistentObject private var coordinator = _WebView.Coordinator()
+    @State private var coordinator = _WebView.Coordinator()
     
     public var body: some View {
-        _WebView(configuration: configuration, coordinator: coordinator)
-            .visible(!coordinator.isLoading)
-            .overlay {
-                if coordinator.isLoading {
-                    placeholder
+        withInlineObservedObject(coordinator) { _ in
+            _WebView(configuration: configuration, coordinator: coordinator)
+                .visible(!coordinator.isLoading)
+                .overlay {
+                    if coordinator.isLoading {
+                        placeholder
+                    }
                 }
-            }
+        }
     }
     
     public init<Placeholder: View>(
@@ -67,6 +69,10 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
             view.load(URLRequest(url: configuration.url))
         }
     }
+
+    static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
+        view.navigationDelegate = nil
+    }
     
     func makeCoordinator() -> Coordinator {
         coordinator
@@ -76,7 +82,7 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
 extension _WebView {
     class Coordinator: NSObject, ObservableObject, WKNavigationDelegate {
         @Published var isLoading: Bool = true
-        
+
         func webView(
             _ webView: WKWebView,
             didStartProvisionalNavigation navigation: WKNavigation!
