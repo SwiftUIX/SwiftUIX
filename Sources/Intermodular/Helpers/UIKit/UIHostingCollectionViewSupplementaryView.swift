@@ -330,7 +330,10 @@ extension UIHostingCollectionViewSupplementaryView {
             }
         }
         
-        func update(disableAnimation: Bool = true, forced: Bool = false) {
+        func update(
+            disableAnimation: Bool = true,
+            forced: Bool = false
+        ) {
             guard let base = base else {
                 return
             }

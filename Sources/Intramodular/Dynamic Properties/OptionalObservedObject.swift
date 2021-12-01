@@ -8,12 +8,12 @@ import SwiftUI
 
 @propertyWrapper
 public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicProperty {
+    public typealias Container = _OptionalObservedObjectContainer<ObjectType>
+    
     private let base: ObjectType?
 
-    @State
-    fileprivate var container: Container
-    @ObservedObject
-    fileprivate var observedContainer: Container
+    @State fileprivate var container: Container
+    @ObservedObject fileprivate var observedContainer: Container
 
     /// The current state value.
     public var wrappedValue: ObjectType? {
@@ -56,42 +56,40 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
 
 // MARK: - Auxiliary Implementation -
 
-extension OptionalObservedObject {
-    fileprivate final class Container: ObservableObject {
-        var baseSubscription: AnyCancellable?
-
-        var base: ObjectType? {
-            didSet {
-                if let oldValue = oldValue, let base = base {
-                    if oldValue === base, baseSubscription != nil {
-                        return
-                    }
+public final class _OptionalObservedObjectContainer<ObjectType: ObservableObject>: ObservableObject {
+    private var baseSubscription: AnyCancellable?
+    
+    fileprivate var base: ObjectType? {
+        didSet {
+            if let oldValue = oldValue, let base = base {
+                if oldValue === base, baseSubscription != nil {
+                    return
                 }
-
+            }
+            
+            subscribe()
+        }
+    }
+    
+    fileprivate init(base: ObjectType?) {
+        self.base = base
+        
+        withExtendedLifetime(self) {
+            withExtendedLifetime(base) {
                 subscribe()
             }
         }
-
-        init(base: ObjectType?) {
-            self.base = base
-
-            withExtendedLifetime(self) {
-                withExtendedLifetime(base) {
-                    subscribe()
-                }
-            }
+    }
+    
+    private func subscribe() {
+        guard let base = base else {
+            return
         }
-
-        func subscribe() {
-            guard let base = base else {
-                return
-            }
-
-            baseSubscription = base
-                .objectWillChange
-                .sink(receiveValue: { [weak self] _ in
-                    self?.objectWillChange.send()
-                })
-        }
+        
+        baseSubscription = base
+            .objectWillChange
+            .sink(receiveValue: { [weak self] _ in
+                self?.objectWillChange.send()
+            })
     }
 }
