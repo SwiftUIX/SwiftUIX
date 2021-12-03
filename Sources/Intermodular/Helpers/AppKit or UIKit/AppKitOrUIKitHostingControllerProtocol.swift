@@ -41,7 +41,11 @@ extension AppKitOrUIKitHostingControllerProtocol {
         }
 
         if #available(iOS 15.0, *) {
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             view.layoutIfNeeded()
+            #elseif os(macOS)
+            view.layout()
+            #endif
         } else {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             view.setNeedsLayout()
