@@ -21,8 +21,8 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 # Requirements 
 
 - iOS 13, macOS 10.15, tvOS 13, or watchOS 6 
-- Swift 5.4.2
-- Xcode 12.5+
+- Swift 5.5+
+- Xcode 13.0+
 
 # Installation
 
