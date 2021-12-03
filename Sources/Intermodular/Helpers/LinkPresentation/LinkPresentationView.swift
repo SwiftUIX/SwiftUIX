@@ -182,6 +182,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
         do {
             if let url = url, let metadata = try cache.decache(LPLinkMetadata.self, forKey: url) {
                 self.fetchedMetadata = metadata
+                onMetadataFetchCompletion?(.success(metadata))
             }
         } catch {
             errorContext.push(error)
