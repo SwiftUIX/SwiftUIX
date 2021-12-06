@@ -7,16 +7,16 @@ import Swift
 import SwiftUI
 
 public struct AnyPresentationView: View {
-    public enum Base {
+    enum Base {
         case native(AnyView)
         #if !os(watchOS)
         case appKitOrUIKitViewController(AppKitOrUIKitViewController)
         #endif
     }
     
-    public let base: Base
+    let base: Base
     
-    private var environmentBuilder: EnvironmentBuilder
+    var environmentBuilder: EnvironmentBuilder = .init()
     
     public private(set) var name: AnyHashable?
     public private(set) var id: AnyHashable?
@@ -47,9 +47,14 @@ public struct AnyPresentationView: View {
             self = view
         } else {
             self.base = .native((view as? _opaque_View)?.eraseToAnyView() ?? view.eraseToAnyView())
-            self.environmentBuilder = .init()
         }
     }
+    
+    #if !os(watchOS)
+    public init(_ viewController: AppKitOrUIKitViewController) {
+        self.base = .appKitOrUIKitViewController(viewController)
+    }
+    #endif
 }
 
 // MARK: - Conformances -

@@ -127,12 +127,18 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
         
-        let viewControllerToBePresented = CocoaPresentationHostingController(
-            presentingViewController: viewController,
-            presentation: modal,
-            coordinator: .init(presentation: modal)
-        )
+        let viewControllerToBePresented: UIViewController
         
+        if case let .appKitOrUIKitViewController(viewController) = modal.content.base {
+            viewControllerToBePresented = viewController
+        } else {
+            viewControllerToBePresented = CocoaPresentationHostingController(
+                presentingViewController: viewController,
+                presentation: modal,
+                coordinator: .init(presentation: modal)
+            )
+        }
+                
         viewController.present(
             viewControllerToBePresented,
             animated: true
