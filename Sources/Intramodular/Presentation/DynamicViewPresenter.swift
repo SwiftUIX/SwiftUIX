@@ -24,9 +24,6 @@ public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvide
     
     @discardableResult
     func dismissSelf(withAnimation _: Animation?) -> Future<Bool, Never>
-    
-    @discardableResult
-    func dismissSelf() -> Future<Bool, Never>
 }
 
 // MARK: - Implementation -
@@ -71,8 +68,16 @@ extension DynamicViewPresenter {
         present(modal, completion: { })
     }
     
+    public func present(_ view: AnyPresentationView) {
+        present(AnyModalPresentation(content: view), completion: { })
+    }
+    
     public func presentOnTop(_ modal: AnyModalPresentation) {
         topmostPresenter.present(modal, completion: { })
+    }
+    
+    public func presentOnTop(_ view: AnyPresentationView) {
+        topmostPresenter.present(AnyModalPresentation(content: view), completion: { })
     }
     
     public func present<Content: View>(@ViewBuilder content: () -> Content) {

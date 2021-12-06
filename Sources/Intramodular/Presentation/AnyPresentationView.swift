@@ -7,7 +7,14 @@ import Swift
 import SwiftUI
 
 public struct AnyPresentationView: View {
-    public let base: _opaque_View
+    public enum Base {
+        case native(AnyView)
+        #if !os(watchOS)
+        case appKitOrUIKitViewController(AppKitOrUIKitViewController)
+        #endif
+    }
+    
+    public let base: Base
     
     private var environmentBuilder: EnvironmentBuilder
     
@@ -19,17 +26,27 @@ public struct AnyPresentationView: View {
     public private(set) var hidesBottomBarWhenPushed: Bool = false
     
     public var body: some View {
-        base
-            .eraseToAnyView()
-            .mergeEnvironmentBuilder(environmentBuilder)
-            .modifier(_ResolveAppKitOrUIKitViewController())
+        PassthroughView {
+            switch base {
+                case .native(let view):
+                    view
+                        .mergeEnvironmentBuilder(environmentBuilder)
+                        .modifier(_ResolveAppKitOrUIKitViewController())
+                #if !os(watchOS)
+                case .appKitOrUIKitViewController(let viewController):
+                    AppKitOrUIKitViewControllerAdaptor(viewController)
+                        .mergeEnvironmentBuilder(environmentBuilder)
+                        .modifier(_ResolveAppKitOrUIKitViewController(viewController))
+                #endif
+            }
+        }
     }
     
     public init<V: View>(_ view: V) {
         if let view = view as? AnyPresentationView {
             self = view
         } else {
-            self.base = (view as? _opaque_View) ?? view.eraseToAnyView()
+            self.base = .native((view as? _opaque_View)?.eraseToAnyView() ?? view.eraseToAnyView())
             self.environmentBuilder = .init()
         }
     }

@@ -194,8 +194,16 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     @State var _appKitOrUIKitViewControllerBox = ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
     @State var presentationCoordinatorBox =
         ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
-    #endif
     
+    init(_ appKitOrUIKitViewController: AppKitOrUIKitViewController?) {
+        self._appKitOrUIKitViewControllerBox = .init(appKitOrUIKitViewController)
+    }
+    #endif
+
+    init() {
+        
+    }
+
     func body(content: Content) -> some View {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return content
