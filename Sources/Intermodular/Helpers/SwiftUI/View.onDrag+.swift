@@ -30,8 +30,6 @@ private struct _OnDragModifier<Content: View>: View {
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension View {
-    @_optimize(none)
-    @inline(never)
     public func onDragIfAvailable(_ data: @escaping () -> NSItemProvider) -> some View {
         if #available(iOS 13.4, iOSApplicationExtension 14.0, macCatalystApplicationExtension 14.0, *) {
             return ViewBuilder.buildEither(first: _OnDragModifier(rootView: self, data: data)) as _ConditionalContent<_OnDragModifier<Self>, Self>
