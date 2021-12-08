@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(>=5.2)
+#if swift(>=5.2) && swift(<5.5) // <5.5 added because Xcode 13.2 is buggy
 
 @available(iOS 13, *)
 @available(tvOS, unavailable)
@@ -15,7 +15,7 @@ public struct _HoverEffectViewModifier: ViewModifier {
     public init(hoverEffect: HoverEffect) {
         self.hoverEffect = hoverEffect
     }
-    
+
     @inlinable
     public func body(content: Content) -> some View {
         if #available(iOS 13.4, iOSApplicationExtension 14.0, macCatalystApplicationExtension 14.0, *) {
@@ -24,7 +24,6 @@ public struct _HoverEffectViewModifier: ViewModifier {
             fatalError("Use View.hoverEffectIfAvailable instead.")
         }
     }
-    
 }
 
 @available(iOS 13, *)
