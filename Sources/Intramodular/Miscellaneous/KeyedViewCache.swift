@@ -6,10 +6,9 @@ import Swift
 import SwiftUI
 
 @usableFromInline
-protocol StateCache {
+protocol KeyedViewCache {
     func cache<T>(_ value: T, forKey key: AnyHashable) throws
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T?
-    
     func removeCachedValue(forKey key: AnyHashable)
     func removeAllCachedValues()
 }
@@ -17,7 +16,7 @@ protocol StateCache {
 // MARK: - Default Implementation -
 
 @usableFromInline
-final class InMemoryStateCache: StateCache {
+final class InMemoryKeyedViewCache: KeyedViewCache {
     enum Error: Swift.Error {
         case typeMismatch
     }
@@ -60,25 +59,25 @@ final class InMemoryStateCache: StateCache {
 // MARK: - Auxiliary Implementation -
 
 @usableFromInline
-struct StateCacheEnvironmentKey: EnvironmentKey {
+struct KeyedViewCacheEnvironmentKey: EnvironmentKey {
     @usableFromInline
-    static let defaultValue: StateCache = InMemoryStateCache()
+    static let defaultValue: KeyedViewCache = InMemoryKeyedViewCache()
 }
 
 extension EnvironmentValues {
     @usableFromInline
-    var cache: StateCache {
+    var cache: KeyedViewCache {
         get {
-            self[StateCacheEnvironmentKey.self]
+            self[KeyedViewCacheEnvironmentKey.self]
         } set {
-            self[StateCacheEnvironmentKey.self] = newValue
+            self[KeyedViewCacheEnvironmentKey.self] = newValue
         }
     }
 }
 
 @propertyWrapper
 @usableFromInline
-struct _UniqueStateCache: DynamicProperty, StateCache {
+struct _UniqueKeyedViewCache: DynamicProperty, KeyedViewCache {
     private struct CacheKey: Hashable {
         let base: AnyHashable
         let parentID: AnyHashable
@@ -86,10 +85,10 @@ struct _UniqueStateCache: DynamicProperty, StateCache {
     
     @State private var id: AnyHashable
     
-    @Environment(\.cache) private var cache: StateCache
+    @Environment(\.cache) private var cache: KeyedViewCache
     
     @usableFromInline
-    var wrappedValue: StateCache {
+    var wrappedValue: KeyedViewCache {
         self
     }
     

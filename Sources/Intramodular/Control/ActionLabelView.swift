@@ -106,7 +106,7 @@ extension ActionLabelView where Label == SwiftUI.Label<Text, Image> {
     }
 }
 
-// MARK: - Concrete Implementaitons -
+// MARK: - Conformances -
 
 extension Button: ActionLabelView {
     public init(action: Action, @ViewBuilder label: () -> Label) {

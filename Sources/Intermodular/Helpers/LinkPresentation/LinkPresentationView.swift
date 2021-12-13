@@ -113,9 +113,9 @@ extension LinkPresentationView {
 @usableFromInline
 struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     @usableFromInline
-    @Environment(\.errorContext) var errorContext
+    @Environment(\.handleLocalizedError) var handleLocalizedError
     @usableFromInline
-    @_UniqueStateCache(for: Self.self) var cache
+    @_UniqueKeyedViewCache(for: Self.self) var cache
     
     let url: URL?
     @usableFromInline
@@ -185,7 +185,7 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
                 onMetadataFetchCompletion?(.success(metadata))
             }
         } catch {
-            errorContext.push(error)
+            onMetadataFetchCompletion?(.failure(error))
         }
         
         guard fetchedMetadata == nil else {
@@ -214,15 +214,11 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
                 } else if let error = error {
                     if let onMetadataFetchCompletion = self.onMetadataFetchCompletion {
                         onMetadataFetchCompletion(.failure(error))
-                    } else {
-                        self.errorContext.push(error)
                     }
                 }
                 
                 if let metadata = metadata {
-                    self.errorContext.withCriticalScope {
-                        try self.cache.cache(metadata, forKey: url)
-                    }
+                    _ = try? self.cache.cache(metadata, forKey: url)
                 }
             }
         }
