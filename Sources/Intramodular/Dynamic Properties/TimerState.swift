@@ -8,6 +8,7 @@ import Swift
 import SwiftUI
 
 /// A property wrapper type that can maintain a timed counter.
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper
 public struct TimerState: DynamicProperty {
     private class ValueBox: ObservableObject {
@@ -27,7 +28,8 @@ public struct TimerState: DynamicProperty {
     private let maxCount: Int?
     
     @State private var state = ReferenceBox<(publisher: Timer.TimerPublisher, connection: Cancellable, subscription: Cancellable)?>(nil)
-    @PersistentObject private var valueBox: ValueBox
+    
+    @StateObject private var valueBox: ValueBox
     
     public var wrappedValue: Int {
         valueBox.value
