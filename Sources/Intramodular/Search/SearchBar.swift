@@ -201,7 +201,11 @@ extension SearchBar: UIViewRepresentable {
         public func searchBar(_ searchBar: UIViewType, textDidChange searchText: String) {
             base.text = searchText
         }
-        
+
+        public func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+            true
+        }
+
         public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
             base.onEditingChanged(false)
         }
