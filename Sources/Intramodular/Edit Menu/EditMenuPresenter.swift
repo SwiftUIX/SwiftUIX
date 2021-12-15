@@ -145,7 +145,8 @@ extension EditMenuPresenter._BackgroundPresenterView {
                     resignFirstResponder()
                 }
             }
-            
+
+            menuController?.menuItems = nil
             menuController = nil
         }
         
