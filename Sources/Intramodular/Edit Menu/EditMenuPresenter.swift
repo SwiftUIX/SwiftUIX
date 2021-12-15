@@ -82,7 +82,6 @@ extension EditMenuPresenter._BackgroundPresenterView {
         var attachmentAnchor: UnitPoint?
         var editMenuItems: () -> [EditMenuItem] = { [] }
         
-        private var menuController: UIMenuController? = nil
         private var itemIndexToActionMap: [Int: Action]?
         
         override var canBecomeFirstResponder: Bool {
@@ -104,20 +103,13 @@ extension EditMenuPresenter._BackgroundPresenterView {
         }
         
         @objc func showMenu(sender _: AnyObject?) {
-            if let menuController = menuController {
-                guard !menuController.isMenuVisible else {
-                    return
-                }
-            }
-            
             becomeFirstResponder()
             
             itemIndexToActionMap = [:]
             
             let items = editMenuItems()
-            let menuController = UIMenuController()
             
-            menuController.menuItems = items.enumerated().map { (index, item) in
+            UIMenuController.shared.menuItems = items.enumerated().map { (index, item) in
                 let selector = Selector("performActionForEditMenuItemAtIndex\(index.description)")
                 
                 itemIndexToActionMap?[index] = item.action
@@ -130,9 +122,7 @@ extension EditMenuPresenter._BackgroundPresenterView {
                 return item
             }
             
-            menuController.showMenu(from: self, rect: frame)
-            
-            self.menuController = menuController
+            UIMenuController.shared.showMenu(from: self, rect: frame)
         }
         
         @objc func didHideEditMenu(_ sender: AnyObject?) {
@@ -146,8 +136,8 @@ extension EditMenuPresenter._BackgroundPresenterView {
                 }
             }
 
-            menuController?.menuItems = nil
-            menuController = nil
+            UIMenuController.shared.menuItems = nil
+            UIMenuController.shared = nil
         }
         
         override func canPerformAction(_ action: Selector, withSender _: Any?) -> Bool {
