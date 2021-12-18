@@ -137,7 +137,6 @@ extension EditMenuPresenter._BackgroundPresenterView {
             }
 
             UIMenuController.shared.menuItems = nil
-            UIMenuController.shared = nil
         }
         
         override func canPerformAction(_ action: Selector, withSender _: Any?) -> Bool {
