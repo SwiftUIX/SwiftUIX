@@ -30,6 +30,9 @@ public struct CocoaList<
     @usableFromInline
     var style: UITableView.Style = .plain
     
+    @usableFromInline
+    var backgroundColor: UIColor?
+    
     #if !os(tvOS)
     @usableFromInline
     var separatorStyle: UITableViewCell.SeparatorStyle = .singleLine
@@ -65,6 +68,7 @@ public struct CocoaList<
         uiViewController.sectionHeader = sectionHeader
         uiViewController.sectionFooter = sectionFooter
         uiViewController.rowContent = rowContent
+        uiViewController.view.backgroundColor = backgroundColor
         
         uiViewController.initialContentAlignment = context.environment.initialContentAlignment
         
@@ -77,6 +81,7 @@ public struct CocoaList<
         #if !os(tvOS)
         uiViewController.tableView.separatorStyle = separatorStyle
         #endif
+        uiViewController.tableView.backgroundColor = backgroundColor
         
         uiViewController.reloadData()
     }
