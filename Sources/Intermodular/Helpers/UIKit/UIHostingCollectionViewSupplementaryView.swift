@@ -60,7 +60,8 @@ class UIHostingCollectionViewSupplementaryView<
         SectionFooterContent,
         Content
     >
-    
+
+    var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
     var configuration: Configuration?
     var cache = Cache()
     
@@ -175,6 +176,10 @@ extension UIHostingCollectionViewSupplementaryView {
         guard configuration != nil else {
             return
         }
+
+        defer {
+            latestRepresentableUpdate = parentViewController?.latestRepresentableUpdate
+        }
         
         if let contentHostingController = contentHostingController {
             contentHostingController.update(disableAnimation: disableAnimation)
@@ -187,10 +192,6 @@ extension UIHostingCollectionViewSupplementaryView {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
-        UIView.performWithoutAnimation {
-            contentHostingController?.view.isHidden = false
-        }
-        
         guard configuration != nil else {
             return
         }
@@ -204,7 +205,7 @@ extension UIHostingCollectionViewSupplementaryView {
             
             return
         }
-        
+                
         if let parentViewController = parentViewController {
             if contentHostingController.parent == nil {
                 contentHostingController.move(toParent: parentViewController, ofSupplementaryView: self)
@@ -218,9 +219,7 @@ extension UIHostingCollectionViewSupplementaryView {
     }
     
     func supplementaryViewDidEndDisplaying() {
-        UIView.performWithoutAnimation {
-            contentHostingController?.view.isHidden = true
-        }
+        updateCollectionCache()
     }
     
     func updateCollectionCache() {
@@ -306,26 +305,39 @@ extension UIHostingCollectionViewSupplementaryView {
             ofSupplementaryView supplementaryView: UIHostingCollectionViewSupplementaryView
         ) {
             if let parent = parent {
+                let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
+
                 if let existingParent = self.parent, existingParent !== parent {
                     move(toParent: nil, ofSupplementaryView: supplementaryView)
                 }
                 
                 if self.parent == nil {
-                    UIView.performWithoutAnimation {
-                        self.willMove(toParent: parent)
-                        parent.addChild(self)
-                        supplementaryView.addSubview(view)
-                        view.frame = supplementaryView.bounds
-                        didMove(toParent: parent)
+                    if hostAsChildViewController {
+                        UIView.performWithoutAnimation {
+                            self.willMove(toParent: parent)
+                            parent.addChild(self)
+                            supplementaryView.addSubview(view)
+                            view.frame = supplementaryView.bounds
+                            didMove(toParent: parent)
+                        }
+                    } else {
+                        if view.superview !== supplementaryView {
+                            UIView.performWithoutAnimation {
+                                supplementaryView.addSubview(view)
+                                view.frame = supplementaryView.bounds
+                            }
+                        }
                     }
                 } else {
                     assertionFailure()
                 }
             } else {
-                UIView.performWithoutAnimation {
-                    willMove(toParent: nil)
-                    view.removeFromSuperview()
-                    removeFromParent()
+                if self.parent != nil {
+                    UIView.performWithoutAnimation {
+                        willMove(toParent: nil)
+                        view.removeFromSuperview()
+                        removeFromParent()
+                    }
                 }
             }
         }

@@ -86,7 +86,7 @@ struct _CollectionView<
     private let dataSourceConfiguration: DataSourceConfiguration
     private let viewProvider: ViewProvider
     
-    @Environment(\._collectionViewConfiguration) var configuration: Configuration
+    @Environment(\._collectionViewConfiguration) private var configuration: Configuration
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(
@@ -97,6 +97,8 @@ struct _CollectionView<
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.latestRepresentableUpdate = _AppKitOrUIKitViewRepresentableUpdate()
+        
         populateCollectionViewProxy: do {
             if let _collectionViewProxy = context.environment._collectionViewProxy {
                 if _collectionViewProxy.wrappedValue.base !== uiViewController {

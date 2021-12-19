@@ -74,7 +74,9 @@ class UIHostingCollectionViewCell<
         SectionFooterContent,
         Content
     >
-    
+
+    var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
+
     var configuration: Configuration? {
         didSet {
             if oldValue?.id != configuration?.id {
@@ -93,7 +95,7 @@ class UIHostingCollectionViewCell<
     
     var preferences = Preferences() {
         didSet {
-            clipsToBounds = preferences._collectionOrListCellPreferences.isClipped
+            assignIfNotEqual(preferences._collectionOrListCellPreferences.isClipped, to: &clipsToBounds)
         }
     }
     
@@ -242,19 +244,17 @@ class UIHostingCollectionViewCell<
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-        _isFocused = false
-        
-        super.isHighlighted = false
-        super.isSelected = false
+
+        assignIfNotEqual(false, to: &_isFocused)
+        assignIfNotEqual(false, to: &super.isHighlighted)
+        assignIfNotEqual(false, to: &super.isSelected)
     }
-    
+
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
         if let size = cache.preferredContentSize {
-            layoutAttributes.size = size
-                .clamped(to: configuration?.maximumSize)
+            layoutAttributes.size = size.clamped(to: configuration?.maximumSize)
             
             return layoutAttributes
         } else if let relativeFrame = preferences.relativeFrame {
@@ -276,19 +276,19 @@ class UIHostingCollectionViewCell<
                 return layoutAttributes
             }
             
-            if !parentViewController.configuration.ignorePreferredCellLayoutAttributes {
-                let result = super.preferredLayoutAttributesFitting(layoutAttributes)
-                
-                if cache.preferredContentSize == nil || result.size != bounds.size {
-                    cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
-                }
-                
-                updateCollectionCache()
-                
-                return result
-            } else {
+            guard !parentViewController.configuration.ignorePreferredCellLayoutAttributes else {
                 return layoutAttributes
             }
+
+            let result = super.preferredLayoutAttributesFitting(layoutAttributes)
+            
+            if cache.preferredContentSize == nil || result.size != bounds.size {
+                cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
+            }
+            
+            updateCollectionCache()
+            
+            return result
         }
     }
     
@@ -319,7 +319,11 @@ extension UIHostingCollectionViewCell {
         guard configuration != nil else {
             return
         }
-        
+
+        defer {
+            latestRepresentableUpdate = parentViewController?.latestRepresentableUpdate
+        }
+
         if let contentHostingController = contentHostingController {
             contentHostingController.update(disableAnimation: disableAnimation)
         } else {
@@ -331,10 +335,6 @@ extension UIHostingCollectionViewCell {
         inParent parentViewController: ParentViewControllerType?,
         isPrototype: Bool = false
     ) {
-        UIView.performWithoutAnimation {
-            contentHostingController?.view.isHidden = false
-        }
-        
         guard configuration != nil else {
             return
         }
@@ -348,7 +348,7 @@ extension UIHostingCollectionViewCell {
             
             return
         }
-        
+                
         if let parentViewController = parentViewController {
             if contentHostingController.parent == nil {
                 contentHostingController.move(toParent: parentViewController, ofCell: self)
@@ -363,10 +363,6 @@ extension UIHostingCollectionViewCell {
     
     func cellDidEndDisplaying() {
         updateCollectionCache()
-        
-        UIView.performWithoutAnimation {
-            contentHostingController?.view.isHidden = true
-        }
     }
     
     func updateCollectionCache() {
@@ -552,29 +548,32 @@ extension UIHostingCollectionViewCell {
         
         func move(toParent parent: ParentViewControllerType?, ofCell cell: UIHostingCollectionViewCell) {
             if let parent = parent {
+                let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
+
                 if let existingParent = self.parent, existingParent !== parent {
                     move(toParent: nil, ofCell: cell)
                 }
                 
                 if self.parent == nil {
-                    let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
-                    
                     let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
-                    
-                    UIView.performWithoutAnimation {
-                        if hostAsChildViewController {
+
+                    if hostAsChildViewController {
+                        UIView.performWithoutAnimation {
                             self.willMove(toParent: parent)
                             parent.addChild(self)
-                        }
-                        
-                        cell.contentView.addSubview(view)
-                        view.frame = cell.contentView.bounds
-                        
-                        if hostAsChildViewController {
+                            cell.contentView.addSubview(view)
+                            view.frame = cell.contentView.bounds
                             didMove(toParent: parent)
                         }
+                    } else {
+                        if view.superview !== cell.contentView {
+                            UIView.performWithoutAnimation {
+                                cell.contentView.addSubview(view)
+                                view.frame = cell.contentView.bounds
+                            }
+                        }
                     }
-                    
+
                     if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
                         navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
                     }
@@ -582,10 +581,12 @@ extension UIHostingCollectionViewCell {
                     assertionFailure()
                 }
             } else {
-                UIView.performWithoutAnimation {
-                    willMove(toParent: nil)
-                    view.removeFromSuperview()
-                    removeFromParent()
+                if self.parent != nil {
+                    UIView.performWithoutAnimation {
+                        willMove(toParent: nil)
+                        view.removeFromSuperview()
+                        removeFromParent()
+                    }
                 }
             }
         }

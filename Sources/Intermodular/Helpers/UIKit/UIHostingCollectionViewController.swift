@@ -36,7 +36,9 @@ final class UIHostingCollectionViewController<
         SectionFooterContent,
         CellContent
     >
-    
+
+    var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
+
     var dataSource: DataSource.Payload? = nil {
         didSet {
             updateDataSource(oldValue: oldValue, newValue: dataSource)
@@ -150,7 +152,7 @@ final class UIHostingCollectionViewController<
                 withReuseIdentifier: .hostingCollectionViewCellIdentifier,
                 for: indexPath
             ) as! UICollectionViewCellType
-            
+
             guard let item = self.item(at: indexPath), let section = self.section(from: indexPath) else {
                 return cell
             }
@@ -168,7 +170,7 @@ final class UIHostingCollectionViewController<
             self.cache.preconfigure(cell: cell)
             
             cell.update(disableAnimation: true)
-            
+
             return cell
         }
         
@@ -489,10 +491,14 @@ extension UIHostingCollectionViewController {
     func refreshVisibleCellsAndSupplementaryViews() {
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
             guard let view = view as? UICollectionViewSupplementaryViewType else {
-                return
+                continue
             }
-            
-            view.cache = .init()
+
+            guard view.latestRepresentableUpdate != latestRepresentableUpdate else {
+                continue
+            }
+
+            view.cache.content = nil
             view.configuration?.viewProvider = viewProvider
             
             view.update(disableAnimation: true)
@@ -500,10 +506,14 @@ extension UIHostingCollectionViewController {
         
         for cell in collectionView.visibleCells {
             guard let cell = cell as? UICollectionViewCellType else {
-                return
+                continue
             }
-            
-            cell.cache = .init()
+
+            guard cell.latestRepresentableUpdate != latestRepresentableUpdate else {
+                continue
+            }
+
+            cell.cache.content = nil
             cell.configuration?.viewProvider = viewProvider
             
             cell.update(disableAnimation: true)
@@ -511,10 +521,14 @@ extension UIHostingCollectionViewController {
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {
             guard let view = view as? UICollectionViewSupplementaryViewType else {
-                return
+                continue
+            }
+
+            guard view.latestRepresentableUpdate != latestRepresentableUpdate else {
+                continue
             }
             
-            view.cache = .init()
+            view.cache.content = nil
             view.configuration?.viewProvider = viewProvider
             
             view.update(disableAnimation: true)

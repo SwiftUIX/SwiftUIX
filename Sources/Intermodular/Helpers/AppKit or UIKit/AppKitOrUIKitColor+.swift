@@ -149,8 +149,10 @@ extension Color {
                 return nil
         }
     }
-    
-    public func toUIColor() -> UIColor? {
+
+    private static var appKitOrUIKitColorConversionCache: [Color: AppKitOrUIKitColor] = [:]
+
+    public func _toUIColor() -> UIColor? {
         #if os(iOS)
         if #available(iOS 14.0, *) {
             return UIColor(self)
@@ -166,6 +168,18 @@ extension Color {
             ?? toUIColor1()
             ?? toUIColor2()
             ?? toUIColor3()
+    }
+
+    public func toUIColor() -> UIColor? {
+        if let cachedResult = Self.appKitOrUIKitColorConversionCache[self] {
+            return cachedResult
+        } else {
+            let result = _toUIColor()
+
+            Self.appKitOrUIKitColorConversionCache[self] = result
+
+            return result
+        }
     }
 }
 

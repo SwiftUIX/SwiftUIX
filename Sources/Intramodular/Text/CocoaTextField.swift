@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A control that displays an editable text interface.
-public struct CocoaTextField<Label: View>: CocoaView {
+public struct CocoaTextField<Label: View>: View {
     typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
     
     public struct CharactersChange: Hashable {
