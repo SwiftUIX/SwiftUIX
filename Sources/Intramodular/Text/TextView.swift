@@ -250,10 +250,16 @@ extension _TextView: UIViewRepresentable {
         }
         
         correctCursorOffset: do {
+            #if os(tvOS)
+            if let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
+                uiView.selectedTextRange = textRange
+            }
+            #else
             // Reset the cursor offset if possible.
             if uiView.isEditable, let cursorOffset = cursorOffset, let position = uiView.position(from: uiView.beginningOfDocument, offset: cursorOffset), let textRange = uiView.textRange(from: position, to: position) {
                 uiView.selectedTextRange = textRange
             }
+            #endif
         }
         
         updateKeyboardConfiguration: do {
