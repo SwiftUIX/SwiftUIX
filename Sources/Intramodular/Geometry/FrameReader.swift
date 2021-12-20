@@ -89,14 +89,19 @@ private struct AttachFrameID: ViewModifier {
 public struct FrameReaderProxy {
     /// Data from the preference key `_NamedViewDescription.PreferenceKey`.
     var preferenceData: [AnyHashable: _NamedViewDescription] = [:]
-    
     /// Data sourced from `EnvironmentValues._frameReaderProxy`.
     var environmentSourcedData: [AnyHashable: _NamedViewDescription] = [:]
 
     private func viewDescription(forFrameWithID id: AnyHashable) -> _NamedViewDescription? {
         preferenceData[FrameID(base: id)] ?? environmentSourcedData[FrameID(base: id)]
     }
-    
+
+    public func frame(for identifier: AnyHashable, in coordinateSpace: CoordinateSpace) -> CGRect {
+        assert(coordinateSpace == .global, "The only coordinateSpace supported currently is .global")
+
+        return viewDescription(forFrameWithID: identifier)?.globalBounds ?? .zero
+    }
+
     public func size(for identifier: AnyHashable) -> CGSize {
         viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
     }
