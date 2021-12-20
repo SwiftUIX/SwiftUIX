@@ -24,6 +24,7 @@ public struct SearchBar: DefaultTextInputType {
     
     private let onEditingChanged: (Bool) -> Void
     private let onCommit: () -> Void
+    private var isInitialFirstResponder: Bool?
     private var isFocused: Binding<Bool>? = nil
     
     private var placeholder: String?
@@ -82,7 +83,15 @@ extension SearchBar: UIViewRepresentable {
         let uiView = _UISearchBar()
         
         uiView.delegate = context.coordinator
-        
+
+        if context.environment.isEnabled {
+            DispatchQueue.main.async {
+                if (isInitialFirstResponder ?? isFocused?.wrappedValue) ?? false {
+                    uiView.becomeFirstResponder()
+                }
+            }
+        }
+
         return uiView
     }
     
@@ -96,6 +105,8 @@ extension SearchBar: UIViewRepresentable {
         _ uiView: UIViewType,
         environment: EnvironmentValues
     ) {
+        uiView.isUserInteractionEnabled = environment.isEnabled
+
         style: do {
             uiView.searchTextField.autocorrectionType = environment.disableAutocorrection.map({ $0 ? .no : .yes }) ?? .default
             
@@ -116,17 +127,17 @@ extension SearchBar: UIViewRepresentable {
             if let placeholder = placeholder {
                 uiView.placeholder = placeholder
             }
-            
-            uiView.searchBarStyle = searchBarStyle
-            
+
+            assignIfNotEqual(searchBarStyle, to: &uiView.searchBarStyle)
+
             for (icon, image) in iconImageConfiguration {
                 if uiView.image(for: icon, state: .normal) == nil { // FIXME: This is a performance hack.
                     uiView.setImage(image, for: icon, state: .normal)
                 }
             }
-            
-            uiView.tintColor = environment.tintColor?.toUIColor()
-            
+
+            assignIfNotEqual(environment.tintColor?.toUIColor(), to: &uiView.tintColor)
+
             if let showsCancelButton = showsCancelButton {
                 if uiView.showsCancelButton != showsCancelButton {
                     uiView.setShowsCancelButton(showsCancelButton, animated: true)
@@ -135,23 +146,9 @@ extension SearchBar: UIViewRepresentable {
         }
         
         keyboard: do {
-            if let returnKeyType = returnKeyType {
-                uiView.returnKeyType = returnKeyType
-            } else {
-                uiView.returnKeyType = .default
-            }
-            
-            if let keyboardType = keyboardType {
-                uiView.keyboardType = keyboardType
-            } else {
-                uiView.keyboardType = .default
-            }
-            
-            if let enablesReturnKeyAutomatically = enablesReturnKeyAutomatically {
-                uiView.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically
-            } else {
-                uiView.enablesReturnKeyAutomatically = false
-            }
+            assignIfNotEqual(returnKeyType ?? .default, to: &uiView.returnKeyType)
+            assignIfNotEqual(keyboardType ?? .default, to: &uiView.keyboardType)
+            assignIfNotEqual(enablesReturnKeyAutomatically ?? false, to: &uiView.enablesReturnKeyAutomatically)
         }
         
         data: do {
@@ -160,8 +157,8 @@ extension SearchBar: UIViewRepresentable {
             }
             
             if let searchTokens = searchTokens?.wrappedValue {
-                if uiView.searchTextField.tokens.map(\._SwiftUIX_text) == searchTokens.map(\.text) {
-                    
+                if uiView.searchTextField.tokens.map(\._SwiftUIX_text) != searchTokens.map(\.text) {
+                    uiView.searchTextField.tokens = searchTokens.map({ .init($0) })
                 }
             } else {
                 if !uiView.searchTextField.tokens.isEmpty {
@@ -171,11 +168,11 @@ extension SearchBar: UIViewRepresentable {
         }
         
         updateResponderChain: do {
-            if let uiView = uiView as? _UISearchBar {
-                if let isFocused = isFocused, uiView.window != nil {
-                    uiView.isFirstResponderBinding = isFocused
+            if let uiView = uiView as? _UISearchBar, environment.isEnabled {
+                DispatchQueue.main.async {
+                    if let isFocused = isFocused, uiView.window != nil {
+                        uiView.isFirstResponderBinding = isFocused
 
-                    DispatchQueue.main.async {
                         if isFocused.wrappedValue && !uiView.isFirstResponder {
                             uiView.becomeFirstResponder()
                         } else if !isFocused.wrappedValue && uiView.isFirstResponder {
@@ -307,6 +304,13 @@ extension SearchBar {
 }
 
 extension SearchBar {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
+    public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
+        then({ $0.isInitialFirstResponder = isInitialFirstResponder })
+    }
+
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
