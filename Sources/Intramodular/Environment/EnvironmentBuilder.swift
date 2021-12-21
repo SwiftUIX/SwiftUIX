@@ -10,8 +10,6 @@ public struct EnvironmentBuilder {
     @usableFromInline
     lazy var environmentValues: [AnyKeyPath: Any] = [:]
     @usableFromInline
-    lazy var environmentValueKeyPaths: Set<KeyPath<EnvironmentValues, Any>> = []
-    @usableFromInline
     lazy var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
     
     @usableFromInline
