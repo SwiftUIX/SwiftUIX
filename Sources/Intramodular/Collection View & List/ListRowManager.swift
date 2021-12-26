@@ -8,14 +8,22 @@ import SwiftUI
 protocol _CellProxyBase {
     var globalFrame: CGRect { get }
     
-    func invalidateLayout()
+    func invalidateLayout(with context: CellProxy.InvalidationContext)
 }
 
 public struct CellProxy {
+    public struct InvalidationContext {
+        public let newPreferredContentSize: OptionalDimensions?
+        
+        public init(newPreferredContentSize: OptionalDimensions? = nil) {
+            self.newPreferredContentSize = newPreferredContentSize
+        }
+    }
+    
     let base: _CellProxyBase?
     
-    public func invalidateLayout() {
-        base?.invalidateLayout()
+    public func invalidateLayout(with context: InvalidationContext = .init()) {
+        base?.invalidateLayout(with: context)
     }
 }
 

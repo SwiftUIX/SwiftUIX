@@ -7,41 +7,6 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-extension UIHostingCollectionViewSupplementaryView {
-    struct Configuration: Identifiable {
-        struct ID: Hashable {
-            let kind: String
-            let item: ItemIdentifierType?
-            let section: SectionIdentifierType
-        }
-        
-        var kind: String
-        var item: ItemType?
-        var section: SectionType
-        var itemIdentifier: ItemIdentifierType?
-        var sectionIdentifier: SectionIdentifierType
-        var indexPath: IndexPath
-        var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
-        var maximumSize: OptionalDimensions?
-        
-        var id: ID {
-            .init(kind: kind, item: itemIdentifier, section: sectionIdentifier)
-        }
-    }
-    
-    struct Cache {
-        var content: AnyView?
-        var contentSize: CGSize?
-        var preferredContentSize: CGSize? {
-            didSet {
-                if oldValue != preferredContentSize {
-                    content = nil
-                }
-            }
-        }
-    }
-}
-
 class UIHostingCollectionViewSupplementaryView<
     SectionType,
     SectionIdentifierType: Hashable,
@@ -60,16 +25,20 @@ class UIHostingCollectionViewSupplementaryView<
         SectionFooterContent,
         Content
     >
+    typealias Configuration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias State = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias Preferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias Cache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
     var configuration: Configuration?
     var cache = Cache()
     
-    var content: AnyView? {
+    var content: AnyView {
         if let content = cache.content {
             return content
         } else if let configuration = configuration {
-            let content = configuration.viewProvider.sectionContent(for: configuration.kind)?(configuration.section)
+            let content = configuration.makeContent()
             
             self.cache.content = content
             
@@ -83,7 +52,7 @@ class UIHostingCollectionViewSupplementaryView<
     
     private var contentHostingController: ContentHostingController?
     
-    private weak var parentViewController: ParentViewControllerType?
+    weak var parentViewController: ParentViewControllerType?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -227,35 +196,14 @@ extension UIHostingCollectionViewSupplementaryView {
             return
         }
         
-        parentViewController.cache.setSupplementaryViewCache(cache, for: configuration.id)
+        parentViewController.cache.setContentCache(cache, for: configuration.id)
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewSupplementaryView {
-    private struct RootView: View {
-        var _collectionViewProxy: CollectionViewProxy
-        var content: AnyView?
-        var configuration: Configuration?
-        
-        init(base: UIHostingCollectionViewSupplementaryView) {
-            _collectionViewProxy = .init(base.parentViewController)
-            content = base.content
-            configuration = base.configuration
-        }
-        
-        var body: some View {
-            if let content = content, let configuration = configuration {
-                content
-                    .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
-                    .edgesIgnoringSafeArea(.all)
-                    .id(configuration.id)
-            }
-        }
-    }
-    
-    private class ContentHostingController: UIHostingController<RootView> {
+    private class ContentHostingController: UIHostingController<_CollectionViewCellOrSupplementaryViewContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
         weak var base: UIHostingCollectionViewSupplementaryView?
         
         init(base: UIHostingCollectionViewSupplementaryView) {
@@ -350,12 +298,12 @@ extension UIHostingCollectionViewSupplementaryView {
                 return
             }
             
-            let currentConfiguration = rootView.configuration
-            let newConfiguration = base.configuration
+            let currentContentConfiguration = rootView.configuration.contentConfiguration
+            let newContentConfiguration = base.configuration
             
             if !forced {
-                if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration {
-                    guard currentConfiguration.id != newConfiguration.id else {
+                if let newContentConfiguration = newContentConfiguration {
+                    guard currentContentConfiguration.id != newContentConfiguration.id else {
                         return
                     }
                 }
@@ -375,7 +323,8 @@ extension UIHostingCollectionViewSupplementaryView {
 }
 
 extension String {
-    static let hostingCollectionViewSupplementaryViewIdentifier = "UIHostingCollectionViewSupplementaryView"
+    static let hostingCollectionViewHeaderSupplementaryViewIdentifier = "UIHostingCollectionViewHeaderSupplementaryView"
+    static let hostingCollectionViewFooterSupplementaryViewIdentifier = "UIHostingCollectionViewFooterSupplementaryView"
 }
 
 #endif

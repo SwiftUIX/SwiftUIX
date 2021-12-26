@@ -128,8 +128,8 @@ private struct _OnChangeOfFrame: ViewModifier {
     let action: (CGSize) -> Void
     
     func body(content: Content) -> some View {
-        IntrinsicGeometryReader { proxy in
-            content.onChange(of: proxy.size, perform: action)
+        IntrinsicSizeReader { size in
+            content.onChange(of: size, perform: action)
         }
     }
 }
@@ -143,16 +143,22 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
     @State private var cancellable: AnyCancellable?
     
     func body(content: Content) -> some View {
-        content.onChange(of: value) { newValue in
-            subscribeIfNecessary()
-            
-            valuePublisher.send(newValue)
-        }
-        .onAppear {
-            subscribeIfNecessary()
-        }
+        content
+            .background {
+                ZeroSizeView()
+                    .onChange(of: value) { newValue in
+                        subscribeIfNecessary()
+                        
+                        valuePublisher.send(newValue)
+                    }
+                    .onAppear {
+                        subscribeIfNecessary()
+                    }
+                    .allowsHitTesting(false)
+                    .accessibility(hidden: true)
+            }
     }
-    
+
     private func subscribeIfNecessary() {
         if subscription == nil {
             let subscription = transform(valuePublisher.eraseToAnyPublisher())

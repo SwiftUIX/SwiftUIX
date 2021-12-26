@@ -7,55 +7,6 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-extension UIHostingCollectionViewCell {
-    struct Configuration: Identifiable {
-        struct ID: Hashable {
-            let item: ItemIdentifierType
-            let section: SectionIdentifierType
-        }
-        
-        let item: ItemType
-        let section: SectionType
-        let itemIdentifier: ItemIdentifierType
-        let sectionIdentifier: SectionIdentifierType
-        let indexPath: IndexPath
-        var viewProvider: ParentViewControllerType._SwiftUIType.ViewProvider
-        let maximumSize: OptionalDimensions?
-        
-        var id: ID {
-            .init(item: itemIdentifier, section: sectionIdentifier)
-        }
-    }
-    
-    struct State: Hashable {
-        let isFocused: Bool
-        let isHighlighted: Bool
-        let isSelected: Bool
-    }
-    
-    struct Preferences: Hashable {
-        var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()        
-        var dragItems: [DragItem]?
-        var relativeFrame: RelativeFrame?
-    }
-    
-    struct Cache {
-        var content: Content?
-        var contentSize: CGSize?
-        var preferredContentSize: CGSize? {
-            didSet {
-                if oldValue != preferredContentSize {
-                    content = nil
-                }
-            }
-        }
-        
-        init() {
-            
-        }
-    }
-}
-
 class UIHostingCollectionViewCell<
     SectionType,
     SectionIdentifierType: Hashable,
@@ -74,18 +25,23 @@ class UIHostingCollectionViewCell<
         SectionFooterContent,
         Content
     >
+    typealias ContentConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentState = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentPreferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentHostingController = CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
-
-    var configuration: Configuration? {
+    
+    var cellContentConfiguration: ContentConfiguration? {
         didSet {
-            if oldValue?.id != configuration?.id {
-                preferences = .init()
+            if oldValue?.id != cellContentConfiguration?.id {
+                contentPreferences = .init()
             }
         }
     }
     
-    var state: State {
+    var contentState: ContentState {
         .init(
             isFocused: isFocused,
             isHighlighted: isHighlighted,
@@ -93,21 +49,23 @@ class UIHostingCollectionViewCell<
         )
     }
     
-    var preferences = Preferences() {
+    var contentPreferences = ContentPreferences() {
         didSet {
-            assignIfNotEqual(preferences._collectionOrListCellPreferences.isClipped, to: &clipsToBounds)
+            clipsToBounds = true
+            
+            updateCollectionCache()
         }
     }
     
-    var cache = Cache()
+    var contentCache = ContentCache()
     
-    var content: Content {
-        if let content = cache.content {
+    var content: AnyView {
+        if let content = contentCache.content {
             return content
-        } else if let configuration = configuration {
-            let content = configuration.viewProvider.rowContent(configuration.section, configuration.item)
+        } else if let configuration = cellContentConfiguration {
+            let content = configuration.makeContent()
             
-            self.cache.content = content
+            self.contentCache.content = content
             
             updateCollectionCache()
             
@@ -117,11 +75,41 @@ class UIHostingCollectionViewCell<
         }
     }
     
+    var configuration: ContentHostingController.Configuration {
+        guard let contentConfiguration = cellContentConfiguration else {
+            fatalError()
+        }
+        
+        return .init(
+            _reuseCellRender: parentViewController?.configuration.unsafeFlags.contains(.reuseCellRender) ?? false,
+            _collectionViewProxy: .init(parentViewController),
+            _cellProxyBase: _CellProxyBase(base: self),
+            contentConfiguration: contentConfiguration,
+            contentState: contentState,
+            contentPreferences: .init(
+                get: { [weak self] in self?.contentPreferences ?? .init() },
+                set: { [weak self] in self?.contentPreferences = $0 }
+            ),
+            contentCache: contentCache,
+            content: content
+        )
+    }
+        
+    weak var parentViewController: ParentViewControllerType?
+
     private var contentHostingController: ContentHostingController?
-    private weak var parentViewController: ParentViewControllerType?
+    private var _isFocused: Bool? = nil
+        
+    private var lastInvalidationContext: CellProxy.InvalidationContext?
     
-    var _isFocused: Bool? = nil
+    var shouldUseCachedContentHostingController: Bool {
+        (parentViewController?.configuration.unsafeFlags.contains(.cacheCellContentHostingControllers) ?? false)
+    }
     
+    var shouldEmbedContentHostingController: Bool {
+        !(parentViewController?.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed) ?? false)
+    }
+
     override var isFocused: Bool {
         get {
             _isFocused ?? super.isFocused
@@ -157,30 +145,30 @@ class UIHostingCollectionViewCell<
     }
     
     var isFocusable: Bool {
-        preferences._collectionOrListCellPreferences.isFocusable
+        contentPreferences._collectionOrListCellPreferences.isFocusable
     }
     
     var isHighlightable: Bool {
-        preferences._collectionOrListCellPreferences.isHighlightable
+        contentPreferences._collectionOrListCellPreferences.isHighlightable
     }
     
     var isReorderable: Bool {
-        preferences._collectionOrListCellPreferences.isReorderable
+        contentPreferences._collectionOrListCellPreferences.isReorderable
     }
     
     var isSelectable: Bool {
-        preferences._collectionOrListCellPreferences.isSelectable
+        contentPreferences._collectionOrListCellPreferences.isSelectable
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .clear
-        backgroundView = .init()
-        contentView.backgroundColor = .clear
+        backgroundColor = nil
+        backgroundView = nil
+        contentView.backgroundColor = nil
         contentView.bounds.origin = .zero
         layoutMargins = .zero
-        selectedBackgroundView = .init()
+        selectedBackgroundView = nil
     }
     
     required init?(coder: NSCoder) {
@@ -199,11 +187,7 @@ class UIHostingCollectionViewCell<
     }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        systemLayoutSizeFitting(
-            targetSize,
-            withHorizontalFittingPriority: contentHuggingPriority(for: .horizontal),
-            verticalFittingPriority: contentHuggingPriority(for: .vertical)
-        )
+        contentHostingController?.systemLayoutSizeFitting(targetSize) ??  CGSize(width: 1, height: 1)
     }
     
     override func systemLayoutSizeFitting(
@@ -211,31 +195,7 @@ class UIHostingCollectionViewCell<
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
-        var newTargetSize = targetSize
-        
-        if let maximumSize = configuration?.maximumSize,
-           let dimensions = content._precomputedDimensionsThatFit(in: maximumSize)
-        {
-            if let size = CGSize(dimensions), !size.isAreaZero {
-                if size.fits(targetSize) {
-                    return size
-                } else {
-                    return size.clamped(to: maximumSize)
-                }
-            } else {
-                newTargetSize = CGSize(dimensions, default: targetSize)
-            }
-        }
-        
-        guard let contentHostingController = contentHostingController else {
-            return .init(width: 1, height: 1)
-        }
-        
-        return contentHostingController.systemLayoutSizeFitting(
-            newTargetSize,
-            withHorizontalFittingPriority: horizontalFittingPriority,
-            verticalFittingPriority: verticalFittingPriority
-        )
+        systemLayoutSizeFitting(targetSize)
     }
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -244,376 +204,262 @@ class UIHostingCollectionViewCell<
     
     override func prepareForReuse() {
         super.prepareForReuse()
-
+        
         assignIfNotEqual(false, to: &_isFocused)
         assignIfNotEqual(false, to: &super.isHighlighted)
         assignIfNotEqual(false, to: &super.isSelected)
     }
-
+        
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
-        if let size = cache.preferredContentSize {
-            layoutAttributes.size = size.clamped(to: configuration?.maximumSize)
-            
+        guard let parentViewController = parentViewController,
+              let contentConfiguration = cellContentConfiguration
+        else {
             return layoutAttributes
-        } else if let relativeFrame = preferences.relativeFrame {
-            let size = relativeFrame.sizeThatFits(in: layoutAttributes.size)
-                .clamped(to: configuration?.maximumSize)
-            
-            layoutAttributes.size = size
-            
-            cache.content = nil
-            cache.preferredContentSize = size
-            
-            updateCollectionCache()
-            
-            update(disableAnimation: true)
+        }
+        
+        if let size = contentCache.preferredContentSize, lastInvalidationContext == nil {
+            layoutAttributes.size = size.clamped(to: contentConfiguration.maximumSize)
             
             return layoutAttributes
         } else {
-            guard let parentViewController = parentViewController else {
-                return layoutAttributes
-            }
-            
             guard !parentViewController.configuration.ignorePreferredCellLayoutAttributes else {
                 return layoutAttributes
             }
-
-            let result = super.preferredLayoutAttributesFitting(layoutAttributes)
             
-            if cache.preferredContentSize == nil || result.size != bounds.size {
-                cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
+            if let relativeFrame = contentPreferences.relativeFrame {
+                let size = relativeFrame
+                    .sizeThatFits(in: layoutAttributes.size)
+                    .clamped(to: contentConfiguration.maximumSize)
+                
+                layoutAttributes.size = size
+                
+                contentCache.content = nil
+                contentCache.preferredContentSize = size
+                
+                updateCollectionCache()
+                
+                update(disableAnimation: true)
+                
+                return layoutAttributes
+            } else {
+                let preferredLayoutAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+                
+                if let invalidationContext = lastInvalidationContext {
+                    contentCache = .init()
+                    
+                    if let newPreferredContentSize = invalidationContext.newPreferredContentSize {
+                        preferredLayoutAttributes.size = CGSize(
+                            newPreferredContentSize.clamped(to: contentConfiguration.maximumSize),
+                            default: preferredLayoutAttributes.size
+                        )
+                    }
+                    
+                    updateCollectionCache()
+                    
+                    lastInvalidationContext = nil
+                }
+                
+                if preferredLayoutAttributes.size != contentCache.preferredContentSize {
+                    contentCache.preferredContentSize = preferredLayoutAttributes
+                        .size
+                        .clamped(to: contentConfiguration.maximumSize)
+                }
+                
+                return preferredLayoutAttributes
             }
-            
-            updateCollectionCache()
-            
-            return result
         }
     }
     
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
-        guard let parentViewController = parentViewController, !parentViewController.configuration.ignorePreferredCellLayoutAttributes else {
+        guard let parentViewController = parentViewController,
+              let contentHostingController = contentHostingController,
+              let contentConfiguration = cellContentConfiguration,
+              !parentViewController.configuration.ignorePreferredCellLayoutAttributes
+        else {
             return
         }
         
-        guard let contentHostingController = contentHostingController, let relativeFrame = preferences.relativeFrame else {
-            return
-        }
-        
-        if layoutAttributes.size != contentHostingController.view.frame.size {
-            self.cache.preferredContentSize = relativeFrame.sizeThatFits(in: layoutAttributes.size.clamped(to: configuration?.maximumSize))
-
-            contentHostingController.update(disableAnimation: true)
+        if let relativeFrame = contentPreferences.relativeFrame {
+            if layoutAttributes.size != contentHostingController.view.frame.size {
+                self.contentCache.preferredContentSize = relativeFrame.sizeThatFits(in: layoutAttributes.size.clamped(to: contentConfiguration.maximumSize))
+                
+                contentHostingController.configure(with: configuration, context: .init(disableAnimation: true))
+            }
         }
     }
 }
 
 extension UIHostingCollectionViewCell {
-    func update(
-        disableAnimation: Bool,
-        forced: Bool = false
-    ) {
-        guard configuration != nil else {
-            return
-        }
-
-        defer {
-            latestRepresentableUpdate = parentViewController?.latestRepresentableUpdate
-        }
-
-        if let contentHostingController = contentHostingController {
-            contentHostingController.update(disableAnimation: disableAnimation)
-        } else {
-            contentHostingController = ContentHostingController(base: self)
-        }
-    }
-    
-    func cellWillDisplay(
-        inParent parentViewController: ParentViewControllerType?,
-        isPrototype: Bool = false
-    ) {
-        guard configuration != nil else {
-            return
-        }
+    func cellWillDisplay(inParent parentViewController: ParentViewControllerType?) {
+        update(disableAnimation: true)
         
-        if contentHostingController == nil {
-            update(disableAnimation: true)
-        }
-        
-        guard let contentHostingController = contentHostingController else {
-            assertionFailure()
-            
-            return
-        }
-                
-        if let parentViewController = parentViewController {
-            if contentHostingController.parent == nil {
-                contentHostingController.move(toParent: parentViewController, ofCell: self)
-                self.parentViewController = parentViewController
-                
-                updateCollectionCache()
-            }
-        } else if !isPrototype {
-            assertionFailure()
-        }
+        contentHostingController?.mount(onto: self)
     }
     
     func cellDidEndDisplaying() {
         updateCollectionCache()
+        
+        contentHostingController?.unmount(from: self)
+        
+        if shouldUseCachedContentHostingController {
+            contentHostingController = nil
+        }
     }
     
-    func updateCollectionCache() {
-        guard let configuration = configuration, let parentViewController = parentViewController else {
+    func update(disableAnimation: Bool) {
+        guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
+            assertionFailure()
+
             return
         }
         
-        parentViewController.cache[preferencesFor: configuration.id] = preferences
-        parentViewController.cache.setCellCache(cache, for: configuration.id)
+        defer {
+            latestRepresentableUpdate = parentViewController.latestRepresentableUpdate
+        }
+        
+        if !shouldUseCachedContentHostingController {
+            if let contentHostingController = contentHostingController {
+                contentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
+            } else {
+                contentHostingController = ContentHostingController(configuration: configuration)
+            }
+        } else {
+            if let newContentHostingController = parentViewController.cache.contentHostingControllerCache[contentConfiguration.id], !newContentHostingController.isLive {
+                newContentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
+                
+                newContentHostingController.view.setNeedsDisplay()
+                newContentHostingController.view.setNeedsLayout()
+
+                contentHostingController = newContentHostingController
+            } else if let contentHostingController = contentHostingController {
+                contentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
+            } else {
+                let newContentHostingController = ContentHostingController(configuration: configuration)
+                
+                contentHostingController = newContentHostingController
+
+                parentViewController.cache.contentHostingControllerCache[contentConfiguration.id] = newContentHostingController
+            }
+        }
+    }
+
+    func updateCollectionCache() {
+        guard let configuration = cellContentConfiguration, let parentViewController = parentViewController else {
+            return
+        }
+        
+        parentViewController.cache.preferences(forID: configuration.id).wrappedValue = contentPreferences
+        parentViewController.cache.setContentCache(contentCache, for: configuration.id)
+    }
+    
+    func invalidateContent(with context: CellProxy.InvalidationContext) {
+        guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
+            return
+        }
+
+        parentViewController.cache.invalidateContent(at: contentConfiguration.indexPath, withID: contentConfiguration.id)
+                
+        if let invalidationContextType = (type(of: parentViewController.collectionView.collectionViewLayout).invalidationContextClass as? UICollectionViewLayoutInvalidationContext.Type) {
+            let context = invalidationContextType.init()
+
+            context.invalidateItems(at: [contentConfiguration.indexPath])
+            
+            parentViewController.collectionView.collectionViewLayout.invalidateLayout(with: context)
+        } else {
+            parentViewController.collectionView.collectionViewLayout.invalidateLayout()
+        }
+
+        contentHostingController?.view.setNeedsDisplay()
+        contentHostingController?.view.setNeedsLayout()
+        
+        lastInvalidationContext = context
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
 extension UIHostingCollectionViewCell {
-    private struct RootView: View {
-        struct _CellProxyBase: SwiftUIX._CellProxyBase {
-            weak var base: UIHostingCollectionViewCell?
-            
-            var globalFrame: CGRect {
-                base?.globalFrame ?? .zero
-            }
-            
-            func invalidateLayout() {
-                guard let base = base, let parentViewController = base.parentViewController else {
-                    return
-                }
-                
-                base.setNeedsDisplay()
-                base.setNeedsLayout()
-                
-                base.cache.contentSize = nil
-                base.cache.preferredContentSize = nil
-                
-                base.updateCollectionCache()
-                
-                parentViewController.invalidateLayout()
-            }
-        }
-        
-        var _reuseCellRender: Bool
-        var _cellProxyBase: _CellProxyBase
-        var _collectionViewProxy: CollectionViewProxy
-        var content: Content
-        var configuration: Configuration?
-        var state: State
-        var preferences: Binding<Preferences>
-        var cache: Cache
-        var updateCollectionCache: (() -> Void)
-        
-        init(base: UIHostingCollectionViewCell) {
-            _reuseCellRender = base.parentViewController?.configuration.unsafeFlags.contains(.reuseCellRender) ?? false
-            _cellProxyBase = _CellProxyBase(base: base)
-            _collectionViewProxy = .init(base.parentViewController)
-            content = base.content
-            configuration = base.configuration
-            state = base.state
-            preferences = .init(
-                get: { [weak base] in base?.preferences ?? .init() },
-                set: { [weak base] in base?.preferences = $0 }
-            )
-            cache = base.cache
-            updateCollectionCache = { [weak base] in base?.updateCollectionCache() }
-        }
-        
-        var body: some View {
-            if let configuration = configuration {
-                if _reuseCellRender {
-                    contentView
-                        .background(ZeroSizeView().id(configuration.id))
-                } else {
-                    contentView
-                        .id(configuration.id)
-                }
-            }
-        }
-        
-        private var contentView: some View {
-            content
-                .environment(\._cellProxy, .init(base: _cellProxyBase))
-                .environment(\._collectionViewProxy, .init(.constant(_collectionViewProxy)))
-                .transformEnvironment(\._relativeFrameResolvedValues) { value in
-                    guard let relativeFrameID = preferences.wrappedValue.relativeFrame?.id else {
-                        if let preferredContentSize = cache.preferredContentSize {
-                            if value[0] == nil {
-                                value[0] = .init(
-                                    width: preferredContentSize.width,
-                                    height: preferredContentSize.height
-                                )
-                            }
-                        }
-                        
-                        return
-                    }
-                    
-                    guard let preferredContentSize = cache.preferredContentSize else {
-                        return
-                    }
-                    
-                    value[relativeFrameID] = .init(
-                        width: preferredContentSize.width,
-                        height: preferredContentSize.height
-                    )
-                }
-                .environment(\.isCellFocused, state.isFocused)
-                .environment(\.isCellHighlighted, state.isHighlighted)
-                .environment(\.isCellSelected, state.isSelected)
-                .onPreferenceChange(_CollectionOrListCellPreferences.PreferenceKey.self) {
-                    if preferences._collectionOrListCellPreferences.wrappedValue != $0 {
-                        preferences._collectionOrListCellPreferences.wrappedValue = $0
-                        
-                        updateCollectionCache()
-                    }
-                }
-                .onPreferenceChange(DragItem.PreferenceKey.self) {
-                    if preferences.dragItems.wrappedValue != $0 {
-                        preferences.dragItems.wrappedValue = $0
-                        
-                        updateCollectionCache()
-                    }
-                }
-                .onPreferenceChange(RelativeFrame.PreferenceKey.self) {
-                    if preferences.relativeFrame.wrappedValue != $0.last {
-                        preferences.relativeFrame.wrappedValue = $0.last
-                        
-                        updateCollectionCache()
-                    }
-                }
-                .edgesIgnoringSafeArea(.all)
-        }
+    struct InvalidationContext {
+        var newPreferredContentSize: CGSize?
     }
-    
-    private class ContentHostingController: UIHostingController<RootView> {
+
+    struct _CellProxyBase: SwiftUIX._CellProxyBase {
         weak var base: UIHostingCollectionViewCell?
         
-        init(base: UIHostingCollectionViewCell) {
-            self.base = base
-            
-            super.init(rootView: .init(base: base))
-            
-            view.backgroundColor = nil
-            
-            update(disableAnimation: true)
-            
-            _fixSafeAreaInsets()
+        var globalFrame: CGRect {
+            base?.globalFrame ?? .zero
         }
         
-        @objc required public init?(coder aDecoder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-
-        override func viewDidLayoutSubviews() {
-            super.viewDidLayoutSubviews()
-        }
-
-        public func systemLayoutSizeFitting(
-            _ targetSize: CGSize
-        ) -> CGSize {
-            sizeThatFits(
-                AppKitOrUIKitLayoutSizeProposal(
-                    targetSize: targetSize,
-                    maximumSize: base?.configuration?.maximumSize ?? nil,
-                    horizontalFittingPriority: nil,
-                    verticalFittingPriority: nil
-                )
-            )
-        }
-        
-        public func systemLayoutSizeFitting(
-            _ targetSize: CGSize,
-            withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
-            verticalFittingPriority: UILayoutPriority
-        ) -> CGSize {
-            sizeThatFits(
-                AppKitOrUIKitLayoutSizeProposal(
-                    targetSize: targetSize,
-                    maximumSize: base?.configuration?.maximumSize ?? nil,
-                    horizontalFittingPriority: horizontalFittingPriority,
-                    verticalFittingPriority: verticalFittingPriority
-                )
-            )
-        }
-        
-        func move(toParent parent: ParentViewControllerType?, ofCell cell: UIHostingCollectionViewCell) {
-            if let parent = parent {
-                let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
-
-                if let existingParent = self.parent, existingParent !== parent {
-                    move(toParent: nil, ofCell: cell)
-                }
-                
-                if self.parent == nil {
-                    let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
-
-                    if hostAsChildViewController {
-                        UIView.performWithoutAnimation {
-                            self.willMove(toParent: parent)
-                            parent.addChild(self)
-                            cell.contentView.addSubview(view)
-                            view.frame = cell.contentView.bounds
-                            didMove(toParent: parent)
-                        }
-                    } else {
-                        if view.superview !== cell.contentView {
-                            UIView.performWithoutAnimation {
-                                cell.contentView.addSubview(view)
-                                view.frame = cell.contentView.bounds
-                            }
-                        }
-                    }
-
-                    if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
-                        navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
-                    }
-                } else {
-                    assertionFailure()
-                }
-            } else {
-                if self.parent != nil {
-                    UIView.performWithoutAnimation {
-                        willMove(toParent: nil)
-                        view.removeFromSuperview()
-                        removeFromParent()
-                    }
-                }
-            }
-        }
-        
-        func update(disableAnimation: Bool) {
-            guard let base = base else {
-                return
-            }
-            
-            let currentConfiguration = rootView.configuration
-            let newConfiguration = base.configuration
-            
-            if let currentConfiguration = currentConfiguration, let newConfiguration = newConfiguration, base.cache.content != nil {
-                guard currentConfiguration.id != newConfiguration.id || rootView.state != base.state else {
-                    return
-                }
-            }
-            
-            _withoutAnimation(disableAnimation) {
-                rootView = .init(base: base)
-            }
+        func invalidateLayout(with context: CellProxy.InvalidationContext) {
+            base?.invalidateContent(with: context)
         }
     }
 }
 
 extension String {
     static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
+}
+
+extension CocoaCollectionCellOrSupplementaryViewHostingController {
+    fileprivate func mount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(onto cell: UIHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
+        guard let parent = cell.parentViewController else {
+            assertionFailure()
+            
+            return
+        }
+        
+        if cell.shouldEmbedContentHostingController {
+            if parent === self.parent && view.superview === cell.contentView {
+                return
+            }
+            
+            if self.parent == nil {
+                let isNavigationBarHidden = parent.navigationController?.isNavigationBarHidden
+                
+                UIView.performWithoutAnimation {
+                    self.willMove(toParent: parent)
+                    parent.addChild(self)
+                    view.removeFromSuperview()
+                    cell.contentView.addSubview(view)
+                    view.frame = cell.contentView.bounds
+                    didMove(toParent: parent)
+                }
+                
+                if let isNavigationBarHidden = isNavigationBarHidden, navigationController?.isNavigationBarHidden != isNavigationBarHidden {
+                    navigationController?.setNavigationBarHidden(isNavigationBarHidden, animated: false)
+                }
+            } else {
+                assertionFailure()
+            }
+        } else {
+            if view.superview !== cell.contentView {
+                UIView.performWithoutAnimation {
+                    cell.contentView.addSubview(view)
+                    view.frame = cell.contentView.bounds
+                }
+            }
+        }
+    }
+    
+    fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(from cell: UIHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
+        if cell.shouldUseCachedContentHostingController {
+            if parent != nil {
+                UIView.performWithoutAnimation {
+                    willMove(toParent: nil)
+                    view.removeFromSuperview()
+                    removeFromParent()
+                }
+            } else {
+                UIView.performWithoutAnimation {
+                    view.removeFromSuperview()
+                }
+            }
+        }
+    }
 }
 
 #endif

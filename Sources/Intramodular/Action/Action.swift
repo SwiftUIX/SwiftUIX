@@ -87,7 +87,10 @@ public struct PerformAction: ActionInitiable, PerformActionView {
             self.action.perform()
         }
         
-        return ZeroSizeView().frameZeroClipped()
+        return ZeroSizeView()
+            .frameZeroClipped()
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {

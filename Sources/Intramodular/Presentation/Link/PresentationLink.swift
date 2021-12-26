@@ -226,13 +226,11 @@ extension PresentationLink {
     public init(
         destination: Destination,
         onDismiss: @escaping () -> () = { },
-        style: ModalPresentationStyle,
         @ViewBuilder label: () -> Label
     ) {
         self._destination = destination
         self._onDismiss = onDismiss
         self._isPresented = nil
-        self._presentationStyle = style
         
         self.label = label()
     }
@@ -241,13 +239,11 @@ extension PresentationLink {
         destination: Destination,
         isPresented: Binding<Bool>,
         onDismiss: @escaping () -> () = { },
-        style: ModalPresentationStyle,
         @ViewBuilder label: () -> Label
     ) {
         self._destination = destination
         self._onDismiss = onDismiss
         self._isPresented = isPresented
-        self._presentationStyle = style
         
         self.label = label()
     }
@@ -297,6 +293,12 @@ extension PresentationLink {
         )
         
         self.label = label()
+    }
+}
+
+extension PresentationLink {
+    public func presentationStyle(_ presentationStyle: ModalPresentationStyle) -> Self {
+        then({ $0._presentationStyle = presentationStyle })
     }
 }
 

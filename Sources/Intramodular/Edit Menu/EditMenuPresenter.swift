@@ -14,12 +14,13 @@ private struct EditMenuPresenter: ViewModifier {
     let editMenuItems: () -> [EditMenuItem]
     
     func body(content: Content) -> some View {
-        content.background {
-            _BackgroundPresenterView(
-                isVisible: $isVisible,
-                attachmentAnchor: attachmentAnchor,
-                editMenuItems: editMenuItems
-            )
+        content
+            .background {
+                _BackgroundPresenterView(
+                    isVisible: $isVisible,
+                    attachmentAnchor: attachmentAnchor,
+                    editMenuItems: editMenuItems
+                )
             .allowsHitTesting(false)
             .accessibility(hidden: true)
         }
@@ -109,10 +110,10 @@ extension EditMenuPresenter._BackgroundPresenterView {
             
             let items = editMenuItems()
             
-            UIMenuController.shared.menuItems = items.enumerated().map { (index, item) in
+            UIMenuController.shared.menuItems = items.enumerated().map { [weak self] (index, item) in
                 let selector = Selector("performActionForEditMenuItemAtIndex\(index.description)")
                 
-                itemIndexToActionMap?[index] = item.action
+                self?.itemIndexToActionMap?[index] = item.action
                 
                 let item = UIMenuItem(
                     title: item.title,

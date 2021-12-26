@@ -45,13 +45,14 @@ extension PresentationLink {
         let destination = destination()
         
         #if os(iOS) || targetEnvironment(macCatalyst)
-        self.init(
+        self = PresentationLink(
             destination: destination.content,
-            style: .popover(
+            label: label
+        ).presentationStyle(
+            .popover(
                 permittedArrowDirections: destination.permittedArrowDirections,
                 attachmentAnchor: destination.attachmentAnchor
-            ),
-            label: label
+            )
         )
         #else
         self.init(destination: destination.content, label: label)
@@ -66,14 +67,15 @@ extension PresentationLink {
         let destination = destination()
         
         #if os(iOS) || targetEnvironment(macCatalyst)
-        self.init(
+        self = PresentationLink(
             destination: destination.content,
             isPresented: isPresented,
-            style: .popover(
+            label: label
+        ).presentationStyle(
+            .popover(
                 permittedArrowDirections: destination.permittedArrowDirections,
                 attachmentAnchor: destination.attachmentAnchor
-            ),
-            label: label
+            )
         )
         #else
         self.init(destination: destination.content, label: label)
@@ -143,7 +145,7 @@ public struct PopoverArrowDirection: OptionSet {
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension PopoverArrowDirection {
-    public init(_ direction: UIPopoverArrowDirection) {
+    init(_ direction: UIPopoverArrowDirection) {
         self.init()
         
         if direction.contains(.up) {
@@ -165,7 +167,7 @@ extension PopoverArrowDirection {
 }
 
 extension UIPopoverArrowDirection {
-    public init(_ direction: PopoverArrowDirection) {
+    init(_ direction: PopoverArrowDirection) {
         self.init()
         
         if direction.contains(.up) {
@@ -185,4 +187,5 @@ extension UIPopoverArrowDirection {
         }
     }
 }
+
 #endif

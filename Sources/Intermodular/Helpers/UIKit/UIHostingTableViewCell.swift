@@ -116,7 +116,7 @@ extension UIHostingTableViewCell {
                 return parentViewController.view.convert(base.frame, to: coordinateSpace)
             }
             
-            func invalidateLayout() {
+            func invalidateLayout(with context: CellProxy.InvalidationContext) {
                 fatalError("unimplemented")
             }
             

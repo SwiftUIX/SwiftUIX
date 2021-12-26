@@ -165,11 +165,11 @@ public struct AppKitOrUIKitLayoutSizeProposal {
     
     var appKitOrUIKitFittingSize: CGSize {
         let width = horizontalFittingPriority == .required
-            ? targetSize.clamping(to: maximumSize).width ?? AppKitOrUIKitView.layoutFittingCompressedSize.width
+            ? targetSize.clamped(to: maximumSize).width ?? AppKitOrUIKitView.layoutFittingCompressedSize.width
             : (maximumSize.width ?? AppKitOrUIKitView.layoutFittingExpandedSize.width)
         
         let height = verticalFittingPriority == .required
-            ? targetSize.clamping(to: maximumSize).height ?? AppKitOrUIKitView.layoutFittingCompressedSize.height
+            ? targetSize.clamped(to: maximumSize).height ?? AppKitOrUIKitView.layoutFittingCompressedSize.height
             : (maximumSize.height ?? AppKitOrUIKitView.layoutFittingExpandedSize.height)
         
         return CGSize(width: width, height: height)
