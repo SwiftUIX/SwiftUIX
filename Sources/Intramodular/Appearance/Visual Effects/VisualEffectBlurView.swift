@@ -47,7 +47,6 @@ public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
         view.blurStyle = blurStyle
         view.vibrancyStyle = vibrancyStyle
         view.alpha = .init(opacity)
-        view.tintColor = context.environment.tintColor?.toUIColor()
         view.intensity = intensity
         view.rootView = content
     }
