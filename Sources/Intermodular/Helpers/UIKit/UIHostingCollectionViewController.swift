@@ -257,7 +257,9 @@ final class UIHostingCollectionViewController<
         
         lastViewSafeAreaInsets = newSafeAreaInsets
         
-        invalidateLayout(includingCache: false, animated: true)
+        cache.invalidate()
+
+        invalidateLayout(animated: true)
     }
     
     public override func viewWillTransition(
@@ -266,14 +268,12 @@ final class UIHostingCollectionViewController<
     ) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        invalidateLayout(includingCache: true, animated: true)
+        cache.invalidate()
+
+        invalidateLayout(animated: true)
     }
     
-    public func invalidateLayout(includingCache: Bool, animated: Bool) {
-        if includingCache {
-            cache.invalidate()
-        }
-        
+    public func invalidateLayout(animated: Bool) {        
         CATransaction.begin()
         
         if !animated {
@@ -473,50 +473,31 @@ final class UIHostingCollectionViewController<
 
 extension UIHostingCollectionViewController {
     func refreshVisibleCellsAndSupplementaryViews() {
-        /*for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
-            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate, let currentConfiguration = view.configuration else {
+        for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
+            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-            
-            guard let newConfiguration = contentConfiguration(for: currentConfiguration.indexPath, reuseIdentifier: currentConfiguration.reuseIdentifier, kind: UICollectionView.elementKindSectionHeader) else {
-                continue
-            }
-            
+                        
             view.cache.content = nil
-            view.configuration = newConfiguration
-            
             view.update(disableAnimation: true)
         }
 
         for cell in collectionView.visibleCells {
-            guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate, let currentConfiguration = cell.cellContentConfiguration else {
+            guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-
-            guard let newConfiguration = contentConfiguration(for: currentConfiguration.indexPath, reuseIdentifier: currentConfiguration.reuseIdentifier, kind: nil) else {
-                continue
-            }
-
             cell.contentCache.content = nil
-            cell.cellContentConfiguration = newConfiguration
-            
             cell.update(disableAnimation: true)
         }
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {
-            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate, let currentConfiguration = view.configuration else {
+            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
             
-            guard let newConfiguration = contentConfiguration(for: currentConfiguration.indexPath, reuseIdentifier: currentConfiguration.reuseIdentifier, kind: UICollectionView.elementKindSectionFooter) else {
-                continue
-            }
-
             view.cache.content = nil
-            view.configuration = newConfiguration
-            
             view.update(disableAnimation: true)
-        }*/
+        }
     }
 }
 
@@ -542,7 +523,7 @@ extension UIHostingCollectionViewController {
                     itemIdentifier: item.map({ dataSourceConfiguration.identifierMap[$0] }),
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
-                    makeContent: { (viewProvider.sectionContent(for: UICollectionView.elementKindSectionHeader)?(section)).eraseToAnyView() },
+                    makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionHeader)?(section)) },
                     maximumSize: self.maximumCollectionViewCellSize
                 )
             case .hostingCollectionViewCellIdentifier:
@@ -557,7 +538,7 @@ extension UIHostingCollectionViewController {
                     itemIdentifier: dataSourceConfiguration.identifierMap[item],
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
-                    makeContent: { viewProvider.rowContent(section, item).eraseToAnyView() },
+                    makeContent: { .init(viewProvider.rowContent(section, item)) },
                     maximumSize: self.maximumCollectionViewCellSize
                 )
             case .hostingCollectionViewFooterSupplementaryViewIdentifier:
@@ -568,7 +549,7 @@ extension UIHostingCollectionViewController {
                     itemIdentifier: item.map({ dataSourceConfiguration.identifierMap[$0] }),
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
-                    makeContent: { (viewProvider.sectionContent(for: UICollectionView.elementKindSectionFooter)?(section)).eraseToAnyView() },
+                    makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionFooter)?(section)) },
                     maximumSize: self.maximumCollectionViewCellSize
                 )
             default:

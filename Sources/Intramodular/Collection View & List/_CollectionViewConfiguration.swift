@@ -37,6 +37,30 @@ public struct _CollectionViewConfiguration {
     }
 }
 
+struct _CollectionViewCellOrSupplementaryViewContent: View {
+    private let base: Any
+    private let baseAsErasedView: AnyView
+    
+    var body: some View {
+        baseAsErasedView
+    }
+    
+    init<T: View>(_ base: T) {
+        self.base = base
+        self.baseAsErasedView = base.eraseToAnyView()
+    }
+    
+    func _precomputedDimensionsThatFit(
+        in dimensions: OptionalDimensions
+    ) -> OptionalDimensions? {
+        if let base = base as? _opaque_FrameModifiedContent {
+            return base._opaque_frameModifier.dimensionsThatFit(in: dimensions)
+        } else {
+            return nil
+        }
+    }
+}
+
 struct _CollectionViewCellOrSupplementaryViewConfiguration<
     ItemType,
     ItemIdentifierType: Hashable,
@@ -48,14 +72,14 @@ struct _CollectionViewCellOrSupplementaryViewConfiguration<
         let item: ItemIdentifierType?
         let section: SectionIdentifierType
     }
-        
+            
     let reuseIdentifier: String
     let item: ItemType?
     let section: SectionType
     let itemIdentifier: ItemIdentifierType?
     let sectionIdentifier: SectionIdentifierType
     let indexPath: IndexPath
-    var makeContent: () -> AnyView
+    var makeContent: () -> _CollectionViewCellOrSupplementaryViewContent
     let maximumSize: OptionalDimensions?
     
     var id: ID {
@@ -92,7 +116,7 @@ struct _CollectionViewCellOrSupplementaryViewPreferences<
     ItemIdentifierType: Hashable,
     SectionType,
     SectionIdentifierType: Hashable
-> {
+>: Equatable {
     var _collectionOrListCellPreferences = _CollectionOrListCellPreferences()
     var dragItems: [DragItem]?
     var relativeFrame: RelativeFrame?
@@ -104,15 +128,9 @@ struct _CollectionViewCellOrSupplementaryViewCache<
     SectionType,
     SectionIdentifierType: Hashable
 > {
-    var content: AnyView?
+    var content: _CollectionViewCellOrSupplementaryViewContent?
     var contentSize: CGSize?
-    var preferredContentSize: CGSize? {
-        didSet {
-            if oldValue != preferredContentSize {
-                content = nil
-            }
-        }
-    }
+    var preferredContentSize: CGSize? 
     
     init() {
         

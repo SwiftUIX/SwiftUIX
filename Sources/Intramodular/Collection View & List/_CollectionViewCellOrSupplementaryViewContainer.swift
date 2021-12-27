@@ -26,7 +26,7 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
         let contentState: ContentState?
         let contentPreferences: Binding<ContentPreferences>?
         let contentCache: ContentCache
-        let content: AnyView
+        let content: _CollectionViewCellOrSupplementaryViewContent
     }
     
     let configuration: Configuration

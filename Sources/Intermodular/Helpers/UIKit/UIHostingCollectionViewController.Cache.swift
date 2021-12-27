@@ -170,15 +170,8 @@ extension UIHostingCollectionViewController.Cache {
                 
                 let oldValue = self.contentIdentifierToPreferencesMap[id]
                 
-                self.contentIdentifierToPreferencesMap[id] = newValue
-                
-                guard let indexPath = self.contentIdentifierToIndexPathMap[id] else {
-                    return
-                }
-                
-                if oldValue?.relativeFrame != newValue?.relativeFrame {
-                    self.parent.cache.invalidateContent(at: indexPath, withID: id)
-                    self.parent.invalidateLayout(includingCache: false, animated: false)
+                if oldValue != newValue {
+                    self.contentIdentifierToPreferencesMap[id] = newValue
                 }
             }
         )

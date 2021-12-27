@@ -25,16 +25,16 @@ class UIHostingCollectionViewSupplementaryView<
         SectionFooterContent,
         Content
     >
-    typealias Configuration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias State = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias Preferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias Cache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentState = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentPreferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
-    var configuration: Configuration?
-    var cache = Cache()
+    var configuration: ContentConfiguration?
+    var cache = ContentCache()
     
-    var content: AnyView {
+    var content: _CollectionViewCellOrSupplementaryViewContent {
         if let content = cache.content {
             return content
         } else if let configuration = configuration {
