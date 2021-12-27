@@ -75,6 +75,13 @@ extension Image {
     ) -> some View {
         sizeToFit(width: size?.width, height: size?.height, alignment: alignment)
     }
+    
+    public func sizeToFitSquare(
+        sideLength: CGFloat?,
+        alignment: Alignment = .center
+    ) -> some View {
+        sizeToFit(width: sideLength, height: sideLength, alignment: alignment)
+    }
 }
 
 #if os(macOS) && swift(<5.3)

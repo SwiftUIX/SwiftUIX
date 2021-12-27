@@ -258,8 +258,8 @@ extension View {
 
 extension View {
     @inlinable
-    public func squareFrame(sideLength: CGFloat?) -> some View {
-        frame(width: sideLength, height: sideLength)
+    public func squareFrame(sideLength: CGFloat?, alignment: Alignment = .center) -> some View {
+        frame(width: sideLength, height: sideLength, alignment: alignment)
     }
     
     @inlinable
