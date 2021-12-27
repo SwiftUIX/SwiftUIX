@@ -49,7 +49,10 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     @usableFromInline
     static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
         DispatchQueue.asyncOnMainIfNecessary {
-            if viewController.contentWindow != nil {
+            if let contentWindow = viewController.contentWindow {
+                #if os(iOS)
+                contentWindow.isHidden = true
+                #endif
                 viewController.contentWindow = nil
             }
         }
