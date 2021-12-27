@@ -24,7 +24,7 @@ extension UIHostingCollectionViewController {
             itemsForBeginning session: UIDragSession,
             at indexPath: IndexPath
         ) -> [UIDragItem] {
-            if let dragItems = parent.cache.preferences(itemAt: indexPath).wrappedValue?.dragItems {
+            if let dragItems = parent.cache.preferences(forContentAt: indexPath).wrappedValue?.dragItems {
                 return dragItems.map(UIDragItem.init)
             }
             
@@ -63,9 +63,9 @@ extension UIHostingCollectionViewController {
             
             if coordinator.items.count == 1, let item = coordinator.items.first, let sourceIndexPath = item.sourceIndexPath, let onMove = parent._dynamicViewContentTraitValues.onMove {
                 if var destinationIndexPath = coordinator.destinationIndexPath {
-                    parent.cache.invalidateCachedContentSize(forIndexPath: sourceIndexPath)
-                    parent.cache.invalidateCachedContentSize(forIndexPath: destinationIndexPath)
-                    
+                    parent.cache.invalidateContent(at: sourceIndexPath)
+                    parent.cache.invalidateContent(at: destinationIndexPath)
+
                     if sourceIndexPath.item < destinationIndexPath.item {
                         destinationIndexPath.item += 1
                     }

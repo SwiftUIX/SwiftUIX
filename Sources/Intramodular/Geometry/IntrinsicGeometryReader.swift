@@ -41,28 +41,27 @@ public struct IntrinsicGeometryProxy: Equatable {
 
 /// A container view that recursively defines its content as a function of the content's size and coordinate space.
 public struct IntrinsicGeometryReader<Content: View>: View {
-    @usableFromInline
-    let content: (IntrinsicGeometryProxy) -> Content
+    private let content: (IntrinsicGeometryProxy) -> Content
     
+    @State private var proxy = IntrinsicGeometryProxy(nil)
+
     public init(@ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content) {
         self.content = content
     }
-    
-    @DelayedState private var proxy = IntrinsicGeometryProxy(nil)
-    
+        
     public var body: some View {
         content(proxy).background {
             GeometryReader { geometry in
                 PerformAction {
-                    DispatchQueue.asyncOnMainIfNecessary {
-                        let proxy = IntrinsicGeometryProxy(geometry)
-                        
-                        if self.proxy != proxy {
-                            self.proxy = proxy
-                        }
+                    let proxy = IntrinsicGeometryProxy(geometry)
+                    
+                    if self.proxy != proxy {
+                        self.proxy = proxy
                     }
                 }
             }
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
         }
     }
 }

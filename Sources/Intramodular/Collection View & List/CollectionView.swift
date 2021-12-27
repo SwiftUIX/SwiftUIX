@@ -128,6 +128,7 @@ extension CollectionView {
         RowContent: View,
         Footer: View
     >(
+        _ axes: Axis.Set = .vertical,
         _ data: Data,
         id: KeyPath<Data.Element, ID>,
         @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
@@ -159,6 +160,8 @@ extension CollectionView {
             )
             .eraseToAnyView()
         )
+        
+        _scrollViewConfiguration.axes = axes
     }
     
     @_disfavoredOverload

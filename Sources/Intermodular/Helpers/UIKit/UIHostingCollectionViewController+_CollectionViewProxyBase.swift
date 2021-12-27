@@ -39,14 +39,14 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             height: max(floor(contentSize.height - 0.001), 0)
         )
         
-        if result.width == 0 {
+        if !_scrollViewConfiguration.axes.contains(.vertical) || result.width == 0 {
             result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
         }
         
-        if result.height == 0 {
+        if !_scrollViewConfiguration.axes.contains(.horizontal) || result.height == 0 {
             result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
         }
-        
+                
         return result
     }
     

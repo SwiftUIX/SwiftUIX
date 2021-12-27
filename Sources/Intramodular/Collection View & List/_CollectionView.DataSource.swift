@@ -7,45 +7,48 @@
 import Swift
 import SwiftUI
 
-extension UIHostingCollectionViewController {
+extension _CollectionView {
     struct DataSource {
         typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
         
-        struct IdentifierMap {
-            var getSectionID: (SectionType) -> SectionIdentifierType
-            var getSectionFromID: (SectionIdentifierType) -> SectionType
-            var getItemID: (ItemType) -> ItemIdentifierType
-            var getItemFromID: (ItemIdentifierType) -> ItemType
-            
-            subscript(_ section: SectionType) -> SectionIdentifierType {
-                getSectionID(section)
+        struct Configuration {
+            struct IdentifierMap {
+                var getSectionID: (SectionType) -> SectionIdentifierType
+                var getSectionFromID: (SectionIdentifierType) -> SectionType
+                var getItemID: (ItemType) -> ItemIdentifierType
+                var getItemFromID: (ItemIdentifierType) -> ItemType
+                
+                subscript(_ section: SectionType) -> SectionIdentifierType {
+                    getSectionID(section)
+                }
+                
+                subscript(_ sectionIdentifier: SectionIdentifierType) -> SectionType {
+                    getSectionFromID(sectionIdentifier)
+                }
+                
+                subscript(_ item: ItemType) -> ItemIdentifierType {
+                    getItemID(item)
+                }
+                
+                subscript(_ itemID: ItemIdentifierType) -> ItemType {
+                    getItemFromID(itemID)
+                }
             }
             
-            subscript(_ sectionIdentifier: SectionIdentifierType) -> SectionType {
-                getSectionFromID(sectionIdentifier)
-            }
-            
-            subscript(_ item: ItemType) -> ItemIdentifierType {
-                getItemID(item)
-            }
-            
-            subscript(_ item: ItemType?) -> ItemIdentifierType? {
-                item.map({ self[$0] })
-            }
-            
-            subscript(_ itemID: ItemIdentifierType) -> ItemType {
-                getItemFromID(itemID)
-            }
+            let identifierMap: IdentifierMap
         }
         
         enum Payload {
             case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
             case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
         }
+        
+        let configuration: Configuration
+        let payload: UIViewControllerType.DataSource.Payload
     }
 }
 
-extension UIHostingCollectionViewController.DataSource.Payload: CustomStringConvertible {
+extension _CollectionView.DataSource.Payload: CustomStringConvertible {
     var isEmpty: Bool {
         switch self {
             case .diffableDataSource(let dataSource):
@@ -119,9 +122,8 @@ extension UIHostingCollectionViewController.DataSource.Payload: CustomStringConv
     }
     
     func reset(
-        _ diffableDataSource: UIHostingCollectionViewController.DataSource.UICollectionViewDiffableDataSourceType,
-        withConfiguration configuration:
-            UIHostingCollectionViewController._SwiftUIType.DataSourceConfiguration,
+        _ diffableDataSource: _CollectionView.DataSource.UICollectionViewDiffableDataSourceType,
+        withConfiguration configuration: _CollectionView.DataSource.Configuration,
         animatingDifferences: Bool
     ) {
         guard case .static(let data) = self else {
@@ -194,7 +196,7 @@ extension UIHostingCollectionViewController {
             
             snapshot.deleteAllItems()
             
-            maintainScrollContentOffsetBehavior {
+            maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
                 _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
             }
             
@@ -244,7 +246,7 @@ extension UIHostingCollectionViewController {
                 )
                 
                 if !itemDifferencesApplied {
-                    maintainScrollContentOffsetBehavior {
+                    maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
                         newValue?.reset(
                             _internalDataSource,
                             withConfiguration: dataSourceConfiguration,
@@ -260,14 +262,14 @@ extension UIHostingCollectionViewController {
         if hasDataSourceChanged {
             cache.invalidate()
             
-            maintainScrollContentOffsetBehavior {
+            maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
                 _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
             }
         }
     }
     
-    private func maintainScrollContentOffsetBehavior(_ update: () -> Void) {
-        collectionView.maintainScrollContentOffsetBehavior(_scrollViewConfiguration.contentOffsetBehavior, animated: false) {
+    private func maintainScrollContentOffsetBehavior(animated: Bool, _ update: () -> Void) {
+        collectionView.maintainScrollContentOffsetBehavior(_scrollViewConfiguration.contentOffsetBehavior, animated: animated) {
             update()
         }
     }

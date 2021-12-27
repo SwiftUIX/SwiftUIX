@@ -10,9 +10,9 @@ import SwiftUI
 struct _CollectionOrListCellPreferences: Hashable {
     var isClipped = false
     var isFocusable = true
-    var isHighlightable = true
-    var isReorderable = true
-    var isSelectable = true
+    var isHighlightable = false
+    var isReorderable = false
+    var isSelectable = false
 }
 
 extension _CollectionOrListCellPreferences {

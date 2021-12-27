@@ -26,7 +26,6 @@ final class UIHostingCollectionViewController<
         SectionFooterContent,
         CellContent
     >
-    
     typealias UICollectionViewSupplementaryViewType = UIHostingCollectionViewSupplementaryView<
         SectionType,
         SectionIdentifierType,
@@ -36,16 +35,27 @@ final class UIHostingCollectionViewController<
         SectionFooterContent,
         CellContent
     >
+    typealias CellOrSupplementaryViewConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias CellOrSupplementaryViewContentConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias CellOrSupplementaryViewContentState = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias CellOrSupplementaryViewContentPreferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias CellOrSupplementaryViewContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
+    typealias DataSource = _SwiftUIType.DataSource
+    
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
 
+    var dataSourceConfiguration: _SwiftUIType.DataSource.Configuration
     var dataSource: DataSource.Payload? = nil {
         didSet {
             updateDataSource(oldValue: oldValue, newValue: dataSource)
         }
     }
+        
+   /* var dataSource: _SwiftUIType.DataSource {
+        .init(configuration: dataSourceConfiguration, payload: dataSource)
+    }*/
     
-    var dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration
     var viewProvider: _SwiftUIType.ViewProvider
     
     var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
@@ -105,7 +115,7 @@ final class UIHostingCollectionViewController<
     private lazy var lastViewSafeAreaInsets: UIEdgeInsets = view.safeAreaInsets
 
     init(
-        dataSourceConfiguration: _SwiftUIType.DataSourceConfiguration,
+        dataSourceConfiguration: _SwiftUIType.DataSource.Configuration,
         viewProvider: _SwiftUIType.ViewProvider,
         configuration: _SwiftUIType.Configuration
     ) {
@@ -125,20 +135,20 @@ final class UIHostingCollectionViewController<
     
     private func registerCellAndSupplementaryViewTypes() {
         collectionView.register(
+            UICollectionViewSupplementaryViewType.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: .hostingCollectionViewHeaderSupplementaryViewIdentifier
+        )
+        
+        collectionView.register(
             UICollectionViewCellType.self,
             forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier
         )
-        
-        collectionView.register(
-            UICollectionViewSupplementaryViewType.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: .hostingCollectionViewSupplementaryViewIdentifier
-        )
-        
+
         collectionView.register(
             UICollectionViewSupplementaryViewType.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-            withReuseIdentifier: .hostingCollectionViewSupplementaryViewIdentifier
+            withReuseIdentifier: .hostingCollectionViewFooterSupplementaryViewIdentifier
         )
     }
     
@@ -153,20 +163,9 @@ final class UIHostingCollectionViewController<
                 for: indexPath
             ) as! UICollectionViewCellType
 
-            guard let item = self.item(at: indexPath), let section = self.section(from: indexPath) else {
-                return cell
-            }
-            
-            cell.configuration = .init(
-                item: item,
-                section: section,
-                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
-                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
-                indexPath: indexPath,
-                viewProvider: self.viewProvider,
-                maximumSize: self.maximumCollectionViewCellSize
-            )
-            
+            cell.parentViewController = self
+            cell.cellContentConfiguration = self.contentConfiguration(for: indexPath, reuseIdentifier: .hostingCollectionViewCellIdentifier)
+
             self.cache.preconfigure(cell: cell)
             
             cell.update(disableAnimation: true)
@@ -182,29 +181,16 @@ final class UIHostingCollectionViewController<
             guard (kind == UICollectionView.elementKindSectionHeader && SectionHeaderContent.self != EmptyView.self) || (kind == UICollectionView.elementKindSectionFooter && SectionFooterContent.self != EmptyView.self) else {
                 return nil
             }
-            
-            let item = self.item(at: indexPath)
+                        
+            let reuseIdentifier = kind == UICollectionView.elementKindSectionHeader ? String.hostingCollectionViewHeaderSupplementaryViewIdentifier : String.hostingCollectionViewFooterSupplementaryViewIdentifier
             
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: .hostingCollectionViewSupplementaryViewIdentifier,
+                withReuseIdentifier: reuseIdentifier,
                 for: indexPath
             ) as! UICollectionViewSupplementaryViewType
             
-            guard let section = self.section(from: indexPath) else {
-                return view
-            }
-            
-            view.configuration = .init(
-                kind: kind,
-                item: item,
-                section: section,
-                itemIdentifier: self.dataSourceConfiguration.identifierMap[item],
-                sectionIdentifier: self.dataSourceConfiguration.identifierMap[section],
-                indexPath: indexPath,
-                viewProvider: self.viewProvider,
-                maximumSize: self.maximumCollectionViewCellSize
-            )
+            view.configuration = self.contentConfiguration(for: indexPath, reuseIdentifier: reuseIdentifier)
             
             self.cache.preconfigure(supplementaryView: view)
             
@@ -271,7 +257,9 @@ final class UIHostingCollectionViewController<
         
         lastViewSafeAreaInsets = newSafeAreaInsets
         
-        invalidateLayout(includingCache: false, animated: true)
+        cache.invalidate()
+
+        invalidateLayout(animated: true)
     }
     
     public override func viewWillTransition(
@@ -280,14 +268,12 @@ final class UIHostingCollectionViewController<
     ) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        invalidateLayout(includingCache: true, animated: true)
+        cache.invalidate()
+
+        invalidateLayout(animated: true)
     }
     
-    public func invalidateLayout(includingCache: Bool, animated: Bool) {
-        if includingCache {
-            cache.invalidate()
-        }
-        
+    public func invalidateLayout(animated: Bool) {        
         CATransaction.begin()
         
         if !animated {
@@ -390,10 +376,13 @@ final class UIHostingCollectionViewController<
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        cache.collectionView(
-            collectionView,
-            layout: collectionViewLayout,
-            sizeForItemAt: indexPath
+        if let itemSize = (collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize, itemSize != UICollectionViewFlowLayout.automaticSize {
+            return itemSize
+        }
+        
+        return cache.sizeForCellOrSupplementaryView(
+            withReuseIdentifier: String.hostingCollectionViewCellIdentifier,
+            at: indexPath
         )
     }
     
@@ -430,11 +419,9 @@ final class UIHostingCollectionViewController<
             return .zero
         }
         
-        return cache.collectionView(
-            collectionView,
-            layout: collectionViewLayout,
-            referenceSizeForHeaderOrFooterInSection: section,
-            kind: UICollectionView.elementKindSectionHeader
+        return cache.sizeForCellOrSupplementaryView(
+            withReuseIdentifier: String.hostingCollectionViewHeaderSupplementaryViewIdentifier,
+            at: IndexPath(row: -1, section: section)
         )
     }
     
@@ -446,12 +433,9 @@ final class UIHostingCollectionViewController<
         guard (SectionFooterContent.self != EmptyView.self && SectionFooterContent.self != Never.self) else {
             return .zero
         }
-        
-        return cache.collectionView(
-            collectionView,
-            layout: collectionViewLayout,
-            referenceSizeForHeaderOrFooterInSection: section,
-            kind: UICollectionView.elementKindSectionFooter
+        return cache.sizeForCellOrSupplementaryView(
+            withReuseIdentifier: String.hostingCollectionViewFooterSupplementaryViewIdentifier,
+            at: IndexPath(row: -1, section: section)
         )
     }
     
@@ -490,70 +474,95 @@ final class UIHostingCollectionViewController<
 extension UIHostingCollectionViewController {
     func refreshVisibleCellsAndSupplementaryViews() {
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
-            guard let view = view as? UICollectionViewSupplementaryViewType else {
+            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-
-            guard view.latestRepresentableUpdate != latestRepresentableUpdate else {
-                continue
-            }
-
+                        
             view.cache.content = nil
-            view.configuration?.viewProvider = viewProvider
-            
             view.update(disableAnimation: true)
         }
-        
+
         for cell in collectionView.visibleCells {
-            guard let cell = cell as? UICollectionViewCellType else {
+            guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-
-            guard cell.latestRepresentableUpdate != latestRepresentableUpdate else {
-                continue
-            }
-
-            cell.cache.content = nil
-            cell.configuration?.viewProvider = viewProvider
-            
+            cell.contentCache.content = nil
             cell.update(disableAnimation: true)
         }
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {
-            guard let view = view as? UICollectionViewSupplementaryViewType else {
-                continue
-            }
-
-            guard view.latestRepresentableUpdate != latestRepresentableUpdate else {
+            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
             
             view.cache.content = nil
-            view.configuration?.viewProvider = viewProvider
-            
             view.update(disableAnimation: true)
         }
     }
 }
 
-extension UIHostingCollectionViewController {
-    func section(from indexPath: IndexPath) -> SectionType? {
+extension UIHostingCollectionViewController {    
+    func contentConfiguration(
+        for indexPath: IndexPath,
+        reuseIdentifier: String
+    ) -> CellOrSupplementaryViewConfiguration? {
+        let item = self.item(at: indexPath)
+        let dataSourceConfiguration = self.dataSourceConfiguration
+        let viewProvider = self.viewProvider
+
+        guard let section = self.section(from: indexPath) else {
+            return nil
+        }
+        
+        switch reuseIdentifier {
+            case .hostingCollectionViewHeaderSupplementaryViewIdentifier:
+                return CellOrSupplementaryViewConfiguration(
+                    reuseIdentifier: reuseIdentifier,
+                    item: item,
+                    section: section,
+                    itemIdentifier: item.map({ dataSourceConfiguration.identifierMap[$0] }),
+                    sectionIdentifier: dataSourceConfiguration.identifierMap[section],
+                    indexPath: indexPath,
+                    makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionHeader)?(section)) },
+                    maximumSize: self.maximumCollectionViewCellSize
+                )
+            case .hostingCollectionViewCellIdentifier:
+                guard let item = item else {
+                    return nil
+                }
+                
+                return CellOrSupplementaryViewConfiguration(
+                    reuseIdentifier: reuseIdentifier,
+                    item: item,
+                    section: section,
+                    itemIdentifier: dataSourceConfiguration.identifierMap[item],
+                    sectionIdentifier: dataSourceConfiguration.identifierMap[section],
+                    indexPath: indexPath,
+                    makeContent: { .init(viewProvider.rowContent(section, item)) },
+                    maximumSize: self.maximumCollectionViewCellSize
+                )
+            case .hostingCollectionViewFooterSupplementaryViewIdentifier:
+                return CellOrSupplementaryViewConfiguration(
+                    reuseIdentifier: reuseIdentifier,
+                    item: item,
+                    section: section,
+                    itemIdentifier: item.map({ dataSourceConfiguration.identifierMap[$0] }),
+                    sectionIdentifier: dataSourceConfiguration.identifierMap[section],
+                    indexPath: indexPath,
+                    makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionFooter)?(section)) },
+                    maximumSize: self.maximumCollectionViewCellSize
+                )
+            default:
+                assertionFailure()
+                return nil
+        }
+    }
+    
+    private func section(from indexPath: IndexPath) -> SectionType? {
         guard let dataSource = dataSource, dataSource.contains(indexPath) else {
             return nil
         }
         
-        return _unsafelyUnwrappedSection(from: indexPath)
-    }
-    
-    func item(at indexPath: IndexPath) -> ItemType? {
-        guard let dataSource = dataSource, dataSource.contains(indexPath) else {
-            return nil
-        }
-        
-        return _unsafelyUnwrappedItem(at: indexPath)
-    }
-    
-    func _unsafelyUnwrappedSection(from indexPath: IndexPath) -> SectionType {
         if case .static(let data) = dataSource {
             return data[data.index(data.startIndex, offsetBy: indexPath.section)].model
         } else {
@@ -561,19 +570,25 @@ extension UIHostingCollectionViewController {
         }
     }
     
-    func _unsafelyUnwrappedItem(at indexPath: IndexPath) -> ItemType {
+    private func item(at indexPath: IndexPath) -> ItemType? {
+        guard indexPath.row >= 0, let dataSource = dataSource, dataSource.contains(indexPath) else {
+            return nil
+        }
+        
         if case .static(let data) = dataSource {
             return data[indexPath]
         } else {
             return dataSourceConfiguration.identifierMap[_internalDiffableDataSource!.itemIdentifier(for: indexPath)!]
         }
     }
-    
+}
+
+extension UIHostingCollectionViewController {
     func cellForItem(at indexPath: IndexPath) -> UICollectionViewCellType? {
         let result = collectionView
             .visibleCells
             .compactMap({ $0 as? UICollectionViewCellType})
-            .first(where: { $0.configuration?.indexPath == indexPath })
+            .first(where: { $0.cellContentConfiguration?.indexPath == indexPath })
         
         if let dataSource = dataSource, !dataSource.contains(indexPath) {
             return nil
@@ -598,9 +613,8 @@ extension UIHostingCollectionViewController {
             )
             
             autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            backgroundColor = .clear
-            backgroundView = UIView()
-            backgroundView?.backgroundColor = .clear
+            backgroundColor = nil
+            backgroundView = nil
             isPrefetchingEnabled = false
         }
         

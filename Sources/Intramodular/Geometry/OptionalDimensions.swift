@@ -67,7 +67,11 @@ extension OptionalDimensions {
         }
     }
     
-    public func clamping(to dimensions: OptionalDimensions) -> Self {
+    public func clamped(to dimensions: OptionalDimensions?) -> Self {
+        guard let dimensions = dimensions else {
+            return self
+        }
+
         var result = self
         
         result.clamp(to: dimensions)

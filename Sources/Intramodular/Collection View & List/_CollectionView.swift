@@ -27,70 +27,16 @@ struct _CollectionView<
         RowContent
     >
     
-    public struct _CollectionViewLayout: CollectionViewLayout, Hashable {
-        weak var collectionViewController: NSObject?
-        
-        let base: CollectionViewLayout
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(collectionViewController?.hashValue)
-            hasher.combine(base.hashValue)
-        }
-        
-        public func _toUICollectionViewLayout() -> UICollectionViewLayout {
-            base._toUICollectionViewLayout()
-        }
-        
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.hashValue == rhs.hashValue
-        }
-    }
-    
-    struct DataSourceConfiguration {
-        let identifierMap: UIViewControllerType.DataSource.IdentifierMap
-    }
-    
-    struct ViewProvider {
-        let sectionHeader: (SectionType) -> SectionHeader
-        let sectionFooter: (SectionType) -> SectionFooter
-        
-        let rowContent: (SectionType, ItemType) -> RowContent
-        
-        func sectionContent(for kind: String) -> ((SectionType) -> AnyView)? {
-            switch kind {
-                case UICollectionView.elementKindSectionHeader: do {
-                    if SectionHeader.self != EmptyView.self && SectionHeader.self != Never.self {
-                        return { sectionHeader($0).eraseToAnyView() }
-                    } else {
-                        return nil
-                    }
-                }
-                case UICollectionView.elementKindSectionFooter:
-                    if SectionFooter.self != EmptyView.self && SectionFooter.self != Never.self {
-                        return { sectionFooter($0).eraseToAnyView() }
-                    } else {
-                        return nil
-                    }
-                default: do {
-                    assertionFailure()
-                    
-                    return nil
-                }
-            }
-        }
-    }
-    
     typealias Configuration = _CollectionViewConfiguration
-    
-    private let dataSourcePayload: UIViewControllerType.DataSource.Payload
-    private let dataSourceConfiguration: DataSourceConfiguration
+
+    private let dataSource: DataSource
     private let viewProvider: ViewProvider
     
     @Environment(\._collectionViewConfiguration) private var configuration: Configuration
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         .init(
-            dataSourceConfiguration: dataSourceConfiguration,
+            dataSourceConfiguration: dataSource.configuration,
             viewProvider: viewProvider,
             configuration: configuration
         )
@@ -123,18 +69,18 @@ struct _CollectionView<
         uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
         uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
-        uiViewController.dataSourceConfiguration = dataSourceConfiguration
+        uiViewController.dataSourceConfiguration = dataSource.configuration
         uiViewController.configuration = context.environment._collectionViewConfiguration
         uiViewController.viewProvider = viewProvider
         
         if let oldUpdateToken = context.coordinator.dataSourceUpdateToken, let currentUpdateToken =
             context.environment._collectionViewConfiguration.dataSourceUpdateToken {
             if oldUpdateToken != currentUpdateToken {
-                uiViewController.dataSource = dataSourcePayload
+                uiViewController.dataSource = dataSource.payload
                 uiViewController.refreshVisibleCellsAndSupplementaryViews()
             }
         } else {
-            uiViewController.dataSource = dataSourcePayload
+            uiViewController.dataSource = dataSource.payload
             uiViewController.refreshVisibleCellsAndSupplementaryViews()
         }
         
@@ -166,15 +112,18 @@ extension _CollectionView {
         ItemIdentifierType == _IdentifierHashedValue<ItemType>,
         Data.Element == ListSection<SectionType, ItemType>
     {
-        self.dataSourcePayload = .static(.init(data))
-        self.dataSourceConfiguration = .init(
-            identifierMap: .init(
-                getSectionID: { .init($0) },
-                getSectionFromID: { $0.value },
-                getItemID: { .init($0) },
-                getItemFromID: { $0.value }
-            )
+        self.dataSource = DataSource(
+            configuration: .init(
+                identifierMap: .init(
+                    getSectionID: { .init($0) },
+                    getSectionFromID: { $0.value },
+                    getItemID: { .init($0) },
+                    getItemFromID: { $0.value }
+                )
+            ),
+            payload: .static(.init(data))
         )
+
         self.viewProvider = .init(
             sectionHeader: sectionHeader,
             sectionFooter: sectionFooter,
@@ -183,7 +132,7 @@ extension _CollectionView {
     }
     
     init(
-        _ dataSourcePayload: UIViewControllerType.DataSource.Payload,
+        _ payload: UIViewControllerType.DataSource.Payload,
         sectionHeader: @escaping (SectionType) -> SectionHeader,
         sectionFooter: @escaping (SectionType) -> SectionFooter,
         rowContent: @escaping (SectionType, ItemType) -> RowContent
@@ -193,14 +142,16 @@ extension _CollectionView {
         SectionIdentifierType == SectionType,
         ItemIdentifierType == ItemType
     {
-        self.dataSourcePayload = dataSourcePayload
-        self.dataSourceConfiguration = .init(
-            identifierMap: .init(
-                getSectionID: { $0 },
-                getSectionFromID: { $0 },
-                getItemID: { $0 },
-                getItemFromID: { $0 }
-            )
+        self.dataSource = .init(
+            configuration: .init(
+                identifierMap: .init(
+                    getSectionID: { $0 },
+                    getSectionFromID: { $0 },
+                    getItemID: { $0 },
+                    getItemFromID: { $0 }
+                )
+            ),
+            payload: payload
         )
         self.viewProvider = .init(
             sectionHeader: sectionHeader,
@@ -227,6 +178,59 @@ extension _CollectionView {
             sectionFooter: sectionFooter,
             rowContent: { rowContent($0, $1) }
         )
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension _CollectionView {
+    struct ViewProvider {
+        let sectionHeader: (SectionType) -> SectionHeader
+        let sectionFooter: (SectionType) -> SectionFooter
+        
+        let rowContent: (SectionType, ItemType) -> RowContent
+        
+        func sectionContent(for kind: String) -> ((SectionType) -> AnyView)? {
+            switch kind {
+                case UICollectionView.elementKindSectionHeader: do {
+                    if SectionHeader.self != EmptyView.self && SectionHeader.self != Never.self {
+                        return { sectionHeader($0).eraseToAnyView() }
+                    } else {
+                        return nil
+                    }
+                }
+                case UICollectionView.elementKindSectionFooter:
+                    if SectionFooter.self != EmptyView.self && SectionFooter.self != Never.self {
+                        return { sectionFooter($0).eraseToAnyView() }
+                    } else {
+                        return nil
+                    }
+                default: do {
+                    assertionFailure()
+                    
+                    return nil
+                }
+            }
+        }
+    }
+    
+    public struct _CollectionViewLayout: CollectionViewLayout, Hashable {
+        weak var collectionViewController: NSObject?
+        
+        let base: CollectionViewLayout
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(collectionViewController?.hashValue)
+            hasher.combine(base.hashValue)
+        }
+        
+        public func _toUICollectionViewLayout() -> UICollectionViewLayout {
+            base._toUICollectionViewLayout()
+        }
+        
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.hashValue == rhs.hashValue
+        }
     }
 }
 
