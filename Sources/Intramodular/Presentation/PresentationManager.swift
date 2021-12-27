@@ -79,6 +79,27 @@ extension EnvironmentValues {
 
 // MARK: - Conformances -
 
+public struct AnyPresentationManager: PresentationManager {
+    private let isPresentedImpl: () -> Bool
+    private let dismissImpl: () -> Void
+    
+    public var isPresented: Bool {
+        isPresentedImpl()
+    }
+    
+    public init(
+        isPresented: @escaping () -> Bool,
+        dismiss: @escaping () -> Void
+    ) {
+        self.isPresentedImpl = isPresented
+        self.dismissImpl = dismiss
+    }
+
+    public func dismiss() {
+        dismissImpl()
+    }
+}
+
 extension Binding: PresentationManager where Value == PresentationMode {
     public var isPresented: Bool {
         return wrappedValue.isPresented
