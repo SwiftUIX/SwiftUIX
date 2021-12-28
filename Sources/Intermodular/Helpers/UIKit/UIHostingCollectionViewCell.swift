@@ -51,8 +51,6 @@ class UIHostingCollectionViewCell<
     
     var contentPreferences = ContentPreferences() {
         didSet {
-            clipsToBounds = true
-            
             updateCollectionCache()
         }
     }
