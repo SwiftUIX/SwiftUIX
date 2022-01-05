@@ -6,15 +6,16 @@ import Combine
 import Swift
 import SwiftUI
 
+/// A property wrapper type that subscribes to an (optional) observable object and invalidates a view whenever the observable object changes.
 @propertyWrapper
 public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicProperty {
     public typealias Container = _OptionalObservedObjectContainer<ObjectType>
     
     private let base: ObjectType?
-
+    
     @State fileprivate var container: Container
     @ObservedObject fileprivate var observedContainer: Container
-
+    
     /// The current state value.
     public var wrappedValue: ObjectType? {
         get {
@@ -23,20 +24,20 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
             container.base = newValue
         }
     }
-
+    
     /// Initialize with the provided initial value.
     public init(wrappedValue value: ObjectType?) {
         let container = Container(base: value)
-
+        
         self.base = value
         self.container = container
         self.observedContainer = container
     }
-
+    
     public init() {
         self.init(wrappedValue: nil)
     }
-
+    
     public mutating func update() {
         withExtendedLifetime(container) {
             withExtendedLifetime(container.base) {
