@@ -40,14 +40,8 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     public mutating func update() {
         withExtendedLifetime(container) {
             withExtendedLifetime(container.base) {
-                if base !== container.base {
-                    container.base = base
-                }
-
                 if container !== observedContainer {
-                    let container = self.container
-
-                    observedContainer = container
+                    observedContainer = self.container
                 }
             }
         }
