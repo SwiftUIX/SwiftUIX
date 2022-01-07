@@ -29,6 +29,10 @@ extension UIViewController {
             ?? nearestChild(ofKind: UINavigationController.self)
             ?? nearestResponder(ofKind: UINavigationController.self)
     }
+
+    var nearestSplitViewController: UISplitViewController? {
+        splitViewController ?? nearestNavigationController?.splitViewController ?? nearestResponder(ofKind: UISplitViewController.self)
+    }
 }
 
 extension UIViewController {
