@@ -26,7 +26,7 @@ public struct ObservedPublisher<P: Publisher>: DynamicProperty where P.Failure =
         self._subscription = .init(
             initialValue: Publishers.Concatenate(
                 prefix: Just(initial)
-                    .delay(for: .nanoseconds(1), scheduler: RunLoop.main),
+                    .delay(for: .nanoseconds(1), scheduler: DispatchQueue.main),
                 suffix: publisher
             ).sink(receiveValue: {
                 updateWrappedValue.value($0)
