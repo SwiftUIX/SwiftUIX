@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-11]
-        xcode: ['13.0', '13.1', '13.2']
+        xcode: ['13.1', '13.2']
         build_type: ['debug', 'release']
     runs-on: ${{ matrix.os }}
     env:
