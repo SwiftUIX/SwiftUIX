@@ -28,7 +28,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     private var _presentationStyle: ModalPresentationStyle?
     
     private let label: Label
-    
+    private let action: () -> Void
+
     @State private var name: AnyHashable = UUID()
     @State private var id: AnyHashable = UUID()
     @State private var _internal_isPresented: Bool = false
@@ -140,10 +141,22 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 }
             }
         } else {
-            Button(action: { presenter.presentOnTop(presentation) }, label: label)
+            Button {
+                togglePresentation()
+                
+                presenter.presentOnTop(presentation)
+            } label: {
+                label
+            }
         }
         #else
-        Button(action: { presenter.present(presentation) }, label: label)
+        Button {
+            togglePresentation()
+            
+            presenter.present(presentation)
+        } label: {
+            label
+        }
         #endif
     }
     
@@ -204,6 +217,8 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     private func togglePresentation() {
+        action()
+        
         isPresented.wrappedValue.toggle()
     }
 }
@@ -211,6 +226,20 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
 // MARK: - API -
 
 extension PresentationLink {
+    public init(
+        action: @escaping () -> Void,
+        @ViewBuilder destination: () -> Destination,
+        onDismiss: @escaping () -> () = { },
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination()
+        self._onDismiss = onDismiss
+        self._isPresented = nil
+        
+        self.label = label()
+        self.action = action
+    }
+
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -221,6 +250,7 @@ extension PresentationLink {
         self._isPresented = nil
         
         self.label = label()
+        self.action = { }
     }
     
     public init(
@@ -233,8 +263,9 @@ extension PresentationLink {
         self._isPresented = nil
         
         self.label = label()
+        self.action = { }
     }
-    
+        
     public init(
         destination: Destination,
         isPresented: Binding<Bool>,
@@ -246,6 +277,7 @@ extension PresentationLink {
         self._isPresented = isPresented
         
         self.label = label()
+        self.action = { }
     }
     
     public init(
@@ -259,6 +291,7 @@ extension PresentationLink {
         self._isPresented = isPresented
         
         self.label = label()
+        self.action = { }
     }
     
     public init(
@@ -271,6 +304,7 @@ extension PresentationLink {
         self._isPresented = isPresented
         
         self.label = label()
+        self.action = { }
     }
     
     public init<V: Hashable>(
@@ -293,6 +327,7 @@ extension PresentationLink {
         )
         
         self.label = label()
+        self.action = { }
     }
 }
 
