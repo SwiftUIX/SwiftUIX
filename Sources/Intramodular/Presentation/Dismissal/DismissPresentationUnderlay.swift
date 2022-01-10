@@ -17,7 +17,7 @@ public struct DismissPresentationUnderlay<Content: View>: View {
     
     public var body: some View {
         #if !os(tvOS)
-        return GeometryReader { proxy in
+        return GeometryReader(alignment: .center) { proxy in
             self.content
         }
         .background(
