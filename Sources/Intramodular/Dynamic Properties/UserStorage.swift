@@ -67,6 +67,8 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                     } catch {
                         if _isStrict {
                             assertionFailure(error.localizedDescription)
+                        } else {
+                            print(String(describing: error))
                         }
                         
                         return nil
