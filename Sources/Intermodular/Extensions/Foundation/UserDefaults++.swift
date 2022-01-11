@@ -132,7 +132,7 @@ extension PropertyListDecoder {
         do {
             return try decode(type, from: data)
         } catch {
-            if error.isFragmentDecodingError {
+            if error.isPossibleFragmentDecodingError {
                 let jsonObject = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
                 let boxedData = try JSONSerialization.data(withJSONObject: [jsonObject])
                 let decoder = copy()
@@ -186,15 +186,22 @@ fileprivate extension CodingUserInfoKey {
 }
 
 fileprivate extension Error {
-    var isFragmentDecodingError: Bool {
-        guard let error = self as? DecodingError, case let DecodingError.dataCorrupted(context) = error else {
+    var isPossibleFragmentDecodingError: Bool {
+        guard let error = self as? DecodingError else {
             return false
         }
         
-        return true
-            && context.debugDescription == "The given data was not valid JSON."
-            && (context.underlyingError as NSError?)?
-                .debugDescription
-                .contains("option to allow fragments not set") ?? false
+        switch error {
+            case let DecodingError.dataCorrupted(context):
+                return true
+                && context.debugDescription == "The given data was not valid JSON."
+                && (context.underlyingError as NSError?)?
+                    .debugDescription
+                    .contains("option to allow fragments not set") ?? false
+            case DecodingError.typeMismatch:
+                return true
+            default:
+                return false
+        }
     }
 }
