@@ -27,7 +27,7 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                 do {
                     try store.encode(newValue, forKey: key)
                     
-                    storedValue = defaultValue
+                    storedValue = newValue
                 } catch {
                     if _isStrict {
                         assertionFailure(String(describing: error))
