@@ -19,9 +19,21 @@ struct SidebarVisibilityModifier: ViewModifier {
 
 // MARK: - API -
 
+public enum _SidebarVisibility {
+    case automatic
+    case visible
+    case hidden
+}
+
 extension View {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     public func initialSidebarVisibility(_ visibility: Visibility) -> some View {
+        modifier(SidebarVisibilityModifier(isSidebarInitiallyVisible: visibility == .visible))
+    }
+    
+    @_disfavoredOverload
+    @available(iOS 14.0, macOS 12.0, tvOS 14.0, *)
+    public func initialSidebarVisibility(_ visibility: _SidebarVisibility) -> some View {
         modifier(SidebarVisibilityModifier(isSidebarInitiallyVisible: visibility == .visible))
     }
 }
