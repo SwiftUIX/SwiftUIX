@@ -9,19 +9,35 @@ import SwiftUI
 /// A property wrapper type that subscribes to an (optional) observable object and invalidates a view whenever the observable object changes.
 @propertyWrapper
 public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicProperty {
-    public typealias Container = _OptionalObservedObjectContainer<ObjectType>
+    private typealias Container = _OptionalObservedObjectContainer<ObjectType>
     
-    private let base: ObjectType?
-    
-    @State fileprivate var container: Container
-    @ObservedObject fileprivate var observedContainer: Container
+    @State
+    private var dummyStateVariable: Bool = false
+    @ObservedObject
+    private var dummyObservedObject = _DummyObservableObject()
+    @State
+    private var base: ObjectType?
+    @State
+    private var container: Container
+    @ObservedObject
+    private var observedContainer: Container
+    @ObservedObject
+    private var observedObject: _AnyObservableObject
     
     /// The current state value.
     public var wrappedValue: ObjectType? {
         get {
             container.base
         } nonmutating set {
+            base = newValue
             container.base = newValue
+            observedContainer.base = newValue
+            
+            container.onObjectWillChange = {
+                dummyObservedObject.objectWillChange.send()
+            }
+            
+            dummyStateVariable.toggle()
         }
     }
     
@@ -29,9 +45,9 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     public init(wrappedValue value: ObjectType?) {
         let container = Container(base: value)
         
-        self.base = value
         self.container = container
         self.observedContainer = container
+        self.observedObject = value.map(_AnyObservableObject.init) ?? .empty
     }
     
     public init() {
@@ -39,22 +55,36 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     }
     
     public mutating func update() {
-        withExtendedLifetime(container) {
-            withExtendedLifetime(container.base) {
-                if container !== observedContainer {
-                    observedContainer = self.container
-                }
-            }
+        let container = self.container
+        
+        if self.observedContainer !== container {
+            self.observedContainer = container
+        }
+        
+        if let base = container.base, container.isDirty {
+            self.observedContainer = container
+            self.observedObject = _AnyObservableObject(base)
+            
+            container.isDirty = false
         }
     }
 }
 
 // MARK: - Auxiliary Implementation -
 
-public final class _OptionalObservedObjectContainer<ObjectType: ObservableObject>: ObservableObject {
+private class _DummyObservableObject: ObservableObject {
+    init() {
+        
+    }
+}
+
+private final class _OptionalObservedObjectContainer<ObjectType: ObservableObject>: ObservableObject {
     private var baseSubscription: AnyCancellable?
     
-    fileprivate var base: ObjectType? {
+    var onObjectWillChange: () -> Void = { }
+    var isDirty: Bool = false
+    
+    var base: ObjectType? {
         didSet {
             if let oldValue = oldValue, let base = base {
                 if oldValue === base, baseSubscription != nil {
@@ -63,17 +93,15 @@ public final class _OptionalObservedObjectContainer<ObjectType: ObservableObject
             }
             
             subscribe()
+            
+            isDirty = true
         }
     }
     
-    fileprivate init(base: ObjectType?) {
+    init(base: ObjectType?) {
         self.base = base
         
-        withExtendedLifetime(self) {
-            withExtendedLifetime(base) {
-                subscribe()
-            }
-        }
+        subscribe()
     }
     
     private func subscribe() {
@@ -83,8 +111,39 @@ public final class _OptionalObservedObjectContainer<ObjectType: ObservableObject
         
         baseSubscription = base
             .objectWillChange
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
-                self?.objectWillChange.send()
+                guard let `self` = self else {
+                    return
+                }
+                
+                DispatchQueue.asyncOnMainIfNecessary {
+                    `self`.objectWillChange.send()
+                    `self`.onObjectWillChange()
+                }
             })
+    }
+}
+
+private final class _AnyObservableObject: ObservableObject {
+    private class _EmptyObservableObject: ObservableObject {
+        init() {
+            
+        }
+    }
+    
+    static let empty = _AnyObservableObject(_EmptyObservableObject())
+    
+    let base: AnyObject
+    
+    private let objectWillChangeImpl: () -> AnyPublisher<Void, Never>
+    
+    var objectWillChange: AnyPublisher<Void, Never> {
+        objectWillChangeImpl()
+    }
+    
+    init<T: ObservableObject>(_ base: T) {
+        self.base = base
+        self.objectWillChangeImpl = { base.objectWillChange.map({ _ in () }).eraseToAnyPublisher() }
     }
 }

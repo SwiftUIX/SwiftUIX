@@ -9,6 +9,7 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension GroupBox where Label == AnyView {
+    @_disfavoredOverload
     public init<S: StringProtocol>(
         _ title: S,
         @ViewBuilder content: () -> Content

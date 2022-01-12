@@ -15,15 +15,18 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         let store: UserDefaults
         let _isStrict: Bool
         
-        var storedValue: Value?
+        var storedValue: Value? {
+            didSet {
+                objectWillChange.send()
+            }
+        }
+        
         var storeSubscription: AnyCancellable?
         
         var value: Value {
             get {
                 storedValue ?? defaultValue
             } set {
-                objectWillChange.send()
-                
                 do {
                     try store.encode(newValue, forKey: key)
                     
@@ -52,11 +55,7 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
             do {
                 storedValue = try store.decode(Value.self, forKey: key) ?? defaultValue
             } catch {
-                if _isStrict {
-                    assertionFailure(error.localizedDescription)
-                } else {
-                    print(String(describing: error))
-                }
+                handleError(error)
             }
             
             storeSubscription = store
@@ -65,12 +64,8 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                     do {
                         return try store.decode(Value.self, from: $0)
                     } catch {
-                        if _isStrict {
-                            assertionFailure(error.localizedDescription)
-                        } else {
-                            print(String(describing: error))
-                        }
-                        
+                        self.handleError(error)
+
                         return nil
                     }
                 }
@@ -78,6 +73,14 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
                 .sink { [weak self] in
                     self?.storedValue = $0
                 }
+        }
+        
+        private func handleError(_ error: Error) {
+            if _isStrict {
+                assertionFailure(String(describing: error))
+            } else {
+                print(String(describing: error))
+            }
         }
     }
     
