@@ -51,7 +51,7 @@ public struct LazyAppearView<Content: View>: View {
     
     public init(
         debounceInterval: DispatchTimeInterval? = nil,
-        destination: @escaping (LazyAppearViewProxy) -> Content
+        @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
     ) {
         self.debounceInterval = debounceInterval
         self.destination = destination

@@ -53,7 +53,6 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     private var presentation: AnyModalPresentation {
         func reset() {
-            self.id = UUID()
             self.isPresented.wrappedValue = false
         }
         
@@ -85,14 +84,14 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     public var body: some View {
         PassthroughView {
-            if let presenter = presenter, userInterfaceIdiom != .mac,  presentationStyle != .automatic {
-                customPopoverPresentationButton(presenter: presenter)
+            if let presenter = presenter, userInterfaceIdiom != .mac, presentationStyle != .automatic {
+                customPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
                 systemSheetPresentationButton
             } else if presentationStyle == .popover, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
                 systemPopoverPresentationButton
             } else {
-                customPresentationButton
+                customPresentationButtonWithAdhocPresenter
             }
         }
         .background(
@@ -105,7 +104,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     @ViewBuilder
-    private func customPopoverPresentationButton(presenter: DynamicViewPresenter) -> some View {
+    private func customPresentationButton(presenter: DynamicViewPresenter) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
         if case .popover(_, _) = presentationStyle {
             IntrinsicGeometryReader { proxy in
@@ -189,15 +188,16 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     @ViewBuilder
-    private var customPresentationButton: some View {
+    private var customPresentationButtonWithAdhocPresenter: some View {
         #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
         Button(
             action: togglePresentation,
             label: label
         )
         .background {
-            CocoaHostingView {
+            CocoaHostingView { 
                 ZeroSizeView()
+                    .id(isPresented.wrappedValue)
                     .preference(
                         key: AnyModalPresentation.PreferenceKey.self,
                         value: .init(

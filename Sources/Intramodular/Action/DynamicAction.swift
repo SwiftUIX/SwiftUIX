@@ -66,6 +66,17 @@ public struct DynamicActionButton<Action: DynamicAction, Label: View>: View {
 }
 
 extension View {
+    /// Adds an action to perform when this view recognizes a tap gesture.
+    public func onTapGesture<A: DynamicAction>(perform action: A) -> some View {
+        modifier(_AddDynamicActionOnTapGesture(action: action))
+    }
+}
+
+extension View {
+    /// Adds an action to perform when this view is pressed.
+    ///
+    /// - Parameters:
+    ///    - action: The action to perform.
     public func onPress<A: DynamicAction>(perform action: A) -> some View {
         DynamicActionButton(action: action) {
             self
@@ -73,12 +84,26 @@ extension View {
         .buttonStyle(PlainButtonStyle())
     }
     
+    /// Adds an action to perform when this view is pressed.
+    ///
+    /// - Parameters:
+    ///    - action: The action to perform.
     public func onPress(perform action: @escaping () -> Void) -> some View {
         onPress(perform: Action(action))
     }
 }
 
 // MARK: - Auxiliary Implementation -
+
+struct _AddDynamicActionOnTapGesture<Action: DynamicAction>: ViewModifier {
+    let action: Action
+    
+    func body(content: Content) -> some View {
+        content.onTapGesture {
+            action.perform()
+        }
+    }
+}
 
 public struct InsertDynamicAction<Base: PerformActionView, Action: DynamicAction>: View {
     public let base: Base
