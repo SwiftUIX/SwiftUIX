@@ -14,7 +14,7 @@ public struct AnyPresentationView: View {
         #endif
     }
     
-    let base: Base
+    var base: Base
     
     var environmentBuilder: EnvironmentBuilder = .init()
     
@@ -53,6 +53,12 @@ public struct AnyPresentationView: View {
     #if !os(watchOS)
     public init(_ viewController: AppKitOrUIKitViewController) {
         self.base = .appKitOrUIKitViewController(viewController)
+
+        #if os(iOS)
+        if let transitioningDelegate = viewController.transitioningDelegate {
+            self = self.modalPresentationStyle(.custom(transitioningDelegate))
+        }
+        #endif
     }
     #endif
 }
