@@ -91,7 +91,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             } else if presentationStyle == .popover, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
                 systemPopoverPresentationButton
             } else {
-                customPresentationButtonWithAdhocPresenter
+                customPresentationButtonWithAdHocPresenter
             }
         }
         .background(
@@ -141,11 +141,24 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             }
         } else {
             Button {
-                togglePresentation()
-                
                 presenter.presentOnTop(presentation)
+                
+                isPresented.wrappedValue = true
             } label: {
                 label
+            }
+            .background {
+                ZeroSizeView()
+                    .id(isPresented.wrappedValue)
+                    .preference(
+                        key: AnyModalPresentation.PreferenceKey.self,
+                        value: .init(
+                            presentationID: id,
+                            presentation: isPresented.wrappedValue
+                            ? presentation
+                            : nil
+                        )
+                    )
             }
         }
         #else
@@ -188,25 +201,40 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     @ViewBuilder
-    private var customPresentationButtonWithAdhocPresenter: some View {
+    private var customPresentationButtonWithAdHocPresenter: some View {
         #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
         Button(
             action: togglePresentation,
             label: label
         )
         .background {
-            CocoaHostingView { 
-                ZeroSizeView()
-                    .id(isPresented.wrappedValue)
-                    .preference(
-                        key: AnyModalPresentation.PreferenceKey.self,
-                        value: .init(
-                            presentationID: id,
-                            presentation: isPresented.wrappedValue
+            CocoaHostingView {
+                withEnvironmentValue(\.cocoaPresentationCoordinator) { cocoaPresentationCoordinator in
+                    ZeroSizeView()
+                        .id(isPresented.wrappedValue)
+                        .preference(
+                            key: AnyModalPresentation.PreferenceKey.self,
+                            value: .init(
+                                presentationID: id,
+                                presentation: isPresented.wrappedValue
                                 ? presentation
                                 : nil
+                            )
                         )
-                    )
+                        
+                    PerformAction {
+                        guard
+                            let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
+                            let activePresentation = presentedCoordinator.presentation
+                        else {
+                            return
+                        }
+                    
+                        if activePresentation.id == presentation.id {
+                            presentedCoordinator.update(with: .init(presentationID: id, presentation: presentation))
+                        }
+                    }
+                }
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)
