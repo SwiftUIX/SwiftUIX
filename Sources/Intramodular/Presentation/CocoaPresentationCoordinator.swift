@@ -117,7 +117,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public func present(_ modal: AnyModalPresentation, completion: @escaping () -> Void) {
-        guard let viewController = viewController, !viewController.isPresenting else {
+        guard let viewController = viewController, !viewController.isBeingPresented else {
             return
         }
                 
@@ -221,6 +221,8 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             let presentation = presentedCoordinator.presentation,
             value.presentationID == presentation.id
         {
+            dismiss()
+        } else if presentedCoordinator != nil {
             dismiss()
         }
     }

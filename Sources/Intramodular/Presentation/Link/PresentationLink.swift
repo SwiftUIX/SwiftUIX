@@ -221,9 +221,26 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                                 : nil
                             )
                         )
+                        .onChange(of: isPresented.wrappedValue) { _ in
+                            // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
+                            guard
+                                !isPresented.wrappedValue,
+                                let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
+                                let presentedViewController = presentedCoordinator.viewController,
+                                presentedCoordinator.presentation == nil,
+                                presentedViewController is CocoaPresentationHostingController
+                            else {
+                                return
+                            }
+                            
+                            // This whole on-change hack is needed because sometimes even though `isPresented.wrappedValue` changes to `false`, the preference key doesn't propagate up.
+                            // Here we force the presentation coordinator to update.
+                            presentedCoordinator.update(with: .init(presentationID: id, presentation: nil))
+                        }
                         
                     PerformAction {
                         guard
+                            isPresented.wrappedValue,
                             let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
                             let activePresentation = presentedCoordinator.presentation
                         else {
