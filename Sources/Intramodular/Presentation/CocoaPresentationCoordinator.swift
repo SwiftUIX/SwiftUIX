@@ -117,11 +117,15 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
     
     public func present(_ modal: AnyModalPresentation, completion: @escaping () -> Void) {
-        guard let viewController = viewController, !viewController.isBeingPresented else {
+        guard let viewController = viewController else {
             return
         }
                 
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        guard !viewController.isBeingPresented else {
+            return
+        }
+        
         if let presentedViewController = viewController.presentedViewController as? CocoaPresentationHostingController, presentedViewController.modalViewPresentationStyle == modal.content.modalPresentationStyle {
             
             presentedViewController.presentation = modal
@@ -209,11 +213,15 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             let newPresentation = value.presentation,
             currentPresentation.id == newPresentation.id || currentPresentation.id == value.presentationID
         {
+            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             if let viewController = viewController as? CocoaPresentationHostingController, !viewController.isBeingPresented {
                 viewController.presentation = newPresentation
             }
             
             return
+            #elseif os(macOS)
+            fatalError("unimplemented")
+            #endif
         } else if let presentation = value.presentation {
             present(presentation, completion: { })
         } else if

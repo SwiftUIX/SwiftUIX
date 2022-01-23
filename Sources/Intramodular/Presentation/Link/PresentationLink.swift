@@ -222,6 +222,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             )
                         )
                         .onChange(of: isPresented.wrappedValue) { _ in
+                            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
                             // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
                             guard
                                 !isPresented.wrappedValue,
@@ -236,6 +237,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             // This whole on-change hack is needed because sometimes even though `isPresented.wrappedValue` changes to `false`, the preference key doesn't propagate up.
                             // Here we force the presentation coordinator to update.
                             presentedCoordinator.update(with: .init(presentationID: id, presentation: nil))
+                            #endif
                         }
                         
                     PerformAction {
