@@ -141,14 +141,17 @@ extension WindowOverlay {
                 contentWindow.rootViewController?.view.setNeedsDisplay()
                 #endif
             } else {
-                #if os(macOS)
-                contentWindow?.close()
-                #else
-                contentWindow?.isHidden = true
-                contentWindow?.isUserInteractionEnabled = false
-                contentWindow?.windowScene = nil
-                contentWindow = nil
-                #endif
+                if let contentWindow = contentWindow {
+                    #if os(macOS)
+                    contentWindow.close()
+                    #else
+                    contentWindow.isHidden = true
+                    contentWindow.isUserInteractionEnabled = false
+                    contentWindow.windowScene = nil
+
+                    self.contentWindow = nil
+                    #endif
+                }
             }
         }
         
