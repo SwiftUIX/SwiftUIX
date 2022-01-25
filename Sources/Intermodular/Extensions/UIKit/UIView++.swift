@@ -33,6 +33,10 @@ extension UIView {
         
         return nil
     }
+
+    public func _SwiftUIX_findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
+        findSubview(ofKind: kind)
+    }
 }
 
 extension UIView {
