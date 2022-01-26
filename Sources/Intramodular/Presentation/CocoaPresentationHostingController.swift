@@ -37,7 +37,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         #if os(iOS) || targetEnvironment(macCatalyst)
         hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
         #endif
-        if presentingViewController?.presentedViewController === self {
+        if (presentingViewController?.presentedViewController !== self) {
             modalPresentationStyle = .init(mainView.modalPresentationStyle)
             presentationController?.delegate = presentationCoordinator
             _transitioningDelegate = mainView.modalPresentationStyle.toTransitioningDelegate()
