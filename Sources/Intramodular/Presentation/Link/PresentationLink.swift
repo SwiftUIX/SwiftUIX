@@ -42,9 +42,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 base.wrappedValue
             },
             set: { newValue in
-                if base.wrappedValue != newValue {
-                    base.wrappedValue = newValue
-                }
+                base.wrappedValue = newValue
             }
         )
     }
