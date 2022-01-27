@@ -93,10 +93,24 @@ extension ActionLabelView where Label == Text {
     }
 }
 
-@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
-extension ActionLabelView where Label == SwiftUI.Label<Text, Image> {
-    public init<S: StringProtocol>(
-        _ title: S,
+// FIXME: Uncomment once Xcode 13.3 fixes this segfault.
+/*@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Button where Label == SwiftUI.Label<Text, Image> {
+    public init(
+        _ title: String,
+        systemImage: SFSymbolName,
+        action: @escaping () -> Void
+    ) {
+        self.init(action: action) {
+            Label(title, systemImage: systemImage)
+        }
+    }
+}*/
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Button where Label == SwiftUI.Label<Text, Image> {
+    public init(
+        _ title: String,
         systemImage: SFSymbolName,
         action: @escaping () -> Void
     ) {

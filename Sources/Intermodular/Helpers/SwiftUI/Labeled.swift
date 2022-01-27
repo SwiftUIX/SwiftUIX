@@ -15,10 +15,12 @@ public struct Labeled<Label: View, Control: View>: View {
         HStack {
             label
                 .foregroundColor(.secondary)
+                .multilineTextAlignment(.leading)
             
             Spacer()
             
             control
+                .multilineTextAlignment(.trailing)
         }
     }
 }

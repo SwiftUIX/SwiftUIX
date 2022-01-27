@@ -50,7 +50,7 @@ extension PresentationLinkView where Label == Image {
     }
 }
 
-@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+/*@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
 extension PresentationLinkView where Label == SwiftUI.Label<Text, Image> {
     public init<S: StringProtocol>(
         _ title: S,
@@ -61,4 +61,4 @@ extension PresentationLinkView where Label == SwiftUI.Label<Text, Image> {
             Label(title, systemImage: systemImage)
         }
     }
-}
+}*/

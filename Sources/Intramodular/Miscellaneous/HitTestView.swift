@@ -42,7 +42,7 @@ fileprivate struct HitTestView<Content: View>: AppKitOrUIKitViewRepresentable {
 
 extension View {
     public func hitTest(_ hitTest: @escaping (CGPoint) -> Bool) -> some View {
-        return HitTestView(rootView: self, hitTest: hitTest)
+        HitTestView(rootView: self, hitTest: hitTest)
     }
 }
 

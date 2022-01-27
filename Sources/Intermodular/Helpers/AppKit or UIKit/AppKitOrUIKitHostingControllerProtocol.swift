@@ -7,7 +7,9 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+@MainActor
 public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {
+    @MainActor
     func sizeThatFits(in _: CGSize) -> CGSize
 }
 
@@ -31,6 +33,7 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+@MainActor
 extension AppKitOrUIKitHostingControllerProtocol {
     public func sizeThatFits(_ sizeProposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize {
         let targetSize = sizeProposal.appKitOrUIKitTargetSize
