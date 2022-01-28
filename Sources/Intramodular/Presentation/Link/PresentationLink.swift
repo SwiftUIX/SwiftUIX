@@ -83,13 +83,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public var body: some View {
-        if #available(iOS 15.0, *) {
-            Self._printChanges()
-        } else {
-            // Fallback on earlier versions
-        }
-
-        return PassthroughView {
+        PassthroughView {
             if let presenter = presenter, userInterfaceIdiom != .mac, presentationStyle != .automatic {
                 customPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
