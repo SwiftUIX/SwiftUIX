@@ -199,7 +199,63 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             content: { presentation.content }
         )
     }
-    
+
+    struct _AdHocPresenter: View {
+        @Environment(\.cocoaPresentationCoordinator) private var cocoaPresentationCoordinator
+
+        let id: AnyHashable
+        let isPresented: Binding<Bool>
+        let presentation: AnyModalPresentation
+
+        @ViewBuilder
+        var body: some View {
+            ZeroSizeView()
+                .id(isPresented.wrappedValue)
+                .preference(
+                    key: AnyModalPresentation.PreferenceKey.self,
+                    value: .init(
+                        presentationID: id,
+                        presentation: isPresented.wrappedValue
+                        ? presentation
+                        : nil
+                    )
+                )
+                .background {
+                    PerformAction { [weak cocoaPresentationCoordinator] in
+                        guard
+                            isPresented.wrappedValue,
+                            let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
+                            let activePresentation = presentedCoordinator.presentation
+                        else {
+                            return
+                        }
+
+                        if activePresentation.id == presentation.id {
+                            presentedCoordinator.update(with: .init(presentationID: id, presentation: presentation))
+                        }
+                    }
+                }
+                .onChange(of: isPresented.wrappedValue) { [weak cocoaPresentationCoordinator] _ in
+                    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+                    // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
+                    guard
+                        !isPresented.wrappedValue,
+                        let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
+                        let presentedViewController = presentedCoordinator.viewController,
+                        presentedCoordinator.presentation == nil,
+                        presentedViewController is CocoaPresentationHostingController
+                    else {
+                        return
+                    }
+
+                    // This whole on-change hack is needed because sometimes even though `isPresented.wrappedValue` changes to `false`, the preference key doesn't propagate up.
+                    // Here we force the presentation coordinator to update.
+                    presentedCoordinator.update(with: .init(presentationID: id, presentation: nil))
+                    #endif
+                }
+        }
+    }
+
     @ViewBuilder
     private var customPresentationButtonWithAdHocPresenter: some View {
         #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -209,51 +265,11 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
         .background {
             CocoaHostingView {
-                withEnvironmentValue(\.cocoaPresentationCoordinator) { cocoaPresentationCoordinator in
-                    ZeroSizeView()
-                        .id(isPresented.wrappedValue)
-                        .preference(
-                            key: AnyModalPresentation.PreferenceKey.self,
-                            value: .init(
-                                presentationID: id,
-                                presentation: isPresented.wrappedValue
-                                ? presentation
-                                : nil
-                            )
-                        )
-                        .onChange(of: isPresented.wrappedValue) { [weak cocoaPresentationCoordinator] _ in
-                            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-                            // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
-                            guard
-                                !isPresented.wrappedValue,
-                                let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
-                                let presentedViewController = presentedCoordinator.viewController,
-                                presentedCoordinator.presentation == nil,
-                                presentedViewController is CocoaPresentationHostingController
-                            else {
-                                return
-                            }
-                            
-                            // This whole on-change hack is needed because sometimes even though `isPresented.wrappedValue` changes to `false`, the preference key doesn't propagate up.
-                            // Here we force the presentation coordinator to update.
-                            presentedCoordinator.update(with: .init(presentationID: id, presentation: nil))
-                            #endif
-                        }
-                        
-                    PerformAction { [weak cocoaPresentationCoordinator] in
-                        guard
-                            isPresented.wrappedValue,
-                            let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
-                            let activePresentation = presentedCoordinator.presentation
-                        else {
-                            return
-                        }
-                    
-                        if activePresentation.id == presentation.id {
-                            presentedCoordinator.update(with: .init(presentationID: id, presentation: presentation))
-                        }
-                    }
-                }
+                _AdHocPresenter(
+                    id: id,
+                    isPresented: isPresented,
+                    presentation: presentation
+                )
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)

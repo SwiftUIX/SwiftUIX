@@ -103,13 +103,13 @@ struct _SetDismissDisabled: ViewModifier {
     
     func body(content: Content) -> some View {
         #if os(iOS) || targetEnvironment(macCatalyst)
-        return content.onAppKitOrUIKitViewControllerResolution { viewController in
-            viewControllerBox.value = viewController.root ?? viewController
-            viewControllerBox.value?.isModalInPresentation = disabled
+        return content.onAppKitOrUIKitViewControllerResolution { [weak viewControllerBox] viewController in
+            viewControllerBox?.value = viewController.root ?? viewController
+            viewControllerBox?.value?.isModalInPresentation = disabled
         }
         .preference(key: _DismissDisabled.self, value: disabled)
-        .onChange(of: disabled) { disabled in
-            viewControllerBox.value?.isModalInPresentation = disabled
+        .onChange(of: disabled) { [weak viewControllerBox] disabled in
+            viewControllerBox?.value?.isModalInPresentation = disabled
         }
         #else
         return content.preference(key: _DismissDisabled.self, value: disabled)

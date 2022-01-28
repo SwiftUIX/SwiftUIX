@@ -210,7 +210,11 @@ struct _ResolveAppKitOrUIKitViewController: ViewModifier {
             .modifier(_UseCocoaPresentationCoordinator(coordinator: presentationCoordinatorBox))
             .environment(\._appKitOrUIKitViewControllerBox, _appKitOrUIKitViewControllerBox)
             .environment(\.navigator, _appKitOrUIKitViewControllerBox.value?.navigationController)
-            .onAppKitOrUIKitViewControllerResolution { viewController in
+            .onAppKitOrUIKitViewControllerResolution { [weak _appKitOrUIKitViewControllerBox, weak presentationCoordinatorBox] viewController in
+                guard let _appKitOrUIKitViewControllerBox = _appKitOrUIKitViewControllerBox, let presentationCoordinatorBox = presentationCoordinatorBox else {
+                    return
+                }
+
                 if !(_appKitOrUIKitViewControllerBox.value === viewController) {
                     _appKitOrUIKitViewControllerBox.value = viewController
                 }

@@ -331,14 +331,14 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             .environment(\.cocoaPresentationCoordinatorBox, presentationCoordinatorBox)
             .environment(\.presenter, coordinator?.presentingCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinatorBox))
-            .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
+            .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) { [weak coordinator] in
                 if let parent = coordinator?.viewController as? _opaque_CocoaController {
                     for description in $0 {
                         parent._setNamedViewDescription(description, for: description.name)
                     }
                 }
-            })
-            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { value in
+            }
+            .onPreferenceChange(AnyModalPresentation.PreferenceKey.self) { [weak coordinator] value in
                 if let value = value {
                     if let coordinator = coordinator {
                         coordinator.update(with: value)
@@ -349,7 +349,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
                     }
                 }
             }
-            .onPreferenceChange(_DismissDisabled.self) {
+            .onPreferenceChange(_DismissDisabled.self) { [weak coordinator] in
                 coordinator?.setIsModalInPresentation($0)
             }
             .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
