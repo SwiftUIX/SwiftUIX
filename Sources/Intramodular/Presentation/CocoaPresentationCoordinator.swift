@@ -328,7 +328,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .environment(\.cocoaPresentationCoordinator, coordinator)
+            .environment(\.cocoaPresentationCoordinatorBox, presentationCoordinatorBox)
             .environment(\.presenter, coordinator?.presentingCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinatorBox))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self, perform: {
@@ -358,15 +358,21 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
 }
 
 extension EnvironmentValues {
-    struct CocoaPresentationCoordinatorKey: EnvironmentKey {
-        static let defaultValue: CocoaPresentationCoordinator? = nil
+    struct CocoaPresentationCoordinatorBoxKey: EnvironmentKey {
+        static let defaultValue = ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
     }
     
+    var cocoaPresentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator> {
+        get {
+            self[CocoaPresentationCoordinatorBoxKey.self]
+        } set {
+            self[CocoaPresentationCoordinatorBoxKey.self] = newValue
+        }
+    }
+
     var cocoaPresentationCoordinator: CocoaPresentationCoordinator? {
         get {
-            self[CocoaPresentationCoordinatorKey.self]
-        } set {
-            self[CocoaPresentationCoordinatorKey.self] = newValue
+            cocoaPresentationCoordinatorBox.value
         }
     }
 }

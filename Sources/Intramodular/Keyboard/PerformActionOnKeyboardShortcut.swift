@@ -39,20 +39,20 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     @available(watchOS, unavailable)
     @usableFromInline
     func body(content: Content) -> some View {
-        content.background(
-            Group {
-                Button(action: self.actionTrampoline.callAsFunction) {
-                    ZeroSizeView()
-                }
-                .keyboardShortcut(shortcut)
-                .visible(false)
-                .frameZeroClipped()
-                
+        content.background {
+            ZStack {
                 PerformAction {
                     actionTrampoline.value = action
                 }
+
+                Button(action: { self.actionTrampoline.callAsFunction() }) {
+                    ZeroSizeView()
+                }
+                .buttonStyle(PlainButtonStyle())
+                .keyboardShortcut(shortcut)
+                .visible(false)
             }
-        )
+        }
     }
 }
 

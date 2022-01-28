@@ -83,7 +83,13 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
     
     public var body: some View {
-        PassthroughView {
+        if #available(iOS 15.0, *) {
+            Self._printChanges()
+        } else {
+            // Fallback on earlier versions
+        }
+
+        return PassthroughView {
             if let presenter = presenter, userInterfaceIdiom != .mac, presentationStyle != .automatic {
                 customPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
@@ -221,7 +227,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                                 : nil
                             )
                         )
-                        .onChange(of: isPresented.wrappedValue) { _ in
+                        .onChange(of: isPresented.wrappedValue) { [weak cocoaPresentationCoordinator] _ in
                             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
                             // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
                             guard
@@ -240,7 +246,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                             #endif
                         }
                         
-                    PerformAction {
+                    PerformAction { [weak cocoaPresentationCoordinator] in
                         guard
                             isPresented.wrappedValue,
                             let presentedCoordinator = cocoaPresentationCoordinator?.presentedCoordinator,
