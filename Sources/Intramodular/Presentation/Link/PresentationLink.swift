@@ -199,8 +199,9 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
     }
 
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     struct _AdHocPresenter: View {
-        @Environment(\.cocoaPresentationCoordinator) private var cocoaPresentationCoordinator
+        @Environment(\.cocoaPresentationCoordinatorBox) private var cocoaPresentationCoordinatorBox
 
         let id: AnyHashable
         let isPresented: Binding<Bool>
@@ -254,6 +255,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 }
         }
     }
+    #endif
 
     @ViewBuilder
     private var customPresentationButtonWithAdHocPresenter: some View {
