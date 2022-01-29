@@ -11,7 +11,6 @@ import SwiftUI
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    @Environment(\._appKitOrUIKitViewController) private var _appKitOrUIKitViewController
     @Environment(\.cocoaPresentationContext) private var cocoaPresentationContext
     #endif
     
