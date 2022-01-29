@@ -369,12 +369,6 @@ extension EnvironmentValues {
             self[CocoaPresentationCoordinatorBoxKey.self] = newValue
         }
     }
-
-    var cocoaPresentationCoordinator: CocoaPresentationCoordinator? {
-        get {
-            cocoaPresentationCoordinatorBox.value
-        }
-    }
 }
 
 #endif

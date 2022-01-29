@@ -7,9 +7,13 @@ import SwiftUI
 
 fileprivate struct HideTitleBar: ViewModifier {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    @Environment(\._appKitOrUIKitWindowScene) var _appKitOrUIKitWindowScene
+    @Environment(\._appKitOrUIKitViewControllerBox) var _appKitOrUIKitViewControllerBox
+
+    var _appKitOrUIKitWindowScene: UIWindowScene? {
+        _appKitOrUIKitViewControllerBox?.value?.view.window?.windowScene
+    }
     #endif
-    
+
     let isHidden: Bool
     
     func body(content: Content) -> some View {

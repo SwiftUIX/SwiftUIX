@@ -156,13 +156,15 @@ extension View {
 public func withAppKitOrUIKitViewController<Content: View>(
     @ViewBuilder _ content: @escaping (AppKitOrUIKitViewController?) -> Content
 ) -> some View {
-    withInlineState(initialValue: Optional<AppKitOrUIKitViewController>.none) { viewController in
-        content(viewController.wrappedValue)
-            .onAppKitOrUIKitViewControllerResolution { _viewController in
-                if _viewController !== viewController.wrappedValue {
-                    viewController.wrappedValue = _viewController
-                }
+    withInlineState(initialValue: ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)) { viewControllerBox in
+        withInlineObservedObject(viewControllerBox.wrappedValue) { box in
+            content(box.value)
+        }
+        .onAppKitOrUIKitViewControllerResolution { viewController in
+            if viewController !== viewControllerBox.wrappedValue.value {
+                viewControllerBox.wrappedValue.value = viewController
             }
+        }
     }
 }
 #endif
