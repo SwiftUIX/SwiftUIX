@@ -97,7 +97,7 @@ extension CocoaNavigationView {
         
         var body: some View {
             rootView
-                .environment(\.navigator, parent)
+                .environment(\.navigator, _UINavigationControllerNavigatorAdaptorBox(navigationController: parent))
         }
     }
 }
