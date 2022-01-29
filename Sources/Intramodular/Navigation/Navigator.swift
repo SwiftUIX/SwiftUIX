@@ -56,6 +56,9 @@ extension EnvironmentValues {
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+/// A box for `UINavigationController` that adapts it to a `Navigator`.
+///
+/// This box is required to prevent a retain-cycle when accessing the navigator via `EnvironmentValues`.
 struct _UINavigationControllerNavigatorAdaptorBox: Navigator {
     weak var navigationController: UINavigationController?
 
