@@ -207,6 +207,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         let isPresented: Binding<Bool>
         let presentation: AnyModalPresentation
 
+        var cocoaPresentationCoordinator: CocoaPresentationCoordinator? {
+            cocoaPresentationCoordinatorBox.value
+        }
+
         @ViewBuilder
         var body: some View {
             ZeroSizeView()
