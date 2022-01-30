@@ -31,12 +31,12 @@ public struct AnyPresentationView: View {
                 case .native(let view):
                     view
                         .mergeEnvironmentBuilder(environmentBuilder)
-                        .modifier(_ResolveAppKitOrUIKitViewController())
+                        ._resolveAppKitOrUIKitViewControllerIfAvailable()
                 #if !os(watchOS)
                 case .appKitOrUIKitViewController(let viewController):
                     AppKitOrUIKitViewControllerAdaptor(viewController)
                         .mergeEnvironmentBuilder(environmentBuilder)
-                        .modifier(_ResolveAppKitOrUIKitViewController(viewController))
+                        ._resolveAppKitOrUIKitViewController(with: viewController)
                 #endif
             }
         }

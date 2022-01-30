@@ -6,9 +6,8 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(macOS, unavailable)
 public struct FullScreenCoverLink<Destination: View, Label: View>: PresentationLinkView {
     private let destination: Destination
     private let label: Label
@@ -41,9 +40,7 @@ public struct FullScreenCoverLink<Destination: View, Label: View>: PresentationL
         Button(toggle: $isPresented, label: { label })
             .fullScreenCover(isPresented: $isPresented, onDismiss: onDismiss) {
                 destination
-                    .modifier(_ResolveAppKitOrUIKitViewController())
+                    ._resolveAppKitOrUIKitViewControllerIfAvailable()
             }
     }
 }
-
-#endif

@@ -28,6 +28,6 @@ public struct PopNavigationButton<Label: View>: ActionLabelView {
                 label
             }
         }
-        .modifier(_ResolveAppKitOrUIKitViewController())
+        ._resolveAppKitOrUIKitViewControllerIfAvailable()
     }
 }
