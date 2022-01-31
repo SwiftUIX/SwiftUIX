@@ -128,8 +128,7 @@ extension CollectionView {
         RowContent: View,
         Footer: View
     >(
-        _ axes: Axis.Set = .vertical,
-        _ data: Data,
+        sections data: Data,
         id: KeyPath<Data.Element, ID>,
         @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
     ) where Items.Element: Identifiable {
@@ -160,8 +159,39 @@ extension CollectionView {
             )
             .eraseToAnyView()
         )
+    }
+
+    public init<
+        Data: RandomAccessCollection,
+        ID: Hashable,
+        Items: RandomAccessCollection,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ axes: Axis.Set,
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
+    ) where Items.Element: Identifiable {
+        self.init(sections: data, id: id, rowContent: rowContent)
         
         _scrollViewConfiguration.axes = axes
+    }
+    
+    public init<
+        Data: RandomAccessCollection,
+        ID: Hashable,
+        Items: RandomAccessCollection,
+        Header: View,
+        RowContent: View,
+        Footer: View
+    >(
+        _ data: Data,
+        id: KeyPath<Data.Element, ID>,
+        @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
+    ) where Items.Element: Identifiable {
+        self.init(sections: data, id: id, rowContent: rowContent)
     }
     
     @_disfavoredOverload
