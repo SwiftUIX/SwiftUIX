@@ -99,14 +99,15 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
             return
         }
 
-        let originX = (windowPosition.x - self.frame.size.width / 2)
-        let originY = (windowPosition.y - self.frame.size.height / 2)
+        let originX = (windowPosition.x - (self.frame.size.width / 2))
+        let originY = (windowPosition.y - (self.frame.size.height / 2))
         
+        print(originX, originY)
         #if os(iOS)
-            self.frame.origin = .init(
-                x: originX,
-                y: originY
-            )
+        self.frame.origin = .init(
+            x: originX,
+            y: originY
+        )
         #elseif os(macOS)
         setFrameOrigin(.init(x: originX, y: originY))
         #endif
@@ -116,16 +117,16 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
 // MARK: - API -
 
 extension View {
-    /// Positions the top-leading corner of this window at the specified coordinates in the screen's coordinate space.
+    /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
-    /// Use the `windowPosition(x:y:)` modifier to place the top-leading corner of a window at a specific coordinate in the screen using `offset`.
+    /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
     public func windowPosition(_ offset: CGPoint) -> some View {
         preference(key: WindowPositionPreferenceKey.self, value: offset)
     }
     
-    /// Positions the top-leading corner of this window at the specified coordinates in the screen's coordinate space.
+    /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
-    /// Use the `windowPosition(x:y:)` modifier to place the top-leading corner of a window at a specific coordinate in the screen using an `x` and `y` offset.
+    /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using an `x` and `y` offset.
     public func windowPosition(x: CGFloat, y: CGFloat) -> some View {
         windowPosition(.init(x: x, y: y))
     }
