@@ -145,6 +145,21 @@ public struct PopoverArrowDirection: OptionSet {
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension PopoverArrowDirection {
+    init(_ edge: Edge) {
+        self.init()
+        
+        switch edge {
+            case .top:
+                self = .up
+            case .leading:
+                self = .left
+            case .bottom:
+                self = .down
+            case .trailing:
+                self = .right
+        }
+    }
+
     init(_ direction: UIPopoverArrowDirection) {
         self.init()
         
@@ -157,11 +172,11 @@ extension PopoverArrowDirection {
         }
         
         if direction.contains(.left) {
-            formUnion(.down)
+            formUnion(.left)
         }
         
         if direction.contains(.right) {
-            formUnion(.down)
+            formUnion(.right)
         }
     }
 }
@@ -179,11 +194,11 @@ extension UIPopoverArrowDirection {
         }
         
         if direction.contains(.left) {
-            formUnion(.down)
+            formUnion(.left)
         }
         
         if direction.contains(.right) {
-            formUnion(.down)
+            formUnion(.right)
         }
     }
 }

@@ -161,9 +161,9 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
 
 extension AppKitOrUIKitHostingController {
     /// https://twitter.com/b3ll/status/1193747288302075906
-    func _fixSafeAreaInsets() {
+    public func _fixSafeAreaInsets() {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        guard let viewClass = object_getClass(view) else {
+        guard let viewClass = object_getClass(view), !String(cString: class_getName(viewClass)).hasSuffix("_SwiftUIX_patched") else {
             return
         }
 

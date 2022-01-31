@@ -9,6 +9,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 public struct PopoverPresentationLink<Destination: View, Label: View>: PresentationLinkView {
+    private let arrowEdge: Edge = .top
     private let destination: Destination
     private let label: Label
     private let onDismiss: (() -> ())?
@@ -17,7 +18,8 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
     @Environment(\.environmentBuilder) private var environmentBuilder
-    
+    @Environment(\.userInterfaceIdiom) private var userInterfaceIdiom
+
     @State private var isPresented: Bool = false
     
     var isPresentedBinding: Binding<Bool> {
@@ -28,6 +30,50 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
         }
     }
     
+    private var isHorizontalCompact: Bool {
+        #if os(iOS) || targetEnvironment(macCatalyst)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
+    }
+        
+    public var body: some View {
+        if userInterfaceIdiom == .phone {
+            #if os(iOS)
+            PresentationLink(isPresented: $isPresented) {
+                popoverContent
+            } label: {
+                label
+            }
+            .modalPresentationStyle(.popover(permittedArrowDirections: [.init(arrowEdge)]))
+            #else
+            Button(toggle: $isPresented, label: { label })
+                .popover(isPresented: isPresentedBinding) {
+                    popoverContent
+                }
+            #endif
+        } else if isHorizontalCompact {
+            Button(toggle: $isPresented, label: { label })
+                .sheet(isPresented: isPresentedBinding) {
+                    popoverContent
+                }
+        } else {
+            Button(toggle: $isPresented, label: { label })
+                .popover(isPresented: isPresentedBinding) {
+                    popoverContent
+                }
+        }
+    }
+    
+    private var popoverContent: some View {
+        destination
+            .mergeEnvironmentBuilder(environmentBuilder)
+            ._resolveAppKitOrUIKitViewControllerIfAvailable()
+    }
+}
+
+extension PopoverPresentationLink {
     public init(
         destination: Destination,
         onDismiss: (() -> ())?,
@@ -47,32 +93,6 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
             onDismiss: nil,
             label: label
         )
-    }
-    
-    public var body: some View {
-        if isHorizontalCompact {
-            Button(toggle: $isPresented, label: { label })
-                .sheet(isPresented: isPresentedBinding) {
-                    popoverContent
-                }
-        } else {
-            Button(toggle: $isPresented, label: { label })
-                .popover(isPresented: isPresentedBinding) {
-                    popoverContent
-                }
-        }
-    }
-    
-    private var popoverContent: some View {
-        CocoaHostingView(mainView: destination.mergeEnvironmentBuilder(environmentBuilder))
-    }
-    
-    private var isHorizontalCompact: Bool {
-        #if os(iOS) || targetEnvironment(macCatalyst)
-        return horizontalSizeClass == .compact
-        #else
-        return false
-        #endif
     }
 }
 

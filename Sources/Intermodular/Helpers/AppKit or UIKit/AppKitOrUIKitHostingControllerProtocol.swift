@@ -7,8 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+public protocol _opaque_AppKitOrUIKitHostingControllerProtocol {
+    func _fixSafeAreaInsets()
+}
+
 @MainActor
-public protocol AppKitOrUIKitHostingControllerProtocol: AppKitOrUIKitViewController {
+public protocol AppKitOrUIKitHostingControllerProtocol: _opaque_AppKitOrUIKitHostingControllerProtocol, AppKitOrUIKitViewController {
     @MainActor
     func sizeThatFits(in _: CGSize) -> CGSize
 }

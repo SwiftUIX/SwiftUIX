@@ -43,10 +43,18 @@ public struct TitlebarItem {
     
     public init(
         id: String,
-        content: Content = .none
+        content: Content
     ) {
         self.id = id
         self.content = content
+    }
+    
+    public init(
+        id: String,
+        content: () -> Content
+    ) {
+        self.id = id
+        self.content = content()
     }
     
     #if os(macOS)

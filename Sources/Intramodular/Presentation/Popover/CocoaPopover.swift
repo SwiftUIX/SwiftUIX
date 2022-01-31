@@ -8,14 +8,15 @@ import SwiftUI
 
 private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverContent: View {
     @Binding var isPresented: Bool
+    let arrowEdge: Edge
     let onDismiss: (() -> Void)?
-    
     let content: () -> PopoverContent
     
     func body(content: Content) -> some View {
         content.background(
             _CocoaPopoverInjector(
                 isPresented: self.$isPresented,
+                arrowEdge: arrowEdge,
                 onDismiss: self.onDismiss,
                 content: self.content
             )
@@ -28,13 +29,14 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
 extension View {
     public func cocoaPopover<Content>(
         isPresented: Binding<Bool>,
+        arrowEdge: Edge = .top,
         onDismiss: (() -> Void)? = nil,
         content: @escaping () -> Content
     ) -> some View where Content: View {
-        ModifiedContent(
-            content: self,
-            modifier: PopoverViewModifier(
+        modifier(
+            PopoverViewModifier(
                 isPresented: isPresented,
+                arrowEdge: arrowEdge,
                 onDismiss: onDismiss,
                 content: content
             )
@@ -61,12 +63,13 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
         }
         
         func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-            return .none
+            .none
         }
     }
     
     @Binding var isPresented: Bool
     
+    let arrowEdge: Edge
     let onDismiss: (() -> Void)?
     
     @ViewBuilder let content: () -> Content
@@ -80,9 +83,12 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
         host.rootView = content()
         
         if host.viewIfLoaded?.window == nil && self.isPresented {
-            host.preferredContentSize = host.sizeThatFits(in: CGSize(width: Int.max, height: Int.max))
+            host.preferredContentSize = host.sizeThatFits(in: UIView.layoutFittingExpandedSize)
+            
             host.modalPresentationStyle = UIModalPresentationStyle.popover
+            
             host.popoverPresentationController?.delegate = context.coordinator
+            host.popoverPresentationController?.permittedArrowDirections = .init(PopoverArrowDirection(arrowEdge))
             host.popoverPresentationController?.sourceView = uiViewController.view
             host.popoverPresentationController?.sourceRect = uiViewController.view.bounds
             

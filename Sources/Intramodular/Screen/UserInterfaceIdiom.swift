@@ -46,6 +46,28 @@ public enum UserInterfaceIdiom: Hashable {
     }
 }
 
+// MARK: - API -
+
+extension View {
+    /// Hides this view on the given user interface idiom.
+    public func hidden(on idiom: UserInterfaceIdiom) -> some View {
+        withEnvironmentValue(\.userInterfaceIdiom) { userInterfaceIdiom in
+            hidden(idiom == userInterfaceIdiom)
+        }
+    }
+
+    /// Remove this view on the given user interface idiom.
+    public func remove(on idiom: UserInterfaceIdiom) -> some View {
+        withEnvironmentValue(\.userInterfaceIdiom) { userInterfaceIdiom in
+            if idiom != userInterfaceIdiom {
+                self
+            } else {
+                EmptyView()
+            }
+        }
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 extension EnvironmentValues {

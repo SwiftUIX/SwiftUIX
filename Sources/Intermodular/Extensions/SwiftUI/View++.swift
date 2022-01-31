@@ -84,6 +84,7 @@ extension View {
 // MARK: - View.hidden
 
 extension View {
+    /// Hides this view conditionally.
     @inlinable
     public func hidden(_ isHidden: Bool) -> some View {
         Group {
