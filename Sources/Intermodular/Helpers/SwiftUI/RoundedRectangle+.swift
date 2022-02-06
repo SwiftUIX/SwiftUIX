@@ -6,12 +6,12 @@ import Swift
 import SwiftUI
 
 extension View {
-    @inlinable
+    /// Clips this view to its bounding frame, with the specific corner radius.
     public func cornerRadius(_ radius: CGFloat, style: RoundedCornerStyle) -> some View {
         clipShape(RoundedRectangle(cornerRadius: radius, style: style))
     }
     
-    @inlinable
+    /// Adds a rounded border to this view.
     public func border<S: ShapeStyle>(
         _ content: S,
         width lineWidth: CGFloat = 1,
@@ -30,7 +30,7 @@ extension View {
             .padding(lineWidth / 2)
     }
     
-    @inlinable
+    /// Adds a rounded border to this view with the specified width and rounded corner style.
     public func border<S: ShapeStyle>(
         _ content: S,
         width lineWidth: CGFloat = 1,
@@ -52,7 +52,6 @@ extension View {
 
 extension View {
     @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:antialiased:) instead.")
-    @inlinable
     public func border<S: ShapeStyle>(
         _ content: S,
         cornerRadius: CGFloat,
@@ -72,7 +71,6 @@ extension View {
     }
     
     @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:style:) instead.")
-    @inlinable
     public func border<S: ShapeStyle>(
         _ content: S,
         cornerRadius: CGFloat,
@@ -92,16 +90,11 @@ extension View {
     }
 }
 
-@usableFromInline
-struct LineWidthInsetRoundedRectangle: Shape {
-    @usableFromInline
+private struct LineWidthInsetRoundedRectangle: Shape {
     let cornerRadius: CGFloat
-    @usableFromInline
     let style: RoundedCornerStyle
-    @usableFromInline
     let lineWidth: CGFloat
     
-    @usableFromInline
     init(
         cornerRadius: CGFloat,
         style: RoundedCornerStyle = .circular,
@@ -112,7 +105,6 @@ struct LineWidthInsetRoundedRectangle: Shape {
         self.lineWidth = lineWidth
     }
     
-    @usableFromInline
     func path(in rect: CGRect) -> Path {
         let ratio = (cornerRadius / rect.minimumDimensionLength)
         let newCornerRadius = ratio * (rect.minimumDimensionLength + (lineWidth * 2))

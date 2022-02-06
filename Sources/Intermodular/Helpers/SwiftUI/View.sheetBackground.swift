@@ -37,7 +37,7 @@ struct _UpdateSheetBackground: ViewModifier {
             #if os(iOS) || os(tvOS)
             let newBackgroundColor = color == .clear ? color.toUIColor() : nil
             
-            (viewController.root ?? viewController).view.backgroundColor = nil
+            (viewController.root ?? viewController).view.backgroundColor = newBackgroundColor
             #else
             if #available(macOS 11, *) {
                 viewController.view.wantsLayer = true
