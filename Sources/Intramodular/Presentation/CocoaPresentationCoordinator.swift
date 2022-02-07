@@ -9,8 +9,9 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
-    public var environmentBuilder = EnvironmentBuilder()
-    
+    /// The active modal presentation represented by the corresponding view controller.
+    ///
+    /// This variable is populated on the coordinator associated with the _presented_ view controller, not the presenting one.
     var presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
@@ -206,32 +207,36 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         return viewController.dismissSelf(withAnimation: animation)
     }
-    
+
+    /// Called upon change of the modal preference key.
+    ///
+    /// This function is responsible for presenting, updating and dismissing a modal presentation.
     func update(with value: AnyModalPresentation.PreferenceKeyValue) {
-        if
-            let currentPresentation = presentation,
-            let newPresentation = value.presentation,
-            currentPresentation.id == newPresentation.id || currentPresentation.id == value.presentationID
-        {
-            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-            if let viewController = viewController as? CocoaPresentationHostingController, !viewController.isBeingPresented {
-                viewController.presentation = newPresentation
+        if let presentation = presentation, value.presentationID == presentation.id {
+            if let newPresentation = value.presentation, newPresentation.id == presentation.id {
+                #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+                if let viewController = viewController as? CocoaPresentationHostingController, !viewController.isBeingPresented {
+                    viewController.presentation = newPresentation
+                }
+
+                return
+                #elseif os(macOS)
+                fatalError("unimplemented")
+                #endif
+            } else if value.presentation == nil {
+                dismissSelf()
             }
-            
-            return
-            #elseif os(macOS)
-            fatalError("unimplemented")
-            #endif
-        } else if let presentation = value.presentation {
-            present(presentation, completion: { })
-        } else if
-            let presentedCoordinator = presentedCoordinator,
-            let presentation = presentedCoordinator.presentation,
-            value.presentationID == presentation.id
-        {
-            dismiss()
-        } else if presentedCoordinator != nil {
-            dismiss()
+        } else {
+            if let presentation = value.presentation {
+                present(presentation, completion: { })
+            } else if
+                let presentedCoordinator = presentedCoordinator,
+                let presentation = presentedCoordinator.presentation,
+                value.presentationID == presentation.id,
+                value.presentation == nil
+            {
+                dismiss()
+            }
         }
     }
 }
