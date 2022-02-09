@@ -6,52 +6,6 @@ import Combine
 import Swift
 import SwiftUI
 
-struct MyView: View {
-    @State private var scrollContentOffset: CGPoint
-
-    var body: some View {
-        MyScrollView(contentOffset: $scrollContentOffset)
-            .navigationBarHidden(scrollContentOffset.y < 0)
-    }
-}
-
-struct MyOptimizedView: View {
-    class ScrollContentOffsetTracker: ObservableObject {
-        var scrollContentOffset: CGPoint = .zero  {
-            didSet {
-                isNavigationBarVisible = scrollContentOffset.y < 0
-            }
-        }
-
-        @Published var isNavigationBarVisible: Bool = false
-
-        init() {
-
-        }
-    }
-
-    @State private var scrollContentOffsetTracker = ScrollContentOffsetTracker()
-
-    var body: some View {
-        MyScrollView(contentOffset: $scrollContentOffsetTracker.scrollContentOffset)
-            .navigationBarHidden(scrollContentOffsetTracker.isNavigationBarVisible)
-    }
-}
-
-struct MyCleanOptimizedView: View {
-    @ViewStorage private var scrollContentOffset: CGPoint
-
-    @State private var isNavigationBarVisible: Bool = false
-
-    var body: some View {
-        MyScrollView(contentOffset: $scrollContentOffset.binding)
-            .navigationBarHidden(isNavigationBarVisible)
-            .onReceive($scrollContentOffset.publisher) { offset in
-                isNavigationBarVisible = scrollContentOffset.y < 0
-            }
-    }
-}
-
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
     fileprivate final class ValueBox: ObservableValue<Value> {
