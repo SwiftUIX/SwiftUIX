@@ -109,6 +109,19 @@ final class UIHostingCollectionViewController<
         
         view.addSubview(collectionView)
         
+        #if targetEnvironment(macCatalyst)
+        if #available(macCatalyst 15.0, *) {
+            collectionView.remembersLastFocusedIndexPath = true
+            collectionView.selectionFollowsFocus = true
+
+            let _setShouldBecomeFocusedOnSelectionSEL = Selector(("_setShouldBecomeFocusedOnSelection:"))
+            
+            if collectionView.responds(to: _setShouldBecomeFocusedOnSelectionSEL) {
+                collectionView.perform(_setShouldBecomeFocusedOnSelectionSEL, with: true)
+            }
+        }
+        #endif
+
         return collectionView
     }()
     
