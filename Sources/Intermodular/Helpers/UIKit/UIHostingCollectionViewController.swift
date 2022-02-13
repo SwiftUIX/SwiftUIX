@@ -492,6 +492,7 @@ extension UIHostingCollectionViewController {
             }
                         
             view.cache.content = nil
+            
             view.update(disableAnimation: true)
         }
 
@@ -499,7 +500,9 @@ extension UIHostingCollectionViewController {
             guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
+        
             cell.contentCache.content = nil
+        
             cell.update(disableAnimation: true)
         }
         
@@ -509,6 +512,7 @@ extension UIHostingCollectionViewController {
             }
             
             view.cache.content = nil
+            
             view.update(disableAnimation: true)
         }
     }
@@ -537,7 +541,7 @@ extension UIHostingCollectionViewController {
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
                     makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionHeader)?(section)) },
-                    maximumSize: self.maximumCollectionViewCellSize
+                    maximumSize: maximumCollectionViewCellSize
                 )
             case .hostingCollectionViewCellIdentifier:
                 guard let item = item else {
@@ -552,7 +556,7 @@ extension UIHostingCollectionViewController {
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
                     makeContent: { .init(viewProvider.rowContent(section, item)) },
-                    maximumSize: self.maximumCollectionViewCellSize
+                    maximumSize: maximumCollectionViewCellSize
                 )
             case .hostingCollectionViewFooterSupplementaryViewIdentifier:
                 return CellOrSupplementaryViewConfiguration(
@@ -563,7 +567,7 @@ extension UIHostingCollectionViewController {
                     sectionIdentifier: dataSourceConfiguration.identifierMap[section],
                     indexPath: indexPath,
                     makeContent: { .init(viewProvider.sectionContent(for: UICollectionView.elementKindSectionFooter)?(section)) },
-                    maximumSize: self.maximumCollectionViewCellSize
+                    maximumSize: maximumCollectionViewCellSize
                 )
             default:
                 assertionFailure()
@@ -612,6 +616,45 @@ extension UIHostingCollectionViewController {
 }
 
 // MARK: - Auxiliary Implementation -
+
+extension UIHostingCollectionViewController {
+    var maximumCollectionViewCellSize: OptionalDimensions {
+        let targetCollectionViewSize = collectionView.frame.size
+        var baseContentSize = collectionView.contentSize
+        
+        if let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            if collectionViewLayout.scrollDirection == .vertical {
+                if (baseContentSize.width == 0 && targetCollectionViewSize.width > 0) || targetCollectionViewSize != collectionView.frame.size {
+                    baseContentSize.width = targetCollectionViewSize.width - collectionView.adjustedContentInset.horizontal
+                }
+            } else if collectionViewLayout.scrollDirection == .horizontal {
+                if (baseContentSize.height == 0 && targetCollectionViewSize.height > 0) || targetCollectionViewSize != collectionView.frame.size {
+                    baseContentSize.height = targetCollectionViewSize.height - collectionView.adjustedContentInset.vertical
+                }
+            }
+        }
+        
+        let contentSize = CGSize(
+            width: baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
+            height: baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
+        )
+        
+        var result = OptionalDimensions(
+            width: max(floor(contentSize.width - 0.001), 0),
+            height: max(floor(contentSize.height - 0.001), 0)
+        )
+        
+        if !_scrollViewConfiguration.axes.contains(.vertical) || result.width == 0 {
+            result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
+        }
+        
+        if !_scrollViewConfiguration.axes.contains(.horizontal) || result.height == 0 {
+            result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
+        }
+        
+        return result
+    }
+}
 
 extension UIHostingCollectionViewController {
     class _UICollectionView: UICollectionView, UICollectionViewDelegateFlowLayout {
@@ -681,16 +724,6 @@ extension UIHostingCollectionViewController {
                 layout: collectionViewLayout,
                 referenceSizeForFooterInSection: section
             )
-        }
-    }
-}
-
-fileprivate extension Dictionary where Key == Int, Value == [Int: CGSize] {
-    subscript(_ indexPath: IndexPath) -> CGSize? {
-        get {
-            self[indexPath.section, default: [:]][indexPath.row]
-        } set {
-            self[indexPath.section, default: [:]][indexPath.row] = newValue
         }
     }
 }

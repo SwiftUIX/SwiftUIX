@@ -13,43 +13,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
             ? collectionView.contentSize
             : collectionView.collectionViewLayout.collectionViewContentSize
     }
-    
-    var maximumCollectionViewCellSize: OptionalDimensions {
-        var baseContentSize = collectionView.contentSize
-
-        if let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            if collectionViewLayout.scrollDirection == .vertical {
-                if baseContentSize.width == 0, collectionView.frame.width > 0 {
-                    baseContentSize.width = collectionView.frame.width - collectionView.adjustedContentInset.horizontal
-                }
-            } else if collectionViewLayout.scrollDirection == .horizontal {
-                if baseContentSize.height == 0, collectionView.frame.height > 0 {
-                    baseContentSize.height = collectionView.frame.height - collectionView.adjustedContentInset.vertical
-                }
-            }
-        }
         
-        let contentSize = CGSize(
-            width: baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
-            height: baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
-        )
-        
-        var result = OptionalDimensions(
-            width: max(floor(contentSize.width - 0.001), 0),
-            height: max(floor(contentSize.height - 0.001), 0)
-        )
-        
-        if !_scrollViewConfiguration.axes.contains(.vertical) || result.width == 0 {
-            result.width = AppKitOrUIKitView.layoutFittingExpandedSize.width
-        }
-        
-        if !_scrollViewConfiguration.axes.contains(.horizontal) || result.height == 0 {
-            result.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
-        }
-                
-        return result
-    }
-    
     func invalidateLayout() {
         collectionView.collectionViewLayout.invalidateLayout()
     }

@@ -95,8 +95,9 @@ struct _CollectionViewCellOrSupplementaryViewConfiguration<
     let itemIdentifier: ItemIdentifierType?
     let sectionIdentifier: SectionIdentifierType
     let indexPath: IndexPath
-    var makeContent: () -> _CollectionViewCellOrSupplementaryViewContent
-    let maximumSize: OptionalDimensions?
+    let makeContent: () -> _CollectionViewCellOrSupplementaryViewContent
+    
+    var maximumSize: OptionalDimensions?
     
     var id: ID {
         .init(reuseIdentifier: reuseIdentifier, item: itemIdentifier, section: sectionIdentifier)

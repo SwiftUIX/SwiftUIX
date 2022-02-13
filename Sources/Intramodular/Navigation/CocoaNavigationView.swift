@@ -86,7 +86,7 @@ extension CocoaNavigationView {
     }
     
     struct _ChildContainer: View {
-        unowned let parent: UINavigationController
+        weak var parent: UINavigationController?
         
         var rootView: AnyView
         
@@ -97,7 +97,7 @@ extension CocoaNavigationView {
         
         var body: some View {
             rootView
-                .environment(\.navigator, _UINavigationControllerNavigatorAdaptorBox(navigationController: parent))
+                .environment(\.navigator, parent.map(_UINavigationControllerNavigatorAdaptorBox.init))
         }
     }
 }

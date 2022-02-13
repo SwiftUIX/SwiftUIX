@@ -10,7 +10,6 @@ import SwiftUI
 
 protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
     var collectionViewContentSize: CGSize { get }
-    var maximumCollectionViewCellSize: OptionalDimensions { get }
     
     func invalidateLayout()
     
@@ -57,10 +56,6 @@ public struct CollectionViewProxy: Hashable {
     
     public var contentSize: CGSize {
         base?.collectionViewContentSize ?? .zero
-    }
-    
-    public var maximumCellSize: OptionalDimensions {
-        base?.maximumCollectionViewCellSize ?? nil
     }
     
     init(_ base: _CollectionViewProxyBase? = nil) {

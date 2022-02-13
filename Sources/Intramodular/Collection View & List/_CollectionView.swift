@@ -81,6 +81,7 @@ struct _CollectionView<
             }
         } else {
             uiViewController.dataSource = dataSource.payload
+            
             uiViewController.refreshVisibleCellsAndSupplementaryViews()
         }
         

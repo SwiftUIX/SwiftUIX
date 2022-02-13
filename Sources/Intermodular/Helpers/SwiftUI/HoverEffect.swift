@@ -50,6 +50,7 @@ extension View {
     /// Applies a pointer hover effect to the view.
     ///
     /// - Note: the system may fall-back to a more appropriate effect.
+    @_disfavoredOverload
     public func hoverEffect(_ effect: HoverEffect) -> some View {
         hoverEffect(SwiftUI.HoverEffect(effect))
     }
