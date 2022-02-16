@@ -22,14 +22,14 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
         let _reuseCellRender: Bool
         let _collectionViewProxy: CollectionViewProxy
         let _cellProxyBase: _CellProxyBase?
-        let contentConfiguration: ContentConfiguration
+        var contentConfiguration: ContentConfiguration
         let contentState: ContentState?
         let contentPreferences: Binding<ContentPreferences>?
         let contentCache: ContentCache
         let content: _CollectionViewCellOrSupplementaryViewContent
     }
     
-    let configuration: Configuration
+    var configuration: Configuration
     
     init(configuration: Configuration) {
         self.configuration = configuration

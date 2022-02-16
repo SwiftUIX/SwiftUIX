@@ -28,6 +28,8 @@ extension UIHostingCollectionViewController {
         private var indexPathToContentIdentifierMap: [IndexPath: UICollectionViewCellType.ContentConfiguration.ID] = [:]
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
                 
+        var prototypeContentHostingController: CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>?
+
         init(parent: UIHostingCollectionViewController) {
             self.parent = parent
         }
@@ -63,7 +65,7 @@ extension UIHostingCollectionViewController.Cache {
             supplementaryView.cache = supplementaryViewCache
         }
     }
-
+    
     func sizeForCellOrSupplementaryView(
         withReuseIdentifier reuseIdentifier: String,
         at indexPath: IndexPath
@@ -81,28 +83,51 @@ extension UIHostingCollectionViewController.Cache {
         if let size = contentIdentifierToCacheMap[configuration.id]?.contentSize {
             return size
         } else {
-            let contentHostingController = contentHostingControllerCache[configuration.id] ?? .init(
-                configuration: .init(
-                    _reuseCellRender: parent.configuration.unsafeFlags.contains(.reuseCellRender),
-                    _collectionViewProxy: .init(parent),
-                    _cellProxyBase: nil,
-                    contentConfiguration: configuration,
-                    contentState: nil,
-                    contentPreferences: nil,
-                    contentCache: .init(),
-                    content: configuration.makeContent()
-                )
+            let contentHostingController: CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+            
+            let contentHostingControllerConfiguration = _CollectionViewCellOrSupplementaryViewContainer.Configuration(
+                _reuseCellRender: parent.configuration.unsafeFlags.contains(.reuseCellRender),
+                _collectionViewProxy: .init(parent),
+                _cellProxyBase: nil,
+                contentConfiguration: configuration,
+                contentState: nil,
+                contentPreferences: nil,
+                contentCache: .init(),
+                content: configuration.makeContent()
             )
             
-            if contentHostingControllerCache[configuration.id] == nil {
-                contentHostingControllerCache[configuration.id] = contentHostingController
+            if parent.configuration.unsafeFlags.contains(.cacheCellContentHostingControllers) {
+                if let cachedContentHostingController = contentHostingControllerCache[configuration.id] {
+                    contentHostingController = cachedContentHostingController
+                    
+                    contentHostingController.rootView.configuration = contentHostingControllerConfiguration
+                } else {
+                    contentHostingController = .init(configuration: contentHostingControllerConfiguration)
+                }
+                
+                if contentHostingControllerCache[configuration.id] == nil {
+                    contentHostingControllerCache[configuration.id] = contentHostingController
+                }
+            } else {
+                if let prototypeContentHostingController = prototypeContentHostingController {
+                    contentHostingController = prototypeContentHostingController
+                    
+                    contentHostingController.rootView.configuration = contentHostingControllerConfiguration
+                } else {
+                    contentHostingController = .init(configuration: contentHostingControllerConfiguration)
+                    
+                    prototypeContentHostingController = contentHostingController
+                }
+            }
+                        
+            if contentHostingController.rootView.configuration.contentConfiguration.maximumSize != parent.maximumCollectionViewCellSize {
+                contentHostingController.rootView.configuration.contentConfiguration.maximumSize = parent.maximumCollectionViewCellSize
             }
             
-            let size = contentHostingController.systemLayoutSizeFitting(
-                UIView.layoutFittingCompressedSize
-                    .clamped(to: configuration.maximumSize?.rounded(.down))
-            )
-            
+            let size = contentHostingController
+                .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+                .clamped(to: parent.maximumCollectionViewCellSize.rounded(.down))
+                                    
             guard !(size.width == 1 && size.height == 1) && !size.isAreaZero else {
                 return size
             }

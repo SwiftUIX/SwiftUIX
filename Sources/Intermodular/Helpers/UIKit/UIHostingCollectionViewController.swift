@@ -254,7 +254,7 @@ final class UIHostingCollectionViewController<
         }
     }
         
-    override public func viewSafeAreaInsetsDidChange()  {
+    override public func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
         
         let newSafeAreaInsets = UIEdgeInsets(
@@ -283,19 +283,22 @@ final class UIHostingCollectionViewController<
         
         cache.invalidate()
 
-        invalidateLayout(animated: true)
+        DispatchQueue.main.async {
+            self.invalidateLayout(animated: false)
+        }
     }
     
-    public func invalidateLayout(animated: Bool) {        
-        CATransaction.begin()
-        
+    public func invalidateLayout(animated: Bool) {
         if !animated {
+            CATransaction.begin()
             CATransaction.setDisableActions(true)
         }
         
         collectionView.collectionViewLayout.invalidateLayout()
         
-        CATransaction.commit()
+        if !animated {
+            CATransaction.commit()
+        }
     }
     
     // MARK: - UICollectionViewDelegate -
@@ -490,7 +493,7 @@ extension UIHostingCollectionViewController {
             guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-                        
+
             view.cache.content = nil
             
             view.update(disableAnimation: true)
@@ -500,7 +503,7 @@ extension UIHostingCollectionViewController {
             guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-        
+
             cell.contentCache.content = nil
         
             cell.update(disableAnimation: true)
@@ -510,7 +513,7 @@ extension UIHostingCollectionViewController {
             guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
-            
+
             view.cache.content = nil
             
             view.update(disableAnimation: true)
@@ -635,8 +638,8 @@ extension UIHostingCollectionViewController {
         }
         
         let contentSize = CGSize(
-            width: baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0),
-            height: baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)
+            width: (baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0)) - collectionView.contentInset.horizontal,
+            height: (baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)) - collectionView.contentInset.vertical
         )
         
         var result = OptionalDimensions(

@@ -80,6 +80,22 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
         hasher.combine(sectionInsets?.trailing)
     }
 
+    class _UICollectionViewFlowLayout: UICollectionViewFlowLayout {
+        override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
+            let context = super.invalidationContext(forBoundsChange: newBounds) as! UICollectionViewFlowLayoutInvalidationContext
+            
+            if let collectionView = collectionView {
+                context.invalidateFlowLayoutDelegateMetrics = collectionView.bounds.size != newBounds.size
+            }
+            
+            return context
+        }
+
+        override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+            true
+        }
+    }
+
     public func _toUICollectionViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
         
@@ -104,7 +120,7 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
         if let itemSize = itemSize {
             layout.itemSize = itemSize
         } else {
-            layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            layout.estimatedItemSize = .zero
             layout.itemSize = UICollectionViewFlowLayout.automaticSize
         }
         
@@ -113,12 +129,6 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.hashValue == rhs.hashValue
-    }
-}
-
-extension UICollectionViewLayout: CollectionViewLayout {
-    public func _toUICollectionViewLayout() -> UICollectionViewLayout {
-        self
     }
 }
 

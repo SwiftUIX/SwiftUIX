@@ -43,7 +43,7 @@ class CocoaCollectionCellOrSupplementaryViewHostingController<
         let currentConfiguration = rootView.configuration
         
         if newConfiguration.contentCache.content != nil {
-            guard currentConfiguration.contentConfiguration.id != newConfiguration.contentConfiguration.id || currentConfiguration.contentState != newConfiguration.contentState else {
+            guard currentConfiguration.contentConfiguration.id != newConfiguration.contentConfiguration.id || currentConfiguration.contentState != newConfiguration.contentState || currentConfiguration.contentCache.contentSize != newConfiguration.contentCache.contentSize else {
                 return
             }
         }

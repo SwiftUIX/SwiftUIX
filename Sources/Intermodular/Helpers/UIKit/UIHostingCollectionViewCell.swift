@@ -35,8 +35,15 @@ class UIHostingCollectionViewCell<
     
     var cellContentConfiguration: ContentConfiguration? {
         didSet {
-            if oldValue?.id != cellContentConfiguration?.id {
+            let newValue = cellContentConfiguration
+
+            if oldValue?.id != newValue?.id {
                 contentPreferences = .init()
+            }
+
+            if oldValue?.maximumSize != newValue?.maximumSize {
+                contentCache.preferredContentSize = nil
+                contentCache.contentSize = nil
             }
         }
     }
