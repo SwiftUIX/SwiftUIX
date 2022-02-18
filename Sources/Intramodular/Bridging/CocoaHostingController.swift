@@ -149,8 +149,6 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         
         #if os(iOS)
         if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero || view.frame.size == Screen.size {
-            _fixSafeAreaInsets()
-            
             window.frame.size = self.sizeThatFits(AppKitOrUIKitLayoutSizeProposal(targetSize: Screen.main.bounds.size))
             
             _didResizeParentWindowOnce = true
@@ -196,7 +194,7 @@ extension AppKitOrUIKitHostingController {
                 objc_registerClassPair(subclass)
                 object_setClass(view, subclass)
             }
-            
+
             view.setNeedsDisplay()
             view.setNeedsLayout()
             view.layoutIfNeeded()
