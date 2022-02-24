@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
+final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     fileprivate var rootHostingViewController: CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>> {
         #if os(macOS)
         return contentViewController as! CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
@@ -16,7 +16,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         #endif
     }
     
-    public var rootView: Content {
+    var rootView: Content {
         get {
             rootHostingViewController.rootView.content.content
         } set {
@@ -25,7 +25,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     }
     
     #if os(iOS)
-    open override var frame: CGRect {
+    override var frame: CGRect {
         get {
             super.frame
         } set {
@@ -41,7 +41,9 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     #endif
              
     var isKeyAndVisible: Binding<Bool> = .constant(true)
-    
+
+    var allowTouchesToPassThrough: Bool = false
+
     var windowPosition: CGPoint? {
         didSet {
             #if os(iOS)
@@ -59,7 +61,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     }
 
     #if os(iOS)
-    override public var isHidden: Bool {
+    override var isHidden: Bool {
         didSet {
             rootHostingViewController.rootView.content.isPresented = !isHidden
         }
@@ -67,7 +69,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     #endif
     
     #if os(macOS)
-    public convenience init(rootView: Content) {
+    convenience init(rootView: Content) {
         let contentViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: nil, content: rootView))
         
         self.init(contentViewController: contentViewController)
@@ -75,25 +77,41 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         contentViewController.mainView.window = self
     }
     #else
-    public init(windowScene: UIWindowScene, rootView: Content) {
+    init(windowScene: UIWindowScene, rootView: Content) {
         super.init(windowScene: windowScene)
         
         rootViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: self, content: rootView))
         rootViewController!.view.backgroundColor = .clear
     }
     
-    public convenience init(
+    convenience init(
         windowScene: UIWindowScene,
         @ViewBuilder rootView: () -> Content
     ) {
         self.init(windowScene: windowScene, rootView: rootView())
     }
     
-    public required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     #endif
-    
+
+    #if os(iOS)
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard allowTouchesToPassThrough else {
+            return super.hitTest(point, with: event)
+        }
+
+        let result = super.hitTest(point, with: event)
+
+        if result == rootViewController?.view {
+            return nil
+        }
+
+        return result
+    }
+    #endif
+
     private func setWindowOrigin() {
         guard let windowPosition = windowPosition else {
             return
@@ -117,6 +135,12 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
 // MARK: - API -
 
 extension View {
+    /// Allows touches in the active window overlay to pass through if possible.
+    @available(macOS, unavailable)
+    public func windowAllowsTouchesToPassThrough(_ allowed: Bool) -> some View {
+        preference(key: WindowAllowsTouchesToPassThrough.self, value: allowed)
+    }
+
     /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
@@ -134,53 +158,47 @@ extension View {
 
 // MARK: - Auxiliary Implementation -
 
-@usableFromInline
+final class WindowAllowsTouchesToPassThrough: TakeLastPreferenceKey<Bool> {
+
+}
+
 final class WindowPositionPreferenceKey: TakeLastPreferenceKey<CGPoint> {
     
 }
 
 fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
-    @usableFromInline
     weak var window: AppKitOrUIKitHostingWindow<Content>?
     
-    @usableFromInline
     var content: Content
-    
-    @usableFromInline
     var isPresented: Bool = false
     
     private var presentationManager: _PresentationManager {
         _PresentationManager(window: window)
     }
     
-    @inlinable
     public var body: some View {
         content
+            .onPreferenceChange(WindowAllowsTouchesToPassThrough.self) { allowTouchesToPassThrough in
+                window?.allowTouchesToPassThrough = (allowTouchesToPassThrough ?? false)
+            }
             .onPreferenceChange(WindowPositionPreferenceKey.self) { windowPosition in
-                if let window = self.window {
-                    window.windowPosition = windowPosition
-                }
+                window?.windowPosition = windowPosition
             }
             .environment(\.presentationManager, presentationManager)
             .id(isPresented)
     }
     
-    @usableFromInline
     struct _PresentationManager: PresentationManager {
-        @usableFromInline
         var window: AppKitOrUIKitHostingWindow<Content>?
         
-        @usableFromInline
         init(window: AppKitOrUIKitHostingWindow<Content>?) {
             self.window = window
         }
         
-        @usableFromInline
         var isPresented: Bool {
             window?.isHidden == false
         }
         
-        @usableFromInline
         func dismiss() {
             #if os(macOS)
             window?.close()

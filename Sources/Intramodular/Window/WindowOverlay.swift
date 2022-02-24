@@ -8,26 +8,19 @@ import Swift
 import SwiftUI
 
 /// A window overlay for SwiftUI.
-@usableFromInline
 struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
-    @usableFromInline
-    let content: Content
+    private let content: Content
+    private let isKeyAndVisible: Binding<Bool>
     
-    @usableFromInline
-    let isKeyAndVisible: Binding<Bool>
-    
-    @usableFromInline
     init(content: Content, isKeyAndVisible: Binding<Bool>) {
         self.content = content
         self.isKeyAndVisible = isKeyAndVisible
     }
     
-    @usableFromInline
     func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
         .init(content: content, isKeyAndVisible: isKeyAndVisible)
     }
     
-    @usableFromInline
     func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
         viewController.isKeyAndVisible = isKeyAndVisible
         viewController.content = content
@@ -46,7 +39,6 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         #endif
     }
     
-    @usableFromInline
     static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
         DispatchQueue.asyncOnMainIfNecessary {
             if let contentWindow = viewController.contentWindow {
@@ -60,26 +52,19 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
 }
 
 extension WindowOverlay {
-    @usableFromInline
     class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
-        @usableFromInline
         var content: Content {
             didSet {
                 contentWindow?.rootView = content
             }
         }
         
-        @usableFromInline
         var isKeyAndVisible: Binding<Bool>
-        
-        @usableFromInline
         var contentWindow: AppKitOrUIKitHostingWindow<Content>?
         #if os(macOS)
-        @usableFromInline
         var contentWindowController: NSWindowController?
         #endif
         
-        @usableFromInline
         init(content: Content, isKeyAndVisible: Binding<Bool>) {
             self.content = content
             self.isKeyAndVisible = isKeyAndVisible
@@ -91,7 +76,6 @@ extension WindowOverlay {
             #endif
         }
         
-        @usableFromInline
         func updateWindow() {
             if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible.wrappedValue {
                 return
@@ -155,13 +139,11 @@ extension WindowOverlay {
             }
         }
         
-        @usableFromInline
         @objc required dynamic init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
         #if !os(macOS)
-        @usableFromInline
         override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
