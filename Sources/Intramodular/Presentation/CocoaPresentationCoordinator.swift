@@ -11,7 +11,7 @@ import SwiftUI
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     /// The active modal presentation represented by the corresponding view controller.
     ///
-    /// This variable is populated on the coordinator associated with the _presented_ view controller, not the presenting one.
+    /// This variable is populated on the coordinator associated with the _presented_ view controller, **not** the presenting one.
     var presentation: AnyModalPresentation?
     
     public var presentingCoordinator: CocoaPresentationCoordinator? {
@@ -126,7 +126,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         guard !viewController.isBeingPresented else {
             return
         }
-        
+
         if let presentedViewController = viewController.presentedViewController as? CocoaPresentationHostingController, presentedViewController.modalViewPresentationStyle == modal.content.modalPresentationStyle {
             
             presentedViewController.presentation = modal
@@ -142,7 +142,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             viewControllerToBePresented = CocoaPresentationHostingController(
                 presentingViewController: viewController,
                 presentation: modal,
-                coordinator: .init(presentation: modal)
+                presentationCoordinator: .init(presentation: modal)
             )
         }
                 
@@ -151,7 +151,6 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             animated: true
         ) {
             viewControllerToBePresented.presentationController?.delegate = self
-            viewControllerToBePresented.presentationCoordinator.presentation = modal
             
             completion()
         }
@@ -212,6 +211,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     ///
     /// This function is responsible for presenting, updating and dismissing a modal presentation.
     func update(with value: AnyModalPresentation.PreferenceKeyValue) {
+        // This update is being called on the _presented_ view controller.
         if let presentation = presentation, value.presentationID == presentation.id {
             if let newPresentation = value.presentation, newPresentation.id == presentation.id {
                 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -226,7 +226,9 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             } else if value.presentation == nil {
                 dismissSelf()
             }
-        } else {
+        }
+        // This update is being called on the _presenting_ view controller.
+        else {
             if let presentation = value.presentation {
                 present(presentation, completion: { })
             } else if
@@ -267,10 +269,6 @@ extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate
     }
     
     public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        presentation = nil
-        
-        presentationController.presentingViewController.presentationCoordinator.presentation = nil
-        
         if let presentation = (presentationController.presentedViewController as? CocoaPresentationHostingController)?.presentation {
             presentation.onDismiss()
             presentation.reset()

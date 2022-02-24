@@ -18,13 +18,13 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     init(
         presentingViewController: UIViewController,
         presentation: AnyModalPresentation,
-        coordinator: CocoaPresentationCoordinator
+        presentationCoordinator: CocoaPresentationCoordinator
     ) {
         self.presentation = presentation
         
         super.init(
             mainView: presentation.content,
-            presentationCoordinator: coordinator
+            presentationCoordinator: presentationCoordinator
         )
         
         presentationDidChange(presentingViewController: presentingViewController)
