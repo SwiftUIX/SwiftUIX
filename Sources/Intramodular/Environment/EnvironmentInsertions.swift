@@ -9,7 +9,8 @@ import SwiftUI
 public struct EnvironmentInsertions {
     lazy var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
     lazy var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
-    
+    lazy var weakEnvironmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
+
     public init() {
         
     }
@@ -43,7 +44,7 @@ extension EnvironmentInsertions {
 }
 
 extension EnvironmentInsertions {
-    public mutating func insert<B: ObservableObject>(_ bindable: B, withKey key: AnyHashable) {
+    private mutating func insert<B: ObservableObject>(_ bindable: B, withKey key: AnyHashable) {
         guard environmentObjectTransforms.index(forKey: key) == nil else {
             return
         }
@@ -51,12 +52,26 @@ extension EnvironmentInsertions {
         environmentObjectTransforms[key] = { $0.environmentObject(bindable).eraseToAnyView() }
     }
     
-    public mutating func insert<B: ObservableObject, Key: Hashable>(_ bindable: B, withKey key: Key) {
-        insert(bindable, withKey: .init(key))
-    }
-    
     public mutating func insert<B: ObservableObject>(_ bindable: B) {
         insert(bindable, withKey: ObjectIdentifier(bindable))
+    }
+
+    private mutating func insert<B: ObservableObject>(weak bindable: B, withKey key: AnyHashable) {
+        guard weakEnvironmentObjectTransforms.index(forKey: key) == nil else {
+            return
+        }
+        
+        weakEnvironmentObjectTransforms[key] = { [weak bindable] in
+            if let bindable = bindable {
+                return $0.environmentObject(bindable).eraseToAnyView()
+            } else {
+                return $0.eraseToAnyView()
+            }
+        }
+    }
+            
+    public mutating func insert<B: ObservableObject>(weak bindable: B) {
+        insert(weak: bindable, withKey: ObjectIdentifier(bindable))
     }
 }
 
@@ -93,6 +108,16 @@ extension EnvironmentInsertions {
         var result = Self()
         
         result.insert(bindable)
+        
+        return result
+    }
+    
+    public static func weakObject<B: ObservableObject>(
+        _ bindable: B
+    ) -> Self {
+        var result = Self()
+        
+        result.insert(weak: bindable)
         
         return result
     }

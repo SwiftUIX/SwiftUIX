@@ -8,9 +8,6 @@ import SwiftUI
 /// A type that provides an environment for its children to inherit.
 public protocol EnvironmentPropagator {
     var environmentInsertions: EnvironmentInsertions { get nonmutating set }
-    
-    func insertEnvironmentObject<B: ObservableObject>(_ bindable: B)
-    func environment(_ builder: EnvironmentInsertions)
 }
 
 // MARK: - Implementation -
@@ -22,7 +19,11 @@ extension EnvironmentPropagator {
         environmentInsertions.insert(bindable)
     }
     
-    public func environment(_ builder: EnvironmentInsertions) {
+    public func insertWeakEnvironmentObject<B: ObservableObject>(_ bindable: B) {
+        environmentInsertions.insert(weak: bindable)
+    }
+    
+    public func insert(contentsOf builder: EnvironmentInsertions) {
         environmentInsertions.merge(builder)
     }
 }
