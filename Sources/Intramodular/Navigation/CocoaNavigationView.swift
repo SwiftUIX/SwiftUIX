@@ -15,28 +15,34 @@ public struct CocoaNavigationView<Content: View>: View {
         self.content = content()
     }
     
+    public init(navigationBarHidden: Bool, @ViewBuilder content: () -> Content) {
+        self.init(content: content)
+        
+        self.configuration.isNavigationBarHidden = navigationBarHidden
+    }
+    
     public var body: some View {
         _Body(content: content, configuration: configuration)
             .edgesIgnoringSafeArea(.all)
     }
     
     public func navigationBarHidden(_ hidden: Bool) -> some View {
-        then({ $0.configuration.navigationBarHidden = hidden })
+        then({ $0.configuration.isNavigationBarHidden = hidden })
     }
 }
 
 extension CocoaNavigationView {
     struct _Body: UIViewControllerRepresentable {
         struct Configuration {
-            var navigationBarHidden: Bool = false
+            var isNavigationBarHidden: Bool = false
         }
         
         class UIViewControllerType: UINavigationController {
             var configuration = Configuration() {
                 didSet {
-                    if configuration.navigationBarHidden != oldValue.navigationBarHidden {
-                        if configuration.navigationBarHidden != isNavigationBarHidden {
-                            self.setNavigationBarHidden(configuration.navigationBarHidden, animated: true)
+                    if configuration.isNavigationBarHidden != oldValue.isNavigationBarHidden {
+                        if configuration.isNavigationBarHidden != isNavigationBarHidden {
+                            self.setNavigationBarHidden(configuration.isNavigationBarHidden, animated: true)
                         }
                     }
                 }
@@ -47,7 +53,7 @@ extension CocoaNavigationView {
                 
                 super.viewWillAppear(animated)
                 
-                setNavigationBarHidden(configuration.navigationBarHidden, animated: false)
+                setNavigationBarHidden(configuration.isNavigationBarHidden, animated: false)
             }
             
             override func setNavigationBarHidden(_ hidden: Bool, animated: Bool) {
@@ -55,7 +61,7 @@ extension CocoaNavigationView {
                     return
                 }
                 
-                super.setNavigationBarHidden(configuration.navigationBarHidden, animated: animated)
+                super.setNavigationBarHidden(configuration.isNavigationBarHidden, animated: animated)
             }
             
             override func pushViewController(_ viewController: UIViewController, animated: Bool) {
