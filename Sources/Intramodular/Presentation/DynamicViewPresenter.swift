@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 /// A type that manages view presentation.
-public protocol DynamicViewPresenter: DynamicViewPresentable, EnvironmentProvider {
+public protocol DynamicViewPresenter: DynamicViewPresentable {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     /// The presentation coordinator for this presenter.
     var _cocoaPresentationCoordinator: CocoaPresentationCoordinator { get }

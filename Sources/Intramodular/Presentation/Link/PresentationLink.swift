@@ -10,11 +10,10 @@ import SwiftUI
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
+    @Environment(\._environmentInsertions) private var environmentInsertions
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @Environment(\.cocoaPresentationContext) private var cocoaPresentationContext
     #endif
-    
-    @Environment(\.environmentBuilder) private var environmentBuilder
     @Environment(\.managedObjectContext) private var managedObjectContext
     @Environment(\.modalPresentationStyle) private var _environment_modalPresentationStyle
     @Environment(\.presenter) private var presenter
@@ -62,7 +61,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
-        .mergeEnvironmentBuilder(environmentBuilder)
+        .environment(environmentInsertions)
         #else
         let content = AnyPresentationView(
             _destination
@@ -70,7 +69,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
-        .mergeEnvironmentBuilder(environmentBuilder)
+        .environment(environmentInsertions)
         #endif
         
         return AnyModalPresentation(

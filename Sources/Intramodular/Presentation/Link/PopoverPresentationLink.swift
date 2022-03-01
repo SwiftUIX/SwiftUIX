@@ -14,10 +14,10 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     private let label: Label
     private let onDismiss: (() -> ())?
     
+    @Environment(\._environmentInsertions) private var environmentInsertions
     #if os(iOS) || targetEnvironment(macCatalyst)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
-    @Environment(\.environmentBuilder) private var environmentBuilder
     @Environment(\.userInterfaceIdiom) private var userInterfaceIdiom
 
     @State private var isPresented: Bool = false
@@ -68,7 +68,7 @@ public struct PopoverPresentationLink<Destination: View, Label: View>: Presentat
     
     private var popoverContent: some View {
         destination
-            .mergeEnvironmentBuilder(environmentBuilder)
+            .environment(environmentInsertions)
             ._resolveAppKitOrUIKitViewControllerIfAvailable()
     }
 }
