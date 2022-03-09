@@ -10,31 +10,86 @@ import UIKit
 
 /// A `UIView` subclass capable of hosting a SwiftUI view.
 open class UIHostingView<Content: View>: UIView {
-    class _UIHostingController: UIHostingController<Content> {
+    struct _ContentContainer: View {
+        weak var parent: _ContentHostingController?
+        
+        var content: Content
+        
+        var body: some View {
+            content.onChangeOfFrame { [weak parent] _ in
+                guard let parent = parent else {
+                    return
+                }
+                
+                if parent.shouldResizeToFitContent {
+                    parent.view.invalidateIntrinsicContentSize()
+                }
+            }
+        }
+    }
+    
+    class _ContentHostingController: UIHostingController<_ContentContainer> {
         weak var _navigationController: UINavigationController?
+        
+        var shouldResizeToFitContent: Bool = false
         
         override var navigationController: UINavigationController? {
             super.navigationController ?? _navigationController
         }
-    }
-    
-    private let rootViewHostingController: _UIHostingController
-    
-    public var rootView: Content {
-        get {
-            return rootViewHostingController.rootView
-        } set {
-            rootViewHostingController.rootView = newValue
+        
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            
+            view.backgroundColor = .clear
+        }
+        
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            view.backgroundColor = .clear
+        }
+        
+        override func viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews()
+            
+            if shouldResizeToFitContent {
+                view.invalidateIntrinsicContentSize()
+            }
         }
     }
     
+    private let rootViewHostingController: _ContentHostingController
+    
+    public var shouldResizeToFitContent: Bool {
+        get {
+            rootViewHostingController.shouldResizeToFitContent
+        } set {
+            rootViewHostingController.shouldResizeToFitContent = newValue
+        }
+    }
+    
+    public var rootView: Content {
+        get {
+            rootViewHostingController.rootView.content
+        } set {
+            rootViewHostingController.rootView.content = newValue
+            
+            if shouldResizeToFitContent {
+                invalidateIntrinsicContentSize()
+            }
+        }
+    }
+    
+    override open var intrinsicContentSize: CGSize {
+        rootViewHostingController.view.intrinsicContentSize
+    }
+    
     public required init(rootView: Content) {
-        self.rootViewHostingController = .init(rootView: rootView)
+        self.rootViewHostingController = .init(rootView: .init(parent: nil, content: rootView))
+        self.rootViewHostingController.rootView.parent = rootViewHostingController
         
         super.init(frame: .zero)
-        
-        rootViewHostingController.view.backgroundColor = .clear
-        
+                
         addSubview(rootViewHostingController.view)
         
         rootViewHostingController.view.constrainEdges(to: self)
@@ -83,6 +138,14 @@ open class UIHostingView<Content: View>: UIView {
             frame.size = rootViewHostingController.sizeThatFits(in: superview.frame.size)
         } else {
             frame.size = rootViewHostingController.sizeThatFits(AppKitOrUIKitLayoutSizeProposal())
+        }
+    }
+    
+    open override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        
+        if shouldResizeToFitContent {
+            rootViewHostingController.view.invalidateIntrinsicContentSize()
         }
     }
 }

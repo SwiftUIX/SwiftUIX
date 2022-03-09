@@ -29,6 +29,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
     }
     
+    public var shouldResizeToFitContent: Bool = false
+    
     override public var presentationCoordinator: CocoaPresentationCoordinator {
         _presentationCoordinator
     }
@@ -94,13 +96,29 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
+        if shouldResizeToFitContent {
+            view.invalidateIntrinsicContentSize()
+        }
+        
         DispatchQueue.main.async {
             self.resizeParentWindowIfNecessary()
         }
     }
     
+    override open func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        
+        if shouldResizeToFitContent {
+            view.invalidateIntrinsicContentSize()
+        }
+    }
+    
     override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+        
+        if shouldResizeToFitContent {
+            view.invalidateIntrinsicContentSize()
+        }
     }
     
     #elseif os(macOS)
