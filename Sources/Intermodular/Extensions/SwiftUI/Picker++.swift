@@ -81,6 +81,24 @@ extension Picker where Label == Text, SelectionValue: CaseIterable & CustomStrin
     }
 }
 
+extension Picker where Label == EmptyView, Content == AnyView {
+    public init(
+        selection: Binding<SelectionValue>
+    ) where SelectionValue.AllCases: RandomAccessCollection, SelectionValue: CaseIterable & CustomStringConvertible & Hashable {
+        self.init(selection: selection) {
+            PassthroughView {
+                ForEach(SelectionValue.allCases, id: \.self) { value in
+                    Text(value.description)
+                        .tag(Optional.some(value))
+                }
+            }
+            .eraseToAnyView()
+        } label: {
+            EmptyView()
+        }
+    }
+}
+
 extension Picker where Label == Text, Content == AnyView {
     public init<T: CaseIterable & CustomStringConvertible & Hashable>(
         _ titleKey: LocalizedStringKey,
