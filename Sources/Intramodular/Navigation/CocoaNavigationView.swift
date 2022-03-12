@@ -98,7 +98,7 @@ extension CocoaNavigationView {
                 let result = viewControllers.count > 1
                 
                 if result {
-                    Keyboard.dismiss()
+                    view.window?.endEditing(true)
                 }
                 
                 return result
