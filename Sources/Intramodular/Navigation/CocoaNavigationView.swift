@@ -54,6 +54,18 @@ extension CocoaNavigationView {
                 }
             }
             
+            override var isNavigationBarHidden: Bool {
+                get {
+                    super.isNavigationBarHidden
+                } set {
+                    guard !(configuration.isNavigationBarHidden && !newValue) else {
+                        return
+                    }
+                    
+                    super.isNavigationBarHidden = newValue
+                }
+            }
+            
             override open func viewDidLoad() {
                 super.viewDidLoad()
                 
