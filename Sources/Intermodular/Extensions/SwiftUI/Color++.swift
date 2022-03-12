@@ -230,6 +230,28 @@ extension Color {
 #endif
 
 extension Color {
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    /// A color that adapts to the preferred color scheme.
+    ///
+    /// - Parameters:
+    ///   - light: The preferred color for a light color scheme.
+    ///   - dark: The preferred color for a dark color scheme.
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+    public static func adaptable(
+        light: @escaping @autoclosure () -> Color,
+        dark: @escaping @autoclosure () -> Color
+    ) -> Color {
+        Color(
+            UIColor.adaptable(
+                light: UIColor(light()),
+                dark: UIColor(dark())
+            )
+        )
+    }
+    #endif
+}
+
+extension Color {
     public init(
         cube256 colorSpace: RGBColorSpace,
         red: Int,
@@ -334,5 +356,29 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 }
+
+// MARK: - Auxiliary Implementation -
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension UIColor {
+    class func adaptable(
+        light: @escaping @autoclosure () -> UIColor,
+        dark: @escaping @autoclosure () -> UIColor
+    ) -> UIColor {
+        UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+                case .light:
+                    return light()
+                case .dark:
+                    return dark()
+                default:
+                    return light()
+            }
+        }
+    }
+}
+
+#endif
 
 #endif
