@@ -92,7 +92,6 @@ public final class FeedbackGenerator {
 // MARK: - Helpers -
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-
 extension UIImpactFeedbackGenerator.FeedbackStyle {
 	public init(_ style: FeedbackGenerator.ImpactFeedbackStyle) {
 		switch style {
@@ -122,19 +121,4 @@ extension UINotificationFeedbackGenerator.FeedbackType {
 		}
 	}
 }
-
 #endif
-
-extension EnvironmentValues {
-	private struct FeedbackGeneratorEnvironmentKey: EnvironmentKey {
-        static let defaultValue: FeedbackGenerator? = FeedbackGenerator.shared
-	}
-	
-    public var feedbackGenerator: FeedbackGenerator? {
-		get {
-			self[FeedbackGeneratorEnvironmentKey.self]
-		} set {
-			self[FeedbackGeneratorEnvironmentKey.self] = newValue
-		}
-	}
-}
