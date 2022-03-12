@@ -37,17 +37,31 @@ extension CocoaNavigationView {
             var isNavigationBarHidden: Bool = false
         }
         
-        class UIViewControllerType: UINavigationController {
+        class UIViewControllerType: UINavigationController, UIGestureRecognizerDelegate {
             var configuration = Configuration() {
                 didSet {
                     if configuration.isNavigationBarHidden != oldValue.isNavigationBarHidden {
                         if configuration.isNavigationBarHidden != isNavigationBarHidden {
                             self.setNavigationBarHidden(configuration.isNavigationBarHidden, animated: true)
                         }
+                        
+                        if configuration.isNavigationBarHidden {
+                            interactivePopGestureRecognizer?.delegate = self
+                        } else if interactivePopGestureRecognizer?.delegate === self {
+                            interactivePopGestureRecognizer?.delegate = nil
+                        }
                     }
                 }
             }
             
+            override open func viewDidLoad() {
+                super.viewDidLoad()
+                
+                if configuration.isNavigationBarHidden {
+                    interactivePopGestureRecognizer?.delegate = self
+                }
+            }
+
             override func viewWillAppear(_ animated: Bool) {
                 self.view.backgroundColor = nil
                 
@@ -66,6 +80,16 @@ extension CocoaNavigationView {
             
             override func pushViewController(_ viewController: UIViewController, animated: Bool) {
                 super.pushViewController(viewController, animated: true)
+            }
+            
+            @objc public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+                let result = viewControllers.count > 1
+                
+                if result {
+                    Keyboard.dismiss()
+                }
+                
+                return result
             }
         }
         
