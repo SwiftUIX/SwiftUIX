@@ -12,6 +12,8 @@ public enum _RelativePaddingAmount: CaseIterable, Hashable {
     case small
     case regular
     case large
+    case extraLarge
+    case extraExtraLarge
 }
 
 extension View {
@@ -51,6 +53,10 @@ extension View {
                 padding(edges)
             case .some(.large):
                 padding(edges).padding(edges)
+            case .some(.extraLarge):
+                padding(edges).padding(edges).padding(edges)
+            case .some(.extraExtraLarge):
+                padding(edges).padding(edges).padding(edges).padding(edges)
         }
     }
     
