@@ -44,8 +44,8 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
             hostingContentView.rootView.content
         } set {
             hostingContentView.rootView.content = newValue
-            
-            update()
+
+            setNeedsLayout()
         }
     }
     
@@ -86,15 +86,14 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
     public func contentOffset(forPageIndex pageIndex: Int) -> CGPoint {
         .zero
     }
-    
+
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        update()
+    }
+
     private func update() {
         guard !frame.size.isAreaZero else {
-            DispatchQueue.main.async {
-                if !self.frame.size.isAreaZero {
-                    self.update()
-                }
-            }
-            
             return
         }
         
