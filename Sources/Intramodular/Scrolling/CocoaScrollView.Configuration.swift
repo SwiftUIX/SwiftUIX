@@ -234,24 +234,21 @@ extension UIScrollView {
         }
         
         if let alwaysBounceVertical = configuration.alwaysBounceVertical {
-            self.alwaysBounceVertical = alwaysBounceVertical
+            assignIfNotEqual(alwaysBounceVertical, to: &self.alwaysBounceVertical)
         }
         
         if let alwaysBounceHorizontal = configuration.alwaysBounceHorizontal {
-            self.alwaysBounceHorizontal = alwaysBounceHorizontal
+            assignIfNotEqual(alwaysBounceHorizontal, to: &self.alwaysBounceHorizontal)
         }
-        
-        isDirectionalLockEnabled = configuration.isDirectionalLockEnabled
-        isScrollEnabled = configuration.isScrollEnabled
-        showsVerticalScrollIndicator = configuration.showsVerticalScrollIndicator
-        showsHorizontalScrollIndicator = configuration.showsHorizontalScrollIndicator
-        horizontalScrollIndicatorInsets = .init(configuration.scrollIndicatorInsets.horizontal)
-        verticalScrollIndicatorInsets = .init(configuration.scrollIndicatorInsets.vertical)
-        decelerationRate = configuration.decelerationRate
-        
-        if contentInset != .init(configuration.contentInset) {
-            contentInset = .init(configuration.contentInset)
-        }
+                
+        assignIfNotEqual(configuration.isDirectionalLockEnabled, to: &isDirectionalLockEnabled)
+        assignIfNotEqual(configuration.isScrollEnabled, to: &isScrollEnabled)
+        assignIfNotEqual(configuration.showsVerticalScrollIndicator, to: &showsVerticalScrollIndicator)
+        assignIfNotEqual(configuration.showsHorizontalScrollIndicator, to: &showsHorizontalScrollIndicator)
+        assignIfNotEqual(.init(configuration.scrollIndicatorInsets.horizontal), to: &horizontalScrollIndicatorInsets)
+        assignIfNotEqual(.init(configuration.scrollIndicatorInsets.vertical), to: &verticalScrollIndicatorInsets)
+        assignIfNotEqual(configuration.decelerationRate, to: &decelerationRate)
+        assignIfNotEqual(.init(configuration.contentInset), to: &self.contentInset)
         
         if let contentInsetAdjustmentBehavior = configuration.contentInsetAdjustmentBehavior {
             self.contentInsetAdjustmentBehavior = contentInsetAdjustmentBehavior
