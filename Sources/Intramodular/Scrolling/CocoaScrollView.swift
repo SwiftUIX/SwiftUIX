@@ -106,6 +106,11 @@ extension CocoaScrollView {
     ) -> Self {
         contentInsets(EdgeInsets(edges, length))
     }
+
+    /// Sets the deceleration rate for this scroll view.
+    public func decelerationRate(_ decelerationRate: UIScrollView.DecelerationRate) -> Self {
+        then({ $0.configuration.decelerationRate = decelerationRate })
+    }
 }
 
 @available(tvOS, unavailable)
