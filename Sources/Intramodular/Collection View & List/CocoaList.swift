@@ -205,13 +205,11 @@ extension CocoaList where
 // MARK: - API -
 
 extension CocoaList {
-    @inlinable
     public func listStyle(_ style: UITableView.Style) -> Self {
         then({ $0.style = style })
     }
     
     #if !os(tvOS)
-    @inlinable
     public func listSeparatorStyle(_ separatorStyle: UITableViewCell.SeparatorStyle) -> Self {
         then({ $0.separatorStyle = separatorStyle })
     }
@@ -219,33 +217,27 @@ extension CocoaList {
 }
 
 extension CocoaList {
-    @inlinable
     public func alwaysBounceVertical(_ alwaysBounceVertical: Bool) -> Self {
         then({ $0.scrollViewConfiguration.alwaysBounceVertical = alwaysBounceVertical })
     }
     
-    @inlinable
     public func alwaysBounceHorizontal(_ alwaysBounceHorizontal: Bool) -> Self {
         then({ $0.scrollViewConfiguration.alwaysBounceHorizontal = alwaysBounceHorizontal })
     }
     
-    @inlinable
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.scrollViewConfiguration.onOffsetChange = body })
     }
     
-    @inlinable
     public func contentInsets(_ contentInset: EdgeInsets) -> Self {
         then({ $0.scrollViewConfiguration.contentInset = contentInset })
     }
     
     @_disfavoredOverload
-    @inlinable
     public func contentInsets(_ insets: UIEdgeInsets) -> Self {
         contentInsets(EdgeInsets(insets))
     }
     
-    @inlinable
     public func contentInsets(
         _ edges: Edge.Set = .all,
         _ length: CGFloat = 0
@@ -253,7 +245,6 @@ extension CocoaList {
         contentInsets(EdgeInsets(edges, length))
     }
     
-    @inlinable
     public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
         then({ $0.scrollViewConfiguration.contentOffset = contentOffset })
     }
@@ -261,17 +252,14 @@ extension CocoaList {
 
 @available(tvOS, unavailable)
 extension CocoaList {
-    @inlinable
     public func onRefresh(_ body: @escaping () -> Void) -> Self {
         then({ $0.scrollViewConfiguration.onRefresh = body })
     }
     
-    @inlinable
     public func isRefreshing(_ isRefreshing: Bool) -> Self {
         then({ $0.scrollViewConfiguration.isRefreshing = isRefreshing })
     }
     
-    @inlinable
     public func refreshControlTintColor(_ color: UIColor?) -> Self {
         then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
     }
