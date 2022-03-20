@@ -15,6 +15,12 @@ public protocol DynamicAction: DynamicProperty {
 
 // MARK: - API -
 
+extension DynamicAction {
+    public func then(_ action: @escaping () -> Void) -> _ExtendedDynamicAction<Self> {
+        _ExtendedDynamicAction(action: self, additionalAction: Action(action))
+    }
+}
+
 extension PerformActionView {
     public func insertAction<A: DynamicAction>(_ action: A) -> _InsertDynamicAction<Self, A> {
         .init(base: self, action: action)
@@ -93,6 +99,17 @@ extension View {
 }
 
 // MARK: - Auxiliary Implementation -
+
+public struct _ExtendedDynamicAction<A: DynamicAction>: DynamicAction {
+    let action: A
+    let additionalAction: Action
+    
+    public func perform() {
+        action.perform()
+        
+        additionalAction.perform()
+    }
+}
 
 @available(iOS 13.0, macOS 10.15, watchOS 6.0, *)
 @available(tvOS, unavailable)

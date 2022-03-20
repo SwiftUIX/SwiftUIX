@@ -33,6 +33,12 @@ extension PresentationMode {
     }
 }
 
+extension DynamicAction where Self == PresentationMode.DismissPresentationAction {
+    public static var dismissPresentation: Self {
+        .init()
+    }
+}
+
 public struct BooleanPresentationManager: PresentationManager  {
     @Binding public var isPresented: Bool
     

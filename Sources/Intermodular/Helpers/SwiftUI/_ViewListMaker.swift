@@ -28,6 +28,6 @@ extension ForEach: _ViewListMaker where Content: View {
 extension TupleView: _ViewListMaker {
     @inlinable
     public func makeViewList() -> [AnyView] {
-        Mirror(reflecting: value).children.compactMap({ $0.value as? AnyView }) // HACK
+        Mirror(reflecting: value).children.map({ $0.value as! AnyView }) 
     }
 }

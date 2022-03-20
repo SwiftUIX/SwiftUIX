@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol _opaque_PerformActionView: _opaque_View {
+public protocol _opaque_PerformActionView {
     func transformAction(_: (Action) -> Action) -> Self
 }
 
