@@ -269,10 +269,6 @@ final class UIHostingCollectionViewController<
         }
         
         lastViewSafeAreaInsets = newSafeAreaInsets
-        
-        cache.invalidate()
-
-        invalidateLayout(animated: true)
     }
     
     public override func viewWillTransition(

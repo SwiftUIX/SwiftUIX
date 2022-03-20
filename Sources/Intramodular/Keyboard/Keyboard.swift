@@ -16,7 +16,7 @@ import UIKit
 public final class Keyboard: ObservableObject {
     public static let main = Keyboard()
     
-    @Published public var state: State = .default
+    @Published public private(set) var state: State = .default
     @Published public private(set) var isShown: Bool = false
     
     /// A Boolean value that determines whether the keyboard is showing on-screen.

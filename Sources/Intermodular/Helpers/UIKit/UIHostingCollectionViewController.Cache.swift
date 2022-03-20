@@ -132,7 +132,7 @@ extension UIHostingCollectionViewController.Cache {
                 return size
             }
             
-            contentIdentifierToCacheMap[configuration.id]?.contentSize = size
+            contentIdentifierToCacheMap[configuration.id, default: .init()].contentSize = size
             contentIdentifierToIndexPathMap[configuration.id] = indexPath
             indexPathToContentIdentifierMap[configuration.indexPath] = configuration.id
             

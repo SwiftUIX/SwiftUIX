@@ -83,10 +83,14 @@ struct _CollectionViewCellOrSupplementaryViewConfiguration<
     SectionType,
     SectionIdentifierType: Hashable
 >: Identifiable {
-    struct ID: Hashable {
+    struct ID: CustomStringConvertible, Hashable {
         let reuseIdentifier: String
         let item: ItemIdentifierType?
         let section: SectionIdentifierType
+        
+        var description: String {
+            "(item: \(item.map(String.init(describing:)) ?? "nil"), section: \(section))"
+        }
     }
             
     let reuseIdentifier: String
