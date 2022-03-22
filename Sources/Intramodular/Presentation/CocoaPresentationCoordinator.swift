@@ -173,7 +173,12 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         return .init { attemptToFulfill in
-            if viewController.presentedViewController != nil {
+            if let presentedViewController = viewController.presentedViewController {
+                // Don't call `UIViewController.dismiss` if the presented view controller is already being dismissed. Otherwise, it causes the _presenter_ to dismiss itself.
+                guard !presentedViewController.isBeingDismissed else {
+                    return attemptToFulfill(.success(false))
+                }
+
                 viewController.dismiss(animated: animation != nil) {
                     if let presentation = presentation {
                         presentation.onDismiss()

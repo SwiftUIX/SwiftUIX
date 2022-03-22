@@ -51,38 +51,6 @@ public struct BooleanPresentationManager: PresentationManager  {
     }
 }
 
-// MARK: - Auxiliary Implementation -
-
-private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey {
-    typealias ViewInteractor = PresentationManager
-    
-    static var defaultValue: PresentationManager? {
-        get {
-            return nil
-        }
-    }
-}
-
-extension EnvironmentValues {
-    public var presentationManager: PresentationManager {
-        get {
-            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
-            if navigator == nil && presentationMode.isPresented {
-                return presentationMode
-            } else {
-                return self[_PresentationManagerEnvironmentKey.self]
-                ?? (_appKitOrUIKitViewControllerBox?.value?._cocoaPresentationCoordinator).flatMap({ CocoaPresentationMode(coordinator: $0) })
-                    ?? presentationMode
-            }
-            #else
-            return self[_PresentationManagerEnvironmentKey.self] ?? presentationMode
-            #endif
-        } set {
-            self[_PresentationManagerEnvironmentKey.self] = newValue
-        }
-    }
-}
-
 // MARK: - Conformances -
 
 public struct AnyPresentationManager: PresentationManager {
@@ -113,5 +81,45 @@ extension Binding: PresentationManager where Value == PresentationMode {
     
     public func dismiss() {
         wrappedValue.dismiss()
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+private struct _PresentationManagerEnvironmentKey: ViewInteractorEnvironmentKey {
+    typealias ViewInteractor = PresentationManager
+
+    static var defaultValue: PresentationManager? {
+        get {
+            return nil
+        }
+    }
+}
+
+extension EnvironmentValues {
+    public var presentationManager: PresentationManager {
+        get {
+            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+            if navigator == nil && presentationMode.isPresented {
+                if let existingPresentationManager = self[_PresentationManagerEnvironmentKey.self], existingPresentationManager.isPresented {
+                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                        return existingPresentationManager
+                    } else {
+                        return presentationMode
+                    }
+                } else {
+                    return presentationMode
+                }
+            } else {
+                return self[_PresentationManagerEnvironmentKey.self]
+                ?? (_appKitOrUIKitViewControllerBox?.value?._cocoaPresentationCoordinator).flatMap({ CocoaPresentationMode(coordinator: $0) })
+                ?? presentationMode
+            }
+            #else
+            return self[_PresentationManagerEnvironmentKey.self] ?? presentationMode
+            #endif
+        } set {
+            self[_PresentationManagerEnvironmentKey.self] = newValue
+        }
     }
 }
