@@ -17,7 +17,7 @@ public struct PartRoundedRectangle: Shape {
     }
     
     public func path(in rect: CGRect) -> Path {
-        return Path(
+        Path(
             AppKitOrUIKitBezierPath(
                 roundedRect: rect,
                 byRoundingCorners: corners,
