@@ -50,8 +50,9 @@ extension ActivityIndicator: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
+        assignIfNotEqual(.init(style), to: &uiView.style)
+
         uiView.color = tintUIColor ?? context.environment.tintColor?.toUIColor()
-        uiView.style = .init(style)
         uiView.tintColor = tintUIColor ?? context.environment.tintColor?.toUIColor()
         
         if !context.environment.isEnabled && uiView.isAnimating {

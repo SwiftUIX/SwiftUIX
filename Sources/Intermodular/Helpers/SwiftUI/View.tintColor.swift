@@ -23,8 +23,12 @@ extension EnvironmentValues {
 
 extension View {
     /// Sets the tint color of the elements displayed by this view.
-    @inlinable
+    @ViewBuilder
     public func tintColor(_ color: Color?) -> some View {
-        environment(\.tintColor, color)
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+            self.tint(color).environment(\.tintColor, color)
+        } else {
+            self.environment(\.tintColor, color)
+        }
     }
 }
