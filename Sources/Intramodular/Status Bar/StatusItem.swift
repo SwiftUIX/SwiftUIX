@@ -45,18 +45,32 @@ extension View {
     public func statusItem<ID: Hashable, Content: View>(
         id: ID,
         image: ImageName,
+        isActive: Binding<Bool>? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        modifier(InsertStatusBarPopover(item: StatusItem(id: id, image: image, content: content)))
+        modifier(
+            InsertStatusBarPopover(
+                item: StatusItem(id: id, image: image, content: content),
+                isActive: isActive
+            )
+        )
+        .background(EmptyView().id(isActive?.wrappedValue))
     }
     
     /// Adds a status bar item configured to present a popover when clicked.
     public func statusItem<ID: Hashable, Content: View>(
         id: ID,
         systemImage image: String,
+        isActive: Binding<Bool>? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        modifier(InsertStatusBarPopover(item: StatusItem(id: id, image: .system(image), content: content)))
+        modifier(
+            InsertStatusBarPopover(
+                item: StatusItem(id: id, image: .system(image), content: content),
+                isActive: isActive
+            )
+        )
+        .background(EmptyView().id(isActive?.wrappedValue))
     }
 }
 
@@ -81,20 +95,23 @@ extension StatusItem {
 
 struct InsertStatusBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier {
     let item: StatusItem<ID, PopoverContent>
+    let isActive: Binding<Bool>?
     
-    @State var popover: NSHostingStatusBarPopover<ID, PopoverContent>? = nil
+    @State private var popover: NSHostingStatusBarPopover<ID, PopoverContent>? = nil
     
     @ViewBuilder
     func body(content: Content) -> some View {
-        PerformAction {
-            if let popover = self.popover {
-                popover.statusItem = self.item
-            } else {
-                self.popover = NSHostingStatusBarPopover(item: self.item)
+        content.background {
+            PerformAction {
+                if let popover = self.popover {
+                    popover.statusItem = self.item
+                } else {
+                    self.popover = NSHostingStatusBarPopover(item: self.item)
+                }
+                
+                popover?.isActive = isActive
             }
         }
-        
-        content
     }
 }
 

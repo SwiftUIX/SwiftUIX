@@ -17,21 +17,35 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         }
     }
     
-    public var statusItem: StatusItem<ID, Content> {
+    var statusItem: StatusItem<ID, Content> {
         didSet {
             updateStatusBarItem(oldValue: oldValue)
         }
     }
     
-    public init(item: StatusItem<ID, Content>) {
+    var isActive: Binding<Bool>? {
+        didSet {
+            if let isActive = isActive {
+                if isActive.wrappedValue, !self.isShown {
+                    present(nil)
+                }
+            }
+        }
+    }
+    
+    init(item: StatusItem<ID, Content>) {
         self.statusItem = item
         
         super.init(rootView: item.content)
         
+        behavior = NSPopover.Behavior.transient
+        
         updateStatusBarItem(oldValue: item)
+        
+        _ = Unmanaged.passUnretained(self).retain() // fixes a crash
     }
     
-    public required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -55,9 +69,13 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         }
         
         statusItem.update(_statusItemBase!)
+        
+        if let isActive = isActive, isActive.wrappedValue, !isShown {
+            present(nil)
+        }
     }
     
-    public func present(_ sender: AnyObject?) {
+    func present(_ sender: AnyObject?) {
         guard let statusBarButton = _statusItemBase?.button else {
             return
         }
@@ -67,19 +85,25 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
             of: statusBarButton,
             preferredEdge: NSRectEdge.maxY
         )
+        
+        isActive?.wrappedValue = true
+    }
+    
+    func hide(_ sender: AnyObject?) {
+        performClose(sender)
+
+        isActive?.wrappedValue = false
     }
     
     @objc func togglePopover(sender: AnyObject?) {
         if isShown {
-            performClose(sender)
+            hide(sender)
         } else {
             present(sender)
         }
     }
     
     deinit {
-        _ = Unmanaged.passUnretained(self).retain() // fixes a crash
-        
         if let item = _statusItemBase {
             item.statusBar?.removeStatusItem(item)
         }
