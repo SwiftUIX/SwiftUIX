@@ -20,6 +20,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     #endif
     var _isResizingParentWindow: Bool = false
     var _didResizeParentWindowOnce: Bool = false
+
+    #if os(macOS)
+    weak var parentPopover: NSPopover?
+    #endif
     
     public var mainView: Content {
         get {
@@ -125,7 +129,15 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayout() {
         super.viewDidLayout()
         
-        preferredContentSize = sizeThatFits(in: Screen.main.bounds.size)
+        let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
+        
+        DispatchQueue.main.async {
+            if let popover = self.parentPopover {
+                popover.contentSize = size
+            } else {
+                self.preferredContentSize = size
+            }
+        }
     }
     #endif
     

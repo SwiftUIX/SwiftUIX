@@ -93,7 +93,7 @@ public typealias AppKitOrUIKitWindow = NSWindow
 
 extension NSView {
     public static var layoutFittingCompressedSize: CGSize {
-        .init(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        .init(width: 0, height: 0)
     }
     
     public static var layoutFittingExpandedSize: CGSize {

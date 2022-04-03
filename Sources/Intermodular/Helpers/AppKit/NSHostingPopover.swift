@@ -9,19 +9,19 @@ import Swift
 import SwiftUI
 
 open class NSHostingPopover<Content: View>: NSPopover {
-    var presentationManager: PresentationManager!
+    private var presentationManager: PresentationManager!
     
-    var _contentViewController: NSHostingController<ContentWrapper> {
-        contentViewController as! NSHostingController<ContentWrapper>
+    private var _contentViewController: CocoaHostingController<ContentWrapper> {
+        contentViewController as! CocoaHostingController<ContentWrapper>
     }
     
     public var rootView: Content {
         get {
-            _contentViewController.rootView.content
+            _contentViewController.mainView.content
         } set {
-            _contentViewController.rootView = .init(content: newValue, owner: self)
+            _contentViewController.mainView.content = newValue
             
-            contentSize = _contentViewController.sizeThatFits(in: Screen.main.bounds.size)
+            _contentViewController.view.layout()
         }
     }
     
@@ -29,9 +29,13 @@ open class NSHostingPopover<Content: View>: NSPopover {
         super.init()
         
         presentationManager = .init(self)
-
-        contentViewController = NSHostingController(rootView: ContentWrapper(content: rootView, owner: self))
-        contentSize = _contentViewController.sizeThatFits(in: Screen.main.bounds.size)
+        
+        let contentViewController = CocoaHostingController(mainView: ContentWrapper(content: rootView, owner: self))
+        
+        contentViewController.parentPopover = self
+        
+        self.animates = true
+        self.contentViewController = contentViewController
     }
     
     public required init?(coder: NSCoder) {
@@ -42,20 +46,23 @@ open class NSHostingPopover<Content: View>: NSPopover {
 // MARK: - Auxiliary Implementation -
 
 extension NSHostingPopover {
-    struct ContentWrapper: View {
-        let content: Content
+    private struct ContentWrapper: View {
+        var content: Content
         
         weak var owner: NSHostingPopover?
         
         var body: some View {
-            owner.ifSome { owner in
+            if let owner = owner {
                 content
                     .environment(\.presentationManager, owner.presentationManager)
+                    .onChangeOfFrame { _ in
+                        owner._contentViewController.view.layout()
+                    }
             }
         }
     }
     
-    class PresentationManager: SwiftUIX.PresentationManager {
+    private class PresentationManager: SwiftUIX.PresentationManager {
         private unowned let popover: NSHostingPopover
         
         public var isPresented: Bool {
