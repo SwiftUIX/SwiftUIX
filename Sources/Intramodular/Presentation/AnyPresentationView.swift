@@ -61,6 +61,18 @@ public struct AnyPresentationView: View {
         #endif
     }
     #endif
+
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    /// Convert to an AppKit/UIKit view controller.
+    public func _toAppKitOrUIKitViewController() -> AppKitOrUIKitViewController {
+        switch base {
+            case .native:
+                return CocoaHostingController(mainView: self)
+            case .appKitOrUIKitViewController(let viewController):
+                return viewController
+        }
+    }
+    #endif
 }
 
 // MARK: - Conformances -
