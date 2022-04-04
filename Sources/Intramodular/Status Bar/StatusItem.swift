@@ -56,7 +56,20 @@ extension View {
         )
         .background(EmptyView().id(isActive?.wrappedValue))
     }
-    
+
+    /// Adds a status bar item configured to present a popover when clicked.
+    public func statusItem<Content: View>(
+        image: ImageName,
+        isActive: Binding<Bool>? = nil,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        let content = content()
+
+        return withInlineState(initialValue: UUID()) { id in
+            statusItem(id: id.wrappedValue, image: image, content: { content })
+        }
+    }
+
     /// Adds a status bar item configured to present a popover when clicked.
     public func statusItem<ID: Hashable, Content: View>(
         id: ID,
