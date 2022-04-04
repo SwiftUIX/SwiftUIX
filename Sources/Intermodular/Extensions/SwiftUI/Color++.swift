@@ -29,7 +29,6 @@ extension Color {
 }
 
 #if os(iOS) || os(macOS) || os(tvOS)
-
 extension Color {
     public static var systemRed: Color {
         .init(.systemRed)
@@ -71,11 +70,9 @@ extension Color {
         .init(.systemGray)
     }
 }
-
 #endif
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-
 extension Color {
     public static var brown: Color {
         return .init(.brown)
@@ -97,11 +94,9 @@ extension Color {
     public static let systemGray5: Color = Color(.systemGray5)
     public static let systemGray6: Color = Color(.systemGray6)
 }
-
 #endif
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 /// Foreground colors for static text and related elements.
 extension Color {
     /// The color for text labels that contain primary content.
@@ -140,11 +135,9 @@ extension Color {
         #endif
     }
 }
-
 #endif
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 extension Color {
     /// A foreground color for standard system links.
     public static var link: Color {
@@ -161,11 +154,9 @@ extension Color {
         return .init(.opaqueSeparator)
     }
 }
-
 #endif
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-
 extension Color {
     /// The color for the main background of your interface.
     public static var systemBackground: Color {
@@ -232,7 +223,6 @@ extension Color {
         return .init(.quaternarySystemFill)
     }
 }
-
 #endif
 
 extension Color {
@@ -284,8 +274,6 @@ extension Color {
         )
     }
 }
-
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension Color {
     /// Creates a color from a hexadecimal color code.
@@ -376,7 +364,6 @@ extension Color {
 // MARK: - Auxiliary Implementation -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 fileprivate extension UIColor {
     class func adaptable(
         light: @escaping @autoclosure () -> UIColor,
@@ -418,7 +405,11 @@ fileprivate extension UIColor {
         return self
     }
 }
-
 #endif
 
+#if os(macOS)
+extension Color {
+    /// The color to use for the window background.
+    public static let windowBackground = Color(NSColor.windowBackgroundColor)
+}
 #endif

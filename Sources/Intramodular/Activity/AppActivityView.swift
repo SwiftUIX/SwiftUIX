@@ -27,12 +27,19 @@ public struct AppActivityView: UIViewControllerRepresentable {
     }
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(activityItems: activityItems, applicationActivities: applicationActivities)
+        let viewController = UIViewControllerType(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+        
+        viewController.excludedActivityTypes = excludedActivityTypes
+        
+        return viewController
     }
     
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.excludedActivityTypes = excludedActivityTypes
-        
+
         uiViewController.completionWithItemsHandler = { activity, success, items, error in
             if let error = error {
                 self.onComplete(.failure(error))
@@ -56,11 +63,15 @@ extension AppActivityView {
         then({ $0.excludedActivityTypes = activityTypes })
     }
     
-    public func onCancel(perform action: @escaping () -> Void) -> Self {
+    public func onCancel(
+        perform action: @escaping () -> Void
+    ) -> Self {
         then({ $0.onCancel = action })
     }
     
-    public func onComplete(perform action: @escaping (Result<(activity: UIActivity.ActivityType, items: [Any]?), Error>) -> Void) -> Self {
+    public func onComplete(
+        perform action: @escaping (Result<(activity: UIActivity.ActivityType, items: [Any]?), Error>) -> Void
+    ) -> Self {
         then({ $0.onComplete = action })
     }
 }

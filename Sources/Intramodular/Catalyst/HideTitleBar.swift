@@ -9,7 +9,7 @@ fileprivate struct HideTitleBar: ViewModifier {
     let isHidden: Bool
     
     func body(content: Content) -> some View {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
         withAppKitOrUIKitViewController { viewController in
             content
                 .onAppear(perform: { updateTitlebar(for: viewController) })
@@ -21,9 +21,21 @@ fileprivate struct HideTitleBar: ViewModifier {
         #endif
     }
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private func updateTitlebar(for viewController: AppKitOrUIKitViewController?) {
-        #if targetEnvironment(macCatalyst)
+        #if os(macOS)
+        guard let window = viewController?.view.window else {
+            return
+        }
+
+        if isHidden {
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+        } else {
+            window.titlebarAppearsTransparent = false
+            window.titleVisibility = .visible
+        }
+        #elseif targetEnvironment(macCatalyst)
         guard let windowScene = viewController?.view.window?.windowScene else {
             return
         }
