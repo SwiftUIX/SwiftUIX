@@ -120,7 +120,6 @@ final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         let originX = (windowPosition.x - (self.frame.size.width / 2))
         let originY = (windowPosition.y - (self.frame.size.height / 2))
         
-        print(originX, originY)
         #if os(iOS)
         self.frame.origin = .init(
             x: originX,
