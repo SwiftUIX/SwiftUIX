@@ -232,20 +232,7 @@ extension SearchBar: UIViewRepresentable {
 @available(tvOSApplicationExtension, unavailable)
 extension SearchBar: NSViewRepresentable {
     public final class NSViewType: NSSearchField {
-        class ClosureResponder: NSView {
-            override func becomeFirstResponder() -> Bool {
-                print("Foo")
-                
-                return true
-            }
-            
-            override func resignFirstResponder() -> Bool {
-                return true
-            }
-        }
-        
         var isFirstResponderBinding: Binding<Bool>?
-        var closureResponder = ClosureResponder()
 
         override public func becomeFirstResponder() -> Bool {
             let result = super.becomeFirstResponder()
@@ -275,9 +262,6 @@ extension SearchBar: NSViewRepresentable {
         nsView.cell?.sendsActionOnEndEditing = false
         nsView.isBordered = false
         nsView.isBezeled = true
-        
-        nsView.nextResponder = nsView.closureResponder
-        nsView.nextKeyView = nsView.closureResponder
         
         return nsView
     }
