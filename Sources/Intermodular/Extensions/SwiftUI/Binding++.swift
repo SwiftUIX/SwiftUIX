@@ -137,14 +137,24 @@ extension Binding {
         )
     }
     
-    public static func boolean<T: Equatable>(_ value: Binding<T?>, equals some: T) -> Binding<Bool> where Value == Bool {
+    /// Creates a `Binding<Bool>` that reports whether `binding.wrappedValue` equals a given value.
+    ///
+    /// `binding.wrappedValue` will be set to `nil` only if `binding.wrappedValue` is equal to the given value and the `Boolean` value being set is `false.`
+    public static func boolean<T: Equatable>(
+        _ binding: Binding<T?>,
+        equals value: T
+    ) -> Binding<Bool> where Value == Bool {
         .init(
-            get: { value.wrappedValue == some },
+            get: {
+                binding.wrappedValue == value
+            },
             set: { newValue in
                 if newValue {
-                    value.wrappedValue = some
+                    binding.wrappedValue = value
                 } else {
-                    value.wrappedValue = nil
+                    if binding.wrappedValue == value {
+                        binding.wrappedValue = nil
+                    }
                 }
             }
         )
