@@ -10,7 +10,7 @@ import Swift
 import SwiftUI
 
 /// A model that represents an item which can be placed in the status bar.
-public struct StatusItem<ID, Content: View> {
+public struct StatusBarItem<ID, Content: View> {
     public let id: ID
     public let length: CGFloat
     public let image: ImageName
@@ -32,7 +32,7 @@ public struct StatusItem<ID, Content: View> {
     }
 }
 
-extension StatusItem: Identifiable where ID: Hashable {
+extension StatusBarItem: Identifiable where ID: Hashable {
     
 }
 
@@ -42,7 +42,7 @@ extension StatusItem: Identifiable where ID: Hashable {
 
 extension View {
     /// Adds a status bar item configured to present a popover when clicked.
-    public func statusItem<ID: Hashable, Content: View>(
+    public func statusBarItem<ID: Hashable, Content: View>(
         id: ID,
         image: ImageName,
         isActive: Binding<Bool>? = nil,
@@ -50,28 +50,28 @@ extension View {
     ) -> some View {
         modifier(
             InsertStatusBarPopover(
-                item: StatusItem(id: id, image: image, content: content),
+                item: StatusBarItem(id: id, image: image, content: content),
                 isActive: isActive
             )
         )
         .background(EmptyView().id(isActive?.wrappedValue))
     }
-
+    
     /// Adds a status bar item configured to present a popover when clicked.
-    public func statusItem<Content: View>(
+    public func statusBarItem<Content: View>(
         image: ImageName,
         isActive: Binding<Bool>? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
         let content = content()
-
+        
         return withInlineState(initialValue: UUID()) { id in
-            statusItem(id: id.wrappedValue, image: image, isActive: isActive, content: { content })
+            statusBarItem(id: id.wrappedValue, image: image, isActive: isActive, content: { content })
         }
     }
-
+    
     /// Adds a status bar item configured to present a popover when clicked.
-    public func statusItem<ID: Hashable, Content: View>(
+    public func statusBarItem<ID: Hashable, Content: View>(
         id: ID,
         systemImage image: String,
         isActive: Binding<Bool>? = nil,
@@ -79,7 +79,7 @@ extension View {
     ) -> some View {
         modifier(
             InsertStatusBarPopover(
-                item: StatusItem(id: id, image: .system(image), content: content),
+                item: StatusBarItem(id: id, image: .system(image), content: content),
                 isActive: isActive
             )
         )
@@ -93,7 +93,7 @@ extension View {
 
 #if os(macOS)
 
-extension StatusItem {
+extension StatusBarItem {
     @usableFromInline
     func update(_ item: NSStatusItem) {
         item.length = length
@@ -107,7 +107,7 @@ extension StatusItem {
 }
 
 struct InsertStatusBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier {
-    let item: StatusItem<ID, PopoverContent>
+    let item: StatusBarItem<ID, PopoverContent>
     let isActive: Binding<Bool>?
     
     @State private var popover: NSHostingStatusBarPopover<ID, PopoverContent>? = nil
@@ -117,7 +117,7 @@ struct InsertStatusBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier
         content.background {
             PerformAction {
                 if let popover = self.popover {
-                    popover.statusItem = self.item
+                    popover.statusBarItem = self.item
                 } else {
                     self.popover = NSHostingStatusBarPopover(item: self.item)
                 }

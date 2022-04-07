@@ -17,7 +17,7 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         }
     }
     
-    var statusItem: StatusItem<ID, Content> {
+    var statusBarItem: StatusBarItem<ID, Content> {
         didSet {
             updateStatusBarItem(oldValue: oldValue)
         }
@@ -33,8 +33,8 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         }
     }
     
-    init(item: StatusItem<ID, Content>) {
-        self.statusItem = item
+    init(item: StatusBarItem<ID, Content>) {
+        self.statusBarItem = item
         
         super.init(rootView: item.content)
         
@@ -49,33 +49,33 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func updateStatusBarItem(oldValue: StatusItem<ID, Content>) {
+    private func updateStatusBarItem(oldValue: StatusBarItem<ID, Content>) {
         if let item = _statusItemBase {
-            if oldValue.id != statusItem.id {
+            if oldValue.id != statusBarItem.id {
                 _statusBarBase.removeStatusItem(item)
                 _statusItemBase = nil
             }
             
-            if oldValue.length != statusItem.length {
+            if oldValue.length != statusBarItem.length {
                 _statusBarBase.removeStatusItem(item)
                 _statusItemBase = nil
             }
         }
         
-        rootView = statusItem.content
+        rootView = statusBarItem.content
         
-        if _statusItemBase == nil {
-            _statusItemBase = _statusBarBase.statusItem(withLength: statusItem.length)
+        if let item = _statusItemBase {
+            statusBarItem.update(item)
+        } else {
+            _statusItemBase = _statusBarBase.statusItem(withLength: statusBarItem.length)
         }
-        
-        statusItem.update(_statusItemBase!)
         
         if let isActive = isActive, isActive.wrappedValue, !isShown {
             present(nil)
         }
     }
     
-    func present(_ sender: AnyObject?) {
+    private func present(_ sender: AnyObject?) {
         guard let statusBarButton = _statusItemBase?.button else {
             return
         }
@@ -89,7 +89,7 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         isActive?.wrappedValue = true
     }
     
-    func hide(_ sender: AnyObject?) {
+    private func hide(_ sender: AnyObject?) {
         performClose(sender)
 
         isActive?.wrappedValue = false
