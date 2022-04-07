@@ -66,7 +66,7 @@ extension View {
         let content = content()
 
         return withInlineState(initialValue: UUID()) { id in
-            statusItem(id: id.wrappedValue, image: image, content: { content })
+            statusItem(id: id.wrappedValue, image: image, isActive: isActive, content: { content })
         }
     }
 

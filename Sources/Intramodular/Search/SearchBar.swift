@@ -29,9 +29,9 @@ public struct SearchBar: DefaultTextInputType {
     
     private var placeholder: String?
     
+    private var appKitOrUIKitFont: AppKitOrUIKitFont?
+    private var appKitOrUIKitForegroundColor: AppKitOrUIKitColor?
     #if os(iOS) || targetEnvironment(macCatalyst)
-    private var appKitOrUIKitFont: UIFont?
-    private var appKitOrUIKitForegroundColor: UIColor?
     private var appKitOrUIKitSearchFieldBackgroundColor: UIColor?
     private var searchBarStyle: UISearchBar.Style = .minimal
     private var iconImageConfiguration: [UISearchBar.Icon: AppKitOrUIKitImage] = [:]
@@ -231,10 +231,41 @@ extension SearchBar: UIViewRepresentable {
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 extension SearchBar: NSViewRepresentable {
-    public typealias NSViewType = NSSearchField
-    
+    public final class NSViewType: NSSearchField {
+        class ClosureResponder: NSView {
+            override func becomeFirstResponder() -> Bool {
+                print("Foo")
+                
+                return true
+            }
+            
+            override func resignFirstResponder() -> Bool {
+                return true
+            }
+        }
+        
+        var isFirstResponderBinding: Binding<Bool>?
+        var closureResponder = ClosureResponder()
+
+        override public func becomeFirstResponder() -> Bool {
+            let result = super.becomeFirstResponder()
+            
+            isFirstResponderBinding?.wrappedValue = result
+            
+            return result
+        }
+        
+        override public func resignFirstResponder() -> Bool {
+            let result = super.resignFirstResponder()
+            
+            isFirstResponderBinding?.wrappedValue = !result
+            
+            return result
+        }
+    }
+        
     public func makeNSView(context: Context) -> NSViewType {
-        let nsView = NSSearchField(string: placeholder ?? "")
+        let nsView = NSViewType(string: placeholder ?? "")
         
         nsView.delegate = context.coordinator
         nsView.target = context.coordinator
@@ -245,11 +276,21 @@ extension SearchBar: NSViewRepresentable {
         nsView.isBordered = false
         nsView.isBezeled = true
         
+        nsView.nextResponder = nsView.closureResponder
+        nsView.nextKeyView = nsView.closureResponder
+        
         return nsView
     }
     
-    public func updateNSView(_ nsView: NSSearchField, context: Context) {
+    public func updateNSView(_ nsView: NSViewType, context: Context) {
         context.coordinator.base = self
+        context.coordinator.view = nsView
+
+        nsView.isFirstResponderBinding = isFocused
+        
+        if let appKitOrUIKitFont = appKitOrUIKitFont {
+            nsView.font = appKitOrUIKitFont
+        }
         
         if nsView.stringValue != text {
             nsView.stringValue = text
@@ -258,6 +299,8 @@ extension SearchBar: NSViewRepresentable {
     
     final public class Coordinator: NSObject, NSSearchFieldDelegate {
         var base: SearchBar
+        
+        weak var view: NSViewType?
         
         init(base: SearchBar) {
             self.base = base
@@ -277,6 +320,8 @@ extension SearchBar: NSViewRepresentable {
         
         public func controlTextDidEndEditing(_ notification: Notification) {
             base.onEditingChanged(false)
+            
+           // _ = view?.resignFirstResponder()
         }
         
         @objc
@@ -338,8 +383,7 @@ extension SearchBar {
     }
     #endif
     
-    #if os(iOS) || targetEnvironment(macCatalyst)
-    public func font(_ font: UIFont) -> Self {
+    public func font(_ font: AppKitOrUIKitFont) -> Self {
         then({ $0.appKitOrUIKitFont = font })
     }
     
@@ -347,6 +391,7 @@ extension SearchBar {
         then({ $0.appKitOrUIKitForegroundColor = foregroundColor })
     }
     
+    #if os(iOS) || targetEnvironment(macCatalyst)
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
