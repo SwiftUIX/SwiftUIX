@@ -9,6 +9,7 @@ import SwiftUI
 public struct ActivityIndicator {
     public enum Style {
         #if os(macOS)
+        case mini
         case small
         #endif
         case regular
@@ -143,6 +144,10 @@ extension ActivityIndicator {
     public func style(_ style: Style) -> Self {
         then({ $0.style = style })
     }
+
+    public func controlSize(_ style: Style) -> Self {
+        then({ $0.style = style })
+    }
 }
 
 #endif
@@ -167,6 +172,8 @@ extension UIActivityIndicatorView.Style {
 extension NSControl.ControlSize {
     public init(_ style: ActivityIndicator.Style) {
         switch style {
+            case .mini:
+                self = .mini
             case .small:
                 self = .small
             case .regular:
