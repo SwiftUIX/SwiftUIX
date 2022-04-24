@@ -12,6 +12,7 @@ public struct CocoaTextField<Label: View>: View {
     typealias Rect = ((_ bounds: CGRect, _ original: CGRect) -> CGRect)
     
     public struct CharactersChange: Hashable {
+        public let text: String
         public let range: NSRange
         public let replacement: String
     }
@@ -143,7 +144,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            configuration.onCharactersChange(.init(range: range, replacement: string))
+            configuration.onCharactersChange(.init(text: textField.text!, range: range, replacement: string))
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
