@@ -11,26 +11,34 @@ import SwiftUI
 public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
     private let thunk: () -> ObjectType
     
-    @OptionalObservedObject
-    private var observedObject: ObjectType?
-    @State
-    private var state = ReferenceBox<ObjectType?>(nil)
+    @State private var objectContainer = _OptionalObservedObjectContainer<ObjectType>()
+    
+    @ObservedObject private var observedObjectContainer = _OptionalObservedObjectContainer<ObjectType>()
     
     public var wrappedValue: ObjectType {
         get {
-            if state.value == nil {
-                state.value = thunk()
+            if let object = objectContainer.base {
+                if observedObjectContainer.base !== object {
+                    observedObjectContainer.base = object
+                }
+                
+                return object
+            } else {
+                let object = thunk()
+                
+                objectContainer.base = object
+                observedObjectContainer.base = object
+                
+                return object
             }
-            
-            return state.value!
         } nonmutating set {
-            state.value = newValue
-            observedObject = newValue
+            objectContainer.base = newValue
+            observedObjectContainer.base = newValue
         }
     }
     
     public var projectedValue: ObservedObject<ObjectType>.Wrapper {
-        ObservedObject(wrappedValue: observedObject!).projectedValue
+        ObservedObject(wrappedValue: wrappedValue).projectedValue
     }
     
     public init(wrappedValue thunk: @autoclosure @escaping () -> ObjectType) {
@@ -38,11 +46,7 @@ public struct PersistentObject<ObjectType: ObservableObject>: DynamicProperty {
     }
     
     public mutating func update() {
-        if state.value == nil {
-            let object = thunk()
-            
-            state.value = object
-            observedObject = object
-        }
+        _objectContainer.update()
+        _observedObjectContainer.update()
     }
 }

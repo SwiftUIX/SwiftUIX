@@ -14,16 +14,12 @@ public struct EnvironmentObjectOrObservedObject<Value: ObservableObject>: Dynami
     @OptionalObservedObject private var _wrappedValue1: Value?
     
     public var wrappedValue: Value {
-        get {
-            if let result = _wrappedValue1 ?? _wrappedValue0 {
-                return result
-            } else {
-                assertionFailure()
-                
-                return defaultValue()
-            }
-        } set {
-            _wrappedValue1 = newValue
+        if let result = _wrappedValue1 ?? _wrappedValue0 {
+            return result
+        } else {
+            assertionFailure()
+
+            return defaultValue()
         }
     }
     
@@ -34,7 +30,7 @@ public struct EnvironmentObjectOrObservedObject<Value: ObservableObject>: Dynami
     
     public mutating func update() {
         if _wrappedValue0 == nil {
-            _wrappedValue1 = defaultValue()
+            __wrappedValue1 = .init(wrappedValue: defaultValue())
         }
         
         self.__wrappedValue0.update()

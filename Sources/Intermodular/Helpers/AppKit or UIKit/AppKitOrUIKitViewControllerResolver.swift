@@ -226,7 +226,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
         PassthroughView {
             #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             content
-                .environment(\.navigator, (_appKitOrUIKitViewControllerBox.value?.navigationController).map(_UINavigationControllerNavigatorAdaptorBox.init))
+                .modifier(ProvideNavigator(_appKitOrUIKitViewControllerBox: _appKitOrUIKitViewControllerBox))
             #elseif os(macOS)
             content
             #endif
@@ -252,6 +252,36 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
                 .id(_appKitOrUIKitViewControllerBox.value.map(ObjectIdentifier.init))
         }
     }
+
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    private struct ProvideNavigator: ViewModifier {
+        struct Navigator: SwiftUIX.Navigator {
+            var base: AppKitOrUIKitViewController?
+
+            private var nearestNavigator: _UINavigationControllerNavigatorAdaptorBox? {
+                base?.nearestNavigationController.map(_UINavigationControllerNavigatorAdaptorBox.init(navigationController:))
+            }
+
+            func push<V: View>(_ view: V, withAnimation animation: Animation?) {
+                nearestNavigator?.push(view, withAnimation: animation)
+            }
+
+            func pop(withAnimation animation: Animation?) {
+                nearestNavigator?.pop(withAnimation: animation)
+            }
+
+            func popToRoot(withAnimation animation: Animation?) {
+                nearestNavigator?.popToRoot(withAnimation: animation)
+            }
+        }
+
+        @ObservedObject var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>
+
+        func body(content: Content) -> some View {
+            content.environment(\.navigator, Navigator(base: _appKitOrUIKitViewControllerBox.value))
+        }
+    }
+    #endif
 }
 
 #endif
