@@ -123,5 +123,12 @@ fileprivate struct SetFontWithLineHeight<F: FontFamily>: ViewModifier {
         }
     }
 }
+#endif
 
+#if os(macOS)
+extension NSFont {
+    public convenience init?<F: FontFamily>(_ family: F, size: CGFloat) {
+        self.init(name: family.rawValue, size: size)!
+    }
+}
 #endif

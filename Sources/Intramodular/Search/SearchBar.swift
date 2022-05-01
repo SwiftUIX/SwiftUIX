@@ -47,7 +47,12 @@ public struct SearchBar: DefaultTextInputType {
     private var textContentType: UITextContentType? = nil
     private var keyboardType: UIKeyboardType?
     #endif
-    
+
+    #if os(macOS)
+    private var isBezeled: Bool = true
+    private var focusRingType: NSFocusRingType = .default
+    #endif
+
     public init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,
@@ -253,16 +258,13 @@ extension SearchBar: NSViewRepresentable {
         
     public func makeNSView(context: Context) -> NSViewType {
         let nsView = NSViewType(string: placeholder ?? "")
-        
+
         nsView.delegate = context.coordinator
         nsView.target = context.coordinator
         nsView.action = #selector(context.coordinator.performAction(_:))
-        
-        nsView.bezelStyle = .roundedBezel
+
         nsView.cell?.sendsActionOnEndEditing = false
-        nsView.isBordered = false
-        nsView.isBezeled = true
-        
+
         return nsView
     }
     
@@ -271,14 +273,20 @@ extension SearchBar: NSViewRepresentable {
         context.coordinator.view = nsView
 
         nsView.isFirstResponderBinding = isFocused
-        
+
+        assignIfNotEqual(.roundedBezel, to: &nsView.bezelStyle)
+        assignIfNotEqual(focusRingType, to: &nsView.focusRingType)
+        assignIfNotEqual(false, to: &nsView.isBordered)
+        assignIfNotEqual(isBezeled, to: &nsView.isBezeled)
+        assignIfNotEqual(placeholder, to: &nsView.placeholderString)
+
+        (nsView.cell as? NSSearchFieldCell)?.searchButtonCell?.isTransparent = !isBezeled
+
         if let appKitOrUIKitFont = appKitOrUIKitFont {
-            nsView.font = appKitOrUIKitFont
+            assignIfNotEqual(appKitOrUIKitFont, to: &nsView.font)
         }
-        
-        if nsView.stringValue != text {
-            nsView.stringValue = text
-        }
+
+        assignIfNotEqual(text, to: &nsView.stringValue)
     }
     
     final public class Coordinator: NSObject, NSSearchFieldDelegate {
@@ -304,8 +312,6 @@ extension SearchBar: NSViewRepresentable {
         
         public func controlTextDidEndEditing(_ notification: Notification) {
             base.onEditingChanged(false)
-            
-           // _ = view?.resignFirstResponder()
         }
         
         @objc
@@ -362,15 +368,21 @@ extension SearchBar {
 @available(tvOSApplicationExtension, unavailable)
 extension SearchBar {
     #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
-    public func placeholder(_ placeholder: String) -> Self {
+    public func placeholder(_ placeholder: String?) -> Self {
         then({ $0.placeholder = placeholder })
     }
     #endif
-    
-    public func font(_ font: AppKitOrUIKitFont) -> Self {
+
+    /// Sets the default font for text in the view.
+    public func font(_ font: AppKitOrUIKitFont?) -> Self {
         then({ $0.appKitOrUIKitFont = font })
     }
-    
+
+    /// Sets the default font for text in the view.
+    public func font<F: FontFamily>(_ font: F, size: CGFloat) -> Self {
+        self.font(AppKitOrUIKitFont(name: font.rawValue, size: size))
+    }
+
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.appKitOrUIKitForegroundColor = foregroundColor })
     }
@@ -424,6 +436,16 @@ extension SearchBar {
     
     public func keyboardType(_ keyboardType: UIKeyboardType) -> Self {
         then({ $0.keyboardType = keyboardType })
+    }
+    #endif
+
+    #if os(macOS)
+    public func focusRingType(_ focusRingType: NSFocusRingType) -> Self {
+        then({ $0.focusRingType = focusRingType })
+    }
+
+    public func isBezeled(_ isBezeled: Bool) -> Self {
+        then({ $0.isBezeled = isBezeled })
     }
     #endif
 }
