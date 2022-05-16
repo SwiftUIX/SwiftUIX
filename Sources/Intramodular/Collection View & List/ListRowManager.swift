@@ -7,8 +7,10 @@ import SwiftUI
 
 protocol _CellProxyBase {
     var globalFrame: CGRect { get }
-    
+        
     func invalidateLayout(with context: CellProxy.InvalidationContext)
+    func select()
+    func deselect()
 }
 
 public struct CellProxy {
@@ -24,6 +26,14 @@ public struct CellProxy {
     
     public func invalidateLayout(with context: InvalidationContext = .init()) {
         base?.invalidateLayout(with: context)
+    }
+    
+    public func select() {
+        base?.select()
+    }
+    
+    public func deselect() {
+        base?.deselect()
     }
 }
 

@@ -380,6 +380,7 @@ extension UIHostingCollectionViewCell {
 
         contentHostingController?.view.setNeedsDisplay()
         contentHostingController?.view.setNeedsLayout()
+        contentHostingController?.view.layoutIfNeeded()
         
         lastInvalidationContext = context
     }
@@ -401,6 +402,14 @@ extension UIHostingCollectionViewCell {
         
         func invalidateLayout(with context: CellProxy.InvalidationContext) {
             base?.invalidateContent(with: context)
+        }
+        
+        func select() {
+            base?.isSelected = true
+        }
+        
+        func deselect() {
+            base?.isSelected = false
         }
     }
 }

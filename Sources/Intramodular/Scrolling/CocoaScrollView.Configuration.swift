@@ -9,176 +9,33 @@ import SwiftUI
 
 /// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View> {
-    var hasChanged: Bool = true
+    var initialContentAlignment: Alignment?
+    var axes: Axis.Set = [.vertical]
+    var showsVerticalScrollIndicator: Bool = true
+    var showsHorizontalScrollIndicator: Bool = true
+    var scrollIndicatorInsets: (horizontal: EdgeInsets, vertical: EdgeInsets) = (.zero, .zero)
+    var decelerationRate: UIScrollView.DecelerationRate = .normal
+    var alwaysBounceVertical: Bool? = nil
+    var alwaysBounceHorizontal: Bool? = nil
+    var isDirectionalLockEnabled: Bool = false
+    var isPagingEnabled: Bool = false
+    var isScrollEnabled: Bool = true
     
-    // MARK: General
+    var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())?
+    var onDragEnd: (() -> Void)?
+    var contentOffset: Binding<CGPoint>? = nil
     
-    var initialContentAlignment: Alignment? {
-        didSet {
-            if oldValue != initialContentAlignment {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var axes: Axis.Set = [.vertical] {
-        didSet {
-            if oldValue != axes {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var showsVerticalScrollIndicator: Bool = true {
-        didSet {
-            if oldValue != showsVerticalScrollIndicator {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var showsHorizontalScrollIndicator: Bool = true {
-        didSet {
-            if oldValue != showsHorizontalScrollIndicator {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var scrollIndicatorInsets: (horizontal: EdgeInsets, vertical: EdgeInsets) = (.zero, .zero) {
-        didSet {
-            if oldValue != scrollIndicatorInsets {
-                hasChanged = true
-            }
-        }
-    }
+    var contentInset: EdgeInsets = .zero
+    var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior?
+    var contentOffsetBehavior: ScrollContentOffsetBehavior = []
+        
+    var onRefresh: (() -> Void)?
+    var isRefreshing: Bool?
+    var refreshControlTintColor: UIColor?
 
-    var decelerationRate: UIScrollView.DecelerationRate = .normal {
-        didSet {
-            if oldValue != decelerationRate {
-                hasChanged = true
-            }
-        }
-    }
 
-    var alwaysBounceVertical: Bool? = nil {
-        didSet {
-            if oldValue != alwaysBounceVertical {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var alwaysBounceHorizontal: Bool? = nil {
-        didSet {
-            if oldValue != alwaysBounceHorizontal {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var isDirectionalLockEnabled: Bool = false {
-        didSet {
-            if oldValue != isDirectionalLockEnabled {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var isPagingEnabled: Bool = false {
-        didSet {
-            if oldValue != isPagingEnabled {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var isScrollEnabled: Bool = true {
-        didSet {
-            if oldValue != isScrollEnabled {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var onOffsetChange: ((ScrollView<Content>.ContentOffset) -> ())? = nil {
-        didSet {
-            if (oldValue == nil) != (onOffsetChange == nil) {
-                hasChanged = true
-            }
-        }
-    }
-    
-    // MARK: Content
-    
-    var contentOffset: Binding<CGPoint>? = nil {
-        didSet {
-            if (oldValue == nil) != (contentOffset == nil) {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var contentInset: EdgeInsets = .zero {
-        didSet {
-            if oldValue != contentInset {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior? {
-        didSet {
-            if oldValue != contentInsetAdjustmentBehavior {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var contentOffsetBehavior: ScrollContentOffsetBehavior = [] {
-        didSet {
-            if oldValue != contentOffsetBehavior {
-                hasChanged = true
-            }
-        }
-    }
-    
-    // MARK: Refresh
-    
-    var onRefresh: (() -> Void)? {
-        didSet {
-            if (oldValue == nil) != (onRefresh == nil) {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var isRefreshing: Bool? {
-        didSet {
-            if oldValue != isRefreshing {
-                hasChanged = true
-            }
-        }
-    }
-    
-    var refreshControlTintColor: UIColor? {
-        didSet {
-            if oldValue != refreshControlTintColor {
-                hasChanged = true
-            }
-        }
-    }
-    
-    // MARK: Keyboard
-    
     @available(tvOS, unavailable)
-    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none {
-        didSet {
-            if oldValue != keyboardDismissMode {
-                hasChanged = true
-            }
-        }
-    }
+    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
 }
 
 extension CocoaScrollViewConfiguration {
@@ -229,10 +86,6 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
-        guard configuration.hasChanged else {
-            return
-        }
-        
         if let alwaysBounceVertical = configuration.alwaysBounceVertical {
             assignIfNotEqual(alwaysBounceVertical, to: &self.alwaysBounceVertical)
         }

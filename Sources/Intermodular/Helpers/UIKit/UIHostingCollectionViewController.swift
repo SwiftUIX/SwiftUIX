@@ -481,6 +481,10 @@ final class UIHostingCollectionViewController<
             contentOffset.wrappedValue = collectionView.contentOffset
         }
     }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        _scrollViewConfiguration.onDragEnd?()
+    }
 }
 
 extension UIHostingCollectionViewController {

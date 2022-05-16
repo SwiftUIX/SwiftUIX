@@ -16,12 +16,16 @@ public struct CollectionView: View {
     private var _collectionViewConfiguration = _CollectionViewConfiguration()
     private var _dynamicViewContentTraitValues = _DynamicViewContentTraitValues()
     private var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
-    
+    private var collectionViewLayout: CollectionViewLayout?
+
     public var body: some View {
         internalBody
             .environment(\._collectionViewConfiguration, _collectionViewConfiguration)
             .environment(\._dynamicViewContentTraitValues, _dynamicViewContentTraitValues)
             .environment(\._scrollViewConfiguration, _scrollViewConfiguration)
+            .transformEnvironment(\.collectionViewLayout, transform: { layout in
+                layout = collectionViewLayout ?? layout
+            })
     }
     
     fileprivate init(internalBody: AnyView) {
@@ -284,6 +288,10 @@ extension CollectionView {
 // MARK: - API -
 
 extension CollectionView {
+    public func collectionViewLayout(_ layout: CollectionViewLayout) -> CollectionView {
+        then({ $0.collectionViewLayout = layout })
+    }
+
     public func updateOnChange<T: Hashable>(of value: T) -> Self {
         then({ $0._collectionViewConfiguration.dataSourceUpdateToken = value })
     }
@@ -400,6 +408,10 @@ extension CollectionView {
     /// Performs an action upon scroll content-offset change.
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0._scrollViewConfiguration.onOffsetChange = body })
+    }
+    
+    public func onDragEnd(perform action: @escaping () -> Void) -> Self {
+        then({ $0._scrollViewConfiguration.onDragEnd = action })
     }
     
     /// Sets whether the collection view animates differences in the data source.

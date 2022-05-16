@@ -250,6 +250,10 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
             targetContentOffset.pointee = contentOffset(forPageIndex: targetIndex)
         }
     }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        configuration.onDragEnd?()
+    }
 }
 
 // MARK: - Auxiliary Implementation -

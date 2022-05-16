@@ -87,6 +87,10 @@ extension CocoaScrollView {
         then({ $0.configuration.onOffsetChange = body })
     }
     
+    public func onDragEnd(perform action: @escaping () -> Void) -> Self {
+        then({ $0.configuration.onDragEnd = action })
+    }
+
     public func contentOffset(_ contentOffset: Binding<CGPoint>) -> Self {
         then({ $0.configuration.contentOffset = contentOffset })
     }
