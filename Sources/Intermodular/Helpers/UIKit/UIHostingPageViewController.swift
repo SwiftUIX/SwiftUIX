@@ -157,9 +157,9 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
         }
         
         let activePageTransitionProgress = (scrollView.contentOffset.x - view.frame.size.width) / view.frame.size.width
-    
+
         if paginationState != nil {
-            _pageUpdateDriver.objectWillChange.send()
+            // _pageUpdateDriver.objectWillChange.send() // FIXME: This does not perform well.
         }
         
         if activePageTransitionProgress == 0 {
