@@ -74,8 +74,13 @@ extension CocoaScrollView {
     /// Adds a condition whether for whether the collection view disables bouncing when scrolling reaches the end of the content
     public func scrollBounceDisabled(_ disabled: Bool) -> Self {
         then {
-            $0.configuration.alwaysBounceHorizontal = !disabled
-            $0.configuration.alwaysBounceVertical = !disabled
+            if $0.configuration.axes.contains(.horizontal) {
+                $0.configuration.alwaysBounceHorizontal = !disabled
+            }
+
+            if $0.configuration.axes.contains(.vertical) {
+                $0.configuration.alwaysBounceVertical = !disabled
+            }
         }
     }
     

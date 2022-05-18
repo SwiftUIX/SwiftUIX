@@ -89,6 +89,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
 
     open override func layoutSubviews() {
         super.layoutSubviews()
+
         update()
     }
 
@@ -134,8 +135,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
 
         hostingContentView.setNeedsDisplay()
         hostingContentView.setNeedsLayout()
-        hostingContentView.layoutIfNeeded()
-                
+
         if configuration.axes == .vertical {
             if contentHuggingPriority(for: .horizontal) != .defaultHigh {
                 setContentHuggingPriority(.defaultHigh, for: .horizontal)
