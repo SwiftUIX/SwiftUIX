@@ -155,6 +155,9 @@ extension View {
                     key: CaptureViewSizePreferenceKey<Self>.self,
                     value: proxy.size
                 )
+                .onAppear {
+                    binding.wrappedValue = proxy.size
+                }
             }
         }
         .onPreferenceChange(CaptureViewSizePreferenceKey<Self>.self) { size in

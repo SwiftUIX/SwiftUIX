@@ -78,7 +78,7 @@ public struct LazyAppearView<Content: View>: View {
             updateAppearanceAction?.cancel()
             
             let updateAppearanceAction = DispatchWorkItem {
-                self.appearance = .active
+                self.appearance = appearance
             }
             
             self.updateAppearanceAction = updateAppearanceAction

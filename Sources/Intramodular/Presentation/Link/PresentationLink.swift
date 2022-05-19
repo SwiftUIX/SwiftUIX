@@ -349,7 +349,7 @@ extension PresentationLink {
     
     public init(
         isPresented: Binding<Bool>,
-        onDismiss: @escaping () -> () = { },
+        onDismiss: @escaping () -> (),
         @ViewBuilder destination: () -> Destination,
         @ViewBuilder label: () -> Label
     ) {
@@ -357,6 +357,19 @@ extension PresentationLink {
         self._onDismiss = onDismiss
         self._isPresented = isPresented
         
+        self.label = label()
+        self.action = { }
+    }
+
+    public init(
+        isPresented: Binding<Bool>,
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self._destination = destination()
+        self._onDismiss = { }
+        self._isPresented = isPresented
+
         self.label = label()
         self.action = { }
     }
