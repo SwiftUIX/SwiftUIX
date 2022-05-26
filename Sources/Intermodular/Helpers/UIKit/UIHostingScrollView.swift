@@ -154,10 +154,6 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
             }
         }
         
-        if configuration.axes == .horizontal || configuration.axes == .vertical {
-            invalidateIntrinsicContentSize()
-        }
-                
         if let initialContentAlignment = configuration.initialContentAlignment {
             if !isInitialContentAlignmentSet {
                 if contentSize != .zero && frame.size != .zero {
@@ -267,9 +263,10 @@ extension UIHostingScrollView {
         var body: some View {
             PassthroughView {
                 if base?._isPagingEnabled ?? false {
-                    content.onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
-                        self.base?.pages = page
-                    })
+                    content
+                        .onPreferenceChange(ArrayReducePreferenceKey<_CocoaScrollViewPage>.self, perform: { page in
+                            self.base?.pages = page
+                        })
                 } else {
                     content
                 }

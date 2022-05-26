@@ -88,6 +88,11 @@ extension CocoaScrollView {
         then({ $0.configuration.isPagingEnabled = enabled })
     }
     
+    /// Sets the collection view's scroll content-offset behavior.
+    public func scrollContentOffsetBehavior(_ contentOffsetBehavior: ScrollContentOffsetBehavior) -> Self {
+        then({ $0.configuration.contentOffsetBehavior = contentOffsetBehavior })
+    }
+    
     public func onOffsetChange(_ body: @escaping (Offset) -> ()) -> Self {
         then({ $0.configuration.onOffsetChange = body })
     }

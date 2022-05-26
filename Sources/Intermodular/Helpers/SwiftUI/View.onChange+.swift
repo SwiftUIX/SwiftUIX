@@ -128,8 +128,13 @@ private struct _OnChangeOfFrame: ViewModifier {
     let action: (CGSize) -> Void
     
     func body(content: Content) -> some View {
-        IntrinsicSizeReader { size in
-            content.onChange(of: size, perform: action)
+        content.background {
+            GeometryReader { proxy in
+                ZeroSizeView()
+                    .onChange(of: proxy.size, perform: { action($0) })
+            }
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
         }
     }
 }

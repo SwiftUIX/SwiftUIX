@@ -38,12 +38,18 @@ public struct LazyAppearViewProxy {
             _appearanceBinding.wrappedValue = newValue
         }
     }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs._appearance == rhs._appearance
+    }
 }
 
 /// A view that appears lazily.
 public struct LazyAppearView<Content: View>: View {
-    private let debounceInterval: DispatchTimeInterval?
     private let destination: (LazyAppearViewProxy) -> Content
+    private let debounceInterval: DispatchTimeInterval?
+    private let explicitAnimation: Animation?
+    private let disableAnimations: Bool
     
     @ViewStorage private var updateAppearanceAction: DispatchWorkItem?
     
@@ -51,10 +57,24 @@ public struct LazyAppearView<Content: View>: View {
     
     public init(
         debounceInterval: DispatchTimeInterval? = nil,
+        animation: Animation,
         @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
     ) {
-        self.debounceInterval = debounceInterval
         self.destination = destination
+        self.debounceInterval = debounceInterval
+        self.explicitAnimation = animation
+        self.disableAnimations = false
+    }
+    
+    public init(
+        debounceInterval: DispatchTimeInterval? = nil,
+        disableAnimations: Bool = false,
+        @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
+    ) {
+        self.destination = destination
+        self.debounceInterval = debounceInterval
+        self.explicitAnimation = nil
+        self.disableAnimations = disableAnimations
     }
     
     public var body: some View {
@@ -69,23 +89,40 @@ public struct LazyAppearView<Content: View>: View {
                 .allowsHitTesting(false)
                 .accessibility(hidden: false)
             
-            destination(.init(_appearance: appearance, _appearanceBinding: .init(get: { appearance }, set: { setAppearance($0) })))
+            destination(
+                .init(
+                    _appearance: appearance,
+                    _appearanceBinding: .init(get: { appearance }, set: { setAppearance($0) })
+                )
+            )
+            .modify(if: disableAnimations) {
+                $0.animation(nil, value: appearance)
+            }
         }
     }
     
     private func setAppearance(_ appearance: LazyAppearViewProxy.Appearance) {
-        if let debounceInterval = debounceInterval {
-            updateAppearanceAction?.cancel()
-            
-            let updateAppearanceAction = DispatchWorkItem {
-                self.appearance = appearance
+        let mutateAppearance: () -> Void = {
+            if let animation = explicitAnimation {
+                withAnimation(explicitAnimation) {
+                    self.appearance = appearance
+                }
+            } else {
+                withoutAnimation(disableAnimations) {
+                    self.appearance = appearance
+                }
             }
+        }
+        
+        if let debounceInterval = debounceInterval {
+            let updateAppearanceAction = DispatchWorkItem(block: mutateAppearance)
             
+            self.updateAppearanceAction?.cancel()
             self.updateAppearanceAction = updateAppearanceAction
             
             DispatchQueue.main.asyncAfter(deadline: .now() + debounceInterval, execute: updateAppearanceAction)
         } else {
-            self.appearance = appearance
+            mutateAppearance()
         }
     }
 }
