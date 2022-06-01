@@ -256,7 +256,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private struct ProvideNavigator: ViewModifier {
         struct Navigator: SwiftUIX.Navigator {
-            var base: AppKitOrUIKitViewController?
+            weak var base: AppKitOrUIKitViewController?
 
             private var nearestNavigator: _UINavigationControllerNavigatorAdaptorBox? {
                 base?.nearestNavigationController.map(_UINavigationControllerNavigatorAdaptorBox.init(navigationController:))
