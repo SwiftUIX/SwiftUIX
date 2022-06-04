@@ -104,7 +104,7 @@ public struct LazyAppearView<Content: View>: View {
     private func setAppearance(_ appearance: LazyAppearViewProxy.Appearance) {
         let mutateAppearance: () -> Void = {
             if let animation = explicitAnimation {
-                withAnimation(explicitAnimation) {
+                withAnimation(animation) {
                     self.appearance = appearance
                 }
             } else {
