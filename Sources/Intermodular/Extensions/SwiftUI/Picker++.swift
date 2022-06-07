@@ -70,7 +70,7 @@ extension Picker where Label == Text, SelectionValue: CaseIterable & CustomStrin
     public init<S: StringProtocol>(
         _ title: S,
         selection: Binding<SelectionValue>
-    ) where Content == AnyView {
+    ) {
         self.init(title, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value.description)

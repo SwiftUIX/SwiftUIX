@@ -61,7 +61,7 @@ public struct CocoaTextField<Label: View>: View {
     }
     
     @Environment(\.font) var font
-    @Environment(\.multilineTextAlignment) var multilineTextAlignment: TextAlignment
+    @Environment(\.multilineTextAlignment) var multilineTextAlignment
     
     #if os(iOS) || targetEnvironment(macCatalyst)
     @available(macCatalystApplicationExtension, unavailable)
