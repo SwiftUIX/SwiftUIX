@@ -25,14 +25,10 @@ public struct OptionalObservedObject<ObjectType: ObservableObject>: DynamicPrope
     }
     
     /// Initialize with the provided initial value.
-    public init(wrappedValue value: ObjectType?) {
+    public init(wrappedValue value: ObjectType? = nil) {
         self.base = value
     }
-    
-    public init() {
-        self.init(wrappedValue: nil)
-    }
-    
+        
     public mutating func update() {
         _observedContainer.update()
     }

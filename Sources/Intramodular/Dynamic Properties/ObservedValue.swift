@@ -63,6 +63,13 @@ extension View {
         WithObservedValue(value: .init(storage), content: { transform(AnyView(self), $0) })
     }
     
+    public func modify<T, TransformedView: View>(
+        observing storage: ViewStorage<T>?,
+        transform: @escaping (AnyView, T?) -> TransformedView
+    ) -> some View {
+        WithOptionalObservableValue(value: .init(wrappedValue: storage.map(ObservedValue.init)?.base), content: { transform(AnyView(self), $0) })
+    }
+
     public func modify<T: Hashable, TransformedView: View>(
         observing storage: ViewStorage<T>,
         transform: @escaping (AnyView) -> TransformedView
@@ -71,6 +78,8 @@ extension View {
     }
 }
 
+// MARK: - Auxiliary Implementation -
+
 private struct WithObservedValue<T, Content: View>: View {
     @ObservedValue var value: T
     
@@ -78,5 +87,15 @@ private struct WithObservedValue<T, Content: View>: View {
     
     var body: some View {
         content(value)
+    }
+}
+
+private struct WithOptionalObservableValue<T, Content: View>: View {
+    @OptionalObservedObject var value: ObservableValue<T>?
+    
+    let content: (T?) -> Content
+    
+    var body: some View {
+        content(value?.wrappedValue)
     }
 }
