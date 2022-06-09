@@ -46,7 +46,7 @@ public struct LazyAppearViewProxy {
 
 /// A view that appears lazily.
 public struct LazyAppearView<Content: View>: View {
-    private let destination: (LazyAppearViewProxy) -> Content
+    private let destination: (LazyAppearViewProxy) -> AnyView
     private let debounceInterval: DispatchTimeInterval?
     private let explicitAnimation: Animation?
     private let disableAnimations: Bool
@@ -60,7 +60,25 @@ public struct LazyAppearView<Content: View>: View {
         animation: Animation,
         @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
     ) {
-        self.destination = destination
+        self.destination = { destination($0).eraseToAnyView() }
+        self.debounceInterval = debounceInterval
+        self.explicitAnimation = animation
+        self.disableAnimations = false
+    }
+    
+    public init(
+        debounceInterval: DispatchTimeInterval? = nil,
+        animation: Animation,
+        @ViewBuilder destination: @escaping () -> Content
+    ) {
+        self.destination = { proxy in
+            Group {
+                if proxy.appearance == .active {
+                    destination()
+                }
+            }
+            .eraseToAnyView()
+        }
         self.debounceInterval = debounceInterval
         self.explicitAnimation = animation
         self.disableAnimations = false
@@ -71,7 +89,25 @@ public struct LazyAppearView<Content: View>: View {
         disableAnimations: Bool = false,
         @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
     ) {
-        self.destination = destination
+        self.destination = { destination($0).eraseToAnyView() }
+        self.debounceInterval = debounceInterval
+        self.explicitAnimation = nil
+        self.disableAnimations = disableAnimations
+    }
+    
+    public init(
+        debounceInterval: DispatchTimeInterval? = nil,
+        disableAnimations: Bool = false,
+        @ViewBuilder destination: @escaping () -> Content
+    ) {
+        self.destination = { proxy in
+            Group {
+                if proxy.appearance == .active {
+                    destination()
+                }
+            }
+            .eraseToAnyView()
+        }
         self.debounceInterval = debounceInterval
         self.explicitAnimation = nil
         self.disableAnimations = disableAnimations

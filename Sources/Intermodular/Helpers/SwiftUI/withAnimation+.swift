@@ -52,10 +52,16 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
 
 public func withAnimation(
     _ animation: Animation = .default,
-    after delay: DispatchTimeInterval,
+    after delay: DispatchTimeInterval?,
     body: @escaping () -> Void
 ) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+    if let delay = delay {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            withAnimation(animation) {
+                body()
+            }
+        }
+    } else {
         withAnimation(animation) {
             body()
         }
