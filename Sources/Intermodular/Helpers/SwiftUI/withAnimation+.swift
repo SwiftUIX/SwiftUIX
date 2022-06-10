@@ -51,7 +51,7 @@ public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
 }
 
 public func withAnimation(
-    _ animation: Animation = .default,
+    _ animation: Animation? = .default,
     after delay: DispatchTimeInterval?,
     body: @escaping () -> Void
 ) {
