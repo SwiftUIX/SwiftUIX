@@ -39,9 +39,9 @@ final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         }
     }
     #endif
-             
-    var isKeyAndVisible: Binding<Bool> = .constant(true)
 
+    var _canBecomeKey: Bool = true
+    var isVisible: Binding<Bool> = .constant(true)
     var allowTouchesToPassThrough: Bool = false
 
     var windowPosition: CGPoint? {
@@ -109,6 +109,14 @@ final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
         }
 
         return result
+    }
+
+    override func makeKey() {
+        guard _canBecomeKey else {
+            return
+        }
+
+        super.makeKey()
     }
     #endif
 
@@ -205,7 +213,7 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             window?.isHidden = true
             #endif
             
-            window?.isKeyAndVisible.wrappedValue = false
+            window?.isVisible.wrappedValue = false
         }
     }
 }

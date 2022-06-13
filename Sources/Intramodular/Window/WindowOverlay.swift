@@ -10,19 +10,25 @@ import SwiftUI
 /// A window overlay for SwiftUI.
 struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     private let content: Content
-    private let isKeyAndVisible: Binding<Bool>
-    
-    init(content: Content, isKeyAndVisible: Binding<Bool>) {
+    private let canBecomeKey: Bool
+    private let isVisible: Binding<Bool>
+
+    init(
+        content: Content,
+        canBecomeKey: Bool,
+        isVisible: Binding<Bool>
+    ) {
         self.content = content
-        self.isKeyAndVisible = isKeyAndVisible
+        self.canBecomeKey = canBecomeKey
+        self.isVisible = isVisible
     }
     
     func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
-        .init(content: content, isKeyAndVisible: isKeyAndVisible)
+        .init(content: content, canBecomeKey: canBecomeKey, isVisible: isVisible)
     }
     
     func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
-        viewController.isKeyAndVisible = isKeyAndVisible
+        viewController.isVisible = isVisible
         viewController.content = content
         
         viewController.updateWindow()
@@ -59,16 +65,18 @@ extension WindowOverlay {
             }
         }
         
-        var isKeyAndVisible: Binding<Bool>
+        var canBecomeKey: Bool
+        var isVisible: Binding<Bool>
         var contentWindow: AppKitOrUIKitHostingWindow<Content>?
         #if os(macOS)
         var contentWindowController: NSWindowController?
         #endif
         
-        init(content: Content, isKeyAndVisible: Binding<Bool>) {
+        init(content: Content, canBecomeKey: Bool, isVisible: Binding<Bool>) {
             self.content = content
-            self.isKeyAndVisible = isKeyAndVisible
-            
+            self.canBecomeKey = canBecomeKey
+            self.isVisible = isVisible
+
             super.init(nibName: nil, bundle: nil)
             
             #if os(macOS)
@@ -77,11 +85,11 @@ extension WindowOverlay {
         }
         
         func updateWindow() {
-            if let contentWindow = contentWindow, contentWindow.isHidden == !isKeyAndVisible.wrappedValue {
+            if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible.wrappedValue {
                 return
             }
             
-            if isKeyAndVisible.wrappedValue {
+            if isVisible.wrappedValue {
                 #if !os(macOS)
                 guard let window = view?.window, let windowScene = window.windowScene else {
                     return
@@ -109,7 +117,8 @@ extension WindowOverlay {
                 #endif
                 
                 contentWindow.rootView = content
-                contentWindow.isKeyAndVisible = isKeyAndVisible
+                contentWindow._canBecomeKey = canBecomeKey
+                contentWindow.isVisible = isVisible
                 
                 #if os(macOS)
                 contentWindow.title = ""
@@ -119,7 +128,7 @@ extension WindowOverlay {
                 contentWindow.isHidden = false
                 contentWindow.isUserInteractionEnabled = true
                 contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
-                
+
                 contentWindow.makeKeyAndVisible()
                 
                 contentWindow.rootViewController?.view.setNeedsDisplay()
@@ -155,7 +164,7 @@ extension WindowOverlay {
         @objc
         public func windowWillClose(_ notification: Notification?) {
             if (notification?.object as? AppKitOrUIKitHostingWindow<Content>) === contentWindow {
-                isKeyAndVisible.wrappedValue = false
+                isVisible.wrappedValue = false
             }
         }
         #endif
@@ -165,7 +174,20 @@ extension WindowOverlay {
 // MARK: - Helpers -
 
 extension View {
-    /// Makes a window key and visible when a given condition is true
+    /// Makes a window visible when a given condition is true.
+    ///
+    /// - Parameters:
+    ///   - isVisible: A binding to whether the window is visible.
+    ///   - content: A closure returning the content of the window.
+    public func windowOverlay<Content: View>(
+        isVisible: Binding<Bool>,
+        @ViewBuilder _ content: () -> Content
+    ) -> some View {
+        background(WindowOverlay(content: content(), canBecomeKey: false, isVisible: isVisible))
+    }
+
+    /// Makes a window key and visible when a given condition is true.
+    ///
     /// - Parameters:
     ///   - isKeyAndVisible: A binding to whether the window is key and visible.
     ///   - content: A closure returning the content of the window.
@@ -173,7 +195,7 @@ extension View {
         isKeyAndVisible: Binding<Bool>,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
-        background(WindowOverlay(content: content(), isKeyAndVisible: isKeyAndVisible))
+        background(WindowOverlay(content: content(), canBecomeKey: true, isVisible: isKeyAndVisible))
     }
 }
 
