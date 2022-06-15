@@ -118,7 +118,7 @@ extension WindowOverlay {
                 
                 contentWindow.rootView = content
                 contentWindow._canBecomeKey = canBecomeKey
-                contentWindow.isVisible = isVisible
+                contentWindow.isVisibleBinding = isVisible
                 
                 #if os(macOS)
                 contentWindow.title = ""

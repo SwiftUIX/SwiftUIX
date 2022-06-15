@@ -41,7 +41,7 @@ final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow {
     #endif
 
     var _canBecomeKey: Bool = true
-    var isVisible: Binding<Bool> = .constant(true)
+    var isVisibleBinding: Binding<Bool> = .constant(true)
     var allowTouchesToPassThrough: Bool = false
 
     var windowPosition: CGPoint? {
@@ -213,7 +213,7 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             window?.isHidden = true
             #endif
             
-            window?.isVisible.wrappedValue = false
+            window?.isVisibleBinding.wrappedValue = false
         }
     }
 }
