@@ -10,8 +10,21 @@ private struct PredicatedAnimateOnChange<Value: Equatable>: ViewModifier {
     let value: Value
     let predicate: ((oldValue: Value, newValue: Value)) -> Bool
     
-    @ViewStorage private var lastValue: Value?
+    @ViewStorage var lastValue: Value?
 
+    init(
+        animation: Animation?,
+        value: Value,
+        initialValue: Value?,
+        predicate: @escaping ((oldValue: Value, newValue: Value)) -> Bool
+    ) {
+        self.animation = animation
+        self.value = value
+        self.predicate = predicate
+        
+        self._lastValue = .init(wrappedValue: initialValue)
+    }
+    
     func body(content: Content) -> some View {
         content
             .transaction { view in
@@ -31,8 +44,9 @@ extension View {
     public func predicatedAnimation<Value: Equatable>(
         _ animation: Animation?,
         value: Value,
+        initialValue: Value? = nil,
         predicate: @escaping ((oldValue: Value, newValue: Value)) -> Bool
     ) -> some View {
-        modifier(PredicatedAnimateOnChange(animation: animation, value: value, predicate: predicate))
+        modifier(PredicatedAnimateOnChange(animation: animation, value: value, initialValue: initialValue, predicate: predicate))
     }
 }
