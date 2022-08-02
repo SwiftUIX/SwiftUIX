@@ -193,7 +193,10 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
         )
         .sheet(
             isPresented: isPresented,
-            onDismiss: _onDismiss,
+            onDismiss: {
+                isPresented.wrappedValue = false
+                _onDismiss()
+            },
             content: { presentation.content }
         )
     }
