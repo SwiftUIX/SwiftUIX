@@ -87,12 +87,13 @@ open class UIHostingView<Content: View>: UIView {
     public required init(rootView: Content) {
         self.rootViewHostingController = .init(rootView: .init(parent: nil, content: rootView))
         self.rootViewHostingController.rootView.parent = rootViewHostingController
-        
+
         super.init(frame: .zero)
                 
         addSubview(rootViewHostingController.view)
         
         rootViewHostingController.view.constrainEdges(to: self)
+        rootViewHostingController.view.backgroundColor = .clear
     }
     
     public required init?(coder: NSCoder) {
