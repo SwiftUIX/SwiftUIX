@@ -62,7 +62,7 @@ fileprivate struct SelectionNavigator<Selection: Hashable, Destination: View>: V
                     isActive: isActive,
                     label: { ZeroSizeView() }
                 )
-                .id(selection.id)
+                .id(selection)
                 .accessibility(hidden: true)
             }
         )
