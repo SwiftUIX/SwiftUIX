@@ -88,7 +88,7 @@ extension CocoaList {
         sectionHeader: @escaping (SectionType) -> SectionHeader,
         sectionFooter: @escaping (SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
-    ) where ItemType == HashIdentifiableValue<_Item> {
+    ) where ItemType == _HashIdentifiableValue<_Item> {
         self.data = data
         self.sectionHeader = sectionHeader
         self.sectionFooter = sectionFooter
@@ -100,7 +100,7 @@ extension CocoaList {
         sectionHeader: @escaping (_SectionType) -> SectionHeader,
         sectionFooter: @escaping (_SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
-    ) where SectionType == HashIdentifiableValue<_SectionType>, ItemType == HashIdentifiableValue<_Item> {
+    ) where SectionType == _HashIdentifiableValue<_SectionType>, ItemType == _HashIdentifiableValue<_Item> {
         self.data = data
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
@@ -112,8 +112,8 @@ extension CocoaList {
         sectionHeader: @escaping (_SectionType) -> SectionHeader,
         sectionFooter: @escaping (_SectionType) -> SectionFooter,
         rowContent: @escaping (_Item) -> RowContent
-    ) where Data == Array<ListSection<SectionType, ItemType>>, SectionType == HashIdentifiableValue<_SectionType>, ItemType == HashIdentifiableValue<_Item> {
-        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(HashIdentifiableValue.init)) })
+    ) where Data == Array<ListSection<SectionType, ItemType>>, SectionType == _HashIdentifiableValue<_SectionType>, ItemType == _HashIdentifiableValue<_Item> {
+        self.data = data.map({ .init(model: .init($0.model), items: $0.items.map(_HashIdentifiableValue.init)) })
         self.sectionHeader = { sectionHeader($0.value) }
         self.sectionFooter = { sectionFooter($0.value) }
         self.rowContent = { rowContent($0.value) }
@@ -121,7 +121,7 @@ extension CocoaList {
 }
 
 extension CocoaList where
-    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionType == _KeyPathHashIdentifiableValue<Int, Int>,
     SectionHeader == Never,
     SectionFooter == Never
 {
@@ -133,9 +133,9 @@ extension CocoaList where
         _ items: Items,
         id: KeyPath<_ItemType, _ItemID>,
         @ViewBuilder rowContent: @escaping (_ItemType) -> RowContent
-    ) where Data == AnyRandomAccessCollection<ListSection<SectionType, ItemType>>, Items.Element == _ItemType, ItemType == KeyPathHashIdentifiableValue<_ItemType, _ItemID> {
+    ) where Data == AnyRandomAccessCollection<ListSection<SectionType, ItemType>>, Items.Element == _ItemType, ItemType == _KeyPathHashIdentifiableValue<_ItemType, _ItemID> {
         self.init(
-            AnyRandomAccessCollection([ListSection(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items.elements(identifiedBy: id))]),
+            AnyRandomAccessCollection([ListSection(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items.elements(identifiedBy: id))]),
             sectionHeader: Never.produce,
             sectionFooter: Never.produce,
             rowContent: { rowContent($0.value) }
@@ -145,7 +145,7 @@ extension CocoaList where
 
 extension CocoaList where
     Data: RangeReplaceableCollection,
-    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionType == _KeyPathHashIdentifiableValue<Int, Int>,
     SectionHeader == Never,
     SectionFooter == Never
 {
@@ -155,7 +155,7 @@ extension CocoaList where
     ) where Items.Element == ItemType {
         var data = Data.init()
         
-        data.append(.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items))
+        data.append(.init(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items))
         
         self.init(
             data,
@@ -172,7 +172,7 @@ extension CocoaList where
         
         let content = content()
         
-        data.append(.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: content.data))
+        data.append(.init(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: content.data))
         
         self.init(
             data,
@@ -185,7 +185,7 @@ extension CocoaList where
 
 extension CocoaList where
     Data == Array<ListSection<SectionType, ItemType>>,
-    SectionType == KeyPathHashIdentifiableValue<Int, Int>,
+    SectionType == _KeyPathHashIdentifiableValue<Int, Int>,
     SectionHeader == Never,
     SectionFooter == Never
 {
@@ -194,7 +194,7 @@ extension CocoaList where
         @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
     ) where Items.Element == ItemType {
         self.init(
-            [.init(KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items)],
+            [.init(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items)],
             sectionHeader: Never.produce,
             sectionFooter: Never.produce,
             rowContent: rowContent

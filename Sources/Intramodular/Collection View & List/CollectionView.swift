@@ -89,7 +89,7 @@ extension CollectionView {
     ) {
         self.init(
             internalBody: _CollectionView(
-                CollectionOfOne(ListSection(0, items: data.lazy.map({ _IdentifierHashedValue(KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))),
+                CollectionOfOne(ListSection(0, items: data.lazy.map({ _IdentifierHashedValue(_KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
                 rowContent: { rowContent($1.value.value) }
@@ -141,7 +141,7 @@ extension CollectionView {
                 data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
-                            KeyPathHashIdentifiableValue(
+                            _KeyPathHashIdentifiableValue(
                                 value: section,
                                 keyPath: id
                             )
@@ -216,13 +216,13 @@ extension CollectionView {
                 data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
-                            KeyPathHashIdentifiableValue(
+                            _KeyPathHashIdentifiableValue(
                                 value: section,
                                 keyPath: id
                             )
                         ),
                         items: rowContent(section).content.data.map { item in
-                            _CollectionViewSectionedItem(item: KeyPathHashIdentifiableValue(value: item, keyPath: \.self), section: section[keyPath: id])
+                            _CollectionViewSectionedItem(item: _KeyPathHashIdentifiableValue(value: item, keyPath: \.self), section: section[keyPath: id])
                         }
                     )
                 },
@@ -257,14 +257,14 @@ extension CollectionView {
                 data.map { section in
                     ListSection(
                         model: _IdentifierHashedValue(
-                            KeyPathHashIdentifiableValue(
+                            _KeyPathHashIdentifiableValue(
                                 value: section,
                                 keyPath: id
                             )
                         ),
                         items: rowContent(section).content.data.map { item in
                             _CollectionViewSectionedItem(
-                                item: KeyPathHashIdentifiableValue(value: item, keyPath: \.hashValue),
+                                item: _KeyPathHashIdentifiableValue(value: item, keyPath: \.hashValue),
                                 section: section[keyPath: id]
                             )
                         }

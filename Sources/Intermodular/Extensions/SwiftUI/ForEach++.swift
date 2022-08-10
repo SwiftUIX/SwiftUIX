@@ -19,7 +19,7 @@ extension ForEach where Content: View {
     public init<_Element>(
         _ data: Data,
         @ViewBuilder content: @escaping (_Element) -> Content
-    ) where Data.Element == KeyPathHashIdentifiableValue<_Element, ID> {
+    ) where Data.Element == _KeyPathHashIdentifiableValue<_Element, ID> {
         self.init(data) {
             content($0.value)
         }
@@ -146,8 +146,8 @@ extension Binding {
 extension RandomAccessCollection {
     public func elements<ID>(
         identifiedBy id: KeyPath<Element, ID>
-    ) -> AnyRandomAccessCollection<KeyPathHashIdentifiableValue<Element, ID>> {
-        .init(lazy.map({ KeyPathHashIdentifiableValue(value: $0, keyPath: id) }))
+    ) -> AnyRandomAccessCollection<_KeyPathHashIdentifiableValue<Element, ID>> {
+        .init(lazy.map({ _KeyPathHashIdentifiableValue(value: $0, keyPath: id) }))
     }
 }
 

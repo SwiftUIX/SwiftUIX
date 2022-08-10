@@ -150,6 +150,26 @@ extension View {
             destination: destination
         ))
     }
+
+    public func navigate<Selection: Identifiable, Destination: View>(
+        selection: Binding<Selection?>,
+        onDismiss: (() -> ())? = nil,
+        @ViewBuilder destination: @escaping (Selection) -> Destination
+    ) -> some View {
+        modifier(SelectionNavigator(
+            selection: Binding<_KeyPathHashable<Selection, Selection.ID>?>(
+                get: {
+                    selection.wrappedValue.map({ _KeyPathHashable($0, keyPath: \.id) })
+                }, set: {
+                    selection.wrappedValue = $0?.root
+                }
+            ),
+            onDismiss: onDismiss,
+            destination: {
+                destination($0.root)
+            }
+        ))
+    }
 }
 
 // MARK: - Auxiliary Implementation -
