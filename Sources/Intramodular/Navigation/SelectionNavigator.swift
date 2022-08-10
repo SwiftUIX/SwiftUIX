@@ -139,6 +139,7 @@ extension View {
 }
 
 extension View {
+    @_disfavoredOverload
     public func navigate<Selection: Hashable, Destination: View>(
         selection: Binding<Selection?>,
         onDismiss: (() -> ())? = nil,
