@@ -17,6 +17,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
+      - name: Download all platforms if Xcode 14
+        if: ${{ matrix.xcode == '14.0' }}
+        run: |
+          xcodebuild -downloadAllPlatforms
       - name: Bundle install
         run: |
           bundle install
