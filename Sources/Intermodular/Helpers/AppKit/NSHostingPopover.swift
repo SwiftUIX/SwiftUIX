@@ -9,8 +9,6 @@ import Swift
 import SwiftUI
 
 open class NSHostingPopover<Content: View>: NSPopover {
-    private var presentationManager: PresentationManager!
-    
     private var _contentViewController: CocoaHostingController<ContentWrapper> {
         contentViewController as! CocoaHostingController<ContentWrapper>
     }
@@ -28,9 +26,12 @@ open class NSHostingPopover<Content: View>: NSPopover {
     public init(rootView: Content) {
         super.init()
         
-        presentationManager = .init(self)
-        
-        let contentViewController = CocoaHostingController(mainView: ContentWrapper(content: rootView, owner: self))
+        let contentViewController = CocoaHostingController(
+            mainView: ContentWrapper(
+                content: rootView,
+                parent: self
+            )
+        )
         
         contentViewController.parentPopover = self
         
@@ -41,6 +42,28 @@ open class NSHostingPopover<Content: View>: NSPopover {
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override open func show(
+        relativeTo positioningRect: NSRect,
+        of positioningView: NSView,
+        preferredEdge: NSRectEdge
+    ) {
+        if _areAnimationsDisabledGlobally {
+            animates = false
+        }
+        
+        defer {
+            if _areAnimationsDisabledGlobally {
+                animates = true 
+            }
+        }
+
+        super.show(
+            relativeTo: positioningRect,
+            of: positioningView,
+            preferredEdge: preferredEdge
+        )
+    }
 }
 
 // MARK: - Auxiliary Implementation -
@@ -49,31 +72,35 @@ extension NSHostingPopover {
     private struct ContentWrapper: View {
         var content: Content
         
-        weak var owner: NSHostingPopover?
+        weak var parent: NSHostingPopover?
         
         var body: some View {
-            if let owner = owner {
+            if let parent = parent {
                 content
-                    .environment(\.presentationManager, owner.presentationManager)
+                    .environment(\.presentationManager, PresentationManager(parent))
                     .onChangeOfFrame { _ in
-                        owner._contentViewController.view.layout()
+                        parent._contentViewController.view.layout()
                     }
             }
         }
     }
     
-    private class PresentationManager: SwiftUIX.PresentationManager {
-        private unowned let popover: NSHostingPopover
+    private struct PresentationManager: SwiftUIX.PresentationManager {
+        weak var popover: NSHostingPopover?
         
         public var isPresented: Bool {
-            popover.isShown
+            popover?.isShown ?? false
         }
         
-        public init(_ popover: NSHostingPopover)  {
+        public init(_ popover: NSHostingPopover?)  {
             self.popover = popover
         }
         
         public func dismiss() {
+            guard let popover = popover else {
+                return assertionFailure()
+            }
+            
             popover.performClose(nil)
         }
     }

@@ -8,21 +8,17 @@ import AppKit
 import Swift
 import SwiftUI
 
-class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
-    var _statusBarBase = NSStatusBar()
-    var _statusItemBase: NSStatusItem? {
+public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
+    var item: MenuBarItem<ID, Content> {
         didSet {
-            _statusItemBase?.button?.action = #selector(togglePopover(sender:))
-            _statusItemBase?.button?.target = self
+            menuBarItemManager.item = item
         }
     }
-    
-    var statusBarItem: StatusBarItem<ID, Content> {
-        didSet {
-            updateStatusBarItem(oldValue: oldValue)
-        }
-    }
-    
+
+    private lazy var menuBarItemManager: MenuBarItemCoordinator<ID, Content> = .init(item: item, action: { [weak self] in
+        self?.togglePopover(sender: nil)
+    })
+
     var isActive: Binding<Bool>? {
         didSet {
             if let isActive = isActive {
@@ -33,68 +29,26 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
         }
     }
     
-    init(item: StatusBarItem<ID, Content>) {
-        self.statusBarItem = item
+    public init(item: MenuBarItem<ID, Content>) {
+        self.item = item
         
         super.init(rootView: item.content)
         
+        menuBarItemManager.item = item
+        
         behavior = NSPopover.Behavior.transient
-        
-        updateStatusBarItem(oldValue: item)
-        
+                        
         _ = Unmanaged.passUnretained(self).retain() // fixes a crash
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func updateStatusBarItem(oldValue: StatusBarItem<ID, Content>) {
-        if let item = _statusItemBase {
-            if oldValue.id != statusBarItem.id {
-                _statusBarBase.removeStatusItem(item)
-                _statusItemBase = nil
-            }
-            
-            if oldValue.length != statusBarItem.length {
-                _statusBarBase.removeStatusItem(item)
-                _statusItemBase = nil
-            }
-        }
-        
-        rootView = statusBarItem.content
-        
-        if let item = _statusItemBase {
-            statusBarItem.update(item)
-        } else {
-            _statusItemBase = _statusBarBase.statusItem(withLength: statusBarItem.length)
-        }
         
         if let isActive = isActive, isActive.wrappedValue, !isShown {
             present(nil)
         }
     }
     
-    private func present(_ sender: AnyObject?) {
-        guard let statusBarButton = _statusItemBase?.button else {
-            return
-        }
-        
-        show(
-            relativeTo: statusBarButton.bounds,
-            of: statusBarButton,
-            preferredEdge: NSRectEdge.maxY
-        )
-        
-        isActive?.wrappedValue = true
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-    
-    private func hide(_ sender: AnyObject?) {
-        performClose(sender)
-
-        isActive?.wrappedValue = false
-    }
-    
+        
     @objc func togglePopover(sender: AnyObject?) {
         if isShown {
             hide(sender)
@@ -102,11 +56,31 @@ class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<
             present(sender)
         }
     }
-    
-    deinit {
-        if let item = _statusItemBase {
-            item.statusBar?.removeStatusItem(item)
+
+    private func present(_ sender: AnyObject?) {
+        guard let statusBarButton = menuBarItemManager.cocoaStatusItem.button else {
+            return
         }
+        
+        NSApp.activate(ignoringOtherApps: true)
+
+        animates = false
+        
+        show(
+            relativeTo: statusBarButton.bounds,
+            of: statusBarButton,
+            preferredEdge: NSRectEdge.maxY
+        )
+        
+        animates = true
+        
+        isActive?.wrappedValue = true
+    }
+    
+    private func hide(_ sender: AnyObject?) {
+        performClose(nil)
+
+        isActive?.wrappedValue = false
     }
 }
 
