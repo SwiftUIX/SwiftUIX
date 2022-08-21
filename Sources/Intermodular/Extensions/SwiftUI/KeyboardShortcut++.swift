@@ -16,6 +16,10 @@ extension KeyboardShortcut {
     }
 
     public init?(from event: NSEvent) {
+        guard let characters = event.charactersIgnoringModifiers, !characters.isEmpty else {
+            return nil
+        }
+        
         guard let key = event.charactersIgnoringModifiers.map(Character.init) else {
             return nil
         }
@@ -30,26 +34,71 @@ extension KeyboardShortcut {
 
 // MARK: - Auxiliary Implementation -
 
+extension SwiftUI.EventModifiers {
+    public func toCGEventFlags() -> CGEventFlags {
+        var result: CGEventFlags = []
+        
+        if contains(.capsLock) {
+            result.insert(CGEventFlags.maskAlphaShift)
+        }
+        
+        if contains(.shift) {
+            result.insert(CGEventFlags.maskShift)
+        }
+        
+        if contains(.control) {
+            result.insert(CGEventFlags.maskControl)
+        }
+        
+        if contains(.option) {
+            result.insert(CGEventFlags.maskAlternate)
+        }
+        
+        if contains(.command) {
+            result.insert(CGEventFlags.maskCommand)
+        }
+        
+        if contains(.numericPad) {
+            result.insert(CGEventFlags.maskNumericPad)
+        }
+        
+        return result
+    }
+}
+
 extension EventModifiers {
     fileprivate var appKitModifierFlags: NSEvent.ModifierFlags {
-        switch self {
-            case .capsLock:
-                return .capsLock
-            case .shift:
-                return .shift
-            case .control:
-                return .control
-            case .option:
-                return .control
-            case .command:
-                return .command
-            case .numericPad:
-                return .numericPad
-            case .function:
-                return .function
-            default:
-                fatalError()
+        var result: NSEvent.ModifierFlags = []
+        
+        if contains(.capsLock) {
+            result.insert(.capsLock)
         }
+        
+        if contains(.shift) {
+            result.insert(.shift)
+        }
+        
+        if contains(.control) {
+            result.insert(.control)
+        }
+        
+        if contains(.option) {
+            result.insert(.option)
+        }
+        
+        if contains(.command) {
+            result.insert(.command)
+        }
+
+        if contains(.numericPad) {
+            result.insert(.numericPad)
+        }
+        
+        if contains(.function) {
+            result.insert(.function)
+        }
+        
+        return result
     }
 
     fileprivate init(from modifierFlags: NSEvent.ModifierFlags) {
