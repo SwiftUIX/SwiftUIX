@@ -16,6 +16,7 @@ fileprivate struct HideTitleBar: ViewModifier {
                 .onChange(of: viewController, perform: { updateTitlebar(for: $0) })
                 .onChange(of: isHidden, perform: { _ in updateTitlebar(for: viewController) })
         }
+        .preference(key: _SwiftUIX_WindowPreferenceKeys.TitleBarIsHidden.self, value: isHidden)
         #else
         return content
         #endif
@@ -51,6 +52,8 @@ fileprivate struct HideTitleBar: ViewModifier {
     }
     #endif
 }
+
+// MARK: - API -
 
 extension View {
     /// Hides the title bar (if any) for this view.
