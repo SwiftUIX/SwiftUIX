@@ -3,7 +3,7 @@
 //
 
 @available(iOS 13, *)
-@available(tvOS, unavailable)
+@available(tvOS 16.0, *)
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 public struct _HoverEffectViewModifier: ViewModifier {
@@ -15,7 +15,11 @@ public struct _HoverEffectViewModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         if #available(iOS 13.4, iOSApplicationExtension 14.0, macCatalystApplicationExtension 14.0, *) {
+            #if compiler(>=5.7) || !os(tvOS)
             return content.hoverEffect(.init(hoverEffect))
+            #else
+            return content
+            #endif
         } else {
             fatalError("Use View.hoverEffectIfAvailable instead.")
         }
@@ -23,7 +27,7 @@ public struct _HoverEffectViewModifier: ViewModifier {
 }
 
 @available(iOS 13, *)
-@available(tvOS, unavailable)
+@available(tvOS 16.0, *)
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 extension View {

@@ -2,13 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if swift(>=5.2)
-
 import SwiftUI
 
 /// A type to mirror `SwiftUI.HoverEffect`, added for compatibility.
 @available(iOS 13, *)
-@available(tvOS, unavailable)
+@available(tvOS 16.0, *)
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 public enum HoverEffect {
@@ -18,6 +16,7 @@ public enum HoverEffect {
     
     /// An effect  that morphs the pointer into a platter behind the view
     /// and shows a light source indicating position.
+    @available(tvOS, unavailable)
     case highlight
     
     /// An effect that slides the pointer under the view and disappears as the
@@ -25,11 +24,32 @@ public enum HoverEffect {
     case lift
 }
 
+#if compiler(>=5.7) || !os(tvOS)
+@available(iOS 13.4, *)
+@available(tvOS 16.0, *)
+@available(watchOS, unavailable)
+@available(OSX, unavailable)
+extension SwiftUI.HoverEffect {
+    public init(_ hoverEffect: HoverEffect) {
+        switch hoverEffect {
+            case .automatic:
+                self = .automatic
+            #if !os(tvOS)
+            case .highlight:
+                self = .highlight
+            #endif
+            case .lift:
+                self = .lift
+        }
+    }
+}
+#else
 @available(iOS 13.4, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 extension SwiftUI.HoverEffect {
+    @available(tvOS 16.0, *)
     public init(_ hoverEffect: HoverEffect) {
         switch hoverEffect {
             case .automatic:
@@ -41,9 +61,11 @@ extension SwiftUI.HoverEffect {
         }
     }
 }
+#endif
 
+#if compiler(>=5.7) || !os(tvOS)
 @available(iOS 13.4, *)
-@available(tvOS, unavailable)
+@available(tvOS 16.0, *)
 @available(watchOS, unavailable)
 @available(OSX, unavailable)
 extension View {
@@ -55,5 +77,4 @@ extension View {
         hoverEffect(SwiftUI.HoverEffect(effect))
     }
 }
-
 #endif
