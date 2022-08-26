@@ -111,12 +111,11 @@ public class MenuBarItemCoordinator<ID: Equatable, Content: View> {
         cocoaStatusItem.button?.action = #selector(didActivate)
         cocoaStatusItem.button?.target = self
         
-        Task { @MainActor in
-            update()
+        DispatchQueue.asyncOnMainIfNecessary {
+            self.update()
         }
     }
     
-    @MainActor
     private func update() {
         cocoaStatusItem.update(from: item)
     }
