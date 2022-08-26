@@ -76,12 +76,22 @@ final class ObservableReferenceBox<T>: ObservableObject {
     }
 }
 
+@propertyWrapper
 @usableFromInline
 final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
     @usableFromInline
     weak var value: T? {
         willSet {
             objectWillChange.send()
+        }
+    }
+    
+    @usableFromInline
+    var wrappedValue: T? {
+        get {
+            value
+        } set {
+            value = newValue
         }
     }
     
