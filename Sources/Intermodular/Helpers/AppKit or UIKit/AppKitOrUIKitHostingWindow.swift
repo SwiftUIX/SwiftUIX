@@ -127,17 +127,22 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     
     #if os(macOS)
     public convenience init(rootView: Content) {
-        let contentViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: nil, content: rootView))
-        
+        let contentViewController = CocoaHostingController(
+            mainView: AppKitOrUIKitHostingWindowContent(
+                windowBox: .init(nil),
+                content: rootView
+            )
+        )
+
         self.init(contentViewController: contentViewController)
                     
-        delegate = self 
+        delegate = self
     }
     #else
     public init(windowScene: UIWindowScene, rootView: Content) {
         super.init(windowScene: windowScene)
         
-        rootViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(window: self, content: rootView))
+        rootViewController = CocoaHostingController(mainView: AppKitOrUIKitHostingWindowContent(windowBox: .init(self), content: rootView))
         rootViewController!.view.backgroundColor = .clear
         
         performSetUp()
@@ -161,21 +166,21 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         guard configuration.allowTouchesToPassThrough else {
             return super.hitTest(point, with: event)
         }
-
+        
         let result = super.hitTest(point, with: event)
-
+        
         if result == rootViewController?.view {
             return nil
         }
-
+        
         return result
     }
-
+    
     override public func makeKey() {
         guard configuration.canBecomeKey else {
             return
         }
-
+        
         super.makeKey()
     }
     #elseif os(macOS)
@@ -198,7 +203,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     
     public func show() {
         #if os(macOS)
-        rootHostingViewController = .init(mainView: .init(window: self, content: rootView))
+        rootHostingViewController.mainView.windowBox.wrappedValue = self
         contentWindowController = contentWindowController ?? NSWindowController(window: self)
         contentWindowController?.showWindow(self)
         #else
@@ -212,12 +217,10 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     }
     
     public func hide() {
-        #if os(macOS)
+        #if os(macOS)        
         contentWindowController?.close()
-        
-        rootHostingViewController = .init(mainView: .init(window: nil, content: rootView))
-        
-        tearDownWindowController()
+                
+        tearDownWindow()
         #else
         isHidden = true
         isUserInteractionEnabled = false
@@ -252,14 +255,14 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     public func windowWillClose(_ notification: Notification) {
         _NSWindow_didWindowJustClose = true
 
-        tearDownWindowController()
+        tearDownWindow()
         
         DispatchQueue.main.async {
             self.isVisibleBinding.wrappedValue = false
         }
     }
     
-    private func tearDownWindowController() {
+    private func tearDownWindow() {
         #if os(macOS)
         contentWindowController?.window = nil
         contentWindowController = nil
@@ -294,7 +297,7 @@ extension View {
     public func windowAllowsTouchesToPassThrough(_ allowed: Bool) -> some View {
         preference(key: _SwiftUIX_WindowPreferenceKeys.AllowsTouchesToPassThrough.self, value: allowed)
     }
-
+    
     /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
@@ -329,14 +332,14 @@ enum _SwiftUIX_WindowPreferenceKeys {
     final class TitleBarIsHidden: TakeLastPreferenceKey<Bool> {
         
     }
-
+    
     final class BackgroundColor: TakeLastPreferenceKey<Color> {
         
     }
 }
 
 fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
-    weak var window: AppKitOrUIKitHostingWindow<Content>?
+    @ObservedObject var windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
     
     var content: Content
     var isPresented: Bool = false
@@ -344,18 +347,18 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @State var queuedWindowUpdates: [(AppKitOrUIKitHostingWindow<Content>) -> Void] = []
     
     private var presentationManager: _PresentationManager {
-        _PresentationManager(window: window)
+        _PresentationManager(windowBox: windowBox)
     }
     
     public var body: some View {
         Group {
-            if window != nil {
+            if windowBox.wrappedValue != nil {
                 LazyAppearView {
                     content
                 }
             }
         }
-        .environment(\._windowProxy, WindowProxy(window: window))
+        .environment(\._windowProxy, WindowProxy(window: windowBox.wrappedValue))
         .onPreferenceChange(_SwiftUIX_WindowPreferenceKeys.AllowsTouchesToPassThrough.self) { allowTouchesToPassThrough in
             queueWindowUpdate {
                 $0.configuration.allowTouchesToPassThrough = allowTouchesToPassThrough ?? false
@@ -378,22 +381,22 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
         }
         .environment(\.presentationManager, presentationManager)
         .id(isPresented)
-        .onChange(of: window != nil) { [weak window] isWindowNotNil in
+        .onChange(of: windowBox.wrappedValue != nil) { isWindowNotNil in
             if isWindowNotNil {
-                queuedWindowUpdates.forEach({ $0(window!) })
+                queuedWindowUpdates.forEach({ $0(windowBox.wrappedValue!) })
                 queuedWindowUpdates = []
             }
         }
-        .onChangeOfFrame { [weak window] _ in
+        .onChangeOfFrame { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) {
-                window?.applyPreferredConfiguration()
+                windowBox.wrappedValue?.applyPreferredConfiguration()
             }
         }
-        .id(window != nil)
+        .id(windowBox.wrappedValue != nil)
     }
     
     func queueWindowUpdate(_ update: @escaping (AppKitOrUIKitHostingWindow<Content>) -> Void) {
-        if let window = window {
+        if let window = windowBox.wrappedValue {
             update(window)
         } else {
             queuedWindowUpdates.append(update)
@@ -401,24 +404,24 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     }
     
     struct _PresentationManager: PresentationManager {
-        weak var window: AppKitOrUIKitHostingWindow<Content>?
-
-        init(window: AppKitOrUIKitHostingWindow<Content>?) {
-            self.window = window
-        }
+        let windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
         
         var isPresented: Bool {
-            window?.isHidden == false
+            (windowBox.wrappedValue?.isHidden ?? false) == true
         }
-        
+
+        init(windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>) {
+            self.windowBox = windowBox
+        }
+                
         func dismiss() {
             #if os(macOS)
-            window?.close()
+            windowBox.wrappedValue?.close()
             #else
-            window?.isHidden = true
+            windowBox.wrappedValue?.isHidden = true
             #endif
             
-            window?.isVisibleBinding.wrappedValue = false
+            windowBox.wrappedValue?.isVisibleBinding.wrappedValue = false
         }
     }
 }

@@ -8,35 +8,35 @@ import AppKit
 import Swift
 import SwiftUI
 
-open class NSHostingPopover<Content: View>: NSPopover {
+/// An AppKit popover that hosts SwiftUI view hierarchy.
+open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate {
     private var _contentViewController: CocoaHostingController<ContentWrapper> {
-        contentViewController as! CocoaHostingController<ContentWrapper>
+        if let contentViewController = contentViewController {
+            return contentViewController as! CocoaHostingController<ContentWrapper>
+        } else {
+            let contentViewController = CocoaHostingController<ContentWrapper>(mainView: .init(parentBox: .init(nil), content: rootView))
+            
+            self.contentViewController = contentViewController
+            
+            return contentViewController
+        }
     }
     
     public var rootView: Content {
-        get {
-            _contentViewController.mainView.content
-        } set {
-            _contentViewController.mainView.content = newValue
-            
+        didSet {
+            _contentViewController.mainView.content = rootView
             _contentViewController.view.layout()
         }
     }
     
     public init(rootView: Content) {
+        self.rootView = rootView
+        
         super.init()
         
-        let contentViewController = CocoaHostingController(
-            mainView: ContentWrapper(
-                content: rootView,
-                parent: self
-            )
-        )
-        
-        contentViewController.parentPopover = self
+        _contentViewController.parentPopover = self
         
         self.animates = true
-        self.contentViewController = contentViewController
     }
     
     public required init?(coder: NSCoder) {
@@ -48,21 +48,29 @@ open class NSHostingPopover<Content: View>: NSPopover {
         of positioningView: NSView,
         preferredEdge: NSRectEdge
     ) {
+        _contentViewController.mainView.parentBox.wrappedValue = self
+        
         if _areAnimationsDisabledGlobally {
             animates = false
         }
         
         defer {
             if _areAnimationsDisabledGlobally {
-                animates = true 
+                animates = true
             }
         }
-
+        
         super.show(
             relativeTo: positioningRect,
             of: positioningView,
             preferredEdge: preferredEdge
         )
+    }
+    
+    // MARK: - NSPopoverDelegate -
+    
+    public func popoverDidClose(_ notification: Notification) {
+        contentViewController = nil
     }
 }
 
@@ -70,34 +78,34 @@ open class NSHostingPopover<Content: View>: NSPopover {
 
 extension NSHostingPopover {
     private struct ContentWrapper: View {
+        var parentBox: ObservableWeakReferenceBox<NSHostingPopover>
+        
         var content: Content
         
-        weak var parent: NSHostingPopover?
-        
         var body: some View {
-            if let parent = parent {
+            if parentBox.wrappedValue != nil {
                 content
-                    .environment(\.presentationManager, PresentationManager(parent))
+                    .environment(\.presentationManager, PresentationManager(parentBox))
                     .onChangeOfFrame { _ in
-                        parent._contentViewController.view.layout()
+                        parentBox.wrappedValue?._contentViewController.view.layout()
                     }
             }
         }
     }
     
     private struct PresentationManager: SwiftUIX.PresentationManager {
-        weak var popover: NSHostingPopover?
+        public let popoverBox: ObservableWeakReferenceBox<NSHostingPopover>
         
         public var isPresented: Bool {
-            popover?.isShown ?? false
+            popoverBox.wrappedValue?.isShown ?? false
         }
         
-        public init(_ popover: NSHostingPopover?)  {
-            self.popover = popover
+        public init(_ popoverBox: ObservableWeakReferenceBox<NSHostingPopover>)  {
+            self.popoverBox = popoverBox
         }
         
         public func dismiss() {
-            guard let popover = popover else {
+            guard let popover = popoverBox.wrappedValue else {
                 return assertionFailure()
             }
             
