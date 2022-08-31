@@ -68,9 +68,6 @@ extension WindowOverlay {
         var canBecomeKey: Bool
         var isVisible: Binding<Bool>
         var contentWindow: AppKitOrUIKitHostingWindow<Content>?
-        #if os(macOS)
-        var contentWindowController: NSWindowController?
-        #endif
         
         init(content: Content, canBecomeKey: Bool, isVisible: Binding<Bool>) {
             self.content = content
@@ -104,47 +101,22 @@ extension WindowOverlay {
                     rootView: content
                 )
                 #endif
-                
-                if self.contentWindow == nil {
-                    #if os(macOS)
-                    NotificationCenter.default.addObserver(self, selector: #selector(Self.windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
-                    #endif
-                }
-                
+                                
                 self.contentWindow = contentWindow
-                #if os(macOS)
-                self.contentWindowController = .init(window: contentWindow)
-                #endif
                 
                 contentWindow.rootView = content
-                contentWindow._canBecomeKey = canBecomeKey
+                contentWindow.configuration.canBecomeKey = canBecomeKey
+               
                 contentWindow.isVisibleBinding = isVisible
                 
-                #if os(macOS)
-                contentWindow.title = ""
-                contentWindowController?.showWindow(self)
-                #else
-                contentWindow.canResizeToFitContent = true
-                contentWindow.isHidden = false
-                contentWindow.isUserInteractionEnabled = true
+                #if os(iOS) || os(tvOS)
                 contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
-
-                contentWindow.makeKeyAndVisible()
-                
-                contentWindow.rootViewController?.view.setNeedsDisplay()
                 #endif
+                
+                contentWindow.show()
             } else {
-                if let contentWindow = contentWindow {
-                    #if os(macOS)
-                    contentWindow.close()
-                    #else
-                    contentWindow.isHidden = true
-                    contentWindow.isUserInteractionEnabled = false
-                    contentWindow.windowScene = nil
-
-                    self.contentWindow = nil
-                    #endif
-                }
+                contentWindow?.hide()
+                contentWindow = nil
             }
         }
         
@@ -157,15 +129,6 @@ extension WindowOverlay {
             super.didMove(toParent: parent)
             
             updateWindow()
-        }
-        #endif
-        
-        #if os(macOS)
-        @objc
-        public func windowWillClose(_ notification: Notification?) {
-            if (notification?.object as? AppKitOrUIKitHostingWindow<Content>) === contentWindow {
-                isVisible.wrappedValue = false
-            }
         }
         #endif
     }
@@ -196,6 +159,63 @@ extension View {
         @ViewBuilder _ content: () -> Content
     ) -> some View {
         background(WindowOverlay(content: content(), canBecomeKey: true, isVisible: isKeyAndVisible))
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+public struct WindowProxy {
+    weak var window: AppKitOrUIKitHostingWindowProtocol?
+    
+    public func orderFrontRegardless() {
+        guard let window = window else {
+            return assertionFailure()
+        }
+        
+        #if os(macOS)
+        window.orderFrontRegardless()
+        #endif
+    }
+    
+    public func setMaximumLevel() {
+        guard let window = window else {
+            return assertionFailure()
+        }
+        
+        #if os(iOS) || os(tvOS)
+        fatalError()
+        #elseif os(macOS)
+        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        window.level = .screenSaver
+        #endif
+    }
+}
+
+public struct WindowReader<Content: View>: View {
+    @Environment(\._windowProxy) var _windowProxy: WindowProxy
+    
+    let content: (WindowProxy) -> Content
+    
+    public init(@ViewBuilder content: @escaping (WindowProxy) -> Content) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(_windowProxy)
+    }
+}
+
+extension EnvironmentValues {
+    struct _WindowProxyKey: EnvironmentKey {
+        static let defaultValue: WindowProxy = .init(window: nil)
+    }
+    
+    var _windowProxy: WindowProxy {
+        get {
+            self[_WindowProxyKey.self]
+        } set {
+            self[_WindowProxyKey.self] = newValue
+        }
     }
 }
 

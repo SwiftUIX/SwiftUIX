@@ -71,7 +71,7 @@ public struct DynamicActionButton<Action: DynamicAction, Label: View>: View {
 extension View {
     /// Adds an action to perform when this view recognizes a tap gesture.
     @available(iOS 13.0, macOS 10.15, watchOS 6.0, *)
-    @available(tvOS, unavailable)
+    @available(tvOS 16.0, *)
     public func onTapGesture<A: DynamicAction>(perform action: A) -> some View {
         modifier(_AddDynamicActionOnTapGesture(action: action))
     }
@@ -111,15 +111,19 @@ public struct _ExtendedDynamicAction<A: DynamicAction>: DynamicAction {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0, *)
-@available(tvOS, unavailable)
+@available(iOS 13.0, macOS 10.15, tvOS 16.0, watchOS 6.0, *)
+@available(tvOS 16.0, *)
 struct _AddDynamicActionOnTapGesture<Action: DynamicAction>: ViewModifier {
     let action: Action
 
     func body(content: Content) -> some View {
+        #if compiler(>=5.7) || !os(tvOS)
         content.onTapGesture {
             action.perform()
         }
+        #else
+        content
+        #endif
     }
 }
 

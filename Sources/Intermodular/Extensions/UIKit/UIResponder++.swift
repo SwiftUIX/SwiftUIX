@@ -37,7 +37,7 @@ extension UIResponder {
 }
 
 extension UIResponder {
-    open func nearestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
+    public func nearestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
         guard !isKind(of: kind) else {
             return (self as! Responder)
         }
@@ -49,11 +49,11 @@ extension UIResponder {
         return next?.furthestResponder(ofKind: kind, default: self as? Responder) ?? _default
     }
     
-    open func furthestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
+    public func furthestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
         return furthestResponder(ofKind: kind, default: nil)
     }
     
-    open func forEach<Responder: UIResponder>(ofKind kind: Responder.Type, recursive iterator: (Responder) throws -> ()) rethrows {
+    public func forEach<Responder: UIResponder>(ofKind kind: Responder.Type, recursive iterator: (Responder) throws -> ()) rethrows {
         if isKind(of: kind) {
             try iterator(self as! Responder)
         }

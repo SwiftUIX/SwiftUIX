@@ -8,7 +8,7 @@ import Swift
 import UIKit
 
 extension UIViewController {
-    open var root: UIViewController? {
+    public var root: UIViewController? {
         var parent = self.parent
         
         while let _parent = parent?.parent {
@@ -20,7 +20,7 @@ extension UIViewController {
 }
 
 extension UIViewController {
-    open var topmostNavigationController: UINavigationController? {
+    public var topmostNavigationController: UINavigationController? {
         topmostViewController?.nearestNavigationController ?? nearestNavigationController
     }
     

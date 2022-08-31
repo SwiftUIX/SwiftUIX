@@ -93,7 +93,13 @@ extension UIScrollView {
         if let alwaysBounceHorizontal = configuration.alwaysBounceHorizontal {
             assignIfNotEqual(alwaysBounceHorizontal, to: &self.alwaysBounceHorizontal)
         }
-                
+           
+        if alwaysBounceVertical || alwaysBounceHorizontal {
+            bounces = true
+        } else if !alwaysBounceVertical && !alwaysBounceHorizontal {
+            bounces = false
+        }
+        
         assignIfNotEqual(configuration.isDirectionalLockEnabled, to: &isDirectionalLockEnabled)
         assignIfNotEqual(configuration.isScrollEnabled, to: &isScrollEnabled)
         assignIfNotEqual(configuration.showsVerticalScrollIndicator, to: &showsVerticalScrollIndicator)

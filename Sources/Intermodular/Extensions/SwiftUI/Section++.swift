@@ -19,25 +19,6 @@ extension Section {
     }
 }
 
-extension Section where Parent: View, Content: View, Footer: View {
-    public init(
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder header: () -> Parent,
-        @ViewBuilder footer: () -> Footer
-    ) {
-        self.init(header: header(), footer: footer(), content: content)
-    }
-}
-
-extension Section where Parent: View, Content: View, Footer == EmptyView {
-    public init(
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder header: () -> Parent
-    ) {
-        self.init(header: header(), footer: EmptyView(), content: content)
-    }
-}
-
 extension Section where Parent == Text, Content: View, Footer == EmptyView {
     @_disfavoredOverload
     public init<S: StringProtocol>(_ header: S, @ViewBuilder content: () -> Content) {

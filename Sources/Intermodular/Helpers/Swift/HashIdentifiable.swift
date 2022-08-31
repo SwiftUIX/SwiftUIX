@@ -22,12 +22,12 @@ extension HashIdentifiable {
 
 extension Hashable {
     @inlinable
-    public var hashIdentifiable: HashIdentifiableValue<Self> {
+    public var hashIdentifiable: _HashIdentifiableValue<Self> {
         return .init(self)
     }
 }
 
-public struct HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, HashIdentifiable {
+public struct _HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, HashIdentifiable {
     public let value: Value
     
     public var description: String {
@@ -40,7 +40,25 @@ public struct HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, H
     }
 }
 
-public struct KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
+public struct _KeyPathHashable<Root, Value: Hashable>: Hashable {
+    public let root: Root
+    public let keyPath: KeyPath<Root, Value>
+
+    public init(_ root: Root, keyPath: KeyPath<Root, Value>) {
+        self.root = root
+        self.keyPath = keyPath
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(root[keyPath: keyPath])
+    }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.root[keyPath: lhs.keyPath] == rhs.root[keyPath: rhs.keyPath]
+    }
+}
+
+public struct _KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
     public let value: Value
     public let keyPath: KeyPath<Value, ID>
     
@@ -58,13 +76,13 @@ public struct KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringCon
     }
 }
 
-extension KeyPathHashIdentifiableValue: Equatable where Value: Equatable {
+extension _KeyPathHashIdentifiableValue: Equatable where Value: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.value == rhs.value
     }
 }
 
-extension KeyPathHashIdentifiableValue: Hashable where Value: Hashable {
+extension _KeyPathHashIdentifiableValue: Hashable where Value: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(value)
     }
