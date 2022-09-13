@@ -12,14 +12,14 @@ import SwiftUI
 /// A model that represents an item which can be placed in the menu bar.
 public struct MenuBarItem<ID, Content: View> {
     public let id: ID
-    public let length: CGFloat
+    public let length: CGFloat?
     public let image: ImageName
     public let imageSize: CGSize
     public let content: Content
     
     public init(
         id: ID,
-        length: CGFloat = 28.0,
+        length: CGFloat? = 28.0,
         image: ImageName,
         imageSize: CGSize = .init(width: 18.0, height: 18.0),
         @ViewBuilder content: () -> Content
@@ -106,7 +106,7 @@ public class MenuBarItemCoordinator<ID: Equatable, Content: View> {
         self.item = item
         self.action = action
         
-        cocoaStatusItem = cocoaStatusBar.statusItem(withLength: item.length)
+        cocoaStatusItem = cocoaStatusBar.statusItem(withLength: item.length ?? NSStatusItem.variableLength)
         
         cocoaStatusItem.button?.action = #selector(didActivate)
         cocoaStatusItem.button?.target = self
@@ -131,7 +131,7 @@ public class MenuBarItemCoordinator<ID: Equatable, Content: View> {
 
 extension NSStatusItem {
     fileprivate func update<ID, Content>(from item: MenuBarItem<ID, Content>) {
-        self.length = item.length
+        self.length = item.length ?? NSStatusItem.variableLength
         
         if let button = button {
             button.image = AppKitOrUIKitImage(named: item.image)

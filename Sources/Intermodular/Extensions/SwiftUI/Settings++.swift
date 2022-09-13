@@ -12,6 +12,8 @@ import SwiftUI
 extension Settings where Content == AnyView {
     public static func show() {
         #if os(macOS)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+
         if #available(macOS 13.0, *) {
             NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         } else {

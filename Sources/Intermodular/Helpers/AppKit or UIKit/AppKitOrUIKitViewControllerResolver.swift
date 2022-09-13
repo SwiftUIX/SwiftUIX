@@ -204,7 +204,9 @@ private struct _WithAppKitOrUIKitViewController<Content: View>: View {
         content(appKitOrUIKitViewControllerBox.value)
             .onAppKitOrUIKitViewControllerResolution { viewController in
                 if viewController !== appKitOrUIKitViewControllerBox.value {
-                    appKitOrUIKitViewControllerBox.value = viewController
+                    DispatchQueue.main.async {
+                        appKitOrUIKitViewControllerBox.value = viewController
+                    }
                 }
             }
     }
@@ -238,13 +240,15 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
                 return
             }
 
-            if !(_appKitOrUIKitViewControllerBox.value === viewController) {
-                _appKitOrUIKitViewControllerBox.value = viewController
-            }
+            DispatchQueue.main.async {
+                if !(_appKitOrUIKitViewControllerBox.value === viewController) {
+                    _appKitOrUIKitViewControllerBox.value = viewController
+                }
 
-            if !(presentationCoordinatorBox.value === viewController._cocoaPresentationCoordinator) {
-                presentationCoordinatorBox.value =
-                viewController.presentationCoordinator
+                if !(presentationCoordinatorBox.value === viewController._cocoaPresentationCoordinator) {
+                    presentationCoordinatorBox.value =
+                    viewController.presentationCoordinator
+                }
             }
         }
         .background {

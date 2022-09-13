@@ -50,26 +50,56 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     #if os(macOS)
     var contentWindowController: NSWindowController?
     #endif
+    
+    /// A copy of the root view for when the `contentViewController` is deinitialized (for macOS windows).
+    fileprivate var copyOfRootView: Content?
 
-    fileprivate var rootHostingViewController: CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>> {
+    fileprivate var rootHostingViewController: CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>! {
         get {
             #if os(macOS)
-            return contentViewController as! CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
+            if let contentViewController = contentViewController as? CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>> {
+                return contentViewController
+            } else {
+                let contentViewController = CocoaHostingController(
+                    mainView: AppKitOrUIKitHostingWindowContent(
+                        windowBox: .init(self),
+                        content: copyOfRootView!
+                    )
+                )
+
+                copyOfRootView = nil
+                
+                self.contentViewController = contentViewController
+                
+                return contentViewController
+            }
             #else
-            return rootViewController as! CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
+            return rootViewController as? CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>
             #endif
         } set {
-            #if os(macOS)
-            contentViewController = newValue
-            #else
-            rootViewController = newValue
-            #endif
+            if let newValue = newValue {
+                #if os(macOS)
+                contentViewController = newValue
+                #else
+                rootViewController = newValue
+                #endif
+            } else {
+                #if os(macOS)
+                if contentViewController != nil {
+                    copyOfRootView = rootView
+                    
+                    contentViewController = nil
+                }
+                #else
+                fatalError()
+                #endif
+            }
         }
     }
     
     var isVisibleBinding: Binding<Bool> = .constant(true)
     
-    var rootView: Content {
+    public var rootView: Content {
         get {
             rootHostingViewController.rootView.content.content
         } set {
@@ -94,6 +124,10 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     #endif
     
     public func applyPreferredConfiguration() {
+        guard !_NSWindow_didWindowJustClose else {
+            return
+        }
+        
         setWindowOrigin()
         
         #if os(iOS) || os(tvOS)
@@ -217,9 +251,15 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     }
     
     public func hide() {
-        #if os(macOS)        
-        contentWindowController?.close()
-                
+        #if os(macOS)
+        rootHostingViewController = nil
+
+        if let contentWindowController = contentWindowController {
+            contentWindowController.close()
+        } else {
+            close()
+        }
+
         tearDownWindow()
         #else
         isHidden = true

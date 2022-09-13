@@ -50,13 +50,17 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate {
     ) {
         _contentViewController.mainView.parentBox.wrappedValue = self
         
+        let _animates = self.animates
+        
         if _areAnimationsDisabledGlobally {
             animates = false
         }
         
         defer {
             if _areAnimationsDisabledGlobally {
-                animates = true
+                DispatchQueue.main.async {
+                    self.animates = _animates
+                }
             }
         }
         
