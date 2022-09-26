@@ -2,8 +2,6 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if !swift(>=5.3) // workaround for Xcode 12 beta 6
-
 import AuthenticationServices
 import Swift
 import SwiftUI
@@ -43,7 +41,5 @@ extension ASAuthorizationAppleIDButton.ButtonType {
         }
     }
 }
-
-#endif
 
 #endif
