@@ -89,7 +89,7 @@ extension SidebarVisibilityModifier.AppKitOrUIKitSidebarIntrospector {
                 return
             }
 
-            if let splitViewController = nearestSplitViewController {
+            if let splitViewController = _nearestSplitViewController {
                 if isSidebarInitiallyVisible && splitViewController.displayMode == .secondaryOnly {
                     UIView.performWithoutAnimation {
                         splitViewController.show(.primary)
