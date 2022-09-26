@@ -74,14 +74,17 @@ extension Color {
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension Color {
+    @_disfavoredOverload
     public static var brown: Color {
         return .init(.brown)
     }
     
+    @_disfavoredOverload
     public static var indigo: Color {
         .init(.systemIndigo)
     }
     
+    @_disfavoredOverload
     public static var teal: Color {
         .init(.systemTeal)
     }
