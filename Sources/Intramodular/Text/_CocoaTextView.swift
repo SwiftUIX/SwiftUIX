@@ -7,7 +7,8 @@
 import Swift
 import SwiftUI
 
-final class UIHostingTextView<Label: View>: UITextView {
+/// The main `UITextView` subclass used by `TextView`.
+final class _CocoaTextView<Label: View>: UITextView {
     var _isSwiftUIRuntimeUpdateActive: Bool = false
     var _isSwiftUIRuntimeDismantled: Bool = false
     
@@ -28,7 +29,31 @@ final class UIHostingTextView<Label: View>: UITextView {
         }
     }
     
-    var numberOfLinesDisplayed: Int {
+    override var keyCommands: [UIKeyCommand]? {
+        [
+            UIKeyCommand(
+                input: "\r",
+                modifierFlags: .shift ,
+                action: #selector(handleShiftEnter(command:))
+            )
+        ]
+    }
+    
+    @objc func handleShiftEnter(command: UIKeyCommand) {
+        if UserInterfaceIdiom.current == .mac {
+            if text != nil {
+                text.append("\n")
+            } else if let attributedText = attributedText {
+                let newAttributedText = NSMutableAttributedString(attributedString: attributedText)
+                
+                newAttributedText.append(.init(string: "\n"))
+                
+                self.attributedText = newAttributedText
+            }
+        }
+    }
+    
+    private var numberOfLinesDisplayed: Int {
         let numberOfGlyphs = layoutManager.numberOfGlyphs
         var index = 0, numberOfLines = 0
         var lineRange = NSRange(location: NSNotFound, length: 0)
@@ -49,8 +74,8 @@ final class UIHostingTextView<Label: View>: UITextView {
             }
             
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
-                ? AppKitOrUIKitLayoutPriority.defaultLow
-                : AppKitOrUIKitLayoutPriority.defaultHigh
+            ? AppKitOrUIKitLayoutPriority.defaultLow
+            : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -60,8 +85,8 @@ final class UIHostingTextView<Label: View>: UITextView {
             }
             
             let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
-                ? AppKitOrUIKitLayoutPriority.defaultLow
-                : AppKitOrUIKitLayoutPriority.defaultHigh
+            ? AppKitOrUIKitLayoutPriority.defaultLow
+            : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -187,10 +212,8 @@ final class UIHostingTextView<Label: View>: UITextView {
     }
 }
 
-// MARK: - Helpers -
-
-fileprivate extension UITextView {
-    func textHeight(forWidth width: CGFloat) -> CGFloat {
+extension _CocoaTextView {
+    private func textHeight(forWidth width: CGFloat) -> CGFloat {
         let storage = NSTextStorage(attributedString: attributedText)
         let width = bounds.width - textContainerInset.horizontal
         let containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)

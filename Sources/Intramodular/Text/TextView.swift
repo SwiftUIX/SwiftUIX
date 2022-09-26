@@ -54,7 +54,7 @@ public struct TextView<Label: View>: View {
     private var configuration: _Configuration
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var customAppKitOrUIKitClass: UITextView.Type = UIHostingTextView<Label>.self
+    private var customAppKitOrUIKitClass: UITextView.Type = _CocoaTextView<Label>.self
     #endif
     
     private var isEmpty: Bool {
@@ -111,7 +111,7 @@ extension _TextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIViewType {
         let uiView: UIViewType
         
-        if let customAppKitOrUIKitClass = customAppKitOrUIKitClass as? UIHostingTextView<Label>.Type {
+        if let customAppKitOrUIKitClass = customAppKitOrUIKitClass as? _CocoaTextView<Label>.Type {
             uiView = customAppKitOrUIKitClass.init(configuration: configuration)
         } else {
             uiView = customAppKitOrUIKitClass.init()
@@ -133,7 +133,7 @@ extension _TextView: UIViewRepresentable {
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
         _withoutAppKitOrUIKitAnimation(context.transaction.animation == nil) {
-            if let uiView = uiView as? UIHostingTextView<Label> {
+            if let uiView = uiView as? _CocoaTextView<Label> {
                 uiView._isSwiftUIRuntimeUpdateActive = true
                 
                 defer {
@@ -170,7 +170,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         updateLayoutConfiguration: do {
-            (uiView as? UIHostingTextView<Label>)?.preferredMaximumDimensions = context.environment.preferredMaximumLayoutDimensions
+            (uiView as? _CocoaTextView<Label>)?.preferredMaximumDimensions = context.environment.preferredMaximumLayoutDimensions
         }
         
         updateTextAndGeneralConfiguration: do {
@@ -288,7 +288,7 @@ extension _TextView: UIViewRepresentable {
     }
     
     static func dismantleUIView(_ uiView: UITextView, coordinator: Coordinator) {
-        if let uiView = uiView as? UIHostingTextView<Label> {
+        if let uiView = uiView as? _CocoaTextView<Label> {
             uiView._isSwiftUIRuntimeDismantled = true
         }
     }
@@ -313,7 +313,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            if let textView = textView as? UIHostingTextView<Label>, textView._isSwiftUIRuntimeDismantled {
+            if let textView = textView as? _CocoaTextView<Label>, textView._isSwiftUIRuntimeDismantled {
                 return
             }
             
@@ -327,11 +327,17 @@ extension _TextView: UIViewRepresentable {
         func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
             if configuration.dismissKeyboardOnReturn {
                 if text == "\n" {
-                    configuration.onCommit()
-                    
-                    #if os(iOS)
-                    textView.resignFirstResponder()
-                    #endif
+                    DispatchQueue.main.async {
+                        #if os(iOS)
+                        guard textView.isFirstResponder else {
+                            return
+                        }
+                                                
+                        self.configuration.onCommit()
+                        
+                        textView.resignFirstResponder()
+                        #endif
+                    }
                     
                     return false
                 }
@@ -341,8 +347,9 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            configuration.onEditingChanged(false)
-            configuration.onCommit()
+            DispatchQueue.main.async {
+                self.configuration.onEditingChanged(false)
+            }
         }
     }
     
