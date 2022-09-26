@@ -44,9 +44,19 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
             }
         }
         
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+        }
+        
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             
+            #if targetEnvironment(macCatalyst)
+            if resolvedParent == nil {
+                resolveIfNecessary(withParent: view.superview?._nearestResponder(ofKind: UIViewController.self))
+            }
+            #endif
+
             resolvedParent.map(onAppear)
         }
         

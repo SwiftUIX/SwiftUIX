@@ -9,7 +9,7 @@ import UIKit
 
 extension UIView {
     var _parentViewController: UIViewController? {
-        guard let result = nearestResponder(ofKind: UIViewController.self), result.view == self else {
+        guard let result = _nearestResponder(ofKind: UIViewController.self), result.view == self else {
             return nil
         }
         
@@ -18,7 +18,27 @@ extension UIView {
 }
 
 extension UIView {
-    func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
+    public func _SwiftUIX_findFirstResponder() -> UIView? {
+        guard !isFirstResponder else {
+            return self
+        }
+        
+        for subview in subviews {
+            if let firstResponder = subview._SwiftUIX_findFirstResponder() {
+                return firstResponder
+            }
+        }
+        
+        return nil
+    }
+}
+
+extension UIView {
+    public func _SwiftUIX_findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
+        findSubview(ofKind: kind)
+    }
+    
+    private func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
         guard !subviews.isEmpty else {
             return nil
         }
@@ -32,10 +52,6 @@ extension UIView {
         }
         
         return nil
-    }
-
-    public func _SwiftUIX_findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
-        findSubview(ofKind: kind)
     }
 }
 

@@ -47,7 +47,7 @@ extension UIPageViewController {
     }
     
     var pageControl: UIPageControl? {
-        view.findSubview(ofKind: UIPageControl.self)
+        view._SwiftUIX_findSubview(ofKind: UIPageControl.self)
     }
 }
 

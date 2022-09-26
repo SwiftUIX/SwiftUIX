@@ -35,4 +35,13 @@ extension UICollectionView {
     }
 }
 
+extension UICollectionView {
+    /// Deselect all selected items.
+    public func _deselectAllItems(animated: Bool = true) {
+        indexPathsForSelectedItems?.forEach {
+            deselectItem(at: $0, animated: true)
+        }
+    }
+}
+
 #endif
