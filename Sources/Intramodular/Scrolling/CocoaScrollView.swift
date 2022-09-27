@@ -139,13 +139,15 @@ extension CocoaScrollView {
 
 #endif
 
+// MARK: - Auxiliary Implementation -
+
 struct _CocoaScrollViewPage: Equatable {
     let index: Int
     let rect: CGRect
 }
 
 extension View {
-    public func scrollPage(index: Int) -> some View {
+    private func scrollPage(index: Int) -> some View {
         background(GeometryReader { geometry in
             Color.clear.preference(
                 key: ArrayReducePreferenceKey<_CocoaScrollViewPage>.self,
