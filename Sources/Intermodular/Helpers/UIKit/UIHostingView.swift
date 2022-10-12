@@ -155,6 +155,10 @@ extension UIHostingView {
     public func _fixSafeAreaInsets() {
         rootViewHostingController._fixSafeAreaInsets()
     }
+    
+    public var hostingController: UIViewController {
+        rootViewHostingController
+    }
 }
 
 #endif
