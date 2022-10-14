@@ -5,13 +5,13 @@
 import Swift
 import SwiftUI
 
-private struct PredicatedAnimateOnChange<Value: Equatable>: ViewModifier {
+private struct ChangePredicatedAnimation<Value: Equatable>: ViewModifier {
     let animation: Animation?
     let value: Value
     let predicate: ((oldValue: Value, newValue: Value)) -> Bool
     
     @ViewStorage var lastValue: Value?
-
+    
     init(
         animation: Animation?,
         value: Value,
@@ -47,6 +47,6 @@ extension View {
         initialValue: Value? = nil,
         predicate: @escaping ((oldValue: Value, newValue: Value)) -> Bool
     ) -> some View {
-        modifier(PredicatedAnimateOnChange(animation: animation, value: value, initialValue: initialValue, predicate: predicate))
+        modifier(ChangePredicatedAnimation(animation: animation, value: value, initialValue: initialValue, predicate: predicate))
     }
 }

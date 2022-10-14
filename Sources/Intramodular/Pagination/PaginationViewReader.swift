@@ -59,7 +59,6 @@ public struct PaginationViewReader<Content: View>: View {
     
     @State private var _paginationViewProxy = PaginationViewProxy()
     
-    
     public init(
         @ViewBuilder content: @escaping (PaginationViewProxy) -> Content
     ) {

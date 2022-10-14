@@ -187,7 +187,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         uiViewController.cyclesPages = configuration.cyclesPages
         uiViewController.isEdgePanGestureEnabled = context.environment.isEdgePanGestureEnabled
         uiViewController.isPanGestureEnabled = context.environment.isPanGestureEnabled
-        uiViewController.isScrollEnabled = context.environment.isScrollEnabled
+        uiViewController.isScrollEnabled = context.environment._isScrollEnabled
         uiViewController.isTapGestureEnabled = context.environment.isTapGestureEnabled
         
         if #available(iOS 14.0, tvOS 14.0, *) {

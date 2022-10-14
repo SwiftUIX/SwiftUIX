@@ -2,10 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(macOS)
+
 import Swift
 import SwiftUI
-
-#if os(macOS)
 
 /// A display of a file system path or virtual path information.
 public struct PathControl<Label> {

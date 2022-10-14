@@ -165,7 +165,7 @@ extension _TextView: UIViewRepresentable {
                     : context.environment.isEnabled && configuration.isEditable
             }
             #endif
-            uiView.isScrollEnabled = context.environment.isScrollEnabled
+            uiView.isScrollEnabled = context.environment._isScrollEnabled
             uiView.isSelectable = configuration.isSelectable
         }
         

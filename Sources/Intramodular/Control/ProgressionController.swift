@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-public protocol ProgressionController: ViewInteractor {
+public protocol ProgressionController {
     func scrollTo(_ id: AnyHashable)
 
     func moveToNext()
@@ -14,11 +14,11 @@ public protocol ProgressionController: ViewInteractor {
 
 // MARK: - Auxiliary Implementation -
 
-public struct ProgressionControllerEnvironmentKey: ViewInteractorEnvironmentKey {
-    public typealias ViewInteractor = ProgressionController
-}
-
 extension EnvironmentValues {
+    struct ProgressionControllerEnvironmentKey: EnvironmentKey {
+        static let defaultValue: ProgressionController? = nil
+    }
+    
     public var progressionController: ProgressionController? {
         get {
             self[ProgressionControllerEnvironmentKey.self]

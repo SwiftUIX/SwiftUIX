@@ -21,9 +21,9 @@ private struct EditMenuPresenter: ViewModifier {
                     attachmentAnchor: attachmentAnchor,
                     editMenuItems: editMenuItems
                 )
-            .allowsHitTesting(false)
-            .accessibility(hidden: true)
-        }
+                .allowsHitTesting(false)
+                .accessibility(hidden: true)
+            }
     }
     
     struct _BackgroundPresenterView: AppKitOrUIKitViewRepresentable {
@@ -136,7 +136,7 @@ extension EditMenuPresenter._BackgroundPresenterView {
                     resignFirstResponder()
                 }
             }
-
+            
             UIMenuController.shared.menuItems = nil
         }
         

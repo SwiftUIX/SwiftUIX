@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
-open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaController {
+open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaViewController {
     var _safeAreaInsetsAreFixed: Bool = false
     var _namedViewDescriptions: [AnyHashable: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator

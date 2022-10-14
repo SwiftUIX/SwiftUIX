@@ -6,7 +6,6 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 public protocol AppKitOrUIKitViewRepresentable: UIViewRepresentable {
     associatedtype AppKitOrUIKitViewType = UIViewType where AppKitOrUIKitViewType == UIViewType
     
@@ -24,9 +23,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: UIViewControllerRepres
     
     static func dismantleAppKitOrUIKitViewController(_ view: AppKitOrUIKitViewControllerType, coordinator: Coordinator)
 }
-
 #elseif os(macOS)
-
 public protocol AppKitOrUIKitViewRepresentable: NSViewRepresentable {
     associatedtype AppKitOrUIKitViewType where AppKitOrUIKitViewType == NSViewType
     
@@ -44,13 +41,11 @@ public protocol AppKitOrUIKitViewControllerRepresentable: NSViewControllerRepres
     
     static func dismantleAppKitOrUIKitViewController(_ view: AppKitOrUIKitViewControllerType, coordinator: Coordinator)
 }
-
 #endif
 
 // MARK: - Implementation -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 extension AppKitOrUIKitViewRepresentable {
     public typealias Context = UIViewRepresentableContext<Self>
     
@@ -132,11 +127,9 @@ extension AppKitOrUIKitViewControllerRepresentable {
         dismantleAppKitOrUIKitViewController(viewController, coordinator: coordinator)
     }
 }
-
 #endif
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 extension AppKitOrUIKitViewRepresentable {
     public static func dismantleAppKitOrUIKitView(
         _ view: AppKitOrUIKitViewType,
@@ -154,5 +147,4 @@ extension AppKitOrUIKitViewControllerRepresentable {
         
     }
 }
-
 #endif

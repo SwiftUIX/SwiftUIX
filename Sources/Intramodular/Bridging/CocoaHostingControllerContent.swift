@@ -8,11 +8,11 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaHostingControllerContent<Content: View>: View  {
-    weak var parent: CocoaController?
+    weak var parent: CocoaViewController?
     
     public var content: Content
     
-    init(parent: CocoaController?, content: Content) {
+    init(parent: CocoaViewController?, content: Content) {
         self.content = content
     }
     

@@ -44,7 +44,7 @@ extension CocoaScrollViewConfiguration {
             self.initialContentAlignment = initialContentAlignment
         }
         
-        if !environment.isScrollEnabled {
+        if !environment._isScrollEnabled {
             isScrollEnabled = false
         }
         
