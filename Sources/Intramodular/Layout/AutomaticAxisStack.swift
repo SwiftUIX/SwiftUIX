@@ -37,7 +37,7 @@ public struct AutomaticAxisStack<Content: View>: View {
     
     @inlinable
     public var body: some View {
-        Group {
+        PassthroughView {
             if wantsRealign {
                 AxisStack(
                     axis: self.preferredAxis.orthogonal,

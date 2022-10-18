@@ -52,7 +52,7 @@ extension Bool {
     
     @inlinable
     public func ifFalse<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        Group {
+        PassthroughView {
             if self {
                 EmptyView()
             } else {

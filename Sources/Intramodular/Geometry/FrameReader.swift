@@ -8,7 +8,7 @@ import SwiftUI
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 public struct FrameReader<Content: View>: View {
     @Namespace var namespace
-        
+    
     public let content: (FrameReaderProxy) -> Content
     
     @State private var proxy = FrameReaderProxy()
@@ -68,7 +68,7 @@ private struct AttachFrameID: ViewModifier {
                         guard let _frameReaderProxy = _frameReaderProxy else {
                             return
                         }
-
+                        
                         DispatchQueue.asyncOnMainIfNecessary {
                             let description = _NamedViewDescription(
                                 name: frameID,
@@ -91,17 +91,17 @@ public struct FrameReaderProxy {
     var preferenceData: [AnyHashable: _NamedViewDescription] = [:]
     /// Data sourced from `EnvironmentValues._frameReaderProxy`.
     var environmentSourcedData: [AnyHashable: _NamedViewDescription] = [:]
-
+    
     private func viewDescription(forFrameWithID id: AnyHashable) -> _NamedViewDescription? {
         preferenceData[FrameID(base: id)] ?? environmentSourcedData[FrameID(base: id)]
     }
-
+    
     public func frame(for identifier: AnyHashable, in coordinateSpace: CoordinateSpace) -> CGRect {
         assert(coordinateSpace == .global, "The only coordinateSpace supported currently is .global")
-
+        
         return viewDescription(forFrameWithID: identifier)?.globalBounds ?? .zero
     }
-
+    
     public func size(for identifier: AnyHashable) -> CGSize {
         viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
     }
@@ -148,31 +148,28 @@ private final class CaptureViewSizePreferenceKey<T: View>: TakeLastPreferenceKey
 }
 
 extension View {
-    public func captureSize(in binding: SetBinding<CGSize>) -> some View {
+    @ViewBuilder
+    public func _measureAndRecordSize(into binding: Binding<CGSize?>) -> some View {
+        let binding = binding.removeDuplicates()
+        
         overlay {
             GeometryReader { proxy in
-                Color.clear.preference(
-                    key: CaptureViewSizePreferenceKey<Self>.self,
-                    value: proxy.size
-                )
-                .onAppear {
-                    binding.wrappedValue = proxy.size
-                }
+                Color.clear
+                    .hidden()
+                    .onAppear {
+                        binding.wrappedValue = proxy.size
+                    }
+                    .onDisappear {
+                        binding.wrappedValue = nil
+                    }
+                    .onChange(of: proxy.size) { size in
+                        binding.wrappedValue = size
+                    }
             }
         }
-        .onPreferenceChange(CaptureViewSizePreferenceKey<Self>.self) { size in
-            if let size = size {
-                binding.wrappedValue = size
-            }
-        }
-        .preference(key: CaptureViewSizePreferenceKey<Self>.self, value: nil)
     }
     
-    public func captureSize(in binding: Binding<CGSize>) -> some View {
-        captureSize(in: SetBinding { newValue in
-            if binding.wrappedValue != newValue {
-                binding.wrappedValue = newValue
-            }
-        })
+    public func _measureAndRecordSize(into binding: Binding<CGSize>) -> some View {
+        _measureAndRecordSize(into: binding._asOptional(defaultValue: .zero))
     }
 }

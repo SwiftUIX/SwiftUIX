@@ -72,7 +72,7 @@ public struct LazyAppearView<Content: View>: View {
         @ViewBuilder destination: @escaping () -> Content
     ) {
         self.destination = { proxy in
-            Group {
+            PassthroughView {
                 if proxy.appearance == .active {
                     destination()
                 }
@@ -101,7 +101,7 @@ public struct LazyAppearView<Content: View>: View {
         @ViewBuilder destination: @escaping () -> Content
     ) {
         self.destination = { proxy in
-            Group {
+            PassthroughView {
                 if proxy.appearance == .active {
                     destination()
                 }

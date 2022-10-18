@@ -391,7 +391,7 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     }
     
     public var body: some View {
-        Group {
+        PassthroughView {
             if windowBox.wrappedValue != nil {
                 LazyAppearView {
                     content

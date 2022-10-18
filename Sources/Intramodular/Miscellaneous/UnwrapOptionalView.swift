@@ -23,7 +23,7 @@ public struct UnwrapOptionalView<Content: View>: View {
     
     @inlinable
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
-        Group {
+        PassthroughView {
             if lhs.content == nil {
                 rhs
             } else {
@@ -57,7 +57,7 @@ extension Optional {
 extension View {
     @inlinable
     public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
-        Group {
+        PassthroughView {
             if value != nil {
                 transform(value!, self)
             } else {

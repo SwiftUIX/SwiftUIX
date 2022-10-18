@@ -38,6 +38,15 @@ extension ForEach where Content: View {
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
+    ) where Data == [_OffsetIdentifiedElementOffsetPair<Elements.Element, Int>], ID == Int {
+        self.init(data.enumerated().map({ _OffsetIdentifiedElementOffsetPair(element: $0.element, offset: $0.offset) }), id: \.offset) {
+            rowContent($0.offset, $0.element)
+        }
+    }
+    
+    public init<Elements: RandomAccessCollection>(
+        enumerating data: Elements,
+        @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
     ) where Elements.Element: Identifiable, Data == [_IdentifiableElementOffsetPair<Elements.Element, Int>], ID == Elements.Element.ID {
         self.init(data.enumerated().map({ _IdentifiableElementOffsetPair(element: $0.element, offset: $0.offset) })) {
             rowContent($0.offset, $0.element)
@@ -168,6 +177,16 @@ public struct _IdentifiableElementOffsetPair<Element: Identifiable, Offset>: Ide
         element.id
     }
     
+    init(element: Element, offset: Offset) {
+        self.element = element
+        self.offset = offset
+    }
+}
+
+public struct _OffsetIdentifiedElementOffsetPair<Element, Offset> {
+    let element: Element
+    let offset: Offset
+        
     init(element: Element, offset: Offset) {
         self.element = element
         self.offset = offset

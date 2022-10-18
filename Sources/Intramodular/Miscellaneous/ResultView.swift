@@ -14,7 +14,7 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
     
     @inlinable
     public var body: some View {
-        Group {
+        PassthroughView {
             if successView != nil {
                 successView!
             } else {

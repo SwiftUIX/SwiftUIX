@@ -49,7 +49,7 @@ extension Image {
 
 extension Image {
     public func resizable(_ resizable: Bool) -> some View {
-        Group {
+        PassthroughView {
             if resizable {
                 self.resizable()
             } else {
