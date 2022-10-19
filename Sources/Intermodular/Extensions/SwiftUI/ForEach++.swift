@@ -35,6 +35,7 @@ extension ForEach where Content: View {
         }
     }
     
+    @_disfavoredOverload
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
