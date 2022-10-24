@@ -37,7 +37,7 @@ extension EnvironmentValues {
         static let defaultValue = true
     }
     
-    fileprivate var _SwiftUIX_isScrollEnabled: Bool {
+    public var _SwiftUIX_isScrollEnabled: Bool {
         get {
             self[_IsScrollEnabledEnvironmentKey.self]
         } set {
