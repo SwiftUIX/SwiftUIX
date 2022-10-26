@@ -10,18 +10,15 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     public var width: CGFloat?
     public var height: CGFloat?
     
-    @inlinable
     public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
     }
     
-    @inlinable
     public init(_ size: CGSize) {
         self.init(width: size.width, height: size.height)
     }
     
-    @inlinable
     public init(_ size: CGSize?) {
         if let size = size {
             self.init(size)
@@ -30,16 +27,34 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
         }
     }
     
-    @inlinable
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
     }
     
-    @inlinable
     public init() {
         
     }
 }
+
+// MARK: - Extensions -
+
+#if os(iOS)
+extension OptionalDimensions {
+    init(intrinsicContentSize: CGSize) {
+        self.init(
+            width: intrinsicContentSize.width == UIView.noIntrinsicMetric ? nil : intrinsicContentSize.width,
+            height: intrinsicContentSize.height == UIView.noIntrinsicMetric ? nil : intrinsicContentSize.height
+        )
+    }
+    
+    func toAppKitOrUIKitIntrinsicContentSize() -> CGSize {
+        CGSize(
+            width: width ?? UIView.noIntrinsicMetric,
+            height: height ?? UIView.noIntrinsicMetric
+        )
+    }
+}
+#endif
 
 extension OptionalDimensions {
     public func rounded(_ rule: FloatingPointRoundingRule) -> Self {
