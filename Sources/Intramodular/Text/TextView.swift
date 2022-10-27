@@ -356,6 +356,18 @@ extension _TextView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         .init(text: text, attributedText: attributedText, configuration: configuration)
     }
+    
+    func _overrideSizeThatFits(
+        _ size: inout CGSize,
+        in proposedSize: _ProposedSize,
+        uiView: UIViewType
+    ) {
+        if let textView = (uiView as? _CocoaTextView<Label>) {
+            let proposedSize = _SwiftUIX_ProposedSize(proposedSize)
+            
+            textView.representableContext.proposedSize = proposedSize
+        }
+    }
 }
 
 #elseif canImport(AppKit)
@@ -479,6 +491,19 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.attributedText = .constant(text)
+        self.configuration = .init(
+            isConstant: true,
+            onEditingChanged: { _ in },
+            onCommit: { }
+        )
+    }
+
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+    public init(
+        _ text: AttributedString
+    ) {
+        self.label = EmptyView()
+        self.attributedText = .constant(NSAttributedString(text))
         self.configuration = .init(
             isConstant: true,
             onEditingChanged: { _ in },

@@ -125,14 +125,14 @@ extension UIViewController {
 }
 
 extension UIViewController {
-    func add(_ child: UIViewController) {
+    public func _SwiftUIX_addChild(_ child: UIViewController) {
         child.willMove(toParent: self)
         addChild(child)
         view.addSubview(child.view)
         child.didMove(toParent: self)
     }
     
-    func remove() {
+    public func _SwiftUIX_asChildRemoveFromParent() {
         guard parent != nil else {
             return
         }

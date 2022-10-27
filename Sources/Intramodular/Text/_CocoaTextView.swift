@@ -8,10 +8,12 @@ import Swift
 import SwiftUI
 
 /// The main `UITextView` subclass used by `TextView`.
-final class _CocoaTextView<Label: View>: UITextView {
+final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKitView {
     var _isSwiftUIRuntimeUpdateActive: Bool = false
     var _isSwiftUIRuntimeDismantled: Bool = false
     
+    var representableContext = _AppKitOrUIKitRepresentableContext() 
+
     var configuration: TextView<Label>._Configuration
     
     private var _cachedIntrinsicContentSize: CGSize?
@@ -74,8 +76,8 @@ final class _CocoaTextView<Label: View>: UITextView {
             }
             
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -85,8 +87,8 @@ final class _CocoaTextView<Label: View>: UITextView {
             }
             
             let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
                 setContentHuggingPriority(

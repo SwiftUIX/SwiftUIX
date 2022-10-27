@@ -45,7 +45,7 @@ struct _CollectionView<
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         uiViewController.latestRepresentableUpdate = _AppKitOrUIKitViewRepresentableUpdate()
         
-        populateCollectionViewProxy: do {
+        func updateCollectionViewProxy() {
             if let _collectionViewProxy = context.environment._collectionViewProxy {
                 if _collectionViewProxy.wrappedValue.base !== uiViewController {
                     DispatchQueue.main.async {
@@ -54,8 +54,8 @@ struct _CollectionView<
                 }
             }
         }
-        
-        updateCollectionViewLayout: do {
+
+        func updateCollectionViewLayout() {
             let collectionViewLayout = _CollectionViewLayout(
                 collectionViewController: uiViewController,
                 base: context.environment.collectionViewLayout
@@ -65,6 +65,9 @@ struct _CollectionView<
                 uiViewController.collectionViewLayout = collectionViewLayout
             }
         }
+        
+        updateCollectionViewProxy()
+        updateCollectionViewLayout()
         
         uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues

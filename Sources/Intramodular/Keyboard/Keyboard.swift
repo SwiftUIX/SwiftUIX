@@ -141,39 +141,4 @@ extension Keyboard {
     }
 }
 
-// MARK: - Helpers -
-
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
-extension View {
-    public func hiddenIfKeyboardActive() -> some View {
-        withInlineObservedObject(Keyboard.main) { keyboard in
-            self.hidden(keyboard.isShowing)
-        }
-    }
-    
-    public func visibleIfKeyboardActive() -> some View {
-        withInlineObservedObject(Keyboard.main) { keyboard in
-            self.visible(keyboard.isShowing)
-        }
-    }
-    
-    public func removeIfKeyboardActive() -> some View {
-        withInlineObservedObject(Keyboard.main) { keyboard in
-            if !keyboard.isShowing {
-                self
-            }
-        }
-    }
-    
-    public func addIfKeyboardActive() -> some View {
-        withInlineObservedObject(Keyboard.main) { keyboard in
-            if keyboard.isShowing {
-                self
-            }
-        }
-    }
-}
-
 #endif

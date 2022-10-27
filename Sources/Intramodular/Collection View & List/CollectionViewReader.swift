@@ -9,6 +9,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
+    var appKitOrUIKitCollectionView: AppKitOrUIKitCollectionView { get }
+    
     var collectionViewContentSize: CGSize { get }
     
     func invalidateLayout()
@@ -36,30 +38,18 @@ protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
 
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CollectionViewProxy: Hashable {
-    private let _baseBox: WeakReferenceBox<AnyObject>
-    
-    @ReferenceBox var onBaseChange: (() -> Void)? = nil
-    
-    var base: _CollectionViewProxyBase? {
-        get {
-            _baseBox.value as? _CollectionViewProxyBase
-        } set {
-            guard _baseBox.value !== newValue else {
-                return
-            }
+    weak var base: _CollectionViewProxyBase?
 
-            _baseBox.value = newValue
-
-            onBaseChange?()
-        }
+    public var appKitOrUIKitCollectionView: AppKitOrUIKitCollectionView? {
+        base?.appKitOrUIKitCollectionView
     }
-    
+
     public var contentSize: CGSize {
         base?.collectionViewContentSize ?? .zero
     }
     
     init(_ base: _CollectionViewProxyBase? = nil) {
-        self._baseBox = .init(base)
+        self.base = base
     }
     
     public func hash(into hasher: inout Hasher) {
@@ -142,7 +132,6 @@ public struct CollectionViewReader<Content: View>: View {
     public let content: (CollectionViewProxy) -> Content
     
     @State var _collectionViewProxy = CollectionViewProxy()
-    @State var invalidate: Bool = false
     
     public init(
         @ViewBuilder content: @escaping (CollectionViewProxy) -> Content
@@ -153,16 +142,6 @@ public struct CollectionViewReader<Content: View>: View {
     public var body: some View {
         content(_environment_collectionViewProxy?.wrappedValue ?? _collectionViewProxy)
             .environment(\._collectionViewProxy, $_collectionViewProxy)
-            .background {
-                PerformAction {
-                    if _collectionViewProxy.onBaseChange == nil {
-                        _collectionViewProxy.onBaseChange = {
-                            invalidate.toggle()
-                        }
-                    }
-                }
-                .id(invalidate)
-            }
     }
 }
 

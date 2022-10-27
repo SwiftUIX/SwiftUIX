@@ -8,6 +8,10 @@ import Swift
 import SwiftUI
 
 extension UIHostingCollectionViewController: _CollectionViewProxyBase {
+    var appKitOrUIKitCollectionView: AppKitOrUIKitCollectionView {
+        collectionView
+    }
+    
     var collectionViewContentSize: CGSize {
         collectionView.contentSize.isAreaZero
             ? collectionView.contentSize
