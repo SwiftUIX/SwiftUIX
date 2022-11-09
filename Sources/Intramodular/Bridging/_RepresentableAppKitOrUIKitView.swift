@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 struct _AppKitOrUIKitRepresentableContext {
     var proposedSize: _SwiftUIX_ProposedSize?
 }
@@ -15,8 +17,6 @@ protocol _RepresentableAppKitOrUIKitView: AppKitOrUIKitView {
 protocol _RepresentableAppKitOrUIKitViewController: AppKitOrUIKitViewController {
     var representableContext: _AppKitOrUIKitRepresentableContext { get set }
 }
-
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _RepresentableAppKitOrUIKitView {
     func makeUIView(context: Context) -> AppKitOrUIKitViewType {
