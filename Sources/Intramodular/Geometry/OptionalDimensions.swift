@@ -42,8 +42,8 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
 extension OptionalDimensions {
     init(intrinsicContentSize: CGSize) {
         self.init(
-            width: intrinsicContentSize.width == UIView.noIntrinsicMetric ? nil : intrinsicContentSize.width,
-            height: intrinsicContentSize.height == UIView.noIntrinsicMetric ? nil : intrinsicContentSize.height
+            width: (intrinsicContentSize.width == UIView.noIntrinsicMetric || intrinsicContentSize.width == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.width,
+            height: (intrinsicContentSize.height == UIView.noIntrinsicMetric || intrinsicContentSize.height == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.height
         )
     }
     
