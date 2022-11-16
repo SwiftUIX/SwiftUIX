@@ -46,7 +46,7 @@ public struct TextView<Label: View>: View {
         }
     }
     
-    @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
+    @Environment(\.preferredMaximumLayoutWidth) private var preferredMaximumLayoutWidth
     
     private var label: Label
     private var text: Binding<String>?
@@ -608,9 +608,14 @@ extension TextView {
     public func kerning(_ kerning: CGFloat) -> Self {
         then({ $0.configuration.kerning = kerning })
     }
-    
+
+    @_disfavoredOverload
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
         then({ $0.configuration.textContainerInset = textContainerInset })
+    }
+
+    public func textContainerInset(_ textContainerInset: EdgeInsets) -> Self {
+        then({ $0.configuration.textContainerInset = AppKitOrUIKitInsets(textContainerInset) })
     }
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
