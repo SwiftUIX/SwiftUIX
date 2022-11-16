@@ -122,6 +122,8 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
     
     override func layoutSubviews() {
         super.layoutSubviews()
+
+        verticallyCenterTextIfNecessary()
     }
     
     override func invalidateIntrinsicContentSize() {
@@ -231,6 +233,25 @@ extension _CocoaTextView {
         _ = manager.glyphRange(for: container)
         
         return ceil(manager.usedRect(for: container).height + textContainerInset.vertical)
+    }
+
+    private func verticallyCenterTextIfNecessary() {
+        guard !isScrollEnabled else {
+            return
+        }
+        
+        guard let _cachedIntrinsicContentSize = _cachedIntrinsicContentSize else {
+            return
+        }
+
+        guard let intrinsicHeight = OptionalDimensions(intrinsicContentSize: _cachedIntrinsicContentSize).height else {
+            return
+        }
+
+        let topOffset = (bounds.size.height - intrinsicHeight * zoomScale) / 2
+        let positiveTopOffset = max(1, topOffset)
+
+        contentOffset.y = -positiveTopOffset
     }
 }
 
