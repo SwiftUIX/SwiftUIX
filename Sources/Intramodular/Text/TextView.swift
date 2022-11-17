@@ -30,7 +30,7 @@ public struct TextView<Label: View>: View {
 		var tintColor: AppKitOrUIKitColor?
         var kerning: CGFloat?
         var linkForegroundColor: AppKitOrUIKitColor?
-        var textContainerInset: AppKitOrUIKitInsets = .zero
+        var textContainerInset: AppKitOrUIKitInsets = .init(EdgeInsets.zero)
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         var textContentType: UITextContentType?
         #endif
@@ -599,21 +599,21 @@ extension TextView {
     public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.textColor = foregroundColor })
     }
-	
-	@_disfavoredOverload
-	public func tint(_ tint: AppKitOrUIKitColor) -> Self {
-		then({ $0.configuration.tintColor = tint })
-	}
+    
+    @_disfavoredOverload
+    public func tint(_ tint: AppKitOrUIKitColor) -> Self {
+        then({ $0.configuration.tintColor = tint })
+    }
     
     public func kerning(_ kerning: CGFloat) -> Self {
         then({ $0.configuration.kerning = kerning })
     }
-
+    
     @_disfavoredOverload
     public func textContainerInset(_ textContainerInset: AppKitOrUIKitInsets) -> Self {
         then({ $0.configuration.textContainerInset = textContainerInset })
     }
-
+    
     public func textContainerInset(_ textContainerInset: EdgeInsets) -> Self {
         then({ $0.configuration.textContainerInset = AppKitOrUIKitInsets(textContainerInset) })
     }

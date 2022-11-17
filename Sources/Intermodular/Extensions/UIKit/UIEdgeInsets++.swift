@@ -34,15 +34,4 @@ extension UIEdgeInsets {
     }
 }
 
-extension UIEdgeInsets {
-    public init(_ insets: EdgeInsets) {
-        self.init(
-            top: insets.top,
-            left: insets.leading,
-            bottom: insets.bottom,
-            right: insets.trailing
-        )
-    }
-}
-
 #endif

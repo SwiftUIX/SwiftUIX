@@ -75,6 +75,7 @@ public typealias AppKitOrUIKitButton = NSButton
 public typealias AppKitOrUIKitCollectionView = NSCollectionView
 public typealias AppKitOrUIKitColor = NSColor
 public typealias AppKitOrUIKitControl = NSControl
+public typealias AppKitOrUIKitEdgeInsets = NSEdgeInsets
 public typealias AppKitOrUIKitEvent = NSEvent
 public typealias AppKitOrUIKitFont = NSFont
 public typealias AppKitOrUIKitHostingController<Content: View> = NSHostingController<Content>
@@ -92,6 +93,21 @@ public typealias AppKitOrUIKitTextView = NSTextView
 public typealias AppKitOrUIKitView = NSView
 public typealias AppKitOrUIKitViewController = NSViewController
 public typealias AppKitOrUIKitWindow = NSWindow
+
+extension NSEdgeInsets {
+    var edgeInsets: EdgeInsets {
+        .init(top: top, leading: left, bottom: bottom, trailing: right)
+    }
+}
+
+extension NSSize {
+    public init(_ edgeInsets: EdgeInsets) {
+        self.init(
+            width: edgeInsets.leading + edgeInsets.trailing,
+            height: edgeInsets.top + edgeInsets.bottom
+        )
+    }
+}
 
 extension NSView {
     public static var layoutFittingCompressedSize: CGSize {
