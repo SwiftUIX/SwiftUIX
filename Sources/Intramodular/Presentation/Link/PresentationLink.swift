@@ -440,7 +440,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
     @Environment(\.presenter) var presenter

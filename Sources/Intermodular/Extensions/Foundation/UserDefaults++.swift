@@ -39,7 +39,7 @@ extension UserDefaults {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private protocol _opaque_Optional {
     var isNotNil: Bool { get }

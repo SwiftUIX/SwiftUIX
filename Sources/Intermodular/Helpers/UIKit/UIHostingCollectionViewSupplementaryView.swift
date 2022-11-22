@@ -200,7 +200,7 @@ extension UIHostingCollectionViewSupplementaryView {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIHostingCollectionViewSupplementaryView {
     private class ContentHostingController: UIHostingController<_CollectionViewCellOrSupplementaryViewContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {

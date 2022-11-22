@@ -71,7 +71,7 @@ struct AppKitOrUIKitViewControllerConfigurator: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIViewController {
     /// Configures this view controller with a given configuration.

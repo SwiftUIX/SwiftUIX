@@ -59,7 +59,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     private struct IsCellFocused: EnvironmentKey {

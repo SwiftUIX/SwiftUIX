@@ -43,7 +43,7 @@ extension PerformActionView {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension ModifiedContent: _opaque_PerformActionView, PerformActionView where Content: PerformActionView, Modifier: ViewModifier {
     public func transformAction(_ transform: (Action) -> Action) -> Self {

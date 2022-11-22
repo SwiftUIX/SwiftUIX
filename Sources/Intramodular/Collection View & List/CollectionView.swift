@@ -467,7 +467,7 @@ extension CollectionView {
 
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: Hashable>: Hashable, Identifiable {
     let item: Item

@@ -146,7 +146,7 @@ extension ForEach where Content: View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension Binding {
     fileprivate struct _BindingIdentifiableKeyPathAdaptor {

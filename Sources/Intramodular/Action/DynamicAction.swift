@@ -98,7 +98,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct _ExtendedDynamicAction<A: DynamicAction>: DynamicAction {
     let action: A

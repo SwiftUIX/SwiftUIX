@@ -53,7 +53,7 @@ public struct CellReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct CellProxyEnvironmentKey: EnvironmentKey {
     static let defaultValue: CellProxy? = nil

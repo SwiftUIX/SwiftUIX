@@ -83,7 +83,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct _NamedViewDescriptionPreferenceKey: SwiftUI.PreferenceKey {
     public struct Value: Hashable, Sequence {

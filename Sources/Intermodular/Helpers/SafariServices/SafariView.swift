@@ -52,7 +52,7 @@ extension SafariView {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension SafariView {
     fileprivate struct _Body: UIViewControllerRepresentable {

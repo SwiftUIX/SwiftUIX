@@ -73,7 +73,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private final class AnyCodableItemProvider<Item: Codable & Hashable>: NSObject, NSItemProviderReading, NSItemProviderWriting {
     enum EncodingError: Error {

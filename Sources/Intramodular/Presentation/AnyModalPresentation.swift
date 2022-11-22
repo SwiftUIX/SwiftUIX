@@ -75,7 +75,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension AnyModalPresentation {
     struct PreferenceKeyValue: Equatable {

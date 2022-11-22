@@ -159,7 +159,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension RelativeFrame {
     typealias ResolvedValues = [AnyHashable: OptionalDimensions]

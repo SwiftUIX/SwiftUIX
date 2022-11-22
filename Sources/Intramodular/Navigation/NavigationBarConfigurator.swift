@@ -352,7 +352,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _NavigationBarLargeTitleViewConfigurator<Content: View>: UIViewControllerRepresentable {
     private let content: Content

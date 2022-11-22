@@ -526,7 +526,7 @@ extension CocoaTextField where Label == Text {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private final class _UITextField: UITextField {
     var isFirstResponderBinding: Binding<Bool>?

@@ -149,7 +149,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentInsertions {
     struct EnvironmentKey: SwiftUI.EnvironmentKey {

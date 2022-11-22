@@ -82,7 +82,7 @@ extension TextView {
 }
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS)
 fileprivate struct SetFontWithLineHeight<F: FontFamily>: ViewModifier {

@@ -252,7 +252,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIHostingScrollView {
     struct RootViewContainer: View {

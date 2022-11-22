@@ -27,7 +27,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private struct _CollectionViewLayoutEnvironmentKey: EnvironmentKey {
     static let defaultValue: CollectionViewLayout = FlowCollectionViewLayout()

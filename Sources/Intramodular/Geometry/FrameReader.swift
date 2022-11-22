@@ -30,7 +30,7 @@ public struct FrameReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     struct FrameReaderProxyKey: EnvironmentKey {

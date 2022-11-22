@@ -173,7 +173,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 fileprivate struct NavigateOnPress<Destination: View>: ViewModifier {
     let destination: Destination

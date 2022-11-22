@@ -23,7 +23,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct SetLocalizedErrorHandler: ViewModifier {
     private struct _ErrorHandler: LocalizedErrorHandler {

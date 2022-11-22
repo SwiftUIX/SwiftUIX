@@ -61,7 +61,7 @@ extension View {
         environment(\.scrollIndicatorStyle, scrollIndicatorStyle)
     }
 }
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     private struct ScrollIndicatorStyleKey: EnvironmentKey {

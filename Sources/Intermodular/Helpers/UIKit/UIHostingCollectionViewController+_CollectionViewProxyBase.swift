@@ -250,7 +250,7 @@ extension UIHostingCollectionViewController: _CollectionViewProxyBase {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 fileprivate extension UICollectionView {
     func contains(_ indexPath: IndexPath) -> Bool {

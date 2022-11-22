@@ -68,7 +68,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     public var userInterfaceIdiom: UserInterfaceIdiom {

@@ -89,7 +89,7 @@ extension Screen {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     public var screen: Screen {

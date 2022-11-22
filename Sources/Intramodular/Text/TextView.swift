@@ -657,7 +657,7 @@ extension TextView {
 
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     struct _ParagraphSpacing: EnvironmentKey {

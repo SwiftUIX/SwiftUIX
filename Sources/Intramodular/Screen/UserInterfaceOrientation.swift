@@ -70,7 +70,7 @@ extension UserInterfaceOrientation {
     #endif
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS)
 

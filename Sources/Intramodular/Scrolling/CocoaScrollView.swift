@@ -139,7 +139,7 @@ extension CocoaScrollView {
 
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _CocoaScrollViewPage: Equatable {
     let index: Int

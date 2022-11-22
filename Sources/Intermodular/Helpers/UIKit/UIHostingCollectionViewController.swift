@@ -618,7 +618,7 @@ extension UIHostingCollectionViewController {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIHostingCollectionViewController {
     var maximumCollectionViewCellSize: OptionalDimensions {

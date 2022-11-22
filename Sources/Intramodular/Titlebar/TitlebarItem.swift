@@ -190,7 +190,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
     public typealias Value = [TitlebarItem]

@@ -72,7 +72,7 @@ public struct PaginationViewReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension PaginationViewProxy {
     fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {

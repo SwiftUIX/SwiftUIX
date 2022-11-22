@@ -82,7 +82,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension ModalPresentationStyle {
     public enum _Comparison {

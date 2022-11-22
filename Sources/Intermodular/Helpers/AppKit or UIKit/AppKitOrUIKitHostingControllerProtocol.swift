@@ -113,7 +113,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct AppKitOrUIKitLayoutSizeProposal {
     var targetSize: OptionalDimensions = nil

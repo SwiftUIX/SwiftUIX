@@ -62,7 +62,7 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
 
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _SwiftUIX_ProposedSize: Hashable {
     let width: CGFloat?

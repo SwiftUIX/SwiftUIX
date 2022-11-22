@@ -364,7 +364,7 @@ extension Color {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 fileprivate extension UIColor {

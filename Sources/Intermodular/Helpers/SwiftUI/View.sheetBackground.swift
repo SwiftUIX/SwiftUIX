@@ -17,7 +17,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _UpdateSheetBackground: ViewModifier {
     let color: Color

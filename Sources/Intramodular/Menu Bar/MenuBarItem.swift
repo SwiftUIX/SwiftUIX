@@ -89,7 +89,7 @@ extension View {
 
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(macOS)
 public class MenuBarItemCoordinator<ID: Equatable, Content: View> {

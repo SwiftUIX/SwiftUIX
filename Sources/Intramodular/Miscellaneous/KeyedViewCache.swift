@@ -56,7 +56,7 @@ final class InMemoryKeyedViewCache: KeyedViewCache {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 @usableFromInline
 struct KeyedViewCacheEnvironmentKey: EnvironmentKey {

@@ -16,7 +16,7 @@ struct _DynamicViewContentTraitValues {
     #endif
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 struct _DynamicViewContentTraitValuesEnvironmentKey: EnvironmentKey {
     static let defaultValue = _DynamicViewContentTraitValues()

@@ -184,7 +184,7 @@ public func withAppKitOrUIKitViewController<Content: View>(
 }
 #endif
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(macOS)
 extension NSResponder {

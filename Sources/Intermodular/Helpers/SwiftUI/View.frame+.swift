@@ -278,7 +278,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 @usableFromInline
 protocol _opaque_FrameModifier {

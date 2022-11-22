@@ -162,7 +162,7 @@ extension DynamicViewPresenter {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {
     static let defaultValue: DynamicViewPresenter? = nil

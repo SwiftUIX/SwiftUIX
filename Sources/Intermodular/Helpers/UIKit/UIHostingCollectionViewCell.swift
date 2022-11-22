@@ -386,7 +386,7 @@ extension UIHostingCollectionViewCell {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIHostingCollectionViewCell {
     struct InvalidationContext {

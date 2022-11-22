@@ -68,7 +68,7 @@ extension ImageName {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

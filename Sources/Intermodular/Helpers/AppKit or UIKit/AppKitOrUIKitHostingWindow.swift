@@ -358,7 +358,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 enum _SwiftUIX_WindowPreferenceKeys {
     final class AllowsTouchesToPassThrough: TakeLastPreferenceKey<Bool> {

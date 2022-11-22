@@ -450,7 +450,7 @@ extension SearchBar {
     #endif
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 private final class _UISearchBar: UISearchBar {

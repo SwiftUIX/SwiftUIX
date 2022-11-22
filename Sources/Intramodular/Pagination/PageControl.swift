@@ -120,7 +120,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension PageControl {
     @available(iOS 14.0, tvOS 14.0, *)

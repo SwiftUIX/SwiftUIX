@@ -130,7 +130,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     private final class PreferredMaximumLayoutWidth: DefaultEnvironmentKey<CGFloat> {

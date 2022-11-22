@@ -94,7 +94,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private struct _AttachNSEventMonitor: ViewModifier {
     @State var eventMonitor: NSEventMonitor

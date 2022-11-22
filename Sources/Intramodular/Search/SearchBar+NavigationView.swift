@@ -241,7 +241,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     final class _HidesNavigationSearchBarWhenScrolling: DefaultEnvironmentKey<Bool> {

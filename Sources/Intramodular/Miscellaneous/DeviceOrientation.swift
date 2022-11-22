@@ -66,7 +66,7 @@ extension DeviceOrientation {
     #endif
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if os(iOS)
 extension UIDeviceOrientation {

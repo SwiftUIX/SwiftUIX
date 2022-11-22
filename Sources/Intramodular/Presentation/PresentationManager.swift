@@ -84,7 +84,7 @@ extension Binding: PresentationManager where Value == PresentationMode {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     fileprivate struct _PresentationManagerEnvironmentKey: EnvironmentKey {

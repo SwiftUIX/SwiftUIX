@@ -108,7 +108,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public protocol PathControlStyle {
     

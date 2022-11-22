@@ -162,7 +162,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct WindowProxy {
     weak var window: AppKitOrUIKitHostingWindowProtocol?

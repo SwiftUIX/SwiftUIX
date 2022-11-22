@@ -78,7 +78,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 private struct WithObservedValue<T, Content: View>: View {
     @ObservedValue var value: T

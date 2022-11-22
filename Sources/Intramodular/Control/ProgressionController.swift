@@ -12,7 +12,7 @@ public protocol ProgressionController {
     func moveToPrevious()
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EnvironmentValues {
     struct ProgressionControllerEnvironmentKey: EnvironmentKey {

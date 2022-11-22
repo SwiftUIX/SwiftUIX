@@ -101,7 +101,7 @@ extension UIHostingTableViewCell {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension UIHostingTableViewCell {
     struct RootView: View {

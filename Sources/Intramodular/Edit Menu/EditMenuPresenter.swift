@@ -75,7 +75,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension EditMenuPresenter._BackgroundPresenterView {
     class AppKitOrUIKitViewType: UIView {

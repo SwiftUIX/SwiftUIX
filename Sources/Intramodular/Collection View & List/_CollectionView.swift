@@ -185,7 +185,7 @@ extension _CollectionView {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension _CollectionView {
     struct ViewProvider {

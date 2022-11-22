@@ -69,7 +69,7 @@ extension AttributedText {
     #endif
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension AppKitOrUIKitLabel {
     func configure(with attributedText: AttributedText) {
