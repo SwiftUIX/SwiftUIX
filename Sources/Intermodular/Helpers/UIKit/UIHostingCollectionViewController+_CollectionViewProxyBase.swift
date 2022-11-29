@@ -7,7 +7,7 @@
 import Swift
 import SwiftUI
 
-extension UIHostingCollectionViewController: _CollectionViewProxyBase {
+extension AppKitOrUIKitHostingCollectionViewController: _CollectionViewProxyBase {
     var appKitOrUIKitCollectionView: AppKitOrUIKitCollectionView {
         collectionView
     }

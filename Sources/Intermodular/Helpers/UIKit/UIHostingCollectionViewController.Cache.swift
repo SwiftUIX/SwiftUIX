@@ -8,36 +8,38 @@ import Swift
 import SwiftUI
 import UIKit
 
-extension UIHostingCollectionViewController.Cache {
-    typealias CellOrSupplementaryViewContentConfiguration = UIHostingCollectionViewController.CellOrSupplementaryViewConfiguration
-    typealias CellOrSupplementaryViewContentPreferences = UIHostingCollectionViewController.CellOrSupplementaryViewContentPreferences
-    typealias CellOrSupplementaryViewContentCache = UIHostingCollectionViewController.CellOrSupplementaryViewContentCache
-    typealias UICollectionViewCellType = UIHostingCollectionViewController.UICollectionViewCellType
-    typealias UICollectionViewSupplementaryViewType = UIHostingCollectionViewController.UICollectionViewSupplementaryViewType
+extension AppKitOrUIKitHostingCollectionViewController.Cache {
+    typealias _ParentControllerType = AppKitOrUIKitHostingCollectionViewController
+
+    typealias CellOrSupplementaryViewContentConfiguration = _ParentControllerType.SupplementaryViewType.ContentConfiguration
+    typealias CellOrSupplementaryViewContentPreferences = _ParentControllerType.SupplementaryViewType.ContentPreferences
+    typealias CellOrSupplementaryViewContentCache = _ParentControllerType.SupplementaryViewType.ContentCache
+    typealias CellType = _ParentControllerType.CellType
+    typealias SupplementaryViewType = _ParentControllerType.SupplementaryViewType
 }
 
-extension UIHostingCollectionViewController {
+extension AppKitOrUIKitHostingCollectionViewController {
     class Cache: NSObject {
-        unowned private let parent: UIHostingCollectionViewController
+        unowned private let parent: AppKitOrUIKitHostingCollectionViewController
         
-        var contentHostingControllerCache =  KeyedBoundedPriorityQueue<UICollectionViewCellType.ContentConfiguration.ID, CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>>()
+        var contentHostingControllerCache =  KeyedBoundedPriorityQueue<CellType.ContentConfiguration.ID, CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>>()
                 
-        private var contentIdentifierToCacheMap: [UICollectionViewCellType.ContentConfiguration.ID: UICollectionViewCellType.ContentCache] = [:]
-        private var contentIdentifierToPreferencesMap: [UICollectionViewCellType.ContentConfiguration.ID: UICollectionViewCellType.ContentPreferences] = [:]
-        private var contentIdentifierToIndexPathMap: [UICollectionViewCellType.ContentConfiguration.ID: IndexPath] = [:]
-        private var indexPathToContentIdentifierMap: [IndexPath: UICollectionViewCellType.ContentConfiguration.ID] = [:]
+        private var contentIdentifierToCacheMap: [CellType.ContentConfiguration.ID: CellType.ContentCache] = [:]
+        private var contentIdentifierToPreferencesMap: [CellType.ContentConfiguration.ID: CellType.ContentPreferences] = [:]
+        private var contentIdentifierToIndexPathMap: [CellType.ContentConfiguration.ID: IndexPath] = [:]
+        private var indexPathToContentIdentifierMap: [IndexPath: CellType.ContentConfiguration.ID] = [:]
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
                 
         var prototypeContentHostingController: CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>?
 
-        init(parent: UIHostingCollectionViewController) {
+        init(parent: AppKitOrUIKitHostingCollectionViewController) {
             self.parent = parent
         }
     }
 }
 
-extension UIHostingCollectionViewController.Cache {
-    func preconfigure(cell: UICollectionViewCellType) {
+extension AppKitOrUIKitHostingCollectionViewController.Cache {
+    func preconfigure(cell: CellType) {
         cell.contentCache = .init()
         cell.contentPreferences = .init()
         
@@ -54,7 +56,7 @@ extension UIHostingCollectionViewController.Cache {
         }
     }
     
-    func preconfigure(supplementaryView: UICollectionViewSupplementaryViewType) {
+    func preconfigure(supplementaryView: SupplementaryViewType) {
         supplementaryView.cache = .init()
         
         guard let id = supplementaryView.configuration?.id else {
@@ -145,7 +147,7 @@ extension UIHostingCollectionViewController.Cache {
     }
 }
 
-extension UIHostingCollectionViewController.Cache {
+extension AppKitOrUIKitHostingCollectionViewController.Cache {
     public func setContentCache(
         _ cache: CellOrSupplementaryViewContentCache?,
         for id: CellOrSupplementaryViewContentConfiguration.ID
@@ -163,7 +165,7 @@ extension UIHostingCollectionViewController.Cache {
     
     func invalidateContent(
         at indexPath: IndexPath,
-        withID suppliedID: UICollectionViewCellType.ContentConfiguration.ID? = nil
+        withID suppliedID: CellType.ContentConfiguration.ID? = nil
     ) {
         guard let id = suppliedID ?? indexPathToContentIdentifierMap[indexPath] else {
             return
@@ -176,10 +178,10 @@ extension UIHostingCollectionViewController.Cache {
     }
 }
 
-extension UIHostingCollectionViewController.Cache {
+extension AppKitOrUIKitHostingCollectionViewController.Cache {
     func preferences(
-        forID id: UIHostingCollectionViewController.UICollectionViewCellType.ContentConfiguration.ID
-    ) -> Binding<UIHostingCollectionViewController.UICollectionViewCellType.ContentPreferences?> {
+        forID id: AppKitOrUIKitHostingCollectionViewController.CellType.ContentConfiguration.ID
+    ) -> Binding<AppKitOrUIKitHostingCollectionViewController.CellType.ContentPreferences?> {
         .init(
             get: { [weak self] in
                 guard let `self` = self else {
@@ -204,7 +206,7 @@ extension UIHostingCollectionViewController.Cache {
     
     func preferences(
         forContentAt indexPath: IndexPath
-    ) -> Binding<UIHostingCollectionViewController.UICollectionViewCellType.ContentPreferences?> {
+    ) -> Binding<AppKitOrUIKitHostingCollectionViewController.CellType.ContentPreferences?> {
         .init(
             get: { [weak self] in
                 guard let `self` = self else {
@@ -237,7 +239,7 @@ extension UIHostingCollectionViewController.Cache {
         }
     }
     
-    func identifier(for indexPath: IndexPath) -> UIHostingCollectionViewController.UICollectionViewCellType.ContentConfiguration.ID? {
+    func identifier(for indexPath: IndexPath) -> AppKitOrUIKitHostingCollectionViewController.CellType.ContentConfiguration.ID? {
         indexPathToContentIdentifierMap[indexPath]
     }
 }

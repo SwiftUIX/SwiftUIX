@@ -16,7 +16,7 @@ class UIHostingCollectionViewSupplementaryView<
     SectionFooterContent: View,
     Content: View
 >: UICollectionReusableView {
-    typealias ParentViewControllerType = UIHostingCollectionViewController<
+    typealias ParentViewControllerType = AppKitOrUIKitHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,

@@ -16,6 +16,7 @@ public typealias AppKitOrUIKitApplicationDelegateAdapter = UIApplicationDelegate
 public typealias AppKitOrUIKitBezierPath = UIBezierPath
 public typealias AppKitOrUIKitButton = UIButton
 public typealias AppKitOrUIKitCollectionView = UICollectionView
+public typealias AppKitOrUIKitCollectionViewFlowLayout = UICollectionViewFlowLayout
 public typealias AppKitOrUIKitColor = UIColor
 public typealias AppKitOrUIKitControl = UIControl
 public typealias AppKitOrUIKitControlEvent = UIControl.Event
@@ -73,6 +74,8 @@ public typealias AppKitOrUIKitApplicationDelegateAdapter = NSApplicationDelegate
 public typealias AppKitOrUIKitBezierPath = NSBezierPath
 public typealias AppKitOrUIKitButton = NSButton
 public typealias AppKitOrUIKitCollectionView = NSCollectionView
+@available(macOS 11, *)
+public typealias AppKitOrUIKitCollectionViewFlowLayout = NSCollectionViewFlowLayout
 public typealias AppKitOrUIKitColor = NSColor
 public typealias AppKitOrUIKitControl = NSControl
 public typealias AppKitOrUIKitEdgeInsets = NSEdgeInsets

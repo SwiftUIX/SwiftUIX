@@ -17,7 +17,7 @@ struct _CollectionView<
     SectionFooter: View,
     RowContent: View
 >: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIHostingCollectionViewController<
+    typealias UIViewControllerType = AppKitOrUIKitHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,

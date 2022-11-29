@@ -8,12 +8,12 @@ import Swift
 import SwiftUI
 import UIKit
 
-extension UIHostingCollectionViewController {
+extension AppKitOrUIKitHostingCollectionViewController {
     #if !os(tvOS)
     class DragAndDropDelegate: NSObject, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
-        unowned let parent: UIHostingCollectionViewController
+        unowned let parent: AppKitOrUIKitHostingCollectionViewController
         
-        init(parent: UIHostingCollectionViewController) {
+        init(parent: AppKitOrUIKitHostingCollectionViewController) {
             self.parent = parent
         }
         

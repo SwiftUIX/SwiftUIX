@@ -16,7 +16,7 @@ class UIHostingCollectionViewCell<
     SectionFooterContent: View,
     Content: View
 >: UICollectionViewCell {
-    typealias ParentViewControllerType = UIHostingCollectionViewController<
+    typealias ParentViewControllerType = AppKitOrUIKitHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -316,6 +316,8 @@ extension UIHostingCollectionViewCell {
     }
     
     func update(disableAnimation: Bool) {
+        assert(Thread.isMainThread)
+        
         guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
             assertionFailure()
 

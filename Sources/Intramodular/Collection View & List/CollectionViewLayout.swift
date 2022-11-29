@@ -80,7 +80,7 @@ public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
         hasher.combine(sectionInsets?.trailing)
     }
 
-    class _UICollectionViewFlowLayout: UICollectionViewFlowLayout {
+    class _AppKitOrUIKitCollectionViewFlowLayout: AppKitOrUIKitCollectionViewFlowLayout {
         override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
             let context = super.invalidationContext(forBoundsChange: newBounds) as! UICollectionViewFlowLayoutInvalidationContext
             

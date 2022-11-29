@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-final class UIHostingCollectionViewController<
+final class AppKitOrUIKitHostingCollectionViewController<
     SectionType,
     SectionIdentifierType: Hashable,
     ItemType,
@@ -16,8 +16,7 @@ final class UIHostingCollectionViewController<
     SectionFooterContent: View,
     CellContent: View
 >: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    typealias _SwiftUIType = _CollectionView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>
-    typealias UICollectionViewCellType = UIHostingCollectionViewCell<
+    typealias _SwiftUIType = _CollectionView<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -26,7 +25,8 @@ final class UIHostingCollectionViewController<
         SectionFooterContent,
         CellContent
     >
-    typealias UICollectionViewSupplementaryViewType = UIHostingCollectionViewSupplementaryView<
+
+    typealias CellType = UIHostingCollectionViewCell<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -35,11 +35,16 @@ final class UIHostingCollectionViewController<
         SectionFooterContent,
         CellContent
     >
-    typealias CellOrSupplementaryViewConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias CellOrSupplementaryViewContentConfiguration = _CollectionViewCellOrSupplementaryViewConfiguration<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias CellOrSupplementaryViewContentState = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias CellOrSupplementaryViewContentPreferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias CellOrSupplementaryViewContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+
+    typealias SupplementaryViewType = UIHostingCollectionViewSupplementaryView<
+        SectionType,
+        SectionIdentifierType,
+        ItemType,
+        ItemIdentifierType,
+        SectionHeaderContent,
+        SectionFooterContent,
+        CellContent
+    >
 
     typealias DataSource = _SwiftUIType.DataSource
     
@@ -98,8 +103,8 @@ final class UIHostingCollectionViewController<
     lazy var dragAndDropDelegate = DragAndDropDelegate(parent: self)
     #endif
     
-    lazy var collectionView: _UICollectionView = {
-        let collectionView = _UICollectionView(parent: self)
+    lazy var collectionView: _AppKitOrUIKitCollectionView = {
+        let collectionView = _AppKitOrUIKitCollectionView(parent: self)
         
         collectionView.delegate = self
         #if !os(tvOS)
@@ -148,18 +153,18 @@ final class UIHostingCollectionViewController<
     
     private func registerCellAndSupplementaryViewTypes() {
         collectionView.register(
-            UICollectionViewSupplementaryViewType.self,
+            SupplementaryViewType.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: .hostingCollectionViewHeaderSupplementaryViewIdentifier
         )
         
         collectionView.register(
-            UICollectionViewCellType.self,
+            CellType.self,
             forCellWithReuseIdentifier: .hostingCollectionViewCellIdentifier
         )
 
         collectionView.register(
-            UICollectionViewSupplementaryViewType.self,
+            SupplementaryViewType.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
             withReuseIdentifier: .hostingCollectionViewFooterSupplementaryViewIdentifier
         )
@@ -174,11 +179,18 @@ final class UIHostingCollectionViewController<
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: .hostingCollectionViewCellIdentifier,
                 for: indexPath
-            ) as! UICollectionViewCellType
+            ) as! CellType
 
             cell.parentViewController = self
-            cell.cellContentConfiguration = self.contentConfiguration(for: indexPath, reuseIdentifier: .hostingCollectionViewCellIdentifier)
 
+            guard let cellContentConfiguration = self.contentConfiguration(
+                for: indexPath,
+                reuseIdentifier: .hostingCollectionViewCellIdentifier
+            ) else {
+                return cell
+            }
+
+            cell.cellContentConfiguration = cellContentConfiguration
             self.cache.preconfigure(cell: cell)
             
             cell.update(disableAnimation: true)
@@ -201,7 +213,7 @@ final class UIHostingCollectionViewController<
                 ofKind: kind,
                 withReuseIdentifier: reuseIdentifier,
                 for: indexPath
-            ) as! UICollectionViewSupplementaryViewType
+            ) as! SupplementaryViewType
             
             view.configuration = self.contentConfiguration(for: indexPath, reuseIdentifier: reuseIdentifier)
             
@@ -300,19 +312,19 @@ final class UIHostingCollectionViewController<
     // MARK: - UICollectionViewDelegate -
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? UICollectionViewCellType)?.cellWillDisplay(inParent: self)
+        (cell as? CellType)?.cellWillDisplay(inParent: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
-        (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewWillDisplay(inParent: self)
+        (view as? SupplementaryViewType)?.supplementaryViewWillDisplay(inParent: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? UICollectionViewCellType)?.cellDidEndDisplaying()
+        (cell as? CellType)?.cellDidEndDisplaying()
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
-        (view as? UICollectionViewSupplementaryViewType)?.supplementaryViewDidEndDisplaying()
+        (view as? SupplementaryViewType)?.supplementaryViewDidEndDisplaying()
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
@@ -358,13 +370,13 @@ final class UIHostingCollectionViewController<
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldUpdateFocusIn context: UICollectionViewFocusUpdateContext) -> Bool {
-        if let previousCell = context.previouslyFocusedView as? UICollectionViewCellType {
+        if let previousCell = context.previouslyFocusedView as? CellType {
             if previousCell.isFocused {
                 previousCell.isFocused = false
             }
         }
         
-        if let nextCell = context.nextFocusedView as? UICollectionViewCellType {
+        if let nextCell = context.nextFocusedView as? CellType {
             if nextCell.isFocused {
                 nextCell.isFocused = true
             }
@@ -388,7 +400,7 @@ final class UIHostingCollectionViewController<
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        if let itemSize = (collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize, itemSize != UICollectionViewFlowLayout.automaticSize {
+        if let itemSize = (collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout)?.itemSize, itemSize != AppKitOrUIKitCollectionViewFlowLayout.automaticSize {
             return itemSize
         }
         
@@ -411,7 +423,7 @@ final class UIHostingCollectionViewController<
         layout collectionViewLayout: UICollectionViewLayout,
         minimumLineSpacingForSectionAt section: Int
     ) -> CGFloat {
-        (collectionViewLayout as? UICollectionViewFlowLayout)?.minimumLineSpacing ?? .zero
+        (collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout)?.minimumLineSpacing ?? .zero
     }
     
     public func collectionView(
@@ -419,7 +431,7 @@ final class UIHostingCollectionViewController<
         layout collectionViewLayout: UICollectionViewLayout,
         minimumInteritemSpacingForSectionAt section: Int
     ) -> CGFloat {
-        (collectionViewLayout as? UICollectionViewFlowLayout)?.minimumInteritemSpacing ?? .zero
+        (collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout)?.minimumInteritemSpacing ?? .zero
     }
 
     public func collectionView(
@@ -487,10 +499,10 @@ final class UIHostingCollectionViewController<
     }
 }
 
-extension UIHostingCollectionViewController {
+extension AppKitOrUIKitHostingCollectionViewController {
     func refreshVisibleCellsAndSupplementaryViews() {
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
-            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
+            guard let view = view as? SupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
 
@@ -500,7 +512,7 @@ extension UIHostingCollectionViewController {
         }
 
         for cell in collectionView.visibleCells {
-            guard let cell = cell as? UICollectionViewCellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
+            guard let cell = cell as? CellType, cell.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
 
@@ -510,7 +522,7 @@ extension UIHostingCollectionViewController {
         }
         
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter) {
-            guard let view = view as? UICollectionViewSupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
+            guard let view = view as? SupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
                 continue
             }
 
@@ -521,11 +533,11 @@ extension UIHostingCollectionViewController {
     }
 }
 
-extension UIHostingCollectionViewController {    
+extension AppKitOrUIKitHostingCollectionViewController {    
     func contentConfiguration(
         for indexPath: IndexPath,
         reuseIdentifier: String
-    ) -> CellOrSupplementaryViewConfiguration? {
+    ) -> CellType.ContentConfiguration? {
         let item = self.item(at: indexPath)
         let dataSourceConfiguration = self.dataSourceConfiguration
         let viewProvider = self.viewProvider
@@ -536,7 +548,7 @@ extension UIHostingCollectionViewController {
         
         switch reuseIdentifier {
             case .hostingCollectionViewHeaderSupplementaryViewIdentifier:
-                return CellOrSupplementaryViewConfiguration(
+                return SupplementaryViewType.ContentConfiguration(
                     reuseIdentifier: reuseIdentifier,
                     item: item,
                     section: section,
@@ -551,7 +563,7 @@ extension UIHostingCollectionViewController {
                     return nil
                 }
                 
-                return CellOrSupplementaryViewConfiguration(
+                return CellType.ContentConfiguration(
                     reuseIdentifier: reuseIdentifier,
                     item: item,
                     section: section,
@@ -562,7 +574,7 @@ extension UIHostingCollectionViewController {
                     maximumSize: maximumCollectionViewCellSize
                 )
             case .hostingCollectionViewFooterSupplementaryViewIdentifier:
-                return CellOrSupplementaryViewConfiguration(
+                return SupplementaryViewType.ContentConfiguration(
                     reuseIdentifier: reuseIdentifier,
                     item: item,
                     section: section,
@@ -574,6 +586,7 @@ extension UIHostingCollectionViewController {
                 )
             default:
                 assertionFailure()
+
                 return nil
         }
     }
@@ -603,29 +616,29 @@ extension UIHostingCollectionViewController {
     }
 }
 
-extension UIHostingCollectionViewController {
-    func cellForItem(at indexPath: IndexPath) -> UICollectionViewCellType? {
+extension AppKitOrUIKitHostingCollectionViewController {
+    func cellForItem(at indexPath: IndexPath) -> CellType? {
         let result = collectionView
             .visibleCells
-            .compactMap({ $0 as? UICollectionViewCellType})
+            .compactMap({ $0 as? CellType})
             .first(where: { $0.cellContentConfiguration?.indexPath == indexPath })
         
         if let dataSource = dataSource, !dataSource.contains(indexPath) {
             return nil
         }
         
-        return result ?? (_internalDiffableDataSource?.collectionView(collectionView, cellForItemAt: indexPath) as? UICollectionViewCellType)
+        return result ?? (_internalDiffableDataSource?.collectionView(collectionView, cellForItemAt: indexPath) as? CellType)
     }
 }
 
 // MARK: - Auxiliary -
 
-extension UIHostingCollectionViewController {
+extension AppKitOrUIKitHostingCollectionViewController {
     var maximumCollectionViewCellSize: OptionalDimensions {
         let targetCollectionViewSize = collectionView.frame.size
         var baseContentSize = collectionView.contentSize
         
-        if let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+        if let collectionViewLayout = collectionView.collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout {
             if collectionViewLayout.scrollDirection == .vertical {
                 if (baseContentSize.width == 0 && targetCollectionViewSize.width > 0) || targetCollectionViewSize != collectionView.frame.size {
                     baseContentSize.width = targetCollectionViewSize.width - collectionView.adjustedContentInset.horizontal
@@ -638,8 +651,8 @@ extension UIHostingCollectionViewController {
         }
         
         let contentSize = CGSize(
-            width: (baseContentSize.width - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.horizontal ?? 0)) - collectionView.contentInset.horizontal,
-            height: (baseContentSize.height - ((collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset.vertical ?? 0)) - collectionView.contentInset.vertical
+            width: (baseContentSize.width - ((collectionView.collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout)?.sectionInset.horizontal ?? 0)) - collectionView.contentInset.horizontal,
+            height: (baseContentSize.height - ((collectionView.collectionViewLayout as? AppKitOrUIKitCollectionViewFlowLayout)?.sectionInset.vertical ?? 0)) - collectionView.contentInset.vertical
         )
         
         var result = OptionalDimensions(
@@ -659,11 +672,11 @@ extension UIHostingCollectionViewController {
     }
 }
 
-extension UIHostingCollectionViewController {
-    class _UICollectionView: UICollectionView, UICollectionViewDelegateFlowLayout {
-        weak var parent: UIHostingCollectionViewController?
+extension AppKitOrUIKitHostingCollectionViewController {
+    class _AppKitOrUIKitCollectionView: AppKitOrUIKitCollectionView, UICollectionViewDelegateFlowLayout {
+        weak var parent: AppKitOrUIKitHostingCollectionViewController?
         
-        init(parent: UIHostingCollectionViewController) {
+        init(parent: AppKitOrUIKitHostingCollectionViewController) {
             self.parent = parent
             
             super.init(
@@ -687,7 +700,7 @@ extension UIHostingCollectionViewController {
             sizeForItemAt indexPath: IndexPath
         ) -> CGSize {
             guard let parent = parent else {
-                return UICollectionViewFlowLayout.automaticSize
+                return AppKitOrUIKitCollectionViewFlowLayout.automaticSize
             }
             
             return parent.collectionView(
@@ -703,7 +716,7 @@ extension UIHostingCollectionViewController {
             referenceSizeForHeaderInSection section: Int
         ) -> CGSize {
             guard let parent = parent else {
-                return UICollectionViewFlowLayout.automaticSize
+                return AppKitOrUIKitCollectionViewFlowLayout.automaticSize
             }
             
             return parent.collectionView(
@@ -719,7 +732,7 @@ extension UIHostingCollectionViewController {
             referenceSizeForFooterInSection section: Int
         ) -> CGSize {
             guard let parent = parent else {
-                return UICollectionViewFlowLayout.automaticSize
+                return AppKitOrUIKitCollectionViewFlowLayout.automaticSize
             }
             
             return parent.collectionView(
