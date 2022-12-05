@@ -65,7 +65,21 @@ extension Color {
     public static var systemIndigo: Color {
         .init(.systemIndigo)
     }
-    
+
+    public static var systemBrown: Color {
+        .init(.systemBrown)
+    }
+
+    @available(iOS 15.0, tvOS 15.0, *)
+    public static var systemMint: Color {
+        .init(.systemMint)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, *)
+    public static var systemCyan: Color {
+        return .init(.systemCyan)
+    }
+
     public static var systemGray: Color {
         .init(.systemGray)
     }
