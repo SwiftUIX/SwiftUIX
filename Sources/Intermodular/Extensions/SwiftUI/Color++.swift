@@ -13,8 +13,16 @@ extension Color {
 
 extension Color {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    public static var lightGray: Color {
+        .init(.lightGray)
+    }
+
     public static var darkGray: Color {
         .init(.darkGray)
+    }
+
+    public static var magenta: Color {
+        .init(.magenta)
     }
     #endif
     
