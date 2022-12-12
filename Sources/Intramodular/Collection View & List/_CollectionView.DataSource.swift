@@ -146,7 +146,7 @@ extension _CollectionView.DataSource.Payload: CustomStringConvertible {
     }
 }
 
-extension AppKitOrUIKitHostingCollectionViewController {
+extension CocoaHostingCollectionViewController {
     func updateDataSource(
         oldValue: DataSource.Payload?,
         newValue: DataSource.Payload?

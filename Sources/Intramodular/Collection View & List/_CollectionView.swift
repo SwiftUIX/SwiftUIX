@@ -17,7 +17,7 @@ struct _CollectionView<
     SectionFooter: View,
     RowContent: View
 >: UIViewControllerRepresentable {
-    typealias UIViewControllerType = AppKitOrUIKitHostingCollectionViewController<
+    typealias UIViewControllerType = CocoaHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -90,7 +90,14 @@ struct _CollectionView<
         
         context.coordinator.dataSourceUpdateToken = context.environment._collectionViewConfiguration.dataSourceUpdateToken
     }
-    
+
+    static func dismantleUIViewController(
+        _ viewController: UIViewControllerType,
+        coordinator: Coordinator
+    ) {
+
+    }
+
     class Coordinator {
         var dataSourceUpdateToken: AnyHashable?
     }

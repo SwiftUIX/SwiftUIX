@@ -116,7 +116,7 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
 }
 
 extension _CollectionViewCellOrSupplementaryViewContainer {
-    init<SectionHeaderContent, SectionFooterContent, CellContent>(base: UIHostingCollectionViewSupplementaryView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>) {
+    init<SectionHeaderContent, SectionFooterContent, CellContent>(base: CocoaHostingCollectionViewSupplementaryView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>) {
         self.init(
             configuration: .init(
                 _reuseCellRender: false,

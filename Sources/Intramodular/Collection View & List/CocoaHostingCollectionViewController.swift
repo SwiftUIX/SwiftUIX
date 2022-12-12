@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-final class AppKitOrUIKitHostingCollectionViewController<
+final class CocoaHostingCollectionViewController<
     SectionType,
     SectionIdentifierType: Hashable,
     ItemType,
@@ -26,7 +26,7 @@ final class AppKitOrUIKitHostingCollectionViewController<
         CellContent
     >
 
-    typealias CellType = UIHostingCollectionViewCell<
+    typealias CellType = CocoaHostingCollectionViewCell<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -36,7 +36,7 @@ final class AppKitOrUIKitHostingCollectionViewController<
         CellContent
     >
 
-    typealias SupplementaryViewType = UIHostingCollectionViewSupplementaryView<
+    typealias SupplementaryViewType = CocoaHostingCollectionViewSupplementaryView<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -63,7 +63,7 @@ final class AppKitOrUIKitHostingCollectionViewController<
     
     var viewProvider: _SwiftUIType.ViewProvider
     
-    var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
+    var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil {
         didSet {
             collectionView.configure(with: _scrollViewConfiguration)
         }
@@ -142,6 +142,10 @@ final class AppKitOrUIKitHostingCollectionViewController<
         self.configuration = configuration
         
         super.init(nibName: nil, bundle: nil)
+    }
+
+    deinit {
+        tearDownDiffableDataSource()
     }
     
     public override func viewDidLoad() {
@@ -226,7 +230,19 @@ final class AppKitOrUIKitHostingCollectionViewController<
         
         self._internalDiffableDataSource = diffableDataSource
     }
-    
+
+    private func tearDownDiffableDataSource() {
+        if let dataSource = _internalDiffableDataSource {
+            var snapshot = dataSource.snapshot()
+
+            snapshot.deleteAllItems()
+
+            dataSource.apply(snapshot)
+        }
+
+        _internalDiffableDataSource = nil
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -499,7 +515,7 @@ final class AppKitOrUIKitHostingCollectionViewController<
     }
 }
 
-extension AppKitOrUIKitHostingCollectionViewController {
+extension CocoaHostingCollectionViewController {
     func refreshVisibleCellsAndSupplementaryViews() {
         for view in collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionHeader) {
             guard let view = view as? SupplementaryViewType, view.latestRepresentableUpdate != latestRepresentableUpdate else {
@@ -533,7 +549,7 @@ extension AppKitOrUIKitHostingCollectionViewController {
     }
 }
 
-extension AppKitOrUIKitHostingCollectionViewController {    
+extension CocoaHostingCollectionViewController {
     func contentConfiguration(
         for indexPath: IndexPath,
         reuseIdentifier: String
@@ -616,7 +632,7 @@ extension AppKitOrUIKitHostingCollectionViewController {
     }
 }
 
-extension AppKitOrUIKitHostingCollectionViewController {
+extension CocoaHostingCollectionViewController {
     func cellForItem(at indexPath: IndexPath) -> CellType? {
         let result = collectionView
             .visibleCells
@@ -633,7 +649,7 @@ extension AppKitOrUIKitHostingCollectionViewController {
 
 // MARK: - Auxiliary -
 
-extension AppKitOrUIKitHostingCollectionViewController {
+extension CocoaHostingCollectionViewController {
     var maximumCollectionViewCellSize: OptionalDimensions {
         let targetCollectionViewSize = collectionView.frame.size
         var baseContentSize = collectionView.contentSize
@@ -672,11 +688,11 @@ extension AppKitOrUIKitHostingCollectionViewController {
     }
 }
 
-extension AppKitOrUIKitHostingCollectionViewController {
+extension CocoaHostingCollectionViewController {
     class _AppKitOrUIKitCollectionView: AppKitOrUIKitCollectionView, UICollectionViewDelegateFlowLayout {
-        weak var parent: AppKitOrUIKitHostingCollectionViewController?
+        weak var parent: CocoaHostingCollectionViewController?
         
-        init(parent: AppKitOrUIKitHostingCollectionViewController) {
+        init(parent: CocoaHostingCollectionViewController) {
             self.parent = parent
             
             super.init(

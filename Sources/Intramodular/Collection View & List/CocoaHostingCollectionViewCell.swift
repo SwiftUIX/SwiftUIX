@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class UIHostingCollectionViewCell<
+class CocoaHostingCollectionViewCell<
     SectionType,
     SectionIdentifierType: Hashable,
     ItemType,
@@ -16,7 +16,7 @@ class UIHostingCollectionViewCell<
     SectionFooterContent: View,
     Content: View
 >: UICollectionViewCell {
-    typealias ParentViewControllerType = AppKitOrUIKitHostingCollectionViewController<
+    typealias ParentViewControllerType = CocoaHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -298,7 +298,7 @@ class UIHostingCollectionViewCell<
     }
 }
 
-extension UIHostingCollectionViewCell {
+extension CocoaHostingCollectionViewCell {
     func cellWillDisplay(inParent parentViewController: ParentViewControllerType?) {
         update(disableAnimation: true)
         
@@ -390,13 +390,13 @@ extension UIHostingCollectionViewCell {
 
 // MARK: - Auxiliary -
 
-extension UIHostingCollectionViewCell {
+extension CocoaHostingCollectionViewCell {
     struct InvalidationContext {
         var newPreferredContentSize: CGSize?
     }
 
     struct _CellProxyBase: SwiftUIX._CellProxyBase {
-        weak var base: UIHostingCollectionViewCell?
+        weak var base: CocoaHostingCollectionViewCell?
         
         var globalFrame: CGRect {
             base?.globalFrame ?? .zero
@@ -417,11 +417,11 @@ extension UIHostingCollectionViewCell {
 }
 
 extension String {
-    static let hostingCollectionViewCellIdentifier = "UIHostingCollectionViewCell"
+    static let hostingCollectionViewCellIdentifier = "CocoaHostingCollectionViewCell"
 }
 
 extension CocoaCollectionCellOrSupplementaryViewHostingController {
-    fileprivate func mount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(onto cell: UIHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
+    fileprivate func mount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(onto cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
         guard let parent = cell.parentViewController else {
             assertionFailure()
             
@@ -461,7 +461,7 @@ extension CocoaCollectionCellOrSupplementaryViewHostingController {
         }
     }
     
-    fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(from cell: UIHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
+    fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(from cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
         if cell.shouldUseCachedContentHostingController {
             if parent != nil {
                 UIView.performWithoutAnimation {

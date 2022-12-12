@@ -14,7 +14,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     
     private let content: Content
     
-    private var configuration = CocoaScrollViewConfiguration<Content>()
+    private var configuration: CocoaScrollViewConfiguration<Content> = nil
     
     public init(
         _ axes: Axis.Set = .vertical,

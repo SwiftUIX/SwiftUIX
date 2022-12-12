@@ -49,7 +49,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
         }
     }
     
-    public var configuration = CocoaScrollViewConfiguration<Content>() {
+    public var configuration: CocoaScrollViewConfiguration<Content> = nil {
         didSet {
             configure(with: configuration)
         }

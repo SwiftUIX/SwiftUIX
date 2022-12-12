@@ -26,7 +26,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
     var sectionFooter: (SectionModel) -> SectionFooter
     var rowContent: (ItemType) -> RowContent
     
-    var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>() {
+    var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil {
         didSet {            
             tableView?.configure(with: scrollViewConfiguration)
         }

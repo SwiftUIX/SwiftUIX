@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// The properties of a `CocoaScrollView` instance.
-public struct CocoaScrollViewConfiguration<Content: View> {
+public struct CocoaScrollViewConfiguration<Content: View>: ExpressibleByNilLiteral {
     var initialContentAlignment: Alignment?
     var axes: Axis.Set = [.vertical]
     var showsVerticalScrollIndicator: Bool = true
@@ -36,6 +36,10 @@ public struct CocoaScrollViewConfiguration<Content: View> {
 
     @available(tvOS, unavailable)
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+    
+    public init(nilLiteral: ()) {
+        
+    }
 }
 
 extension CocoaScrollViewConfiguration {
@@ -287,7 +291,7 @@ final class _UIRefreshControl: UIRefreshControl {
 
 extension EnvironmentValues {
     struct _ScrollViewConfiguration: EnvironmentKey {
-        static let defaultValue = CocoaScrollViewConfiguration<AnyView>()
+        static let defaultValue: CocoaScrollViewConfiguration<AnyView> = nil
     }
     
     var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {

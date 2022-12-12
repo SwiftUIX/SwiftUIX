@@ -13,9 +13,9 @@ public struct CollectionView: View {
     
     private let internalBody: AnyView
     
-    private var _collectionViewConfiguration = _CollectionViewConfiguration()
+    private var _collectionViewConfiguration: _CollectionViewConfiguration = nil
     private var _dynamicViewContentTraitValues = _DynamicViewContentTraitValues()
-    private var _scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
+    private var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
     private var collectionViewLayout: CollectionViewLayout?
 
     public var body: some View {
@@ -73,7 +73,9 @@ extension CollectionView {
     ) where Data.Element: Identifiable {
         self.init(
             internalBody: _CollectionView(
-                CollectionOfOne(ListSection<Int, _IdentifierHashedValue<Data.Element>>(0, items: data.lazy.map(_IdentifierHashedValue.init))),
+                CollectionOfOne(
+                    ListSection(0, items: data.lazy.map(_IdentifierHashedValue.init))
+                ),
                 sectionHeader: { _ in header() },
                 sectionFooter: { _ in footer() },
                 rowContent: { rowContent($1.value) }
@@ -89,7 +91,14 @@ extension CollectionView {
     ) {
         self.init(
             internalBody: _CollectionView(
-                CollectionOfOne(ListSection(0, items: data.lazy.map({ _IdentifierHashedValue(_KeyPathHashIdentifiableValue(value: $0, keyPath: id)) }))),
+                CollectionOfOne(
+                    ListSection(
+                        0,
+                        items: data.lazy.map {
+                            _IdentifierHashedValue(_KeyPathHashIdentifiableValue(value: $0, keyPath: id))
+                        }
+                    )
+                ),
                 sectionHeader: Never.produce,
                 sectionFooter: Never.produce,
                 rowContent: { rowContent($1.value.value) }

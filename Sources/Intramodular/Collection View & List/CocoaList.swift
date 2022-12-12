@@ -36,7 +36,7 @@ public struct CocoaList<
     #endif
     
     @usableFromInline
-    var scrollViewConfiguration = CocoaScrollViewConfiguration<AnyView>()
+    var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
     
     public init(
         _ data: Data,

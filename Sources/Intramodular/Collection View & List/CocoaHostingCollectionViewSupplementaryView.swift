@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class UIHostingCollectionViewSupplementaryView<
+class CocoaHostingCollectionViewSupplementaryView<
     SectionType,
     SectionIdentifierType: Hashable,
     ItemType,
@@ -16,7 +16,7 @@ class UIHostingCollectionViewSupplementaryView<
     SectionFooterContent: View,
     Content: View
 >: UICollectionReusableView {
-    typealias ParentViewControllerType = AppKitOrUIKitHostingCollectionViewController<
+    typealias ParentViewControllerType = CocoaHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
         ItemType,
@@ -140,7 +140,7 @@ class UIHostingCollectionViewSupplementaryView<
     }
 }
 
-extension UIHostingCollectionViewSupplementaryView {
+extension CocoaHostingCollectionViewSupplementaryView {
     func update(disableAnimation: Bool = true) {
         guard configuration != nil else {
             return
@@ -202,11 +202,11 @@ extension UIHostingCollectionViewSupplementaryView {
 
 // MARK: - Auxiliary -
 
-extension UIHostingCollectionViewSupplementaryView {
+extension CocoaHostingCollectionViewSupplementaryView {
     private class ContentHostingController: UIHostingController<_CollectionViewCellOrSupplementaryViewContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
-        weak var base: UIHostingCollectionViewSupplementaryView?
+        weak var base: CocoaHostingCollectionViewSupplementaryView?
         
-        init(base: UIHostingCollectionViewSupplementaryView) {
+        init(base: CocoaHostingCollectionViewSupplementaryView) {
             self.base = base
             
             super.init(rootView: .init(base: base))
@@ -250,7 +250,7 @@ extension UIHostingCollectionViewSupplementaryView {
         
         func move(
             toParent parent: ParentViewControllerType?,
-            ofSupplementaryView supplementaryView: UIHostingCollectionViewSupplementaryView
+            ofSupplementaryView supplementaryView: CocoaHostingCollectionViewSupplementaryView
         ) {
             if let parent = parent {
                 let hostAsChildViewController = !parent.configuration.unsafeFlags.contains(.disableCellHostingControllerEmbed)
