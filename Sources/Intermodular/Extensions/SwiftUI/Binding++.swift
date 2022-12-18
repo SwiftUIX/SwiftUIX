@@ -102,6 +102,13 @@ extension Binding {
             set: { self.wrappedValue = $0 }
         )
     }
+    
+    public func forceUnwrap<T>() -> Binding<T> where Value == Optional<T> {
+        .init(
+            get: { self.wrappedValue! },
+            set: { self.wrappedValue = $0 }
+        )
+    }
         
     public func isNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
