@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
-struct SceneActivationActionModifier: ViewModifier {
+private struct SceneActivationActionModifier: ViewModifier {
     let action: () -> Void
     
     func body(content: Content) -> some View {
@@ -18,12 +18,23 @@ struct SceneActivationActionModifier: ViewModifier {
     }
 }
 
-struct SceneDeactivationActionModifier: ViewModifier {
+private struct SceneDeactivationActionModifier: ViewModifier {
     let action: () -> Void
     
     func body(content: Content) -> some View {
         content
             .onReceive(NotificationCenter.default.publisher(for: UIScene.willDeactivateNotification)) { _ in
+                self.action()
+            }
+    }
+}
+
+private struct SceneDisconnectionActionModifier: ViewModifier {
+    let action: () -> Void
+    
+    func body(content: Content) -> some View {
+        content
+            .onReceive(NotificationCenter.default.publisher(for: UIScene.didDisconnectNotification)) { _ in
                 self.action()
             }
     }
@@ -35,9 +46,13 @@ extension View {
     public func onSceneActivate(perform action: @escaping () -> Void) -> some View {
         modifier(SceneActivationActionModifier(action: action))
     }
-
+    
     public func onSceneDeactivate(perform action: @escaping () -> Void) -> some View {
         modifier(SceneDeactivationActionModifier(action: action))
+    }
+
+    public func onSceneDisconnect(perform action: @escaping () -> Void) -> some View {
+        modifier(SceneDisconnectionActionModifier(action: action))
     }
 }
 
