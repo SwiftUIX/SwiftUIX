@@ -8,7 +8,10 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension Menu {
-    public init(systemImage: String, content: () -> Content) where Label == Image {
+    public init(
+        systemImage: String,
+        @ViewBuilder content: () -> Content
+    ) where Label == Image {
         let content = content()
         
         self.init(content: { content }) {
@@ -16,7 +19,10 @@ extension Menu {
         }
     }
     
-    public init(systemImage: SFSymbolName, content: () -> Content) where Label == Image {
+    public init(
+        systemImage: SFSymbolName,
+        @ViewBuilder content: () -> Content
+    ) where Label == Image {
         self.init(systemImage: systemImage.rawValue, content: content)
     }
 }
