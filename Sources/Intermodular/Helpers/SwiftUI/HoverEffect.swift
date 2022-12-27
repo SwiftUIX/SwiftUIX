@@ -24,7 +24,6 @@ public enum HoverEffect {
     case lift
 }
 
-#if compiler(>=5.7) || !os(tvOS)
 @available(iOS 13.4, *)
 @available(tvOS 16.0, *)
 @available(watchOS, unavailable)
@@ -43,27 +42,7 @@ extension SwiftUI.HoverEffect {
         }
     }
 }
-#else
-@available(iOS 13.4, *)
-@available(tvOS, unavailable)
-@available(watchOS, unavailable)
-@available(OSX, unavailable)
-extension SwiftUI.HoverEffect {
-    @available(tvOS 16.0, *)
-    public init(_ hoverEffect: HoverEffect) {
-        switch hoverEffect {
-            case .automatic:
-                self = .automatic
-            case .highlight:
-                self = .highlight
-            case .lift:
-                self = .lift
-        }
-    }
-}
-#endif
 
-#if compiler(>=5.7) || !os(tvOS)
 @available(iOS 13.4, *)
 @available(tvOS 16.0, *)
 @available(watchOS, unavailable)
@@ -77,4 +56,3 @@ extension View {
         hoverEffect(SwiftUI.HoverEffect(effect))
     }
 }
-#endif

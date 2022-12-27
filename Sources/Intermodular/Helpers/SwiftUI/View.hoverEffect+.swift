@@ -15,11 +15,7 @@ public struct _HoverEffectViewModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         if #available(iOS 13.4, iOSApplicationExtension 14.0, macCatalystApplicationExtension 14.0, *) {
-            #if compiler(>=5.7) || !os(tvOS)
             return content.hoverEffect(.init(hoverEffect))
-            #else
-            return content
-            #endif
         } else {
             fatalError("Use View.hoverEffectIfAvailable instead.")
         }
