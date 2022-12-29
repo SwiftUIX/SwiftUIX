@@ -29,10 +29,6 @@ extension PerformActionView {
     public func appendAction<A: DynamicAction>(_ action: A) -> _AppendDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
-    
-    public func addAction<A: DynamicAction>(_ action: A) -> _AddDynamicAction<Self, A> {
-        .init(base: self, action: action)
-    }
 }
 
 public struct WithDynamicAction<Action: DynamicAction, Content: View>: View {
@@ -138,14 +134,5 @@ public struct _AppendDynamicAction<Base: PerformActionView, Action: DynamicActio
     
     public var body: some View {
         base.transformAction({ $0.insert(action.perform) })
-    }
-}
-
-public struct _AddDynamicAction<Base: PerformActionView, Action: DynamicAction>: View {
-    let base: Base
-    let action: Action
-    
-    public var body: some View {
-        base.addAction(action)
     }
 }

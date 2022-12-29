@@ -43,9 +43,9 @@ public struct WebView: View {
 struct _WebViewContainer: View {
     let configuration: _WebView.Configuration
     let placeholder: AnyView?
-
+    
     @ObservedObject var coordinator: _WebView.Coordinator
-
+    
     var body: some View {
         _WebView(configuration: configuration, coordinator: coordinator)
             .visible(!coordinator.isLoading)
@@ -68,14 +68,14 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
     }
     
     let configuration: Configuration
-
+    
     @ObservedObject var coordinator: Coordinator
     
     func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
         let view = WKWebView()
-
+        
         context.coordinator.webView = view
-
+        
         return view
     }
     
@@ -84,7 +84,7 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
             coordinator.load(configuration.url)
         }
     }
-
+    
     static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         coordinator.webView = nil
     }
@@ -100,7 +100,7 @@ extension _WebView {
             var url: URL?
             var redirectedURL: URL?
         }
-
+        
         weak var webView: WKWebView? {
             didSet {
                 activeLoadRequest = nil
@@ -108,27 +108,27 @@ extension _WebView {
                 webView?.navigationDelegate = self
             }
         }
-
+        
         @Published var isLoading: Bool = true
-
+        
         var activeLoadRequest: LoadRequest?
-
+        
         func load(_ url: URL) {
             self.activeLoadRequest = nil
             self.activeLoadRequest = .init(url: url, redirectedURL: nil)
-
+            
             isLoading = true
-
+            
             webView?.load(URLRequest(url: url))
         }
-
+        
         func webView(
             _ webView: WKWebView,
             didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!
         ) {
             self.activeLoadRequest?.redirectedURL = webView.url
         }
-
+        
         func webView(
             _ webView: WKWebView,
             didFinish navigation: WKNavigation!

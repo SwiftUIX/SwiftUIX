@@ -7,7 +7,7 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 13.0, watchOS 7.0, *)
 @available(macOS, unavailable)
-public struct _NestedNavigationView<Content: View>: ContainerView {
+public struct _NestedNavigationView<Content: View>: View {
     public let content: Content
     
     public init(@ViewBuilder content: () -> Content) {

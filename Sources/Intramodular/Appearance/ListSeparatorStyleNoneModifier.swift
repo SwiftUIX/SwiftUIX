@@ -6,7 +6,6 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-
 public struct ListSeparatorStyleNoneModifier: ViewModifier {
     @inlinable
     public func body(content: Content) -> some View {
@@ -30,5 +29,4 @@ extension View {
         modifier(ListSeparatorStyleNoneModifier())
     }
 }
-
 #endif

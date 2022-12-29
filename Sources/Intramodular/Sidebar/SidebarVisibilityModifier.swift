@@ -7,7 +7,7 @@ import SwiftUI
 #if os(iOS)
 
 @available(iOS 14.0, *)
-struct SidebarVisibilityModifier: ViewModifier {
+private struct SidebarVisibilityModifier: ViewModifier {
     var isSidebarInitiallyVisible: Bool
 
     func body(content: Content) -> some View {

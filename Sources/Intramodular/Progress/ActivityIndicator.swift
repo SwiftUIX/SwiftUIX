@@ -30,7 +30,7 @@ public struct ActivityIndicator {
     #endif
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var tintUIColor: UIColor?
+    private var tintAppKitOrUIKitColor: AppKitOrUIKitColor?
     #endif
     
     public init() {
@@ -53,8 +53,8 @@ extension ActivityIndicator: UIViewRepresentable {
     public func updateUIView(_ uiView: UIViewType, context: Context) {
         assignIfNotEqual(.init(style), to: &uiView.style)
 
-        uiView.color = tintUIColor ?? context.environment.tintColor?.toUIColor()
-        uiView.tintColor = tintUIColor ?? context.environment.tintColor?.toUIColor()
+        uiView.color = tintAppKitOrUIKitColor ?? context.environment.tintColor?.toUIColor()
+        uiView.tintColor = tintAppKitOrUIKitColor ?? context.environment.tintColor?.toUIColor()
         
         if !context.environment.isEnabled && uiView.isAnimating {
             uiView.stopAnimating()
@@ -72,8 +72,8 @@ extension ActivityIndicator: UIViewRepresentable {
     }
     
     @_disfavoredOverload
-    public func tintColor(_ color: UIColor?) -> Self {
-        then({ $0.tintUIColor = color })
+    public func tintColor(_ color: AppKitOrUIKitColor?) -> Self {
+        then({ $0.tintAppKitOrUIKitColor = color })
     }
 }
 

@@ -7,7 +7,7 @@ import SwiftUI
 
 public protocol ProgressionController {
     func scrollTo(_ id: AnyHashable)
-
+    
     func moveToNext()
     func moveToPrevious()
 }

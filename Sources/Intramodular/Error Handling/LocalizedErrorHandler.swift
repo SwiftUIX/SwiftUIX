@@ -66,7 +66,7 @@ extension EnvironmentValues {
         static let defaultValue: LocalizedErrorHandler = DefaultLocalizedErrorHandler()
     }
     
-    public var localizedErrorHandler: LocalizedErrorHandler {
+    var localizedErrorHandler: LocalizedErrorHandler {
         get {
             self[LocalizedErrorHandlerKey.self]
         } set {
