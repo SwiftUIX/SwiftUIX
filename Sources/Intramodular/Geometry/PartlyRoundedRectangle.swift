@@ -5,9 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-public struct PartRoundedRectangle: Shape {
+public struct PartRoundedRectangle {
     public let corners: [RectangleCorner]
     public let cornerRadii: CGFloat
     
@@ -15,7 +13,10 @@ public struct PartRoundedRectangle: Shape {
         self.corners = corners
         self.cornerRadii = cornerRadii
     }
-    
+}
+
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension PartRoundedRectangle: Shape {
     public func path(in rect: CGRect) -> Path {
         Path(
             AppKitOrUIKitBezierPath(
@@ -27,9 +28,11 @@ public struct PartRoundedRectangle: Shape {
         )
     }
 }
+#endif
 
 // MARK: - API -
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension View {
     @inlinable
     public func cornerRadius(
@@ -39,12 +42,25 @@ extension View {
         clipShape(PartRoundedRectangle(corners: corners, cornerRadii: cornerRadii))
     }
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    @inlinable
+    public func cornerRadius(
+        _ corners: Set<RectangleCorner>,
+        _ cornerRadii: CGFloat
+    ) -> some View {
+        clipShape(PartRoundedRectangle(corners: Array(corners), cornerRadii: cornerRadii))
+    }
+    
+    @inlinable
+    public func cornerRadius(
+        _ corner: RectangleCorner,
+        _ cornerRadii: CGFloat
+    ) -> some View {
+        clipShape(PartRoundedRectangle(corners: [corner], cornerRadii: cornerRadii))
+    }
+    
     @_disfavoredOverload
-    public func cornerRadius(_ corners: UIRectCorner, _ cornerRadii: CGFloat) -> some View {
+    public func cornerRadius(_ corners: AppKitOrUIKitRectCorner, _ cornerRadii: CGFloat) -> some View {
         clipShape(PartRoundedRectangle(corners: .init(corners), cornerRadii: cornerRadii))
     }
-    #endif
 }
-
 #endif
