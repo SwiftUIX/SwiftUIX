@@ -52,9 +52,9 @@ extension Font.TextStyle {
     #endif
 }
 
+@available(macOS 11.0, *)
 extension Font.TextStyle {
-    #if canImport(UIKit)
-    public func toUIFontTextStyle() -> UIFont.TextStyle? {
+    public func toAppKitOrUIKitFontTextStyle() -> AppKitOrUIKitFont.TextStyle? {
         switch self {
             #if !os(tvOS)
             case .largeTitle:
@@ -76,7 +76,7 @@ extension Font.TextStyle {
                 return .caption1
                 
             default: do {
-                if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+                if #available(iOS 14.0, tvOS 14.0, watchOS 7.0, *) {
                     switch self {
                         case .title2:
                             return .title2
@@ -98,5 +98,4 @@ extension Font.TextStyle {
             }
         }
     }
-    #endif
 }

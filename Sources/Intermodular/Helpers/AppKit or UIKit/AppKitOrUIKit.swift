@@ -31,6 +31,10 @@ public typealias AppKitOrUIKitLabel = UILabel
 public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
 public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
+#if os(iOS)
+public typealias AppKitOrUIKitPasteboard = UIPasteboard
+#endif
+public typealias AppKitOrUIKitRectCorner = UIRectCorner
 public typealias AppKitOrUIKitResponder = UIResponder
 public typealias AppKitOrUIKitScrollView = UIScrollView
 public typealias AppKitOrUIKitSearchBar = UISearchBar
@@ -89,6 +93,7 @@ public typealias AppKitOrUIKitLabel = NSLabel
 public typealias AppKitOrUIKitLayoutAxis = NSUserInterfaceLayoutOrientation
 public typealias AppKitOrUIKitLayoutGuide = NSLayoutGuide
 public typealias AppKitOrUIKitLayoutPriority = NSLayoutConstraint.Priority
+public typealias AppKitOrUIKitPasteboard = NSPasteboard
 public typealias AppKitOrUIKitResponder = NSResponder
 public typealias AppKitOrUIKitSearchBar = NSSearchField
 public typealias AppKitOrUIKitTableView = NSTableView
@@ -100,6 +105,13 @@ public typealias AppKitOrUIKitWindow = NSWindow
 extension NSEdgeInsets {
     var edgeInsets: EdgeInsets {
         .init(top: top, leading: left, bottom: bottom, trailing: right)
+    }
+}
+
+extension NSFont {
+    @available(macOS 11.0, *)
+    public static func preferredFont(forTextStyle textStyle: TextStyle) -> NSFont {
+        .preferredFont(forTextStyle: textStyle, options: [:])
     }
 }
 
@@ -186,7 +198,7 @@ extension EnvironmentValues {
             _appKitOrUIKitViewControllerBox?.value
         }
     }
-
+    
     var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>? {
         get {
             self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>.self]

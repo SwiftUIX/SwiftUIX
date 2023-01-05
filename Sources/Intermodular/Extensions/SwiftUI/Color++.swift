@@ -248,6 +248,20 @@ extension Color {
         return .init(.quaternarySystemFill)
     }
 }
+#elseif os(macOS)
+extension Color {
+    public static var systemBackground: Color {
+        Color(AppKitOrUIKitColor.windowBackgroundColor)
+    }
+    
+    public static var secondarySystemBackground: Color {
+        Color(AppKitOrUIKitColor.controlBackgroundColor)
+    }
+    
+    public static var tertiarySystemBackground: Color {
+        Color(AppKitOrUIKitColor.textBackgroundColor)
+    }
+}
 #endif
 
 extension Color {

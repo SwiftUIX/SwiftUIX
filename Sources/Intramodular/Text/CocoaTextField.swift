@@ -200,7 +200,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             uiView.borderStyle = configuration.borderStyle
             uiView.clearButtonMode = configuration.clearButtonMode ?? .never
             uiView.enablesReturnKeyAutomatically = configuration.enablesReturnKeyAutomatically ?? false
-            uiView.font = configuration.uiFont ?? context.environment.font?.toUIFont() ?? uiView.font
+            uiView.font = try? configuration.uiFont ?? context.environment.font?.toAppKitOrUIKitFont() ?? uiView.font
             uiView.isSecureTextEntry = configuration.secureTextEntry ?? false
             uiView.isUserInteractionEnabled = context.environment.isEnabled
             uiView.keyboardType = configuration.keyboardType
@@ -224,7 +224,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
                 uiView.attributedPlaceholder = NSAttributedString(
                     string: placeholder,
                     attributes: [
-                        .font: configuration.uiFont ?? context.environment.font?.toUIFont() ?? uiView.font,
+                        .font: try? configuration.uiFont ?? context.environment.font?.toAppKitOrUIKitFont() ?? uiView.font,
                         .paragraphStyle: NSMutableParagraphStyle().then {
                             $0.alignment = .init(context.environment.multilineTextAlignment)
                         }

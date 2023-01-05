@@ -43,3 +43,22 @@ extension Optional where Wrapped: View {
         }
     }
 }
+
+extension Optional {
+    enum UnwrappingError: Error {
+        case unexpectedlyFoundNil
+    }
+
+    func unwrap(
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line,
+        column: UInt = #column
+    ) throws -> Wrapped {
+        guard let wrapped = self else {
+            throw UnwrappingError.unexpectedlyFoundNil
+        }
+        
+        return wrapped
+    }
+}

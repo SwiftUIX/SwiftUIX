@@ -89,7 +89,7 @@ extension AppKitOrUIKitLabel {
         #endif
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        if let font = attributedText.configuration.appKitOrUIKitFont ?? attributedText.font?.toUIFont() {
+        if let font = try? attributedText.configuration.appKitOrUIKitFont ?? attributedText.font?.toAppKitOrUIKitFont() {
             let string = NSMutableAttributedString(attributedString: attributedText.content)
             
             string.addAttribute(.font, value: font, range: .init(location: 0, length: string.length))
