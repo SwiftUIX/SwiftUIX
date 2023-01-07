@@ -180,8 +180,8 @@ extension _TextView: UIViewRepresentable {
             
             uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
             
-            let font = try? configuration.font
-                ?? context.environment.font?.toAppKitOrUIKitFont()
+            let font = configuration.font
+                ?? (try? context.environment.font?.toAppKitOrUIKitFont())
                 ?? AppKitOrUIKitFont.preferredFont(forTextStyle: .body)
             
             if let textColor = configuration.textColor {
