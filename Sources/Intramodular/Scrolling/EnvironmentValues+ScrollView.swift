@@ -47,17 +47,9 @@ extension EnvironmentValues {
     
     public var _isScrollEnabled: Bool {
         get {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                return isScrollEnabled
-            } else {
-                return _SwiftUIX_isScrollEnabled
-            }
+            return _SwiftUIX_isScrollEnabled
         } set {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                isScrollEnabled = newValue
-            } else {
-                _SwiftUIX_isScrollEnabled = newValue
-            }
+            _SwiftUIX_isScrollEnabled = newValue
         }
     }
 }
@@ -83,7 +75,6 @@ extension View {
     public func scrollDisabled(_ disabled: Bool) -> some View {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             self
-                .environment(\.isScrollEnabled, !disabled)
                 .environment(\._SwiftUIX_isScrollEnabled, !disabled)
         } else {
             environment(\._SwiftUIX_isScrollEnabled, !disabled)

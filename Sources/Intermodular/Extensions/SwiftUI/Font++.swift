@@ -187,7 +187,7 @@ private enum _SwiftUIFontProvider {
                     font = (value as? CTFont?)?.flatMap({ $0 })
                 }
                 
-                guard let font else {
+                guard let font = font else {
                     return nil
                 }
                 
@@ -210,7 +210,7 @@ extension SwiftUI.Font.Weight {
             rawValue = value as? CGFloat
         }
         
-        guard let rawValue else {
+        guard let rawValue = rawValue else {
             return nil
         }
         
