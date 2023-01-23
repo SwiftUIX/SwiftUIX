@@ -18,3 +18,11 @@ public struct AnyButtonStyle: ButtonStyle {
         self._makeBody(configuration)
     }
 }
+
+extension View {
+    public func buttonStyle<V: View>(
+        @ViewBuilder makeBody: @escaping (AnyButtonStyle.Configuration) -> V
+    ) -> some View {
+        buttonStyle(AnyButtonStyle(makeBody: makeBody))
+    }
+}

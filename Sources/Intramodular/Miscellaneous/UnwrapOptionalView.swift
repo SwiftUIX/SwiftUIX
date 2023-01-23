@@ -2,26 +2,46 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Combine
 import Swift
 import SwiftUI
 
 /// A view that unwraps an `Optional` to produce some content.
 public struct UnwrapOptionalView<Content: View>: View {
-    @usableFromInline
-    let content: Content?
+    private let content: Content?
     
-    @inlinable
-    public init<Value>(_ value: Optional<Value>, @ViewBuilder content: (Value) -> Content) {
-        self.content = value.map(content)
-    }
-    
-    @inlinable
     public var body: some View {
         content
     }
+}
+
+extension UnwrapOptionalView {
+    public init<Value>(
+        _ value: Optional<Value>,
+        @ViewBuilder content: (Value) -> Content
+    ) {
+        self.content = value.map(content)
+    }
     
-    @inlinable
+    public init<Value>(
+        _ value: Binding<Optional<Value>>,
+        @ViewBuilder content: (Binding<Value>) -> Content
+    ) {
+        self.content = value.wrappedValue.map { unwrappedValue in
+            let binding = Binding(
+                get: { value.wrappedValue ?? unwrappedValue },
+                set: { newValue in
+                    if value.wrappedValue != nil {
+                        value.wrappedValue = newValue
+                    }
+                }
+            )
+            
+            content(binding)
+        }
+    }
+}
+
+extension UnwrapOptionalView {
     public static func ?? <V: View>(lhs: UnwrapOptionalView, rhs: V) -> some View {
         PassthroughView {
             if lhs.content == nil {
@@ -31,32 +51,30 @@ public struct UnwrapOptionalView<Content: View>: View {
             }
         }
     }
-}
-
-extension UnwrapOptionalView {
-    @inlinable
+    
     public func `else`<V: View>(@ViewBuilder _ view: () -> V) -> some View {
         self ?? view()
     }
     
-    @inlinable
     public func `else`<V: View>(_ view: V) -> some View {
         self ?? view
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Supplementary -
 
 extension Optional {
-    @inlinable
-    public func ifSome<Content: View>(@ViewBuilder content: (Wrapped) -> Content) -> UnwrapOptionalView<Content> {
-        .init(self, content: content)
+    public func ifSome<Content: View>(
+        @ViewBuilder content: (Wrapped) -> Content
+    ) -> UnwrapOptionalView<Content> {
+        UnwrapOptionalView(self, content: content)
     }
 }
 
 extension View {
-    @inlinable
-    public func unwrap<T, V: View>(_ value: T?, transform: (T, Self) -> V) -> some View {
+    public func unwrap<T, V: View>(
+        _ value: T?, transform: (T, Self) -> V
+    ) -> some View {
         PassthroughView {
             if value != nil {
                 transform(value!, self)

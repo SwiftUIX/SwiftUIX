@@ -57,7 +57,7 @@ extension View {
     
     /// Resolves and applies a modifier to a view and returns a new view.
     public func modify<T: ViewModifier>(
-        modifier: () -> T
+        @ViewBuilder modifier: () -> T
     ) -> ModifiedContent<Self, T> {
         self.modifier(modifier())
     }
