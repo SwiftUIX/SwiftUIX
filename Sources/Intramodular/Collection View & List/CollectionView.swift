@@ -472,6 +472,10 @@ extension CollectionView {
     public func refreshControlTintColor(_ color: Color?) -> Self {
         then({ $0._scrollViewConfiguration.refreshControlTintColor = color?.toUIColor() })
     }
+    
+    public func isPagingEnabled(_ isPagingEnabled: Bool) -> Self {
+        then({ $0._scrollViewConfiguration.isPagingEnabled = isPagingEnabled })
+    }
 }
 
 #endif
