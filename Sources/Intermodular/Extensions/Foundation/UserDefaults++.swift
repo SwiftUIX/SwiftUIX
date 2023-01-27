@@ -20,12 +20,12 @@ extension UserDefaults {
         } else if let value = object as? Value {
             return value
         } else if let data = object as? Data {
-            return try PropertyListDecoder().decode(Value.self, from: data, allowFragments: true)
+            return try JSONDecoder().decode(Value.self, from: data, allowFragments: true)
         } else {
             return nil
         }
     }
-
+    
     func encode<Value: Codable>(_ value: Value, forKey key: String) throws {
         if let value = value as? _opaque_Optional, !value.isNotNil {
             removeObject(forKey: key)
@@ -34,7 +34,7 @@ extension UserDefaults {
         } else if let url = value as? URL {
             set(url, forKey: key)
         } else {
-            setValue(try PropertyListEncoder().encode(value, allowFragments: true), forKey: key)
+            setValue(try JSONEncoder().encode(value, allowFragments: true), forKey: key)
         }
     }
 }
@@ -111,7 +111,7 @@ extension UInt64: UserDefaultsPrimitive {
     
 }
 
-extension PropertyListDecoder {
+extension JSONDecoder {
     private struct FragmentDecodingBox<T: Decodable>: Decodable {
         var value: T
         
@@ -124,7 +124,11 @@ extension PropertyListDecoder {
         }
     }
     
-    public func decode<T: Decodable>(_ type: T.Type, from data: Data, allowFragments: Bool) throws -> T {
+    public func decode<T: Decodable>(
+        _ type: T.Type,
+        from data: Data,
+        allowFragments: Bool
+    ) throws -> T {
         guard allowFragments else {
             return try decode(type, from: data)
         }
@@ -150,14 +154,14 @@ extension PropertyListDecoder {
     
     private func copy() -> PropertyListDecoder {
         let decoder = PropertyListDecoder()
-
+        
         decoder.userInfo = userInfo
         
         return decoder
     }
 }
 
-extension PropertyListEncoder {
+extension JSONEncoder {
     private struct FragmentEncodingBox<T: Encodable>: Encodable {
         var wrappedValue: T
         
@@ -167,7 +171,7 @@ extension PropertyListEncoder {
             try container.encode(wrappedValue)
         }
     }
-
+    
     fileprivate func encode<T: Encodable>(_ value: T, allowFragments: Bool) throws -> Data {
         do {
             return try encode(value)
