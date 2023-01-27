@@ -48,7 +48,7 @@ extension Optional {
     enum UnwrappingError: Error {
         case unexpectedlyFoundNil
     }
-
+    
     func unwrap(
         file: StaticString = #file,
         function: StaticString = #function,

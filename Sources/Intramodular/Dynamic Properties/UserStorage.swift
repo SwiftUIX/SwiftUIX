@@ -16,7 +16,7 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         let _isStrict: Bool
         
         var storedValue: Value? {
-            didSet {
+            willSet {
                 objectWillChange.send()
             }
         }

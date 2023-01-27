@@ -13,38 +13,64 @@ extension Binding {
 }
 
 extension Binding {
-    public func map<T>(_ keyPath: WritableKeyPath<Value, T>) -> Binding<T> {
-        .init(
-            get: { wrappedValue[keyPath: keyPath] },
-            set: { wrappedValue[keyPath: keyPath] = $0 }
+    public func _cast<T>(
+        to type: T.Type = T.self
+    ) -> Binding<Optional<T>> {
+        Binding<Optional<T>>(
+            get: {
+                self.wrappedValue as? T
+            },
+            set: { newValue in
+                guard let _newValue = newValue as? Value else {
+                    assertionFailure()
+                    
+                    return
+                }
+                
+                self.wrappedValue = _newValue
+            }
         )
     }
-}
 
-extension Binding {
-    public func mirror(to other: Binding) -> Self {
-        .init(
-            get: { wrappedValue },
-            set: {
-                wrappedValue = $0
-                other.wrappedValue = $0
+    public func _cast<T>(
+        to type: T.Type = T.self,
+        defaultValue: @escaping () -> T
+    ) -> Binding<T> {
+        Binding<T>(
+            get: {
+                (self.wrappedValue as? T) ?? defaultValue()
+            },
+            set: { newValue in
+                guard let _newValue = newValue as? Value else {
+                    assertionFailure()
+                    
+                    return
+                }
+                 
+                self.wrappedValue = _newValue
+            }
+        )
+    }
+
+    /// Creates a `Binding` by force-casting this binding's value.
+    public func forceCast<T>(to type: T.Type = T.self) -> Binding<T> {
+        Binding<T>(
+            get: {
+                self.wrappedValue as! T
+            },
+            set: { newValue in
+                self.wrappedValue = newValue as! Value
             }
         )
     }
 }
 
 extension Binding {
-    public func onSet(_ body: @escaping (Value) -> ()) -> Self {
-        return .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0; body($0) }
+    public func map<T>(_ keyPath: WritableKeyPath<Value, T>) -> Binding<T> {
+        .init(
+            get: { wrappedValue[keyPath: keyPath] },
+            set: { wrappedValue[keyPath: keyPath] = $0 }
         )
-    }
-    
-    public func printOnSet() -> Self {
-        onSet {
-            print("Set value: \($0)")
-        }
     }
 }
 
@@ -69,22 +95,22 @@ extension Binding {
             value.wrappedValue.toggle()
         }
     }
-}
-
-extension Binding {
-    public func removeDuplicates() -> Self where Value: Equatable {
+    
+    public func onSet(_ body: @escaping (Value) -> ()) -> Self {
         return .init(
             get: { self.wrappedValue },
-            set: { newValue in
-                let oldValue = self.wrappedValue
-                
-                guard newValue != oldValue else {
-                    return
-                }
-                
-                self.wrappedValue = newValue
-            }
+            set: { self.wrappedValue = $0; body($0) }
         )
+    }
+    
+    public func mirror(to other: Binding<Value>) -> Binding<Value> {
+        onSet({ other.wrappedValue = $0 })
+    }
+    
+    public func printOnSet() -> Self {
+        onSet {
+            print("Set value: \($0)")
+        }
     }
 }
 
@@ -95,7 +121,7 @@ extension Binding {
             set: { self.wrappedValue = $0 ?? defaultValue }
         )
     }
-
+    
     public func withDefaultValue<T>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
         .init(
             get: { self.wrappedValue ?? defaultValue },
@@ -109,7 +135,7 @@ extension Binding {
             set: { self.wrappedValue = $0 }
         )
     }
-        
+    
     public func isNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
             get: { self.wrappedValue == nil },
@@ -140,6 +166,22 @@ extension Binding {
                     self.wrappedValue = nil
                 }
             }
+        )
+    }
+}
+
+extension Binding {
+    public static func && (lhs: Binding, rhs: Bool) -> Binding where Value == Bool {
+        .init(
+            get: { lhs.wrappedValue && rhs },
+            set: { lhs.wrappedValue = $0 }
+        )
+    }
+    
+    public static func && (lhs: Binding, rhs: Bool) -> Binding where Value == Bool? {
+        .init(
+            get: { lhs.wrappedValue.map({ $0 && rhs }) },
+            set: { lhs.wrappedValue = $0 }
         )
     }
     
@@ -192,17 +234,18 @@ extension Binding {
 }
 
 extension Binding {
-    public static func && (lhs: Binding, rhs: Bool) -> Binding where Value == Bool {
-        .init(
-            get: { lhs.wrappedValue && rhs },
-            set: { lhs.wrappedValue = $0 }
-        )
-    }
-    
-    public static func && (lhs: Binding, rhs: Bool) -> Binding where Value == Bool? {
-        .init(
-            get: { lhs.wrappedValue.map({ $0 && rhs }) },
-            set: { lhs.wrappedValue = $0 }
+    public func removeDuplicates() -> Self where Value: Equatable {
+        return .init(
+            get: { self.wrappedValue },
+            set: { newValue in
+                let oldValue = self.wrappedValue
+                
+                guard newValue != oldValue else {
+                    return
+                }
+                
+                self.wrappedValue = newValue
+            }
         )
     }
 }

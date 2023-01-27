@@ -14,22 +14,22 @@ extension Color {
 extension Color {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public static var lightGray: Color {
-        .init(.lightGray)
+        Color(.lightGray)
     }
 
     public static var darkGray: Color {
-        .init(.darkGray)
+        Color(.darkGray)
     }
 
     public static var magenta: Color {
-        .init(.magenta)
+        Color(.magenta)
     }
     #endif
     
     /// A color for placeholder text in controls or text fields or text views.
     public static var placeholderText: Color {
         #if os(iOS) || os(macOS) || os(tvOS)
-        return .init(.placeholderText)
+        Color(.placeholderText)
         #else
         return .gray // FIXME
         #endif
@@ -39,57 +39,57 @@ extension Color {
 #if os(iOS) || os(macOS) || os(tvOS)
 extension Color {
     public static var systemRed: Color {
-        .init(.systemRed)
+        Color(.systemRed)
     }
     
     public static var systemGreen: Color {
-        .init(.systemGreen)
+        Color(.systemGreen)
     }
     
     public static var systemBlue: Color {
-        .init(.systemBlue)
+        Color(.systemBlue)
     }
     
     public static var systemOrange: Color {
-        .init(.systemOrange)
+        Color(.systemOrange)
     }
     
     public static var systemYellow: Color {
-        .init(.systemYellow)
+        Color(.systemYellow)
     }
     
     public static var systemPink: Color {
-        .init(.systemPink)
+        Color(.systemPink)
     }
     
     public static var systemPurple: Color {
-        .init(.systemPurple)
+        Color(.systemPurple)
     }
     
     public static var systemTeal: Color {
-        .init(.systemTeal)
+        Color(.systemTeal)
     }
     
     public static var systemIndigo: Color {
-        .init(.systemIndigo)
+        Color(.systemIndigo)
     }
 
     public static var systemBrown: Color {
-        .init(.systemBrown)
+        Color(.systemBrown)
     }
 
     @available(iOS 15.0, tvOS 15.0, *)
     public static var systemMint: Color {
-        .init(.systemMint)
+        Color(.systemMint)
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, *)
     public static var systemCyan: Color {
-        return .init(.systemCyan)
+        Color(.systemCyan)
     }
 
     public static var systemGray: Color {
-        .init(.systemGray)
+        Color(.systemGray)
     }
 }
 #endif
@@ -98,17 +98,17 @@ extension Color {
 extension Color {
     @_disfavoredOverload
     public static var brown: Color {
-        return .init(.brown)
+        Color(.brown)
     }
     
     @_disfavoredOverload
     public static var indigo: Color {
-        .init(.systemIndigo)
+        Color(.systemIndigo)
     }
     
     @_disfavoredOverload
     public static var teal: Color {
-        .init(.systemTeal)
+        Color(.systemTeal)
     }
 }
 
@@ -122,41 +122,40 @@ extension Color {
 #endif
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-/// Foreground colors for static text and related elements.
 extension Color {
     /// The color for text labels that contain primary content.
     public static var label: Color {
         #if os(macOS)
-        return .init(.labelColor)
+        Color(.labelColor)
         #else
-        return .init(.label)
+        Color(.label)
         #endif
     }
     
     /// The color for text labels that contain secondary content.
     public static var secondaryLabel: Color {
         #if os(macOS)
-        return .init(.secondaryLabelColor)
+        Color(.secondaryLabelColor)
         #else
-        return .init(.secondaryLabel)
+        Color(.secondaryLabel)
         #endif
     }
     
     /// The color for text labels that contain tertiary content.
     public static var tertiaryLabel: Color {
         #if os(macOS)
-        return .init(.tertiaryLabelColor)
+        Color(.tertiaryLabelColor)
         #else
-        return .init(.tertiaryLabel)
+        Color(.tertiaryLabel)
         #endif
     }
     
     /// The color for text labels that contain quaternary content.
     public static var quaternaryLabel: Color {
         #if os(macOS)
-        return .init(.quaternaryLabelColor)
+        Color(.quaternaryLabelColor)
         #else
-        return .init(.quaternaryLabel)
+        Color(.quaternaryLabel)
         #endif
     }
 }
@@ -166,100 +165,116 @@ extension Color {
 extension Color {
     /// A foreground color for standard system links.
     public static var link: Color {
-        return .init(.link)
+        Color(.link)
     }
     
     /// A forground color for separators (thin border or divider lines).
     public static var separator: Color {
-        return .init(.separator)
+        Color(.separator)
     }
     
     /// A forground color intended to look similar to `Color.separated`, but is guaranteed to be opaque, so it will.
     public static var opaqueSeparator: Color {
-        return .init(.opaqueSeparator)
+        Color(.opaqueSeparator)
+    }
+}
+#endif
+
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+extension Color {
+    /// The color for the main background of your interface.
+    public static var systemBackground: Color {
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.windowBackgroundColor)
+        #else
+        return Color(.systemBackground)
+        #endif
+    }
+    
+    /// The color for content layered on top of the main background.
+    public static var secondarySystemBackground: Color {
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.controlBackgroundColor)
+        #else
+        return Color(AppKitOrUIKitColor.secondarySystemBackground)
+        #endif
+    }
+    
+    /// The color for content layered on top of secondary backgrounds.
+    public static var tertiarySystemBackground: Color {
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.textBackgroundColor)
+        #else 
+        return Color(AppKitOrUIKitColor.tertiarySystemBackground)
+        #endif
     }
 }
 #endif
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension Color {
-    /// The color for the main background of your interface.
-    public static var systemBackground: Color {
-        .init(.systemBackground)
-    }
-    
-    /// The color for content layered on top of the main background.
-    public static var secondarySystemBackground: Color {
-        return .init(.secondarySystemBackground)
-    }
-    
-    /// The color for content layered on top of secondary backgrounds.
-    public static var tertiarySystemBackground: Color {
-        return .init(.tertiarySystemBackground)
-    }
-    
     /// The color for the main background of your grouped interface.
     public static var systemGroupedBackground: Color {
-        .init(.systemGroupedBackground)
+        Color(AppKitOrUIKitColor.systemGroupedBackground)
     }
     
     /// The color for content layered on top of the main background of your grouped interface.
     public static var secondarySystemGroupedBackground: Color {
-        return .init(.secondarySystemGroupedBackground)
+        Color(AppKitOrUIKitColor.secondarySystemGroupedBackground)
     }
     
     /// The color for content layered on top of secondary backgrounds of your grouped interface.
     public static var tertiarySystemGroupedBackground: Color {
-        return .init(.tertiarySystemGroupedBackground)
+        Color(AppKitOrUIKitColor.tertiarySystemGroupedBackground)
     }
 }
+#endif
 
-/// Fill colors for UI elements.
-/// These are meant to be used over the background colors, since their alpha component is less than 1.
+#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// A color  appropriate for filling thin and small shapes.
     ///
     /// Example: The track of a slider.
     public static var systemFill: Color {
-        .init(.systemFill)
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.textBackgroundColor)
+        #else
+        return Color(AppKitOrUIKitColor.systemFill)
+        #endif
     }
-    
     
     /// A color appropriate for filling medium-size shapes.
     ///
     /// Example: The background of a switch.
     public static var secondarySystemFill: Color {
-        return .init(.secondarySystemFill)
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.windowBackgroundColor)
+        #else
+        return Color(AppKitOrUIKitColor.secondarySystemFill)
+        #endif
     }
-    
-    
+        
     /// A color appropriate for filling large shapes.
     ///
     /// Examples: Input fields, search bars, buttons.
     public static var tertiarySystemFill: Color {
-        return .init(.tertiarySystemFill)
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.underPageBackgroundColor)
+        #else
+        return Color(AppKitOrUIKitColor.tertiarySystemFill)
+        #endif
     }
-    
     
     /// A color appropriate for filling large areas containing complex content.
     ///
     /// Example: Expanded table cells.
+    @available(macOS, unavailable)
     public static var quaternarySystemFill: Color {
-        return .init(.quaternarySystemFill)
-    }
-}
-#elseif os(macOS)
-extension Color {
-    public static var systemBackground: Color {
-        Color(AppKitOrUIKitColor.windowBackgroundColor)
-    }
-    
-    public static var secondarySystemBackground: Color {
-        Color(AppKitOrUIKitColor.controlBackgroundColor)
-    }
-    
-    public static var tertiarySystemBackground: Color {
-        Color(AppKitOrUIKitColor.textBackgroundColor)
+        #if os(macOS)
+        return Color(AppKitOrUIKitColor.scrubberTexturedBackground) // FIXME: This crashes for some reason.
+        #else
+        return Color(AppKitOrUIKitColor.quaternarySystemFill)
+        #endif
     }
 }
 #endif
@@ -288,8 +303,8 @@ extension Color {
     @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
     public func colorInvert() -> Color {
         Color(
-            UIColor { _ in
-                UIColor(self).invertedColor()
+            AppKitOrUIKitColor { _ in
+                AppKitOrUIKitColor(self).invertedColor()
             }
         )
     }
