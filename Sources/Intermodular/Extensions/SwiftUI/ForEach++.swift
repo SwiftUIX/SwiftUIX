@@ -187,7 +187,7 @@ public struct _IdentifiableElementOffsetPair<Element: Identifiable, Offset>: Ide
 public struct _OffsetIdentifiedElementOffsetPair<Element, Offset> {
     let element: Element
     let offset: Offset
-        
+    
     init(element: Element, offset: Offset) {
         self.element = element
         self.offset = offset
