@@ -42,7 +42,7 @@ public struct EvaluateBooleanView<Content: View>: View {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension Bool {
     @inlinable

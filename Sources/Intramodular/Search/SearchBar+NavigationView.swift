@@ -224,7 +224,7 @@ extension _NavigationSearchBarConfigurator {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Sets the navigation search bar for this view.
@@ -241,7 +241,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     final class _HidesNavigationSearchBarWhenScrolling: DefaultEnvironmentKey<Bool> {
@@ -257,7 +257,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 private extension UIViewController {
     var searchController: UISearchController? {

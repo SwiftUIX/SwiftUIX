@@ -25,7 +25,7 @@ public struct PageControl {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension PageControl: UIViewRepresentable {
     public typealias UIViewType = UIPageControl
@@ -88,7 +88,7 @@ extension PageControl: UIViewRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension PageControl {
     @inlinable
@@ -120,7 +120,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension PageControl {
     @available(iOS 14.0, tvOS 14.0, *)

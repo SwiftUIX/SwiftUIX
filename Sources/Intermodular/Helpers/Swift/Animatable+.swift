@@ -13,7 +13,7 @@ public func withAnimatableData<AnimatableData: Hashable & VectorArithmetic, Cont
     ZeroSizeView().modifier(_WithAnimatableData(animatableData: data, _content: content))
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct _WithAnimatableData<AnimatableData: Hashable & VectorArithmetic, _Content: View>: AnimatableModifier {
     var animatableData: AnimatableData

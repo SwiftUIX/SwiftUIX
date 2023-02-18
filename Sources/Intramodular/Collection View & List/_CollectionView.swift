@@ -107,7 +107,7 @@ struct _CollectionView<
     }
 }
 
-// MARK: - Initializers -
+// MARK: - Initializers
 
 extension _CollectionView {
     @_disfavoredOverload
@@ -192,7 +192,7 @@ extension _CollectionView {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension _CollectionView {
     struct ViewProvider {

@@ -32,7 +32,7 @@ public struct DraggabilityViewModifier: ViewModifier {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     @inlinable

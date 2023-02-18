@@ -44,7 +44,7 @@ public struct SetBinding<Value> {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension Binding {
     @inlinable

@@ -46,7 +46,7 @@ public enum UserInterfaceIdiom: Hashable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Hides this view on the given user interface idiom.
@@ -68,7 +68,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     public var userInterfaceIdiom: UserInterfaceIdiom {

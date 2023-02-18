@@ -121,7 +121,7 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Resolve the nearest `UIViewController` or `NSViewController` in the view hierarchy.
@@ -184,7 +184,7 @@ public func withAppKitOrUIKitViewController<Content: View>(
 }
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(macOS)
 extension NSResponder {

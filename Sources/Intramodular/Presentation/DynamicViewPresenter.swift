@@ -26,7 +26,7 @@ public protocol DynamicViewPresenter: DynamicViewPresentable {
     func dismissSelf(withAnimation _: Animation?) -> Future<Bool, Never>
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension DynamicViewPresenter {
     /// A reference to the top-most presented item.
@@ -61,7 +61,7 @@ extension DynamicViewPresenter {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension DynamicViewPresenter {
     public func present(_ modal: AnyModalPresentation) {
@@ -162,7 +162,7 @@ extension DynamicViewPresenter {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {
     static let defaultValue: DynamicViewPresenter? = nil
@@ -182,7 +182,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

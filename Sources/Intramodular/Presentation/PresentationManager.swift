@@ -12,7 +12,7 @@ public protocol PresentationManager {
     func dismiss()
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension PresentationMode {
     /// A dynamic action that dismisses an active presentation.
@@ -51,7 +51,7 @@ public struct BooleanPresentationManager: PresentationManager  {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 public struct AnyPresentationManager: PresentationManager {
     private let isPresentedImpl: () -> Bool
@@ -84,7 +84,7 @@ extension Binding: PresentationManager where Value == PresentationMode {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     fileprivate struct _PresentationManagerEnvironmentKey: EnvironmentKey {

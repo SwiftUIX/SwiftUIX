@@ -12,7 +12,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private struct _AdHocEquatableView<Content: View, Value: Equatable>: Equatable, View {
     let content: Content

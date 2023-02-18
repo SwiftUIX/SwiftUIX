@@ -23,7 +23,7 @@ public protocol DefaultTextInputType {
     )
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension DefaultTextInputType {
     public init<S: StringProtocol>(
@@ -119,7 +119,7 @@ extension DefaultTextInputType {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension TextField: DefaultTextInputType where Label == Text {
     

@@ -28,7 +28,7 @@ public struct NavigationPresentationLink<Label: View, Destination: View>: View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct NavigationPresentationManager: PresentationManager {
     let isActive: Binding<Bool>

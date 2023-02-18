@@ -10,7 +10,7 @@ public enum ImageName: Hashable {
     case system(String)
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension ImageName: Codable {
     struct _CodableRepresentation: Codable {
@@ -68,7 +68,7 @@ extension ImageName {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
@@ -110,7 +110,7 @@ extension NSImage {
 
 #endif
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension Image {
     public init(_ name: ImageName) {

@@ -35,7 +35,7 @@ public struct ObservedValue<Value>: DynamicProperty {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension ObservedValue {
     public init(_ base: ObservableValue<Value>) {
@@ -78,7 +78,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private struct WithObservedValue<T, Content: View>: View {
     @ObservedValue var value: T

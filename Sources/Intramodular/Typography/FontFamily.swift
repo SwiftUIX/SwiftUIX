@@ -13,7 +13,7 @@ public protocol FontFamily: CaseIterable, RawRepresentable {
     var weight: Font.Weight? { get }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension FontFamily {
     public func callAsFunction(size: CGFloat) -> Font {
@@ -82,7 +82,7 @@ extension TextView {
 }
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS)
 fileprivate struct SetFontWithLineHeight<F: FontFamily>: ViewModifier {

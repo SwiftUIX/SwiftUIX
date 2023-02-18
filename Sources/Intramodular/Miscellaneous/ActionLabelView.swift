@@ -12,7 +12,7 @@ public protocol ActionLabelView: View {
     init(action: Action, @ViewBuilder label: () -> Label)
 }
 
-// MARK: - Implementation --
+// MARK: - Implementation-
 
 extension ActionLabelView {
     public init(action: @escaping () -> Void, @ViewBuilder label: () -> Label) {
@@ -20,7 +20,7 @@ extension ActionLabelView {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension ActionLabelView {
     public init(action: Action, label: Label) {
@@ -120,7 +120,7 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension Button: ActionLabelView {
     public init(action: Action, @ViewBuilder label: () -> Label) {

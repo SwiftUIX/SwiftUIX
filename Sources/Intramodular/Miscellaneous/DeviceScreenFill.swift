@@ -26,7 +26,7 @@ public struct DeviceScreenFill<Content: View>: View {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 private extension GeometryProxy {
     var centerOffsetInGlobalframe: CGSize {

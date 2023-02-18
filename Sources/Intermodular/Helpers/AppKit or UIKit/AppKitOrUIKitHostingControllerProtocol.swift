@@ -19,7 +19,7 @@ public protocol AppKitOrUIKitHostingControllerProtocol: _opaque_AppKitOrUIKitHos
 
 #endif
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
@@ -113,7 +113,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct AppKitOrUIKitLayoutSizeProposal {
     var targetSize: OptionalDimensions = nil

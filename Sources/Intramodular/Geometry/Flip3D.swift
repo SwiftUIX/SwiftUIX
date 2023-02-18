@@ -23,7 +23,7 @@ fileprivate struct Flip3D<Reverse: View>: ViewModifier {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     /// Flips this view.

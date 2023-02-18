@@ -233,7 +233,7 @@ extension AppKitOrUIKitHostingController {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 final class _FixSafeAreaInsetsPreferenceKey: TakeLastPreferenceKey<Bool> {
     

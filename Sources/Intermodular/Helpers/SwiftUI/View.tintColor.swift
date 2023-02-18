@@ -19,7 +19,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Sets the tint color of the elements displayed by this view.

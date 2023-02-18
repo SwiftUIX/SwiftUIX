@@ -32,7 +32,7 @@ public enum Axis3D {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     /// Rotates this view's rendered output in three dimensions around the given

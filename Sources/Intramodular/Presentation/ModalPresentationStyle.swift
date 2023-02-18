@@ -74,7 +74,7 @@ public enum ModalPresentationStyle: Equatable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func modalPresentationStyle(_ style: ModalPresentationStyle) -> some View {
@@ -82,7 +82,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension ModalPresentationStyle {
     public enum _Comparison {

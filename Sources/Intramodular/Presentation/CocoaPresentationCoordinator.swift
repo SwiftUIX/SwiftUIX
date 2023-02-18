@@ -98,7 +98,7 @@ extension CocoaPresentationCoordinator {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension CocoaPresentationCoordinator: DynamicViewPresenter {
     public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {

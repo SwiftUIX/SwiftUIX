@@ -294,7 +294,7 @@ extension CollectionView {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension CollectionView {
     public func collectionViewLayout(_ layout: CollectionViewLayout) -> CollectionView {
@@ -476,7 +476,7 @@ extension CollectionView {
 
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct _CollectionViewSectionedItem<Item: Identifiable, SectionID: Hashable>: Hashable, Identifiable {
     let item: Item

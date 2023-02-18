@@ -13,7 +13,7 @@ public protocol DynamicAction: DynamicProperty {
     func perform()
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension DynamicAction {
     public func then(_ action: @escaping () -> Void) -> _ExtendedDynamicAction<Self> {
@@ -94,7 +94,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct _ExtendedDynamicAction<A: DynamicAction>: DynamicAction {
     let action: A

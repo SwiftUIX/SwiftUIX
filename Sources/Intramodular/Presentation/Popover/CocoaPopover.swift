@@ -24,7 +24,7 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func cocoaPopover<Content>(

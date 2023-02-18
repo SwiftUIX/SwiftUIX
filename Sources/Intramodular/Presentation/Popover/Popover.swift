@@ -35,7 +35,7 @@ extension Popover {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension PresentationLink {
     public init(
@@ -126,7 +126,7 @@ extension PresentationLink where Label == SwiftUI.Label<Text, Image> {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct PopoverArrowDirection: OptionSet {
     public let rawValue: Int

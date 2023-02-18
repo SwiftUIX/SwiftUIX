@@ -9,7 +9,7 @@ public protocol HashIdentifiable: Hashable, Identifiable where Self.ID == Int {
     
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension HashIdentifiable {
     @inlinable
@@ -18,7 +18,7 @@ extension HashIdentifiable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension Hashable {
     @inlinable

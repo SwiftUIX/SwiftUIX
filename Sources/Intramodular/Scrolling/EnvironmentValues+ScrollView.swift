@@ -62,7 +62,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)

@@ -22,7 +22,7 @@ extension OutlineGroup where ID == Data.Element.ID, Parent : View, Parent == Lea
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension RandomAccessCollection {
     fileprivate var _nilIfEmpty: Self? {

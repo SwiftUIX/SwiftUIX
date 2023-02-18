@@ -39,7 +39,7 @@ public struct LinkPresentationView<Placeholder: View>: Identifiable, View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension LinkPresentationView {
     @inlinable
@@ -108,7 +108,7 @@ extension LinkPresentationView {
     }
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 @usableFromInline
 struct _LinkPresentationView<Placeholder: View>: Identifiable, View {

@@ -75,7 +75,7 @@ public struct CocoaScrollViewReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension CocoaScrollViewProxy {
     fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {

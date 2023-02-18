@@ -51,7 +51,7 @@ extension AnyModalPresentation {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension AnyModalPresentation: Equatable {
     public static func == (lhs: AnyModalPresentation, rhs: AnyModalPresentation) -> Bool {
@@ -61,7 +61,7 @@ extension AnyModalPresentation: Equatable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Adds a condition for whether the presented view hierarchy is dismissable.
@@ -75,7 +75,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension AnyModalPresentation {
     struct PreferenceKeyValue: Equatable {

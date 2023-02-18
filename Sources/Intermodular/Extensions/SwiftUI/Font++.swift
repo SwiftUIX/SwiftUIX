@@ -89,7 +89,7 @@ extension Font {
 }
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private enum _SwiftUIFontProvider {
     case system(size: CGFloat, weight: Font.Weight?, design: Font.Design?)

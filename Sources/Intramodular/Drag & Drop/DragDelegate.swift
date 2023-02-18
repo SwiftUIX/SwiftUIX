@@ -19,7 +19,7 @@ public struct DragInfo {
     public let items: [DragItem]
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct AnyDragDelegate: DragDelegate {
     let dragBeganImpl: (DragInfo) -> ()

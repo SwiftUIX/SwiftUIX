@@ -43,7 +43,7 @@ private struct _ViewIdentityDestroyer<Content: View>: View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func resetIdentity(on events: Set<ViewIdentityDestroyTrigger>) -> some View {

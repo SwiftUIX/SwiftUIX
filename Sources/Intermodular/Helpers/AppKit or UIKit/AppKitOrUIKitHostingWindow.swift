@@ -329,7 +329,7 @@ extension AppKitOrUIKitHostingWindow {
 }
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Allows touches in the active window overlay to pass through if possible.
@@ -358,7 +358,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 enum _SwiftUIX_WindowPreferenceKeys {
     final class AllowsTouchesToPassThrough: TakeLastPreferenceKey<Bool> {

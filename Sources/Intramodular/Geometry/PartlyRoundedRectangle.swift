@@ -30,7 +30,7 @@ extension PartRoundedRectangle: Shape {
 }
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension View {

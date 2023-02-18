@@ -53,7 +53,7 @@ fileprivate struct HideTitleBar: ViewModifier {
     #endif
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Hides the title bar (if any) for this view.

@@ -18,7 +18,7 @@ public enum AuthorizationAppleIDButtonType: Equatable {
     case `default`
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

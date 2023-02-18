@@ -21,7 +21,7 @@ public protocol CollectionViewDropDelegate {
     func dropUpdated(info: CollectionViewDropInfo) -> DropProposal?
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 @available(iOS 13.4, *)
 @available(tvOS, unavailable)

@@ -36,7 +36,7 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 #if os(iOS) || os(tvOS)
 extension OptionalDimensions {
@@ -102,7 +102,7 @@ extension OptionalDimensions {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Sets the preferred maximum layout width for the view.
@@ -130,7 +130,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     private final class PreferredMaximumLayoutWidth: DefaultEnvironmentKey<CGFloat> {
@@ -176,7 +176,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension CGSize {
     public init(_ dimensions: OptionalDimensions, default: CGSize) {

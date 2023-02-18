@@ -43,7 +43,7 @@ fileprivate struct _NameAssignmentView<Content: View>: View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Set a name for `self`.
@@ -83,7 +83,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct _NamedViewDescriptionPreferenceKey: SwiftUI.PreferenceKey {
     public struct Value: Hashable, Sequence {

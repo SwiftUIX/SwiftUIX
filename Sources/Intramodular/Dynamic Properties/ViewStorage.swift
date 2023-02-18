@@ -45,7 +45,7 @@ public struct ViewStorage<Value>: DynamicProperty {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension ViewStorage {
     public var binding: Binding<Value> {

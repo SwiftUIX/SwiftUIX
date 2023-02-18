@@ -70,7 +70,7 @@ fileprivate struct SelectionNavigator<Selection: Hashable, Destination: View>: V
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func navigate<Destination: View>(
@@ -173,7 +173,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 fileprivate struct NavigateOnPress<Destination: View>: ViewModifier {
     let destination: Destination

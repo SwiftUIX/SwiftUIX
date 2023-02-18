@@ -75,7 +75,7 @@ private struct AddKeyboardPadding: ViewModifier {
 
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 public enum KeyboardPadding {
     case keyboard

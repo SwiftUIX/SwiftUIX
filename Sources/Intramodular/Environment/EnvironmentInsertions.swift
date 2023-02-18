@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
@@ -86,7 +87,7 @@ extension EnvironmentInsertions {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension EnvironmentInsertions {
     public static func value<T>(
@@ -149,7 +150,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentInsertions {
     struct EnvironmentKey: SwiftUI.EnvironmentKey {

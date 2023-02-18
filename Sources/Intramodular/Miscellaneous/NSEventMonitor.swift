@@ -61,7 +61,7 @@ public final class NSEventMonitor {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 @available(macOS 11.0, *)
 extension View {
@@ -94,7 +94,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private struct _AttachNSEventMonitor: ViewModifier {
     @State var eventMonitor: NSEventMonitor

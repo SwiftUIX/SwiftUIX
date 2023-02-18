@@ -86,7 +86,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 // A modified implementation based on https://stackoverflow.com/questions/58363563/swiftui-get-notified-when-binding-value-changes
 private struct OnChangeOfValue<Base: View, Value: Equatable>: View {

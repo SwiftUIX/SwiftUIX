@@ -41,7 +41,7 @@ struct _PaginationView<Page: View> {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension _PaginationView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIHostingPageViewController<Page>

@@ -107,7 +107,7 @@ struct SwipeGestureOverlay: UIViewRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     @inlinable

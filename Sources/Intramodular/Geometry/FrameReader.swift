@@ -30,7 +30,7 @@ public struct FrameReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     struct FrameReaderProxyKey: EnvironmentKey {
@@ -133,7 +133,7 @@ public struct FrameReaderProxy {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func frame<ID: Hashable>(id: ID) -> some View {
@@ -141,7 +141,7 @@ extension View {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 private final class CaptureViewSizePreferenceKey<T: View>: TakeLastPreferenceKey<CGSize> {
     

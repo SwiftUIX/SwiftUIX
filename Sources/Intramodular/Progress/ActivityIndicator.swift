@@ -132,7 +132,7 @@ extension ActivityIndicator: NSViewRepresentable {
 
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
@@ -152,7 +152,7 @@ extension ActivityIndicator {
 
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

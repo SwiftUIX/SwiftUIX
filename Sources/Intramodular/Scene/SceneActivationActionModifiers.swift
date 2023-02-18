@@ -40,7 +40,7 @@ private struct SceneDisconnectionActionModifier: ViewModifier {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func onSceneActivate(perform action: @escaping () -> Void) -> some View {

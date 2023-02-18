@@ -388,7 +388,7 @@ extension CocoaHostingCollectionViewCell {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension CocoaHostingCollectionViewCell {
     struct InvalidationContext {

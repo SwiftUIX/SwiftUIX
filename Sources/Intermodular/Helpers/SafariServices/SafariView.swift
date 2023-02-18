@@ -32,7 +32,7 @@ public struct SafariView: View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension SafariView {
     public func onFinish(perform action: @escaping () -> Void) -> Self {
@@ -52,7 +52,7 @@ extension SafariView {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension SafariView {
     fileprivate struct _Body: UIViewControllerRepresentable {

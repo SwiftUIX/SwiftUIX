@@ -66,7 +66,7 @@ extension RectangleCorner {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

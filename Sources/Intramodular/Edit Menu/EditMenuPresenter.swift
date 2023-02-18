@@ -48,7 +48,7 @@ private struct EditMenuPresenter: ViewModifier {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 public struct EditMenuItem {
     let title: String
@@ -75,7 +75,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EditMenuPresenter._BackgroundPresenterView {
     class AppKitOrUIKitViewType: UIView {

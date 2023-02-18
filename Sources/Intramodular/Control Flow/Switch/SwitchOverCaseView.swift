@@ -137,7 +137,7 @@ public struct SwitchOverCaseDefaultView<PreviousCase: SwitchOverCaseView, Conten
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension SwitchOverCaseView {
     /// Handles a case in a `switch` control flow.

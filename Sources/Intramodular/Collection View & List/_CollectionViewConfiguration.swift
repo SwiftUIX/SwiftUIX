@@ -162,7 +162,7 @@ struct _CollectionViewCellOrSupplementaryViewCache<
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct _CollectionViewConfigurationEnvironmentKey: EnvironmentKey {
     static let defaultValue: _CollectionViewConfiguration = nil

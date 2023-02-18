@@ -36,7 +36,7 @@ extension MenuBarItem: Identifiable where ID: Hashable {
     
 }
 
-// MARK: - API -
+// MARK: - API
 
 #if os(macOS)
 
@@ -89,7 +89,7 @@ extension View {
 
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(macOS)
 public class MenuBarItemCoordinator<ID: Equatable, Content: View> {

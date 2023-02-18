@@ -63,7 +63,7 @@ extension Action {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension Action {
     public static let empty = Action {

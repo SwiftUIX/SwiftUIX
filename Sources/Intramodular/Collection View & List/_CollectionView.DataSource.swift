@@ -275,7 +275,7 @@ extension CocoaHostingCollectionViewController {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 fileprivate extension NSDiffableDataSourceSnapshot {
     mutating func deleteAllItemsIfNecessary() {

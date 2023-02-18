@@ -45,7 +45,7 @@ private struct HideNavigationBar: ViewModifier {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Hides the navigation bar for this view. Really.

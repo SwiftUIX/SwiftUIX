@@ -145,7 +145,7 @@ public struct CollectionViewReader<Content: View>: View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension CollectionViewProxy {
     fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {

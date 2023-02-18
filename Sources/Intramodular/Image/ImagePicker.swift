@@ -78,7 +78,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension ImagePicker {
     public init(
@@ -135,7 +135,7 @@ extension ImagePicker {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension UIImage {
     @inlinable

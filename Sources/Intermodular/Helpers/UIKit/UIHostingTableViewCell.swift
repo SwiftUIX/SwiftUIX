@@ -101,7 +101,7 @@ extension UIHostingTableViewCell {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension UIHostingTableViewCell {
     struct RootView: View {
@@ -158,7 +158,7 @@ extension UIHostingTableViewCell {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension String {
     static let hostingTableViewCellIdentifier = "UIHostingTableViewCell"

@@ -78,7 +78,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension NSHostingPopover {
     private struct ContentWrapper: View {

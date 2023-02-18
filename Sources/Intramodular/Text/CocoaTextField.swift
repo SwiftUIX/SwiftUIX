@@ -300,7 +300,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension CocoaTextField where Label == Text {
     public init<S: StringProtocol>(
@@ -526,7 +526,7 @@ extension CocoaTextField where Label == Text {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 private final class _UITextField: UITextField {
     var isFirstResponderBinding: Binding<Bool>?

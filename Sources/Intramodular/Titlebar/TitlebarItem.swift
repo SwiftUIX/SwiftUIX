@@ -126,7 +126,7 @@ extension TitlebarItem {
     #endif
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension TitlebarItem: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -134,7 +134,7 @@ extension TitlebarItem: Equatable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension TitlebarItem {
     public func content(_ content: Content) -> Self {
@@ -190,7 +190,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
     public typealias Value = [TitlebarItem]

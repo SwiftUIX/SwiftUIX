@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
@@ -12,7 +13,7 @@ public protocol _opaque_View {
     func eraseToAnyView() -> AnyView
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension _opaque_View where Self: View {
     @inlinable

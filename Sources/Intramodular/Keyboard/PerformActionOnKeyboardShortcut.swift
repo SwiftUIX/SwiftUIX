@@ -56,7 +56,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Adds an action to perform when this view recognizes a keyboard shortcut.

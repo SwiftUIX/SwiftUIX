@@ -39,6 +39,10 @@ final class ReferenceBox<T> {
     }
 }
 
+extension ReferenceBox: @unchecked Sendable where T: Sendable {
+    
+}
+
 @propertyWrapper
 @usableFromInline
 final class WeakReferenceBox<T: AnyObject> {
@@ -64,6 +68,9 @@ final class WeakReferenceBox<T: AnyObject> {
         self.value = value
     }
 }
+
+#if canImport(Combine)
+import Combine
 
 @usableFromInline
 final class ObservableReferenceBox<T>: ObservableObject {
@@ -100,3 +107,4 @@ final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
         self.value = value
     }
 }
+#endif

@@ -66,7 +66,7 @@ public struct ThrottledDelayedState<Value>: DynamicProperty {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 private class MutableDispatchWorkItem {
     var base: DispatchWorkItem

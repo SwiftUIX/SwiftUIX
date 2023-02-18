@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Dispatch
 import Swift
 import SwiftUI
@@ -24,7 +25,7 @@ public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicPr
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func optionalEnvironmentObject<B: ObservableObject>(_ bindable: B?) -> some View {

@@ -18,7 +18,7 @@ public protocol Navigator {
     func popToRoot(withAnimation animation: Animation?)
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension Navigator {
     public func push<V: View>(_ view: V) {
@@ -34,7 +34,7 @@ extension Navigator {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension EnvironmentValues {
     private struct NavigatorEnvironmentKey: EnvironmentKey {
@@ -57,7 +57,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

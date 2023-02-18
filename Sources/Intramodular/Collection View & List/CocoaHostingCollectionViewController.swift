@@ -325,7 +325,7 @@ final class CocoaHostingCollectionViewController<
         }
     }
     
-    // MARK: - UICollectionViewDelegate -
+    // MARK: - UICollectionViewDelegate
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? CellType)?.cellWillDisplay(inParent: self)
@@ -409,7 +409,7 @@ final class CocoaHostingCollectionViewController<
         
     }
     
-    // MARK: - UICollectionViewDelegateFlowLayout -
+    // MARK: - UICollectionViewDelegateFlowLayout
         
     public func collectionView(
         _ collectionView: UICollectionView,
@@ -647,7 +647,7 @@ extension CocoaHostingCollectionViewController {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension CocoaHostingCollectionViewController {
     var maximumCollectionViewCellSize: OptionalDimensions {

@@ -293,7 +293,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension PresentationLink {
     public init(
@@ -420,7 +420,7 @@ extension PresentationLink {
     }
 }
 
-// MARK: - Supplementary API -
+// MARK: - Supplementary API
 
 extension View {
     /// Adds a destination to present when this view is pressed.
@@ -442,7 +442,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct _PresentOnPressViewModifier<Destination: View>: ViewModifier {
     @Environment(\.presenter) var presenter

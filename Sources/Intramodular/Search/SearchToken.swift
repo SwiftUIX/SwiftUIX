@@ -9,7 +9,7 @@ public struct SearchToken: Codable, Hashable {
     public let text: String
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension UISearchToken {

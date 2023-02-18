@@ -17,7 +17,7 @@ public struct SwitchOver<Data>: View {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension SwitchOver {
     /// Handles a case in a `switch` control flow.

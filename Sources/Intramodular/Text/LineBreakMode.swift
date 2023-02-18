@@ -19,7 +19,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func lineBreakMode(_ lineBreakMode: NSLineBreakMode) -> some View {

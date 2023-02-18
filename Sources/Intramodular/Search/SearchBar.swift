@@ -327,7 +327,7 @@ extension SearchBar: NSViewRepresentable {
 
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
@@ -450,7 +450,7 @@ extension SearchBar {
     #endif
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 private final class _UISearchBar: UISearchBar {

@@ -165,7 +165,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
         }
     }
     
-    // MARK: - Data Source -
+    // MARK: - Data Source
     
     override public func numberOfSections(in tableView: UITableView) -> Int {
         data.count
@@ -178,7 +178,7 @@ public class UIHostingTableViewController<SectionModel: Identifiable, ItemType: 
         data[data.index(data.startIndex, offsetBy: section)].items.count
     }
     
-    // MARK: - Delegate -
+    // MARK: - Delegate
     
     override public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard SectionHeader.self != Never.self else {

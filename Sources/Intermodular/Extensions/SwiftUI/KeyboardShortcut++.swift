@@ -32,7 +32,7 @@ extension KeyboardShortcut {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension SwiftUI.EventModifiers {
     public func toCGEventFlags() -> CGEventFlags {

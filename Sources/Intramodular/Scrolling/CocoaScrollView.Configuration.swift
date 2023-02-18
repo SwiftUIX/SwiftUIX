@@ -67,7 +67,7 @@ extension CocoaScrollViewConfiguration {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct ScrollContentOffsetBehavior: OptionSet {
     public static let maintainOnChangeOfBounds = Self(rawValue: 1 << 0)

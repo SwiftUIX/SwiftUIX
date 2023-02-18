@@ -50,7 +50,7 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension AttributedText {
     public func font(_ font: AppKitOrUIKitFont) -> Self {
@@ -69,7 +69,7 @@ extension AttributedText {
     #endif
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension AppKitOrUIKitLabel {
     func configure(with attributedText: AttributedText) {

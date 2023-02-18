@@ -11,7 +11,7 @@ public enum FocusRingType: UInt {
     case exterior  = 2
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitView {

@@ -134,7 +134,7 @@ extension ScrollView.ContentOffset {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 

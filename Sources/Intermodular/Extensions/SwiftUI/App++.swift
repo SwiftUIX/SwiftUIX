@@ -16,7 +16,7 @@ extension App {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 enum AppQuitError: Error {
     case unsupported

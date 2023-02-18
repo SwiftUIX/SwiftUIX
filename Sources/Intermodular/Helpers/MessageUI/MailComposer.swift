@@ -78,7 +78,7 @@ public struct MailComposer: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension MailComposer {
     public init(onCompletion: @escaping (MFMailComposeResult, Error?) -> Void) {
@@ -132,7 +132,7 @@ extension MailComposer {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension MFMailComposeViewController {
     fileprivate func configure(with configuration: MailComposer.Configuration, context: MailComposer.Context) {

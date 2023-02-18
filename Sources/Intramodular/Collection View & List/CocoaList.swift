@@ -202,7 +202,7 @@ extension CocoaList where
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension CocoaList {
     public func listStyle(_ style: UITableView.Style) -> Self {

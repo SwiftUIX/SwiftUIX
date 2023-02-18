@@ -12,7 +12,7 @@ public protocol LocalizedErrorHandler {
     func handle(_ error: LocalizedError)
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Sets a localized error handler for this view.
@@ -23,7 +23,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct SetLocalizedErrorHandler: ViewModifier {
     private struct _ErrorHandler: LocalizedErrorHandler {

@@ -148,7 +148,7 @@ public enum RelativeFrameDimension: Hashable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func relativeFrame(
@@ -159,7 +159,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension RelativeFrame {
     typealias ResolvedValues = [AnyHashable: OptionalDimensions]
@@ -208,7 +208,7 @@ struct RelativeFrameModifier: _opaque_FrameModifier, ViewModifier {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension CGSize {
     fileprivate func value(for dimensionType: FrameDimensionType) -> CGFloat {

@@ -134,7 +134,7 @@ extension WindowOverlay {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     /// Makes a window visible when a given condition is true.
@@ -162,7 +162,7 @@ extension View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct WindowProxy {
     weak var window: AppKitOrUIKitHostingWindowProtocol?

@@ -43,7 +43,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: NSViewControllerRepres
 }
 #endif
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitViewRepresentable {

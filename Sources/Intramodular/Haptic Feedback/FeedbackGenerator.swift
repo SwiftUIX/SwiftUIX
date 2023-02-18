@@ -89,7 +89,7 @@ public final class FeedbackGenerator {
 	}
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 extension UIImpactFeedbackGenerator.FeedbackStyle {

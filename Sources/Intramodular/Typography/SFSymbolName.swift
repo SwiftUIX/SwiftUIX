@@ -2565,7 +2565,7 @@ public enum SFSymbolName: String {
     @available(iOS 15.0, *) case xmarkAppFill = "xmark.app.fill"
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 public extension Image {
     init(systemName: SFSymbolName) {

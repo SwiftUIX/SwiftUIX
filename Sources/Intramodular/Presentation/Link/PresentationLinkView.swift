@@ -17,7 +17,7 @@ public protocol PresentationLinkView: View {
     )
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension PresentationLinkView {
     public init(destination: Destination, @ViewBuilder label: () -> Label) {

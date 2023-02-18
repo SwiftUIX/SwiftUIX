@@ -38,7 +38,7 @@ fileprivate struct HitTestView<Content: View>: AppKitOrUIKitViewRepresentable {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     public func hitTest(_ hitTest: @escaping (CGPoint) -> Bool) -> some View {

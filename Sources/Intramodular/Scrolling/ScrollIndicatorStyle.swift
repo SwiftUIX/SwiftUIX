@@ -9,7 +9,7 @@ public protocol ScrollIndicatorStyle {
     
 }
 
-// MARK: - API -
+// MARK: - API
 
 public struct DefaultScrollViewIndicatorStyle: Hashable, ScrollIndicatorStyle {
     public init() {
@@ -61,7 +61,7 @@ extension View {
         environment(\.scrollIndicatorStyle, scrollIndicatorStyle)
     }
 }
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     private struct ScrollIndicatorStyleKey: EnvironmentKey {

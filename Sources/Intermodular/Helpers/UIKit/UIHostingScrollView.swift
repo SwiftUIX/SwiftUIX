@@ -252,7 +252,7 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension UIHostingScrollView {
     struct RootViewContainer: View {
@@ -275,7 +275,7 @@ extension UIHostingScrollView {
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension UIHostingScrollView {
     public func scrollTo(_ edge: Edge) {

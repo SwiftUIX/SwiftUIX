@@ -87,7 +87,7 @@ public struct TextView<Label: View>: View {
     }
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 fileprivate struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
@@ -459,7 +459,7 @@ class _NSTextView: NSTextView {
 
 #endif
 
-// MARK: - API -
+// MARK: - API
 
 extension TextView where Label == EmptyView {
     public init(
@@ -659,7 +659,7 @@ extension TextView {
 
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     struct _ParagraphSpacing: EnvironmentKey {
@@ -684,7 +684,7 @@ extension View {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension EnvironmentValues {
     fileprivate var requiresAttributedText: Bool {

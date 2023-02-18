@@ -17,7 +17,7 @@ private struct SidebarVisibilityModifier: ViewModifier {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 public enum _SidebarVisibility {
     case automatic

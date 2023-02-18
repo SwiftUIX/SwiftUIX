@@ -21,7 +21,7 @@ public struct _VisibilityModifier: ViewModifier {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension View {
     /// Sets a view's visibility.

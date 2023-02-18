@@ -17,7 +17,7 @@ extension CocoaHostingCollectionViewController {
             self.parent = parent
         }
         
-        // MARK: - UICollectionViewDragDelegate -
+        // MARK: - UICollectionViewDragDelegate
         
         func collectionView(
             _ collectionView: UICollectionView,
@@ -50,7 +50,7 @@ extension CocoaHostingCollectionViewController {
             true
         }
         
-        // MARK: - UICollectionViewDropDelegate -
+        // MARK: - UICollectionViewDropDelegate
         
         @objc
         func collectionView(

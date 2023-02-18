@@ -45,6 +45,16 @@ extension ForEach where Content: View {
         }
     }
     
+    @_disfavoredOverload
+    public init<Elements: RandomAccessCollection>(
+        enumerating data: Elements,
+        @ViewBuilder rowContent: @escaping (Elements.Element) -> Content
+    ) where Data == [_OffsetIdentifiedElementOffsetPair<Elements.Element, Int>], ID == Int {
+        self.init(data.enumerated().map({ _OffsetIdentifiedElementOffsetPair(element: $0.element, offset: $0.offset) }), id: \.offset) {
+            rowContent($0.element)
+        }
+    }
+
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         @ViewBuilder rowContent: @escaping (Int, Elements.Element) -> Content
@@ -146,7 +156,7 @@ extension ForEach where Content: View {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension Binding {
     fileprivate struct _BindingIdentifiableKeyPathAdaptor {

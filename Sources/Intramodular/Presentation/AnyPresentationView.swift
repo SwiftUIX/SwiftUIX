@@ -75,7 +75,7 @@ public struct AnyPresentationView: View {
     #endif
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension AnyPresentationView: _opaque_View {
     public func _opaque_getViewName() -> AnyHashable? {
@@ -83,7 +83,7 @@ extension AnyPresentationView: _opaque_View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension AnyPresentationView {
     public func name(_ name: AnyHashable?) -> Self {

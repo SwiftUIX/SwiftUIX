@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
@@ -10,7 +11,7 @@ public protocol EnvironmentPropagator {
     var environmentInsertions: EnvironmentInsertions { get nonmutating set }
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 private var objc_environmentInsertionsKey: UInt8 = 0
 

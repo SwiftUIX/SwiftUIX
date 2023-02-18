@@ -46,7 +46,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     public func isEdgePanGestureEnabled(_ enabled: Bool) -> some View {

@@ -60,7 +60,7 @@ public struct CocoaScrollView<Content: View>: UIViewRepresentable  {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension CocoaScrollView {
     public func alwaysBounceVertical(_ alwaysBounceVertical: Bool) -> Self {
@@ -139,7 +139,7 @@ extension CocoaScrollView {
 
 #endif
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 struct _CocoaScrollViewPage: Equatable {
     let index: Int

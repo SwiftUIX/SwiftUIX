@@ -153,7 +153,7 @@ extension AuthorizationAppleIDButton {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)

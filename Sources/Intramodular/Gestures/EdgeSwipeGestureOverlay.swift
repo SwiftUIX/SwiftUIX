@@ -63,7 +63,7 @@ struct EdgeSwipeGestureOverlay: UIViewRepresentable {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     @inlinable

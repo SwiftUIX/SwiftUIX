@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
@@ -53,7 +54,7 @@ public class Screen: ObservableObject {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension Screen {
     public var size: CGSize {
@@ -89,7 +90,7 @@ extension Screen {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     public var screen: Screen {

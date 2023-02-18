@@ -10,7 +10,7 @@ public protocol PerformActionView: View {
     func transformAction(_: (Action) -> Action) -> Self
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension PerformActionView {
     public func insertAction(_ action: Action) -> Self {
@@ -30,7 +30,7 @@ extension PerformActionView {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension ModifiedContent: PerformActionView where Content: PerformActionView, Modifier: ViewModifier {
     public func transformAction(_ transform: (Action) -> Action) -> Self {

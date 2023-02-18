@@ -329,7 +329,7 @@ extension View {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 extension DragInfo {
 	public init(interaction: UIDragInteraction, session: UIDragSession) {

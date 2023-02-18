@@ -12,7 +12,7 @@ public protocol ProgressionController {
     func moveToPrevious()
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     struct ProgressionControllerEnvironmentKey: EnvironmentKey {
@@ -28,7 +28,7 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 /// A button that triggers a regression.
 public struct PreviousButton<Label: View>: ActionLabelView, PerformActionView {
