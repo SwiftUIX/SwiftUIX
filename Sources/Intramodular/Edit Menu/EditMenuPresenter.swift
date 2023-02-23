@@ -63,7 +63,7 @@ public struct EditMenuItem {
 extension View {
     public func editMenu(
         isVisible: Binding<Bool>,
-        @ArrayBuilder<EditMenuItem> content: @escaping () -> [EditMenuItem]
+        @_ArrayBuilder<EditMenuItem> content: @escaping () -> [EditMenuItem]
     ) -> some View {
         modifier(
             EditMenuPresenter(

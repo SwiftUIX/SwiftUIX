@@ -200,7 +200,7 @@ extension PaginationView {
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
-        @ArrayBuilder<Page> content: () -> [Page]
+        @_ArrayBuilder<Page> content: () -> [Page]
     ) {
         self.init(
             pages: content(),

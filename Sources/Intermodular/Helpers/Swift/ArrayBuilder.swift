@@ -4,8 +4,13 @@
 
 import Swift
 
+#if compiler(<5.8)
+@available(*, deprecated, renamed: "_ArrayBuilder")
+public typealias ArrayBuilder = _ArrayBuilder
+#endif
+
 @resultBuilder
-public class ArrayBuilder<Element> {
+public class _ArrayBuilder<Element> {
     @inlinable
     public static func buildBlock() -> [Element] {
         return []

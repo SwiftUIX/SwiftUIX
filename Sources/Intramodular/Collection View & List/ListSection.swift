@@ -35,7 +35,7 @@ public struct ListSection<SectionType, ItemType> {
     
     public init(
         _ model: SectionType,
-        @ArrayBuilder<ItemType> items: () -> [ItemType]
+        @_ArrayBuilder<ItemType> items: () -> [ItemType]
     ) {
         self.init(model, items: items())
     }

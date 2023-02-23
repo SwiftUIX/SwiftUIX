@@ -7,7 +7,7 @@ import SwiftUI
 
 extension Text {
     public static func concatenate(
-        @ArrayBuilder<Text> _ items: () -> [Text]
+        @_ArrayBuilder<Text> _ items: () -> [Text]
     ) -> Self {
         items().reduce(Text(""), +)
     }

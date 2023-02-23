@@ -180,7 +180,7 @@ extension TitlebarItem {
 
 extension View {
     public func titlebar(
-        @ArrayBuilder<TitlebarItem> items: () -> [TitlebarItem]
+        @_ArrayBuilder<TitlebarItem> items: () -> [TitlebarItem]
     ) -> some View {
         background {
             TitlebarConfigurationView {
