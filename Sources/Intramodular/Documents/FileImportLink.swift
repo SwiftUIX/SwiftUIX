@@ -9,12 +9,14 @@ import UniformTypeIdentifiers
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
-public struct FileImportLink<Label: View>: View {
+public struct FileImportLink<Label: View> {
     private let allowedContentTypes: [UTType]
     private let onCompletion: (Result<URL, Error>) -> Void
     private let label: Label
     
-    @State var isPresented: Bool = false
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @State private var isPresented: Bool = false
     
     public init(
         allowedContentTypes: [UTType],

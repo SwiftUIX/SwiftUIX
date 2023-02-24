@@ -27,7 +27,7 @@ public struct AnyModalPresentation: Identifiable {
     public func environment<T>(_ key: WritableKeyPath<EnvironmentValues, T>, _ value: T) -> Self {
         var result = self
         
-        result.content.environmentInPlace(.value(value, forKey: key))
+        result.content = result.content.environment(.value(value, forKey: key))
         
         return result
     }
