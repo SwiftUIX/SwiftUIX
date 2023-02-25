@@ -17,3 +17,12 @@ extension KeyEquivalent {
         lhs.character == rhs.character
     }
 }
+
+#if compiler(>=5.8)
+@available(iOS 14.0, macOS 11.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension KeyEquivalent: @unchecked Sendable {
+    
+}
+#endif

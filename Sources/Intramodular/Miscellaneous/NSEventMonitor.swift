@@ -16,17 +16,19 @@ public final class NSEventMonitor {
     }
     
     private let context: Context
-    private let mask: NSEvent.EventTypeMask
+    private let eventTypeMask: NSEvent.EventTypeMask
     private var monitor: Any?
     
-    public var eventHandler: (NSEvent) -> NSEvent? = { $0 }
+    public var handleEvent: (NSEvent) -> NSEvent? = { $0 }
     
     public init(
         context: Context,
-        matching mask: NSEvent.EventTypeMask
+        matching mask: NSEvent.EventTypeMask,
+        handleEvent: @escaping (NSEvent) -> NSEvent? = { $0 }
     ) {
         self.context = context
-        self.mask = mask
+        self.eventTypeMask = mask
+        self.handleEvent = handleEvent
         
         start()
     }
@@ -34,16 +36,18 @@ public final class NSEventMonitor {
     private func start() {
         switch self.context {
             case .local:
-                monitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
+                monitor = NSEvent.addLocalMonitorForEvents(matching: eventTypeMask) { [weak self] event in
                     guard let `self` = self else {
                         return event
                     }
                     
-                    return self.eventHandler(event)
+                    return self.handleEvent(event)
                 }
             case .global:
-                monitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] event in
-                    _ = self?.eventHandler(event)
+                monitor = NSEvent.addGlobalMonitorForEvents(matching: eventTypeMask) { [weak self] event in
+                    let e = self?.handleEvent(event)
+                    
+                    assert(event === e)
                 }
         }
     }
@@ -104,7 +108,7 @@ private struct _AttachNSEventMonitor: ViewModifier {
     func body(content: Content) -> some View {
         content.background {
             PerformAction {
-                eventMonitor.eventHandler = handleEvent
+                eventMonitor.handleEvent = handleEvent
             }
         }
     }
