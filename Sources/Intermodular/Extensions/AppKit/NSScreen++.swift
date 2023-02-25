@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(macOS) || targetEnvironment(macCatalyst)
+
 import SwiftUI
 
 extension NSScreen {
@@ -16,3 +18,5 @@ extension NSScreen {
         return result
     }
 }
+
+#endif
