@@ -2,6 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(AppKit)
+
+import AppKit
 import SwiftUI
 
 extension NSScreen {
@@ -16,3 +19,5 @@ extension NSScreen {
         return result
     }
 }
+
+#endif
