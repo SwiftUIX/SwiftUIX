@@ -138,7 +138,7 @@ extension SwiftUI.EventModifiers {
 }
 #endif
 
-#if canImport(Carbon)
+#if os(macOS)
 import Carbon
 
 extension SwiftUI.EventModifiers {

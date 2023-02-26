@@ -20,6 +20,7 @@ public struct AnyButtonStyle: ButtonStyle {
 }
 
 extension View {
+    @_disfavoredOverload
     public func buttonStyle<V: View>(
         @ViewBuilder makeBody: @escaping (AnyButtonStyle.Configuration) -> V
     ) -> some View {

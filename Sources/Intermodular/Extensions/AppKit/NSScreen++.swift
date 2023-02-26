@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(AppKit)
+#if os(macOS)
 
 import AppKit
 import SwiftUI
