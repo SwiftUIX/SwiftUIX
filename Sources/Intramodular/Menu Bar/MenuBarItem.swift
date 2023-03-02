@@ -92,7 +92,7 @@ extension View {
 // MARK: - Auxiliary
 
 #if os(macOS)
-public class MenuBarItemCoordinator<ID: Equatable, Content: View> {
+public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Content: View> {
     let cocoaStatusBar = NSStatusBar.system
     let cocoaStatusItem: NSStatusItem
     

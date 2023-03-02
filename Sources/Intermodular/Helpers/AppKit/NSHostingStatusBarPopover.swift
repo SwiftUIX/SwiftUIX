@@ -11,14 +11,14 @@ import SwiftUI
 public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
     var item: MenuBarItem<ID, Content> {
         didSet {
-            menuBarItemManager.item = item
+            menuBarExtraCoordinator.item = item
         }
     }
-
-    private lazy var menuBarItemManager: MenuBarItemCoordinator<ID, Content> = .init(item: item, action: { [weak self] in
+    
+    private lazy var menuBarExtraCoordinator: _CocoaMenuBarExtraCoordinator<ID, Content> = .init(item: item, action: { [weak self] in
         self?.togglePopover(sender: nil)
     })
-
+    
     var isActive: Binding<Bool>? {
         didSet {
             if let isActive = isActive {
@@ -34,10 +34,10 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
         
         super.init(rootView: item.content)
         
-        menuBarItemManager.item = item
+        menuBarExtraCoordinator.item = item
         
         behavior = NSPopover.Behavior.transient
-                        
+        
         _ = Unmanaged.passUnretained(self).retain() // fixes a crash
         
         if let isActive = isActive, isActive.wrappedValue, !isShown {
@@ -48,7 +48,7 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
+    
     @objc func togglePopover(sender: AnyObject?) {
         if isShown {
             hide(sender)
@@ -56,14 +56,14 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
             present(sender)
         }
     }
-
+    
     private func present(_ sender: AnyObject?) {
-        guard let statusBarButton = menuBarItemManager.cocoaStatusItem.button else {
+        guard let statusBarButton = menuBarExtraCoordinator.cocoaStatusItem.button else {
             return
         }
         
         NSApp.activate(ignoringOtherApps: true)
-
+        
         animates = false
         
         show(
@@ -79,7 +79,7 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
     
     private func hide(_ sender: AnyObject?) {
         performClose(nil)
-
+        
         isActive?.wrappedValue = false
     }
 }
