@@ -9,13 +9,42 @@ import AppKit
 import Swift
 import SwiftUI
 
+public enum _MenuBarExtraLabelContent: Hashable {
+    case image(name: ImageName, size: CGSize?)
+    case text(String)
+    
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+            case .image(let name, let size):
+                name.hash(into: &hasher)
+                (size?.width)?.hash(into: &hasher)
+                (size?.height)?.hash(into: &hasher)
+            case .text(let string):
+                string.hash(into: &hasher)
+        }
+    }
+}
+
 /// A model that represents an item which can be placed in the menu bar.
 public struct MenuBarItem<ID, Content: View> {
     public let id: ID
-    public let length: CGFloat?
-    public let image: ImageName
-    public let imageSize: CGSize
+    
+    fileprivate let length: CGFloat?
+    fileprivate let label: _MenuBarExtraLabelContent
+    
     public let content: Content
+    
+    fileprivate init(
+        id: ID,
+        length: CGFloat?,
+        label: _MenuBarExtraLabelContent,
+        content: Content
+    ) {
+        self.id = id
+        self.length = length
+        self.label = label
+        self.content = content
+    }
     
     public init(
         id: ID,
@@ -24,11 +53,16 @@ public struct MenuBarItem<ID, Content: View> {
         imageSize: CGSize = .init(width: 18.0, height: 18.0),
         @ViewBuilder content: () -> Content
     ) {
-        self.id = id
-        self.length = length
-        self.image = image
-        self.imageSize = imageSize
-        self.content = content()
+        self.init(id: id, length: length, label: .image(name: image, size: imageSize), content: content())
+    }
+    
+    public init(
+        id: ID,
+        length: CGFloat? = 28.0,
+        text: String,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(id: id, length: length, label: .text(text), content: content())
     }
 }
 
@@ -106,7 +140,9 @@ public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Content: View> {
         self.item = item
         self.action = action
         
-        cocoaStatusItem = cocoaStatusBar.statusItem(withLength: item.length ?? NSStatusItem.variableLength)
+        cocoaStatusItem = cocoaStatusBar.statusItem(
+            withLength: item.length ?? NSStatusItem.variableLength
+        )
         
         cocoaStatusItem.button?.action = #selector(didActivate)
         cocoaStatusItem.button?.target = self
@@ -130,13 +166,20 @@ public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Content: View> {
 }
 
 extension NSStatusItem {
-    fileprivate func update<ID, Content>(from item: MenuBarItem<ID, Content>) {
+    fileprivate func update<ID, Content>(
+        from item: MenuBarItem<ID, Content>
+    ) {
         self.length = item.length ?? NSStatusItem.variableLength
         
         if let button = button {
-            button.image = AppKitOrUIKitImage(named: item.image)
-            button.image?.size = NSSize(width: item.imageSize.width, height: item.imageSize.height)
-            button.image?.isTemplate = true
+            switch item.label {
+                case .image(let imageName, let imageSize):
+                    button.image = AppKitOrUIKitImage(named: imageName)
+                    button.image?.size = imageSize ?? .init(width: 18, height: 18)
+                    button.image?.isTemplate = true
+                case .text(let string):
+                    button.title = string
+            }
         }
     }
 }
