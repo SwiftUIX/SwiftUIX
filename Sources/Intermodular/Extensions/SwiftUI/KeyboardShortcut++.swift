@@ -27,7 +27,10 @@ extension KeyboardShortcut {
             return nil
         }
         
-        self.init(KeyEquivalent(key), modifiers: EventModifiers(_appKitModifierFlags: event.modifierFlags))
+        self.init(
+            KeyEquivalent(key),
+            modifiers: EventModifiers(_appKitModifierFlags: event.modifierFlags)
+        )
     }
     
     public static func ~= (lhs: KeyboardShortcut, rhs: KeyboardShortcut) -> Bool {
