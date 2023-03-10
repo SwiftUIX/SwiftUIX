@@ -74,4 +74,11 @@ extension View {
     ) -> some View {
         padding(.all, amount)
     }
+    
+    public func padding(
+        horizontal: _RelativePaddingAmount,
+        vertical: _RelativePaddingAmount
+    ) -> some View {
+        padding(.horizontal, horizontal).padding(.vertical, vertical)
+    }
 }
