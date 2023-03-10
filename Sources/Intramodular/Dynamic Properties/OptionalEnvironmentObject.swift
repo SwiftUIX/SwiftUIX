@@ -13,7 +13,7 @@ public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicPr
     @EnvironmentObject private var _wrappedValue: ObjectType
     
     public var wrappedValue: ObjectType? {
-        __wrappedValue.isPresent ? _wrappedValue : nil
+        __wrappedValue._SwiftUIX_isEnvironmentObjectPresent ? _wrappedValue : nil
     }
     
     public var projectedValue: Wrapper {
@@ -28,6 +28,7 @@ public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicPr
 // MARK: - API
 
 extension View {
+    @available(*, deprecated)
     public func optionalEnvironmentObject<B: ObservableObject>(_ bindable: B?) -> some View {
         bindable.map(environmentObject) ?? self
     }
@@ -50,5 +51,20 @@ extension OptionalEnvironmentObject {
                 }
             })
         }
+    }
+}
+
+// MARK: - Auxiliary
+
+extension EnvironmentObject {
+    public var _SwiftUIX_isEnvironmentObjectPresent: Bool {
+        let mirror = Mirror(reflecting: self)
+        let _store = mirror.children.first(where: { $0.label == "_store" })
+        
+        guard let _store else {
+            return false
+        }
+        
+        return (_store.value as? ObjectType) != nil
     }
 }

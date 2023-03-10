@@ -19,7 +19,7 @@ public struct EnvironmentObjectOrObservedObject<Value: ObservableObject>: Dynami
             return result
         } else {
             assertionFailure()
-
+            
             return defaultValue()
         }
     }
