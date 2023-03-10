@@ -10,30 +10,41 @@ import SwiftUI
 
 /// A display of a file system path or virtual path information.
 public struct PathControl<Label> {
+    fileprivate enum OnItemClick {
+        case openItem
+        case url(Binding<URL?>)
+    }
+    
+    private let url: URL?
     private let label: Label
-    
-    @Binding private var url: URL?
-    
-    private var placeholderText: String?
-    private var onDoubleTapGesture: () -> Void = { }
+    private let onItemClick: OnItemClick
+    private var placeholder: String?
 }
 
 extension PathControl where Label == EmptyView {
     public init(url: Binding<URL?>) {
-        self._url = url
+        self.url = url.wrappedValue
+        self.onItemClick = .url(url)
         self.label = EmptyView()
     }
     
     public init(path: Binding<String?>) {
         self.init(url: path.toFileURL())
     }
+
+    public init(url: URL) {
+        self.url = url
+        self.onItemClick = .openItem
+        self.label = EmptyView()
+    }
 }
 
 extension PathControl where Label == Text {
     public init<S: StringProtocol>(_ title: S, url: Binding<URL?>) {
-        self._url = url
+        self.url = url.wrappedValue
+        self.onItemClick = .url(url)
         self.label = .init(title)
-        self.placeholderText = .init(title)
+        self.placeholder = .init(title)
     }
     
     public init<S: StringProtocol>(_ title: S, path: Binding<String?>) {
@@ -49,16 +60,16 @@ extension PathControl: NSViewRepresentable {
         
         nsView.target = context.coordinator
         nsView.action = #selector(context.coordinator.pathItemClicked)
-        nsView.doubleAction = #selector(context.coordinator.pathControlDoubleClicked)
         
         nsView.delegate = context.coordinator
-        
+
+        nsView.focusRingType = .none
+
         return nsView
     }
     
     public func updateNSView(_ nsView: NSViewType, context: Context) {
-        context.coordinator.onURLChange = { self.url = $0 }
-        context.coordinator.onDoubleTapGesture = onDoubleTapGesture
+        context.coordinator.onItemClick = onItemClick
         
         if context.environment.pathControlStyle is StandardPathControlStyle {
             nsView.pathStyle = .standard
@@ -66,25 +77,27 @@ extension PathControl: NSViewRepresentable {
             nsView.pathStyle = .popUp
         }
         
-        nsView.placeholderString = placeholderText
+        nsView.placeholderString = placeholder
         nsView.isEditable = context.environment.isEnabled
         nsView.url = url
     }
     
     public final class Coordinator: NSObject, ObservableObject, NSPathControlDelegate {
-        var onURLChange: (URL?) -> Void = { _ in }
-        var onDoubleTapGesture: () -> Void = { }
-        
-        @objc func pathControlDoubleClicked(_ sender: NSPathControl) {
-            onDoubleTapGesture()
-        }
+        fileprivate var onItemClick: OnItemClick?
         
         @objc func pathItemClicked(_ sender: NSPathControl) {
-            guard let clickedPathItem = sender.clickedPathItem else {
+            guard let onItemClick, let clickedPathItem = sender.clickedPathItem else {
                 return
             }
             
-            onURLChange(clickedPathItem.url)
+            switch onItemClick {
+                case .openItem:
+                    if let url = clickedPathItem.url {
+                        NSWorkspace.shared.open(url)
+                    }
+                case .url(let url):
+                    url.wrappedValue = clickedPathItem.url
+            }
         }
     }
     
@@ -95,15 +108,8 @@ extension PathControl: NSViewRepresentable {
 
 // MARK: - API
 
-extension PathControl {
-    /// Adds an action to perform when this view recognizes a double-tap gesture.
-    public func onDoubleTapGesture(perform action: @escaping () -> Void) -> Self {
-        then({ $0.onDoubleTapGesture = action })
-    }
-}
-
 extension View {
-    @inlinable
+    /// Sets the style for path controls within this view.
     public func pathControlStyle(_ style: PathControlStyle) -> some View {
         environment(\.pathControlStyle, style)
     }
@@ -121,14 +127,25 @@ public struct StandardPathControlStyle: PathControlStyle {
     }
 }
 
+extension PathControlStyle where Self == StandardPathControlStyle {
+    public static var standard: Self {
+        Self()
+    }
+}
+
 public struct PopUpPathControlStyle: PathControlStyle {
     public init() {
         
     }
 }
 
+extension PathControlStyle where Self == PopUpPathControlStyle {
+    public static var popUp: Self {
+        Self()
+    }
+}
+
 extension EnvironmentValues {
-    @usableFromInline
     var pathControlStyle: PathControlStyle {
         get {
             self[DefaultEnvironmentKey<PathControlStyle>.self] ?? StandardPathControlStyle()
