@@ -173,3 +173,82 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
         }
     }
 }
+
+extension View {
+
+    /// Adds a modifier for this view that fires an action only when a time interval in
+    /// DispatchTimeInterval represented by `timeInterval` elapses between value changes.
+    ///
+    /// Each time the value changes before `timeInterval` passes, the previous action will
+    /// be cancelled and the next action will be scheduled to run after that time passes
+    /// again. This mean that the action will only execute after changes to the value stay
+    /// unmodified for the specified `timeInterval` in seconds.
+    ///
+    /// `onChange` is called on the main thread. Avoid performing long-running
+    /// tasks on the main thread. If you need to perform a long-running task in
+    /// response to `value` changing, you should dispatch to a background queue.
+    ///
+    /// - Parameters:
+    ///   - value: The value to check against when determining whether to run the closure.
+    ///   - timeInterval: A time interval in `DispatchTimeInterval` represented.
+    ///   - action: A closure to run when the value changes after time interval.
+    ///   - newValue: The new value that failed the comparison check.
+    ///
+    /// - Returns: A view that fires an action when the specified value changes.
+    @_disfavoredOverload
+    @ViewBuilder
+    public func onChange<V: Equatable>(
+        of value: V,
+        debounce timeInterval: DispatchTimeInterval,
+        perform action: @escaping (_ newValue: V) -> Void
+    ) -> some View {
+        self.modifier(DebouncedChangeViewModifier(trigger: value, timeInterval: timeInterval, action: action))
+    }
+}
+
+private struct DebouncedChangeViewModifier<V: Equatable>: ViewModifier {
+    
+    let trigger: V
+    let timeInterval: DispatchTimeInterval
+    let action: (V) -> Void
+    
+    @State private var debouncedTask: Task<Void, Never>?
+    
+    func body(content: Content) -> some View {
+        content.onChange(of: trigger) { newValue in
+            debouncedTask?.cancel()
+            debouncedTask = Task.delayed(timeInterval: timeInterval) { @MainActor in
+                action(newValue)
+            }
+        }
+    }
+}
+
+extension Task {
+    
+    @discardableResult
+    static func delayed(
+        timeInterval: DispatchTimeInterval,
+        action: @escaping @Sendable () async -> Void
+    ) -> Self where Success == Void, Failure == Never {
+        Self {
+            do {
+                try await Task<Never, Never>.sleep(nanoseconds: timeInterval.nanoseconds)
+                await action()
+            } catch {}
+        }
+    }
+}
+
+extension DispatchTimeInterval {
+    
+    var nanoseconds: UInt64 {
+        switch self {
+        case .nanoseconds(let value): return UInt64(value)
+        case .microseconds(let value): return UInt64(value) * 1_000
+        case .milliseconds(let value): return UInt64(value) * 1_000_000
+        case .seconds(let value): return UInt64(value) * 1_000_000_000
+        default: fatalError("Time interval can not be `\(self)`.")
+        }
+    }
+}
