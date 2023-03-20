@@ -91,7 +91,7 @@ private struct WithObservedValue<T, Content: View>: View {
 }
 
 private struct WithOptionalObservableValue<T, Content: View>: View {
-    @OptionalObservedObject var value: ObservableValue<T>?
+    @ObservedObject.Optional var value: ObservableValue<T>?
     
     let content: (T?) -> Content
     

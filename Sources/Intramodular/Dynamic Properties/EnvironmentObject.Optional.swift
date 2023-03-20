@@ -7,23 +7,28 @@ import Dispatch
 import Swift
 import SwiftUI
 
-/// An `@EnvironmentObject` wrapper that affords `Optional`-ity to environment objects.
-@propertyWrapper
-public struct OptionalEnvironmentObject<ObjectType: ObservableObject>: DynamicProperty {
-    @EnvironmentObject private var _wrappedValue: ObjectType
-    
-    public var wrappedValue: ObjectType? {
-        __wrappedValue._SwiftUIX_isEnvironmentObjectPresent ? _wrappedValue : nil
-    }
-    
-    public var projectedValue: Wrapper {
-        .init(base: self)
-    }
-    
-    public init() {
+extension EnvironmentObject {
+    /// An `@EnvironmentObject` wrapper that affords `Optional`-ity to environment objects.
+    @propertyWrapper
+    public struct Optional: DynamicProperty {
+        @EnvironmentObject private var _wrappedValue: ObjectType
         
+        public var wrappedValue: ObjectType? {
+            __wrappedValue._SwiftUIX_isEnvironmentObjectPresent ? _wrappedValue : nil
+        }
+        
+        public var projectedValue: Wrapper {
+            .init(base: self)
+        }
+        
+        public init() {
+            
+        }
     }
 }
+
+@available(*, deprecated, renamed: "EnvironmentObject.Optional")
+public typealias OptionalEnvironmentObject<ObjectType: ObservableObject> = EnvironmentObject<ObjectType>.Optional
 
 // MARK: - API
 
@@ -34,11 +39,11 @@ extension View {
     }
 }
 
-extension OptionalEnvironmentObject {
+extension EnvironmentObject.Optional {
     @dynamicMemberLookup
     @frozen
     public struct Wrapper {
-        fileprivate let base: OptionalEnvironmentObject
+        fileprivate let base: EnvironmentObject.Optional
         
         public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject?> {
             Binding<Subject?>(get: {
