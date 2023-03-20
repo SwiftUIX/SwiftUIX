@@ -32,7 +32,7 @@ extension View {
             value.isClipped = true
         }
     }
-
+    
     public func cellFocusable(_ focusable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isFocusable = focusable

@@ -64,7 +64,7 @@ private struct WithInlineObservedObject<Object: ObservableObject, Content: View>
 }
 
 private struct WithOptionalInlineObservedObject<Object: ObservableObject, Content: View>: View {
-    @OptionalObservedObject var object: Object?
+    @ObservedObject.Optional var object: Object?
     
     let content: Content
     
