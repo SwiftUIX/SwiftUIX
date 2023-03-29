@@ -34,7 +34,7 @@ extension KeyboardShortcut {
     }
     
     public static func ~= (lhs: KeyboardShortcut, rhs: KeyboardShortcut) -> Bool {
-        lhs.key ~= rhs.key && rhs.modifiers.contains(lhs.modifiers)
+        lhs.key ~= rhs.key && rhs.modifiers == lhs.modifiers
     }
 }
 #endif
