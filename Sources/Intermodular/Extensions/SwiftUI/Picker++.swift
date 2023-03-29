@@ -60,11 +60,25 @@ extension Picker where Label == EmptyView {
     }
 }
 
-extension Picker where Label == Text, SelectionValue: CaseIterable & CustomStringConvertible & Hashable, SelectionValue.AllCases: RandomAccessCollection, Content == AnyView {
+extension Picker where Label == Text, SelectionValue: CaseIterable & Hashable, SelectionValue.AllCases: RandomAccessCollection, Content == AnyView {
+    public init(
+        _ titleKey: LocalizedStringKey,
+        selection: Binding<SelectionValue>,
+        title: KeyPath<SelectionValue, String>
+    ) {
+        self.init(titleKey, selection: selection) {
+            ForEach(SelectionValue.allCases, id: \.self) { value in
+                Text(value[keyPath: title])
+                    .tag(value)
+            }
+            .eraseToAnyView()
+        }
+    }
+    
     public init(
         _ titleKey: LocalizedStringKey,
         selection: Binding<SelectionValue>
-    )  {
+    ) where SelectionValue: CustomStringConvertible {
         self.init(titleKey, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value.description)
@@ -77,7 +91,7 @@ extension Picker where Label == Text, SelectionValue: CaseIterable & CustomStrin
     public init<S: StringProtocol>(
         _ title: S,
         selection: Binding<SelectionValue>
-    ) {
+    ) where SelectionValue: CustomStringConvertible {
         self.init(title, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value.description)
