@@ -10,6 +10,7 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension Settings where Content == AnyView {
+    @MainActor
     public static func show() {
         #if os(macOS)
         NSApplication.shared.activate(ignoringOtherApps: true)
