@@ -8,6 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A control that displays an editable text interface.
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 public struct TextView<Label: View>: View {
     struct _Configuration {
         var isConstant: Bool
@@ -53,9 +54,7 @@ public struct TextView<Label: View>: View {
     private var attributedText: Binding<NSAttributedString>?
     private var configuration: _Configuration
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    private var customAppKitOrUIKitClass: UITextView.Type = _CocoaTextView<Label>.self
-    #endif
+    private let customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type = _CocoaTextView<Label>.self
     
     private var isEmpty: Bool {
         text?.wrappedValue.isEmpty ?? attributedText!.wrappedValue.string.isEmpty
@@ -69,36 +68,26 @@ public struct TextView<Label: View>: View {
                 .animation(.none)
                 .padding(configuration.textContainerInset.edgeInsets)
             
-            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
             _TextView<Label>(
                 text: text,
                 attributedText: attributedText,
                 configuration: configuration,
                 customAppKitOrUIKitClass: customAppKitOrUIKitClass
             )
-            #else
-            _TextView<Label>(
-                text: text,
-                attributedText: attributedText,
-                configuration: configuration
-            )
-            #endif
         }
     }
 }
 
 // MARK: - Implementation
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 fileprivate struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
     
     let text: Binding<String>?
     let attributedText: Binding<NSAttributedString>?
     let configuration: Configuration
-    
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-    var customAppKitOrUIKitClass: UITextView.Type
-    #endif
+    let customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type
 }
 
 #if os(iOS) || os(tvOS)
@@ -376,64 +365,17 @@ extension _TextView: UIViewRepresentable {
 
 import AppKit
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension _TextView: NSViewRepresentable {
-    typealias NSViewType = _NSTextView
-    
-    class Coordinator: NSObject, NSTextViewDelegate {
-        var view: _TextView
-        
-        init(_ view: _TextView) {
-            self.view = view
-        }
-        
-        func textDidBeginEditing(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else {
-                return
-            }
+    typealias NSViewType = _NSTextView<Label>
             
-            if let text = view.text {
-                text.wrappedValue = textView.string
-            } else if let attributedText = view.attributedText {
-                attributedText.wrappedValue = textView.attributedString()
-            } else {
-                assertionFailure()
-            }
-            
-            view.configuration.onEditingChanged(true)
-        }
-        
-        func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else {
-                return
-            }
-            
-            if let text = view.text {
-                text.wrappedValue = textView.string
-            } else if let attributedText = view.attributedText {
-                attributedText.wrappedValue = textView.attributedString()
-            } else {
-                assertionFailure()
-            }
-        }
-        
-        func textDidEndEditing(_ notification: Notification) {
-            view.configuration.onEditingChanged(false)
-            view.configuration.onCommit()
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
     func makeNSView(context: Context) -> NSViewType {
-        let nsView = _NSTextView()
+        let nsView = NSViewType()
         
+        nsView.parent = self
         nsView.delegate = context.coordinator
-        
-        nsView.backgroundColor = .clear
-        nsView.textContainerInset = configuration.textContainerInset
-        
+    
         return nsView
     }
     
@@ -446,21 +388,142 @@ extension _TextView: NSViewRepresentable {
             nsView.textStorage?.setAttributedString(attributedText.wrappedValue)
         }
         
-        nsView.textColor = configuration.textColor
-		if let tintColor = configuration.tintColor {
-			nsView.insertionPointColor = tintColor
-		}
+        nsView.parent = self
+        nsView._update(configuration: configuration, context: context)
+        
+        nsView.invalidateIntrinsicContentSize()
+    }
+    
+    class Coordinator: NSObject, NSTextViewDelegate {
+        var parent: _TextView
+        
+        init(parent: _TextView) {
+            self.parent = parent
+        }
+        
+        func textDidBeginEditing(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else {
+                return
+            }
+            
+            if let text = parent.text {
+                text.wrappedValue = textView.string
+            } else if let attributedText = parent.attributedText {
+                attributedText.wrappedValue = textView.attributedString()
+            } else {
+                assertionFailure()
+            }
+            
+            parent.configuration.onEditingChanged(true)
+        }
+        
+        func textDidChange(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else {
+                return
+            }
+            
+            if let text = parent.text {
+                text.wrappedValue = textView.string
+            } else if let attributedText = parent.attributedText {
+                attributedText.wrappedValue = textView.attributedString()
+            } else {
+                assertionFailure()
+            }
+        }
+        
+        func textDidEndEditing(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else {
+                return
+            }
+            
+            parent.configuration.onEditingChanged(false)
+            
+            parent.text?.wrappedValue = textView.string
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
     }
 }
 
-class _NSTextView: NSTextView {
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
+fileprivate class _NSTextView<Label: View>: NSTextView {
+    var parent: _TextView<Label>!
+
+    var configuration: _TextView<Label>.Configuration {
+        parent.configuration
+    }
     
+    override var intrinsicContentSize: NSSize {
+        guard let manager = textContainer?.layoutManager else {
+            return .zero
+        }
+        
+        manager.ensureLayout(for: textContainer!)
+        
+        return manager.usedRect(for: textContainer!).size
+    }
+        
+    func _update(
+        configuration: _TextView<Label>.Configuration,
+        context: _TextView<Label>.Context
+    ) {
+        backgroundColor = .clear
+        drawsBackground = false
+        isEditable = true
+        textContainerInset = configuration.textContainerInset
+        usesAdaptiveColorMappingForDarkAppearance = true
+        
+        font = font ?? (try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont())
+        textColor = configuration.textColor
+        
+        textStorage?.font = font
+        
+        isHorizontallyResizable = false
+        isVerticallyResizable = true
+        autoresizingMask = [.width]
+
+        if let tintColor = configuration.tintColor {
+            insertionPointColor = tintColor
+        }
+    }
+    
+    override func preferredPasteboardType(
+        from availableTypes: [NSPasteboard.PasteboardType],
+        restrictedToTypesFrom allowedTypes: [NSPasteboard.PasteboardType]?
+    ) -> NSPasteboard.PasteboardType? {
+        if availableTypes.contains(.string) {
+            return .string
+        } else {
+            return super.preferredPasteboardType(
+                from: availableTypes,
+                restrictedToTypesFrom: allowedTypes
+            )
+        }
+    }
+            
+    override func keyDown(with event: NSEvent) {
+        if let shortcut = KeyboardShortcut(from: event) {
+            switch shortcut {
+                case KeyboardShortcut(.return, modifiers: []):
+                    parent.configuration.onCommit()
+                default:
+                    super.keyDown(with: event)
+            }
+        } else {
+            super.keyDown(with: event)
+        }
+    }
 }
 
 #endif
 
 // MARK: - API
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView where Label == EmptyView {
     public init(
         text: Binding<String>,
@@ -514,6 +577,8 @@ extension TextView where Label == EmptyView {
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView: DefaultTextInputType where Label == Text {
     public init<S: StringProtocol>(
         _ title: S,
@@ -545,6 +610,8 @@ extension TextView: DefaultTextInputType where Label == Text {
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func customAppKitOrUIKitClass(_ type: UITextView.Type) -> Self {
@@ -553,12 +620,16 @@ extension TextView {
     #endif
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
         then({ $0.configuration.onDeleteBackward = action })
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
         then({ $0.configuration.isInitialFirstResponder = isInitialFirstResponder })
@@ -573,24 +644,29 @@ extension TextView {
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func autocapitalization(_ autocapitalization: UITextAutocapitalizationType) -> Self {
         then({ $0.configuration.autocapitalization = autocapitalization })
     }
+    #endif
     
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func foregroundColor(_ foregroundColor: Color) -> Self {
-        then({ $0.configuration.textColor = foregroundColor.toUIColor() })
+        then({ $0.configuration.textColor = foregroundColor.toAppKitOrUIKitColor() })
     }
 	
 	public func tint(_ tint: Color) -> Self {
-		then({ $0.configuration.tintColor = tint.toUIColor() })
+		then({ $0.configuration.tintColor = tint.toAppKitOrUIKitColor() })
 	}
+    #endif
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func linkForegroundColor(_ linkForegroundColor: Color?) -> Self {
-        then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toUIColor() })
+        then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toAppKitOrUIKitColor() })
     }
-    
     #endif
     
     public func font(_ font: AppKitOrUIKitFont?) -> Self {
@@ -627,6 +703,8 @@ extension TextView {
     #endif
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     public func isEditable(_ isEditable: Bool) -> Self {
         then({ $0.configuration.isEditable = isEditable })
@@ -637,6 +715,8 @@ extension TextView {
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(watchOS, unavailable)
 extension TextView {
     public func dismissKeyboardOnReturn(_ dismissKeyboardOnReturn: Bool) -> Self {
         then({ $0.configuration.dismissKeyboardOnReturn = dismissKeyboardOnReturn })

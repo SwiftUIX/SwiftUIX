@@ -2,13 +2,14 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
 
 /// The main `UITextView` subclass used by `TextView`.
-final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKitView {
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+final class _CocoaTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAppKitOrUIKitView {
     var _isSwiftUIRuntimeUpdateActive: Bool = false
     var _isSwiftUIRuntimeDismantled: Bool = false
     
@@ -19,6 +20,7 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override var attributedText: NSAttributedString! {
         didSet {
             if preferredMaximumDimensions.height != nil {
@@ -54,7 +56,9 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
             }
         }
     }
+    #endif
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var numberOfLinesDisplayed: Int {
         let numberOfGlyphs = layoutManager.numberOfGlyphs
         var index = 0, numberOfLines = 0
@@ -105,7 +109,8 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
             }
         }
     }
-    
+    #endif
+
     override var intrinsicContentSize: CGSize {
         computeIntrinsicContentSize() ?? super.intrinsicContentSize
     }
@@ -120,11 +125,13 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
         fatalError("init(coder:) has not been implemented")
     }
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override func layoutSubviews() {
         super.layoutSubviews()
 
         verticallyCenterTextIfNecessary()
     }
+    #endif
     
     override func invalidateIntrinsicContentSize() {
         _cachedIntrinsicContentSize = nil
@@ -137,6 +144,7 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
             return _cachedIntrinsicContentSize
         }
         
+        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let preferredMaximumLayoutWidth = preferredMaximumDimensions.width {
             self._cachedIntrinsicContentSize = sizeThatFits(
                 CGSize(
@@ -152,17 +160,21 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
             )
         } else {
             self._cachedIntrinsicContentSize = .init(
-                width: UIView.noIntrinsicMetric,
+                width: AppKitOrUIKitView.noIntrinsicMetric,
                 height: min(
                     preferredMaximumDimensions.height ?? contentSize.height,
                     contentSize.height
                 )
             )
         }
+        #else
+        
+        #endif
         
         return self._cachedIntrinsicContentSize
     }
     
+    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
@@ -214,8 +226,11 @@ final class _CocoaTextView<Label: View>: UITextView, _RepresentableAppKitOrUIKit
         
         configuration.onDeleteBackward()
     }
+    #endif
 }
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _CocoaTextView {
     private func textHeight(forWidth width: CGFloat) -> CGFloat {
         let storage = NSTextStorage(attributedString: attributedText)
@@ -254,5 +269,11 @@ extension _CocoaTextView {
         contentOffset.y = -positiveTopOffset
     }
 }
+#elseif os(macOS)
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+extension _CocoaTextView {
+    
+}
+#endif
 
 #endif
