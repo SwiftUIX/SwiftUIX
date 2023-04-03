@@ -57,6 +57,7 @@ extension View {
     }
 }
 
+@available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
 extension _TargetPlatformConditionalModifiable where Platform == _SwiftUI_TargetPlatform.iOS {
     @ViewBuilder
     public func navigationBarTitleDisplayMode(

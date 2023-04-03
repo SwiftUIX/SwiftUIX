@@ -54,7 +54,7 @@ public struct TextView<Label: View>: View {
     private var attributedText: Binding<NSAttributedString>?
     private var configuration: _Configuration
     
-    private let customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type = _CocoaTextView<Label>.self
+    private var customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type = _CocoaTextView<Label>.self
     
     private var isEmpty: Bool {
         text?.wrappedValue.isEmpty ?? attributedText!.wrappedValue.string.isEmpty
@@ -610,7 +610,7 @@ extension TextView: DefaultTextInputType where Label == Text {
     }
 }
 
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
 @available(watchOS, unavailable)
 extension TextView {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
