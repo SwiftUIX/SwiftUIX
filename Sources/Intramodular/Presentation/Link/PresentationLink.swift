@@ -86,7 +86,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 customPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
                 systemSheetPresentationButton
-            } else if case .popover = presentationStyle, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
+            } else if presentationStyle == ModalPresentationStyle._Comparison.popover, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
                 systemPopoverPresentationButton
             } else {
                 customPresentationButtonWithAdHocPresenter
