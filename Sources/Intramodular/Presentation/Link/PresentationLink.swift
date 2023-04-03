@@ -86,7 +86,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 customPresentationButton(presenter: presenter)
             } else if presentationStyle == .automatic {
                 systemSheetPresentationButton
-            } else if presentationStyle == .popover, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
+            } else if case .popover = presentationStyle, userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
                 systemPopoverPresentationButton
             } else {
                 customPresentationButtonWithAdHocPresenter
@@ -172,7 +172,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     
     @ViewBuilder
     private var systemPopoverPresentationButton: some View {
-        #if os(iOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
         Button(action: togglePresentation, label: label)
             .popover(isPresented: isPresented.onChange { newValue in
                 if !newValue {
@@ -197,7 +197,9 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                 isPresented.wrappedValue = false
                 _onDismiss()
             },
-            content: { presentation.content }
+            content: {
+                presentation.content
+            }
         )
     }
 

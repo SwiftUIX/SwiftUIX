@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct _AppKitOrUIKitRepresentableContext {
     var proposedSize: _SwiftUIX_ProposedSize?
@@ -31,13 +31,15 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _Represent
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
     }
 
+    #if os(iOS)
     func _overrideSizeThatFits(
         _ size: inout CGSize,
         in proposedSize: _ProposedSize,
-        uiView: UIViewType
+        uiView: AppKitOrUIKitViewType
     ) {
         uiView.representableContext.proposedSize = .init(proposedSize)
     }
+    #endif
 }
 
 extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewControllerType: _RepresentableAppKitOrUIKitViewController {
