@@ -96,7 +96,7 @@ extension ModalPresentationStyle {
     }
     
     public static func == (lhs: Self, rhs: _Comparison) -> Bool {
-        #if os(iOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
         switch (lhs, rhs) {
             case (.popover, .popover):
                 return true
