@@ -13,6 +13,17 @@ extension Binding {
 }
 
 extension Binding {
+    public func cast<T, U>() -> Binding<Optional<U>> where Value == Optional<T> {
+        Binding<Optional<U>>(
+            get: {
+                self.wrappedValue.flatMap({ $0 as? U })
+            },
+            set: { newValue in
+                self.wrappedValue = newValue as? T
+            }
+        )
+    }
+
     public func _cast<T>(
         to type: T.Type = T.self
     ) -> Binding<Optional<T>> {
