@@ -308,6 +308,10 @@ extension _TextView: UIViewRepresentable {
                 return
             }
             
+            guard textView.markedTextRange == nil, text?.wrappedValue != textView.text else {
+                return
+            }
+            
             if let text = text {
                 text.wrappedValue = textView.text
             } else {
