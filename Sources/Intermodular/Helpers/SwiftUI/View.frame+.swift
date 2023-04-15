@@ -196,6 +196,23 @@ extension View {
             alignment: alignment
         )
     }
+    
+    @_disfavoredOverload
+    public func frame(
+        width: ClosedRange<CGFloat>? = nil,
+        idealWidth: CGFloat? = nil,
+        height: ClosedRange<CGFloat>? = nil,
+        idealHeight: CGFloat? = nil
+    ) -> some View {
+        frame(
+            minWidth: width?.lowerBound,
+            idealWidth: idealWidth,
+            maxWidth: width?.upperBound,
+            minHeight: height?.lowerBound,
+            idealHeight: idealHeight,
+            maxHeight: height?.upperBound
+        )
+    }
 }
 
 extension View {
