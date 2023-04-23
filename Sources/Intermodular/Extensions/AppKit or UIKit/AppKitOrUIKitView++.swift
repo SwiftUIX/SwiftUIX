@@ -24,4 +24,54 @@ extension AppKitOrUIKitView {
     }
 }
 
+extension AppKitOrUIKitView {
+    public func _SwiftUIX_findSubview<T: AppKitOrUIKitView>(
+        ofKind kind: T.Type
+    ) -> T? {
+        findSubview(ofKind: kind)
+    }
+    
+    public func _SwiftUIX_findSubview(
+        where predicate: (AppKitOrUIKitView) -> Bool
+    ) -> AppKitOrUIKitView? {
+        findSubview(where: predicate)
+    }
+
+    private func findSubview<T: AppKitOrUIKitView>(
+        ofKind kind: T.Type
+    ) -> T? {
+        guard !subviews.isEmpty else {
+            return nil
+        }
+        
+        for subview in subviews {
+            if subview.isKind(of: kind) {
+                return subview as? T
+            } else if let result = subview.findSubview(ofKind: kind) {
+                return result
+            }
+        }
+        
+        return nil
+    }
+    
+    private func findSubview(
+        where predicate: (AppKitOrUIKitView) -> Bool
+    ) -> AppKitOrUIKitView? {
+        guard !subviews.isEmpty else {
+            return nil
+        }
+        
+        for subview in subviews {
+            if predicate(subview) {
+                return subview
+            } else if let result = subview.findSubview(where: predicate) {
+                return result
+            }
+        }
+        
+        return nil
+    }
+}
+
 #endif

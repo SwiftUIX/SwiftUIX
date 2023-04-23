@@ -222,6 +222,52 @@ extension Binding {
     /// Creates a `Binding<Bool>` that reports whether `binding.wrappedValue` equals a given value.
     ///
     /// `binding.wrappedValue` will be set to `nil` only if `binding.wrappedValue` is equal to the given value and the `Boolean` value being set is `false.`
+    public static func boolean<T: AnyObject>(
+        _ binding: Binding<T?>,
+        equals value: T
+    ) -> Binding<Bool> where Value == Bool {
+        .init(
+            get: {
+                binding.wrappedValue === value
+            },
+            set: { newValue in
+                if newValue {
+                    binding.wrappedValue = value
+                } else {
+                    if binding.wrappedValue === value {
+                        binding.wrappedValue = nil
+                    }
+                }
+            }
+        )
+    }
+    
+    /// Creates a `Binding<Bool>` that reports whether `binding.wrappedValue` equals a given value.
+    ///
+    /// `binding.wrappedValue` will be set to `nil` only if `binding.wrappedValue` is equal to the given value and the `Boolean` value being set is `false.`
+    public static func boolean<T: AnyObject & Equatable>(
+        _ binding: Binding<T?>,
+        equals value: T
+    ) -> Binding<Bool> where Value == Bool {
+        .init(
+            get: {
+                binding.wrappedValue == value
+            },
+            set: { newValue in
+                if newValue {
+                    binding.wrappedValue = value
+                } else {
+                    if binding.wrappedValue == value {
+                        binding.wrappedValue = nil
+                    }
+                }
+            }
+        )
+    }
+
+    /// Creates a `Binding<Bool>` that reports whether `binding.wrappedValue` equals a given value.
+    ///
+    /// `binding.wrappedValue` will be set to `nil` only if `binding.wrappedValue` is equal to the given value and the `Boolean` value being set is `false.`
     public static func boolean<T: Equatable>(
         _ binding: Binding<T>,
         equals value: T,

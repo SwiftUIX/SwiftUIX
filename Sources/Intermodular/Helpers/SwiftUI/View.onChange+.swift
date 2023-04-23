@@ -51,15 +51,15 @@ extension View {
         of value: V,
         perform action: @escaping (V) -> Void
     ) -> some View {
-        #if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
             onChange(of: value, perform: action)
         } else {
             _backport_onChange(of: value, perform: action)
         }
-        #else
+#else
         _backport_onChange(of: value, perform: action)
-        #endif
+#endif
     }
     
     @ViewBuilder
@@ -72,7 +72,9 @@ extension View {
 }
 
 extension View {
-    public func onChangeOfFrame(perform action: @escaping (CGSize) -> Void) -> some View {
+    public func onChangeOfFrame(
+        perform action: @escaping (CGSize) -> Void
+    ) -> some View {
         modifier(_OnChangeOfFrame(action: action))
     }
 }
@@ -163,7 +165,7 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
                     .accessibility(hidden: true)
             }
     }
-
+    
     private func subscribeIfNecessary() {
         if subscription == nil {
             let subscription = transform(valuePublisher.eraseToAnyPublisher())

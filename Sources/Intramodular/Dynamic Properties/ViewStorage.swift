@@ -8,10 +8,10 @@ import SwiftUI
 
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
-    fileprivate final class ValueBox: ObservableValue<Value> {
-        @Published var value: Value
+    public final class ValueBox: ObservableValue<Value> {
+        @Published fileprivate var value: Value
         
-        override var wrappedValue: Value {
+        public override var wrappedValue: Value {
             get {
                 value
             } set {
@@ -19,20 +19,20 @@ public struct ViewStorage<Value>: DynamicProperty {
             }
         }
         
-        init(_ value: Value) {
+        fileprivate init(_ value: Value) {
             self.value = value
             
             super.init()
         }
     }
     
-    @State fileprivate var valueBox: ValueBox
+    @State fileprivate var _valueBox: ValueBox
     
     public var wrappedValue: Value {
         get {
-            valueBox.value
+            _valueBox.value
         } nonmutating set {
-            valueBox.value = newValue
+            _valueBox.value = newValue
         }
     }
     
@@ -40,8 +40,12 @@ public struct ViewStorage<Value>: DynamicProperty {
         self
     }
     
+    public var valueBox: ValueBox {
+        _valueBox
+    }
+    
     public init(wrappedValue value: @autoclosure @escaping () -> Value) {
-        self._valueBox = .init(wrappedValue: ValueBox(value()))
+        self.__valueBox = .init(wrappedValue: ValueBox(value()))
     }
 }
 

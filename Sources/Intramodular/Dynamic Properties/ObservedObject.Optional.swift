@@ -26,7 +26,7 @@ extension ObservedObject {
         }
         
         /// Initialize with the provided initial value.
-        public init(wrappedValue value: ObjectType? = nil) {
+        public init(wrappedValue value: ObjectType?) {
             self.base = value
         }
         

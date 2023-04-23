@@ -67,7 +67,7 @@ extension View {
         observing storage: ViewStorage<T>?,
         transform: @escaping (AnyView, T?) -> TransformedView
     ) -> some View {
-        WithOptionalObservableValue(value: .init(wrappedValue: storage.map(ObservedValue.init)?.base), content: { transform(AnyView(self), $0) })
+        WithOptionalObservableValue(value: storage.map(ObservedValue.init)?.base, content: { transform(AnyView(self), $0) })
     }
 
     public func modify<T: Hashable, TransformedView: View>(

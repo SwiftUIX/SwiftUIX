@@ -7,7 +7,7 @@ import SwiftUI
 
 extension View {
     /// Applies a linear foreground gradient to the text.
-    public func foregroundLinearGradient(
+    public func _foregroundLinearGradient(
         _ gradient: Gradient,
         startPoint: UnitPoint = .leading,
         endPoint: UnitPoint = .trailing
@@ -22,7 +22,7 @@ extension View {
         .mask(self)
     }
 
-    public func linearGradientOpacity(
+    public func _linearGradientOpacity(
         _ edges: Edge.Set,
         _ opacity: Double,
         inset: CGFloat

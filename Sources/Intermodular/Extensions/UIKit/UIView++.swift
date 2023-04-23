@@ -34,28 +34,6 @@ extension UIView {
 }
 
 extension UIView {
-    public func _SwiftUIX_findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
-        findSubview(ofKind: kind)
-    }
-    
-    private func findSubview<T: UIView>(ofKind kind: T.Type) -> T? {
-        guard !subviews.isEmpty else {
-            return nil
-        }
-        
-        for subview in subviews {
-            if subview.isKind(of: kind) {
-                return subview as? T
-            } else if let result = subview.findSubview(ofKind: kind) {
-                return result
-            }
-        }
-        
-        return nil
-    }
-}
-
-extension UIView {
     func constrain(to other: UIView) {
         translatesAutoresizingMaskIntoConstraints = false
         
