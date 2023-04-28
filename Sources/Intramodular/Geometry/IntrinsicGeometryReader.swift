@@ -6,81 +6,6 @@ import Combine
 import Swift
 import SwiftUI
 
-public struct _KeyPathEquatable<Root, Value: Equatable>: Equatable {
-    public let root: Root
-    public let keyPath: KeyPath<Root, Value>
-    
-    public init(root: Root, keyPath: KeyPath<Root, Value>) {
-        self.root = root
-        self.keyPath = keyPath
-    }
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs.keyPath == rhs.keyPath else {
-            return false
-        }
-        
-        return lhs.root[keyPath: lhs.keyPath] == rhs.root[keyPath: rhs.keyPath]
-    }
-}
-
-extension GeometryProxy {
-    public var _globalFrame: CGRect {
-        frame(in: .global)
-    }
-}
-
-public struct _BackgroundGeometryReader<Content: View>: View {
-    private struct GeometryPreferenceKey: PreferenceKey {
-        typealias Value = _KeyPathEquatable<GeometryProxy, CGSize>?
-        
-        static var defaultValue: Value {
-            nil
-        }
-        
-        static func reduce(value: inout Value, nextValue: () -> Value) {
-            value = nextValue() ?? value
-        }
-    }
-
-    private let content: (GeometryProxy) -> Content
-    
-    @State private var geometry: GeometryProxy?
-    
-    public init(@ViewBuilder content: @escaping (GeometryProxy) -> Content) {
-        self.content = content
-    }
-    
-    public var body: some View {
-        ZStack {
-            if let geometry = geometry {
-                content(geometry)
-            }
-        }
-        .background {
-            GeometryReader { geometry in
-                Color.clear.preference(
-                    key: GeometryPreferenceKey.self,
-                    value: _KeyPathEquatable(root: geometry, keyPath: \.size)
-                )
-            }
-            .allowsHitTesting(false)
-            .accessibility(hidden: true)
-        }
-        .onPreferenceChange(GeometryPreferenceKey.self) { newValue in
-            guard let newValue = newValue?.root else {
-                return
-            }
-            
-            Task { @MainActor in
-                if geometry?._globalFrame != newValue._globalFrame {
-                    geometry = newValue
-                }
-            }
-        }
-    }
-}
-
 /// A proxy for access to the size and coordinate space (for anchor resolution) of the content view.
 public struct IntrinsicGeometryProxy: Equatable {
     private let localFrame: CGRect?
@@ -137,6 +62,93 @@ public struct IntrinsicGeometryReader<Content: View>: View {
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)
+        }
+    }
+}
+
+public struct _BackgroundGeometryReader<Content: View>: View {
+    private struct GeometryPreferenceKey: PreferenceKey {
+        typealias Value = _KeyPathEquatable<GeometryProxy, CGSize>?
+        
+        static var defaultValue: Value {
+            nil
+        }
+        
+        static func reduce(value: inout Value, nextValue: () -> Value) {
+            value = nextValue() ?? value
+        }
+    }
+    
+    private let content: (GeometryProxy) -> Content
+    
+    @State private var geometry: GeometryProxy?
+    
+    public init(@ViewBuilder content: @escaping (GeometryProxy) -> Content) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        ZStack {
+            if let geometry = geometry {
+                content(geometry)
+            }
+        }
+        .background {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: GeometryPreferenceKey.self,
+                    value: _KeyPathEquatable(root: geometry, keyPath: \.size)
+                )
+            }
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
+        }
+        .onPreferenceChange(GeometryPreferenceKey.self) { newValue in
+            guard let newValue = newValue?.root else {
+                return
+            }
+            
+            Task { @MainActor in
+                if geometry?._globalFrame != newValue._globalFrame {
+                    geometry = newValue
+                }
+            }
+        }
+    }
+}
+
+public struct _AxesGeometryReader<Content: View>: View {
+    private let axes: Axis.Set
+    private let content: (IntrinsicGeometryProxy) -> Content
+    
+    @State private var geometry: GeometryProxy?
+    
+    public init(
+        _ axes: Axis.Set,
+        @ViewBuilder content: @escaping (IntrinsicGeometryProxy) -> Content
+    ) {
+        self.axes = axes
+        self.content = content
+    }
+    
+    @_disfavoredOverload
+    public init(
+        _ axis: Axis,
+        @ViewBuilder content: @escaping (IntrinsicGeometryProxy) -> Content
+    ) {
+        self.init(
+            axis == .horizontal ? Axis.Set.horizontal : Axis.Set.vertical,
+            content: content
+        )
+    }
+    
+    public var body: some View {
+        IntrinsicGeometryReader { (proxy: IntrinsicGeometryProxy) in
+            content(proxy)
+                .frame(
+                    maxWidth: axes.contains(.horizontal) ? .infinity : nil,
+                    maxHeight: axes.contains(.vertical) ? .infinity : nil
+                )
         }
     }
 }

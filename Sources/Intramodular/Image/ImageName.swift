@@ -71,8 +71,7 @@ extension ImageName {
 // MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-extension UIImage {
+extension AppKitOrUIKitImage {
     public convenience init?(named name: ImageName) {
         switch name {
             case .bundleResource(let name, let bundle):
@@ -82,32 +81,33 @@ extension UIImage {
         }
     }
 }
-
-#endif
-
-#if os(macOS)
-
-extension NSImage {
+#elseif os(macOS)
+extension AppKitOrUIKitImage {
     public convenience init?(named name: ImageName) {
         switch name {
-            case .bundleResource(let name, let bundle): do {
-                if let bundle = bundle, let _ = bundle.image(forResource: name) {
-                    self.init(named: name) // FIXME
+            case .bundleResource(let name, let bundle):
+                if let bundle {
+                    if let url = bundle.urlForImageResource(name) {
+                        self.init(byReferencing: url)
+                    } else {
+                        assertionFailure()
+                        
+                        return nil
+                    }
                 } else {
                     self.init(named: name)
                 }
-            }
-            case .system(let name): do {
-                if #available(OSX 10.16, *) {
+            case .system(let name):
+                if #available(macOS 11.0, *) {
                     self.init(systemSymbolName: name, accessibilityDescription: nil)
                 } else {
-                    fatalError("unimplemented")
+                    assertionFailure()
+                    
+                    return nil
                 }
-            }
         }
     }
 }
-
 #endif
 
 // MARK: - Helpers

@@ -40,6 +40,24 @@ public struct _HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, 
     }
 }
 
+public struct _KeyPathEquatable<Root, Value: Equatable>: Equatable {
+    public let root: Root
+    public let keyPath: KeyPath<Root, Value>
+    
+    public init(root: Root, keyPath: KeyPath<Root, Value>) {
+        self.root = root
+        self.keyPath = keyPath
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        guard lhs.keyPath == rhs.keyPath else {
+            return false
+        }
+        
+        return lhs.root[keyPath: lhs.keyPath] == rhs.root[keyPath: rhs.keyPath]
+    }
+}
+
 public struct _KeyPathHashable<Root, Value: Hashable>: Hashable {
     public let root: Root
     public let keyPath: KeyPath<Root, Value>

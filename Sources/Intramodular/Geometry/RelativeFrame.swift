@@ -211,7 +211,7 @@ struct RelativeFrameModifier: _opaque_FrameModifier, ViewModifier {
 // MARK: - Helpers
 
 extension CGSize {
-    fileprivate func value(for dimensionType: FrameDimensionType) -> CGFloat {
+    public func value(for dimensionType: FrameDimensionType) -> CGFloat {
         switch dimensionType {
             case .width:
                 return width

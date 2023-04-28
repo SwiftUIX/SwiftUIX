@@ -279,26 +279,30 @@ extension Color {
 }
 #endif
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension Color {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     /// A color that adapts to the preferred color scheme.
     ///
     /// - Parameters:
     ///   - light: The preferred color for a light color scheme.
     ///   - dark: The preferred color for a dark color scheme.
-    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     public static func adaptable(
         light: @escaping @autoclosure () -> Color,
         dark: @escaping @autoclosure () -> Color
     ) -> Color {
         Color(
-            UIColor.adaptable(
-                light: UIColor(light()),
-                dark: UIColor(dark())
+            AppKitOrUIKitColor.adaptable(
+                light: AppKitOrUIKitColor(light()),
+                dark: AppKitOrUIKitColor(dark())
             )
         )
     }
+}
+#endif
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension Color {
     /// Inverts the color.
     @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
     public func colorInvert() -> Color {
@@ -308,8 +312,8 @@ extension Color {
             }
         )
     }
-    #endif
 }
+#endif
 
 extension Color {
     public init(
@@ -418,12 +422,12 @@ extension Color {
 // MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-fileprivate extension UIColor {
+fileprivate extension AppKitOrUIKitColor {
     class func adaptable(
-        light: @escaping @autoclosure () -> UIColor,
-        dark: @escaping @autoclosure () -> UIColor
-    ) -> UIColor {
-        UIColor { traitCollection in
+        light: @escaping @autoclosure () -> AppKitOrUIKitColor,
+        dark: @escaping @autoclosure () -> AppKitOrUIKitColor
+    ) -> AppKitOrUIKitColor {
+        AppKitOrUIKitColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
                 case .light:
                     return light()
@@ -434,26 +438,45 @@ fileprivate extension UIColor {
             }
         }
     }
-    
-    func invertedColor() -> UIColor {
+}
+#elseif os(macOS)
+fileprivate extension AppKitOrUIKitColor {
+    class func adaptable(
+        light: @escaping @autoclosure () -> AppKitOrUIKitColor,
+        dark: @escaping @autoclosure () -> AppKitOrUIKitColor
+    ) -> AppKitOrUIKitColor {
+        AppKitOrUIKitColor(name: nil) { appearance in
+            if appearance.isDarkMode {
+                return dark()
+            } else {
+                return light()
+            }
+        }
+    }
+}
+#endif
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension AppKitOrUIKitColor {
+    func invertedColor() -> AppKitOrUIKitColor {
         var alpha: CGFloat = 1.0
         
         var red: CGFloat = 0.0, green: CGFloat = 0.0, blue: CGFloat = 0.0
         
         if self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
-            return UIColor(red: 1.0 - red, green: 1.0 - green, blue: 1.0 - blue, alpha: alpha)
+            return AppKitOrUIKitColor(red: 1.0 - red, green: 1.0 - green, blue: 1.0 - blue, alpha: alpha)
         }
         
         var hue: CGFloat = 0.0, saturation: CGFloat = 0.0, brightness: CGFloat = 0.0
         
         if self.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            return UIColor(hue: 1.0 - hue, saturation: 1.0 - saturation, brightness: 1.0 - brightness, alpha: alpha)
+            return AppKitOrUIKitColor(hue: 1.0 - hue, saturation: 1.0 - saturation, brightness: 1.0 - brightness, alpha: alpha)
         }
         
         var white: CGFloat = 0.0
         
         if self.getWhite(&white, alpha: &alpha) {
-            return UIColor(white: 1.0 - white, alpha: alpha)
+            return AppKitOrUIKitColor(white: 1.0 - white, alpha: alpha)
         }
         
         return self
@@ -465,5 +488,20 @@ fileprivate extension UIColor {
 extension Color {
     /// The color to use for the window background.
     public static let windowBackground = Color(NSColor.windowBackgroundColor)
+}
+#endif
+
+// MARK: - Helpers
+
+#if os(macOS)
+extension NSAppearance {
+    fileprivate var isDarkMode: Bool {
+        switch name {
+            case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
+                return true
+            default:
+                return false
+        }
+    }
 }
 #endif

@@ -5,6 +5,12 @@
 import Swift
 import SwiftUI
 
+extension GeometryProxy {
+    var _globalFrame: CGRect {
+        frame(in: .global)
+    }
+}
+
 @available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
 extension GeometryProxy {
     public var insetAdjustedSize: CGSize {
