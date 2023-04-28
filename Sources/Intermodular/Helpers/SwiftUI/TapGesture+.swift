@@ -5,6 +5,7 @@
 import SwiftUI
 
 extension View {
+    @available(tvOS, unavailable)
     public func onTapGesture(
         count: Int = 1,
         disabled: Bool,
