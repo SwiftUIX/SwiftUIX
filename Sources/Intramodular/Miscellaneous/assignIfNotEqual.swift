@@ -5,8 +5,9 @@
 import Swift
 import SwiftUI
 
-@usableFromInline
-func assignIfNotEqual<Value: Equatable>(
+@_spi(Internal)
+@inlinable
+public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Value
 ) {
@@ -15,8 +16,9 @@ func assignIfNotEqual<Value: Equatable>(
     }
 }
 
-@usableFromInline
-func assignIfNotEqual<Value: Equatable>(
+@_spi(Internal)
+@inlinable
+public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Any
 ) {
@@ -29,8 +31,9 @@ func assignIfNotEqual<Value: Equatable>(
     }
 }
 
-@usableFromInline
-func assignIfNotEqual<Value: Equatable>(
+@_spi(Internal)
+@inlinable
+public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Any?
 ) {

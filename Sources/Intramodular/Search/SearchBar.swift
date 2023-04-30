@@ -274,19 +274,19 @@ extension SearchBar: NSViewRepresentable {
 
         nsView.isFirstResponderBinding = isFocused
 
-        assignIfNotEqual(.roundedBezel, to: &nsView.bezelStyle)
-        assignIfNotEqual(focusRingType, to: &nsView.focusRingType)
-        assignIfNotEqual(false, to: &nsView.isBordered)
-        assignIfNotEqual(isBezeled, to: &nsView.isBezeled)
-        assignIfNotEqual(placeholder, to: &nsView.placeholderString)
+        _assignIfNotEqual(.roundedBezel, to: &nsView.bezelStyle)
+        _assignIfNotEqual(focusRingType, to: &nsView.focusRingType)
+        _assignIfNotEqual(false, to: &nsView.isBordered)
+        _assignIfNotEqual(isBezeled, to: &nsView.isBezeled)
+        _assignIfNotEqual(placeholder, to: &nsView.placeholderString)
 
         (nsView.cell as? NSSearchFieldCell)?.searchButtonCell?.isTransparent = !isBezeled
 
         if let appKitOrUIKitFont = appKitOrUIKitFont {
-            assignIfNotEqual(appKitOrUIKitFont, to: &nsView.font)
+            _assignIfNotEqual(appKitOrUIKitFont, to: &nsView.font)
         }
 
-        assignIfNotEqual(text, to: &nsView.stringValue)
+        _assignIfNotEqual(text, to: &nsView.stringValue)
     }
     
     final public class Coordinator: NSObject, NSSearchFieldDelegate {

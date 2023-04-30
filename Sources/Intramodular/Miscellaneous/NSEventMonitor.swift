@@ -96,6 +96,38 @@ extension View {
             return wasEventHandled ? nil : event
         }
     }
+    
+    @available( macOS 12.0, *)
+    public func onAppKitKeyboardShortcutEvent(
+        _ shortcutToMatch: KeyboardShortcut,
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onAppKitEvent(context: .local, matching: [.keyDown]) { event in
+            guard let shortcut = KeyboardShortcut(from: event) else {
+                return event
+            }
+            
+            guard shortcut == shortcutToMatch else {
+                return event
+            }
+            
+            _ = action()
+            
+            return nil
+        }
+    }
+    
+    @available( macOS 12.0, *)
+    public func onAppKitKeyboardShortcutEvent(
+        _ key: KeyEquivalent,
+        modifiers: EventModifiers = [.command],
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onAppKitKeyboardShortcutEvent(
+            .init(key, modifiers: modifiers),
+            perform: action
+        )
+    }
 }
 
 // MARK: - Auxiliary

@@ -60,12 +60,27 @@ extension Picker where Label == EmptyView {
     }
 }
 
-extension Picker where Label == Text, SelectionValue: CaseIterable & Hashable, SelectionValue.AllCases: RandomAccessCollection, Content == AnyView {
+extension Picker where Label == Text, SelectionValue: Hashable, Content == AnyView {
+    public init(
+        _ titleKey: LocalizedStringKey,
+        values: some RandomAccessCollection<SelectionValue>,
+        selection: Binding<SelectionValue>,
+        title: KeyPath<SelectionValue, String>
+    ) {
+        self.init(titleKey, selection: selection) {
+            ForEach(values, id: \.self) { value in
+                Text(value[keyPath: title])
+                    .tag(value)
+            }
+            .eraseToAnyView()
+        }
+    }
+
     public init(
         _ titleKey: LocalizedStringKey,
         selection: Binding<SelectionValue>,
         title: KeyPath<SelectionValue, String>
-    ) {
+    ) where SelectionValue: CaseIterable, SelectionValue.AllCases: RandomAccessCollection {
         self.init(titleKey, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value[keyPath: title])
@@ -78,7 +93,7 @@ extension Picker where Label == Text, SelectionValue: CaseIterable & Hashable, S
     public init(
         _ titleKey: LocalizedStringKey,
         selection: Binding<SelectionValue>
-    ) where SelectionValue: CustomStringConvertible {
+    ) where SelectionValue: CaseIterable & CustomStringConvertible, SelectionValue.AllCases: RandomAccessCollection {
         self.init(titleKey, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value.description)
@@ -91,7 +106,7 @@ extension Picker where Label == Text, SelectionValue: CaseIterable & Hashable, S
     public init<S: StringProtocol>(
         _ title: S,
         selection: Binding<SelectionValue>
-    ) where SelectionValue: CustomStringConvertible {
+    ) where SelectionValue: CaseIterable & CustomStringConvertible, SelectionValue.AllCases: RandomAccessCollection {
         self.init(title, selection: selection) {
             ForEach(SelectionValue.allCases, id: \.self) { value in
                 Text(value.description)
