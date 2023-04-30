@@ -5,7 +5,7 @@
 import SwiftUI
 
 extension View {
-    @available(tvOS, unavailable)
+    @available(iOS 13.0, macOS 10.15, tvOS 16.0, watchOS 6.0, *)
     public func onTapGesture(
         count: Int = 1,
         disabled: Bool,
@@ -16,22 +16,17 @@ extension View {
             including: disabled ? .subviews : .all
         )
     }
-
+    
     /// Adds an action to perform when the _background_ of this view recognizes a tap gesture.
-    @available(tvOS, unavailable)
+    @available(iOS 13.0, macOS 10.15, tvOS 16.0, watchOS 6.0, *)
     public func onTapGestureOnBackground(
         count: Int = 1,
         perform action: @escaping () -> Void
     ) -> some View {
-        if #available(iOS 13.0, macOS 10.15, tvOS 16.0, watchOS 6.0, *) {
-            return background {
-                Color.almostClear
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: count, perform: action)
-            }
-            .eraseToAnyView()
-        } else {
-            return self.eraseToAnyView()
+        background {
+            Color.almostClear
+                .contentShape(Rectangle())
+                .onTapGesture(count: count, perform: action)
         }
     }
 }

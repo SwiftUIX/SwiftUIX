@@ -51,7 +51,7 @@ extension ActivityIndicator: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: UIViewType, context: Context) {
-        assignIfNotEqual(.init(style), to: &uiView.style)
+        _assignIfNotEqual(.init(style), to: &uiView.style)
 
         uiView.color = tintAppKitOrUIKitColor ?? context.environment.tintColor?.toUIColor()
         uiView.tintColor = tintAppKitOrUIKitColor ?? context.environment.tintColor?.toUIColor()

@@ -174,15 +174,15 @@ extension _TextView: UIViewRepresentable {
                 ?? AppKitOrUIKitFont.preferredFont(forTextStyle: .body)
             
             if let textColor = configuration.textColor {
-                assignIfNotEqual(textColor, to: &uiView.textColor)
+                _assignIfNotEqual(textColor, to: &uiView.textColor)
             }
 			
 			if let tintColor = configuration.tintColor {
-                assignIfNotEqual(tintColor, to: &uiView.tintColor)
+                _assignIfNotEqual(tintColor, to: &uiView.tintColor)
 			}
             
             if let linkForegroundColor = configuration.linkForegroundColor {
-                assignIfNotEqual(linkForegroundColor, to: &uiView.linkTextAttributes[.foregroundColor])
+                _assignIfNotEqual(linkForegroundColor, to: &uiView.linkTextAttributes[.foregroundColor])
             } else {
                 if uiView.linkTextAttributes[.foregroundColor] != nil {
                     uiView.linkTextAttributes[.foregroundColor] = nil
@@ -203,8 +203,8 @@ extension _TextView: UIViewRepresentable {
             if requiresAttributedText {
                 let paragraphStyle = NSMutableParagraphStyle()
 
-                assignIfNotEqual(context.environment.lineBreakMode, to: &paragraphStyle.lineBreakMode)
-                assignIfNotEqual(context.environment.lineSpacing, to: &paragraphStyle.lineSpacing)
+                _assignIfNotEqual(context.environment.lineBreakMode, to: &paragraphStyle.lineBreakMode)
+                _assignIfNotEqual(context.environment.lineSpacing, to: &paragraphStyle.lineSpacing)
 
                 context.environment._paragraphSpacing.map {
                     paragraphStyle.paragraphSpacing = $0
@@ -217,11 +217,11 @@ extension _TextView: UIViewRepresentable {
                     ]
                     
                     if let kerning = configuration.kerning {
-                        assignIfNotEqual(kerning, to: &attributes[.kern])
+                        _assignIfNotEqual(kerning, to: &attributes[.kern])
                     }
                     
                     if let textColor = configuration.textColor {
-                        assignIfNotEqual(textColor, to: &attributes[.foregroundColor])
+                        _assignIfNotEqual(textColor, to: &attributes[.foregroundColor])
                     }
                     
                     uiView.attributedText = NSAttributedString(

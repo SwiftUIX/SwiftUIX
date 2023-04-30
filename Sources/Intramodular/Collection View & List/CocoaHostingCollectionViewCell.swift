@@ -210,9 +210,9 @@ class CocoaHostingCollectionViewCell<
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        assignIfNotEqual(false, to: &_isFocused)
-        assignIfNotEqual(false, to: &super.isHighlighted)
-        assignIfNotEqual(false, to: &super.isSelected)
+        _assignIfNotEqual(false, to: &_isFocused)
+        _assignIfNotEqual(false, to: &super.isHighlighted)
+        _assignIfNotEqual(false, to: &super.isSelected)
     }
         
     override func preferredLayoutAttributesFitting(

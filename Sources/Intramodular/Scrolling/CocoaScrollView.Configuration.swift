@@ -91,11 +91,11 @@ extension UIScrollView {
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
         if let alwaysBounceVertical = configuration.alwaysBounceVertical {
-            assignIfNotEqual(alwaysBounceVertical, to: &self.alwaysBounceVertical)
+            _assignIfNotEqual(alwaysBounceVertical, to: &self.alwaysBounceVertical)
         }
         
         if let alwaysBounceHorizontal = configuration.alwaysBounceHorizontal {
-            assignIfNotEqual(alwaysBounceHorizontal, to: &self.alwaysBounceHorizontal)
+            _assignIfNotEqual(alwaysBounceHorizontal, to: &self.alwaysBounceHorizontal)
         }
            
         if alwaysBounceVertical || alwaysBounceHorizontal {
@@ -104,14 +104,14 @@ extension UIScrollView {
             bounces = false
         }
         
-        assignIfNotEqual(configuration.isDirectionalLockEnabled, to: &isDirectionalLockEnabled)
-        assignIfNotEqual(configuration.isScrollEnabled, to: &isScrollEnabled)
-        assignIfNotEqual(configuration.showsVerticalScrollIndicator, to: &showsVerticalScrollIndicator)
-        assignIfNotEqual(configuration.showsHorizontalScrollIndicator, to: &showsHorizontalScrollIndicator)
-        assignIfNotEqual(.init(configuration.scrollIndicatorInsets.horizontal), to: &horizontalScrollIndicatorInsets)
-        assignIfNotEqual(.init(configuration.scrollIndicatorInsets.vertical), to: &verticalScrollIndicatorInsets)
-        assignIfNotEqual(configuration.decelerationRate, to: &decelerationRate)
-        assignIfNotEqual(.init(configuration.contentInset), to: &self.contentInset)
+        _assignIfNotEqual(configuration.isDirectionalLockEnabled, to: &isDirectionalLockEnabled)
+        _assignIfNotEqual(configuration.isScrollEnabled, to: &isScrollEnabled)
+        _assignIfNotEqual(configuration.showsVerticalScrollIndicator, to: &showsVerticalScrollIndicator)
+        _assignIfNotEqual(configuration.showsHorizontalScrollIndicator, to: &showsHorizontalScrollIndicator)
+        _assignIfNotEqual(.init(configuration.scrollIndicatorInsets.horizontal), to: &horizontalScrollIndicatorInsets)
+        _assignIfNotEqual(.init(configuration.scrollIndicatorInsets.vertical), to: &verticalScrollIndicatorInsets)
+        _assignIfNotEqual(configuration.decelerationRate, to: &decelerationRate)
+        _assignIfNotEqual(.init(configuration.contentInset), to: &self.contentInset)
         
         if let contentInsetAdjustmentBehavior = configuration.contentInsetAdjustmentBehavior {
             self.contentInsetAdjustmentBehavior = contentInsetAdjustmentBehavior

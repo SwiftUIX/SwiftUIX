@@ -76,7 +76,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         #endif
         
         if mainView.modalPresentationStyle != .automatic {
-            assignIfNotEqual(.clear, to: &view.backgroundColor)
+            _assignIfNotEqual(.clear, to: &view.backgroundColor)
         }
     }
     

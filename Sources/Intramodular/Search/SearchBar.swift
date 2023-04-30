@@ -133,7 +133,7 @@ extension SearchBar: UIViewRepresentable {
                 uiView.placeholder = placeholder
             }
 
-            assignIfNotEqual(searchBarStyle, to: &uiView.searchBarStyle)
+            _assignIfNotEqual(searchBarStyle, to: &uiView.searchBarStyle)
 
             for (icon, image) in iconImageConfiguration {
                 if uiView.image(for: icon, state: .normal) == nil { // FIXME: This is a performance hack.
@@ -141,7 +141,7 @@ extension SearchBar: UIViewRepresentable {
                 }
             }
 
-            assignIfNotEqual(environment.tintColor?.toUIColor(), to: &uiView.tintColor)
+            _assignIfNotEqual(environment.tintColor?.toUIColor(), to: &uiView.tintColor)
 
             if let showsCancelButton = showsCancelButton {
                 if uiView.showsCancelButton != showsCancelButton {
@@ -151,9 +151,9 @@ extension SearchBar: UIViewRepresentable {
         }
         
         keyboard: do {
-            assignIfNotEqual(returnKeyType ?? .default, to: &uiView.returnKeyType)
-            assignIfNotEqual(keyboardType ?? .default, to: &uiView.keyboardType)
-            assignIfNotEqual(enablesReturnKeyAutomatically ?? false, to: &uiView.enablesReturnKeyAutomatically)
+            _assignIfNotEqual(returnKeyType ?? .default, to: &uiView.returnKeyType)
+            _assignIfNotEqual(keyboardType ?? .default, to: &uiView.keyboardType)
+            _assignIfNotEqual(enablesReturnKeyAutomatically ?? false, to: &uiView.enablesReturnKeyAutomatically)
         }
         
         data: do {
