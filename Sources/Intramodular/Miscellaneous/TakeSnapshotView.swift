@@ -8,19 +8,32 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
-    class _UIHostingController: UIHostingController<Content> {
-        let image: Binding<UIImage?>
+    let image: Binding<UIImage?>
+    let content: Content
+    
+    init(image: Binding<UIImage?>, content: Content) {
+        self.image = image
+        self.content = content
+    }
+    
+    func makeUIViewController(context: Context) -> UIViewControllerType {
+        .init(mainView: content)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.image = image
+        uiViewController.mainView = content
         
-        init(image: Binding<UIImage?>, rootView: Content) {
-            self.image = image
-            
-            super.init(rootView: rootView)
+        Task { @MainActor in
+            uiViewController.takeSnapshot()
         }
-        
-        required dynamic init?(coder aDecoder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
+    }
+}
+
+extension TakeSnapshotView {
+    class UIViewControllerType: CocoaHostingController<Content> {
+        var image: Binding<UIImage?>? = nil
+                
         override open func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             
@@ -30,19 +43,21 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
         }
         
         func takeSnapshot() {
-            guard view.superview != nil else {
+            guard
+                let image,
+                image.wrappedValue == nil,
+                view.superview != nil,
+                (view.layer.animationKeys() ?? []).count == 0,
+                UIView.inheritedAnimationDuration == 0
+            else {
                 return
             }
-            
-            guard (view.layer.animationKeys() ?? []).count == 0 else {
-                return
-            }
-            
-            guard UIView.inheritedAnimationDuration == 0 else {
-                return
-            }
-            
+                        
             guard view.frame.size.width >= 1 && view.frame.size.height >= 1 else {
+                Task { @MainActor in
+                    image.wrappedValue = mainView._renderAsImage()
+                }
+                
                 return
             }
             
@@ -56,40 +71,37 @@ struct TakeSnapshotView<Content: View>: UIViewControllerRepresentable {
             
             let newImage = UIGraphicsGetImageFromCurrentImageContext()
             
-            if image.wrappedValue?.pngData() == newImage?.pngData() {
-                
-            } else {
+            if image.wrappedValue?.pngData() != newImage?.pngData() {
                 image.wrappedValue = newImage
             }
         }
     }
-    
-    typealias Context = UIViewControllerRepresentableContext<Self>
-    typealias UIViewControllerType = _UIHostingController
-    
-    let image: Binding<UIImage?>
-    let rootView: Content
-    
-    init(image: Binding<UIImage?>, rootView: Content) {
-        self.image = image
-        self.rootView = rootView
-    }
-    
-    func makeUIViewController(context: Context) -> UIViewControllerType {
-        .init(image: image, rootView: rootView)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        uiViewController.rootView = rootView
+}
+
+extension View {
+    @MainActor
+    func _renderAsImage() -> AppKitOrUIKitImage? {
+        let hostingController = CocoaHostingController(mainView: self.edgesIgnoringSafeArea(.all))
         
-        uiViewController.takeSnapshot()
+        let view = hostingController.view
+        let targetSize = hostingController.view.intrinsicContentSize
+        
+        view?.bounds = CGRect(origin: .zero, size: targetSize)
+        
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        
+        return renderer.image { _ in
+            view?.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+        }
     }
 }
+
+// MARK: - API
 
 extension View {
     /// Takes a screenshot when this view appears and passes it via the `image` binding.
     public func screenshotOnAppear(to image: Binding<UIImage?>) -> some View {
-        TakeSnapshotView(image: image, rootView: self)
+        TakeSnapshotView(image: image, content: self)
     }
     
     @available(iOS, deprecated: 13.0, renamed: "screenshotOnAppear(to:)")

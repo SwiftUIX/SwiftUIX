@@ -377,7 +377,7 @@ extension OptionalDimensions {
     fileprivate static var greatestFiniteDimensions: OptionalDimensions {
         .init(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
     }
-
+    
     fileprivate static var infinite: OptionalDimensions {
         .init(width: .infinity, height: .infinity)
     }

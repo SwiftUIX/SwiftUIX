@@ -152,8 +152,8 @@ open class UIHostingView<Content: View>: UIView {
 }
 
 extension UIHostingView {
-    public func _fixSafeAreaInsets() {
-        rootViewHostingController._fixSafeAreaInsets()
+    public func _disableSafeAreaInsets() {
+        rootViewHostingController._disableSafeAreaInsets()
     }
 }
 

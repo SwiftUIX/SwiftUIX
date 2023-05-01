@@ -13,7 +13,7 @@ public protocol _opaque_CocoaViewController: AppKitOrUIKitViewController {
 }
 
 public protocol CocoaViewController: _opaque_CocoaViewController {
-    func _fixSafeAreaInsetsIfNecessary()
+    func _disableSafeAreaInsetsIfNecessary()
 }
 
 #endif

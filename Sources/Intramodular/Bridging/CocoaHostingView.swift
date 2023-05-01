@@ -42,7 +42,7 @@ extension CocoaHostingView: AppKitOrUIKitViewControllerRepresentable {
         #endif
         
         if configuration.edgesIgnoringSafeArea {
-            viewController._fixSafeAreaInsetsIfNecessary()
+            viewController._disableSafeAreaInsetsIfNecessary()
         }
         
         return viewController

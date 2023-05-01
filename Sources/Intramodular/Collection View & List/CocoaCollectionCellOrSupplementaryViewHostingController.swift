@@ -24,7 +24,7 @@ class CocoaCollectionCellOrSupplementaryViewHostingController<
         
         view.backgroundColor = nil
         
-        _fixSafeAreaInsets()
+        _disableSafeAreaInsets()
     }
     
     @objc required public init?(coder aDecoder: NSCoder) {

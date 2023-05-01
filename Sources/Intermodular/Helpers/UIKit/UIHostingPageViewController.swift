@@ -258,7 +258,7 @@ extension UIHostingPageViewController {
         init(mainView: PageContainer) {
             super.init(mainView: mainView)
             
-            _fixSafeAreaInsetsIfNecessary()
+            _disableSafeAreaInsetsIfNecessary()
             
             view.backgroundColor = .clear
         }

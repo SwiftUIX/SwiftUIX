@@ -150,7 +150,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     }
     
     /// https://twitter.com/b3ll/status/1193747288302075906
-    public func _fixSafeAreaInsetsIfNecessary() {
+    public func _disableSafeAreaInsetsIfNecessary() {
         defer {
             _safeAreaInsetsAreFixed = true
         }
@@ -159,7 +159,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             return
         }
                
-        _fixSafeAreaInsets()
+        _disableSafeAreaInsets()
     }
         
     private func resizeParentWindowIfNecessary() {
@@ -189,7 +189,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
 
 extension AppKitOrUIKitHostingController {
     /// https://twitter.com/b3ll/status/1193747288302075906
-    public func _fixSafeAreaInsets() {
+    public func _disableSafeAreaInsets() {
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         guard let viewClass = object_getClass(view), !String(cString: class_getName(viewClass)).hasSuffix("_SwiftUIX_patched") else {
             return
@@ -230,18 +230,6 @@ extension AppKitOrUIKitHostingController {
             view.layoutIfNeeded()
         }
         #endif
-    }
-}
-
-// MARK: - Auxiliary
-
-final class _FixSafeAreaInsetsPreferenceKey: TakeLastPreferenceKey<Bool> {
-    
-}
-
-extension View {
-    public func _fixSafeAreaInsets() -> some View {
-        preference(key: _FixSafeAreaInsetsPreferenceKey.self, value: true)
     }
 }
 

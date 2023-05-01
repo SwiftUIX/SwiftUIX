@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public protocol _opaque_AppKitOrUIKitHostingControllerProtocol {
-    func _fixSafeAreaInsets()
+    func _disableSafeAreaInsets()
 }
 
 @MainActor
