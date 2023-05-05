@@ -19,19 +19,23 @@ protocol _RepresentableAppKitOrUIKitViewController: AppKitOrUIKitViewController 
 }
 
 extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _RepresentableAppKitOrUIKitView {
+    @MainActor
     func makeUIView(context: Context) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
 
+    @MainActor
     func updateUIView(_ view: AppKitOrUIKitViewType, context: Context) {
         updateAppKitOrUIKitView(view, context: context)
     }
 
+    @MainActor
     static func dismantleUIView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
     }
 
     #if os(iOS)
+    @MainActor
     func _overrideSizeThatFits(
         _ size: inout CGSize,
         in proposedSize: _ProposedSize,
@@ -43,10 +47,12 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _Represent
 }
 
 extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewControllerType: _RepresentableAppKitOrUIKitViewController {
+    @MainActor
     func makeUIVieWController(context: Context) -> AppKitOrUIKitViewControllerType {
         makeAppKitOrUIKitViewController(context: context)
     }
 
+    @MainActor
     func updateUIView(
         _ viewController: AppKitOrUIKitViewControllerType,
         context: Context
@@ -54,6 +60,7 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
         updateAppKitOrUIKitViewController(viewController, context: context)
     }
 
+    @MainActor
     static func dismantleUIViewController(
         _ viewController: AppKitOrUIKitViewControllerType,
         coordinator: Coordinator
