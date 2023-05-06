@@ -5,6 +5,9 @@
 import SwiftUI
 
 #if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitWindow {
     public static var _firstKeyInstance: AppKitOrUIKitWindow? {
         #if os(iOS) || os(macOS)
