@@ -23,56 +23,45 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         self.isVisible = isVisible
     }
     
-    func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
-        .init(content: content, canBecomeKey: canBecomeKey, isVisible: isVisible)
+    func makeAppKitOrUIKitViewController(
+        context: Context
+    ) -> AppKitOrUIKitViewControllerType {
+        .init(
+            content: content,
+            canBecomeKey: canBecomeKey,
+            isVisible: isVisible.wrappedValue
+        )
     }
     
-    func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
-        viewController.isVisible = isVisible
-        viewController.content = content
-        
-        viewController.updateWindow()
-        
-        #if os(iOS)
-        if let window = viewController.contentWindow {
-            let userInterfaceStyle: UIUserInterfaceStyle = context.environment.colorScheme == .light ? .light : .dark
-            
-            if window.overrideUserInterfaceStyle != userInterfaceStyle {
-                window.overrideUserInterfaceStyle = userInterfaceStyle
-                window.rootViewController?.overrideUserInterfaceStyle = userInterfaceStyle
-            }
-        }
-        #endif
+    func updateAppKitOrUIKitViewController(
+        _ viewController: AppKitOrUIKitViewControllerType,
+        context: Context
+    ) {
+        viewController.windowPresentationController.isVisible = isVisible.wrappedValue
+        viewController.windowPresentationController.preferredColorScheme = context.environment.colorScheme
+        viewController.windowPresentationController.content = content
     }
     
-    static func dismantleAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, coordinator: Coordinator) {
+    static func dismantleAppKitOrUIKitViewController(
+        _ viewController: AppKitOrUIKitViewControllerType,
+        coordinator: Coordinator
+    ) {
         DispatchQueue.asyncOnMainIfNecessary {
-            if let contentWindow = viewController.contentWindow {
-                #if os(iOS)
-                contentWindow.isHidden = true
-                #endif
-                viewController.contentWindow = nil
-            }
+            viewController.windowPresentationController.isVisible = false
         }
     }
 }
 
 extension WindowOverlay {
     class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
-        var content: Content {
-            didSet {
-                contentWindow?.rootView = content
-            }
-        }
+        var windowPresentationController: _WindowPresentationController<Content>
         
-        var canBecomeKey: Bool
-        var isVisible: Binding<Bool>
-        var contentWindow: AppKitOrUIKitHostingWindow<Content>?
-        
-        init(content: Content, canBecomeKey: Bool, isVisible: Binding<Bool>) {
-            self.content = content
-            self.canBecomeKey = canBecomeKey
-            self.isVisible = isVisible
+        init(content: Content, canBecomeKey: Bool, isVisible: Bool) {
+            self.windowPresentationController = .init(
+                content: content,
+                canBecomeKey: canBecomeKey,
+                isVisible: isVisible
+            )
 
             super.init(nibName: nil, bundle: nil)
             
@@ -80,46 +69,7 @@ extension WindowOverlay {
             view = NSView()
             #endif
         }
-        
-        func updateWindow() {
-            if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible.wrappedValue {
-                return
-            }
-            
-            if isVisible.wrappedValue {
-                #if !os(macOS)
-                guard let window = view?.window, let windowScene = window.windowScene else {
-                    return
-                }
-                #endif
                 
-                #if os(macOS)
-                let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(rootView: content)
-                #else
-                let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(
-                    windowScene: windowScene,
-                    rootView: content
-                )
-                #endif
-                                
-                self.contentWindow = contentWindow
-                
-                contentWindow.rootView = content
-                contentWindow.configuration.canBecomeKey = canBecomeKey
-               
-                contentWindow.isVisibleBinding = isVisible
-                
-                #if os(iOS) || os(tvOS)
-                contentWindow.windowLevel = .init(rawValue: window.windowLevel.rawValue + 1)
-                #endif
-                
-                contentWindow.show()
-            } else {
-                contentWindow?.hide()
-                contentWindow = nil
-            }
-        }
-        
         @objc required dynamic init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -128,7 +78,7 @@ extension WindowOverlay {
         override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
             
-            updateWindow()
+            windowPresentationController._update()
         }
         #endif
     }

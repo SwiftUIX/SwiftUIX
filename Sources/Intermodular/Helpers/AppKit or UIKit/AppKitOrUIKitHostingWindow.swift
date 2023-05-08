@@ -18,19 +18,24 @@ protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
 #endif
 
 public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
-    public struct PreferredConfiguration {
+    public struct PreferredConfiguration: Equatable {
+        public var style: _WindowStyle = .default
         public var canBecomeKey: Bool = true
         public var allowTouchesToPassThrough: Bool = false
         public var windowPosition: CGPoint?
         public var isTitleBarHidden: Bool?
         public var backgroundColor: Color?
     }
-        
+    
     /// The window's preferred configuration.
     ///
     /// This is informed by SwiftUIX's window preference key values.
     public var configuration = PreferredConfiguration() {
         didSet {
+            guard configuration != oldValue else {
+                return
+            }
+            
             #if os(iOS)
             if oldValue.windowPosition == nil, configuration.windowPosition != nil {
                 setWindowOrigin()
@@ -53,7 +58,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     
     /// A copy of the root view for when the `contentViewController` is deinitialized (for macOS windows).
     fileprivate var copyOfRootView: Content?
-
+    
     fileprivate var rootHostingViewController: CocoaHostingController<AppKitOrUIKitHostingWindowContent<Content>>! {
         get {
             #if os(macOS)
@@ -66,7 +71,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                         content: copyOfRootView!
                     )
                 )
-
+                
                 copyOfRootView = nil
                 
                 self.contentViewController = contentViewController
@@ -134,7 +139,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor()
         #elseif os(macOS)
         backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor()
-
+        
         if configuration.backgroundColor == .clear {
             hasShadow = false
             isOpaque = false
@@ -144,13 +149,28 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         }
         
         if (configuration.isTitleBarHidden ?? false) {
-            styleMask.remove(.titled)
+            if styleMask.contains(.titled) {
+                styleMask.remove(.titled)
+            }
         } else {
-            styleMask.formUnion(.titled)
+            if !styleMask.contains(.titled) {
+                styleMask.formUnion(.titled)
+            }
         }
+        
+        if configuration.style == .hiddenTitleBar {
+            _assignIfNotEqual(true, to: &isMovableByWindowBackground)
+            _assignIfNotEqual(true, to: &titlebarAppearsTransparent)
+            _assignIfNotEqual(.hidden, to: &titleVisibility)
+                        
+            standardWindowButton(.miniaturizeButton)?.isHidden = true
+            standardWindowButton(.closeButton)?.isHidden = true
+            standardWindowButton(.zoomButton)?.isHidden = true
+        }
+        
         #endif
     }
-
+    
     #if os(iOS)
     override public var isHidden: Bool {
         didSet {
@@ -160,17 +180,48 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     #endif
     
     #if os(macOS)
-    public convenience init(rootView: Content) {
+    public convenience init(
+        rootView: Content,
+        style: _WindowStyle
+    ) {
         let contentViewController = CocoaHostingController(
             mainView: AppKitOrUIKitHostingWindowContent(
                 windowBox: .init(nil),
                 content: rootView
             )
         )
-
-        self.init(contentViewController: contentViewController)
-                    
+        
+        switch style {
+            case .`default`:
+                self.init(contentViewController: contentViewController)
+            case .titleBar:
+                self.init(contentViewController: contentViewController)
+            case .hiddenTitleBar:
+                let styleMask: NSWindow.StyleMask = [.titled, .closable, .resizable, .miniaturizable]
+                
+                self.init(
+                    contentRect: .zero,
+                    styleMask: styleMask,
+                    backing: .buffered,
+                    defer: false
+                )
+                
+                contentViewController.title = nil
+                
+                self.contentViewController = contentViewController
+                
+                self.configuration.style = style
+                
+                applyPreferredConfiguration()
+        }
+        
+        performSetUp()
+        
         delegate = self
+    }
+    
+    public convenience init(rootView: Content) {
+        self.init(rootView: rootView, style: .default)
     }
     #else
     public init(windowScene: UIWindowScene, rootView: Content) {
@@ -186,12 +237,14 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         fatalError("init(coder:) has not been implemented")
     }
     #endif
-
+    
     private func performSetUp() {
         #if os(iOS) || os(tvOS)
         canResizeToFitContent = true
         #elseif os(macOS)
-        title = ""
+        if styleMask.contains(.titled) {
+            title = ""
+        }
         #endif
     }
     
@@ -239,7 +292,20 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         #if os(macOS)
         rootHostingViewController.mainView.windowBox.wrappedValue = self
         contentWindowController = contentWindowController ?? NSWindowController(window: self)
-        contentWindowController?.showWindow(self)
+        
+        if configuration.windowPosition == nil {
+            alphaValue = 0.0
+            
+            contentWindowController?.showWindow(self)
+            
+            DispatchQueue.main.async {
+                self.center()
+                self.applyPreferredConfiguration()
+                self.alphaValue = 1.0
+            }
+        } else {
+            contentWindowController?.showWindow(self)
+        }
         #else
         isHidden = false
         isUserInteractionEnabled = true
@@ -253,13 +319,13 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     public func hide() {
         #if os(macOS)
         rootHostingViewController = nil
-
+        
         if let contentWindowController = contentWindowController {
             contentWindowController.close()
         } else {
             close()
         }
-
+        
         tearDownWindow()
         #else
         isHidden = true
@@ -294,7 +360,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     
     public func windowWillClose(_ notification: Notification) {
         _NSWindow_didWindowJustClose = true
-
+        
         tearDownWindow()
         
         DispatchQueue.main.async {
@@ -395,6 +461,9 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             if windowBox.wrappedValue != nil {
                 LazyAppearView {
                     content
+                        /*.modify(if: windowBox.wrappedValue?.configuration.style == .hiddenTitleBar) {
+                            $0.titleBarHidden(true) // setting this lazily fixes actually hiding the title bar
+                        }*/
                 }
             }
         }
@@ -449,11 +518,11 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
         var isPresented: Bool {
             (windowBox.wrappedValue?.isHidden ?? false) == true
         }
-
+        
         init(windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>) {
             self.windowBox = windowBox
         }
-                
+        
         func dismiss() {
             #if os(macOS)
             windowBox.wrappedValue?.close()
