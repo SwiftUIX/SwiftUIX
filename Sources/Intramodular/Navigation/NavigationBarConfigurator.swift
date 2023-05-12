@@ -42,10 +42,11 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
         }
         
         override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            
             isVisible = true
             
-            updateNavigationBar(viewController: parent?.navigationController?.visibleViewController
-            )
+            updateNavigationBar(viewController: parent?.navigationController?.visibleViewController)
         }
         
         override func viewWillDisappear(_ animated: Bool) {
