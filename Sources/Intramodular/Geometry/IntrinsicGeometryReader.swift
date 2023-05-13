@@ -10,6 +10,8 @@ import SwiftUI
 public struct IntrinsicGeometryProxy: Equatable {
     private let localFrame: CGRect?
     private let globalFrame: CGRect?
+    private let customCoordinateSpace: CoordinateSpace?
+    private let frameInCustomCoordinateSpace: CGRect?
     
     public let safeAreaInsets: EdgeInsets
     
@@ -17,9 +19,15 @@ public struct IntrinsicGeometryProxy: Equatable {
         localFrame?.size ?? .zero
     }
     
-    public init(_ geometry: GeometryProxy?) {
+    public init(
+        _ geometry: GeometryProxy?,
+        coordinateSpace: CoordinateSpace?
+    ) {
         localFrame = geometry?.frame(in: .local)
         globalFrame = geometry?.frame(in: .global)
+        customCoordinateSpace = coordinateSpace
+        frameInCustomCoordinateSpace = coordinateSpace.flatMap({ geometry?.frame(in: $0) })
+        
         safeAreaInsets = geometry?.safeAreaInsets ?? .zero
     }
     
@@ -30,9 +38,13 @@ public struct IntrinsicGeometryProxy: Equatable {
             case .global:
                 return globalFrame ?? .init()
             case .named:
-                assertionFailure("CoordinateSpace.named(_:) is currently unsupported in IntrinsicGeometryProxy.")
-                
-                return .init()
+                if coordinateSpace == customCoordinateSpace {
+                    return frameInCustomCoordinateSpace ?? .zero
+                } else {
+                    assertionFailure("CoordinateSpace.named(_:) is currently unsupported in IntrinsicGeometryProxy.")
+                    
+                    return .init()
+                }
             default:
                 return .init()
         }
@@ -41,24 +53,40 @@ public struct IntrinsicGeometryProxy: Equatable {
 
 /// A container view that recursively defines its content as a function of the content's size and coordinate space.
 public struct IntrinsicGeometryReader<Content: View>: View {
+    private let coordinateSpace: CoordinateSpace?
     private let content: (IntrinsicGeometryProxy) -> Content
     
-    @State private var proxy = IntrinsicGeometryProxy(nil)
-
-    public init(@ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content) {
+    @State private var proxy: IntrinsicGeometryProxy
+    
+    public init(
+        @ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content
+    ) {
+        self.coordinateSpace = nil
         self.content = content
+        self._proxy = .init(wrappedValue: IntrinsicGeometryProxy(nil, coordinateSpace: nil))
+    }
+
+    public init(
+        coordinateSpace: CoordinateSpace,
+        @ViewBuilder _ content: @escaping (IntrinsicGeometryProxy) -> Content
+    ) {
+        self.coordinateSpace = coordinateSpace
+        self.content = content
+        self._proxy = .init(initialValue: IntrinsicGeometryProxy(nil, coordinateSpace: coordinateSpace))
     }
         
     public var body: some View {
         content(proxy).background {
             GeometryReader { geometry in
-                PerformAction {
-                    let proxy = IntrinsicGeometryProxy(geometry)
-                    
-                    if self.proxy != proxy {
+                let proxy = IntrinsicGeometryProxy(geometry, coordinateSpace: coordinateSpace)
+
+                ZeroSizeView()
+                    .onAppear {
                         self.proxy = proxy
                     }
-                }
+                    .onChange(of: proxy) { proxy in
+                        self.proxy = proxy
+                    }
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)

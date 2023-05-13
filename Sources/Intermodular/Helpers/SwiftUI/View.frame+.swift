@@ -407,3 +407,23 @@ extension View {
         _precomputedDimensionsThatFit(in: .init(dimensions))
     }
 }
+
+extension View {
+    public func _minimumFrameReference<T: View>(
+        _ view: T
+    ) -> some View {
+        ZStack {
+            view
+                .hidden()
+                .accessibility(hidden: true)
+            
+            self
+        }
+    }
+    
+    public func _minimumFrameReference<T: View>(
+        @ViewBuilder _ view: () -> T
+    ) -> some View {
+        _minimumFrameReference(view())
+    }
+}

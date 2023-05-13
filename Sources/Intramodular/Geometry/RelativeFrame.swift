@@ -19,6 +19,18 @@ public enum FrameDimensionType: Hashable {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+extension ProposedViewSize {
+    public func value(for dimension: FrameDimensionType) -> CGFloat? {
+        switch dimension {
+            case .width:
+                return width
+            case .height:
+                return height
+        }
+    }
+}
+
 public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
     struct PreferenceKey: SwiftUI.PreferenceKey {
         static let defaultValue: [RelativeFrame] = []
