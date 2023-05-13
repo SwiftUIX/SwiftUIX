@@ -302,9 +302,7 @@ fileprivate extension NSDiffableDataSourceSnapshot {
     mutating func applyItemDifference(
         _ difference: CollectionDifference<ItemIdentifierType>, inSection section: SectionIdentifierType
     ) -> Bool {
-        difference
-            .map({ applyItemChange($0, inSection: section) })
-            .reduce(true, { $0 && $1 })
+        difference.allSatisfy { applyItemChange($0, inSection: section) }
     }
     
     mutating func applyItemChange(

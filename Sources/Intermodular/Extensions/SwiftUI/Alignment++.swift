@@ -20,7 +20,7 @@ extension Alignment {
     }
     
     public func isAligned(to edges: [Edge]) -> Bool {
-        edges.map(isAligned(to:)).reduce(true, { $0 && $1 })
+        edges.allSatisfy(isAligned(to:))
     }
 }
 
