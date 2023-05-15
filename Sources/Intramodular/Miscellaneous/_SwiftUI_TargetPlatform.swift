@@ -34,17 +34,40 @@ extension _TargetPlatformSpecific where Platform == _SwiftUI_TargetPlatform.iOS 
     }
 }
 
-public struct _TargetPlatformConditionalModifiable<Root: View, Platform>: View {
+public struct _TargetPlatformConditionalModifiable<Root, Platform> {
     public typealias SpecificTypes = _TargetPlatformSpecific<_SwiftUI_TargetPlatform.iOS>
     
     public let root: Root
     
-    fileprivate init(@ViewBuilder root: () -> Root) {
-        self.root = root()
+    fileprivate init(root: Root)  {
+        self.root = root
     }
-    
-    public var body: some View {
+
+    public var body: Root {
         root
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension _TargetPlatformConditionalModifiable: Scene where Root: Scene {
+    fileprivate init(@SceneBuilder root: () -> Root)  {
+        self.init(root: root())
+    }
+}
+
+extension _TargetPlatformConditionalModifiable: View where Root: View {
+    fileprivate init(@ViewBuilder root: () -> Root)  {
+        self.init(root: root())
+    }
+}
+
+@available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
+extension Scene {
+    public func modify<Modified: Scene>(
+        for platform: _SwiftUI_TargetPlatform.macOS,
+        @SceneBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
+    ) -> some Scene {
+        modify(.init(root: self))
     }
 }
 
@@ -53,17 +76,29 @@ extension View {
         for platform: _SwiftUI_TargetPlatform.iOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.iOS>) -> Modified
     ) -> some View {
-        modify(.init(root: { self }))
+        modify(.init(root: self))
+    }
+}
+
+@available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
+extension _TargetPlatformConditionalModifiable where Root: Scene, Platform == _SwiftUI_TargetPlatform.macOS {
+    @SceneBuilder
+    public func defaultSize(width: CGFloat, height: CGFloat) -> some Scene {
+#if os(macOS)
+        root.defaultSize(width: width, height: height)
+#else
+        root
+#endif
     }
 }
 
 @available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
-extension _TargetPlatformConditionalModifiable where Platform == _SwiftUI_TargetPlatform.iOS {
+extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.iOS {
     @ViewBuilder
     public func navigationBarTitleDisplayMode(
         _ mode: SpecificTypes.NavigationBarItemTitleDisplayMode
     ) -> _TargetPlatformConditionalModifiable<some View, Platform> {
-        #if os(iOS)
+#if os(iOS)
         _TargetPlatformConditionalModifiable<_, Platform> {
             switch mode {
                 case .automatic:
@@ -74,8 +109,8 @@ extension _TargetPlatformConditionalModifiable where Platform == _SwiftUI_Target
                     root.navigationBarTitleDisplayMode(.inline)
             }
         }
-        #else
+#else
         self
-        #endif
+#endif
     }
 }

@@ -27,7 +27,6 @@ extension View {
                 )
                 .stroke(content, lineWidth: lineWidth)
             )
-            .padding(lineWidth / 2)
     }
     
     /// Adds a rounded border to this view with the specified width and rounded corner style.
@@ -46,47 +45,6 @@ extension View {
                 )
                 .stroke(content, lineWidth: lineWidth)
             )
-            .padding(lineWidth / 2)
-    }
-}
-
-extension View {
-    @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:antialiased:) instead.")
-    public func border<S: ShapeStyle>(
-        _ content: S,
-        cornerRadius: CGFloat,
-        width lineWidth: CGFloat,
-        antialiased: Bool
-    ) -> some View {
-        self.cornerRadius(cornerRadius, antialiased: antialiased)
-            .overlay(
-                LineWidthInsetRoundedRectangle(
-                    cornerRadius: cornerRadius,
-                    style: .circular,
-                    lineWidth: lineWidth
-                )
-                .stroke(content, lineWidth: lineWidth)
-            )
-            .padding(lineWidth / 2)
-    }
-    
-    @available(*, deprecated, message: "Please use View.border(_:width:cornerRadius:style:) instead.")
-    public func border<S: ShapeStyle>(
-        _ content: S,
-        cornerRadius: CGFloat,
-        width lineWidth: CGFloat,
-        style: RoundedCornerStyle = .circular
-    ) -> some View {
-        clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: style))
-            .overlay(
-                LineWidthInsetRoundedRectangle(
-                    cornerRadius: cornerRadius,
-                    style: style,
-                    lineWidth: lineWidth
-                )
-                .stroke(content, lineWidth: lineWidth)
-            )
-            .padding(lineWidth / 2)
     }
 }
 

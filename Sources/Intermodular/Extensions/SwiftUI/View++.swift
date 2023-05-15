@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+// MARK: - View.then
+
 extension View {
     @inlinable
     public func then(_ body: (inout Self) -> Void) -> Self {
@@ -14,11 +16,27 @@ extension View {
         
         return result
     }
-    
+}
+
+// MARK: - View.eraseToAnyView
+
+extension View {
     /// Returns a type-erased version of `self`.
     @inlinable
     public func eraseToAnyView() -> AnyView {
         return .init(self)
+    }
+}
+
+// MARK: - View.animation
+
+extension View {
+    @inlinable
+    public func animation<Object: AnyObject>(
+        _ animation: Animation?,
+        object: Object?
+    ) -> some View {
+        self.animation(animation, value: object.map({ ObjectIdentifier($0) }))
     }
 }
 
@@ -122,17 +140,6 @@ extension View {
     }
 }
 
-// MARK: - View.padding
-
-extension View {
-    /// A view that pads this view inside the specified edge insets with a system-calculated amount of padding and a color.
-    @_disfavoredOverload
-    @inlinable
-    public func padding(_ color: Color) -> some View {
-        padding().background(color)
-    }
-}
-
 // MARK: - View.transition
 
 extension View {
@@ -150,7 +157,7 @@ extension View {
     }
 }
 
-// MARK: - Debugging -
+// MARK: - Debugging
 
 extension View {
     public func _printingChanges() -> Self {

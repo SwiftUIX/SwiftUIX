@@ -23,15 +23,21 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     
     let shortcut: KeyboardShortcut
     let action: () -> Void
+    let disabled: Bool
     
-    @State private var actionTrampoline = ActionTrampoline()
+    @ViewStorage private var actionTrampoline = ActionTrampoline()
     
     @usableFromInline
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    init(shortcut: KeyboardShortcut, action: @escaping () -> ()) {
+    init(
+        shortcut: KeyboardShortcut,
+        action: @escaping () -> (),
+        disabled: Bool
+    ) {
         self.shortcut = shortcut
         self.action = action
+        self.disabled = disabled
     }
     
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
@@ -45,14 +51,21 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
                     actionTrampoline.value = action
                 }
 
-                Button(action: { self.actionTrampoline.callAsFunction() }) {
-                    ZeroSizeView()
+                if !disabled {
+                    Button(action: performAction) {
+                        ZeroSizeView()
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .keyboardShortcut(shortcut)
+                    .visible(false)
                 }
-                .buttonStyle(PlainButtonStyle())
-                .keyboardShortcut(shortcut)
-                .visible(false)
             }
+            .accessibilityHidden(true)
         }
+    }
+    
+    private func performAction() {
+        self.actionTrampoline.callAsFunction()
     }
 }
 
@@ -63,78 +76,57 @@ extension View {
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    @inlinable
     public func onKeyboardShortcut(
         _ shortcut: KeyboardShortcut,
+        disabled: Bool = false,
         perform action: @escaping () -> Void
     ) -> some View {
-        modifier(PerformActionOnKeyboardShortcut(shortcut: shortcut, action: action))
+        modifier(
+            PerformActionOnKeyboardShortcut(
+                shortcut: shortcut,
+                action: action,
+                disabled: disabled
+            )
+        )
     }
     
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    @inlinable
     public func onKeyboardShortcut(
         _ key: KeyEquivalent,
         modifiers: EventModifiers = [],
+        disabled: Bool = false,
         perform action: @escaping () -> Void
     ) -> some View {
-        modifier(PerformActionOnKeyboardShortcut(shortcut: .init(key, modifiers: modifiers), action: action))
+        modifier(
+            PerformActionOnKeyboardShortcut(
+                shortcut: .init(key, modifiers: modifiers),
+                action: action,
+                disabled: disabled
+            )
+        )
     }
     
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    @inlinable
     public func onKeyboardShortcut<Action: DynamicAction>(
         _ key: KeyEquivalent,
         modifiers: EventModifiers = [],
+        disabled: Bool = false,
         perform action: Action
     ) -> some View {
         WithDynamicAction(action) { action in
-            onKeyboardShortcut(key, modifiers: modifiers, perform: action.perform)
+            onKeyboardShortcut(
+                key,
+                modifiers: modifiers,
+                disabled: disabled,
+                perform: action.perform
+            )
         }
-    }
-}
-
-@available(iOS 14.0, macOS 11.0, *)
-@available(tvOS, unavailable)
-@available(watchOS, unavailable)
-public struct OnKeyboardShortcut: PerformActionView {
-    public let shortcut: KeyboardShortcut
-    public let action: Action
-    
-    public init(_ shortcut: KeyboardShortcut, perform action: Action) {
-        self.shortcut = shortcut
-        self.action = action
-    }
-    
-    public init(_ shortcut: KeyboardShortcut, perform action: @escaping () -> Void) {
-        self.init(shortcut, perform: .init(action))
-    }
-    
-    public init(
-        _ key: KeyEquivalent,
-        modifiers: EventModifiers = [],
-        action: @escaping () -> Void
-    ) {
-        self.init(.init(key, modifiers: modifiers), perform: .init(action))
-    }
-    
-    public var body: some View {
-        Button(action: action.perform) {
-            ZeroSizeView()
-        }
-        .keyboardShortcut(shortcut)
-        .visible(false)
-        .frameZeroClipped()
-    }
-    
-    public func transformAction(_ transform: (Action) -> Action) -> Self {
-        .init(shortcut, perform: action.map(transform))
     }
 }
 
@@ -143,19 +135,12 @@ extension View {
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    @inlinable
     public func onKeyboardShortcut(
         _ shortcut: KeyEquivalent,
         when predicate: Bool,
         perform action: @escaping () -> Void
     ) -> some View {
-        background {
-            if predicate {
-                OnKeyboardShortcut(shortcut) {
-                    action()
-                }
-            }
-        }
+        onKeyboardShortcut(shortcut, disabled: !predicate, perform: action)
     }
 }
 
