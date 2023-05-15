@@ -58,7 +58,7 @@ extension _CollectionView.DataSource.Payload: CustomStringConvertible {
         }
     }
     
-    var numerOfSections: Int {
+    var numberOfSections: Int {
         switch self {
             case .diffableDataSource(let dataSource):
                 return dataSource.wrappedValue?.snapshot().numberOfSections ?? 0

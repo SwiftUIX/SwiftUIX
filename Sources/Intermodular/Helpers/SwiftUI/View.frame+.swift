@@ -12,7 +12,7 @@ extension View {
         _ size: _GreedyFrameSize,
         alignment: Alignment = .center
     ) -> some View {
-        modifier(GreedyFrameModifer(width: .greedy, height: .greedy, alignment: alignment))
+        modifier(GreedyFrameModifier(width: .greedy, height: .greedy, alignment: alignment))
     }
     
     @inlinable
@@ -20,7 +20,7 @@ extension View {
         width: _GreedyFrameSize,
         alignment: Alignment = .center
     ) -> some View {
-        modifier(GreedyFrameModifer(width: .greedy, height: nil, alignment: alignment))
+        modifier(GreedyFrameModifier(width: .greedy, height: nil, alignment: alignment))
     }
     
     @inlinable
@@ -29,7 +29,7 @@ extension View {
         height: CGFloat?,
         alignment: Alignment = .center
     ) -> some View {
-        modifier(GreedyFrameModifer(width: .greedy, height: height.map({ .fixed($0) }), alignment: alignment))
+        modifier(GreedyFrameModifier(width: .greedy, height: height.map({ .fixed($0) }), alignment: alignment))
     }
     
     @inlinable
@@ -38,7 +38,7 @@ extension View {
         height: _GreedyFrameSize,
         alignment: Alignment = .center
     ) -> some View {
-        modifier(GreedyFrameModifer(width: width.map({ .fixed($0) }), height: .greedy, alignment: alignment))
+        modifier(GreedyFrameModifier(width: width.map({ .fixed($0) }), height: .greedy, alignment: alignment))
     }
     
     @inlinable
@@ -46,7 +46,7 @@ extension View {
         height: _GreedyFrameSize,
         alignment: Alignment = .center
     ) -> some View {
-        modifier(GreedyFrameModifer(width: nil, height: .greedy, alignment: alignment))
+        modifier(GreedyFrameModifier(width: nil, height: .greedy, alignment: alignment))
     }
     
     @inlinable
@@ -57,9 +57,9 @@ extension View {
     ) -> some View {
         switch axis {
             case .horizontal:
-                return modifier(GreedyFrameModifer(width: .greedy, height: nil, alignment: alignment))
+                return modifier(GreedyFrameModifier(width: .greedy, height: nil, alignment: alignment))
             case .vertical:
-                return modifier(GreedyFrameModifer(width: nil, height: .greedy, alignment: alignment))
+                return modifier(GreedyFrameModifier(width: nil, height: .greedy, alignment: alignment))
         }
     }
     
@@ -313,7 +313,7 @@ public enum _GreedyFrameSize {
 }
 
 @usableFromInline
-struct GreedyFrameModifer: _opaque_FrameModifier, ViewModifier {
+struct GreedyFrameModifier: _opaque_FrameModifier, ViewModifier {
     @_frozen
     @usableFromInline
     enum Dimension {
