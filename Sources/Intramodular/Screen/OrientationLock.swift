@@ -52,7 +52,7 @@ private struct _OrientationLockView<Content: View>: UIViewControllerRepresentabl
         }
         
         override func viewDidDisappear(_ animated: Bool) {
-            super.viewDidAppear(animated)
+            super.viewDidDisappear(animated)
         }
     }
 }

@@ -219,6 +219,8 @@ extension _NavigationSearchBarConfigurator {
         }
         
         override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
             coordinator?.uiViewController = navigationController?.viewControllers.first
         }
     }
