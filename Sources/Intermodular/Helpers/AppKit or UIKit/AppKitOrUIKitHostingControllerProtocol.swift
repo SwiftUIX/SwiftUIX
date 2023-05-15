@@ -39,7 +39,10 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 
 @MainActor
 extension AppKitOrUIKitHostingControllerProtocol {
-    public func sizeThatFits(_ sizeProposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize {
+    public func sizeThatFits(
+        _ sizeProposal: AppKitOrUIKitLayoutSizeProposal,
+        needsLayout: Bool
+    ) -> CGSize {
         let targetSize = sizeProposal.appKitOrUIKitTargetSize
         let fittingSize = sizeProposal.appKitOrUIKitFittingSize
 
@@ -48,10 +51,14 @@ extension AppKitOrUIKitHostingControllerProtocol {
         }
 
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
+        if needsLayout {
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+        }
         #elseif os(macOS)
-        view.layout()
+        if needsLayout {
+            view.layout()
+        }
         #endif
 
         var result: CGSize = sizeThatFits(in: fittingSize)
@@ -99,6 +106,12 @@ extension AppKitOrUIKitHostingControllerProtocol {
     }
 
     public func sizeThatFits(
+        _ proposal: AppKitOrUIKitLayoutSizeProposal
+    ) -> CGSize {
+        self.sizeThatFits(proposal, needsLayout: true)
+    }
+    
+    public func sizeThatFits(
         in size: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: AppKitOrUIKitLayoutPriority? = nil,
         verticalFittingPriority: AppKitOrUIKitLayoutPriority? = nil
@@ -145,6 +158,11 @@ public struct AppKitOrUIKitLayoutSizeProposal {
             horizontalFittingPriority: horizontalFittingPriority,
             verticalFittingPriority: verticalFittingPriority
         )
+    }
+    
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    public init(from proposal: ProposedViewSize) {
+        self.init(targetSize: .init(width: proposal.width, height: proposal.height))
     }
     
     var allowsSelfSizing: Bool {
