@@ -71,7 +71,7 @@ struct _DragSourceDropDestinationView<
                 viewController.view.addInteraction(context.coordinator.dragInteraction)
             }
             
-            if let longPressRecognizer = viewController.view.gestureRecognizers?.compactMap({ $0 as? UILongPressGestureRecognizer}).filter({ NSStringFromClass(type(of: $0)).contains("Drag") }).first {
+            if let longPressRecognizer = viewController.view.gestureRecognizers?.compactMap({ $0 as? UILongPressGestureRecognizer}).first(where: { NSStringFromClass(type(of: $0)).contains("Drag") }) {
                 if longPressRecognizer.minimumPressDuration != 0 {
                     longPressRecognizer.minimumPressDuration = 0
                 }

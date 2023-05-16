@@ -73,14 +73,14 @@ extension Color {
     
     private func toUIColor2() -> UIColor? {
         let children = Mirror(reflecting: self).children
-        let _provider = children.filter { $0.label == "provider" }.first
+        let _provider = children.first { $0.label == "provider" }
         
         guard let provider = _provider?.value else {
             return nil
         }
         
         let providerChildren = Mirror(reflecting: provider).children
-        let _base = providerChildren.filter { $0.label == "base" }.first
+        let _base = providerChildren.first { $0.label == "base" }
         
         guard let base = _base?.value else {
             return nil
