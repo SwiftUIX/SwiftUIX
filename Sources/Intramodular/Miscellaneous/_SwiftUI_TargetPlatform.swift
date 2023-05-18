@@ -64,6 +64,13 @@ extension _TargetPlatformConditionalModifiable: View where Root: View {
 @available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
 extension Scene {
     public func modify<Modified: Scene>(
+        for platform: _SwiftUI_TargetPlatform.iOS,
+        @SceneBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
+    ) -> some Scene {
+        modify(.init(root: self))
+    }
+
+    public func modify<Modified: Scene>(
         for platform: _SwiftUI_TargetPlatform.macOS,
         @SceneBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
     ) -> some Scene {
@@ -75,6 +82,13 @@ extension View {
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.iOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.iOS>) -> Modified
+    ) -> some View {
+        modify(.init(root: self))
+    }
+    
+    public func modify<Modified: View>(
+        for platform: _SwiftUI_TargetPlatform.macOS,
+        @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
     ) -> some View {
         modify(.init(root: self))
     }

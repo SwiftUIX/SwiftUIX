@@ -47,6 +47,7 @@ public struct TextView<Label: View>: View {
         }
     }
     
+    @Environment(\.font) private var font
     @Environment(\.preferredMaximumLayoutWidth) private var preferredMaximumLayoutWidth
     
     private var label: Label
@@ -54,19 +55,23 @@ public struct TextView<Label: View>: View {
     private var attributedText: Binding<NSAttributedString>?
     private var configuration: _Configuration
     
-    private var customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type = _CocoaTextView<Label>.self
+    private var customAppKitOrUIKitClass: AppKitOrUIKitTextView.Type = _PlatformTextView<Label>.self
     
     private var isEmpty: Bool {
         text?.wrappedValue.isEmpty ?? attributedText!.wrappedValue.string.isEmpty
     }
     
     public var body: some View {
-        return ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
-            label
-                .font(configuration.font.map(Font.init))
-                .visible(isEmpty)
-                .animation(.none)
-                .padding(configuration.textContainerInset.edgeInsets)
+        ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
+            if isEmpty {
+                label
+                    .font(configuration.font.map(Font.init) ?? font)
+                    .animation(.none)
+                    .padding(configuration.textContainerInset.edgeInsets)
+                    .modify(for: .macOS) {
+                        $0.padding(.vertical, -1)
+                    }
+            }
             
             _TextView<Label>(
                 text: text,
@@ -100,7 +105,7 @@ extension _TextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIViewType {
         let uiView: UIViewType
         
-        if let customAppKitOrUIKitClass = customAppKitOrUIKitClass as? _CocoaTextView<Label>.Type {
+        if let customAppKitOrUIKitClass = customAppKitOrUIKitClass as? _PlatformTextView<Label>.Type {
             uiView = customAppKitOrUIKitClass.init(configuration: configuration)
         } else {
             uiView = customAppKitOrUIKitClass.init()
@@ -122,11 +127,11 @@ extension _TextView: UIViewRepresentable {
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
         _withoutAppKitOrUIKitAnimation(context.transaction.animation == nil) {
-            if let uiView = uiView as? _CocoaTextView<Label> {
-                uiView._isSwiftUIRuntimeUpdateActive = true
+            if let uiView = uiView as? _PlatformTextView<Label> {
+                uiView.representableContext._isSwiftUIRuntimeUpdateActive = true
                 
                 defer {
-                    uiView._isSwiftUIRuntimeUpdateActive = false
+                    uiView.representableContext._isSwiftUIRuntimeUpdateActive = false
                 }
                 
                 uiView.configuration = configuration
@@ -159,7 +164,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         updateLayoutConfiguration: do {
-            (uiView as? _CocoaTextView<Label>)?.preferredMaximumDimensions = context.environment.preferredMaximumLayoutDimensions
+            (uiView as? _PlatformTextView<Label>)?.preferredMaximumDimensions = context.environment.preferredMaximumLayoutDimensions
         }
         
         updateTextAndGeneralConfiguration: do {
@@ -279,8 +284,8 @@ extension _TextView: UIViewRepresentable {
     }
     
     static func dismantleUIView(_ uiView: UITextView, coordinator: Coordinator) {
-        if let uiView = uiView as? _CocoaTextView<Label> {
-            uiView._isSwiftUIRuntimeDismantled = true
+        if let uiView = uiView as? _PlatformTextView<Label> {
+            uiView.representableContext._isSwiftUIRuntimeDismantled = true
         }
     }
     
@@ -304,7 +309,7 @@ extension _TextView: UIViewRepresentable {
         }
         
         func textViewDidChange(_ textView: UITextView) {
-            if let textView = textView as? _CocoaTextView<Label>, textView._isSwiftUIRuntimeDismantled {
+            if let textView = textView as? _PlatformTextView<Label>, textView.representableContext._isSwiftUIRuntimeDismantled {
                 return
             }
             
@@ -357,7 +362,7 @@ extension _TextView: UIViewRepresentable {
         in proposedSize: _ProposedSize,
         uiView: UIViewType
     ) {
-        if let textView = (uiView as? _CocoaTextView<Label>) {
+        if let textView = (uiView as? _PlatformTextView<Label>) {
             let proposedSize = _SwiftUIX_ProposedSize(proposedSize)
             
             textView.representableContext.proposedSize = proposedSize
@@ -467,7 +472,9 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         
         manager.ensureLayout(for: textContainer!)
         
-        return manager.usedRect(for: textContainer!).size
+        let size = manager.usedRect(for: textContainer!).size
+        
+        return .init(width: size.width, height: size.height)
     }
         
     func _update(
@@ -477,7 +484,7 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         backgroundColor = .clear
         drawsBackground = false
         isEditable = true
-        textContainerInset = configuration.textContainerInset
+        textContainerInset = .zero
         usesAdaptiveColorMappingForDarkAppearance = true
         
         font = font ?? (try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont())
@@ -485,6 +492,11 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         
         textStorage?.font = font
         
+        if let textContainer {
+            _assignIfNotEqual(.zero, to: &textContainer.lineFragmentPadding)
+            _assignIfNotEqual((context.environment.lineLimit ?? 0), to: &textContainer.maximumNumberOfLines)
+        }
+
         isHorizontallyResizable = false
         isVerticallyResizable = true
         autoresizingMask = [.width]

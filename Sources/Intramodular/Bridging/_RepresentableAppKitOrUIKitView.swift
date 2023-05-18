@@ -7,6 +7,8 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 struct _AppKitOrUIKitRepresentableContext {
+    var _isSwiftUIRuntimeUpdateActive: Bool = false
+    var _isSwiftUIRuntimeDismantled: Bool = false
     var proposedSize: _SwiftUIX_ProposedSize?
 }
 

@@ -9,11 +9,8 @@ import SwiftUI
 
 /// The main `UITextView` subclass used by `TextView`.
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-final class _CocoaTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAppKitOrUIKitView {
-    var _isSwiftUIRuntimeUpdateActive: Bool = false
-    var _isSwiftUIRuntimeDismantled: Bool = false
-    
-    var representableContext = _AppKitOrUIKitRepresentableContext() 
+final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAppKitOrUIKitView {
+    var representableContext = _AppKitOrUIKitRepresentableContext()
 
     var configuration: TextView<Label>._Configuration
     
@@ -198,7 +195,7 @@ final class _CocoaTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAp
     @discardableResult
     override func becomeFirstResponder() -> Bool {
         defer {
-            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled {
+            if !representableContext._isSwiftUIRuntimeUpdateActive && !representableContext._isSwiftUIRuntimeDismantled {
                 if configuration.isFocused?.wrappedValue != isFirstResponder {
                     configuration.isFocused?.wrappedValue = isFirstResponder
                 }
@@ -211,7 +208,7 @@ final class _CocoaTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAp
     @discardableResult
     override func resignFirstResponder() -> Bool {
         defer {
-            if !_isSwiftUIRuntimeUpdateActive && !_isSwiftUIRuntimeDismantled  {
+            if !representableContext._isSwiftUIRuntimeUpdateActive && !representableContext._isSwiftUIRuntimeDismantled  {
                 if configuration.isFocused?.wrappedValue != isFirstResponder {
                     configuration.isFocused?.wrappedValue = isFirstResponder
                 }
@@ -231,7 +228,7 @@ final class _CocoaTextView<Label: View>: AppKitOrUIKitTextView, _RepresentableAp
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension _CocoaTextView {
+extension _PlatformTextView {
     private func textHeight(forWidth width: CGFloat) -> CGFloat {
         let storage = NSTextStorage(attributedString: attributedText)
         let width = bounds.width - textContainerInset.horizontal
@@ -271,7 +268,7 @@ extension _CocoaTextView {
 }
 #elseif os(macOS)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension _CocoaTextView {
+extension _PlatformTextView {
     
 }
 #endif
