@@ -61,6 +61,17 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         }
     }
     
+    public convenience init(
+        content: Content
+    ) {
+        self.init(
+            content: content,
+            windowStyle: .default,
+            canBecomeKey: true,
+            isVisible: false
+        )
+    }
+    
     @available(macOS 11.0, *)
     @available(iOS, unavailable)
     @available(tvOS, unavailable)
@@ -92,7 +103,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         
         if isVisible {
             #if !os(macOS)
-            guard let window = contentWindow, let windowScene = window.windowScene else {
+            guard let window = AppKitOrUIKitWindow._firstKeyInstance, let windowScene = window.windowScene else {
                 return
             }
             #endif
