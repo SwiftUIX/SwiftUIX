@@ -168,12 +168,12 @@ extension Color {
         Color(.link)
     }
     
-    /// A forground color for separators (thin border or divider lines).
+    /// A foreground color for separators (thin border or divider lines).
     public static var separator: Color {
         Color(.separator)
     }
     
-    /// A forground color intended to look similar to `Color.separated`, but is guaranteed to be opaque, so it will.
+    /// A foreground color intended to look similar to `Color.separated`, but is guaranteed to be opaque, so it will.
     public static var opaqueSeparator: Color {
         Color(.opaqueSeparator)
     }

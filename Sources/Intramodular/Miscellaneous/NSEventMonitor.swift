@@ -72,7 +72,7 @@ extension View {
     public func onAppKitEvent(
         context: NSEventMonitor.Context = .local,
         matching mask: NSEvent.EventTypeMask,
-        peform action: @escaping (NSEvent) -> NSEvent?
+        perform action: @escaping (NSEvent) -> NSEvent?
     ) -> some View {
         modifier(
             _AttachNSEventMonitor(

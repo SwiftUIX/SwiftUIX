@@ -62,12 +62,12 @@ public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObje
     }
     
     /// Detach the receiver from the target publisher.
-    public func detatch() {
+    public func detach() {
         subscription?.cancel()
         subscription = nil
     }
     
     deinit {
-        detatch()
+        detach()
     }
 }
