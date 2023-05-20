@@ -102,7 +102,7 @@ public struct CocoaTextField<Label: View>: View {
 
 fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     typealias Configuration = CocoaTextField<Label>._Configuration
-    typealias UIViewType = _UITextField
+    typealias UIViewType = PlatformTextField
     
     let text: Binding<String>
     let isEditing: Binding<Bool>
@@ -159,7 +159,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> UIViewType {
-        let uiView = _UITextField()
+        let uiView = PlatformTextField()
         
         uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         uiView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -237,37 +237,16 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             }
         }
         
-        setUpInputViews: do {
-            if let inputAccessoryView = configuration.inputAccessoryView {
-                if let _inputAccessoryView = uiView.inputAccessoryView as? UIHostingView<AnyView> {
-                    _inputAccessoryView.rootView = inputAccessoryView
-                } else {
-                    uiView.inputAccessoryView = UIHostingView(rootView: inputAccessoryView)
-                    uiView.inputAccessoryView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                }
-            } else {
-                uiView.inputAccessoryView = nil
-            }
-            
-            if let inputView = configuration.inputView {
-                if let _inputView = uiView.inputView as? UIHostingView<AnyView> {
-                    _inputView.rootView = inputView
-                } else {
-                    uiView.inputView = UIHostingView(rootView: inputView)
-                    uiView.inputView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                }
-            } else {
-                uiView.inputView = nil
-            }
-            
-            if configuration.inputAssistantDisabled {
-                #if os(iOS)
-                uiView.inputAssistantItem.leadingBarButtonGroups = [UIBarButtonItemGroup()]
-                uiView.inputAssistantItem.trailingBarButtonGroups = [UIBarButtonItemGroup()]
-                #endif
-            }
+        uiView._SwiftUIX_inputView = configuration.inputView
+        uiView._SwiftUIX_inputAccessoryView = configuration.inputAccessoryView
+
+        if configuration.inputAssistantDisabled {
+            #if os(iOS)
+            uiView.inputAssistantItem.leadingBarButtonGroups = [UIBarButtonItemGroup()]
+            uiView.inputAssistantItem.trailingBarButtonGroups = [UIBarButtonItemGroup()]
+            #endif
         }
-        
+
         updateResponderChain: do {
             DispatchQueue.main.async {
                 if let isFocused = configuration.isFocused, uiView.window != nil {
@@ -528,7 +507,7 @@ extension CocoaTextField where Label == Text {
 
 // MARK: - Auxiliary
 
-private final class _UITextField: UITextField {
+private final class PlatformTextField: UITextField {
     var isFirstResponderBinding: Binding<Bool>?
 
     var onDeleteBackward: () -> Void = { }
@@ -591,6 +570,72 @@ private final class _UITextField: UITextField {
         let original = super.clearButtonRect(forBounds: bounds)
         
         return clearButtonRect?(bounds, original) ?? original
+    }
+}
+
+extension PlatformTextField {
+    fileprivate struct InputHostingView: View {
+        let content: AnyView
+        
+        var body: some View {
+            content
+        }
+    }
+    
+    var _SwiftUIX_inputView: AnyView? {
+        get {
+            return (inputView as? AppKitOrUIKitHostingView<InputHostingView>)?.rootView.content
+        } set {
+            if let newValue {
+                if let hostingView = inputView as? AppKitOrUIKitHostingView<InputHostingView> {
+                    hostingView.rootView = InputHostingView(content: newValue)
+                } else {
+                    let hostingView = AppKitOrUIKitHostingView(
+                        rootView: InputHostingView(content: newValue)
+                    )
+                    
+                    hostingView._disableSafeAreaInsets()
+                    hostingView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    
+                    inputView = hostingView
+                }
+            } else {
+                inputView = nil
+            }
+        }
+    }
+}
+
+extension PlatformTextField {
+    fileprivate struct InputAccessoryHostingView: View {
+        let content: AnyView
+        
+        var body: some View {
+            content
+        }
+    }
+    
+    var _SwiftUIX_inputAccessoryView: AnyView? {
+        get {
+            return (inputAccessoryView as? AppKitOrUIKitHostingView<InputAccessoryHostingView>)?.rootView.content
+        } set {
+            if let newValue {
+                if let hostingView = inputAccessoryView as? AppKitOrUIKitHostingView<InputAccessoryHostingView> {
+                    hostingView.rootView = InputAccessoryHostingView(content: newValue)
+                } else {
+                    let hostingView = AppKitOrUIKitHostingView(
+                        rootView: InputAccessoryHostingView(content: newValue)
+                    )
+                    
+                    hostingView._disableSafeAreaInsets()
+                    hostingView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    
+                    inputAccessoryView = hostingView
+                }
+            } else {
+                inputAccessoryView = nil
+            }
+        }
     }
 }
 
