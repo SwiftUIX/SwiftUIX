@@ -21,7 +21,7 @@ extension UIPageViewController {
             #if os(tvOS)
             return false
             #else
-            return gestureRecognizers.filter({ $0 is UIScreenEdgePanGestureRecognizer }).first?.isEnabled ?? true
+            return gestureRecognizers.first(where: { $0 is UIScreenEdgePanGestureRecognizer })?.isEnabled ?? true
             #endif
         } set {
             #if !os(tvOS)
@@ -32,7 +32,7 @@ extension UIPageViewController {
     
     var isTapGestureEnabled: Bool {
         get {
-            gestureRecognizers.filter({ $0 is UITapGestureRecognizer }).first?.isEnabled ?? true
+            gestureRecognizers.first(where: { $0 is UITapGestureRecognizer })?.isEnabled ?? true
         } set {
             gestureRecognizers.filter({ $0 is UITapGestureRecognizer }).forEach({ $0.isEnabled = newValue })
         }
