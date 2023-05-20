@@ -7,6 +7,9 @@
 import Swift
 import SwiftUI
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 @MainActor
 public final class _WindowPresentationController<Content: View>: ObservableObject {
     public var content: Content {
@@ -159,6 +162,9 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
 
 // MARK: - Auxiliary
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public enum _WindowStyle {
     case `default`
     case titleBar
