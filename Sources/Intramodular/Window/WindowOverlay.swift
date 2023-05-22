@@ -8,6 +8,9 @@ import Swift
 import SwiftUI
 
 /// A window overlay for SwiftUI.
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     private let content: Content
     private let canBecomeKey: Bool
@@ -52,7 +55,13 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension WindowOverlay {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
         var windowPresentationController: _WindowPresentationController<Content>
         
@@ -86,6 +95,9 @@ extension WindowOverlay {
 
 // MARK: - Helpers
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension View {
     /// Makes a window visible when a given condition is true.
     ///
@@ -114,6 +126,9 @@ extension View {
 
 // MARK: - Auxiliary
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public struct WindowProxy {
     weak var window: AppKitOrUIKitHostingWindowProtocol?
     
@@ -141,6 +156,9 @@ public struct WindowProxy {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public struct WindowReader<Content: View>: View {
     @Environment(\._windowProxy) var _windowProxy: WindowProxy
     
@@ -156,10 +174,16 @@ public struct WindowReader<Content: View>: View {
 }
 
 extension EnvironmentValues {
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     struct _WindowProxyKey: EnvironmentKey {
         static let defaultValue: WindowProxy = .init(window: nil)
     }
     
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
     var _windowProxy: WindowProxy {
         get {
             self[_WindowProxyKey.self]
