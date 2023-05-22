@@ -33,6 +33,22 @@ extension UIView {
     }
 }
 
+extension UIViewController {
+    public func _SwiftUIX_findFirstResponder() -> AppKitOrUIKitResponder? {
+        guard !isFirstResponder else {
+            return self
+        }
+        
+        for subview in view.subviews {
+            if let firstResponder = subview._SwiftUIX_findFirstResponder() {
+                return firstResponder
+            }
+        }
+        
+        return nil
+    }
+}
+
 extension UIView {
     func constrain(to other: UIView) {
         translatesAutoresizingMaskIntoConstraints = false

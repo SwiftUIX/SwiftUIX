@@ -8,6 +8,8 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaViewController {
+    public var _canBecomeFirstResponder: Bool? = nil
+    
     var _safeAreaInsetsAreFixed: Bool = false
     var _namedViewDescriptions: [AnyHashable: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
@@ -33,6 +35,12 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
     }
     
+    #if os(iOS)
+    open override var canBecomeFirstResponder: Bool {
+        _canBecomeFirstResponder ?? super.canBecomeFirstResponder
+    }
+    #endif
+
     public var shouldResizeToFitContent: Bool = false
     
     override public var presentationCoordinator: CocoaPresentationCoordinator {

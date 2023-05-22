@@ -41,7 +41,7 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 extension AppKitOrUIKitHostingControllerProtocol {
     public func sizeThatFits(
         _ sizeProposal: AppKitOrUIKitLayoutSizeProposal,
-        needsLayout: Bool
+        layoutImmediately: Bool
     ) -> CGSize {
         let targetSize = sizeProposal.appKitOrUIKitTargetSize
         let fittingSize = sizeProposal.appKitOrUIKitFittingSize
@@ -51,12 +51,12 @@ extension AppKitOrUIKitHostingControllerProtocol {
         }
 
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        if needsLayout {
+        if layoutImmediately {
             view.setNeedsLayout()
             view.layoutIfNeeded()
         }
         #elseif os(macOS)
-        if needsLayout {
+        if layoutImmediately {
             view.layout()
         }
         #endif
@@ -108,7 +108,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
     public func sizeThatFits(
         _ proposal: AppKitOrUIKitLayoutSizeProposal
     ) -> CGSize {
-        self.sizeThatFits(proposal, needsLayout: true)
+        self.sizeThatFits(proposal, layoutImmediately: true)
     }
     
     public func sizeThatFits(

@@ -17,26 +17,7 @@ extension UIResponder {
     }
 }
 
-extension UIResponder {
-    private static weak var _firstResponder: UIResponder?
-    
-    @available(macCatalystApplicationExtension, unavailable)
-    @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
-    static var firstResponder: UIResponder? {
-        _firstResponder = nil
-        
-        UIApplication.shared.sendAction(#selector(UIResponder.acquireFirstResponder(_:)), to: nil, from: nil, for: nil)
-        
-        return _firstResponder
-    }
-    
-    @objc private func acquireFirstResponder(_ sender: Any) {
-        UIResponder._firstResponder = self
-    }
-}
-
-extension UIResponder {
+extension AppKitOrUIKitResponder {
     public func _nearestResponder<Responder: UIResponder>(ofKind kind: Responder.Type) -> Responder? {
         guard !isKind(of: kind) else {
             return (self as! Responder)

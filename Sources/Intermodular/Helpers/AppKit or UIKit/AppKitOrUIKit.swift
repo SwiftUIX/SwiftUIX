@@ -31,12 +31,12 @@ public typealias AppKitOrUIKitLabel = UILabel
 public typealias AppKitOrUIKitLayoutAxis = NSLayoutConstraint.Axis
 public typealias AppKitOrUIKitLayoutGuide = UILayoutGuide
 public typealias AppKitOrUIKitLayoutPriority = UILayoutPriority
-#if os(iOS)
+@available(tvOS, unavailable)
 public typealias AppKitOrUIKitPasteboard = UIPasteboard
-#endif
 public typealias AppKitOrUIKitRectCorner = UIRectCorner
 public typealias AppKitOrUIKitResponder = UIResponder
 public typealias AppKitOrUIKitScrollView = UIScrollView
+public typealias AppKitOrUIKitSplitViewController = UISplitViewController
 public typealias AppKitOrUIKitSearchBar = UISearchBar
 public typealias AppKitOrUIKitTableView = UITableView
 public typealias AppKitOrUIKitTableViewController = UITableViewController
@@ -97,6 +97,7 @@ public typealias AppKitOrUIKitPasteboard = NSPasteboard
 public typealias AppKitOrUIKitRectCorner = NSRectCorner
 public typealias AppKitOrUIKitResponder = NSResponder
 public typealias AppKitOrUIKitSearchBar = NSSearchField
+public typealias AppKitOrUIKitSplitViewController = NSSplitViewController
 public typealias AppKitOrUIKitTableView = NSTableView
 public typealias AppKitOrUIKitTextView = NSTextView
 public typealias AppKitOrUIKitView = NSView
@@ -231,6 +232,20 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+
+#if os(macOS)
+extension AppKitOrUIKitViewController {    
+    public func _setNeedsLayout() {
+        view.needsLayout = true
+    }
+}
+#else
+extension AppKitOrUIKitViewController {
+    public func _setNeedsLayout() {
+        view.setNeedsLayout()
+    }
+}
+#endif
 
 extension EnvironmentValues {
     @available(*, deprecated, message: "This environment value has been deprecated. Use EnvironmentValues._appKitOrUIKitViewControllerBox instead.")

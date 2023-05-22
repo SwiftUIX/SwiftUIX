@@ -180,14 +180,16 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 extension Color {
     /// The color for the main background of your interface.
     public static var systemBackground: Color {
         #if os(macOS)
         return Color(AppKitOrUIKitColor.windowBackgroundColor)
         #else
-        return Color(.systemBackground)
+        return Color(AppKitOrUIKitColor.systemBackground)
         #endif
     }
     
