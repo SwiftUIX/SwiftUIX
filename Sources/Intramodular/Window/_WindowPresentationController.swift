@@ -74,23 +74,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             isVisible: false
         )
     }
-    
-    @available(macOS 11.0, *)
-    @available(iOS, unavailable)
-    @available(tvOS, unavailable)
-    @available(watchOS, unavailable)
-    public convenience init<Style: WindowStyle>(
-        content: Content,
-        windowStyle: Style
-    ) {
-        self.init(
-            content: content,
-            windowStyle: .init(from: windowStyle),
-            canBecomeKey: true,
-            isVisible: false
-        )
-    }
-    
+        
     public func show() {
         isVisible = true
     }
@@ -159,6 +143,26 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         }
     }
 }
+
+#if os(macOS)
+extension _WindowPresentationController {
+    @available(macOS 11.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public convenience init<Style: WindowStyle>(
+        content: Content,
+        windowStyle: Style
+    ) {
+        self.init(
+            content: content,
+            windowStyle: .init(from: windowStyle),
+            canBecomeKey: true,
+            isVisible: false
+        )
+    }
+}
+#endif
 
 // MARK: - Auxiliary
 

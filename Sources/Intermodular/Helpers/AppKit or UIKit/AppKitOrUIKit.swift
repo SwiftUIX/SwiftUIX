@@ -167,6 +167,12 @@ extension NSSize {
 }
 
 extension NSView {
+    public enum AnimationOptions {
+        case `default`
+    }
+}
+
+extension NSView {
     public static var layoutFittingCompressedSize: CGSize {
         .init(width: 0, height: 0)
     }

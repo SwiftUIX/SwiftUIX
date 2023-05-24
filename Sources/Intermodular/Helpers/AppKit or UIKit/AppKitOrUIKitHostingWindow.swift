@@ -17,6 +17,9 @@ protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
 }
 #endif
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
     public struct PreferredConfiguration: Equatable {
         public var style: _WindowStyle = .default
@@ -377,6 +380,9 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
     public convenience init(
         windowScene: UIWindowScene,
@@ -386,6 +392,9 @@ extension AppKitOrUIKitHostingWindow {
     }
 }
 #elseif os(macOS)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
     public convenience init(
         @ViewBuilder rootView: () -> Content
@@ -397,6 +406,9 @@ extension AppKitOrUIKitHostingWindow {
 
 // MARK: - API
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension View {
     /// Allows touches in the active window overlay to pass through if possible.
     @available(macOS, unavailable)
@@ -444,6 +456,9 @@ enum _SwiftUIX_WindowPreferenceKeys {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @ObservedObject var windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
     
