@@ -12,22 +12,24 @@ extension View {
     public func _configureUINavigationController(
         _ configure: @escaping (UINavigationController) -> Void
     ) -> some View {
-        onAppKitOrUIKitViewControllerResolution { viewController in
-            DispatchQueue.main.async {
-                guard let navigationController = viewController.navigationController else {
-                    return
-                }
-                
+        func _configure(_ viewController: UIViewController) {
+            if let navigationController = viewController.navigationController {
                 configure(navigationController)
+            } else {
+                DispatchQueue.main.async {
+                    guard let navigationController = viewController.navigationController else {
+                        return
+                    }
+                    
+                    configure(navigationController)
+                }
             }
+        }
+        
+        return onAppKitOrUIKitViewControllerResolution { viewController in
+            _configure(viewController)
         } onAppear: { viewController in
-            DispatchQueue.main.async {
-                guard let navigationController = viewController.navigationController else {
-                    return
-                }
-                
-                configure(navigationController)
-            }
+            _configure(viewController)
         }
     }
     
@@ -57,6 +59,14 @@ extension View {
         }
     }
     
+    /// Configures the tint color of the navigation bar for this view.
+    @inlinable
+    public func navigationBarTint(_ color: Color) -> some View {
+        _configureUINavigationBar { navigationBar in
+            navigationBar.tintColor = color.toAppKitOrUIKitColor()
+        }
+    }
+
     /// Configures the translucency of the navigation bar for this view.
     ///
     /// This modifier only takes effect when this view is inside of and visible

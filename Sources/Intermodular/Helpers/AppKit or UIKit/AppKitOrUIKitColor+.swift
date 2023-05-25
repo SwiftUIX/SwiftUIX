@@ -169,14 +169,33 @@ extension Color {
             ?? toUIColor3()
     }
 
-    public func toUIColor() -> UIColor? {
+    public func toUIColor(colorScheme: ColorScheme? = nil) -> AppKitOrUIKitColor? {
+        let result: AppKitOrUIKitColor
+        
         if let cachedResult = Self.appKitOrUIKitColorConversionCache[self] {
-            return cachedResult
+            result = cachedResult
         } else {
-            let result = _toUIColor()
+            guard let _result = _toUIColor() else {
+                return nil
+            }
+            
+            Self.appKitOrUIKitColorConversionCache[self] = _result
 
-            Self.appKitOrUIKitColorConversionCache[self] = result
-
+            result = _result
+        }
+        
+        if let colorScheme {
+            switch colorScheme {
+                case .light:
+                    return result.resolvedColor(with: .init(userInterfaceStyle: .dark))
+                case .dark:
+                    return result.resolvedColor(with: .init(userInterfaceStyle: .dark))
+                @unknown default:
+                    assertionFailure()
+                    
+                    return result
+            }
+        } else {
             return result
         }
     }
@@ -192,7 +211,9 @@ extension Color {
         if #available(macOS 11.0, *) {
             return NSColor(self)
         } else {
-            fatalError()
+            assertionFailure("unimplemented")
+
+            return nil
         }
         #endif
     }
