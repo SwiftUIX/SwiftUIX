@@ -28,18 +28,6 @@ extension View {
     }
 }
 
-// MARK: - View.animation
-
-extension View {
-    @inlinable
-    public func animation<Object: AnyObject>(
-        _ animation: Animation?,
-        object: Object?
-    ) -> some View {
-        self.animation(animation, value: object.map({ ObjectIdentifier($0) }))
-    }
-}
-
 // MARK: - View.background
 
 extension View {
