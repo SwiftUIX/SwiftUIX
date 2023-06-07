@@ -29,6 +29,20 @@ extension ProposedViewSize {
                 return height
         }
     }
+    
+    public func _padding(_ insets: EdgeInsets) -> Self {
+        var result = self
+        
+        if let _width = width {
+            result.width = _width + (insets.leading + insets.trailing)
+        }
+        
+        if let _height = height {
+            result.height = _height + (insets.top + insets.bottom)
+        }
+        
+        return result
+    }
 }
 
 public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {

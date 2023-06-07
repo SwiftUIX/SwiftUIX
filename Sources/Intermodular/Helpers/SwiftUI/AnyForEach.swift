@@ -17,26 +17,26 @@ public struct AnyForEachElement: Identifiable {
 
 extension ForEach where Content: View, Data == AnyForEachData, ID == AnyHashable {
     @_disfavoredOverload
-    public init<Data: RandomAccessCollection, ID: Hashable>(
-        _ data: Data,
-        id: KeyPath<Data.Element, ID>,
-        @ViewBuilder content: @escaping (Data.Element) -> Content
+    public init<_Data: RandomAccessCollection, _ID: Hashable>(
+        _ data: _Data,
+        id: KeyPath<_Data.Element, _ID>,
+        @ViewBuilder content: @escaping (_Data.Element) -> Content
     ) {
         let collection = AnyRandomAccessCollection(data.indices.lazy.map({ AnyForEachElement(index: AnyIndex($0), value: data[$0], id: data[$0][keyPath: id]) }))
         
         self.init(collection, id: \.id) { (element: AnyForEachElement) in
-            content(collection[element.index].value as! Data.Element)
+            content(collection[element.index].value as! _Data.Element)
         }
     }
     
-    public init<Data: RandomAccessCollection, ID: Hashable>(
-        _ data: ForEach<Data, ID, Content>
-    ) where Data.Element: Identifiable {
+    public init<_Data: RandomAccessCollection, _ID: Hashable>(
+        _ data: ForEach<_Data, _ID, Content>
+    ) where _Data.Element: Identifiable {
         self.init(data.data, id: \.id, content: data.content)
     }
     
-    public init<Data: RandomAccessCollection, ID: Hashable>(
-        _ content: ForEach<Data, ID, Content>
+    public init<_Data: RandomAccessCollection, _ID: Hashable>(
+        _ content: ForEach<_Data, _ID, Content>
     ) {
         let data = content.data
         let content = content.content

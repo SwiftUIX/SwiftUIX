@@ -19,7 +19,7 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
         self.toolbar = NSToolbar(identifier: identifier)
     }
     
-    private class HostingView<Content: View>: AppKitOrUIKitHostingView<Content> {
+    private class HostingView<T: View>: AppKitOrUIKitHostingView<T> {
         weak var toolbar: NSToolbar?
         
         func updateToolbar() {
@@ -31,7 +31,6 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
         }
         
         #if os(macOS)
-        
         override open func viewDidMoveToSuperview() {
             super.viewDidMoveToWindow()
             
@@ -43,9 +42,7 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
             
             updateToolbar()
         }
-        
         #elseif targetEnvironment(macCatalyst)
-        
         override open func didMoveToSuperview() {
             super.didMoveToSuperview()
             
@@ -57,7 +54,6 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
             
             updateToolbar()
         }
-        
         #endif
     }
     

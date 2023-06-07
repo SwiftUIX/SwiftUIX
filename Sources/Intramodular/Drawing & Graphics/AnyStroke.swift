@@ -24,7 +24,6 @@ public struct AnyStroke {
         self.content = .init(content)
         self.style = .init(lineWidth: lineWidth)
     }
-    
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)

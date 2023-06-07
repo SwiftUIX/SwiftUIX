@@ -45,7 +45,7 @@ extension NSObject {
 }
 
 private extension NSObject.StringKeyValueObservingPublisher {
-    final class Subscription<Value, S: Subscriber>: NSObject, Combine.Subscription where S.Input == Value {
+    final class Subscription<S: Subscriber>: NSObject, Combine.Subscription where S.Input == Value {
         private var subscriber: S?
         private var object: NSObject?
         private let keyPath: String

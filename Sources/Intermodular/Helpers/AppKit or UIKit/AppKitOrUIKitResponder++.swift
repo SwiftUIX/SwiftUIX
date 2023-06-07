@@ -7,19 +7,18 @@
 import Swift
 import SwiftUI
 
-
 #if os(iOS)
 extension AppKitOrUIKitResponder {
     private static weak var _firstResponder: AppKitOrUIKitResponder?
     
-    public func _nearestResponder(
+    public func _SwiftUIX_nearestResponder(
         where predicate: (AppKitOrUIKitResponder) throws -> Bool
     ) rethrows -> AppKitOrUIKitResponder? {
         if try predicate(self) {
             return self
         }
         
-        return try next?._nearestResponder(where: predicate)
+        return try next?._SwiftUIX_nearestResponder(where: predicate)
     }
 
     @available(macCatalystApplicationExtension, unavailable)
@@ -34,24 +33,23 @@ extension AppKitOrUIKitResponder {
     }
     
     public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
-        _nearestResponder(where: { $0.isFirstResponder })
+        _SwiftUIX_nearestResponder(where: { $0.isFirstResponder })
     }
     
     @objc private func acquireFirstResponder(_ sender: Any) {
         AppKitOrUIKitResponder._firstResponder = self
     }
 }
-
 #elseif os(macOS)
 extension AppKitOrUIKitResponder {
-    public func _nearestResponder(
+    public func _SwiftUIX_nearestResponder(
         where predicate: (AppKitOrUIKitResponder) throws -> Bool
     ) rethrows -> AppKitOrUIKitResponder? {
         if try predicate(self) {
             return self
         }
         
-        return try nextResponder?._nearestResponder(where: predicate)
+        return try nextResponder?._SwiftUIX_nearestResponder(where: predicate)
     }
     
     public var _SwiftUIX_nearestWindow: AppKitOrUIKitWindow? {
@@ -67,7 +65,7 @@ extension AppKitOrUIKitResponder {
     }
     
     public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
-        _nearestResponder(where: { _SwiftUIX_nearestWindow?.firstResponder == $0  })
+        _SwiftUIX_nearestResponder(where: { _SwiftUIX_nearestWindow?.firstResponder == $0  })
     }
 }
 
