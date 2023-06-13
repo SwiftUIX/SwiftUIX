@@ -5,13 +5,13 @@
 import Swift
 import SwiftUI
 
-public protocol HashIdentifiable: Hashable, Identifiable where Self.ID == Int {
+public protocol _HashIdentifiable: Hashable, Identifiable where Self.ID == Int {
     
 }
 
 // MARK: - Implementation
 
-extension HashIdentifiable {
+extension _HashIdentifiable {
     @inlinable
     public var id: Int {
         hashValue
@@ -23,11 +23,11 @@ extension HashIdentifiable {
 extension Hashable {
     @inlinable
     public var hashIdentifiable: _HashIdentifiableValue<Self> {
-        return .init(self)
+        .init(self)
     }
 }
 
-public struct _HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, HashIdentifiable {
+public struct _HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, _HashIdentifiable {
     public let value: Value
     
     public var description: String {
@@ -73,6 +73,24 @@ public struct _KeyPathHashable<Root, Value: Hashable>: Hashable {
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.root[keyPath: lhs.keyPath] == rhs.root[keyPath: rhs.keyPath]
+    }
+}
+
+public struct _ArbitrarilyIdentifiedValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
+    public let value: Value
+    public let _id: (Value) -> ID
+    
+    public var description: String {
+        .init(describing: value)
+    }
+    
+    public var id: ID {
+        _id(value)
+    }
+    
+    public init(value: Value, id: @escaping (Value) -> ID) {
+        self.value = value
+        self._id = id
     }
 }
 

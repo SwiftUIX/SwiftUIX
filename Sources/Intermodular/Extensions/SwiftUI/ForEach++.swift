@@ -25,6 +25,16 @@ extension ForEach where Content: View {
         }
     }
     
+    public init<_Data: RandomAccessCollection>(
+        _ data: _Data,
+        id: @escaping (_Data.Element) -> ID,
+        @ViewBuilder content: @escaping (_Data.Element) -> Content
+    ) where Data == LazyMapSequence<_Data, _ArbitrarilyIdentifiedValue<_Data.Element, ID>> {
+        self.init(data.lazy.map({ _ArbitrarilyIdentifiedValue(value: $0, id: id) })) {
+            content($0.value)
+        }
+    }
+    
     public init<Elements: RandomAccessCollection>(
         enumerating data: Elements,
         id: KeyPath<Elements.Element, ID>,
