@@ -84,8 +84,8 @@ public struct IntrinsicGeometryReader<Content: View>: View {
                     .onAppear {
                         self.proxy = proxy
                     }
-                    .onChange(of: proxy) { proxy in
-                        self.proxy = proxy
+                    .onChange(of: proxy) { newProxy in
+                        self.proxy = newProxy
                     }
             }
             .allowsHitTesting(false)

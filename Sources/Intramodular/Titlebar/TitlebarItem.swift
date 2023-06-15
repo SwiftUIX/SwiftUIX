@@ -184,7 +184,8 @@ extension View {
     ) -> some View {
         background {
             TitlebarConfigurationView {
-                ZeroSizeView().preference(key: TitlebarConfigurationViewItemsPreferenceKey.self, value: items())
+                ZeroSizeView()
+                    .preference(key: TitlebarConfigurationViewItemsPreferenceKey.self, value: items())
             }
         }
     }

@@ -36,18 +36,32 @@ public func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()
 }
 
 /// Returns the result of recomputing the view’s body with animations disabled.
-public func withoutAnimation(_ flag: Bool = true, _ body: () -> ()) {
-    guard flag else {
-        return body()
+public func withoutAnimation(
+    _ flag: Bool = true,
+    after delay: DispatchTimeInterval? = nil,
+    _ body: @escaping () -> ()
+) {
+    func _perform() {
+        guard flag else {
+            return body()
+        }
+        
+        _areAnimationsDisabledGlobally = true
+        
+        _withoutAnimation {
+            body()
+        }
+        
+        _areAnimationsDisabledGlobally = false
     }
     
-    _areAnimationsDisabledGlobally = true
-    
-    _withoutAnimation {
-        body()
+    if let delay = delay {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            _perform()
+        }
+    } else {
+        _perform()
     }
-    
-    _areAnimationsDisabledGlobally = false
 }
 
 public func withAnimation(
