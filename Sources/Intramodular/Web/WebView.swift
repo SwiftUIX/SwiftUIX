@@ -4,6 +4,7 @@
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
+import Dispatch
 import Swift
 import SwiftUI
 import WebKit
@@ -116,9 +117,9 @@ extension _WebView {
         func load(_ url: URL) {
             self.activeLoadRequest = nil
             self.activeLoadRequest = .init(url: url, redirectedURL: nil)
-            
-            isLoading = true
-            
+            DispatchQueue.main.async {
+                self.isLoading = true
+            }
             webView?.load(URLRequest(url: url))
         }
         
