@@ -254,18 +254,17 @@ extension AppKitOrUIKitViewController {
 #endif
 
 extension EnvironmentValues {
-    @available(*, deprecated, message: "This environment value has been deprecated. Use EnvironmentValues._appKitOrUIKitViewControllerBox instead.")
-    public var _appKitOrUIKitViewController: AppKitOrUIKitViewController? {
-        get {
-            _appKitOrUIKitViewControllerBox?.value
-        }
+    struct AppKitOrUIKitViewControllerBoxKey: EnvironmentKey {
+        typealias Value = ObservableWeakReferenceBox<AppKitOrUIKitViewController>?
+          
+        static let defaultValue: Value = nil
     }
     
-    var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>? {
+    var _appKitOrUIKitViewControllerBox: AppKitOrUIKitViewControllerBoxKey.Value {
         get {
-            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>.self]
+            self[AppKitOrUIKitViewControllerBoxKey.self]
         } set {
-            self[DefaultEnvironmentKey<ObservableWeakReferenceBox<AppKitOrUIKitViewController>>.self] = newValue
+            self[AppKitOrUIKitViewControllerBoxKey.self] = newValue
         }
     }
 }
