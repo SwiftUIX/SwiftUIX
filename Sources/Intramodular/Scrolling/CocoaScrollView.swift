@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A SwiftUI port of `UIScrollView`.
 public struct CocoaScrollView<Content: View>: UIViewRepresentable  {

@@ -2,8 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || targetEnvironment(macCatalyst)
-
+#if (os(iOS) && canImport(CoreTelephony)) || targetEnvironment(macCatalyst)
+ 
 import SafariServices
 import SwiftUI
 

@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// The properties of a `CocoaScrollView` instance.
 public struct CocoaScrollViewConfiguration<Content: View>: ExpressibleByNilLiteral {

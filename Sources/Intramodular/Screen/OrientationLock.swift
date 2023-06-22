@@ -60,7 +60,6 @@ private struct _OrientationLockView<Content: View>: UIViewControllerRepresentabl
 // MARK: - API
 
 extension View {
-    @available(iOS 3.0, *)
     @available(OSX, unavailable)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)

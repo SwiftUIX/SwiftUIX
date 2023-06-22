@@ -8,13 +8,23 @@ import AppKit
 import Swift
 import SwiftUI
 
+public enum _WindowToolbarStyle {
+    case automatic
+    case expanded
+    case unified
+    case unifiedCompact
+}
+
 public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
     private let content: Content
     private let toolbar: NSToolbar
     
-    public init(identifier: String = UUID().uuidString, content: () -> Content) {
+    public init(
+        identifier: String = UUID().uuidString,
+        content: () -> Content
+    ) {
         self.content = content()
         self.toolbar = NSToolbar(identifier: identifier)
     }

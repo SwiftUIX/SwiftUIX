@@ -86,21 +86,6 @@ extension HStack {
 }
 
 extension HStack {
-    @_disfavoredOverload
-    @inlinable
-    public init<V: View>(
-        direction: LayoutDirection,
-        alignment: VerticalAlignment = .center,
-        spacing: CGFloat? = nil,
-        @ViewBuilder content: () -> V
-    ) where Content == AnyView {
-        let content = content()
-        
-        self = HStack(alignment: alignment, spacing: spacing) {
-            content.eraseToAnyView()
-        }
-    }
-    
     @inlinable
     public init<V0: View, V1: View>(
         direction: LayoutDirection,

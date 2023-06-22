@@ -4,8 +4,8 @@
 
 import SwiftUI
 
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 extension EnvironmentValues {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private struct ContentInsetAdjustmentBehaviorKey: EnvironmentKey {
         static let defaultValue: UIScrollView.ContentInsetAdjustmentBehavior? = nil
     }
@@ -31,8 +31,10 @@ extension EnvironmentValues {
             self[KeyboardDismissModeKey.self] = newValue
         }
     }
-    #endif
-    
+}
+#endif
+
+extension EnvironmentValues {
     private struct _IsScrollEnabledEnvironmentKey: EnvironmentKey {
         static let defaultValue = true
     }
@@ -64,8 +66,8 @@ extension EnvironmentValues {
 
 // MARK: - API
 
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 extension View {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public func contentInsetAdjustmentBehavior(_ behavior: UIScrollView.ContentInsetAdjustmentBehavior) -> some View {
         environment(\.contentInsetAdjustmentBehavior, behavior)
     }
@@ -75,8 +77,10 @@ extension View {
     public func keyboardDismissMode(_ keyboardDismissMode: UIScrollView.KeyboardDismissMode) -> some View {
         environment(\.keyboardDismissMode, keyboardDismissMode)
     }
-    #endif
-    
+}
+#endif
+
+extension View {
     /// Adds a condition that controls whether users can scroll within this view.
     @_disfavoredOverload
     @ViewBuilder

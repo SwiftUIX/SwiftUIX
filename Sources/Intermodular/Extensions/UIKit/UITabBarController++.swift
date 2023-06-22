@@ -2,18 +2,21 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import UIKit
 
 extension UITabBarController {
-    public var tabBarIsHidden: Bool {
+    public var _SwiftUIX_tabBarIsHidden: Bool {
         tabBar.frame.origin.y >= UIScreen.main.bounds.height
     }
     
-    public func setTabBarIsHidden(_ isHidden: Bool, animated: Bool) {
-        if tabBarIsHidden == isHidden {
+    public func _SwiftUIX_setTabBarIsHidden(
+        _ isHidden: Bool,
+        animated: Bool
+    ) {
+        if _SwiftUIX_tabBarIsHidden == isHidden {
             return
         }
         

@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 /// A control that displays an editable text interface.
 public struct CocoaTextField<Label: View>: View {

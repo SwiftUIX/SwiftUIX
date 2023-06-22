@@ -29,6 +29,10 @@ public struct Action: DynamicAction, Hashable, Identifiable {
     public func perform() {
         value()
     }
+    
+    public func callAsFunction() {
+        perform()
+    }
 }
 
 extension Action {

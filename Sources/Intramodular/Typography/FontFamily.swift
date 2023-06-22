@@ -66,7 +66,7 @@ extension View {
     #endif
 }
 
-#if os(iOS)
+#if os(iOS) && canImport(CoreTelephony)
 extension CocoaTextField {
     /// Sets the default font for text in the view.
     public func font<F: FontFamily>(_ font: F, size: CGFloat) -> Self {

@@ -54,15 +54,21 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             self.isPresented.wrappedValue = false
         }
         
-        #if !os(watchOS)
-        let content = AnyPresentationView(
+        #if os(iOS) || os(macOS) || os(tvOS)
+        let content = AnyPresentationView {
+            #if os(macOS)
             _destination
                 .managedObjectContext(managedObjectContext)
-        )
+                .environment(\.presentationManager, BooleanPresentationManager(isPresented: isPresented))
+            #else
+            _destination
+                .managedObjectContext(managedObjectContext)
+            #endif
+        }
         .modalPresentationStyle(presentationStyle)
         .preferredSourceViewName(name)
         .environment(environmentInsertions)
-        #else
+        #elseif os(watchOS)
         let content = AnyPresentationView(
             _destination
                 .managedObjectContext(managedObjectContext)

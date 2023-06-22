@@ -185,7 +185,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             _isResizingParentWindow = false
         }
         
-        #if os(iOS)
+        #if os(iOS) && canImport(CoreTelephony)
         if let window = view.window, window.canResizeToFitContent, view.frame.size.isAreaZero || view.frame.size == Screen.size {
             window.frame.size = self.sizeThatFits(AppKitOrUIKitLayoutSizeProposal(targetSize: Screen.main.bounds.size))
             

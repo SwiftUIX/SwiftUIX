@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || targetEnvironment(macCatalyst)
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)

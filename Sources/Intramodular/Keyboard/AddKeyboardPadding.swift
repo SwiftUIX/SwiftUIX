@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || targetEnvironment(macCatalyst)
 
 import Combine
 import SwiftUI
@@ -83,6 +83,7 @@ public enum KeyboardPadding {
     case keyboardIntelligent // experimental
 }
 
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 extension View {
@@ -105,3 +106,4 @@ extension View {
         #endif
     }
 }
+#endif

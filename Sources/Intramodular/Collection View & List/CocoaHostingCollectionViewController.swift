@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 final class CocoaHostingCollectionViewController<
     SectionType,
@@ -202,6 +202,7 @@ final class CocoaHostingCollectionViewController<
             return cell
         }
         
+
         diffableDataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
             guard let self = self, self.dataSource != nil else {
                 return nil

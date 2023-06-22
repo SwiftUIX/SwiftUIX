@@ -9,9 +9,9 @@ import SwiftUI
 public struct AnyPresentationView: View {
     enum Base {
         case native(AnyView)
-#if !os(watchOS)
+        #if !os(watchOS)
         case appKitOrUIKitViewController(AppKitOrUIKitViewController)
-#endif
+        #endif
     }
     
     var base: Base
@@ -32,12 +32,12 @@ public struct AnyPresentationView: View {
                     view
                         .environment(environmentInsertions)
                         ._resolveAppKitOrUIKitViewControllerIfAvailable()
-#if !os(watchOS)
+                #if !os(watchOS)
                 case .appKitOrUIKitViewController(let viewController):
                     AppKitOrUIKitViewControllerAdaptor(viewController)
                         .environment(environmentInsertions)
                         ._resolveAppKitOrUIKitViewController(with: viewController)
-#endif
+                #endif
             }
         }
     }
@@ -50,19 +50,23 @@ public struct AnyPresentationView: View {
         }
     }
     
-#if !os(watchOS)
+    public init<V: View>(@ViewBuilder _ view: () -> V) {
+        self.init(view())
+    }
+    
+    #if !os(watchOS)
     public init(_ viewController: AppKitOrUIKitViewController) {
         self.base = .appKitOrUIKitViewController(viewController)
         
-#if os(iOS)
+        #if os(iOS)
         if let transitioningDelegate = viewController.transitioningDelegate {
             self = self.modalPresentationStyle(.custom(transitioningDelegate))
         }
-#endif
+        #endif
     }
-#endif
+    #endif
     
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     /// Convert to an AppKit/UIKit view controller.
     public func _toAppKitOrUIKitViewController() -> AppKitOrUIKitViewController {
         switch base {
@@ -72,7 +76,7 @@ public struct AnyPresentationView: View {
                 return viewController
         }
     }
-#endif
+    #endif
 }
 
 // MARK: - Conformances

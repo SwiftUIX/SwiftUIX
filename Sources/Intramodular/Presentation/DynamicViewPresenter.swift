@@ -349,11 +349,11 @@ extension NSViewController: DynamicViewPresenter {
         }
         
         return Future { attemptToFulfill in
-            if let presentingViewController = self.presentingViewController {
-                presentingViewController.dismiss(self)
+            if let presenter = self.presenter {
+                presenter.dismiss()
                 
                 attemptToFulfill(.success(true))
-            } else {
+            }else {
                 attemptToFulfill(.success(false))
             }
         }
@@ -374,8 +374,16 @@ extension NSWindow: DynamicViewPresenter {
     }
     
     @discardableResult
-    public func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
-        contentViewController?.dismiss(withAnimation: animation) ?? .init({ $0(.success(false)) })
+    public func dismiss(
+        withAnimation animation: Animation?
+    ) -> Future<Bool, Never> {
+        if NSStringFromClass(type(of: self)).hasSuffix("SheetPresentationWindow") {
+            self.close()
+            
+            return .init({ $0(.success(true)) })
+        } else {
+            return contentViewController?.dismiss(withAnimation: animation) ?? .init({ $0(.success(false)) })
+        }
     }
     
     @discardableResult

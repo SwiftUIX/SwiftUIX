@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CollectionView: View {
     public typealias Offset = ScrollView<AnyView>.ContentOffset

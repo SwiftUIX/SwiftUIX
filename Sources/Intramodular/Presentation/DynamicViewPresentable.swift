@@ -54,7 +54,7 @@ extension NSViewController: DynamicViewPresentable {
     }
     
     public var presenter: DynamicViewPresenter? {
-        presentingViewController
+        presentingViewController ?? view.presenter
     }
 }
 
