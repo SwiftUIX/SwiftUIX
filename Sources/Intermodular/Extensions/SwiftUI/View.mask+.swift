@@ -19,9 +19,18 @@ extension View {
         hidden().background(view.mask(self))
     }
     
+    /// Masks the given view using the alpha channel of this view.
+    @inlinable
+    public func masking<T: View>(@ViewBuilder _ view: () -> T) -> some View {
+        masking(view())
+    }
+
     /// https://www.fivestars.blog/articles/reverse-masks-how-to/
     @inlinable
-    public func reverseMask<Mask: View>(alignment: Alignment = .center, @ViewBuilder _ mask: () -> Mask) -> some View {
+    public func reverseMask<Mask: View>(
+        alignment: Alignment = .center,
+        @ViewBuilder _ mask: () -> Mask
+    ) -> some View {
         self.mask(
             Rectangle()
                 .overlay(alignment: alignment) {

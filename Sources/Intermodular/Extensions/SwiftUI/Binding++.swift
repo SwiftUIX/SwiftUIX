@@ -107,15 +107,19 @@ extension Binding {
         }
     }
     
-    public func onSet(_ body: @escaping (Value) -> ()) -> Self {
+    public func onSet(
+        perform body: @escaping (Value) -> ()
+    ) -> Self {
         return .init(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0; body($0) }
         )
     }
     
-    public func mirror(to other: Binding<Value>) -> Binding<Value> {
-        onSet({ other.wrappedValue = $0 })
+    public func mirror(
+        to other: Binding<Value>
+    ) -> Binding<Value> {
+        onSet(perform: { other.wrappedValue = $0 })
     }
     
     public func printOnSet() -> Self {

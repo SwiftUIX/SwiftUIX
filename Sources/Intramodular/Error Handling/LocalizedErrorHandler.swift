@@ -48,7 +48,7 @@ struct SetLocalizedErrorHandler: ViewModifier {
 
 private struct DefaultLocalizedErrorHandler: LocalizedErrorHandler {
     func handle(_ error: LocalizedError) {
-        debugPrint(error.localizedDescription)
+        debugPrint(String(describing: error))
     }
 }
 

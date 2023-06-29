@@ -136,10 +136,22 @@ extension View {
         self.transition(makeTransition())
     }
     
+    public func asymmetricTransition(
+        insertion: AnyTransition
+    ) -> some View {
+        transition(.asymmetric(insertion: insertion, removal: .identity))
+    }
+    
+    public func asymmetricTransition(
+        removal: AnyTransition
+    ) -> some View {
+        transition(.asymmetric(insertion: .identity, removal: removal))
+    }
+    
     /// Associates an insertion transition and a removal transition with the view.
     public func asymmetricTransition(
-        insertion: AnyTransition = .identity,
-        removal: AnyTransition = .identity
+        insertion: AnyTransition,
+        removal: AnyTransition
     ) -> some View {
         transition(.asymmetric(insertion: insertion, removal: removal))
     }

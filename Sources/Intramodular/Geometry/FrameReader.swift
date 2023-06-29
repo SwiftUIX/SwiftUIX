@@ -96,17 +96,25 @@ public struct FrameReaderProxy {
         preferenceData[FrameID(base: id)] ?? environmentSourcedData[FrameID(base: id)]
     }
     
-    public func frame(for identifier: AnyHashable, in coordinateSpace: CoordinateSpace) -> CGRect {
+    public func frame(
+        for identifier: AnyHashable,
+        in coordinateSpace: CoordinateSpace
+    ) -> CGRect {
         assert(coordinateSpace == .global, "The only coordinateSpace supported currently is .global")
         
         return viewDescription(forFrameWithID: identifier)?.globalBounds ?? .zero
     }
     
-    public func size(for identifier: AnyHashable) -> CGSize {
+    public func size(
+        for identifier: AnyHashable
+    ) -> CGSize {
         viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
     }
     
-    public func intersectionSize(between x: AnyHashable, and y: AnyHashable) -> CGSize {
+    public func intersectionSize(
+        between x: AnyHashable,
+        and y: AnyHashable
+    ) -> CGSize {
         guard let xFrame = viewDescription(forFrameWithID: x)?.globalBounds else {
             return .zero
         }
@@ -118,7 +126,10 @@ public struct FrameReaderProxy {
         return xFrame.intersection(yFrame).size
     }
     
-    public func percentageIntersection(between x: AnyHashable, and y: AnyHashable) -> Double {
+    public func percentageIntersection(
+        between x: AnyHashable,
+        and y: AnyHashable
+    ) -> Double {
         let intersectionSize = self.intersectionSize(between: x, and: y)
         let xSize = size(for: x)
         

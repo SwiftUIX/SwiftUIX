@@ -409,7 +409,7 @@ extension View {
 }
 
 extension View {
-    public func _minimumFrameReference<T: View>(
+    public func _minFrameReference<T: View>(
         _ view: T
     ) -> some View {
         ZStack {
@@ -421,9 +421,52 @@ extension View {
         }
     }
     
-    public func _minimumFrameReference<T: View>(
+    public func _minFrameReference<T: View>(
         @ViewBuilder _ view: () -> T
     ) -> some View {
-        _minimumFrameReference(view())
+        _minFrameReference(view())
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+fileprivate struct _AdhereToReferenceFrame<Reference: View>: ViewModifier {
+    private enum Subviews {
+        case reference
+        case content
+    }
+
+    let dimensions: Set<FrameDimensionType>
+    let reference: Reference
+        
+    func body(content: Content) -> some View {
+        FrameReader { proxy in
+            ZStack {
+                reference
+                    .hidden()
+                    .frame(id: Subviews.reference)
+                    .frame(
+                        width: !dimensions.contains(.width) ? proxy.size(for: Subviews.content).width : nil,
+                        height: !dimensions.contains(.height) ? proxy.size(for: Subviews.content).height : nil
+                    )
+                    .clipped()
+                
+                content
+                    .frame(id: Subviews.content)
+                    .frame(
+                        width: dimensions.contains(.width) ? proxy.size(for: Subviews.reference).width : nil,
+                        height: dimensions.contains(.height) ? proxy.size(for: Subviews.reference).height : nil
+                    )
+            }
+        }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension View {
+    public func _referenceFrame<Reference: View>(
+        _ dimensions: Set<FrameDimensionType> = [.width, .height],
+        @ViewBuilder _ reference: () -> Reference
+    ) -> some View {
+        modifier(_AdhereToReferenceFrame(dimensions: dimensions, reference: reference()))
     }
 }

@@ -72,16 +72,20 @@ import SwiftUI
         self.viewController = viewController
     }
     
-    func setIsModalInPresentation(_ isActive: Bool) {
+    func setIsDismissDisabled(
+        _ disabled: Bool
+    ) {
         guard let viewController = viewController else {
             return
         }
         
         #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-        viewController.isModalInPresentation = isActive
+        viewController.isModalInPresentation = disabled
         #elseif os(macOS)
-        viewController.view.window?.standardWindowButton(NSWindow.ButtonType.closeButton)!.isHidden = isActive
-        viewController.view.window?.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)!.isHidden = isActive
+        if let window = viewController.view.window {
+            window.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = disabled
+            window.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = disabled
+        }
         #endif
     }
 }
@@ -357,8 +361,12 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
                     }
                 }
             }
-            .onPreferenceChange(_DismissDisabled.self) { [weak coordinator] in
-                coordinator?.setIsModalInPresentation($0)
+            .onPreferenceChange(_DismissDisabled.self) { [weak coordinator] dismissDisabled in
+                guard let coordinator, let dismissDisabled else {
+                    return
+                }
+                
+                coordinator.setIsDismissDisabled(dismissDisabled)
             }
             .preference(key: AnyModalPresentation.PreferenceKey.self, value: nil)
             .preference(key: _DismissDisabled.self, value: false)

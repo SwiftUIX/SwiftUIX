@@ -87,9 +87,9 @@ extension AnyModalPresentation {
 }
 
 struct _DismissDisabled: PreferenceKey {
-    static let defaultValue: Bool = false
+    static let defaultValue: Bool? = nil
     
-    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+    static func reduce(value: inout Bool?, nextValue: () -> Bool?) {
         value = nextValue()
     }
 }

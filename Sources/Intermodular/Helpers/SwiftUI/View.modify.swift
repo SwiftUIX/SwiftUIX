@@ -7,6 +7,19 @@ import SwiftUI
 extension View {
     /// Modifies the view based on a predicate.
     @ViewBuilder
+    public func modify<Value>(
+        forUnwrapped value: Value?,
+        transform: (Value) -> AnyViewModifier
+    ) -> some View {
+        if let value {
+            modifier(transform(value))
+        } else {
+            self
+        }
+    }
+
+    /// Modifies the view based on a predicate.
+    @ViewBuilder
     public func modify<T: View>(
         @ViewBuilder transform: (Self) -> T
     ) -> some View {
