@@ -224,3 +224,22 @@ extension LazyAppearView {
         }
     }
 }
+
+private struct _DestroyOnDisappear: ViewModifier {
+    @State private var id = UUID()
+    
+    func body(content: Content) -> some View {
+        content
+            .id(id)
+            .onDisappear {
+                id = UUID()
+            }
+    }
+}
+
+extension View {
+    /// Resets the view's identity every time it disappears.
+    public func _destroyOnDisappear() -> some View {
+        modifier(_DestroyOnDisappear())
+    }
+}

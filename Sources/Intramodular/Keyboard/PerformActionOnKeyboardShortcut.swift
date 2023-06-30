@@ -21,7 +21,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
         }
     }
     
-    let shortcut: KeyboardShortcut
+    let shortcut: KeyboardShortcut?
     let action: () -> Void
     let disabled: Bool
     
@@ -31,7 +31,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     init(
-        shortcut: KeyboardShortcut,
+        shortcut: KeyboardShortcut?,
         action: @escaping () -> (),
         disabled: Bool
     ) {
@@ -51,7 +51,7 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
                     actionTrampoline.value = action
                 }
 
-                if !disabled {
+                if let shortcut, !disabled {
                     Button(action: performAction) {
                         ZeroSizeView()
                     }
@@ -72,6 +72,23 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
 // MARK: - API
 
 extension View {
+    /// Adds an action to perform when this view recognizes a keyboard shortcut.
+    @available(iOS 14.0, macOS 11.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public func onKeyboardShortcut(
+        _ shortcut: KeyboardShortcut?,
+        perform action: @escaping () -> Void
+    ) -> some View {
+        modifier(
+            PerformActionOnKeyboardShortcut(
+                shortcut: shortcut,
+                action: action,
+                disabled: false
+            )
+        )
+    }
+
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)
