@@ -37,10 +37,14 @@ extension Font {
         var font: AppKitOrUIKitFont?
         
         inspect(self) { label, value in
-            guard label == "provider" else { return }
+            guard label == "provider" else {
+                return
+            }
             
             inspect(value) { label, value in
-                guard label == "base" else { return }
+                guard label == "base" else {
+                    return
+                }
                 
                 guard let provider = _SwiftUIFontProvider(from: value) else {
                     return assertionFailure("Could not create font provider")
@@ -96,6 +100,17 @@ private enum _SwiftUIFontProvider {
     case textStyle(Font.TextStyle, weight: Font.Weight?, design: Font.Design?)
     case platform(CTFont)
     
+    mutating func setWeight(_ weight: Font.Weight?) {
+        switch self {
+            case let .system(size, _, design):
+                self = .system(size: size, weight: weight, design: design)
+            case let .textStyle(style, _, design):
+                self = .textStyle(style, weight: weight, design: design)
+            case .platform:
+                break // FIXME!
+        }
+    }
+    
     @available(macOS 11.0, *)
     func toAppKitOrUIKitFont() -> AppKitOrUIKitFont? {
         switch self {
@@ -114,8 +129,20 @@ private enum _SwiftUIFontProvider {
         }
     }
     
-    init?(from reflection: Any) {
-        switch String(describing: type(of: reflection)) {
+    init?(from subject: Any) {
+        switch String(describing: type(of: subject)) {
+            case "ModifierProvider<WeightModifier>":
+                guard let base = Mirror(reflecting: subject)[_keyPath: "base.provider.base"] else {
+                    return nil
+                }
+                
+                guard let weight = Mirror(reflecting: subject)[_keyPath: "modifier.weight"] as? Font.Weight else {
+                    return nil
+                }
+                
+                self.init(from: base)
+
+                self.setWeight(weight)
             case "SystemProvider":
                 var props: (
                     size: CGFloat?,
@@ -123,7 +150,7 @@ private enum _SwiftUIFontProvider {
                     design: Font.Design?
                 ) = (nil, nil, nil)
                 
-                inspect(reflection) { label, value in
+                inspect(subject) { label, value in
                     switch label {
                         case "size":
                             props.size = value as? CGFloat
@@ -153,7 +180,7 @@ private enum _SwiftUIFontProvider {
                     design: Font.Design?
                 ) = (nil, nil, nil)
                 
-                inspect(reflection) { label, value in
+                inspect(subject) { label, value in
                     switch label {
                         case "style":
                             props.style = value as? Font.TextStyle
@@ -179,7 +206,7 @@ private enum _SwiftUIFontProvider {
             case "PlatformFontProvider":
                 var font: CTFont?
                 
-                inspect(reflection) { label, value in
+                inspect(subject) { label, value in
                     guard label == "font" else {
                         return
                     }
@@ -220,4 +247,27 @@ extension SwiftUI.Font.Weight {
 
 private func inspect(_ object: Any, with action: (Mirror.Child) -> Void) {
     Mirror(reflecting: object).children.forEach(action)
+}
+
+extension Mirror {
+    public subscript(_keyPath path: String) -> Any? {
+        guard !path.isEmpty else {
+            assertionFailure()
+            
+            return nil
+        }
+        
+        var components = path.components(separatedBy: ".")
+        let first = components.removeFirst()
+        
+        guard let value = children.first(where: { $0.label == first })?.value else {
+            return nil
+        }
+        
+        if components.isEmpty {
+            return value
+        } else {
+            return Mirror(reflecting: value)[_keyPath: components.joined(separator: ".")]
+        }
+    }
 }
