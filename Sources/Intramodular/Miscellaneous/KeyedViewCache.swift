@@ -13,7 +13,7 @@ protocol KeyedViewCache {
     func removeAllCachedValues()
 }
 
-// MARK: - Default Implementation -
+// MARK: - Default Implementation
 
 @usableFromInline
 final class InMemoryKeyedViewCache: KeyedViewCache {

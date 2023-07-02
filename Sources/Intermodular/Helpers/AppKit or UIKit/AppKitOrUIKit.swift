@@ -104,6 +104,30 @@ public typealias AppKitOrUIKitView = NSView
 public typealias AppKitOrUIKitViewController = NSViewController
 public typealias AppKitOrUIKitWindow = NSWindow
 
+extension NSAppearance {
+    public func _SwiftUIX_toColorScheme() -> ColorScheme {
+        let darkAppearances: [NSAppearance.Name] = [
+            .vibrantDark,
+            .darkAqua,
+            .accessibilityHighContrastVibrantDark,
+            .accessibilityHighContrastDarkAqua,
+        ]
+        
+        return darkAppearances.contains(self.name) ? .dark : .light
+    }
+        
+    public convenience init?(_SwiftUIX_from colorScheme: ColorScheme) {
+        switch colorScheme {
+            case .light:
+                self.init(named: .aqua)
+            case .dark:
+                self.init(named: .darkAqua)
+            default:
+                return nil
+        }
+    }
+}
+
 extension NSEdgeInsets {
     var edgeInsets: EdgeInsets {
         .init(top: top, leading: left, bottom: bottom, trailing: right)
@@ -280,9 +304,16 @@ public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType
     private let updateAppKitOrUIKitViewControllerImpl: (AppKitOrUIKitViewControllerType, Context) -> ()
     
     public init(
-        _ makeAppKitOrUIKitViewController: @autoclosure @escaping () -> AppKitOrUIKitViewControllerType
+        _ makeController: @autoclosure @escaping () -> AppKitOrUIKitViewControllerType
     ) {
-        self.makeAppKitOrUIKitViewControllerImpl = { _ in makeAppKitOrUIKitViewController() }
+        self.makeAppKitOrUIKitViewControllerImpl = { _ in makeController() }
+        self.updateAppKitOrUIKitViewControllerImpl = { _, _ in }
+    }
+    
+    public init(
+        _ makeController: @escaping () -> AppKitOrUIKitViewControllerType
+    ) {
+        self.makeAppKitOrUIKitViewControllerImpl = { _ in makeController() }
         self.updateAppKitOrUIKitViewControllerImpl = { _, _ in }
     }
     
