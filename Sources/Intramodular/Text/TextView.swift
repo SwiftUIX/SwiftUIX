@@ -62,15 +62,12 @@ public struct TextView<Label: View>: View {
     }
     
     public var body: some View {
-        ZStack(alignment: Alignment(horizontal: .leading, vertical: .top)) {
+        ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
             if isEmpty {
                 label
                     .font(configuration.font.map(Font.init) ?? font)
                     .animation(.none)
                     .padding(configuration.textContainerInset.edgeInsets)
-                    .modify(for: .macOS) {
-                        $0.padding(.vertical, -1)
-                    }
             }
             
             _TextView<Label>(
@@ -174,9 +171,7 @@ extension _TextView: UIViewRepresentable {
             
             uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
             
-            let font = configuration.font
-                ?? (try? context.environment.font?.toAppKitOrUIKitFont())
-                ?? AppKitOrUIKitFont.preferredFont(forTextStyle: .body)
+            let font = configuration.font ?? (try? context.environment.font?.toAppKitOrUIKitFont())
             
             if let textColor = configuration.textColor {
                 _assignIfNotEqual(textColor, to: &uiView.textColor)
@@ -487,11 +482,13 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         textContainerInset = .zero
         usesAdaptiveColorMappingForDarkAppearance = true
         
-        font = font ?? (try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont())
+        if let preferredFont = try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont() {
+            font = preferredFont
+            textStorage?.font = preferredFont
+        }
+
         textColor = configuration.textColor
-        
-        textStorage?.font = font
-        
+                
         if let textContainer {
             _assignIfNotEqual(.zero, to: &textContainer.lineFragmentPadding)
             _assignIfNotEqual((context.environment.lineLimit ?? 0), to: &textContainer.maximumNumberOfLines)
