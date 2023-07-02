@@ -51,7 +51,7 @@ public struct LazyAppearView<Content: View>: View {
     }
 
     private let placeholder: Placeholder?
-    private let destination: (LazyAppearViewProxy) -> AnyView
+    private let destination: (LazyAppearViewProxy) -> Content?
     private var debounceInterval: DispatchTimeInterval?
     private var explicitAnimation: Animation? {
         didSet {
@@ -73,71 +73,43 @@ public struct LazyAppearView<Content: View>: View {
     @State private var appearance: LazyAppearViewProxy.Appearance = .inactive
     
     public init(
+        initial: LazyAppearViewProxy.Appearance = .inactive,
         debounceInterval: DispatchTimeInterval? = nil,
-        animation: Animation,
+        animation: Animation = .default,
         placeholder: Placeholder? = nil,
         @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
     ) {
+        self._appearance = .init(initialValue: initial)
         self.placeholder = placeholder
-        self.destination = { destination($0).eraseToAnyView() }
+        self.destination = { destination($0) }
         self.debounceInterval = debounceInterval
         self.explicitAnimation = animation
         self.disableAnimations = false
     }
     
     public init(
+        initial: LazyAppearViewProxy.Appearance = .inactive,
         debounceInterval: DispatchTimeInterval? = nil,
-        animation: Animation,
+        animation: Animation = .default,
         placeholder: Placeholder? = nil,
-        @ViewBuilder destination: @escaping () -> Content
+        @ViewBuilder destination: () -> Content
     ) {
+        let destination = destination()
+        
+        self._appearance = .init(initialValue: initial)
         self.placeholder = placeholder
         self.destination = { proxy in
-            PassthroughView {
-                if proxy.appearance == .active {
-                    destination()
-                }
+            if proxy.appearance == .active {
+                return destination
+            } else {
+                return nil
             }
-            .eraseToAnyView()
         }
         self.debounceInterval = debounceInterval
         self.explicitAnimation = animation
         self.disableAnimations = false
     }
-    
-    public init(
-        debounceInterval: DispatchTimeInterval? = nil,
-        disableAnimations: Bool = false,
-        placeholder: Placeholder? = nil,
-        @ViewBuilder destination: @escaping (LazyAppearViewProxy) -> Content
-    ) {
-        self.placeholder = placeholder
-        self.destination = { destination($0).eraseToAnyView() }
-        self.debounceInterval = debounceInterval
-        self.explicitAnimation = nil
-        self.disableAnimations = disableAnimations
-    }
-    
-    public init(
-        debounceInterval: DispatchTimeInterval? = nil,
-        disableAnimations: Bool = false,
-        placeholder: Placeholder? = nil,
-        @ViewBuilder destination: @escaping () -> Content
-    ) {
-        self.placeholder = placeholder
-        self.destination = { proxy in
-            PassthroughView {
-                if proxy.appearance == .active {
-                    destination()
-                }
-            }
-            .eraseToAnyView()
-        }
-        self.debounceInterval = debounceInterval
-        self.explicitAnimation = nil
-        self.disableAnimations = disableAnimations
-    }
-    
+        
     public var body: some View {
         ZStack {
             placeholderView
