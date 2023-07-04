@@ -39,6 +39,7 @@ public typealias AppKitOrUIKitScrollView = UIScrollView
 public typealias AppKitOrUIKitSplitViewController = UISplitViewController
 public typealias AppKitOrUIKitSearchBar = UISearchBar
 public typealias AppKitOrUIKitTableView = UITableView
+public typealias AppKitOrUIKitTableViewCell = UITableViewCell
 public typealias AppKitOrUIKitTableViewController = UITableViewController
 public typealias AppKitOrUIKitTextField = UITextField
 public typealias AppKitOrUIKitTextView = UITextView
@@ -99,6 +100,8 @@ public typealias AppKitOrUIKitResponder = NSResponder
 public typealias AppKitOrUIKitSearchBar = NSSearchField
 public typealias AppKitOrUIKitSplitViewController = NSSplitViewController
 public typealias AppKitOrUIKitTableView = NSTableView
+public typealias AppKitOrUIKitTableViewCell = NSTableCellView
+public typealias AppKitOrUIKitTextField = NSTextField
 public typealias AppKitOrUIKitTextView = NSTextView
 public typealias AppKitOrUIKitView = NSView
 public typealias AppKitOrUIKitViewController = NSViewController
@@ -191,8 +194,56 @@ extension NSSize {
 }
 
 extension NSView {
-    public enum AnimationOptions {
-        case `default`
+    public struct AnimationOptions: OptionSet {
+        public static let curveEaseInOut = AnimationOptions(rawValue: 1 << 0)
+        public static let curveEaseIn = AnimationOptions(rawValue: 1 << 1)
+        public static let curveEaseOut = AnimationOptions(rawValue: 1 << 2)
+        public static let curveLinear = AnimationOptions(rawValue: 1 << 3)
+        
+        public let rawValue: Int
+        
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+        
+        public func _toCAAnimationMediaTimingFunction() -> CAMediaTimingFunctionName {
+            switch self {
+                case .curveEaseIn:
+                    return CAMediaTimingFunctionName.easeIn
+                case .curveEaseOut:
+                    return CAMediaTimingFunctionName.easeOut
+                case .curveLinear:
+                    return CAMediaTimingFunctionName.linear
+                default:
+                    return CAMediaTimingFunctionName.default
+            }
+        }
+    }
+
+    public static func animate(
+        withDuration duration: TimeInterval,
+        delay: TimeInterval = 0.0,
+        options: AnimationOptions = .curveEaseInOut,
+        animations: @escaping () -> Void,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = duration
+            context.allowsImplicitAnimation = true
+            context.timingFunction = CAMediaTimingFunction(name: options._toCAAnimationMediaTimingFunction())
+            
+            // Execute delay if specified
+            if delay > 0.0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    animations()
+                }
+            } else {
+                animations()
+            }
+            
+        } completionHandler: {
+            completion?(true)
+        }
     }
 }
 
