@@ -121,7 +121,9 @@ extension Image {
                 if #available(OSX 10.16, *) {
                     self.init(systemName: name)
                 } else {
-                    fatalError()
+                    assertionFailure()
+                    
+                    self.init(systemName: .nosign)
                 }
             }
         }

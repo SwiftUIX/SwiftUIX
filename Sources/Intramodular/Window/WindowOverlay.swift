@@ -142,13 +142,13 @@ public struct WindowProxy {
         #endif
     }
     
-    public func setMaximumLevel() {
+    public func _macOS_setMaximumLevel() {
         guard let window = window else {
             return assertionFailure()
         }
         
         #if os(iOS) || os(tvOS)
-        fatalError()
+        assertionFailure()
         #elseif os(macOS)
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         window.level = .screenSaver

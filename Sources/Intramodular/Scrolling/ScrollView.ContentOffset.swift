@@ -116,7 +116,7 @@ extension ScrollView.ContentOffset {
             case .trailing:
                 offset.x = contentSize.width - containerBounds.size.width
             default:
-                fatalError()
+                assertionFailure()
         }
         
         switch alignment.vertical {
@@ -127,7 +127,7 @@ extension ScrollView.ContentOffset {
             case .bottom:
                 offset.y = max(-contentInsets.top, contentSize.height - (containerBounds.size.height - contentInsets.bottom))
             default:
-                fatalError()
+                assertionFailure()
         }
         
         return offset
