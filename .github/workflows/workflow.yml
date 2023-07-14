@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-12]
-        xcode: ['14.1']
+        os: [macos-13]
+        xcode: ['14.3.1', '15.0']
         build_type: ['debug', 'release']
     runs-on: ${{ matrix.os }}
     env:
