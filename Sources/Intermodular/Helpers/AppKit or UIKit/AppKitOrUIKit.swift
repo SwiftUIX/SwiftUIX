@@ -118,7 +118,7 @@ extension NSAppearance {
         
         return darkAppearances.contains(self.name) ? .dark : .light
     }
-        
+    
     public convenience init?(_SwiftUIX_from colorScheme: ColorScheme) {
         switch colorScheme {
             case .light:
@@ -219,12 +219,12 @@ extension NSView {
             }
         }
     }
-
+    
     public static func animate(
         withDuration duration: TimeInterval,
         delay: TimeInterval = 0.0,
         options: AnimationOptions = .curveEaseInOut,
-        animations: @escaping () -> Void,
+        @_implicitSelfCapture animations: @escaping () -> Void,
         completion: ((Bool) -> Void)? = nil
     ) {
         NSAnimationContext.runAnimationGroup { context in
@@ -232,7 +232,6 @@ extension NSView {
             context.allowsImplicitAnimation = true
             context.timingFunction = CAMediaTimingFunction(name: options._toCAAnimationMediaTimingFunction())
             
-            // Execute delay if specified
             if delay > 0.0 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     animations()
@@ -258,6 +257,47 @@ extension NSView {
     
     @objc open func hitTest(_ point: CGPoint, with event: NSEvent?) -> NSView? {
         hitTest(point)
+    }
+}
+
+extension NSVisualEffectView.Material: CaseIterable {
+    public static var allCases: [Self] {
+        [.titlebar, .selection, .menu, .popover, .sidebar, .headerView, .sheet, .windowBackground, .hudWindow, .fullScreenUI, .toolTip, .contentBackground, .underWindowBackground, .underPageBackground]
+    }
+    
+    public var name: String {
+        switch self {
+            case .titlebar:
+                return "titlebar"
+            case .selection:
+                return "selection"
+            case .menu:
+                return "menu"
+            case .popover:
+                return "popover"
+            case .sidebar:
+                return "sidebar"
+            case .headerView:
+                return "headerView"
+            case .sheet:
+                return "sheet"
+            case .windowBackground:
+                return "windowBackground"
+            case .hudWindow:
+                return "hudWindow"
+            case .fullScreenUI:
+                return "fullScreenUI"
+            case .toolTip:
+                return "toolTip"
+            case .contentBackground:
+                return "contentBackground"
+            case .underWindowBackground:
+                return "underWindowBackground"
+            case .underPageBackground:
+                return "underPageBackground"
+            default:
+                return "unknown"
+        }
     }
 }
 
@@ -314,8 +354,60 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
+public struct _AppKitOrUIKitViewAnimation: Equatable  {
+    public let options: AppKitOrUIKitView.AnimationOptions
+    public let duration: CGFloat
+    
+    public init(options: AppKitOrUIKitView.AnimationOptions, duration: CGFloat) {
+        self.options = options
+        self.duration = duration
+    }
+    
+    public static func easeInOut(duration: Double) -> Self {
+        .init(options: .curveEaseInOut, duration: duration)
+    }
+
+    public static var easeInOut: Self {
+        .init(options: .curveEaseInOut, duration: 0.3)
+    }
+    
+    public static func easeIn(duration: Double) -> Self {
+        .init(options: .curveEaseIn, duration: duration)
+    }
+
+    public static var easeIn: Self {
+        .init(options: .curveEaseIn, duration: 0.3)
+    }
+    
+    public static func easeOut(duration: Double) -> Self {
+        .init(options: .curveEaseOut, duration: duration)
+    }
+
+    public static var easeOut: Self {
+        .init(options: .curveEaseOut, duration: 0.3)
+    }
+}
+
+public func _withAppKitOrUIKitAnimation(
+    _ animation: _AppKitOrUIKitViewAnimation?,
+    @_implicitSelfCapture body: @escaping () -> ()
+) {
+    guard let animation else {
+        body()
+        
+        return
+    }
+    
+    AppKitOrUIKitView.animate(
+        withDuration: animation.duration,
+        delay: 0,
+        options: animation.options,
+        animations: body
+    )
+}
+
 #if os(macOS)
-extension AppKitOrUIKitViewController {    
+extension AppKitOrUIKitViewController {
     public func _setNeedsLayout() {
         view.needsLayout = true
     }
@@ -331,7 +423,7 @@ extension AppKitOrUIKitViewController {
 extension EnvironmentValues {
     struct AppKitOrUIKitViewControllerBoxKey: EnvironmentKey {
         typealias Value = ObservableWeakReferenceBox<AppKitOrUIKitViewController>?
-          
+        
         static let defaultValue: Value = nil
     }
     
@@ -345,11 +437,11 @@ extension EnvironmentValues {
 }
 
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     public typealias UIViewControllerType = AppKitOrUIKitViewControllerType
-    #elseif os(macOS)
+#elseif os(macOS)
     public typealias NSViewControllerType = AppKitOrUIKitViewControllerType
-    #endif
+#endif
     
     private let makeAppKitOrUIKitViewControllerImpl: (Context) -> AppKitOrUIKitViewControllerType
     private let updateAppKitOrUIKitViewControllerImpl: (AppKitOrUIKitViewControllerType, Context) -> ()

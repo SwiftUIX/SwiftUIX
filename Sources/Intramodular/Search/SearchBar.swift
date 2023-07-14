@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) && canImport(CoreTelephony)) || targetEnvironment(macCatalyst)
+#if (os(iOS) && canImport(CoreTelephony)) || os(macOS) || targetEnvironment(macCatalyst)
 
 /// A specialized view for receiving search-related information from the user.
 public struct SearchBar: DefaultTextInputType {

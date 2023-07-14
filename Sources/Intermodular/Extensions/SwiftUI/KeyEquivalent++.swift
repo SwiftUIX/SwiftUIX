@@ -9,8 +9,21 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension KeyEquivalent {
-    public static let DEL = Self("\u{7F}")
-    public static let backspace = Self("\u{08}")
+    public static let DEL = Self("\u{7F}" as Character)
+    public static let backspace = Self("\u{08}" as Character)
+    
+    public var _isDeleteOrBackspace: Bool {
+        switch self {
+            case .DEL:
+                return true
+            case .delete:
+                return true
+            case .backspace:
+                return true
+            default:
+                return false
+        }
+    }
 }
 
 @available(iOS 14.0, macOS 11.0, *)

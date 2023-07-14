@@ -5,6 +5,10 @@
 import Swift
 import SwiftUI
 
+public protocol _CustomOptionalDimensionsConvertible {
+    func _toOptionalDimensions() -> OptionalDimensions
+}
+
 @_frozen
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     public var width: CGFloat?
@@ -15,22 +19,22 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
         self.height = height
     }
     
-    public init(_ size: CGSize) {
-        self.init(width: size.width, height: size.height)
+    public init<T: _CustomOptionalDimensionsConvertible>(_ size: T) {
+        self = size._toOptionalDimensions()
     }
     
-    public init(_ size: CGSize?) {
+    public init<T: _CustomOptionalDimensionsConvertible>(_ size: T?) {
         if let size = size {
             self.init(size)
         } else {
             self.init(nilLiteral: ())
         }
     }
-    
+
     public init(nilLiteral: ()) {
         self.init(width: nil, height: nil)
     }
-    
+        
     public init() {
         
     }
@@ -132,6 +136,25 @@ extension View {
 
 // MARK: - Auxiliary
 
+extension CGSize: _CustomOptionalDimensionsConvertible {
+    public func _toOptionalDimensions() -> OptionalDimensions {
+        .init(width: width, height: height)
+    }
+}
+
+extension OptionalDimensions: _CustomOptionalDimensionsConvertible {
+    public func _toOptionalDimensions() -> OptionalDimensions {
+        self
+    }
+}
+
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+extension ProposedViewSize: _CustomOptionalDimensionsConvertible {
+    public func _toOptionalDimensions() -> OptionalDimensions {
+        .init(width: width, height: height)
+    }
+}
+
 extension EnvironmentValues {
     private final class PreferredMaximumLayoutWidth: DefaultEnvironmentKey<CGFloat> {
         
@@ -175,8 +198,6 @@ extension EnvironmentValues {
         }
     }
 }
-
-// MARK: - Helpers
 
 extension CGSize {
     public init(_ dimensions: OptionalDimensions, default: CGSize) {

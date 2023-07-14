@@ -33,9 +33,16 @@ public struct CocoaScrollViewConfiguration<Content: View>: ExpressibleByNilLiter
     var isRefreshing: Bool?
     var refreshControlTintColor: UIColor?
 
-
+    private var _keyboardDismissMode: Any?
+    
     @available(tvOS, unavailable)
-    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+    var keyboardDismissMode: UIScrollView.KeyboardDismissMode {
+        get {
+            _keyboardDismissMode.flatMap({ $0 as? UIScrollView.KeyboardDismissMode }) ?? .none
+        } set {
+            _keyboardDismissMode = newValue
+        }
+    }
     
     public init(nilLiteral: ()) {
         

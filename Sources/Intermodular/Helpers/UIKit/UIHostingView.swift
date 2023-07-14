@@ -113,7 +113,7 @@ open class UIHostingView<Content: View>: UIView {
     }
     
     override open func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        rootViewHostingController.sizeThatFits(.init(targetSize: .init(targetSize)))
+        rootViewHostingController.sizeThatFits(.init(targetSize: targetSize))
     }
     
     override open func systemLayoutSizeFitting(
@@ -123,7 +123,7 @@ open class UIHostingView<Content: View>: UIView {
     ) -> CGSize {
         rootViewHostingController.sizeThatFits(
             .init(
-                targetSize: .init(targetSize),
+                targetSize: targetSize,
                 horizontalFittingPriority: horizontalFittingPriority,
                 verticalFittingPriority: verticalFittingPriority
             )
@@ -138,7 +138,7 @@ open class UIHostingView<Content: View>: UIView {
         if let superview = superview {
             frame.size = rootViewHostingController.sizeThatFits(in: superview.frame.size)
         } else {
-            frame.size = rootViewHostingController.sizeThatFits(AppKitOrUIKitLayoutSizeProposal())
+            frame.size = rootViewHostingController.sizeThatFits(nil)
         }
     }
     

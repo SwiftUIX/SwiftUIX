@@ -103,7 +103,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     open func invalidatePreferredContentSize() {
         #if os(iOS) || targetEnvironment(macCatalyst)
         if modalPresentationStyle == .popover {
-            preferredContentSize = sizeThatFits(.init(targetSize: nil))
+            preferredContentSize = sizeThatFits(nil)
         }
         #endif
     }

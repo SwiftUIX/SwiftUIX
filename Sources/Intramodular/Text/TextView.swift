@@ -171,7 +171,7 @@ extension _TextView: UIViewRepresentable {
             
             uiView.autocapitalizationType = configuration.autocapitalization ?? .sentences
             
-            let font = configuration.font ?? (try? context.environment.font?.toAppKitOrUIKitFont())
+            let font: AppKitOrUIKitFont? = configuration.font ?? (try? context.environment.font?.toAppKitOrUIKitFont())
             
             if let textColor = configuration.textColor {
                 _assignIfNotEqual(textColor, to: &uiView.textColor)
@@ -212,9 +212,12 @@ extension _TextView: UIViewRepresentable {
                 
                 if let text = text {
                     var attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                        NSAttributedString.Key.font: font
+                        NSAttributedString.Key.paragraphStyle: paragraphStyle
                     ]
+                    
+                    if let font {
+                        attributes[.font] = font
+                    }
                     
                     if let kerning = configuration.kerning {
                         _assignIfNotEqual(kerning, to: &attributes[.kern])
