@@ -84,41 +84,35 @@ struct NavigationBarConfigurator<Leading: View, Center: View, Trailing: View, La
             }
             #endif
             
-            if let leading = leading {
-                if !(leading is EmptyView) {
-                    if parent.navigationItem.leftBarButtonItem == nil {
-                        parent.navigationItem.leftBarButtonItem = .init(customView: UIHostingView(rootView: leading))
-                    } else if let view = parent.navigationItem.leftBarButtonItem?.customView as? UIHostingView<Leading> {
-                        view.rootView = leading
-                    } else {
-                        parent.navigationItem.leftBarButtonItem?.customView = UIHostingView(rootView: leading)
-                    }
+            if let leading = leading, !(leading is EmptyView) {
+                if parent.navigationItem.leftBarButtonItem == nil {
+                    parent.navigationItem.leftBarButtonItem = .init(customView: UIHostingView(rootView: leading))
+                } else if let view = parent.navigationItem.leftBarButtonItem?.customView as? UIHostingView<Leading> {
+                    view.rootView = leading
+                } else {
+                    parent.navigationItem.leftBarButtonItem?.customView = UIHostingView(rootView: leading)
                 }
             } else {
                 parent.navigationItem.leftBarButtonItem = nil
             }
             
-            if let center = center {
-                if !(center is EmptyView) {
-                    if let view = parent.navigationItem.titleView as? UIHostingView<Center> {
-                        view.rootView = center
-                    } else {
-                        parent.navigationItem.titleView = UIHostingView(rootView: center)
-                    }
+            if let center = center, !(center is EmptyView) {
+                if let view = parent.navigationItem.titleView as? UIHostingView<Center> {
+                    view.rootView = center
+                } else {
+                    parent.navigationItem.titleView = UIHostingView(rootView: center)
                 }
             } else {
                 parent.navigationItem.titleView = nil
             }
             
-            if let trailing = trailing {
-                if !(trailing is EmptyView) {
-                    if parent.navigationItem.rightBarButtonItem == nil {
-                        parent.navigationItem.rightBarButtonItem = .init(customView: UIHostingView(rootView: trailing))
-                    } else if let view = parent.navigationItem.rightBarButtonItem?.customView as? UIHostingView<Trailing> {
-                        view.rootView = trailing
-                    } else {
-                        parent.navigationItem.rightBarButtonItem?.customView = UIHostingView(rootView: trailing)
-                    }
+            if let trailing = trailing, !(trailing is EmptyView) {
+                if parent.navigationItem.rightBarButtonItem == nil {
+                    parent.navigationItem.rightBarButtonItem = .init(customView: UIHostingView(rootView: trailing))
+                } else if let view = parent.navigationItem.rightBarButtonItem?.customView as? UIHostingView<Trailing> {
+                    view.rootView = trailing
+                } else {
+                    parent.navigationItem.rightBarButtonItem?.customView = UIHostingView(rootView: trailing)
                 }
             } else {
                 parent.navigationItem.rightBarButtonItem = nil
