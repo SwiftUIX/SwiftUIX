@@ -8,7 +8,7 @@ import SwiftUI
 
 private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverContent: View {
     @Binding var isPresented: Bool
-    let arrowEdge: Edge?
+    let arrowEdges: UIPopoverArrowDirection
     let onDismiss: (() -> Void)?
     let content: () -> PopoverContent
     
@@ -16,7 +16,7 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
         content.background(
             _CocoaPopoverInjector(
                 isPresented: self.$isPresented,
-                arrowEdge: arrowEdge,
+                arrowEdges: arrowEdges,
                 onDismiss: self.onDismiss,
                 content: self.content
             )
@@ -29,14 +29,14 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
 extension View {
     public func cocoaPopover<Content>(
         isPresented: Binding<Bool>,
-        arrowEdge: Edge? = .top,
+        arrowEdges: UIPopoverArrowDirection,
         onDismiss: (() -> Void)? = nil,
         content: @escaping () -> Content
     ) -> some View where Content: View {
         modifier(
             PopoverViewModifier(
                 isPresented: isPresented,
-                arrowEdge: arrowEdge,
+                arrowEdges: arrowEdges,
                 onDismiss: onDismiss,
                 content: content
             )
@@ -69,7 +69,7 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
     
     @Binding var isPresented: Bool
     
-    let arrowEdge: Edge?
+    let arrowEdges: UIPopoverArrowDirection
     let onDismiss: (() -> Void)?
     
     @ViewBuilder let content: () -> Content
@@ -88,7 +88,7 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
             host.modalPresentationStyle = UIModalPresentationStyle.popover
             
             host.popoverPresentationController?.delegate = context.coordinator
-            host.popoverPresentationController?.permittedArrowDirections = arrowEdge.map({  .init(PopoverArrowDirection($0)) }) ?? []
+            host.popoverPresentationController?.permittedArrowDirections = arrowEdges
             host.popoverPresentationController?.sourceView = uiViewController.view
             host.popoverPresentationController?.sourceRect = uiViewController.view.bounds
             
