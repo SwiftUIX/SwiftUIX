@@ -8,7 +8,7 @@ import SwiftUI
 
 private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverContent: View {
     @Binding var isPresented: Bool
-    let arrowEdges: UIPopoverArrowDirection
+    let arrowEdges: Edge.Set
     let onDismiss: (() -> Void)?
     let content: () -> PopoverContent
     
@@ -29,7 +29,7 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
 extension View {
     public func cocoaPopover<Content>(
         isPresented: Binding<Bool>,
-        arrowEdges: UIPopoverArrowDirection,
+        arrowEdges: Edge.Set,
         onDismiss: (() -> Void)? = nil,
         content: @escaping () -> Content
     ) -> some View where Content: View {
@@ -69,7 +69,7 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
     
     @Binding var isPresented: Bool
     
-    let arrowEdges: UIPopoverArrowDirection
+    let arrowEdges: Edge.Set
     let onDismiss: (() -> Void)?
     
     @ViewBuilder let content: () -> Content
@@ -88,7 +88,7 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
             host.modalPresentationStyle = UIModalPresentationStyle.popover
             
             host.popoverPresentationController?.delegate = context.coordinator
-            host.popoverPresentationController?.permittedArrowDirections = arrowEdges
+            host.popoverPresentationController?.permittedArrowDirections = arrowEdges.permittedArrowDirection
             host.popoverPresentationController?.sourceView = uiViewController.view
             host.popoverPresentationController?.sourceRect = uiViewController.view.bounds
             
@@ -104,4 +104,22 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
     }
 }
 
+private extension Edge.Set {
+    
+    var permittedArrowDirection: UIPopoverArrowDirection {
+        var directions: UIPopoverArrowDirection = .unknown
+        if contains(.top) {
+            directions.insert(.up)
+        } else if contains(.bottom) {
+            directions.insert(.down)
+        } else if contains(.leading) {
+            directions.insert(.left)
+        } else if contains(.trailing) {
+            directions.insert(.right)
+        }
+        guard directions != .unknown else { return .any }
+        return directions
+    }
+    
+}
 #endif
