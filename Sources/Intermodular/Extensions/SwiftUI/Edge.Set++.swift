@@ -6,6 +6,19 @@ import Swift
 import SwiftUI
 
 extension Edge.Set {
+    init(edge: Edge) {
+        switch edge {
+            case .top:
+                self = .top
+            case .bottom:
+                self = .bottom
+            case .leading:
+                self = .leading
+            case .trailing:
+                self = .trailing
+        }
+    }
+    
     public init(from alignment: HorizontalAlignment) {
         switch alignment {
             case .leading:

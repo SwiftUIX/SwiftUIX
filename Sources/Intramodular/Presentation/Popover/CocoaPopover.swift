@@ -14,7 +14,7 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
     
     func body(content: Content) -> some View {
         content.background(
-            _CocoaPopoverInjector(
+            _AttachCocoaPopoverPresenter(
                 isPresented: self.$isPresented,
                 arrowEdges: arrowEdges,
                 onDismiss: self.onDismiss,
@@ -27,12 +27,12 @@ private struct PopoverViewModifier<PopoverContent>: ViewModifier where PopoverCo
 // MARK: - API
 
 extension View {
-    public func cocoaPopover<Content>(
+    public func cocoaPopover<Content: View>(
         isPresented: Binding<Bool>,
         arrowEdges: Edge.Set,
         onDismiss: (() -> Void)? = nil,
         content: @escaping () -> Content
-    ) -> some View where Content: View {
+    ) -> some View {
         modifier(
             PopoverViewModifier(
                 isPresented: isPresented,
@@ -42,15 +42,31 @@ extension View {
             )
         )
     }
+    
+    public func cocoaPopover<Content: View>(
+        isPresented: Binding<Bool>,
+        arrowEdge: Edge,
+        onDismiss: (() -> Void)? = nil,
+        content: @escaping () -> Content
+    ) -> some View  {
+        self.cocoaPopover(
+            isPresented: isPresented,
+            arrowEdges: .init(edge: arrowEdge),
+            onDismiss: onDismiss,
+            content: content
+        )
+    }
 }
 
-private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresentable {
+// MARK: - Implementation
+
+private struct _AttachCocoaPopoverPresenter<Content: View> : UIViewControllerRepresentable {
     class Coordinator: NSObject, UIPopoverPresentationControllerDelegate {
         let host: UIHostingController<Content>
         
-        private let parent: _CocoaPopoverInjector
+        private let parent: _AttachCocoaPopoverPresenter
         
-        init(parent: _CocoaPopoverInjector, content: Content) {
+        init(parent: _AttachCocoaPopoverPresenter, content: Content) {
             self.parent = parent
             self.host = UIHostingController(rootView: content)
         }
@@ -104,22 +120,34 @@ private struct _CocoaPopoverInjector<Content: View> : UIViewControllerRepresenta
     }
 }
 
+// MARK: - Auxiliary
+
 private extension Edge.Set {
-    
     var permittedArrowDirection: UIPopoverArrowDirection {
         var directions: UIPopoverArrowDirection = .unknown
+        
         if contains(.top) {
             directions.insert(.up)
-        } else if contains(.bottom) {
+        }
+        
+        if contains(.bottom) {
             directions.insert(.down)
-        } else if contains(.leading) {
+        }
+        
+        if contains(.leading) {
             directions.insert(.left)
-        } else if contains(.trailing) {
+        }
+        
+        if contains(.trailing) {
             directions.insert(.right)
         }
-        guard directions != .unknown else { return .any }
+        
+        guard directions != .unknown else {
+            return .any
+        }
+        
         return directions
     }
-    
 }
+
 #endif
