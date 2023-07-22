@@ -25,6 +25,41 @@ extension CGSize {
     var isAreaZero: Bool {
         minimumDimensionLength.isZero
     }
+    
+    var isAreaPracticallyInfinite: Bool {
+        maximumDimensionLength == .greatestFiniteMagnitude || maximumDimensionLength == .infinity
+    }
+    
+    var isRegularAndNonZero: Bool {
+        guard !isAreaPracticallyInfinite else {
+            return false
+        }
+        
+        guard !isAreaZero else {
+            return false
+        }
+        
+        return true
+    }
+    
+    public static func _maxByArea(_ lhs: CGSize, rhs: CGSize) -> CGSize {
+        guard lhs.isRegularAndNonZero, rhs.isRegularAndNonZero else {
+            return lhs
+        }
+        
+        let _lhs = lhs.width * lhs.height
+        let _rhs = rhs.width * rhs.height
+        
+        if _lhs >= _rhs {
+            return lhs
+        } else {
+            return rhs
+        }
+    }
+    
+    public static func _maxByCombining(_ lhs: CGSize, rhs: CGSize) -> CGSize {
+        CGSize(width: max(lhs.width, rhs.width), height: max(lhs.height, rhs.height))
+    }
 }
 
 extension CGSize {

@@ -8,9 +8,9 @@ import SwiftUI
 
 /// A view that eventually produces its content.
 public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View>: View {
-    public typealias SubscriptionPolicy = PublisherObserver<P, DispatchQueue>.SubscriptionPolicy
+    public typealias SubscriptionPolicy = _PublisherObserver<P, DispatchQueue>.SubscriptionPolicy
     
-    @PersistentObject private var observer: PublisherObserver<P, DispatchQueue>
+    @PersistentObject private var observer: _PublisherObserver<P, DispatchQueue>
     
     private let subscriptionPolicy: SubscriptionPolicy
     private let placeholder: Placeholder
@@ -37,10 +37,11 @@ public struct PublisherOutputView<P: Publisher, Placeholder: View, Content: View
     public var body: some View {
         ZStack {
             ZeroSizeView().onAppear {
-                if subscriptionPolicy == .delayed {
+                if subscriptionPolicy == .deferred {
                     observer.attach()
                 }
             }
+            .accessibility(hidden: true)
             
             if let lastValue = observer.lastValue {
                 makeContent(lastValue)

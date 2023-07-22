@@ -30,7 +30,9 @@ public struct ObservedValue<Value>: DynamicProperty {
         )
     }
     
-    public subscript<Subject>(dynamicMember keyPath: WritableKeyPath<Value, Subject>) -> ObservedValue<Subject> {
+    public subscript<Subject>(
+        dynamicMember keyPath: WritableKeyPath<Value, Subject>
+    ) -> ObservedValue<Subject> {
         .init(base[dynamicMember: keyPath])
     }
 }
@@ -42,16 +44,24 @@ extension ObservedValue {
         self.base = base
     }
     
-    public init<Root>(_ keyPath: WritableKeyPath<Root, Value>, on root: ObservedValue<Root>) {
+    public init<Root>(
+        _ keyPath: WritableKeyPath<Root, Value>,
+        on root: ObservedValue<Root>
+    ) {
         self = root[dynamicMember: keyPath]
     }
     
-    public init<Root: ObservableObject>(_ keyPath: ReferenceWritableKeyPath<Root, Value>, on root: Root) {
-        self.init(ObservableObjectMember(root: root, keyPath: keyPath))
+    public init<Root: ObservableObject>(
+        _ keyPath: ReferenceWritableKeyPath<Root, Value>,
+        on root: Root
+    ) {
+        self.init(ObservableValues.ObjectMember(root: root, keyPath: keyPath))
     }
     
-    public static func constant(_ value: Value) -> ObservedValue<Value> {
-        self.init(ObservableValueRoot(root: value))
+    public static func constant(
+        _ value: Value
+    ) -> ObservedValue<Value> {
+        self.init(ObservableValues.Root(root: value))
     }
 }
 
@@ -69,7 +79,7 @@ extension View {
     ) -> some View {
         WithOptionalObservableValue(value: storage.map(ObservedValue.init)?.base, content: { transform(AnyView(self), $0) })
     }
-
+    
     public func modify<T: Hashable, TransformedView: View>(
         observing storage: ViewStorage<T>,
         transform: @escaping (AnyView) -> TransformedView

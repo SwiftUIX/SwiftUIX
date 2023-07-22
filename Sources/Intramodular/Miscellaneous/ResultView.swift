@@ -72,13 +72,16 @@ public struct ResultView<SuccessView: View, FailureView: View, Success, Failure:
 }
 
 extension ResultView where Success == Void, Failure == Error {
-    public init(successView: () throws -> SuccessView, failureView: (Error) -> FailureView) {
+    public init(
+        success: () throws -> SuccessView,
+        failure: (Error) -> FailureView
+    ) {
         do {
-            self.successView = try successView()
+            self.successView = try success()
             self.failureView = nil
         } catch {
             self.successView = nil
-            self.failureView = failureView(error)
+            self.failureView = failure(error)
         }
     }
 }

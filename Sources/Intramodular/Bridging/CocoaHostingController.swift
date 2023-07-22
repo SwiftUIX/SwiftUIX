@@ -193,6 +193,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
         #endif
     }
+    
+    public func _SwiftUIX_sizeThatFits(in size: CGSize) -> CGSize {
+        sizeThatFits(in: size)
+    }
 }
 
 extension AppKitOrUIKitHostingController {

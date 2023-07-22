@@ -8,21 +8,25 @@ import AppKit
 import Swift
 import SwiftUI
 
-public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
-    var item: MenuBarItem<ID, Content> {
+@_spi(Internal)
+public class _AppKitMenuBarExtraPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
+    private lazy var menuBarExtraCoordinator = _CocoaMenuBarExtraCoordinator<ID, Content>(
+        item: item,
+        action: { [weak self] in
+            self?.togglePopover(sender: nil)
+        }
+    )
+    
+    public var item: MenuBarItem<ID, Content> {
         didSet {
             menuBarExtraCoordinator.item = item
         }
     }
     
-    private lazy var menuBarExtraCoordinator: _CocoaMenuBarExtraCoordinator<ID, Content> = .init(item: item, action: { [weak self] in
-        self?.togglePopover(sender: nil)
-    })
-    
-    var isActive: Binding<Bool>? {
+    var _isActiveBinding: Binding<Bool>? {
         didSet {
-            if let isActive = isActive {
-                if isActive.wrappedValue, !self.isShown {
+            if let _isActiveBinding = _isActiveBinding {
+                if _isActiveBinding.wrappedValue, !self.isShown {
                     present(nil)
                 }
             }
@@ -40,7 +44,7 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
         
         _ = Unmanaged.passUnretained(self).retain() // fixes a crash
         
-        if let isActive = isActive, isActive.wrappedValue, !isShown {
+        if let _isActiveBinding, _isActiveBinding.wrappedValue, !isShown {
             present(nil)
         }
     }
@@ -74,13 +78,13 @@ public class NSHostingStatusBarPopover<ID: Equatable, Content: View>: NSHostingP
         
         animates = true
         
-        isActive?.wrappedValue = true
+        _isActiveBinding?.wrappedValue = true
     }
     
     private func hide(_ sender: AnyObject?) {
         performClose(nil)
         
-        isActive?.wrappedValue = false
+        _isActiveBinding?.wrappedValue = false
     }
 }
 

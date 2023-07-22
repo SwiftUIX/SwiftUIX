@@ -21,6 +21,11 @@ extension Section {
 
 extension Section where Parent == Text, Content: View, Footer == EmptyView {
     @_disfavoredOverload
+    public init(_ header: Text, @ViewBuilder content: () -> Content) {
+        self.init(header: header, content: content)
+    }
+
+    @_disfavoredOverload
     public init<S: StringProtocol>(_ header: S, @ViewBuilder content: () -> Content) {
         self.init(header: Text(header), content: content)
     }

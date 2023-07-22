@@ -56,10 +56,15 @@ extension AppKitOrUIKitViewController {
         _SwiftUIX_nearestFirstResponder as? NSViewController
     }
     
+    @discardableResult
     public func _SwiftUIX_makeFirstResponder(
         _ responder: AppKitOrUIKitResponder?
-    ) {
-        view.window?.makeFirstResponder(responder)
+    ) -> Bool {
+        guard let window = view.window else {
+            return false
+        }
+        
+        return window.makeFirstResponder(responder)
     }
 }
 #endif

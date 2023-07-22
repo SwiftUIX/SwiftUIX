@@ -7,13 +7,12 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-public protocol _opaque_CocoaViewController: AppKitOrUIKitViewController {
+public protocol CocoaViewController: AppKitOrUIKitViewController {
     func _namedViewDescription(for _: AnyHashable) -> _NamedViewDescription?
     func _setNamedViewDescription(_: _NamedViewDescription?, for _: AnyHashable)
-}
-
-public protocol CocoaViewController: _opaque_CocoaViewController {
     func _disableSafeAreaInsetsIfNecessary()
+    
+    func _SwiftUIX_sizeThatFits(in size: CGSize) -> CGSize
 }
 
 #endif

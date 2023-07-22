@@ -21,7 +21,7 @@ extension DynamicAction {
     }
 }
 
-extension PerformActionView {
+extension _ActionPerformingView {
     public func insertAction<A: DynamicAction>(_ action: A) -> _InsertDynamicAction<Self, A> {
         .init(base: self, action: action)
     }
@@ -119,7 +119,7 @@ struct _AddDynamicActionOnTapGesture<Action: DynamicAction>: ViewModifier {
     }
 }
 
-public struct _InsertDynamicAction<Base: PerformActionView, Action: DynamicAction>: View {
+public struct _InsertDynamicAction<Base: _ActionPerformingView, Action: DynamicAction>: View {
     let base: Base
     let action: Action
     
@@ -128,7 +128,7 @@ public struct _InsertDynamicAction<Base: PerformActionView, Action: DynamicActio
     }
 }
 
-public struct _AppendDynamicAction<Base: PerformActionView, Action: DynamicAction>: View {
+public struct _AppendDynamicAction<Base: _ActionPerformingView, Action: DynamicAction>: View {
     let base: Base
     let action: Action
     

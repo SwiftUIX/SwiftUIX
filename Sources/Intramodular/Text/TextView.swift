@@ -382,11 +382,15 @@ extension _TextView: NSViewRepresentable {
         
         nsView.parent = self
         nsView.delegate = context.coordinator
-    
+
+        nsView.focusRingType = .none
+
         return nsView
     }
     
     func updateNSView(_ nsView: NSViewType, context: Context) {
+        nsView.parent = self
+        
         if let text = text {
             if nsView.string != text.wrappedValue {
                 nsView.string = text.wrappedValue
@@ -394,8 +398,7 @@ extension _TextView: NSViewRepresentable {
         } else if let attributedText = attributedText {
             nsView.textStorage?.setAttributedString(attributedText.wrappedValue)
         }
-        
-        nsView.parent = self
+
         nsView._update(configuration: configuration, context: context)
         
         nsView.invalidateIntrinsicContentSize()

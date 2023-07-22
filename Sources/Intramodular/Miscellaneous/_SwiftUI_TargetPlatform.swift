@@ -128,3 +128,15 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 #endif
     }
 }
+
+@available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
+extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.macOS {
+    @ViewBuilder
+    public func onExitCommand(perform action: (() -> Void)?) -> some View {
+#if os(macOS)
+        root.onExitCommand(perform: action)
+#else
+        root
+#endif
+    }
+}

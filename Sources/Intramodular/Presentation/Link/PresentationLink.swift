@@ -428,7 +428,7 @@ extension PresentationLink {
     }
 }
 
-// MARK: - Supplementary API
+// MARK: - Supplementary
 
 extension View {
     /// Adds a destination to present when this view is pressed.

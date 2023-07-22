@@ -145,7 +145,11 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     }
     
     private var isPlaceholderVisible: Bool {
-        placeholder is EmptyView ? false : (metadata ?? fetchedMetadata) == nil
+        if placeholder is EmptyView {
+            return false
+        } else {
+            return (metadata ?? fetchedMetadata) == nil
+        }
     }
     
     @usableFromInline

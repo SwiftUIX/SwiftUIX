@@ -6,13 +6,13 @@ import Swift
 import SwiftUI
 
 /// A view with the primary goal of triggering an action.
-public protocol PerformActionView: View {
+public protocol _ActionPerformingView: View {
     func transformAction(_: (Action) -> Action) -> Self
 }
 
 // MARK: - Extensions
 
-extension PerformActionView {
+extension _ActionPerformingView {
     public func insertAction(_ action: Action) -> Self {
         transformAction({ $0.insert(action) })
     }
@@ -32,7 +32,7 @@ extension PerformActionView {
 
 // MARK: - Auxiliary
 
-extension ModifiedContent: PerformActionView where Content: PerformActionView, Modifier: ViewModifier {
+extension ModifiedContent: _ActionPerformingView where Content: _ActionPerformingView, Modifier: ViewModifier {
     public func transformAction(_ transform: (Action) -> Action) -> Self {
         Self.init(content: content.transformAction(transform), modifier: modifier)
     }

@@ -10,13 +10,14 @@ import Swift
 import SwiftUI
 
 public enum _MenuBarExtraLabelContent: Hashable {
-    case image(name: ImageName, size: CGSize?)
+    case image(_AnyImage, size: CGSize?)
     case text(String)
     
     public func hash(into hasher: inout Hasher) {
         switch self {
-            case .image(let name, let size):
-                name.hash(into: &hasher)
+            case .image(let image, let size):
+                image.hash(into: &hasher)
+                
                 (size?.width)?.hash(into: &hasher)
                 (size?.height)?.hash(into: &hasher)
             case .text(let string):
@@ -48,12 +49,32 @@ public struct MenuBarItem<ID, Content: View> {
     
     public init(
         id: ID,
-        length: CGFloat? = 28.0,
-        image: ImageName,
-        imageSize: CGSize = .init(width: 18.0, height: 18.0),
+        length: CGFloat? = nil,
+        image: _AnyImage,
+        imageSize: CGSize? = nil,
         @ViewBuilder content: () -> Content
     ) {
-        self.init(id: id, length: length, label: .image(name: image, size: imageSize), content: content())
+        self.init(
+            id: id,
+            length: length ?? 28.0,
+            label: .image(image, size: imageSize ?? CGSize(width: 18.0, height: 18.0)),
+            content: content()
+        )
+    }
+    
+    public init(
+        id: ID,
+        length: CGFloat? = nil,
+        image: _AnyImage.Name,
+        imageSize: CGSize? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(
+            id: id,
+            length: length,
+            label: .image(.named(image), size: imageSize),
+            content: content()
+        )
     }
     
     public init(
@@ -78,7 +99,7 @@ extension View {
     /// Adds a menu bar item configured to present a popover when clicked.
     public func menuBarItem<ID: Hashable, Content: View>(
         id: ID,
-        image: ImageName,
+        image: _AnyImage.Name,
         isActive: Binding<Bool>? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
@@ -93,7 +114,7 @@ extension View {
     
     /// Adds a menu bar item configured to present a popover when clicked.
     public func menuBarItem<Content: View>(
-        image: ImageName,
+        image: _AnyImage.Name,
         isActive: Binding<Bool>? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
@@ -173,8 +194,8 @@ extension NSStatusItem {
         
         if let button = button {
             switch item.label {
-                case .image(let imageName, let imageSize):
-                    button.image = AppKitOrUIKitImage(named: imageName)
+                case .image(let image, let imageSize):
+                    button.image = image.appKitOrUIKitImage
                     button.image?.size = imageSize ?? .init(width: 18, height: 18)
                     button.image?.isTemplate = true
                 case .text(let string):
@@ -188,7 +209,7 @@ struct InsertMenuBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier {
     let item: MenuBarItem<ID, PopoverContent>
     let isActive: Binding<Bool>?
     
-    @State private var popover: NSHostingStatusBarPopover<ID, PopoverContent>? = nil
+    @State private var popover: _AppKitMenuBarExtraPopover<ID, PopoverContent>? = nil
     
     @ViewBuilder
     func body(content: Content) -> some View {
@@ -197,10 +218,10 @@ struct InsertMenuBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier {
                 if let popover = self.popover {
                     popover.item = self.item
                 } else {
-                    self.popover = NSHostingStatusBarPopover(item: self.item)
+                    self.popover = _AppKitMenuBarExtraPopover(item: self.item)
                 }
                 
-                popover?.isActive = isActive
+                popover?._isActiveBinding = isActive
             }
         }
     }

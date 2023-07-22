@@ -20,8 +20,10 @@ public class ObservableValue<Value>: ObservableObject {
         
     }
     
-    public subscript<Subject>(dynamicMember keyPath: WritableKeyPath<Value, Subject>) -> ObservableValue<Subject> {
-        ObservableValueMember(root: self, keyPath: keyPath)
+    public subscript<Subject>(
+        dynamicMember keyPath: WritableKeyPath<Value, Subject>
+    ) -> ObservableValue<Subject> {
+        ObservableValues.ValueMember(root: self, keyPath: keyPath)
     }
     
     @_disfavoredOverload
@@ -33,82 +35,87 @@ public class ObservableValue<Value>: ObservableObject {
     }
 }
 
-final class ObservableValueRoot<Root>: ObservableValue<Root> {
-    public var root: Root
-    
-    private let _objectDidChange = PassthroughSubject<Void, Never>()
-    
-    public var objectDidChange: AnyPublisher<Void, Never> {
-        _objectDidChange.eraseToAnyPublisher()
-    }
-    
-    override var wrappedValue: Root {
-        get {
-            root
-        } set {
-            root = newValue
-            
-            _objectDidChange.send()
+enum ObservableValues {
+    final class Root<Root>: ObservableValue<Root> {
+        public var root: Root
+        
+        private let _objectDidChange = PassthroughSubject<Void, Never>()
+        
+        public var objectDidChange: AnyPublisher<Void, Never> {
+            _objectDidChange.eraseToAnyPublisher()
+        }
+        
+        override var wrappedValue: Root {
+            get {
+                root
+            } set {
+                root = newValue
+                
+                _objectDidChange.send()
+            }
+        }
+        
+        public init(root: Root) {
+            self.root = root
         }
     }
     
-    public init(root: Root) {
-        self.root = root
-    }
-}
+    final class ValueMember<Root, Value>: ObservableValue<Value> {
+        unowned let root: ObservableValue<Root>
+        
+        let keyPath: WritableKeyPath<Root, Value>
+        var subscription: AnyCancellable?
+        
+        override var wrappedValue: Value {
+            get {
+                root.wrappedValue[keyPath: keyPath]
+            } set {
+                objectWillChange.send()
 
-final class ObservableValueMember<Root, Value>: ObservableValue<Value> {
-    unowned let root: ObservableValue<Root>
-    let keyPath: WritableKeyPath<Root, Value>
-    var subscription: AnyCancellable?
-    
-    override var wrappedValue: Value {
-        get {
-            root.wrappedValue[keyPath: keyPath]
-        } set {
-            root.wrappedValue[keyPath: keyPath] = newValue
+                root.wrappedValue[keyPath: keyPath] = newValue
+            }
         }
-    }
-    
-    public init(root: ObservableValue<Root>, keyPath: WritableKeyPath<Root, Value>) {
-        self.root = root
-        self.keyPath = keyPath
-        self.subscription = nil
         
-        super.init()
-        
-        subscription = root.objectWillChange.sink(receiveValue: { _ in
-            self.objectWillChange.send()
-        })
-    }
-}
-
-final class ObservableObjectMember<Root: ObservableObject, Value>: ObservableValue<Value> {
-    unowned let root: Root
-    
-    let keyPath: ReferenceWritableKeyPath<Root, Value>
-    
-    var subscription: AnyCancellable?
-    
-    override var wrappedValue: Value {
-        get {
-            root[keyPath: keyPath]
-        } set {
-            objectWillChange.send()
+        public init(root: ObservableValue<Root>, keyPath: WritableKeyPath<Root, Value>) {
+            self.root = root
+            self.keyPath = keyPath
+            self.subscription = nil
             
-            root[keyPath: keyPath] = newValue
+            super.init()
+            
+            subscription = root.objectWillChange.sink(receiveValue: { _ in
+                self.objectWillChange.send()
+            })
         }
     }
     
-    public init(root: Root, keyPath: ReferenceWritableKeyPath<Root, Value>) {
-        self.root = root
-        self.keyPath = keyPath
-        self.subscription = nil
+    final class ObjectMember<Root: ObservableObject, Value>: ObservableValue<Value> {
+        unowned let root: Root
         
-        super.init()
+        let keyPath: ReferenceWritableKeyPath<Root, Value>
         
-        subscription = root.objectWillChange.sink(receiveValue: { _ in
-            self.objectWillChange.send()
-        })
+        var subscription: AnyCancellable?
+        
+        override var wrappedValue: Value {
+            get {
+                root[keyPath: keyPath]
+            } set {
+                objectWillChange.send()
+                
+                root[keyPath: keyPath] = newValue
+            }
+        }
+        
+        public init(root: Root, keyPath: ReferenceWritableKeyPath<Root, Value>) {
+            self.root = root
+            self.keyPath = keyPath
+            self.subscription = nil
+            
+            super.init()
+            
+            subscription = root.objectWillChange.sink(receiveValue: { _ in
+                self.objectWillChange.send()
+            })
+        }
     }
 }

@@ -74,7 +74,7 @@ extension TitlebarItem {
     #if os(macOS) || targetEnvironment(macCatalyst)
     
     func toNSToolbarItem() -> NSToolbarItem {
-        var result = NSToolbarItem(itemIdentifier: .init(rawValue: id))
+        var result = NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier(rawValue: id))
         let target = NSToolbarItem._ActionTarget(action: action)
         
         switch content {
@@ -194,14 +194,14 @@ extension View {
 // MARK: - Auxiliary
 
 public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
-    public typealias Value = [TitlebarItem]
+    public typealias Value = [TitlebarItem]?
     
     public static var defaultValue: Value {
-        []
+        nil
     }
     
     public static func reduce(value: inout Value, nextValue: () -> Value) {
-        
+        value = nextValue()
     }
 }
 

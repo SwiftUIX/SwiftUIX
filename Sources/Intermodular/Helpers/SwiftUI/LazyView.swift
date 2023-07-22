@@ -53,20 +53,8 @@ public struct LazyAppearView<Content: View>: View {
     private let placeholder: Placeholder?
     private let destination: (LazyAppearViewProxy) -> Content?
     private var debounceInterval: DispatchTimeInterval?
-    private var explicitAnimation: Animation? {
-        didSet {
-            if explicitAnimation != nil {
-                disableAnimations = false
-            }
-        }
-    }
-    private var disableAnimations: Bool {
-        didSet {
-            if disableAnimations {
-                explicitAnimation = nil
-            }
-        }
-    }
+    private var explicitAnimation: Animation?
+    private var disableAnimations: Bool
     
     @ViewStorage private var updateAppearanceAction: DispatchWorkItem?
     
@@ -187,12 +175,17 @@ extension LazyAppearView {
     public func animation(_ animation: Animation?) -> Self {
         then {
             $0.explicitAnimation = animation
+            $0.disableAnimations = animation == nil
         }
     }
     
     public func animationDisabled(_ disabled: Bool) -> Self {
         then {
             $0.disableAnimations = disabled
+            
+            if disabled {
+                $0.explicitAnimation = nil
+            }
         }
     }
 }

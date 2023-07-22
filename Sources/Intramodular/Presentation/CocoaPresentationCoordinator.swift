@@ -344,7 +344,7 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
             .environment(\.presenter, coordinator?.presentingCoordinator)
             .environment(\.presentationManager, CocoaPresentationMode(coordinator: presentationCoordinatorBox))
             .onPreferenceChange(_NamedViewDescription.PreferenceKey.self) { [weak coordinator] in
-                if let parent = coordinator?.viewController as? _opaque_CocoaViewController {
+                if let parent = coordinator?.viewController as? (any CocoaViewController) {
                     for description in $0 {
                         parent._setNamedViewDescription(description, for: description.name)
                     }

@@ -18,15 +18,16 @@ public enum _WindowToolbarStyle {
 public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitView
     
+    @State var identifier: String
+    
     private let content: Content
-    private let toolbar: NSToolbar
     
     public init(
         identifier: String = UUID().uuidString,
         content: () -> Content
     ) {
+        self._identifier = .init(initialValue: identifier)
         self.content = content()
-        self.toolbar = NSToolbar(identifier: identifier)
     }
     
     private class HostingView<T: View>: AppKitOrUIKitHostingView<T> {
@@ -68,52 +69,63 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
     }
     
     public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
-        context.coordinator.toolbar = toolbar
-        
         let rootView = content.onPreferenceChange(TitlebarConfigurationViewItemsPreferenceKey.self) { items in
-            context.coordinator.items = items.map({ $0.toNSToolbarItem() })
+            context.coordinator.items = items?.map({ $0.toNSToolbarItem() })
         }
         
         return HostingView(rootView: rootView).then {
-            $0.toolbar = self.toolbar
+            $0.toolbar = context.coordinator.toolbar
         }
     }
     
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-        toolbar.allowsUserCustomization = true
-        toolbar.delegate = context.coordinator
+        _assignIfNotEqual(false, to: &context.coordinator.toolbar.allowsUserCustomization)
     }
     
     public class Coordinator: NSObject, NSToolbarDelegate {
-        public var toolbar: NSToolbar!
+        public var toolbar: NSToolbar
         
-        public var items: [NSToolbarItem] = [] {
+        public init(identifier: String) {
+            self.toolbar = NSToolbar(identifier: identifier)
+            
+            super.init()
+        }
+
+        public var items: [NSToolbarItem]? = [] {
             didSet {
-                toolbar.delegate = nil
-                toolbar.delegate = self
-                toolbar.setItems(items)
+                if let items {
+                    toolbar.delegate = self
+                    
+                    toolbar.setItems(items)
+                } else {
+                    toolbar.delegate = nil
+                }
             }
         }
-        
-        public override init() {
-            
-        }
-        
+                
         public func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+            let items = self.items ?? []
+            
             return items
                 .firstIndex(where: { $0.itemIdentifier == itemIdentifier })
                 .map({ items[$0] })
         }
         
         public func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+            let items = self.items ?? []
+
             return items.map({ $0.itemIdentifier })
         }
         
         public func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+            let items = self.items ?? []
+
             return items.map({ $0.itemIdentifier })
         }
         
         public func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+            let items = self.items ?? []
+
             return items.map({ $0.itemIdentifier })
         }
         
@@ -127,7 +139,7 @@ public struct TitlebarConfigurationView<Content: View>: AppKitOrUIKitViewReprese
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(identifier: identifier)
     }
 }
 

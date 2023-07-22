@@ -19,10 +19,10 @@ public struct _TryCatchView<Content: View, RecoveryContent: View>: View {
     
     public var body: some View {
         ResultView(
-            successView: {
+            success: {
                 try content()
             },
-            failureView: {
+            failure: {
                 recovery($0)
             }
         )

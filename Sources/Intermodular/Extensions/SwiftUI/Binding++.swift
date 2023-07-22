@@ -183,6 +183,19 @@ extension Binding {
             }
         )
     }
+    
+    public static func unwrapping(
+        _ other: Binding<Value?>
+    ) -> Self? {
+        guard let wrappedValue = other.wrappedValue else {
+            return nil
+        }
+        
+        return Binding(
+            get: { other.wrappedValue ?? wrappedValue },
+            set: { other.wrappedValue = $0 }
+        )
+    }
 }
 
 extension Binding {

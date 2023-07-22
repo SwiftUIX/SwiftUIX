@@ -365,7 +365,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         _NSWindow_didWindowJustClose = true
         
         tearDownWindow()
-        
+
         DispatchQueue.main.async {
             self.isVisibleBinding.wrappedValue = false
         }
@@ -476,10 +476,8 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             if windowBox.wrappedValue != nil {
                 LazyAppearView {
                     content
-                        /*.modify(if: windowBox.wrappedValue?.configuration.style == .hiddenTitleBar) {
-                            $0.titleBarHidden(true) // setting this lazily fixes actually hiding the title bar
-                        }*/
                 }
+                .animation(.none)
             }
         }
         .environment(\._windowProxy, WindowProxy(window: windowBox.wrappedValue))

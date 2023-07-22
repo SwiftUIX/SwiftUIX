@@ -104,6 +104,19 @@ extension View {
     }
 }
 
+// MARK: View.id
+
+extension View {
+    @_spi(Internal)
+    public func _opaque_id(_ hashable: AnyHashable) -> some View {
+        func _makeView<ID: Hashable>(_ id: ID) -> AnyView {
+            self.id(id).eraseToAnyView()
+        }
+        
+        return _openExistential(hashable.base as! (any Hashable), do: _makeView)
+    }
+}
+
 // MARK: View.offset
 
 extension View {

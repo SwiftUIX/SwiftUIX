@@ -67,6 +67,23 @@ extension AppKitOrUIKitResponder {
     public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
         _SwiftUIX_nearestResponder(where: { _SwiftUIX_nearestWindow?.firstResponder == $0  })
     }
+    
+    @discardableResult
+    public func _SwiftUIX_becomeFirstResponder() -> Bool {
+        if let _self = self as? NSView {
+            if let window = _self.window {
+               return window.makeFirstResponder(self)
+            } else {
+                return false
+            }
+        } else if let _self = self as? NSViewController {
+            return _self._SwiftUIX_makeFirstResponder(_self)
+        } else {
+            assertionFailure()
+            
+            return false
+        }
+    }
 }
 
 extension AppKitOrUIKitResponder {

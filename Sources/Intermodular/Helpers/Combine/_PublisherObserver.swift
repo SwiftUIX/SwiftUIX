@@ -6,10 +6,15 @@ import Combine
 import Swift
 import SwiftUI
 
-public final class PublisherObserver<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
+public final class _PublisherObserver<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
     public enum SubscriptionPolicy {
         case immediate
-        case delayed
+        case deferred
+        
+        @available(*, deprecated, renamed: "deferred")
+        public static var delayed: Self {
+            .deferred
+        }
     }
     
     public typealias Input = P.Output

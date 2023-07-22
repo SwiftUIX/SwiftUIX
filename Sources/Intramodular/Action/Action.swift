@@ -75,7 +75,7 @@ extension Action {
     }
 }
 
-public struct PerformAction: ActionInitiable, PerformActionView {
+public struct PerformAction: _ActionInitiableView, _ActionPerformingView {
     private let action: Action
     
     public init(action: Action) {
@@ -104,11 +104,11 @@ public struct PerformAction: ActionInitiable, PerformActionView {
 
 // MARK: - Auxiliary Implementaton -
 
-public protocol ActionInitiable {
+public protocol _ActionInitiableView {
     init(action: Action)
 }
 
-extension ActionInitiable {
+extension _ActionInitiableView {
     public init(action: @escaping () -> Void) {
         self.init(action: .init(action))
     }

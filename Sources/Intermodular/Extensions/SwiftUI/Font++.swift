@@ -250,7 +250,7 @@ private func inspect(_ object: Any, with action: (Mirror.Child) -> Void) {
 }
 
 extension Mirror {
-    public subscript(_keyPath path: String) -> Any? {
+    fileprivate subscript(_keyPath path: String) -> Any? {
         guard !path.isEmpty else {
             assertionFailure()
             

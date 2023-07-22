@@ -5,14 +5,52 @@
 import Swift
 import SwiftUI
 
-public enum ImageName: Hashable {
-    case bundleResource(String, in: Bundle? = .main)
-    case system(String)
+@available(*, deprecated, renamed: "_AnyImage.Name")
+public typealias ImageName = _AnyImage.Name
+
+/// A portable representation of an image.
+public enum _AnyImage: Hashable {
+    public enum Name: Hashable, @unchecked Sendable {
+        case bundleResource(String, in: Bundle? = .main)
+        case system(String)
+        
+        public static func system(_ symbol: SFSymbolName) -> Self {
+            .system(symbol.rawValue)
+        }
+    }
+
+    case appKitOrUIKitImage(AppKitOrUIKitImage)
+    case named(Name)
+    
+    public init(systemName: String) {
+        self = .named(.system(systemName))
+    }
+    
+    public init(systemName: SFSymbolName) {
+        self.init(systemName: systemName.rawValue)
+    }
+    
+    public var appKitOrUIKitImage: AppKitOrUIKitImage? {
+        switch self {
+            case .appKitOrUIKitImage(let image):
+                return image
+            case .named(let name):
+                return .init(named: name)
+        }
+    }
+    
+    public init?(_ image: AppKitOrUIKitImage?) {
+        guard let image else {
+            return nil
+        }
+        
+        self = .appKitOrUIKitImage(image)
+    }
 }
 
 // MARK: - Conformances
 
-extension ImageName: Codable {
+extension _AnyImage.Name: Codable {
     struct _CodableRepresentation: Codable {
         enum ImageNameType: String, Codable {
             case bundleResource
@@ -62,17 +100,11 @@ extension ImageName: Codable {
     }
 }
 
-extension ImageName {
-    public static func system(_ symbol: SFSymbolName) -> Self {
-        .system(symbol.rawValue)
-    }
-}
-
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(watchOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitImage {
-    public convenience init?(named name: ImageName) {
+    public convenience init?(named name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
                 self.init(named: name, in: bundle, with: nil)
@@ -83,7 +115,7 @@ extension AppKitOrUIKitImage {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitImage {
-    public convenience init?(named name: ImageName) {
+    public convenience init?(named name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
                 if let bundle {
@@ -113,7 +145,7 @@ extension AppKitOrUIKitImage {
 // MARK: - Helpers
 
 extension Image {
-    public init(_ name: ImageName) {
+    public init(_ name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
                 self.init(name, bundle: bundle)

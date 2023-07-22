@@ -15,38 +15,59 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     public var content: Content {
         didSet {
             if contentWindow == nil {
-                _update()
+                _setNeedsUpdate()
             }
         }
     }
     
     public let windowStyle: _WindowStyle
     
+    private var _updateWorkItem: DispatchWorkItem?
+    
+    public func _setNeedsUpdate() {
+        _updateWorkItem?.cancel()
+        _updateWorkItem = nil
+        
+        let item = DispatchWorkItem {
+            self._update()
+        }
+        
+        DispatchQueue.main.async(execute: item)
+        
+        _updateWorkItem = item
+    }
+    
     @Published public var canBecomeKey: Bool {
         didSet {
             if contentWindow == nil || canBecomeKey != oldValue {
-                _update()
+                _setNeedsUpdate()
             }
         }
     }
     
     @Published public var isVisible: Bool {
         didSet {
-            if contentWindow == nil || isVisible != oldValue {
-                _update()
+            if contentWindow == nil || isVisible != oldValue {                
+                _setNeedsUpdate()
             }
         }
     }
+    
+    var _externalIsVisibleBinding: Binding<Bool>?
     
     @Published public var preferredColorScheme: ColorScheme? {
         didSet {
             if contentWindow == nil || preferredColorScheme != oldValue {
-                _update()
+                _setNeedsUpdate()
             }
         }
     }
     
-    private var contentWindow: AppKitOrUIKitHostingWindow<Content>?
+    private var contentWindow: AppKitOrUIKitHostingWindow<Content>? {
+        didSet {
+            _bindVisibilityToContentWindow()
+        }
+    }
     
     init(
         content: Content,
@@ -84,6 +105,10 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     }
     
     func _update() {
+        defer {
+            _updateWorkItem = nil
+        }
+        
         if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
             return
         }
@@ -111,15 +136,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             
             contentWindow.rootView = content
             contentWindow.configuration.canBecomeKey = canBecomeKey
-            contentWindow.isVisibleBinding = Binding(
-                get: { [weak self] in
-                    self?.isVisible ?? false
-                },
-                set: { [weak self] in
-                    self?.isVisible = $0
-                }
-            )
-            
+                        
             #if os(iOS)
             let userInterfaceStyle: UIUserInterfaceStyle = preferredColorScheme == .light ? .light : .dark
             
@@ -142,6 +159,18 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             contentWindow = nil
         }
     }
+    
+    private func _bindVisibilityToContentWindow() {
+        contentWindow?.isVisibleBinding = Binding(
+            get: { [weak self] in
+                self?.isVisible ?? false
+            },
+            set: { [weak self] in
+                self?.isVisible = $0
+                self?._externalIsVisibleBinding?.wrappedValue = $0
+            }
+        )
+    }
 }
 
 #if os(macOS)
@@ -156,6 +185,23 @@ extension _WindowPresentationController {
     ) {
         self.init(
             content: content,
+            windowStyle: .init(from: windowStyle),
+            canBecomeKey: true,
+            isVisible: false
+        )
+    }
+    
+    @available(macOS 11.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @_disfavoredOverload
+    public convenience init<_Content: View, Style: WindowStyle>(
+        content: _Content,
+        windowStyle: Style
+    ) where Content == AnyView {
+        self.init(
+            content: content.eraseToAnyView(),
             windowStyle: .init(from: windowStyle),
             canBecomeKey: true,
             isVisible: false
