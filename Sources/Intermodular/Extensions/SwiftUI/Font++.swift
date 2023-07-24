@@ -32,8 +32,14 @@ extension Font {
         }
     }
     
+    private static var _appKitOrUIKitConversionCache: [Font: AppKitOrUIKitFont] = [:]
+    
     @available(macOS 11.0, *)
     public func toAppKitOrUIKitFont() throws -> AppKitOrUIKitFont {
+        if let result = Self._appKitOrUIKitConversionCache[self] {
+            return result
+        }
+        
         var font: AppKitOrUIKitFont?
         
         inspect(self) { label, value in
@@ -57,6 +63,8 @@ extension Font {
         font = font ?? getTextStyle()
             .flatMap({ $0.toAppKitOrUIKitFontTextStyle() })
             .map(AppKitOrUIKitFont.preferredFont(forTextStyle:))
+        
+        Self._appKitOrUIKitConversionCache[self] = font
         
         return try font.unwrap()
     }

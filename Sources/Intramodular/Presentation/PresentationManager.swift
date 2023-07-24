@@ -14,6 +14,22 @@ public protocol PresentationManager {
 
 // MARK: - API
 
+public struct _PresentationReader<Content: View>: View {
+    @Environment(\.presentationManager) private var presentationManager
+    
+    public typealias Proxy = any PresentationManager
+    
+    private let content: (Proxy) -> Content
+    
+    public init(@ViewBuilder content: @escaping (Proxy) -> Content) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(presentationManager)
+    }
+}
+
 extension PresentationMode {
     /// A dynamic action that dismisses an active presentation.
     public struct DismissPresentationAction: DynamicAction {

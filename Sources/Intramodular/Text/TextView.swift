@@ -475,37 +475,40 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         
         let size = manager.usedRect(for: textContainer!).size
         
-        return .init(width: size.width, height: size.height)
+        return NSSize(width: size.width, height: size.height)
     }
         
     func _update(
         configuration: _TextView<Label>.Configuration,
         context: _TextView<Label>.Context
     ) {
-        backgroundColor = .clear
-        drawsBackground = false
-        isEditable = true
-        textContainerInset = .zero
-        usesAdaptiveColorMappingForDarkAppearance = true
-        
+        _assignIfNotEqual(.clear, to: &backgroundColor)
+        _assignIfNotEqual(false, to: &drawsBackground)
+        _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: &isEditable)
+        _assignIfNotEqual(.zero, to: &textContainerInset)
+        _assignIfNotEqual(true, to: &usesAdaptiveColorMappingForDarkAppearance)
+
         if let preferredFont = try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont() {
-            font = preferredFont
-            textStorage?.font = preferredFont
+            _assignIfNotEqual(preferredFont, to: &self.font)
+            
+            if let textStorage {
+                _assignIfNotEqual(preferredFont, to: &textStorage.font)
+            }
         }
 
-        textColor = configuration.textColor
+        _assignIfNotEqual(configuration.textColor, to: &textColor)
                 
         if let textContainer {
             _assignIfNotEqual(.zero, to: &textContainer.lineFragmentPadding)
             _assignIfNotEqual((context.environment.lineLimit ?? 0), to: &textContainer.maximumNumberOfLines)
         }
 
-        isHorizontallyResizable = false
-        isVerticallyResizable = true
-        autoresizingMask = [.width]
+        _assignIfNotEqual(false, to: &isHorizontallyResizable)
+        _assignIfNotEqual(true, to: &isVerticallyResizable)
+        _assignIfNotEqual([.width], to: &autoresizingMask)
 
         if let tintColor = configuration.tintColor {
-            insertionPointColor = tintColor
+            _assignIfNotEqual(tintColor, to: &insertionPointColor)
         }
     }
     
@@ -575,6 +578,18 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.attributedText = .constant(text)
+        self.configuration = .init(
+            isConstant: true,
+            onEditingChanged: { _ in },
+            onCommit: { }
+        )
+    }
+    
+    public init(
+        _ text: String
+    ) {
+        self.label = EmptyView()
+        self.text = .constant(text)
         self.configuration = .init(
             isConstant: true,
             onEditingChanged: { _ in },
