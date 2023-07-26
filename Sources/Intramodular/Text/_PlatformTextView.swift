@@ -165,7 +165,7 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
             )
         }
         #else
-        
+        assertionFailure()
         #endif
         
         return self._cachedIntrinsicContentSize

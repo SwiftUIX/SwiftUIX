@@ -455,6 +455,19 @@ extension _TextView: NSViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
     }
+
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    public func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        nsView: NSViewType,
+        context: Context
+    ) -> CGSize? {
+        if let width = proposal.width {
+            return nsView._sizeThatFits(width: width)
+        } else {
+            return nil
+        }
+    }
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
@@ -478,6 +491,34 @@ fileprivate class _NSTextView<Label: View>: NSTextView {
         return NSSize(width: size.width, height: size.height)
     }
         
+    fileprivate func _sizeThatFits(width: CGFloat) -> NSSize? {
+        guard width != .zero else {
+            return nil
+        }
+        
+        guard let textContainer = self.textContainer, let layoutManager = self.layoutManager else {
+            return .zero
+        }
+        
+        textContainer.containerSize = NSMakeSize(width, .greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: textContainer)
+        
+        let rect = layoutManager.boundingRect(
+            forGlyphRange: layoutManager.glyphRange(for: textContainer),
+            in: textContainer
+        )
+        
+        var additionalHeight: CGFloat?
+         
+        if let font = self.font {
+            if rect.height == 0 || string.hasSuffix("\n") {
+                additionalHeight = font.ascender + font.descender + font.leading
+            }
+        }
+        
+        return CGSize(width: max(width, rect.width), height: rect.height + (additionalHeight ?? 0))
+    }
+
     func _update(
         configuration: _TextView<Label>.Configuration,
         context: _TextView<Label>.Context
