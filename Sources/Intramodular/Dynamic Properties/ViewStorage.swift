@@ -67,7 +67,7 @@ extension ViewStorage {
 extension ViewStorage {
     @ViewBuilder
     public func withObservedValue<Content: View>(
-        _ value: (Value) -> Content
+        _ value: @escaping (Value) -> Content
     ) -> some View {
         withInlineObservedObject(_valueBox) {
             value($0.value)

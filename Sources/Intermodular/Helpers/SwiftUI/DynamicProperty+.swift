@@ -13,11 +13,19 @@ public func withInlineState<Value, Content: View>(
     WithInlineState(initialValue: initialValue, content: content)
 }
 
+@_disfavoredOverload
 public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     _ object: Object,
-    @ViewBuilder content: (Object) -> Content
+    @ViewBuilder content: @escaping (Object) -> Content
 ) -> some View {
-    WithInlineObservedObject(object: object, content: content(object))
+    WithInlineObservedObject(object, content: { content($0.wrappedValue) })
+}
+
+public func withInlineObservedObject<Object: ObservableObject, Content: View>(
+    _ object: Object,
+    @ViewBuilder content: @escaping (ObservedObject<Object>.Wrapper) -> Content
+) -> some View {
+    WithInlineObservedObject(object, content: { content($0.projectedValue) })
 }
 
 public func withInlineObservedObject<Object: ObservableObject, Content: View>(
@@ -28,6 +36,7 @@ public func withInlineObservedObject<Object: ObservableObject, Content: View>(
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
+@_disfavoredOverload
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object,
     @ViewBuilder content: @escaping (Object) -> Content
@@ -64,10 +73,18 @@ private struct WithInlineState<Value, Content: View>: View {
 private struct WithInlineObservedObject<Object: ObservableObject, Content: View>: View {
     @ObservedObject var object: Object
     
-    let content: Content
+    let content: (ObservedObject<Object>) -> Content
+    
+    init(
+        _ object: Object,
+        @ViewBuilder content: @escaping (ObservedObject<Object>) -> Content
+    ) {
+        self.object = object
+        self.content = content
+    }
     
     var body: some View {
-        content
+        content(_object)
     }
 }
 

@@ -12,6 +12,7 @@ public struct PersistentObject<Value>: DynamicProperty {
     private let thunk: () -> Value
     
     @State private var objectContainer: _ObservableObjectBox<Value>
+    
     @ObservedObject private var observedObjectContainer: _ObservableObjectBox<Value>
     
     public var wrappedValue: Value {

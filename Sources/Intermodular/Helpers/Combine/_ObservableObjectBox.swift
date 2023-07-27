@@ -5,7 +5,8 @@
 import Combine
 import Swift
 
-final class _ObservableObjectBox<Value>: ObservableObject {
+@_spi(Private)
+public final class _ObservableObjectBox<Value>: ObservableObject {
     private var baseSubscription: AnyCancellable?
     
     private var _isNotNil: (Value) -> Bool
@@ -14,7 +15,8 @@ final class _ObservableObjectBox<Value>: ObservableObject {
 
     private var onObjectWillChange: () -> Void = { }
     
-    var base: Value? {
+    @_spi(Private)
+    public var base: Value? {
         didSet {
             if _equate(oldValue, base), baseSubscription != nil {
                 return
@@ -24,7 +26,8 @@ final class _ObservableObjectBox<Value>: ObservableObject {
         }
     }
     
-    init<T: ObservableObject>(base: T? = nil) where Value == Optional<T> {
+    @_spi(Private)
+    public init<T: ObservableObject>(base: T? = nil) where Value == Optional<T> {
         _isNotNil = { $0 != nil }
         _equate = { lhs, rhs in
             if let lhs, let rhs {
@@ -40,7 +43,8 @@ final class _ObservableObjectBox<Value>: ObservableObject {
         subscribe()
     }
     
-    init(base: Value? = nil) where Value: ObservableObject {
+    @_spi(Private)
+    public init(base: Value? = nil) where Value: ObservableObject {
         _isNotNil = { _ in true }
         _equate = { $0 === $1 }
         _getObjectWillChange = { $0.objectWillChange.map({ _ in () }).eraseToAnyPublisher() }
