@@ -24,7 +24,7 @@ extension PartRoundedRectangle: Shape {
                 byRoundingCorners: corners,
                 cornerRadii: cornerRadii
             )
-            .cgPath
+            ._cgPath
         )
     }
 }

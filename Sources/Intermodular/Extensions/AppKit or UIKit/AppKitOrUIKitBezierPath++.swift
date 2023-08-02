@@ -2,10 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitBezierPath {
     public convenience init(
         roundedRect rect: CGRect,
@@ -23,7 +22,7 @@ extension AppKitOrUIKitBezierPath {
         
         let cornerRadius: CGFloat = min(cornerRadii, min(rect.midY, rect.midX))
         let (maxX, minX, maxY, minY, midX, midY) = (rect.size.width, CGFloat(0), rect.size.height, CGFloat(0), rect.midX, rect.midY)
-
+        
         let topCenter = CGPoint(x: midX, y: minY)
         let topTrailing = CGPoint(x: maxX, y: minY)
         let trailingCenter = CGPoint(x: maxX, y: midY)
@@ -38,7 +37,7 @@ extension AppKitOrUIKitBezierPath {
             line(to: topTrailing)
             line(to: trailingCenter)
         }
-
+        
         let bottomTrailing = CGPoint(x: maxX, y: maxY)
         let bottomCenter = CGPoint(x: midX, y: maxY)
         if corners.contains(.bottomTrailing) {
@@ -51,7 +50,7 @@ extension AppKitOrUIKitBezierPath {
             line(to: bottomTrailing)
             line(to: bottomCenter)
         }
-
+        
         let bottomLeading = CGPoint(x: minX, y: maxY)
         let leadingCenter = CGPoint(x: minX, y: midY)
         if corners.contains(.bottomLeading) {
@@ -64,7 +63,7 @@ extension AppKitOrUIKitBezierPath {
             line(to: bottomLeading)
             line(to: leadingCenter)
         }
-
+        
         let topLeading = CGPoint(x: minX, y: minY)
         if corners.contains(.topLeading) {
             let x = min(minX + cornerRadius, midX)
@@ -81,5 +80,39 @@ extension AppKitOrUIKitBezierPath {
         #endif
     }
 }
+#endif
 
+#if os(iOS) || os(tvOS)
+extension AppKitOrUIKitBezierPath {
+    var _cgPath: CGPath {
+        cgPath
+    }
+}
+#elseif os(macOS)
+extension AppKitOrUIKitBezierPath {
+    var _cgPath: CGPath {
+        let path = CGMutablePath()
+        var points = [CGPoint](repeating: .zero, count: 3)
+        
+        for i in 0..<elementCount {
+            let type = element(at: i, associatedPoints: &points)
+            
+            switch type {
+                case .moveTo:
+                    path.move(to: points[0])
+                case .lineTo:
+                    path.addLine(to: points[0])
+                case .curveTo:
+                    path.addCurve(to: points[2], control1: points[0], control2: points[1])
+                case .closePath:
+                    path.closeSubpath()
+                default:
+                    assertionFailure()
+                    break
+            }
+        }
+        
+        return path
+    }
+}
 #endif
