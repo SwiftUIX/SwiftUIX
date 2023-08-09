@@ -10,7 +10,7 @@ public enum UserInterfaceIdiom: Hashable {
     case mac
     case phone
     case pad
-    case reality
+    case vision
     case tv
     case watch
     
@@ -28,8 +28,8 @@ public enum UserInterfaceIdiom: Hashable {
             case .pad:
                 return .pad
             #if swift(>=5.9)
-            case .reality:
-                return .reality
+            case .vision:
+                return .vision
             #endif
             case .tv:
                 return .tv
