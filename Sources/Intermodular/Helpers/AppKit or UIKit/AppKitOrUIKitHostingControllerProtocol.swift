@@ -214,12 +214,12 @@ public struct AppKitOrUIKitLayoutSizeProposal {
     
     public init<T: _CustomOptionalDimensionsConvertible>(
         _ size: T,
-        fixedSize: (horizontal: Bool, vertical: Bool)
+        fixedSize: (horizontal: Bool, vertical: Bool)?
     ) {
         self.init(
             targetSize: size,
-            horizontalFittingPriority: fixedSize.horizontal ? .required : .defaultLow,
-            verticalFittingPriority: fixedSize.vertical ? .required : .defaultLow
+            horizontalFittingPriority: fixedSize.map({ $0.horizontal ? .required : .defaultLow }),
+            verticalFittingPriority: fixedSize.map({ $0.vertical ? .required : .defaultLow })
         )
     }
 

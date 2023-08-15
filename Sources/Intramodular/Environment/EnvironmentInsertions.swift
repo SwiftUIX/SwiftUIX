@@ -27,7 +27,10 @@ extension EnvironmentInsertions {
 }
 
 extension EnvironmentInsertions {
-    public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void, withKey key: AnyHashable) {
+    public mutating func transformEnvironment(
+        _ transform: @escaping (inout EnvironmentValues) -> Void,
+        withKey key: AnyHashable
+    ) {
         guard environmentValuesTransforms.index(forKey: key) == nil else {
             return
         }
@@ -35,7 +38,10 @@ extension EnvironmentInsertions {
         environmentValuesTransforms[key] = transform
     }
     
-    public mutating func transformEnvironment<Key: Hashable>(_ transform: @escaping (inout EnvironmentValues) -> Void, withKey key: Key) {
+    public mutating func transformEnvironment<Key: Hashable>(
+        _ transform: @escaping (inout EnvironmentValues) -> Void,
+        withKey key: Key
+    ) {
         transformEnvironment(transform, withKey: .init(key))
     }
     
@@ -45,7 +51,10 @@ extension EnvironmentInsertions {
 }
 
 extension EnvironmentInsertions {
-    private mutating func insert<B: ObservableObject>(_ bindable: B, withKey key: AnyHashable) {
+    private mutating func insert<B: ObservableObject>(
+        _ bindable: B,
+        withKey key: AnyHashable
+    ) {
         guard environmentObjectTransforms.index(forKey: key) == nil else {
             return
         }

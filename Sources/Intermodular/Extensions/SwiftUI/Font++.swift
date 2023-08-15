@@ -42,12 +42,12 @@ extension Font {
         
         var font: AppKitOrUIKitFont?
         
-        inspect(self) { label, value in
+        Mirror.inspect(self) { label, value in
             guard label == "provider" else {
                 return
             }
             
-            inspect(value) { label, value in
+            Mirror.inspect(value) { label, value in
                 guard label == "base" else {
                     return
                 }
@@ -158,7 +158,7 @@ private enum _SwiftUIFontProvider {
                     design: Font.Design?
                 ) = (nil, nil, nil)
                 
-                inspect(subject) { label, value in
+                Mirror.inspect(subject) { label, value in
                     switch label {
                         case "size":
                             props.size = value as? CGFloat
@@ -188,7 +188,7 @@ private enum _SwiftUIFontProvider {
                     design: Font.Design?
                 ) = (nil, nil, nil)
                 
-                inspect(subject) { label, value in
+                Mirror.inspect(subject) { label, value in
                     switch label {
                         case "style":
                             props.style = value as? Font.TextStyle
@@ -214,7 +214,7 @@ private enum _SwiftUIFontProvider {
             case "PlatformFontProvider":
                 var font: CTFont?
                 
-                inspect(subject) { label, value in
+                Mirror.inspect(subject) { label, value in
                     guard label == "font" else {
                         return
                     }
@@ -237,7 +237,7 @@ extension SwiftUI.Font.Weight {
     fileprivate func toAppKitOrUIKitFontWeight() -> AppKitOrUIKitFont.Weight? {
         var rawValue: CGFloat? = nil
         
-        inspect(self) { label, value in
+        Mirror.inspect(self) { label, value in
             guard label == "value" else {
                 return
             }
@@ -250,32 +250,5 @@ extension SwiftUI.Font.Weight {
         }
         
         return .init(rawValue)
-    }
-}
-
-private func inspect(_ object: Any, with action: (Mirror.Child) -> Void) {
-    Mirror(reflecting: object).children.forEach(action)
-}
-
-extension Mirror {
-    fileprivate subscript(_keyPath path: String) -> Any? {
-        guard !path.isEmpty else {
-            assertionFailure()
-            
-            return nil
-        }
-        
-        var components = path.components(separatedBy: ".")
-        let first = components.removeFirst()
-        
-        guard let value = children.first(where: { $0.label == first })?.value else {
-            return nil
-        }
-        
-        if components.isEmpty {
-            return value
-        } else {
-            return Mirror(reflecting: value)[_keyPath: components.joined(separator: ".")]
-        }
     }
 }

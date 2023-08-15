@@ -11,6 +11,8 @@ import SwiftUI
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 public struct TextView<Label: View>: View {
     struct _Configuration {
+        var _fixedSize: (Bool, Bool)? = nil
+        
         var isConstant: Bool
         var onEditingChanged: (Bool) -> Void
         var onCommit: () -> Void
@@ -83,7 +85,7 @@ public struct TextView<Label: View>: View {
 // MARK: - Implementation
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-fileprivate struct _TextView<Label: View> {
+struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
     
     let text: Binding<String>?
@@ -462,128 +464,33 @@ extension _TextView: NSViewRepresentable {
         nsView: NSViewType,
         context: Context
     ) -> CGSize? {
-        if let width = proposal.width {
-            return nsView._sizeThatFits(width: width)
-        } else {
-            return nil
-        }
-    }
-}
-
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-@available(watchOS, unavailable)
-fileprivate class _NSTextView<Label: View>: NSTextView {
-    var parent: _TextView<Label>!
-
-    var configuration: _TextView<Label>.Configuration {
-        parent.configuration
-    }
-    
-    override var intrinsicContentSize: NSSize {
-        guard let manager = textContainer?.layoutManager else {
-            return .zero
-        }
-        
-        manager.ensureLayout(for: textContainer!)
-        
-        let size = manager.usedRect(for: textContainer!).size
-        
-        return NSSize(width: size.width, height: size.height)
-    }
-        
-    fileprivate func _sizeThatFits(width: CGFloat) -> NSSize? {
-        guard width != .zero else {
-            return nil
-        }
-        
-        guard let textContainer = self.textContainer, let layoutManager = self.layoutManager else {
-            return .zero
-        }
-        
-        textContainer.containerSize = NSMakeSize(width, .greatestFiniteMagnitude)
-        layoutManager.ensureLayout(for: textContainer)
-        
-        let rect = layoutManager.boundingRect(
-            forGlyphRange: layoutManager.glyphRange(for: textContainer),
-            in: textContainer
-        )
-        
-        var additionalHeight: CGFloat?
-         
-        if let font = self.font {
-            if rect.height == 0 || string.hasSuffix("\n") {
-                additionalHeight = font.ascender + font.descender + font.leading
-            }
-        }
-        
-        return CGSize(width: max(width, rect.width), height: rect.height + (additionalHeight ?? 0))
-    }
-
-    func _update(
-        configuration: _TextView<Label>.Configuration,
-        context: _TextView<Label>.Context
-    ) {
-        _assignIfNotEqual(.clear, to: &backgroundColor)
-        _assignIfNotEqual(false, to: &drawsBackground)
-        _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: &isEditable)
-        _assignIfNotEqual(.zero, to: &textContainerInset)
-        _assignIfNotEqual(true, to: &usesAdaptiveColorMappingForDarkAppearance)
-
-        if let preferredFont = try? configuration.font ?? context.environment.font?.toAppKitOrUIKitFont() {
-            _assignIfNotEqual(preferredFont, to: &self.font)
-            
-            if let textStorage {
-                _assignIfNotEqual(preferredFont, to: &textStorage.font)
-            }
-        }
-
-        _assignIfNotEqual(configuration.textColor, to: &textColor)
-                
-        if let textContainer {
-            _assignIfNotEqual(.zero, to: &textContainer.lineFragmentPadding)
-            _assignIfNotEqual((context.environment.lineLimit ?? 0), to: &textContainer.maximumNumberOfLines)
-        }
-
-        _assignIfNotEqual(false, to: &isHorizontallyResizable)
-        _assignIfNotEqual(true, to: &isVerticallyResizable)
-        _assignIfNotEqual([.width], to: &autoresizingMask)
-
-        if let tintColor = configuration.tintColor {
-            _assignIfNotEqual(tintColor, to: &insertionPointColor)
-        }
-    }
-    
-    override func preferredPasteboardType(
-        from availableTypes: [NSPasteboard.PasteboardType],
-        restrictedToTypesFrom allowedTypes: [NSPasteboard.PasteboardType]?
-    ) -> NSPasteboard.PasteboardType? {
-        if availableTypes.contains(.string) {
-            return .string
-        } else {
-            return super.preferredPasteboardType(
-                from: availableTypes,
-                restrictedToTypesFrom: allowedTypes
-            )
-        }
-    }
-            
-    override func keyDown(with event: NSEvent) {
-        if let shortcut = KeyboardShortcut(from: event) {
-            switch shortcut {
-                case KeyboardShortcut(.return, modifiers: []):
-                    parent.configuration.onCommit()
+        if let _fixedSize = configuration._fixedSize {
+            switch _fixedSize {
+                case (false, false):
+                    return nil
                 default:
-                    super.keyDown(with: event)
+                    assertionFailure("unsupported")
+                    
+                    return nil
             }
         } else {
-            super.keyDown(with: event)
+            if proposal.width != nil {
+                return nsView._sizeThatFits(
+                    AppKitOrUIKitLayoutSizeProposal(
+                        proposal,
+                        fixedSize: nil
+                    )
+                )
+            } else {
+                return nil
+            }
         }
     }
 }
 
 #endif
 
-// MARK: - API
+// MARK: - Initializers
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 @available(watchOS, unavailable)
@@ -682,6 +589,18 @@ extension TextView: DefaultTextInputType where Label == Text {
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
         )
+    }
+}
+
+// MARK: - Modifiers
+
+@available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
+@available(watchOS, unavailable)
+extension TextView {
+    public func _fixedSize(horizontal: Bool, vertical: Bool) -> Self {
+        then {
+            $0.configuration._fixedSize = (horizontal, vertical)
+        }
     }
 }
 

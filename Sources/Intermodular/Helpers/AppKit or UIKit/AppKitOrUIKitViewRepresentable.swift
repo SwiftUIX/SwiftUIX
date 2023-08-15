@@ -5,6 +5,14 @@
 import Swift
 import SwiftUI
 
+public protocol _SwiftUIX_AppKitOrUIKitViewRepresentableContext {
+    associatedtype Coordinator
+    
+    var coordinator: Coordinator { get }
+    var transaction: Transaction { get }
+    var environment: EnvironmentValues { get }
+}
+
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 public protocol AppKitOrUIKitViewRepresentable: UIViewRepresentable {
     associatedtype AppKitOrUIKitViewType = UIViewType where AppKitOrUIKitViewType == UIViewType
@@ -58,6 +66,10 @@ public protocol AppKitOrUIKitViewControllerRepresentable: NSViewControllerRepres
 // MARK: - Implementation
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension UIViewRepresentableContext: _SwiftUIX_AppKitOrUIKitViewRepresentableContext {
+    
+}
+
 extension AppKitOrUIKitViewRepresentable {
     public typealias Context = UIViewRepresentableContext<Self>
     
@@ -105,6 +117,9 @@ extension AppKitOrUIKitViewControllerRepresentable {
 }
 
 #elseif os(macOS)
+extension NSViewRepresentableContext: _SwiftUIX_AppKitOrUIKitViewRepresentableContext {
+    
+}
 
 extension AppKitOrUIKitViewRepresentable {
     public typealias Context = NSViewRepresentableContext<Self>
@@ -174,3 +189,30 @@ extension AppKitOrUIKitViewControllerRepresentable {
     }
 }
 #endif
+
+// MARK: - Auxiliary
+
+public struct _SwiftUIX_EditableAppKitOrUIKitViewRepresentableContext: _SwiftUIX_AppKitOrUIKitViewRepresentableContext {
+    public var coordinator: Void = ()
+    public var transaction: Transaction
+    public var environment: EnvironmentValues
+    
+    public init(
+        transaction: Transaction = .init(),
+        environment: EnvironmentValues
+    ) {
+        self.transaction = transaction
+        self.environment = environment
+    }
+    
+    public init(_ context: some _SwiftUIX_AppKitOrUIKitViewRepresentableContext) {
+        self.transaction = context.transaction
+        self.environment = context.environment
+    }
+}
+
+extension _SwiftUIX_AppKitOrUIKitViewRepresentableContext {
+    public func _editable() -> _SwiftUIX_EditableAppKitOrUIKitViewRepresentableContext {
+        .init(self)
+    }
+}
