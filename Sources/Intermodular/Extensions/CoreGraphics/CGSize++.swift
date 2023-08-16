@@ -7,6 +7,13 @@ import Swift
 import SwiftUI
 
 extension CGSize {
+    public static var infinite: CGSize {
+        .init(
+            width: CGFloat.infinity,
+            height: CGFloat.infinity
+        )
+    }
+
     public static var greatestFiniteSize: CGSize {
         .init(
             width: CGFloat.greatestFiniteMagnitude,

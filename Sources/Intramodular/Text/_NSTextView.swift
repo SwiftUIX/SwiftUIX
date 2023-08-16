@@ -9,27 +9,46 @@ import SwiftUI
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 @available(watchOS, unavailable)
 class _NSTextView<Label: View>: NSTextView {
+    var _cachedIntrinsicContentSize: CGSize? = nil
+    var _sizeThatFitsCache: [AppKitOrUIKitLayoutSizeProposal: CGSize] = [:]
+    
     var parent: _TextView<Label>!
     
     var configuration: _TextView<Label>.Configuration {
         parent.configuration
     }
     
-    override var intrinsicContentSize: NSSize {
-        guard let manager = textContainer?.layoutManager else {
-            return .zero
+    override var intrinsicContentSize: CGSize {
+        if let _cachedIntrinsicContentSize {
+            return _cachedIntrinsicContentSize
+        } else {
+            guard let result = _sizeThatFits() else {
+                return super.intrinsicContentSize
+            }
+            
+            _cachedIntrinsicContentSize = result
+            
+            return result
         }
+    }
+    
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
         
-        manager.ensureLayout(for: textContainer!)
-        
-        let size = manager.usedRect(for: textContainer!).size
-        
-        return NSSize(width: size.width, height: size.height)
+        return result
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        super.resignFirstResponder()
     }
     
     func _sizeThatFits(
         _ proposal: AppKitOrUIKitLayoutSizeProposal
-    ) -> NSSize? {
+    ) -> CGSize? {
+        if let cachedResult = _sizeThatFitsCache[proposal] {
+            return cachedResult
+        }
+        
         guard let targetWidth = proposal.size.target.width else {
             assertionFailure("unsupported")
             
@@ -40,16 +59,16 @@ class _NSTextView<Label: View>: NSTextView {
             return nil
         }
         
-        guard let idealSize = self._sizeThatFits(forWidth: targetWidth) else {
-            return .zero
+        let oldFrame = frame
+        
+        defer {
+            if oldFrame != self.frame {
+                self.frame = oldFrame
+            }
         }
         
-        var additionalHeight: CGFloat?
-        
-        if let font = self.font {
-            if idealSize.height == 0 || string.hasSuffix("\n") {
-                additionalHeight = font.ascender + font.descender + font.leading
-            }
+        guard let idealSize = self._sizeThatFits(CGSize(width: targetWidth, height: .greatestFiniteMagnitude)) else {
+            return .zero
         }
         
         let result: CGSize
@@ -57,19 +76,51 @@ class _NSTextView<Label: View>: NSTextView {
         if proposal.fit.horizontal == .required {
             result = CGSize(
                 width: min(targetWidth, idealSize.width),
-                height: idealSize.height + (additionalHeight ?? 0)
+                height: idealSize.height
             )
         } else {
             result = CGSize(
                 width: max(targetWidth, idealSize.width),
-                height: idealSize.height + (additionalHeight ?? 0)
+                height: idealSize.height
             )
         }
         
         if result.isAreaZero {
             return nil
         }
-                
+        
+        _sizeThatFitsCache[proposal] = result
+        
+        return result
+    }
+    
+    func _sizeThatFits(_ size: CGSize? = nil) -> CGSize? {
+        guard let textContainer = self.textContainer, let layoutManager = self.layoutManager else {
+            return nil
+        }
+        
+        if let size, textContainer.containerSize != size {
+            textContainer.containerSize = size
+        }
+        
+        layoutManager.ensureLayout(for: textContainer)
+        
+        let measuredSize = layoutManager.boundingRect(
+            forGlyphRange: layoutManager.glyphRange(for: textContainer),
+            in: textContainer
+        ).size
+        
+        var extraHeight: CGFloat = 0
+        
+        if measuredSize.height == 0 || string.hasSuffix("\n") {
+            extraHeight += (_heightDifferenceForNewline ?? 0)
+        }
+        
+        let result = CGSize(
+            width: measuredSize.width,
+            height: measuredSize.height + extraHeight
+        )
+        
         return result
     }
     
@@ -107,6 +158,13 @@ class _NSTextView<Label: View>: NSTextView {
         }
     }
     
+    override func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
+        
+        _sizeThatFitsCache = [:]
+        _cachedIntrinsicContentSize = nil
+    }
+    
     override func preferredPasteboardType(
         from availableTypes: [NSPasteboard.PasteboardType],
         restrictedToTypesFrom allowedTypes: [NSPasteboard.PasteboardType]?
@@ -125,7 +183,7 @@ class _NSTextView<Label: View>: NSTextView {
         if let shortcut = KeyboardShortcut(from: event) {
             switch shortcut {
                 case KeyboardShortcut(.return, modifiers: []):
-                    parent.configuration.onCommit()
+                    configuration.onCommit()
                 default:
                     super.keyDown(with: event)
             }

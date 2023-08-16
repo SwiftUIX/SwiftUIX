@@ -136,8 +136,8 @@ extension AppKitOrUIKitHostingControllerProtocol {
 
 // MARK: - Auxiliary
 
-public struct AppKitOrUIKitLayoutSizeProposal {
-    public struct _SizingConstraints {
+public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
+    public struct _SizingConstraints: Hashable {
         public let minimum: OptionalDimensions
         public let target: OptionalDimensions
         public let maximum: OptionalDimensions
@@ -160,7 +160,7 @@ public struct AppKitOrUIKitLayoutSizeProposal {
         }
     }
     
-    public struct _Fit {
+    public struct _Fit: Hashable {
         public let horizontal: AppKitOrUIKitLayoutPriority?
         public let vertical: AppKitOrUIKitLayoutPriority?
         

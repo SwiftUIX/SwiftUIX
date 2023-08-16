@@ -140,3 +140,61 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 #endif
     }
 }
+
+@available(macOS 13.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.macOS {
+    @ViewBuilder
+    public func controlActiveState(_ state: _SwiftUI_TargetPlatform.macOS._ControlActiveState) -> _TargetPlatformConditionalModifiable<some View, Platform> {
+        #if os(macOS)
+        _TargetPlatformConditionalModifiable<_, Platform> {
+            self.environment(\.controlActiveState, .init(state))
+        }
+        #else
+        _TargetPlatformConditionalModifiable<_, Platform> {
+            self
+        }
+        #endif
+    }
+}
+
+// MARK: - Auxiliary
+
+extension _SwiftUI_TargetPlatform.macOS {
+    public enum _ControlActiveState {
+        case key
+        case active
+        case inactive
+    }
+}
+
+#if os(macOS)
+extension SwiftUI.ControlActiveState {
+    public init(_ state: _SwiftUI_TargetPlatform.macOS._ControlActiveState) {
+        switch state {
+            case .key:
+                self = .key
+            case .active:
+                self = .active
+            case .inactive:
+                self = .inactive
+        }
+    }
+}
+
+extension _SwiftUI_TargetPlatform.macOS._ControlActiveState {
+    public init(_ state: SwiftUI.ControlActiveState) {
+        switch state {
+            case .key:
+                self = .key
+            case .active:
+                self = .active
+            case .inactive:
+                self = .inactive
+            default:
+                assertionFailure()
+                
+                self = .inactive
+        }
+    }
+}
+#endif

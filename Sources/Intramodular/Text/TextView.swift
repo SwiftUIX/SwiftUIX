@@ -387,6 +387,14 @@ extension _TextView: NSViewRepresentable {
 
         nsView.focusRingType = .none
 
+        if context.environment.isEnabled {
+            DispatchQueue.main.async {
+                if (configuration.isInitialFirstResponder ?? configuration.isFocused?.wrappedValue) ?? false {
+                    nsView._SwiftUIX_becomeFirstResponder()
+                }
+            }
+        }
+
         return nsView
     }
     
@@ -404,6 +412,8 @@ extension _TextView: NSViewRepresentable {
         nsView._update(configuration: configuration, context: context)
         
         nsView.invalidateIntrinsicContentSize()
+        
+        nsView.frame.size = nsView.intrinsicContentSize
     }
     
     class Coordinator: NSObject, NSTextViewDelegate {
@@ -651,6 +661,11 @@ extension TextView {
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toAppKitOrUIKitColor() })
     }
+    
+    @_disfavoredOverload
+    public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
+        then({ $0.configuration.textColor = foregroundColor })
+    }
 	
 	public func tint(_ tint: Color) -> Self {
 		then({ $0.configuration.tintColor = tint.toAppKitOrUIKitColor() })
@@ -662,16 +677,16 @@ extension TextView {
         then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toAppKitOrUIKitColor() })
     }
     #endif
-    
+        
+    public func font(_ font: Font) -> Self {
+        then({ $0.configuration.font = try? font.toAppKitOrUIKitFont() })
+    }
+        
+    @_disfavoredOverload
     public func font(_ font: AppKitOrUIKitFont?) -> Self {
         then({ $0.configuration.font = font })
     }
-    
-    @_disfavoredOverload
-    public func foregroundColor(_ foregroundColor: AppKitOrUIKitColor) -> Self {
-        then({ $0.configuration.textColor = foregroundColor })
-    }
-    
+
     @_disfavoredOverload
     public func tint(_ tint: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.tintColor = tint })

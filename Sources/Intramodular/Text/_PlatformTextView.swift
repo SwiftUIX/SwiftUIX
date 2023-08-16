@@ -17,7 +17,7 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override var attributedText: NSAttributedString! {
         didSet {
             if preferredMaximumDimensions.height != nil {
@@ -53,9 +53,9 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
             }
         }
     }
-    #endif
+#endif
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private var numberOfLinesDisplayed: Int {
         let numberOfGlyphs = layoutManager.numberOfGlyphs
         var index = 0, numberOfLines = 0
@@ -106,7 +106,7 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
             }
         }
     }
-    #endif
+#endif
     
     override var intrinsicContentSize: CGSize {
         computeIntrinsicContentSize() ?? super.intrinsicContentSize
@@ -122,13 +122,13 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
         fatalError("init(coder:) has not been implemented")
     }
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override func layoutSubviews() {
         super.layoutSubviews()
         
         verticallyCenterTextIfNecessary()
     }
-    #endif
+#endif
     
     override func invalidateIntrinsicContentSize() {
         _cachedIntrinsicContentSize = nil
@@ -136,20 +136,20 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
         super.invalidateIntrinsicContentSize()
     }
     
-    #if os(macOS)
+#if os(macOS)
     override func becomeFirstResponder() -> Bool {
         self.needsDisplay = true
         
         return super.becomeFirstResponder()
     }
-    #endif
+#endif
     
     private func computeIntrinsicContentSize() -> CGSize? {
         if let _cachedIntrinsicContentSize = _cachedIntrinsicContentSize {
             return _cachedIntrinsicContentSize
         }
         
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if let preferredMaximumLayoutWidth = preferredMaximumDimensions.width {
             self._cachedIntrinsicContentSize = sizeThatFits(
                 CGSize(
@@ -172,14 +172,14 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
                 )
             )
         }
-        #else
+#else
         assertionFailure()
-        #endif
+#endif
         
         return self._cachedIntrinsicContentSize
     }
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     private func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
@@ -231,7 +231,7 @@ final class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, _Representabl
         
         configuration.onDeleteBackward()
     }
-    #endif
+#endif
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -285,6 +285,55 @@ extension _PlatformTextView {
 #elseif os(macOS)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension NSTextView {
+    var _lastLineParagraphStyle: NSParagraphStyle? {
+        guard let textStorage = textStorage else {
+            return defaultParagraphStyle
+        }
+        
+        if textStorage.length == 0 {
+            return defaultParagraphStyle
+        }
+        
+        let selectedRange = self.selectedRange()
+        
+        let location: Int
+        
+        if selectedRange.location == NSNotFound {
+            location = max(0, textStorage.length - 1)
+        } else if selectedRange.location == textStorage.length {
+            location = 0
+        } else {
+            location = selectedRange.location
+        }
+        
+        guard location < textStorage.length else {
+            return defaultParagraphStyle
+        }
+        
+        let paragraphStyle = textStorage.attributes(at: location, effectiveRange: nil)[.paragraphStyle] as? NSParagraphStyle
+        
+        guard let paragraphStyle else {
+            return defaultParagraphStyle
+        }
+        
+        return paragraphStyle
+    }
+    
+    var _heightDifferenceForNewline: CGFloat? {
+        guard let font = font else {
+            return nil
+        }
+        
+        var lineHeight = font.ascender + font.descender + font.leading
+        let lineSpacing = _lastLineParagraphStyle?.lineSpacing ?? 0
+        
+        if let layoutManager = self.layoutManager {
+            lineHeight = max(lineHeight, layoutManager.defaultLineHeight(for: font))
+        }
+                
+        return lineHeight + lineSpacing
+    }
+    
     func _sizeThatFits(
         forWidth width: CGFloat
     ) -> CGSize? {
