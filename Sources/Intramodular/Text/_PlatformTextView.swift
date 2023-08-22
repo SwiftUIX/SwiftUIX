@@ -35,6 +35,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     public private(set) lazy var _trackedTextCursor = _TextCursorTracking(owner: self)
     
+    private var _wantsTextKit1: Bool?
     private var _customTextStorage: NSTextStorage?
     private var _cachedIntrinsicContentSize: CGSize?
     private var lastBounds: CGSize = .zero
@@ -172,6 +173,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             self.init()
         }
         
+        _wantsTextKit1 = !usingTextLayoutManager
+        
         if let textStorage {
             _SwiftUIX_replaceTextStorage(textStorage)
             
@@ -184,17 +187,17 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     ) {
         assert(!representationStateFlags.contains(.didUpdateAtLeastOnce))
         
-        guard let textStorage = _SwiftUIX_textStorage, let layoutManager = _SwiftUIX_layoutManager else {
+        guard let textStorage = _SwiftUIX_textStorage else {
             assertionFailure()
             
             return
         }
-        
-        _ = textStorage
-        _ = layoutManager
-        
+                
         textStorage.delegate = self
-        layoutManager.delegate = self
+        
+        if _wantsTextKit1 == true {
+            _SwiftUIX_layoutManager?.delegate = self
+        }
     }
     
     open func _updateTextView(
@@ -357,6 +360,62 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
 }
 
+extension _PlatformTextView {
+    func _sizeThatFits(
+        _ proposal: AppKitOrUIKitLayoutSizeProposal
+    ) -> CGSize? {
+        if let cachedResult = representationCache._sizeThatFitsCache[proposal] {
+            return cachedResult
+        }
+        
+        guard let targetWidth = proposal.size.target.width else {
+            assertionFailure("unsupported")
+            
+            return nil
+        }
+        
+        guard proposal.size.target.width != .zero else {
+            return nil
+        }
+        
+        let oldFrame = frame
+        
+        defer {
+            if oldFrame != self.frame {
+                self.frame = oldFrame
+            }
+        }
+        
+        guard let idealSize = self._sizeThatFits(CGSize(width: targetWidth, height: .greatestFiniteMagnitude)) else {
+            return .zero
+        }
+        
+        let result: CGSize
+        
+        if proposal.fit.horizontal == .required {
+            result = CGSize(
+                width: min(targetWidth, idealSize.width),
+                height: idealSize.height
+            )
+        } else {
+            result = CGSize(
+                width: max(targetWidth, idealSize.width),
+                height: idealSize.height
+            )
+        }
+        
+        if result.isAreaZero {
+            return nil
+        }
+        
+        representationCache._sizeThatFitsCache[proposal] = result
+        
+        return result
+    }
+}
+
+// MARK: -
+
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView {
@@ -367,9 +426,9 @@ extension _PlatformTextView {
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         let requiresAttributedText = false
-        || context.environment.requiresAttributedText
-        || configuration.requiresAttributedText
-        || data.isAttributed
+            || context.environment.requiresAttributedText
+            || configuration.requiresAttributedText
+            || data.isAttributed
         
         var cursorOffset: Int?
         
@@ -510,56 +569,34 @@ extension _PlatformTextView {
     }
     
     func _sizeThatFits(_ size: CGSize? = nil) -> CGSize? {
-        guard size == nil else {
-            assertionFailure("unimplemented")
-            
-            return nil
-        }
-        
-        if let preferredMaximumLayoutWidth = preferredMaximumDimensions.width {
-            return sizeThatFits(
-                CGSize(
-                    width: preferredMaximumLayoutWidth,
-                    height: AppKitOrUIKitView.layoutFittingCompressedSize.height
-                )
-                .clamped(to: preferredMaximumDimensions)
-            )
-        } else if !isScrollEnabled {
-            return .init(
-                width: bounds.width,
-                height: _sizeThatFits(forWidth: bounds.width)?.height ?? AppKitOrUIKitView.noIntrinsicMetric
-            )
+        if let size {
+            return self.sizeThatFits(size)
         } else {
-            return .init(
-                width: AppKitOrUIKitView.noIntrinsicMetric,
-                height: min(
-                    preferredMaximumDimensions.height ?? contentSize.height,
-                    contentSize.height
+            if let preferredMaximumLayoutWidth = preferredMaximumDimensions.width {
+                return sizeThatFits(
+                    CGSize(
+                        width: preferredMaximumLayoutWidth,
+                        height: AppKitOrUIKitView.layoutFittingCompressedSize.height
+                    )
+                    .clamped(to: preferredMaximumDimensions)
                 )
-            )
-        }
-    }
-    
-    private func adjustFontSizeToFitWidth() {
-        guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
-            return
-        }
-        
-        let textViewSize = frame.size
-        let fixedWidth = textViewSize.width;
-        let expectSize = sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-        
-        if expectSize.height > textViewSize.height {
-            while sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude)).height > textViewSize.height {
-                font = font!.withSize(font!.pointSize - 1)
-            }
-        } else {
-            while sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude)).height < textViewSize.height {
-                font = font!.withSize(font!.pointSize + 1)
+            } else if !isScrollEnabled {
+                return .init(
+                    width: bounds.width,
+                    height: _sizeThatFits(width: bounds.width)?.height ?? AppKitOrUIKitView.noIntrinsicMetric
+                )
+            } else {
+                return .init(
+                    width: AppKitOrUIKitView.noIntrinsicMetric,
+                    height: min(
+                        preferredMaximumDimensions.height ?? contentSize.height,
+                        contentSize.height
+                    )
+                )
             }
         }
     }
-    
+        
     private func verticallyCenterTextIfNecessary() {
         guard !isScrollEnabled else {
             return
@@ -659,59 +696,7 @@ extension _PlatformTextView {
             }
         }
     }
-    
-    func _sizeThatFits(
-        _ proposal: AppKitOrUIKitLayoutSizeProposal
-    ) -> CGSize? {
-        if let cachedResult = representationCache._sizeThatFitsCache[proposal] {
-            return cachedResult
-        }
         
-        guard let targetWidth = proposal.size.target.width else {
-            assertionFailure("unsupported")
-            
-            return nil
-        }
-        
-        guard proposal.size.target.width != .zero else {
-            return nil
-        }
-        
-        let oldFrame = frame
-        
-        defer {
-            if oldFrame != self.frame {
-                self.frame = oldFrame
-            }
-        }
-        
-        guard let idealSize = self._sizeThatFits(CGSize(width: targetWidth, height: .greatestFiniteMagnitude)) else {
-            return .zero
-        }
-        
-        let result: CGSize
-        
-        if proposal.fit.horizontal == .required {
-            result = CGSize(
-                width: min(targetWidth, idealSize.width),
-                height: idealSize.height
-            )
-        } else {
-            result = CGSize(
-                width: max(targetWidth, idealSize.width),
-                height: idealSize.height
-            )
-        }
-        
-        if result.isAreaZero {
-            return nil
-        }
-        
-        representationCache._sizeThatFitsCache[proposal] = result
-        
-        return result
-    }
-    
     func _sizeThatFits(
         _ size: CGSize? = nil
     ) -> CGSize? {

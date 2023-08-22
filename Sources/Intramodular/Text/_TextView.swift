@@ -252,11 +252,10 @@ extension _TextView {
         Coordinator(data: data, configuration: configuration)
     }
 
-    #if os(macOS)
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
-        nsView view: AppKitOrUIKitViewType,
+        view: AppKitOrUIKitViewType,
         context: Context
     ) -> CGSize? {
         if let _fixedSize = configuration._fixedSize {
@@ -285,7 +284,6 @@ extension _TextView {
             }
         }
     }
-    #endif
 }
 
 // MARK: - Auxiliary

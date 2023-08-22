@@ -65,7 +65,17 @@ extension AppKitOrUIKitTextView {
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     var _cocoaCaretBoundsInWindow: CGRect? {
-        fatalError("unimplemented")
+        guard let selectedRange = selectedTextRange else {
+            return nil
+        }
+
+        guard selectedRange.isEmpty else {
+            return nil
+        }
+        
+        let cursorRect = caretRect(for: selectedRange.start)
+        
+        return cursorRect
     }
 }
 #elseif os(macOS)

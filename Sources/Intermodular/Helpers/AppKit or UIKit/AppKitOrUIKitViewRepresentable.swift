@@ -30,6 +30,13 @@ public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, UIV
     
     @MainActor
     static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
+    
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        view: AppKitOrUIKitViewType,
+        context: Context
+    ) -> CGSize?
 }
 
 public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresentable, UIViewControllerRepresentable {
@@ -42,6 +49,13 @@ public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresen
     
     @MainActor
     static func dismantleAppKitOrUIKitViewController(_ view: AppKitOrUIKitViewControllerType, coordinator: Coordinator)
+    
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        viewController: AppKitOrUIKitViewControllerType,
+        context: Context
+    ) -> CGSize?
 }
 #elseif os(macOS)
 public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, NSViewRepresentable {

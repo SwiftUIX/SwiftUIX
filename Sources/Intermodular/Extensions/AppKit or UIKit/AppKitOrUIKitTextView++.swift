@@ -25,7 +25,7 @@ extension AppKitOrUIKitTextView {
     }
     
     func _sizeThatFits(
-        forWidth width: CGFloat
+        width: CGFloat
     ) -> CGSize? {
         let storage = NSTextStorage(attributedString: attributedText)
         let width = bounds.width - textContainerInset.horizontal
@@ -48,6 +48,26 @@ extension AppKitOrUIKitTextView {
             height: ceil(usedRect.size.height + textContainerInset.vertical)
         )
     }
+    
+    func adjustFontSizeToFitWidth() {
+        guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
+            return
+        }
+        
+        let textViewSize = frame.size
+        let fixedWidth = textViewSize.width;
+        let expectSize = sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+        
+        if expectSize.height > textViewSize.height {
+            while sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude)).height > textViewSize.height {
+                font = font!.withSize(font!.pointSize - 1)
+            }
+        } else {
+            while sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude)).height < textViewSize.height {
+                font = font!.withSize(font!.pointSize + 1)
+            }
+        }
+    }
 }
 #elseif os(macOS)
 extension AppKitOrUIKitTextView {
@@ -64,7 +84,7 @@ extension AppKitOrUIKitTextView {
     }
     
     func _sizeThatFits(
-        forWidth width: CGFloat
+        width: CGFloat
     ) -> CGSize? {
         guard let layoutManager, let textContainer else {
             return nil

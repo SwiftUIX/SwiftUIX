@@ -26,6 +26,45 @@ extension _CollectionOrListCellPreferences {
 }
 
 extension View {
+    public func _SwiftUIX_focusable(
+        _ focusable: Bool
+    ) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            value.isFocusable = focusable
+        }
+    }
+    
+    public func _SwiftUIX_highlightDisabled(
+        _ disabled: Bool
+    ) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            value.isHighlightable = disabled
+        }
+    }
+    
+    public func _SwiftUIX_moveDisabled(
+        _ View: Bool
+    ) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            if View {
+                value.isReorderable = false
+            }
+        }
+        .moveDisabled(View)
+    }
+    
+    public func _SwiftUIX_selectionDisabled(
+        _ disabled: Bool
+    ) -> some View {
+        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
+            if disabled {
+                value.isSelectable = false
+            }
+        }
+    }
+}
+
+extension View {
     @available(*, deprecated)
     public func cellFocusable(_ focusable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
@@ -52,35 +91,6 @@ extension View {
     public func cellSelectable(_ selectable: Bool) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isSelectable = selectable
-        }
-    }
-}
-
-extension View {
-    public func _SwiftUIX_focusable(
-        _ focusable: Bool
-    ) -> some View {
-        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
-            value.isFocusable = focusable
-        }
-    }
-    
-    public func _SwiftUIX_moveDisabled(
-        _ isDisabled: Bool
-    ) -> some View {
-        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
-            if isDisabled {
-                value.isReorderable = false
-            }
-        }
-        .moveDisabled(isDisabled)
-    }
-    
-    public func _SwiftUIX_selectionDisabled(_ disabled: Bool) -> some View {
-        transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
-            if disabled {
-                value.isSelectable = false
-            }
         }
     }
 }

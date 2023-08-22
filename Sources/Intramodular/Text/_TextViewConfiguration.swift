@@ -289,23 +289,9 @@ extension AppKitOrUIKitTextView {
                 
                 return .cocoaTextStorage(storage)
             case .string:
-                if let attributedText {
-                    assert(text.isEmpty)
-                    
-                    return .string(attributedText.string)
-                } else {
-                    assert(attributedText == nil)
-                    
-                    return .string(text)
-                }
+                return .string(text ?? (attributedText?.string ?? ""))
             case .cocoaAttributedString:
-                if let attributedText {
-                    return .cocoaAttributedString(attributedText)
-                } else {
-                    assertionFailure()
-                    
-                    return .cocoaAttributedString(.init())
-                }
+                return .cocoaAttributedString(attributedText)
             case .attributedString:
                 if #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) {
                     if let attributedText {
