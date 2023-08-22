@@ -360,6 +360,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView {
     func _sizeThatFits(
         _ proposal: AppKitOrUIKitLayoutSizeProposal
