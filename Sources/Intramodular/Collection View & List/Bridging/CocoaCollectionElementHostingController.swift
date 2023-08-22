@@ -7,13 +7,13 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
-class CocoaCollectionCellOrSupplementaryViewHostingController<
+class CocoaCollectionElementHostingController<
     ItemType,
     ItemIdentifierType: Hashable,
     SectionType,
     SectionIdentifierType: Hashable
->: UIHostingController<_CollectionViewCellOrSupplementaryViewContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
-    typealias Configuration = _CollectionViewCellOrSupplementaryViewContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>.Configuration
+>: UIHostingController<_CollectionViewElementContentContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
+    typealias Configuration = _CollectionViewElementContentContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>.Configuration
     
     var isLive: Bool {
         view.superview != nil
@@ -39,7 +39,10 @@ class CocoaCollectionCellOrSupplementaryViewHostingController<
         var disableAnimation: Bool
     }
     
-    func configure(with newConfiguration: Configuration, context: ConfigurationContext) {
+    func configure(
+        with newConfiguration: Configuration,
+        context: ConfigurationContext
+    ) {
         let currentConfiguration = rootView.configuration
         
         if newConfiguration.contentCache.content != nil {

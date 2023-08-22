@@ -5,6 +5,64 @@
 import Swift
 import SwiftUI
 
+public struct FrameReaderProxy {
+    /// Data from the preference key `_NamedViewDescription.PreferenceKey`.
+    var preferenceData: [AnyHashable: _NamedViewDescription] = [:]
+    /// Data sourced from `EnvironmentValues._frameReaderProxy`.
+    var environmentSourcedData: [AnyHashable: _NamedViewDescription] = [:]
+    
+    private func viewDescription(forFrameWithID id: AnyHashable) -> _NamedViewDescription? {
+        preferenceData[FrameID(base: id)] ?? environmentSourcedData[FrameID(base: id)]
+    }
+    
+    public func frame(
+        for identifier: AnyHashable,
+        in coordinateSpace: CoordinateSpace
+    ) -> CGRect {
+        assert(coordinateSpace == .global, "The only coordinateSpace supported currently is .global")
+        
+        return viewDescription(forFrameWithID: identifier)?.globalBounds ?? .zero
+    }
+    
+    public func size(
+        for identifier: AnyHashable
+    ) -> CGSize {
+        viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
+    }
+    
+    public func intersectionSize(
+        between x: AnyHashable,
+        and y: AnyHashable
+    ) -> CGSize {
+        guard let xFrame = viewDescription(forFrameWithID: x)?.globalBounds else {
+            return .zero
+        }
+        
+        guard let yFrame = viewDescription(forFrameWithID: y)?.globalBounds else {
+            return .zero
+        }
+        
+        return xFrame.intersection(yFrame).size
+    }
+    
+    public func percentageIntersection(
+        between x: AnyHashable,
+        and y: AnyHashable
+    ) -> Double {
+        let intersectionSize = self.intersectionSize(between: x, and: y)
+        let xSize = size(for: x)
+        
+        let xSizeArea = xSize.width * xSize.height
+        let intersectionSizeArea = intersectionSize.width * intersectionSize.height
+        
+        if xSizeArea.isZero || intersectionSizeArea.isZero {
+            return 0
+        }
+        
+        return Double(intersectionSizeArea / xSizeArea)
+    }
+}
+
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 public struct FrameReader<Content: View>: View {
     @Namespace var namespace
@@ -86,65 +144,7 @@ private struct AttachFrameID: ViewModifier {
     }
 }
 
-public struct FrameReaderProxy {
-    /// Data from the preference key `_NamedViewDescription.PreferenceKey`.
-    var preferenceData: [AnyHashable: _NamedViewDescription] = [:]
-    /// Data sourced from `EnvironmentValues._frameReaderProxy`.
-    var environmentSourcedData: [AnyHashable: _NamedViewDescription] = [:]
-    
-    private func viewDescription(forFrameWithID id: AnyHashable) -> _NamedViewDescription? {
-        preferenceData[FrameID(base: id)] ?? environmentSourcedData[FrameID(base: id)]
-    }
-    
-    public func frame(
-        for identifier: AnyHashable,
-        in coordinateSpace: CoordinateSpace
-    ) -> CGRect {
-        assert(coordinateSpace == .global, "The only coordinateSpace supported currently is .global")
-        
-        return viewDescription(forFrameWithID: identifier)?.globalBounds ?? .zero
-    }
-    
-    public func size(
-        for identifier: AnyHashable
-    ) -> CGSize {
-        viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
-    }
-    
-    public func intersectionSize(
-        between x: AnyHashable,
-        and y: AnyHashable
-    ) -> CGSize {
-        guard let xFrame = viewDescription(forFrameWithID: x)?.globalBounds else {
-            return .zero
-        }
-        
-        guard let yFrame = viewDescription(forFrameWithID: y)?.globalBounds else {
-            return .zero
-        }
-        
-        return xFrame.intersection(yFrame).size
-    }
-    
-    public func percentageIntersection(
-        between x: AnyHashable,
-        and y: AnyHashable
-    ) -> Double {
-        let intersectionSize = self.intersectionSize(between: x, and: y)
-        let xSize = size(for: x)
-        
-        let xSizeArea = xSize.width * xSize.height
-        let intersectionSizeArea = intersectionSize.width * intersectionSize.height
-        
-        if xSizeArea.isZero || intersectionSizeArea.isZero {
-            return 0
-        }
-        
-        return Double(intersectionSizeArea / xSizeArea)
-    }
-}
-
-// MARK: - API
+// MARK: - Supplementary
 
 extension View {
     public func frame<ID: Hashable>(id: ID) -> some View {

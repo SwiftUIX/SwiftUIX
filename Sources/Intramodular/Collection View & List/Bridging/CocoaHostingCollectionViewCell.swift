@@ -29,7 +29,7 @@ class CocoaHostingCollectionViewCell<
     typealias ContentState = _CollectionViewCellOrSupplementaryViewState<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
     typealias ContentPreferences = _CollectionViewCellOrSupplementaryViewPreferences<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
     typealias ContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
-    typealias ContentHostingController = CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+    typealias ContentHostingController = CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
     
@@ -191,7 +191,9 @@ class CocoaHostingCollectionViewCell<
         }
     }
     
-    override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+    override func systemLayoutSizeFitting(
+        _ targetSize: CGSize
+    ) -> CGSize {
         contentHostingController?.systemLayoutSizeFitting(targetSize) ??  CGSize(width: 1, height: 1)
     }
     
@@ -280,6 +282,8 @@ class CocoaHostingCollectionViewCell<
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
+        contentHostingController?.rootView.configuration._cellProxyBase = _CellProxyBase(base: self)
+        
         guard let parentViewController = parentViewController,
               let contentHostingController = contentHostingController,
               let contentConfiguration = cellContentConfiguration,
@@ -337,7 +341,10 @@ extension CocoaHostingCollectionViewCell {
         
         if !shouldUseCachedContentHostingController {
             if let contentHostingController = contentHostingController {
-                contentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
+                contentHostingController.configure(
+                    with: configuration,
+                    context: .init(disableAnimation: disableAnimation)
+                )
             } else {
                 contentHostingController = ContentHostingController(configuration: configuration)
             }
@@ -373,12 +380,17 @@ extension CocoaHostingCollectionViewCell {
         parentViewController.cache.setContentCache(contentCache, for: configuration.id)
     }
     
-    func invalidateContent(with context: CellProxy.InvalidationContext) {
+    func invalidateContent(
+        with context: CellProxy.InvalidationContext
+    ) {
         guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
             return
         }
 
-        parentViewController.cache.invalidateContent(at: contentConfiguration.indexPath, withID: contentConfiguration.id)
+        parentViewController.cache.invalidateContent(
+            at: contentConfiguration.indexPath,
+            withID: contentConfiguration.id
+        )
                 
         if let invalidationContextType = (type(of: parentViewController.collectionView.collectionViewLayout).invalidationContextClass as? UICollectionViewLayoutInvalidationContext.Type) {
             let context = invalidationContextType.init()
@@ -394,6 +406,10 @@ extension CocoaHostingCollectionViewCell {
         contentHostingController?.view.setNeedsLayout()
         contentHostingController?.view.layoutIfNeeded()
         
+        _withAppKitOrUIKitAnimation(.default) {
+            parentViewController.collectionView.layoutIfNeeded()
+        }
+
         lastInvalidationContext = context
     }
 }
@@ -413,15 +429,33 @@ extension CocoaHostingCollectionViewCell {
         }
         
         func invalidateLayout(with context: CellProxy.InvalidationContext) {
-            base?.invalidateContent(with: context)
+            guard let base else {
+                assertionFailure()
+                
+                return
+            }
+
+            base.invalidateContent(with: context)
         }
         
         func select() {
-            base?.isSelected = true
+            guard let base else {
+                assertionFailure()
+                
+                return
+            }
+
+            base.isSelected = true
         }
         
         func deselect() {
-            base?.isSelected = false
+            guard let base else {
+                assertionFailure()
+                
+                return
+            }
+
+            base.isSelected = false
         }
     }
 }
@@ -430,7 +464,7 @@ extension String {
     static let hostingCollectionViewCellIdentifier = "CocoaHostingCollectionViewCell"
 }
 
-extension CocoaCollectionCellOrSupplementaryViewHostingController {
+extension CocoaCollectionElementHostingController {
     fileprivate func mount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(onto cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
         guard let parent = cell.parentViewController else {
             assertionFailure()

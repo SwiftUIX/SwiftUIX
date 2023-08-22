@@ -25,39 +25,10 @@ open class UIHostingView<Content: View>: UIView {
                     parent.view.invalidateIntrinsicContentSize()
                 }
             }
+            .frame(max: AppKitOrUIKitView.layoutFittingExpandedSize)
         }
     }
-    
-    class _ContentHostingController: UIHostingController<_ContentContainer> {
-        weak var _navigationController: UINavigationController?
         
-        var shouldResizeToFitContent: Bool = false
-        
-        override var navigationController: UINavigationController? {
-            super.navigationController ?? _navigationController
-        }
-        
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            
-            view.backgroundColor = .clear
-        }
-        
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            
-            view.backgroundColor = .clear
-        }
-        
-        override func viewDidLayoutSubviews() {
-            super.viewDidLayoutSubviews()
-            
-            if shouldResizeToFitContent {
-                view.invalidateIntrinsicContentSize()
-            }
-        }
-    }
-    
     private let rootViewHostingController: _ContentHostingController
     
     public var shouldResizeToFitContent: Bool {
@@ -98,6 +69,12 @@ open class UIHostingView<Content: View>: UIView {
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override func invalidateIntrinsicContentSize() {
+        rootViewHostingController.view.invalidateIntrinsicContentSize()
+        
+        super.invalidateIntrinsicContentSize()
     }
     
     override open func willMove(toSuperview newSuperview: UIView?) {
@@ -146,7 +123,7 @@ open class UIHostingView<Content: View>: UIView {
         super.safeAreaInsetsDidChange()
         
         if shouldResizeToFitContent {
-            rootViewHostingController.view.invalidateIntrinsicContentSize()
+            invalidateIntrinsicContentSize()
         }
     }
 }
@@ -154,6 +131,38 @@ open class UIHostingView<Content: View>: UIView {
 extension UIHostingView {
     public func _disableSafeAreaInsets() {
         rootViewHostingController._disableSafeAreaInsets()
+    }
+}
+
+extension UIHostingView {
+    class _ContentHostingController: UIHostingController<_ContentContainer> {
+        weak var _navigationController: UINavigationController?
+        
+        var shouldResizeToFitContent: Bool = false
+        
+        override var navigationController: UINavigationController? {
+            super.navigationController ?? _navigationController
+        }
+        
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            
+            view.backgroundColor = .clear
+        }
+        
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            
+            view.backgroundColor = .clear
+        }
+        
+        override func viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews()
+            
+            if shouldResizeToFitContent {
+                view.invalidateIntrinsicContentSize()
+            }
+        }
     }
 }
 

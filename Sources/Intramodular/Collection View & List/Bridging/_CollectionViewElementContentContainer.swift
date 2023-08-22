@@ -7,7 +7,7 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
-struct _CollectionViewCellOrSupplementaryViewContainer<
+struct _CollectionViewElementContentContainer<
     ItemType,
     ItemIdentifierType: Hashable,
     SectionType,
@@ -21,7 +21,7 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
         
         let _reuseCellRender: Bool
         let _collectionViewProxy: CollectionViewProxy
-        let _cellProxyBase: _CellProxyBase?
+        var _cellProxyBase: _CellProxyBase?
         var contentConfiguration: ContentConfiguration
         let contentState: ContentState?
         let contentPreferences: Binding<ContentPreferences>?
@@ -36,17 +36,28 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
     }
 
     var body: some View {
-        if configuration._reuseCellRender {
-            contentView
-                .background(
-                    ZeroSizeView()
-                        .id(configuration.contentConfiguration.id)
-                        .allowsHitTesting(false)
-                        .accessibility(hidden: true)
-                )
-        } else {
-            contentView
-                .id(configuration.contentConfiguration.id)
+        Group {
+            if configuration._reuseCellRender {
+                contentView
+                    .background(
+                        ZeroSizeView()
+                            .id(configuration.contentConfiguration.id)
+                            .allowsHitTesting(false)
+                            .accessibility(hidden: true)
+                    )
+            } else {
+                contentView
+                    .id(configuration.contentConfiguration.id)
+            }
+        }
+        .onChangeOfFrame { size in
+            guard let proxy = configuration._cellProxyBase else {
+                return
+            }
+            
+            proxy.invalidateLayout(
+                with: .init(newPreferredContentSize: .init(size))
+            )
         }
     }
     
@@ -115,7 +126,7 @@ struct _CollectionViewCellOrSupplementaryViewContainer<
     }
 }
 
-extension _CollectionViewCellOrSupplementaryViewContainer {
+extension _CollectionViewElementContentContainer {
     init<SectionHeaderContent, SectionFooterContent, CellContent>(base: CocoaHostingCollectionViewSupplementaryView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>) {
         self.init(
             configuration: .init(

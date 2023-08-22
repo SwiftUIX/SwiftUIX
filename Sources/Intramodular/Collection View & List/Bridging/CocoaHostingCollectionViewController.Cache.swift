@@ -22,7 +22,7 @@ extension CocoaHostingCollectionViewController {
     class Cache: NSObject {
         unowned private let parent: CocoaHostingCollectionViewController
         
-        var contentHostingControllerCache =  KeyedBoundedPriorityQueue<CellType.ContentConfiguration.ID, CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>>()
+        var contentHostingControllerCache =  KeyedBoundedPriorityQueue<CellType.ContentConfiguration.ID, CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>>()
                 
         private var contentIdentifierToCacheMap: [CellType.ContentConfiguration.ID: CellType.ContentCache] = [:]
         private var contentIdentifierToPreferencesMap: [CellType.ContentConfiguration.ID: CellType.ContentPreferences] = [:]
@@ -30,7 +30,7 @@ extension CocoaHostingCollectionViewController {
         private var indexPathToContentIdentifierMap: [IndexPath: CellType.ContentConfiguration.ID] = [:]
         private var itemIdentifierHashToIndexPathMap: [Int: IndexPath] = [:]
                 
-        var prototypeContentHostingController: CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>?
+        var prototypeContentHostingController: CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>?
 
         init(parent: CocoaHostingCollectionViewController) {
             self.parent = parent
@@ -85,9 +85,9 @@ extension CocoaHostingCollectionViewController.Cache {
         if let size = contentIdentifierToCacheMap[configuration.id]?.contentSize {
             return size
         } else {
-            let contentHostingController: CocoaCollectionCellOrSupplementaryViewHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
+            let contentHostingController: CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
             
-            let contentHostingControllerConfiguration = _CollectionViewCellOrSupplementaryViewContainer.Configuration(
+            let contentHostingControllerConfiguration = _CollectionViewElementContentContainer.Configuration(
                 _reuseCellRender: parent.configuration.unsafeFlags.contains(.reuseCellRender),
                 _collectionViewProxy: .init(parent),
                 _cellProxyBase: nil,

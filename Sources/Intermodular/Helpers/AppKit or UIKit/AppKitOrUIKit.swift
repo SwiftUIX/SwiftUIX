@@ -355,12 +355,27 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
 public struct _AppKitOrUIKitViewAnimation: Equatable  {
-    public let options: AppKitOrUIKitView.AnimationOptions
-    public let duration: CGFloat
-    
-    public init(options: AppKitOrUIKitView.AnimationOptions, duration: CGFloat) {
+    public let options: AppKitOrUIKitView.AnimationOptions?
+    public let duration: CGFloat?
+
+    init(
+        options: AppKitOrUIKitView.AnimationOptions?,
+        duration: CGFloat?
+    ) {
         self.options = options
         self.duration = duration
+    }
+    
+    public init(
+        options: AppKitOrUIKitView.AnimationOptions,
+        duration: CGFloat
+    ) {
+        self.options = options
+        self.duration = duration
+    }
+    
+    public static var `default`: Self {
+        .init(options: nil, duration: nil)
     }
     
     public static func easeInOut(duration: Double) -> Self {
@@ -399,9 +414,9 @@ public func _withAppKitOrUIKitAnimation(
     }
     
     AppKitOrUIKitView.animate(
-        withDuration: animation.duration,
+        withDuration: animation.duration ?? 0.3,
         delay: 0,
-        options: animation.options,
+        options: animation.options ?? [],
         animations: body
     )
 }

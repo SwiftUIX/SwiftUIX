@@ -24,16 +24,36 @@ public struct CellProxy {
     
     let base: _CellProxyBase?
     
-    public func invalidateLayout(with context: InvalidationContext = .init()) {
-        base?.invalidateLayout(with: context)
+    public func invalidateLayout(
+        with context: InvalidationContext = .init()
+    ) {
+        guard let base else {
+            assertionFailure()
+            
+            return
+        }
+        
+        base.invalidateLayout(with: context)
     }
     
     public func select() {
-        base?.select()
+        guard let base else {
+            assertionFailure()
+            
+            return
+        }
+
+        base.select()
     }
     
     public func deselect() {
-        base?.deselect()
+        guard let base else {
+            assertionFailure()
+            
+            return
+        }
+
+        base.deselect()
     }
 }
 

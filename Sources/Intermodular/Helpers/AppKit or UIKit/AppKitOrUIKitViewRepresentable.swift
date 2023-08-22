@@ -201,7 +201,7 @@ extension AppKitOrUIKitViewControllerRepresentable {
     ) -> CGSize? {
         self.sizeThatFits(
             proposal,
-            uiViewController: uiViewController,
+            viewController: uiViewController,
             context: context
         )
     }
@@ -338,7 +338,11 @@ extension AppKitOrUIKitViewControllerRepresentable {
         nsViewController: Self.NSViewControllerType,
         context: Self.Context
     ) -> CGSize? {
-        self.sizeThatFits(proposal, viewController: nsViewController, context: context)
+        self.sizeThatFits(
+            proposal,
+            viewController: nsViewController,
+            context: context
+        )
     }
 }
 

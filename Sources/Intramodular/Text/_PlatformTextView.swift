@@ -104,8 +104,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -115,8 +115,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
                 setContentHuggingPriority(
