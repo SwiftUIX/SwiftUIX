@@ -2,14 +2,36 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
-open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, CocoaViewController {
-    public var _canBecomeFirstResponder: Bool? = nil
+public struct CocoaHostingControllerConfiguration {
+    var _isMeasuringSize: Bool = false
     
+    lazy var _measuredSizePublisher = {
+        self._isMeasuringSize = true
+        
+        return PassthroughSubject<CGSize, Never>()
+    }()
+    
+    var observedPreferenceKeys: [any PreferenceKey.Type] = []
+    var preferenceValueObservers: [AnyViewModifier] = []
+}
+
+open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView, CocoaViewController {
+    public var _configuration: CocoaHostingControllerConfiguration = .init() {
+        didSet {
+            rootView.parentConfiguration = _configuration
+        }
+    }
+        
+    public var _observedPreferenceValues = _ObservedPreferenceValues()
+
+    public var _canBecomeFirstResponder: Bool? = nil
+        
     var _safeAreaInsetsAreFixed: Bool = false
     var _namedViewDescriptions: [AnyHashable: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
@@ -56,6 +78,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         super.init(
             rootView: .init(
                 parent: nil,
+                parentConfiguration: _configuration,
                 content: mainView
             )
         )
@@ -157,19 +180,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         _namedViewDescriptions[name] = description
     }
     
-    /// https://twitter.com/b3ll/status/1193747288302075906
-    public func _disableSafeAreaInsetsIfNecessary() {
-        defer {
-            _safeAreaInsetsAreFixed = true
-        }
-        
-        guard !_safeAreaInsetsAreFixed else {
-            return
-        }
-               
-        _disableSafeAreaInsets()
+    public func _SwiftUIX_sizeThatFits(in size: CGSize) -> CGSize {
+        sizeThatFits(in: size)
     }
-        
+    
     private func resizeParentWindowIfNecessary() {
         guard !_didResizeParentWindowOnce else {
             return
@@ -178,7 +192,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         guard !_isResizingParentWindow else {
             return
         }
-
+        
         _isResizingParentWindow = true
         
         defer {
@@ -193,9 +207,20 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
         #endif
     }
-    
-    public func _SwiftUIX_sizeThatFits(in size: CGSize) -> CGSize {
-        sizeThatFits(in: size)
+}
+
+extension CocoaHostingController {
+    /// https://twitter.com/b3ll/status/1193747288302075906
+    public func _disableSafeAreaInsetsIfNecessary() {
+        defer {
+            _safeAreaInsetsAreFixed = true
+        }
+        
+        guard !_safeAreaInsetsAreFixed else {
+            return
+        }
+        
+        _disableSafeAreaInsets()
     }
 }
 

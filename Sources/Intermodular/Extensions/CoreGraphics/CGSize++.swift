@@ -13,14 +13,14 @@ extension CGSize {
             height: CGFloat.infinity
         )
     }
-
+    
     public static var greatestFiniteSize: CGSize {
         .init(
             width: CGFloat.greatestFiniteMagnitude,
             height: CGFloat.greatestFiniteMagnitude
         )
     }
-        
+    
     public var minimumDimensionLength: CGFloat {
         min(width, height)
     }
@@ -28,16 +28,21 @@ extension CGSize {
     public var maximumDimensionLength: CGFloat {
         max(width, height)
     }
-    
-    var isAreaZero: Bool {
+}
+
+extension CGSize {
+    @_spi(Internal)
+    public var isAreaZero: Bool {
         minimumDimensionLength.isZero
     }
     
-    var isAreaPracticallyInfinite: Bool {
+    @_spi(Internal)
+    public var isAreaPracticallyInfinite: Bool {
         maximumDimensionLength == .greatestFiniteMagnitude || maximumDimensionLength == .infinity
     }
     
-    var isRegularAndNonZero: Bool {
+    @_spi(Internal)
+    public var isRegularAndNonZero: Bool {
         guard !isAreaPracticallyInfinite else {
             return false
         }
@@ -48,7 +53,44 @@ extension CGSize {
         
         return true
     }
-    
+}
+
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension CGSize {
+    /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
+    public var _hasUnspecifiedIntrinsicContentSizeDimensions: Bool {
+        guard width >= 0 && height >= 0 else {
+            return true
+        }
+        
+        switch width {
+            case AppKitOrUIKitView.noIntrinsicMetric:
+                return true
+            case CGFloat.greatestFiniteMagnitude:
+                return true
+            case CGFloat.infinity:
+                return true
+            default:
+                break
+        }
+        
+        switch height {
+            case AppKitOrUIKitView.noIntrinsicMetric:
+                return true
+            case CGFloat.greatestFiniteMagnitude:
+                return true
+            case CGFloat.infinity:
+                return true
+            default:
+                break
+        }
+
+        return false
+    }
+}
+#endif
+
+extension CGSize {
     public static func _maxByArea(_ lhs: CGSize, rhs: CGSize) -> CGSize {
         guard lhs.isRegularAndNonZero, rhs.isRegularAndNonZero else {
             return lhs
@@ -64,7 +106,7 @@ extension CGSize {
         }
     }
     
-    public static func _maxByCombining(_ lhs: CGSize, rhs: CGSize) -> CGSize {
+    public static func _maxByCombining(_ lhs: CGSize, _ rhs: CGSize) -> CGSize {
         CGSize(width: max(lhs.width, rhs.width), height: max(lhs.height, rhs.height))
     }
 }

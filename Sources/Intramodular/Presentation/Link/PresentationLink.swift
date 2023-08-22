@@ -279,7 +279,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             label: label
         )
         .background {
-            CocoaHostingView {
+            _CocoaHostingViewWrapped {
                 _AdHocPresenter(
                     id: id,
                     isPresented: isPresented,
@@ -301,7 +301,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
     }
 }
 
-// MARK: - API
+// MARK: - Initializers
 
 extension PresentationLink {
     public init(
@@ -421,6 +421,8 @@ extension PresentationLink {
         self.action = { }
     }
 }
+
+// MARK: - Modifiers
 
 extension PresentationLink {
     public func presentationStyle(_ presentationStyle: ModalPresentationStyle) -> Self {

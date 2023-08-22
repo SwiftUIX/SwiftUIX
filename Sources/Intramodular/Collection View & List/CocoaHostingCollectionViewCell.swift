@@ -150,19 +150,19 @@ class CocoaHostingCollectionViewCell<
     }
     
     var isFocusable: Bool {
-        contentPreferences._collectionOrListCellPreferences.isFocusable
+        contentPreferences._collectionOrListCellPreferences.isFocusable ?? false
     }
     
     var isHighlightable: Bool {
-        contentPreferences._collectionOrListCellPreferences.isHighlightable
+        contentPreferences._collectionOrListCellPreferences.isHighlightable  ?? false
     }
     
     var isReorderable: Bool {
-        contentPreferences._collectionOrListCellPreferences.isReorderable
+        contentPreferences._collectionOrListCellPreferences.isReorderable ?? false
     }
     
     var isSelectable: Bool {
-        contentPreferences._collectionOrListCellPreferences.isSelectable
+        contentPreferences._collectionOrListCellPreferences.isSelectable ?? false
     }
     
     override init(frame: CGRect) {
@@ -290,16 +290,23 @@ class CocoaHostingCollectionViewCell<
         
         if let relativeFrame = contentPreferences.relativeFrame {
             if layoutAttributes.size != contentHostingController.view.frame.size {
-                self.contentCache.preferredContentSize = relativeFrame.sizeThatFits(in: layoutAttributes.size.clamped(to: contentConfiguration.maximumSize))
+                self.contentCache.preferredContentSize = relativeFrame.sizeThatFits(
+                    in: layoutAttributes.size.clamped(to: contentConfiguration.maximumSize)
+                )
                 
-                contentHostingController.configure(with: configuration, context: .init(disableAnimation: true))
+                contentHostingController.configure(
+                    with: configuration,
+                    context: .init(disableAnimation: true)
+                )
             }
         }
     }
 }
 
 extension CocoaHostingCollectionViewCell {
-    func cellWillDisplay(inParent parentViewController: ParentViewControllerType?) {
+    func cellWillDisplay(
+        inParent parentViewController: ParentViewControllerType?
+    ) {
         update(disableAnimation: true)
         
         contentHostingController?.mount(onto: self)
@@ -343,7 +350,10 @@ extension CocoaHostingCollectionViewCell {
 
                 contentHostingController = newContentHostingController
             } else if let contentHostingController = contentHostingController {
-                contentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
+                contentHostingController.configure(
+                    with: configuration, 
+                    context: .init(disableAnimation: disableAnimation)
+                )
             } else {
                 let newContentHostingController = ContentHostingController(configuration: configuration)
                 

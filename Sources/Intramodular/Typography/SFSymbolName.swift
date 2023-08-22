@@ -2565,18 +2565,45 @@ public enum SFSymbolName: String {
     @available(iOS 15.0, *) case xmarkAppFill = "xmark.app.fill"
 }
 
-// MARK: - Helpers
+// MARK: - Supplementary
 
-public extension Image {
-    init(systemName: SFSymbolName) {
+extension Image {
+    public init(systemName: SFSymbolName) {
+        self.init(_systemName: systemName.rawValue)
+    }
+    
+    public init(_systemName systemName: String) {
         #if os(macOS)
         if #available(OSX 11.0, *) {
-            self.init(systemName: systemName.rawValue)
+            self.init(systemName: systemName)
         } else {
             fatalError()
         }
         #else
-        self.init(systemName: systemName.rawValue)
+        self.init(systemName: systemName)
         #endif
     }
 }
+
+#if os(iOS) || os(tvOS)
+@_spi(Internal)
+extension AppKitOrUIKitImage {
+    public convenience init?(_SwiftUIX_systemName systemName: String) {
+        self.init(systemName: systemName)
+    }
+}
+#elseif os(macOS)
+@_spi(Internal)
+extension AppKitOrUIKitImage {
+    public convenience init?(_SwiftUIX_systemName systemName: String) {
+        if #available(macOS 11.0, *) {
+            self.init(
+                systemSymbolName: systemName,
+                accessibilityDescription: nil
+            )
+        } else {            
+            return nil
+        }
+    }
+}
+#endif

@@ -160,27 +160,48 @@ private final class CaptureViewSizePreferenceKey<T: View>: TakeLastPreferenceKey
 
 extension View {
     @ViewBuilder
-    public func _measureAndRecordSize(into binding: Binding<CGSize?>) -> some View {
+    public func _measureAndRecordSize(
+        _ shouldMeasure: Bool = true,
+        into binding: Binding<CGSize?>
+    ) -> some View {
         let binding = binding.removeDuplicates()
         
-        overlay {
-            GeometryReader { proxy in
-                Color.clear
-                    .hidden()
-                    .onAppear {
-                        binding.wrappedValue = proxy.size
-                    }
-                    .onDisappear {
-                        binding.wrappedValue = nil
-                    }
-                    .onChange(of: proxy.size) { size in
-                        binding.wrappedValue = size
-                    }
+        self.background {
+            if shouldMeasure {
+                GeometryReader { proxy in
+                    Color.clear
+                        .hidden()
+                        .onAppear {
+                            binding.wrappedValue = proxy.size
+                        }
+                        .onDisappear {
+                            binding.wrappedValue = nil
+                        }
+                        .onChange(of: proxy.size) { size in
+                            binding.wrappedValue = size
+                        }
+                }
             }
         }
     }
     
-    public func _measureAndRecordSize(into binding: Binding<CGSize>) -> some View {
-        _measureAndRecordSize(into: binding._asOptional(defaultValue: .zero))
+    public func _measureAndRecordSize(
+        _ shouldMeasure: Bool = true,
+        into binding: Binding<CGSize>
+    ) -> some View {
+        _measureAndRecordSize(shouldMeasure, into: binding._asOptional(defaultValue: .zero))
+    }
+    
+    public func _measureAndRecordSize(
+        _ shouldMeasure: Bool = true,
+        _ fn: @escaping (CGSize) -> Void
+    ) -> some View {
+        _measureAndRecordSize(
+            shouldMeasure,
+            into: Binding<CGSize>(
+                get: { .zero },
+                set: { fn($0) }
+            )
+        )
     }
 }

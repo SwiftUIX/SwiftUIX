@@ -52,6 +52,14 @@ public func withInlineStateObject<Object: ObservableObject, Content: View>(
     WithInlineStateObject(object(), content: { content($0.projectedValue) })
 }
 
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+public func withInlineTimerState<Content: View>(
+    interval: TimeInterval,
+    @ViewBuilder content: @escaping (Int) -> Content
+) -> some View {
+    WithInlineTimerState(interval: interval, content: content)
+}
+
 private struct WithInlineState<Value, Content: View>: View {
     @State var value: Value
     
@@ -114,5 +122,24 @@ private struct WithInlineStateObject<Object: ObservableObject, Content: View>: V
     
     var body: some View {
         content(_object)
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+private struct WithInlineTimerState<Content: View>: View {
+    @TimerState var value: Int
+    
+    let content: (Int) -> Content
+    
+    init(
+        interval: TimeInterval,
+        @ViewBuilder content: @escaping (Int) -> Content
+    ) {
+        self._value = TimerState(interval: interval)
+        self.content = content
+    }
+    
+    var body: some View {
+        content(value)
     }
 }

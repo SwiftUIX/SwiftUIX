@@ -7,20 +7,10 @@
 import Swift
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 extension AppKitOrUIKitResponder {
     private static weak var _firstResponder: AppKitOrUIKitResponder?
     
-    public func _SwiftUIX_nearestResponder(
-        where predicate: (AppKitOrUIKitResponder) throws -> Bool
-    ) rethrows -> AppKitOrUIKitResponder? {
-        if try predicate(self) {
-            return self
-        }
-        
-        return try next?._SwiftUIX_nearestResponder(where: predicate)
-    }
-
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
@@ -32,16 +22,14 @@ extension AppKitOrUIKitResponder {
         return _firstResponder
     }
     
+    public var _SwiftUIX_isFirstResponder: Bool {
+        isFirstResponder
+    }
+    
     public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
         _SwiftUIX_nearestResponder(where: { $0.isFirstResponder })
     }
     
-    @objc private func acquireFirstResponder(_ sender: Any) {
-        AppKitOrUIKitResponder._firstResponder = self
-    }
-}
-#elseif os(macOS)
-extension AppKitOrUIKitResponder {
     public func _SwiftUIX_nearestResponder(
         where predicate: (AppKitOrUIKitResponder) throws -> Bool
     ) rethrows -> AppKitOrUIKitResponder? {
@@ -49,7 +37,40 @@ extension AppKitOrUIKitResponder {
             return self
         }
         
-        return try nextResponder?._SwiftUIX_nearestResponder(where: predicate)
+        return try next?._SwiftUIX_nearestResponder(where: predicate)
+    }
+    
+    @objc private func acquireFirstResponder(_ sender: Any) {
+        AppKitOrUIKitResponder._firstResponder = self
+    }
+    
+    @discardableResult
+    public func _SwiftUIX_becomeFirstResponder() -> Bool {
+        self.becomeFirstResponder()
+    }
+    
+    @discardableResult
+    public func _SwiftUIX_resignFirstResponder() -> Bool {
+        self.resignFirstResponder()
+    }
+}
+#elseif os(macOS)
+extension AppKitOrUIKitResponder {
+    private static weak var _firstResponder: AppKitOrUIKitResponder?
+    
+    @available(macCatalystApplicationExtension, unavailable)
+    @available(iOSApplicationExtension, unavailable)
+    @available(tvOSApplicationExtension, unavailable)
+    public static var _SwiftUIX_firstResponder: AppKitOrUIKitResponder? {
+        NSWindow._firstKeyInstance?.firstResponder
+    }
+    
+    public var _SwiftUIX_isFirstResponder: Bool {
+        Self._SwiftUIX_firstResponder === self
+    }
+    
+    public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
+        _SwiftUIX_nearestResponder(where: { _SwiftUIX_nearestWindow?.firstResponder == $0  })
     }
     
     public var _SwiftUIX_nearestWindow: AppKitOrUIKitWindow? {
@@ -64,15 +85,21 @@ extension AppKitOrUIKitResponder {
         }
     }
     
-    public var _SwiftUIX_nearestFirstResponder: AppKitOrUIKitResponder? {
-        _SwiftUIX_nearestResponder(where: { _SwiftUIX_nearestWindow?.firstResponder == $0  })
+    public func _SwiftUIX_nearestResponder(
+        where predicate: (AppKitOrUIKitResponder) throws -> Bool
+    ) rethrows -> AppKitOrUIKitResponder? {
+        if try predicate(self) {
+            return self
+        }
+        
+        return try nextResponder?._SwiftUIX_nearestResponder(where: predicate)
     }
     
     @discardableResult
     public func _SwiftUIX_becomeFirstResponder() -> Bool {
         if let _self = self as? NSView {
             if let window = _self.window {
-               return window.makeFirstResponder(self)
+                return window.makeFirstResponder(self)
             } else {
                 return false
             }
@@ -84,16 +111,10 @@ extension AppKitOrUIKitResponder {
             return false
         }
     }
-}
-
-extension AppKitOrUIKitResponder {
-    private static weak var _firstResponder: AppKitOrUIKitResponder?
     
-    @available(macCatalystApplicationExtension, unavailable)
-    @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
-    public static var _SwiftUIX_firstResponder: AppKitOrUIKitResponder? {
-        NSWindow._firstKeyInstance?.firstResponder
+    @discardableResult
+    public func _SwiftUIX_resignFirstResponder() -> Bool {
+        resignFirstResponder()
     }
 }
 #endif

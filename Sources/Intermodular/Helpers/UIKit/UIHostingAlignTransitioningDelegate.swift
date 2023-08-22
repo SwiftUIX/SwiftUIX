@@ -183,6 +183,7 @@ extension UIHostingAlignTransitioningDelegate {
             var body: some View {
                 CocoaHostingControllerContent(
                     parent: parent,
+                    parentConfiguration: .init(),
                     content: content
                         .environment(\.presentationTransitionType, transitionType)
                 )

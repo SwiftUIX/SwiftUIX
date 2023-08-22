@@ -23,3 +23,24 @@ public struct AnyViewModifier: ViewModifier {
         makeBody(content)
     }
 }
+
+// MARK: - Supplementary
+
+extension View {
+    @ViewBuilder
+    func modifiers(_ modifiers: [AnyViewModifier]) -> some View {
+        if modifiers.isEmpty {
+            self
+        } else {
+            modifiers.reduce(eraseToAnyView()) { view, modifier in
+                view.modifier(modifier).eraseToAnyView()
+            }
+        }
+    }
+}
+
+extension ViewModifier {
+    public func eraseToAnyViewModifier() -> AnyViewModifier {
+        .init(self)
+    }
+}

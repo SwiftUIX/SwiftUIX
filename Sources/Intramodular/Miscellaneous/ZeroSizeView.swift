@@ -14,6 +14,12 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
             .zero
         }
         
+        #if os(macOS)
+        override public var acceptsFirstResponder: Bool {
+            false
+        }
+        #endif
+        
         public override init(frame: CGRect) {
             super.init(frame: .zero)
         }
@@ -60,6 +66,15 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
     @inlinable
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         view.frame.size = .zero
+    }
+    
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    public func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        view: AppKitOrUIKitViewType,
+        context: Context
+    ) -> CGSize? {
+        .zero
     }
 }
 

@@ -8,6 +8,13 @@ import AppKit
 import SwiftUI
 
 extension NSScreen {
+    @_spi(Internal)
+    public static var _primary: NSScreen? {
+        assert(NSScreen.screens.count <= 1)
+        
+        return NSScreen.screens.first
+    }
+    
     /// <http://stackoverflow.com/a/19887161/23649>
     public func _convertToCocoaRect(
         quartzRect: CGRect
@@ -17,6 +24,30 @@ extension NSScreen {
         result.origin.y = self.frame.maxY - result.maxY
         
         return result
+    }
+    
+    @_spi(Internal)
+    public static func flip(_ point: CGPoint) -> CGPoint {
+        let globalHeight = screens.map({ $0.frame.origin.y + $0.frame.height }).max()!
+        let flippedY = globalHeight - point.y
+        let convertedPoint = NSPoint(x: point.x, y: flippedY)
+        
+        return convertedPoint
+    }
+}
+
+extension NSWindow {
+    func flip(_ point: CGPoint) -> CGPoint {
+        CGPoint(x: point.x, y: frame.height - point.y)
+    }
+    
+    func flip(_ rect: CGRect) -> CGRect {
+        CGRect(
+            x: rect.origin.x,
+            y: frame.height - (rect.origin.y + rect.height),
+            width: rect.width,
+            height: rect.height
+        )
     }
 }
 

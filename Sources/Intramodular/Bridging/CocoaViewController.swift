@@ -2,10 +2,16 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Swift
 import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+public protocol _CocoaHostingControllerOrView: AppKitOrUIKitResponder {
+    var _configuration: CocoaHostingControllerConfiguration { get set }
+    var _observedPreferenceValues: _ObservedPreferenceValues { get }
+}
 
 public protocol CocoaViewController: AppKitOrUIKitViewController {
     func _namedViewDescription(for _: AnyHashable) -> _NamedViewDescription?
@@ -13,6 +19,34 @@ public protocol CocoaViewController: AppKitOrUIKitViewController {
     func _disableSafeAreaInsetsIfNecessary()
     
     func _SwiftUIX_sizeThatFits(in size: CGSize) -> CGSize
+}
+
+// MARK: - API
+
+extension _CocoaHostingControllerOrView {
+    public var _measuredSizePublisher: AnyPublisher<CGSize, Never> {
+        _configuration._measuredSizePublisher.eraseToAnyPublisher()
+    }
+
+    public func _observePreferenceKey<Key: PreferenceKey>(
+        _ key: Key.Type
+    ) where Key.Value: Equatable {
+        guard !_configuration.observedPreferenceKeys.contains(where: { $0 == key }) else {
+            return
+        }
+        
+        _configuration.observedPreferenceKeys.append(key)
+        _configuration.preferenceValueObservers.append(
+            PreferenceValueObserver<Key>(store: self._observedPreferenceValues)
+                .eraseToAnyViewModifier()
+        )
+    }
+    
+    public subscript<Key: PreferenceKey>(
+        _ key: Key.Type
+    ) -> Key.Value? where Key.Value: Equatable {
+        self._observedPreferenceValues[key]
+    }
 }
 
 #endif

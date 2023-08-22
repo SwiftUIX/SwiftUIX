@@ -8,9 +8,21 @@ import SwiftUI
 
 /// Environment values and objects captured for insertion into view hierarchies.
 public struct EnvironmentInsertions {
-    lazy var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
-    lazy var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
-    lazy var weakEnvironmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
+    var valuesByKeyPath: [PartialKeyPath<EnvironmentValues>: Any] = [:]
+    var environmentValuesTransforms: [AnyHashable: (inout EnvironmentValues) -> Void] = [:]
+    var environmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
+    var weakEnvironmentObjectTransforms: [AnyHashable: (AnyView) -> AnyView] = [:]
+
+    public var _isOnlyEnvironmentValues: Bool {
+        environmentObjectTransforms.isEmpty && weakEnvironmentObjectTransforms.isEmpty
+    }
+    
+    public var isEmpty: Bool {
+        valuesByKeyPath.isEmpty
+            && self.environmentObjectTransforms.isEmpty
+            && self.environmentValuesTransforms.isEmpty
+            && weakEnvironmentObjectTransforms.isEmpty
+    }
 
     public init() {
         
@@ -18,15 +30,14 @@ public struct EnvironmentInsertions {
 }
 
 extension EnvironmentInsertions {
-    /// A Boolean value that indicates whether the builder is empty.
-    public var isEmpty: Bool {
-        var `self` = self
-        
-        return self.environmentObjectTransforms.isEmpty && self.environmentValuesTransforms.isEmpty
+    public subscript<Value>(_ keyPath: WritableKeyPath<EnvironmentValues, Value>) -> Value? {
+        get {
+            valuesByKeyPath[keyPath] as? Value
+        } set {
+            valuesByKeyPath[keyPath] = newValue
+        }
     }
-}
 
-extension EnvironmentInsertions {
     public mutating func transformEnvironment(
         _ transform: @escaping (inout EnvironmentValues) -> Void,
         withKey key: AnyHashable
@@ -48,9 +59,7 @@ extension EnvironmentInsertions {
     public mutating func transformEnvironment(_ transform: @escaping (inout EnvironmentValues) -> Void) {
         transformEnvironment(transform, withKey: UUID())
     }
-}
 
-extension EnvironmentInsertions {
     private mutating func insert<B: ObservableObject>(
         _ bindable: B,
         withKey key: AnyHashable
@@ -86,17 +95,33 @@ extension EnvironmentInsertions {
 }
 
 extension EnvironmentInsertions {
-    public mutating func merge(_ builder: EnvironmentInsertions?) {
-        guard var builder = builder else {
+    public mutating func merge(
+        _ insertions: EnvironmentInsertions?
+    ) {
+        guard let insertions else {
             return
         }
         
-        environmentValuesTransforms.merge(builder.environmentValuesTransforms, uniquingKeysWith: { x, y in x })
-        environmentObjectTransforms.merge(builder.environmentObjectTransforms, uniquingKeysWith: { x, y in x })
+        valuesByKeyPath.merge(
+            insertions.valuesByKeyPath,
+            uniquingKeysWith: { lhs, rhs in lhs }
+        )
+        environmentValuesTransforms.merge(
+            insertions.environmentValuesTransforms,
+            uniquingKeysWith: { lhs, rhs in lhs }
+        )
+        environmentObjectTransforms.merge(
+            insertions.environmentObjectTransforms,
+            uniquingKeysWith: { lhs, rhs in lhs }
+        )
+        weakEnvironmentObjectTransforms.merge(
+            insertions.environmentObjectTransforms,
+            uniquingKeysWith: { lhs, rhs in lhs }
+        )
     }
 }
 
-// MARK: - API
+// MARK: - Initializers
 
 extension EnvironmentInsertions {
     public static func value<T>(
@@ -133,46 +158,82 @@ extension EnvironmentInsertions {
     }
 }
 
+// MARK: - Supplementary
+
 extension View {
-    @ViewBuilder
-    public func environment(_ builder: EnvironmentInsertions) -> some View {
-        if builder.isEmpty {
-            self
-        } else {
-            _environment(builder)
-        }
+    public func environment(
+        _ insertions: EnvironmentInsertions
+    ) -> some View {
+        _insertEnvironment(insertions)
     }
     
-    private func _environment(_ other: EnvironmentInsertions) -> some View {
-        var other = other
-        
-        return other
-            .environmentObjectTransforms
-            .values
-            .reduce(eraseToAnyView(), { view, transform in transform(view) })
-            .transformEnvironment(\.self, transform: { environment in
-                other.environmentValuesTransforms.values.forEach({ $0(&environment) })
-            })
-            .transformEnvironment(\._environmentInsertions, transform: {
-                $0.merge(other)
-            })
+    @ViewBuilder
+    private func _insertEnvironment(
+        _ insertions: EnvironmentInsertions
+    ) -> some View {
+        if insertions._isOnlyEnvironmentValues {
+            self.transformEnvironment(\.self) { environment in
+                insertions._apply(to: &environment)
+            }
+        } else {
+            insertions
+                .environmentObjectTransforms
+                .values // FIXME: The order can change here.
+                .reduce(eraseToAnyView(), { view, transform in transform(view) })
+                .transformEnvironment(\.self) { environment in
+                    insertions._apply(to: &environment)
+                }
+                .transformEnvironment(\._environmentInsertions) {
+                    $0.merge(insertions)
+                }
+        }
     }
 }
 
 // MARK: - Auxiliary
 
 extension EnvironmentInsertions {
-    struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        static let defaultValue = EnvironmentInsertions()
+    func _apply(to environment: inout EnvironmentValues) {
+        valuesByKeyPath.forEach {
+            try! ($0.key as! _opaque_WritableKeyPathType)._opaque_assign($0.value, to: &environment)
+        }
+        
+        environmentValuesTransforms.values.forEach({ $0(&environment) })
     }
 }
 
 extension EnvironmentValues {
+    struct EnvironmentInsertionsKey: EnvironmentKey {
+        static let defaultValue = EnvironmentInsertions()
+    }
+
     public var _environmentInsertions: EnvironmentInsertions {
         get {
-            self[EnvironmentInsertions.EnvironmentKey.self]
+            self[EnvironmentInsertionsKey.self]
         } set {
-            self[EnvironmentInsertions.EnvironmentKey.self] = newValue
+            self[EnvironmentInsertionsKey.self] = newValue
         }
     }
+}
+
+// MARK: - Helpers
+
+fileprivate protocol _opaque_WritableKeyPathType {
+    func _opaque_assign<_Value, _Root>(_ value: _Value, to root: inout _Root) throws
+}
+
+extension WritableKeyPath: _opaque_WritableKeyPathType {
+    func _opaque_assign<_Value, _Root>(_ value: _Value, to root: inout _Root) throws {
+        guard var _root = root as? Root, let value = value as? Value else {
+            throw CastError.invalidTypeCast
+        }
+        
+        _root[keyPath: self] = value
+        
+        root = _root as! _Root
+    }
+}
+
+fileprivate enum CastError: Error {
+    case invalidTypeCast
 }

@@ -18,7 +18,7 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
             .system(symbol.rawValue)
         }
     }
-
+    
     case appKitOrUIKitImage(AppKitOrUIKitImage)
     case named(Name)
     
@@ -48,7 +48,52 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
     }
 }
 
+extension _AnyImage: View {
+    public var body: some View {
+        switch self {
+            case .appKitOrUIKitImage(let image):
+                Image(image: image)
+            case .named(let name):
+                switch name {
+                    case .bundleResource(let name, let bundle):
+                        Image(name, bundle: bundle)
+                    case .system(let name):
+                        Image(_systemName: name)
+                }
+        }
+    }
+}
+
 // MARK: - Conformances
+
+extension _AnyImage: Codable {
+    private enum _DecodingError: Error {
+        case unsupported
+    }
+
+    private enum _EncodingError: Error {
+        case unsupported
+    }
+        
+    public init(from decoder: Decoder) throws {
+        do {
+            self = try .named(Name(from: decoder))
+        } catch {
+            throw _DecodingError.unsupported
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+            case .named(let name):
+                try name.encode(to: encoder)
+            case .appKitOrUIKitImage:
+                assertionFailure("unsupported")
+                
+                throw _EncodingError.unsupported
+        }
+    }
+}
 
 extension _AnyImage.Name: Codable {
     struct _CodableRepresentation: Codable {

@@ -29,21 +29,27 @@ extension AppKitOrUIKitViewController {
     
     public func _SwiftUIX_makeFirstResponder(
         _ responder: AppKitOrUIKitResponder?
-    ) {
+    ) -> Bool {
         if let responder {
             if responder === self {
                 if view.canBecomeFirstResponder {
-                    view.becomeFirstResponder()
+                    return view.becomeFirstResponder()
                 } else if canBecomeFirstResponder {
-                    becomeFirstResponder()
+                    return becomeFirstResponder()
                 } else {
                     assertionFailure()
+                    
+                    return false
                 }
             } else {
-                responder.becomeFirstResponder()
+                return responder.becomeFirstResponder()
             }
         } else {
-            _SwiftUIX_firstResponderController?.resignFirstResponder()
+            guard let responder = _SwiftUIX_firstResponderController else {
+                return false
+            }
+            
+            return responder.resignFirstResponder()
         }
     }
 }

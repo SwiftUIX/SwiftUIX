@@ -103,7 +103,10 @@ extension _PaginationView: UIViewControllerRepresentable {
     }
     
     @usableFromInline
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+    func updateUIViewController(
+        _ uiViewController: UIViewControllerType,
+        context: Context
+    ) {
         var shouldUpdateContent = true
         
         defer {

@@ -52,6 +52,10 @@ public struct TimerState: DynamicProperty {
         self.animation = animation
     }
     
+    public init() {
+        self.init(wrappedValue: 0, interval: 1, maxCount: nil, animation: nil)
+    }
+    
     public mutating func update() {
         if state.value == nil {
             let maxCount = self.maxCount

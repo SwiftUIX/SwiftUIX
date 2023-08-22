@@ -7,13 +7,21 @@ import SwiftUI
 
 /// A convenience around a closure of the type `() -> Void`.
 public struct Action: DynamicAction, Hashable, Identifiable {
+    public let id: AnyHashable?
+
+    private let fakeID: AnyHashable?
     private let value: @convention(block) () -> Void
-    
-    public let id: AnyHashable
+        
+    public init(id: AnyHashable, _ value: @escaping () -> Void) {
+        self.value = value
+        self.fakeID = nil
+        self.id = id
+    }
     
     public init(_ value: @escaping () -> Void) {
         self.value = value
-        self.id = UUID()
+        self.fakeID = AnyHashable(UUID())
+        self.id = nil
     }
     
     public func hash(into hasher: inout Hasher) {
@@ -102,7 +110,7 @@ public struct PerformAction: _ActionInitiableView, _ActionPerformingView {
     }
 }
 
-// MARK: - Auxiliary Implementaton -
+// MARK: - Auxiliary -
 
 public protocol _ActionInitiableView {
     init(action: Action)
@@ -111,5 +119,89 @@ public protocol _ActionInitiableView {
 extension _ActionInitiableView {
     public init(action: @escaping () -> Void) {
         self.init(action: .init(action))
+    }
+}
+
+@_spi(Internal)
+public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
+    private class ActionTrampoline {
+        var value: Action = .init({ })
+        
+        func callAsFunction() {
+            value()
+        }
+    }
+    
+    private let actions: [Key: Action]
+    private let content: ([Key: Action]) -> Content
+    
+    @ViewStorage private var trampolineIdentifiersByKey: [Key: AnyHashable] = [:]
+    @ViewStorage private var trampolines: [AnyHashable: ActionTrampoline] = [:]
+    
+    @State private var stableActions: [Key: Action] = [:]
+    
+    public init(
+        actions: [Key: Action],
+        @ViewBuilder content: @escaping ([Key: Action]) -> Content
+    ) {
+        self.actions = actions
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(trampolines(for: actions))
+    }
+    
+    private func trampolines(for actions: [Key: Action]) -> [Key: Action] {
+        if Set(trampolineIdentifiersByKey.keys) == Set(actions.keys) {
+            for (key, newAction) in actions {
+                let trampolineID: AnyHashable = trampolineIdentifiersByKey[key]!
+                
+                trampolines[trampolineID]!.value = newAction
+            }
+            
+            guard Set(stableActions.keys) == Set(actions.keys) else {
+                return self._makeStableActions(
+                    trampolineIdentifiersByKey: trampolineIdentifiersByKey,
+                    trampolines: trampolines
+                )
+            }
+            
+            return stableActions
+        } else {
+            self.trampolineIdentifiersByKey = actions.mapValues({ _ in AnyHashable(UUID()) })
+            self.trampolines = Dictionary(uniqueKeysWithValues: trampolineIdentifiersByKey.map({ (key, id) in
+                (id, ActionTrampoline())
+            }))
+            
+            let stableActions = self._makeStableActions(
+                trampolineIdentifiersByKey: self.trampolineIdentifiersByKey,
+                trampolines: self.trampolines
+            )
+            
+            DispatchQueue.main.async {
+                self.stableActions = stableActions
+            }
+            
+            return stableActions
+        }
+    }
+    
+    private func _makeStableActions(
+        trampolineIdentifiersByKey: [Key: AnyHashable],
+        trampolines: [AnyHashable: ActionTrampoline]
+    ) -> [Key: Action] {
+        Dictionary(
+            uniqueKeysWithValues: actions.keys.map({ key in
+                let trampolineID = trampolineIdentifiersByKey[key]!
+                let trampoline = trampolines[trampolineID]!
+                
+                let action = Action(id: trampolineID) {
+                    trampoline.value()
+                }
+                
+                return (key, action)
+            })
+        )
     }
 }
