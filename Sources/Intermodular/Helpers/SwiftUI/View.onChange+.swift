@@ -51,15 +51,15 @@ extension View {
         of value: V,
         perform action: @escaping (V) -> Void
     ) -> some View {
-#if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(watchOS) || os(tvOS) || targetEnvironment(macCatalyst)
         if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
             onChange(of: value, perform: action)
         } else {
             _backport_onChange(of: value, perform: action)
         }
-#else
+        #else
         _backport_onChange(of: value, perform: action)
-#endif
+        #endif
     }
     
     @ViewBuilder
@@ -69,13 +69,16 @@ extension View {
     ) -> some View {
         OnChangeOfValue(base: self, value: value, action: action)
     }
-}
 
-extension View {
-    public func onChangeOfFrame(
-        perform action: @escaping (CGSize) -> Void
+    @inlinable
+    public func _onAppearAndChange<V: Equatable>(
+        of value: V,
+        perform action: @escaping (_ newValue: V) -> Void
     ) -> some View {
-        modifier(_OnChangeOfFrame(action: action))
+        onAppear {
+            action(value)
+        }
+        .onChange(of: value, perform: action)
     }
 }
 
@@ -88,11 +91,19 @@ extension View {
     }
 }
 
+extension View {
+    public func onChangeOfFrame(
+        perform action: @escaping (CGSize) -> Void
+    ) -> some View {
+        modifier(_OnChangeOfFrame(action: action))
+    }
+}
+
 // MARK: - Auxiliary
 
 // A modified implementation based on https://stackoverflow.com/questions/58363563/swiftui-get-notified-when-binding-value-changes
 private struct OnChangeOfValue<Base: View, Value: Equatable>: View {
-    class ValueBox {
+    private class ValueBox {
         private var savedValue: Value?
         
         func update(value: Value) -> Bool {
@@ -123,21 +134,6 @@ private struct OnChangeOfValue<Base: View, Value: Equatable>: View {
         }
         
         return base
-    }
-}
-
-private struct _OnChangeOfFrame: ViewModifier {
-    let action: (CGSize) -> Void
-    
-    func body(content: Content) -> some View {
-        content.background {
-            GeometryReader { proxy in
-                ZeroSizeView()
-                    .onChange(of: proxy.size, perform: { action($0) })
-            }
-            .allowsHitTesting(false)
-            .accessibility(hidden: true)
-        }
     }
 }
 
@@ -172,6 +168,21 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
             
             self.subscription = subscription
             self.cancellable = .init(subscription.cancel)
+        }
+    }
+}
+
+private struct _OnChangeOfFrame: ViewModifier {
+    let action: (CGSize) -> Void
+    
+    func body(content: Content) -> some View {
+        content.background {
+            GeometryReader { proxy in
+                ZeroSizeView()
+                    .onChange(of: proxy.size, perform: { action($0) })
+            }
+            .allowsHitTesting(false)
+            .accessibility(hidden: true)
         }
     }
 }

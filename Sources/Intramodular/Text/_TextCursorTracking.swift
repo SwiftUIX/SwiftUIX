@@ -10,9 +10,10 @@ import SwiftUI
 public final class _TextCursorTracking: ObservableObject {
     private weak var owner: (any _PlatformTextView_Type)?
     
-    @Published public private(set) var location: Int?
-    @Published public private(set) var bounds: CGRect?
-    
+    @Published public private(set) var positionInText: Int?
+    @_spi(Internal)
+    @Published public private(set) var location: _CoordinateSpaceSpecific<CGRect>?
+
     init(owner: (any _PlatformTextView_Type)?) {
         self.owner = owner
         
@@ -23,8 +24,14 @@ public final class _TextCursorTracking: ObservableObject {
     /// Update the tracking state by copying from the owner.
     @_spi(Internal)
     public func update() {
-        self.location = owner?._caretLocation
-        self.bounds = owner?._cocoaCaretBoundsInWindow
+        guard let owner else {
+            return
+        }
+        
+        owner._performOrSchedulePublishingChanges {
+            self.positionInText = owner._caretTextPosition
+            self.location = owner._SwiftUIX_caretLocation
+        }
     }
 }
 
@@ -46,7 +53,7 @@ extension _TextCursorTracking {
     }
     
     @objc func selectionDidChange(_ notification: Notification) {
-        guard (notification.object as? NSTextView) === owner else {
+        guard let owner, (notification.object as? NSTextView) === owner else {
             return
         }
         
@@ -58,13 +65,13 @@ extension _TextCursorTracking {
 // MARK: - Auxiliary
 
 extension AppKitOrUIKitTextView {
-    var _caretLocation: Int? {
+    var _caretTextPosition: Int? {
         _SwiftUIX_selectedRange.length > 0 ? nil : selectedRange.location
     }
 }
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
-    var _cocoaCaretBoundsInWindow: CGRect? {
+    var _SwiftUIX_caretLocation: _CoordinateSpaceSpecific<CGRect>? {
         guard let selectedRange = selectedTextRange else {
             return nil
         }
@@ -73,14 +80,16 @@ extension AppKitOrUIKitTextView {
             return nil
         }
         
-        let cursorRect = caretRect(for: selectedRange.start)
-        
-        return cursorRect
+        var result = _CoordinateSpaceSpecific<CGRect>()
+
+        result[.coordinateSpace(.global)] = caretRect(for: selectedRange.start)
+
+        return result
     }
 }
 #elseif os(macOS)
 extension AppKitOrUIKitTextView {
-    var _cocoaCaretBoundsInWindow: CGRect? {
+    var _SwiftUIX_caretLocation: _CoordinateSpaceSpecific<CGRect>? {
         guard let window else {
             return nil
         }
@@ -90,15 +99,18 @@ extension AppKitOrUIKitTextView {
         if selectedRange.length > 0 {
             return nil
         } else {
-            let unflippedScreenRect = firstRect(forCharacterRange: selectedRange, actualRange: nil)
+            var unflippedScreenRect = firstRect(forCharacterRange: selectedRange, actualRange: nil)
                         
-            var rect = window.flip(window.convertFromScreen(unflippedScreenRect))
-            
-            if rect.width == 0 {
-                rect.size.width = 1
+            if unflippedScreenRect.width == 0 {
+                unflippedScreenRect.size.width = 1
             }
+
+            var result = _CoordinateSpaceSpecific<CGRect>()
             
-            return rect
+            result[.coordinateSpace(.global)] = window.flipLocal(window.convertFromScreen(unflippedScreenRect))
+            result[.screen(.main)] = NSScreen.flip(unflippedScreenRect)
+
+            return result
         }
     }
 }

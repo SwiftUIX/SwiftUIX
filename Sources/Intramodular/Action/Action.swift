@@ -125,10 +125,14 @@ extension _ActionInitiableView {
 @_spi(Internal)
 public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
     private class ActionTrampoline {
-        var value: Action = .init({ })
+        var base: Action
+        
+        init(base: Action) {
+            self.base = base
+        }
         
         func callAsFunction() {
-            value()
+            base()
         }
     }
     
@@ -157,7 +161,7 @@ public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
             for (key, newAction) in actions {
                 let trampolineID: AnyHashable = trampolineIdentifiersByKey[key]!
                 
-                trampolines[trampolineID]!.value = newAction
+                trampolines[trampolineID]!.base = newAction
             }
             
             guard Set(stableActions.keys) == Set(actions.keys) else {
@@ -171,7 +175,9 @@ public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
         } else {
             self.trampolineIdentifiersByKey = actions.mapValues({ _ in AnyHashable(UUID()) })
             self.trampolines = Dictionary(uniqueKeysWithValues: trampolineIdentifiersByKey.map({ (key, id) in
-                (id, ActionTrampoline())
+                let action = actions[key]!
+                
+                return (id, ActionTrampoline(base: action))
             }))
             
             let stableActions = self._makeStableActions(
@@ -197,7 +203,7 @@ public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
                 let trampoline = trampolines[trampolineID]!
                 
                 let action = Action(id: trampolineID) {
-                    trampoline.value()
+                    trampoline()
                 }
                 
                 return (key, action)

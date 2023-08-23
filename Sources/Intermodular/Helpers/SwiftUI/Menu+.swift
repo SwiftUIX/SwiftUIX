@@ -19,7 +19,7 @@ extension View {
         .buttonStyle(PlainButtonStyle())
     }
 }
-#else
+#elseif !os(tvOS)
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

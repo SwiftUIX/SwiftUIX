@@ -6,9 +6,11 @@
 
 import SwiftUI
 
-public protocol _AppKitOrUIKitRepresented: AppKitOrUIKitResponder {    
+public protocol _AppKitOrUIKitRepresented: AppKitOrUIKitResponder {
     var representationStateFlags: _AppKitOrUIKitRepresentationStateFlags { get set }
     var representationCache: _AppKitOrUIKitRepresentationCache { get set }
+    
+    func _performOrSchedulePublishingChanges(_: @escaping () -> Void)
 }
 
 public struct _AppKitOrUIKitRepresentationStateFlags: OptionSet {
@@ -40,6 +42,38 @@ public struct _AppKitOrUIKitRepresentationCache: ExpressibleByNilLiteral {
             case .intrinsicContentSize:
                 _cachedIntrinsicContentSize = nil
                 _sizeThatFitsCache = [:]
+        }
+    }
+}
+
+extension AppKitOrUIKitResponder {
+    public func _performOrSchedulePublishingChanges(
+        @_implicitSelfCapture _ operation: @escaping () -> Void
+    ) {
+        if let responder = self as? _AppKitOrUIKitRepresented {
+            if responder.representationStateFlags.contains(.updateInProgress) {
+                DispatchQueue.main.async {
+                    operation()
+                }
+            } else {
+                operation()
+            }
+        } else {
+            operation()
+        }
+    }
+}
+
+extension _AppKitOrUIKitRepresented {
+    public func _performOrSchedulePublishingChanges(
+        @_implicitSelfCapture _ operation: @escaping () -> Void
+    ) {
+        if representationStateFlags.contains(.updateInProgress) {
+            DispatchQueue.main.async {
+                operation()
+            }
+        } else {
+            operation()
         }
     }
 }

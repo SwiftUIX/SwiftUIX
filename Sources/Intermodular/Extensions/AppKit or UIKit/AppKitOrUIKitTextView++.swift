@@ -20,6 +20,14 @@ extension AppKitOrUIKitTextView {
         textStorage
     }
     
+    public var _SwiftUIX_text: String {
+        text ?? ""
+    }
+
+    public var _SwiftUIX_attributedText: NSAttributedString {
+        attributedText ?? NSAttributedString()
+    }
+
     var defaultParagraphStyle: NSParagraphStyle? {
         NSParagraphStyle.default
     }
@@ -81,6 +89,14 @@ extension AppKitOrUIKitTextView {
     
     public var _SwiftUIX_textStorage: NSTextStorage? {
         textStorage
+    }
+    
+    public var _SwiftUIX_text: String {
+        string
+    }
+    
+    public var _SwiftUIX_attributedText: NSAttributedString {
+        attributedString()
     }
     
     func _sizeThatFits(

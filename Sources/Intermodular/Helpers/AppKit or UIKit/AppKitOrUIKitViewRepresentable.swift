@@ -142,18 +142,40 @@ extension AppKitOrUIKitViewRepresentable {
 
 extension AppKitOrUIKitViewRepresentable {
     @MainActor
-    public func makeUIView(context: Context) -> AppKitOrUIKitViewType {
+    public func makeUIView(
+        context: Context
+    ) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
     
     @MainActor
-    public func updateUIView(_ view: AppKitOrUIKitViewType, context: Context) {
+    public func updateUIView(
+        _ view: AppKitOrUIKitViewType,
+        context: Context
+    ) {
+        let represented = view as? _AppKitOrUIKitRepresented
+        
+        represented?.representationStateFlags.insert(.updateInProgress)
+        
         updateAppKitOrUIKitView(view, context: context)
+        
+        represented?.representationStateFlags.remove(.updateInProgress)
+        
+        if let represented, !represented.representationStateFlags.contains(.didUpdateAtLeastOnce) {
+            represented.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        }
     }
     
     @MainActor
-    public static func dismantleUIView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
+    public static func dismantleUIView(
+        _ view: AppKitOrUIKitViewType,
+        coordinator: Coordinator
+    ) {
+        let represented = view as? _AppKitOrUIKitRepresented
+        
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
+        
+        represented?.representationStateFlags.insert(.dismantled)
     }
 }
 
@@ -292,13 +314,30 @@ extension AppKitOrUIKitViewRepresentable {
     }
     
     @MainActor
-    public func updateNSView(_ view: AppKitOrUIKitViewType, context: Context) {
+    public func updateNSView(
+        _ view: AppKitOrUIKitViewType, 
+        context: Context
+    ) {
+        let represented = view as? _AppKitOrUIKitRepresented
+        
+        represented?.representationStateFlags.insert(.updateInProgress)
+
         updateAppKitOrUIKitView(view, context: context)
+        
+        represented?.representationStateFlags.remove(.updateInProgress)
+        
+        if let represented, !represented.representationStateFlags.contains(.didUpdateAtLeastOnce) {
+            represented.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        }
     }
     
     @MainActor
     public static func dismantleNSView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
+        let represented = view as? _AppKitOrUIKitRepresented
+        
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
+        
+        represented?.representationStateFlags.insert(.dismantled)
     }
 }
 
@@ -309,7 +348,10 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
     }
     
     @MainActor
-    public func updateNSView(_ view: AppKitOrUIKitViewType, context: Context) {
+    public func updateNSView(
+        _ view: AppKitOrUIKitViewType,
+        context: Context
+    ) {
         view.representationStateFlags.insert(.updateInProgress)
         
         updateAppKitOrUIKitView(view, context: context)

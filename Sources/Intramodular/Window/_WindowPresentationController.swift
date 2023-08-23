@@ -24,7 +24,16 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     
     private var _updateWorkItem: DispatchWorkItem?
     
-    public func _setNeedsUpdate() {
+    public func _setNeedsUpdate(immediately: Bool = false) {
+        guard !immediately else {
+            _updateWorkItem?.cancel()
+            _updateWorkItem = nil
+            
+            self._update()
+            
+            return
+        }
+        
         _updateWorkItem?.cancel()
         _updateWorkItem = nil
         
@@ -63,7 +72,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         }
     }
     
-    private var contentWindow: AppKitOrUIKitHostingWindow<Content>? {
+    @_spi(Internal)
+    public var contentWindow: AppKitOrUIKitHostingWindow<Content>? {
         didSet {
             _bindVisibilityToContentWindow()
         }
@@ -95,13 +105,23 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             isVisible: false
         )
     }
+    
+    public convenience init(
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(content: content())
+    }
         
     public func show() {
         isVisible = true
+        
+        _setNeedsUpdate(immediately: true)
     }
     
     public func hide() {
         isVisible = false
+        
+        _setNeedsUpdate(immediately: true)
     }
     
     func _update() {
@@ -175,6 +195,18 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
 
 #if os(macOS)
 extension _WindowPresentationController {
+    public convenience init(
+        content: Content,
+        _windowStyle: _WindowStyle
+    ) {
+        self.init(
+            content: content,
+            windowStyle: _windowStyle,
+            canBecomeKey: true,
+            isVisible: false
+        )
+    }
+
     @available(macOS 11.0, *)
     @available(iOS, unavailable)
     @available(tvOS, unavailable)
@@ -214,9 +246,10 @@ extension _WindowPresentationController {
 
 public enum _WindowStyle {
     case `default`
-    case titleBar
     case hiddenTitleBar
-    
+    case plain
+    case titleBar
+
     @available(macOS 11.0, *)
     @available(iOS, unavailable)
     @available(tvOS, unavailable)
@@ -225,10 +258,10 @@ public enum _WindowStyle {
         switch windowStyle {
             case is DefaultWindowStyle:
                 self = .`default`
-            case is TitleBarWindowStyle:
-                self = .titleBar
             case is HiddenTitleBarWindowStyle:
                 self = .hiddenTitleBar
+            case is TitleBarWindowStyle:
+                self = .titleBar
             default:
                 assertionFailure("unimplemented")
                 

@@ -173,7 +173,7 @@ extension View {
 // MARK: - Debugging
 
 extension View {
-    public func _printingChanges() -> Self {
+    public func _printChanges_printingChanges() -> Self {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
             Self._printChanges()
 

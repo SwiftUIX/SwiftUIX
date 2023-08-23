@@ -27,21 +27,30 @@ extension NSScreen {
     }
     
     @_spi(Internal)
-    public static func flip(_ point: CGPoint) -> CGPoint {
+    public static func flip(
+        _ point: CGPoint
+    ) -> CGPoint {
         let globalHeight = screens.map({ $0.frame.origin.y + $0.frame.height }).max()!
         let flippedY = globalHeight - point.y
         let convertedPoint = NSPoint(x: point.x, y: flippedY)
         
         return convertedPoint
     }
+    
+    @_spi(Internal)
+    public static func flip(
+        _ rect: CGRect
+    ) -> CGRect {
+        CGRect(origin: flip(rect.origin), size: rect.size)
+    }
 }
 
 extension NSWindow {
-    func flip(_ point: CGPoint) -> CGPoint {
+    func flipLocal(_ point: CGPoint) -> CGPoint {
         CGPoint(x: point.x, y: frame.height - point.y)
     }
     
-    func flip(_ rect: CGRect) -> CGRect {
+    func flipLocal(_ rect: CGRect) -> CGRect {
         CGRect(
             x: rect.origin.x,
             y: frame.height - (rect.origin.y + rect.height),

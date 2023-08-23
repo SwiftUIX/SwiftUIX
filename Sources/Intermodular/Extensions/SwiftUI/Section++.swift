@@ -20,9 +20,9 @@ extension Section {
         } else {
             let mirror = Mirror(reflecting: self)
             
-            let header = mirror[_keyPath: "header"] as! Parent
-            let content = mirror[_keyPath: "content"] as! Content
-            let footer = mirror[_keyPath: "footer"] as! Footer
+            let header = mirror[_SwiftUIX_keyPath: "header"] as! Parent
+            let content = mirror[_SwiftUIX_keyPath: "content"] as! Content
+            let footer = mirror[_SwiftUIX_keyPath: "footer"] as! Footer
             
             return .init(header: header, content: content, footer: footer)
         }

@@ -9,8 +9,8 @@ import SwiftUI
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: (any _CocoaHostingControllerOrView)?
 
-    var parentConfiguration: CocoaHostingControllerConfiguration
-    var content: Content
+    public var parentConfiguration: CocoaHostingControllerConfiguration
+    public var content: Content
     
     init(
         parent: CocoaViewController?,

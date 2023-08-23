@@ -8,27 +8,33 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 #if os(macOS)
-protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindowDelegate {
+public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindowDelegate {
+    var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
+    func show()
 }
 #else
-protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
+public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
+    var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
+    func show()
 }
 #endif
+
+public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
+    public var style: _WindowStyle = .default
+    public var canBecomeKey: Bool = true
+    public var allowTouchesToPassThrough: Bool = false
+    public var windowPosition: CGPoint?
+    public var isTitleBarHidden: Bool?
+    public var backgroundColor: Color?
+}
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
-    public struct PreferredConfiguration: Equatable {
-        public var style: _WindowStyle = .default
-        public var canBecomeKey: Bool = true
-        public var allowTouchesToPassThrough: Bool = false
-        public var windowPosition: CGPoint?
-        public var isTitleBarHidden: Bool?
-        public var backgroundColor: Color?
-    }
+    public typealias PreferredConfiguration = _AppKitOrUIKitHostingWindowConfiguration
     
     /// The window's preferred configuration.
     ///
@@ -56,6 +62,10 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     }
     
     #if os(macOS)
+    override public var canBecomeKey: Bool {
+        configuration.canBecomeKey
+    }
+
     var contentWindowController: NSWindowController?
     #endif
     
@@ -139,25 +149,31 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         setWindowOrigin()
         
         #if os(iOS) || os(tvOS)
-        backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor()
+        if let backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor() {
+            self.backgroundColor = backgroundColor
+        }
         #elseif os(macOS)
-        backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor()
-        
-        if configuration.backgroundColor == .clear {
-            hasShadow = false
-            isOpaque = false
-        } else {
-            hasShadow = true
-            isOpaque = true
+        if let backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor() {
+            self.backgroundColor = backgroundColor
         }
         
-        if (configuration.isTitleBarHidden ?? false) {
-            if styleMask.contains(.titled) {
-                styleMask.remove(.titled)
-            }
+        if self.backgroundColor == .clear {
+            _assignIfNotEqual(false, to: &isOpaque)
+            _assignIfNotEqual(false, to: &hasShadow)
         } else {
-            if !styleMask.contains(.titled) {
-                styleMask.formUnion(.titled)
+            _assignIfNotEqual(true, to: &isOpaque)
+            _assignIfNotEqual(true, to: &hasShadow)
+        }
+        
+        if configuration.style == .default {
+            if (configuration.isTitleBarHidden ?? false) {
+                if styleMask.contains(.titled) {
+                    styleMask.remove(.titled)
+                }
+            } else {
+                if !styleMask.contains(.titled) {
+                    styleMask.formUnion(.titled)
+                }
             }
         }
         
@@ -197,8 +213,6 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         switch style {
             case .`default`:
                 self.init(contentViewController: contentViewController)
-            case .titleBar:
-                self.init(contentViewController: contentViewController)
             case .hiddenTitleBar:
                 let styleMask: NSWindow.StyleMask = [.titled, .closable, .resizable, .miniaturizable]
                 
@@ -212,10 +226,28 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 contentViewController.title = nil
                 
                 self.contentViewController = contentViewController
-                
                 self.configuration.style = style
                 
                 applyPreferredConfiguration()
+            case .plain:
+                self.init(
+                    contentRect: .zero,
+                    styleMask: [.borderless, .fullSizeContentView],
+                    backing: .buffered,
+                    defer: false
+                )
+                
+                self.contentViewController = contentViewController
+                self.configuration.style = style
+
+                backgroundColor = NSColor.clear
+                isOpaque = false
+                styleMask.insert(NSWindow.StyleMask.fullSizeContentView)
+                styleMask.remove(NSWindow.StyleMask.titled)
+                hasShadow = false
+                
+            case .titleBar:
+                self.init(contentViewController: contentViewController)
         }
         
         performSetUp()
@@ -287,6 +319,22 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         
         super.layoutIfNeeded()
     }
+    
+    override public func makeKey() {
+        guard configuration.canBecomeKey else {
+            return
+        }
+        
+        super.makeKey()
+    }
+    
+    override public func becomeKey() {
+        guard configuration.canBecomeKey else {
+            return
+        }
+        
+        super.becomeKey()
+    }
     #endif
     
     // MARK: - API
@@ -343,17 +391,22 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         guard let windowPosition = configuration.windowPosition else {
             return
         }
-        
+                        
+        #if os(iOS)
         let originX = (windowPosition.x - (self.frame.size.width / 2))
         let originY = (windowPosition.y - (self.frame.size.height / 2))
-        
-        #if os(iOS)
+
         self.frame.origin = .init(
             x: originX,
             y: originY
         )
         #elseif os(macOS)
-        setFrameOrigin(.init(x: originX, y: -originY))
+        let originX = (windowPosition.x - (self.frame.size.width / 2))
+        let originY = (windowPosition.y - (self.frame.size.height / 2))
+
+        let origin = CGPoint(x: originX, y: originY)
+
+        setFrameOrigin(NSScreen.flip(origin))
         #endif
     }
     
@@ -487,6 +540,10 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
             }
         }
         .onPreferenceChange(_SwiftUIX_WindowPreferenceKeys.Position.self) { windowPosition in
+            guard let windowPosition else {
+                return
+            }
+            
             queueWindowUpdate {
                 $0.configuration.windowPosition = windowPosition
             }

@@ -140,11 +140,11 @@ private enum _SwiftUIFontProvider {
     init?(from subject: Any) {
         switch String(describing: type(of: subject)) {
             case "ModifierProvider<WeightModifier>":
-                guard let base = Mirror(reflecting: subject)[_keyPath: "base.provider.base"] else {
+                guard let base = Mirror(reflecting: subject)[_SwiftUIX_keyPath: "base.provider.base"] else {
                     return nil
                 }
                 
-                guard let weight = Mirror(reflecting: subject)[_keyPath: "modifier.weight"] as? Font.Weight else {
+                guard let weight = Mirror(reflecting: subject)[_SwiftUIX_keyPath: "modifier.weight"] as? Font.Weight else {
                     return nil
                 }
                 

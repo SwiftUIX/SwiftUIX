@@ -92,7 +92,42 @@ extension Screen {
     }
 }
 
+// MARK: - Conformances
+
+extension Screen: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+    
+    public static func == (lhs: Screen, rhs: Screen) -> Bool {
+        true // FIXME
+    }
+}
+
 // MARK: - Auxiliary
+
+@_spi(Internal)
+public enum _ScreenOrCoordinateSpace: Hashable {
+    case screen(Screen?)
+    case coordinateSpace(CoordinateSpace)
+}
+
+@_spi(Internal)
+public struct _CoordinateSpaceSpecific<T> {
+    private var storage: [_ScreenOrCoordinateSpace: T] = [:]
+    
+    public init() {
+        
+    }
+    
+    public subscript(_ key: _ScreenOrCoordinateSpace) -> T? {
+        get {
+            storage[key]
+        } set {
+            storage[key] = newValue
+        }
+    }
+}
 
 extension EnvironmentValues {
     public var screen: Screen {

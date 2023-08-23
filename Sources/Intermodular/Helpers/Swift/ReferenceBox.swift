@@ -39,6 +39,36 @@ final class ReferenceBox<T> {
     }
 }
 
+@propertyWrapper
+final class LazyReferenceBox<T> {
+    private var initializeValue: (() -> T)?
+    private var value: T?
+    
+    var wrappedValue: T {
+        get {
+            if let value {
+                return value
+            } else {
+                self.value = initializeValue!()
+                self.initializeValue = nil
+                
+                return self.value!
+            }
+        } set {
+            self.value = newValue
+            self.initializeValue = nil
+        }
+    }
+    
+    var projectedValue: T? {
+        value
+    }
+    
+    init(wrappedValue value: @autoclosure @escaping () -> T) {
+        self.initializeValue = value
+    }
+}
+
 extension ReferenceBox: @unchecked Sendable where T: Sendable {
     
 }

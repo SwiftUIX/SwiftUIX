@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension Mirror {
-    subscript(_keyPath path: String) -> Any? {
+    subscript(_SwiftUIX_keyPath path: String) -> Any? {
         guard !path.isEmpty else {
             assertionFailure()
             
@@ -23,7 +23,7 @@ extension Mirror {
         if components.isEmpty {
             return value
         } else {
-            return Mirror(reflecting: value)[_keyPath: components.joined(separator: ".")]
+            return Mirror(reflecting: value)[_SwiftUIX_keyPath: components.joined(separator: ".")]
         }
     }
     

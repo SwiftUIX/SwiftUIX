@@ -65,23 +65,47 @@ extension AppKitOrUIKitHostingControllerProtocol {
 
         switch (result.width, result.height)  {
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, AppKitOrUIKitView.layoutFittingExpandedSize.height), (.greatestFiniteMagnitude, .greatestFiniteMagnitude), (.infinity, .infinity):
-                result = _SwiftUIX_sizeThatFits(in: targetSize.clamped(to: sizeProposal.size.maximum))
+                result = _SwiftUIX_sizeThatFits(
+                    in: targetSize.clamped(to: sizeProposal.size.maximum)
+                )
             case (AppKitOrUIKitView.layoutFittingExpandedSize.width, _), (.greatestFiniteMagnitude, _), (.infinity, _):
                 if !targetSize.width.isZero {
-                    result = _SwiftUIX_sizeThatFits(in: CGSize(width: targetSize.clamped(to: sizeProposal.size.maximum).width, height: fitSize.height))
+                    result = _SwiftUIX_sizeThatFits(
+                        in: CGSize(
+                            width: targetSize.clamped(to: sizeProposal.size.maximum).width,
+                            height: fitSize.height
+                        )
+                    )
                 }
             case (_, AppKitOrUIKitView.layoutFittingExpandedSize.height), (_, .greatestFiniteMagnitude), (_, .infinity):
                 if !targetSize.height.isZero {
-                    result = _SwiftUIX_sizeThatFits(in: CGSize(width: fitSize.width, height: targetSize.clamped(to: sizeProposal.size.maximum).height))
+                    result = _SwiftUIX_sizeThatFits(
+                        in: CGSize(
+                            width: fitSize.width,
+                            height: targetSize.clamped(to: sizeProposal.size.maximum).height
+                        )
+                    )
                 }
             case (.zero, 1...): do {
-                result = _SwiftUIX_sizeThatFits(in: CGSize(width: AppKitOrUIKitView.layoutFittingExpandedSize.width, height: fitSize.height))
+                result = _SwiftUIX_sizeThatFits(
+                    in: CGSize(
+                        width: AppKitOrUIKitView.layoutFittingExpandedSize.width,
+                        height: fitSize.height
+                    )
+                )
             }
             case (1..., .zero): do {
-                result = _SwiftUIX_sizeThatFits(in: CGSize(width: fitSize.width, height: AppKitOrUIKitView.layoutFittingExpandedSize.width))
+                result = _SwiftUIX_sizeThatFits(
+                    in: CGSize(
+                        width: fitSize.width,
+                        height: AppKitOrUIKitView.layoutFittingExpandedSize.width
+                    )
+                )
             }
             case (.zero, .zero): do {
-                result = _SwiftUIX_sizeThatFits(in: AppKitOrUIKitView.layoutFittingExpandedSize)
+                result = _SwiftUIX_sizeThatFits(
+                    in: AppKitOrUIKitView.layoutFittingExpandedSize
+                )
             }
             default:
                 break
@@ -222,6 +246,12 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
             verticalFittingPriority: fixedSize.map({ $0.vertical ? .required : .defaultLow })
         )
     }
+    
+    public init(
+        fixedSize: (horizontal: Bool, vertical: Bool)
+    ) {
+        self.init(OptionalDimensions(), fixedSize: fixedSize)
+    }
 
     public init<T0: _CustomOptionalDimensionsConvertible, T1: _CustomOptionalDimensionsConvertible>(
         targetSize: T0,
@@ -240,8 +270,8 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
 
 extension AppKitOrUIKitLayoutSizeProposal {
     var _targetAppKitOrUIKitSize: CGSize {
-        let width = size.target.width ?? ((fit.horizontal ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.width : AppKitOrUIKitView.layoutFittingExpandedSize.width)
-        let height = size.target.height ?? ((fit.vertical ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.height : AppKitOrUIKitView.layoutFittingExpandedSize.height)
+        let width = size.target.width ?? ((fit.horizontal ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.width : AppKitOrUIKitView.layoutFittingCompressedSize.width)
+        let height = size.target.height ?? ((fit.vertical ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.height : AppKitOrUIKitView.layoutFittingCompressedSize.height)
         
         return .init(width: width, height: height)
     }

@@ -33,6 +33,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         context: Context
     ) -> AppKitOrUIKitViewType {
         let view: AppKitOrUIKitViewType
+        
         if case .cocoaTextStorage(let textStorage) = data {
             if let type = customAppKitOrUIKitClassConfiguration.class as? _PlatformTextView<Label>.Type {
                 view = type.init(usingTextLayoutManager: false, textStorage: textStorage)
@@ -58,7 +59,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
             view.data = data
             view.configuration = configuration
             
-            view._setUpTextView(context: context)
+            view.representableWillAssemble(context: context)
         }
         
         view.delegate = context.coordinator
@@ -92,6 +93,8 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
 
         _withoutAppKitOrUIKitAnimation(context.transaction.animation == nil) {
             if let view = view as? _PlatformTextView<Label> {
+                assert(view.representationStateFlags.contains(.updateInProgress))
+                
                 view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
                 view.data = data
                 view.configuration = configuration

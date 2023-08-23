@@ -4,16 +4,18 @@
 
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
+import Combine
 import Swift
 import SwiftUI
 
 @_spi(Internal)
-public protocol _PlatformTextView_Type: AppKitOrUIKitTextView {
+public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
     associatedtype Label: View
     
+    var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> { get }
     var _trackedTextCursor: _TextCursorTracking { get }
     
-    func _setUpTextView(context: some _AppKitOrUIKitViewRepresentableContext)
+    func representableWillAssemble(context: some _AppKitOrUIKitViewRepresentableContext)
     
     @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
     func _updateTextView(
@@ -26,19 +28,48 @@ public protocol _PlatformTextView_Type: AppKitOrUIKitTextView {
 /// The main `UITextView` subclass used by `TextView`.
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManagerDelegate, NSTextStorageDelegate {
-    var representationStateFlags: _AppKitOrUIKitRepresentationStateFlags = []
-    var representationCache: _AppKitOrUIKitRepresentationCache = nil
+    public var representationStateFlags: _AppKitOrUIKitRepresentationStateFlags = []
+    public var representationCache: _AppKitOrUIKitRepresentationCache = nil
     
     var data: _TextViewDataBinding = .string(.constant(""))
     var configuration = TextView<Label>._Configuration()
     var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration!
     
-    public private(set) lazy var _trackedTextCursor = _TextCursorTracking(owner: self)
+    @_spi(Internal)
+    public var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
+    
+    private var _lazyTextEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? = nil
+    private var _lazyTrackedTextCursor: _TextCursorTracking? = nil
+            
+    @_spi(Internal)
+    public var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> {
+        guard let publisher = _lazyTextEditorEventPublisher else {
+            let subject = PassthroughSubject<_TextView_TextEditorEvent, Never>()
+            let publisher = subject.eraseToAnyPublisher()
+            
+            self._lazyTextEditorEventSubject = subject
+            self._lazyTextEditorEventPublisher = publisher
+            
+            return publisher
+        }
+        
+        return publisher
+    }
+
+    public var _trackedTextCursor: _TextCursorTracking {
+        guard let result = _lazyTrackedTextCursor else {
+            let result = _TextCursorTracking(owner: self)
+            
+            return result
+        }
+        
+        return result
+    }
     
     private var _wantsTextKit1: Bool?
     private var _customTextStorage: NSTextStorage?
-    private var _cachedIntrinsicContentSize: CGSize?
-    private var lastBounds: CGSize = .zero
+    
+    var lastInsertedString: String?
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override open var textStorage: NSTextStorage {
@@ -182,7 +213,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         }
     }
     
-    open func _setUpTextView(
+    open func representableWillAssemble(
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         assert(!representationStateFlags.contains(.didUpdateAtLeastOnce))
@@ -212,9 +243,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             context: context
         )
         
-        DispatchQueue.main.async {
-            self._trackedTextCursor.update()
-        }
+        _lazyTrackedTextCursor?.update()
     }
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -222,6 +251,14 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         super.layoutSubviews()
         
         verticallyCenterTextIfNecessary()
+    }
+    #elseif os(macOS)
+    override open func resizeSubviews(withOldSize oldSize: NSSize) {
+        super.resizeSubviews(withOldSize: oldSize)
+    }
+    
+    override open func layoutSubtreeIfNeeded() {
+        super.layoutSubtreeIfNeeded()
     }
     #endif
     
@@ -265,6 +302,46 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         
         return super.becomeFirstResponder()
     }
+    
+    override open func resignFirstResponder() -> Bool {
+        super.resignFirstResponder()
+    }
+    #endif
+    
+    #if os(macOS)
+    open override func insertText(_ insertString: Any, replacementRange: NSRange) {
+        super.insertText(insertString, replacementRange: replacementRange)
+
+        if let text = insertString as? String {
+            lastInsertedString = text
+            
+            _publishTextEditorEvent(.insert(text: .init(string: text), range: replacementRange))
+        }
+    }
+    
+    open override func shouldChangeText(
+        in affectedCharRange: NSRange,
+        replacementString: String?
+    ) -> Bool {
+        if let lastInsertedString = lastInsertedString, replacementString == lastInsertedString {
+            self.lastInsertedString = nil
+        } else if let replacementString = replacementString {
+            self._publishTextEditorEvent(.replace(text: .init(string: replacementString), range: affectedCharRange))
+        } else {
+            if _lazyTextEditorEventSubject != nil {
+                let deletedText = _SwiftUIX_attributedText.attributedSubstring(from: affectedCharRange)
+                
+                self._publishTextEditorEvent(.delete(text: deletedText, range: affectedCharRange))
+            }
+        }
+        
+        self.lastInsertedString = nil
+        
+        return super.shouldChangeText(
+            in: affectedCharRange,
+            replacementString: replacementString
+        )
+    }
     #endif
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
@@ -274,6 +351,14 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         configuration.onDeleteBackward()
     }
     #elseif os(macOS)
+    open override func setSelectedRange(
+        _ charRange: NSRange,
+        affinity: NSSelectionAffinity,
+        stillSelecting stillSelectingFlag: Bool
+    ) {
+        super.setSelectedRange(charRange, affinity: affinity, stillSelecting: stillSelectingFlag)
+    }
+    
     override open func deleteBackward(_ sender: Any?) {
         super.deleteBackward(sender)
         
@@ -603,7 +688,7 @@ extension _PlatformTextView {
             return
         }
         
-        guard let _cachedIntrinsicContentSize = _cachedIntrinsicContentSize else {
+        guard let _cachedIntrinsicContentSize = representationCache._cachedIntrinsicContentSize else {
             return
         }
         
@@ -739,7 +824,13 @@ extension _PlatformTextView {
 @_spi(Internal)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView: _PlatformTextView_Type {
-    
+    func _publishTextEditorEvent(_ event: _TextView_TextEditorEvent) {
+        DispatchQueue.main.async {
+            self._performOrSchedulePublishingChanges {
+                self._lazyTextEditorEventSubject?.send(event)
+            }
+        }
+    }
 }
 
 // MARK: - Auxiliary

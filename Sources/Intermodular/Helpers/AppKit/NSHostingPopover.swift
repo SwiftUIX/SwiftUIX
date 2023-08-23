@@ -43,12 +43,20 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func _setShouldHideAnchor(_ hide: Bool) {
+        setValue(hide, forKeyPath: "shouldHideAnchor")
+    }
+    
     override open func show(
         relativeTo positioningRect: NSRect,
         of positioningView: NSView,
         preferredEdge: NSRectEdge
     ) {
         _contentViewController.mainView.parentBox.wrappedValue = self
+        
+        if _contentViewController.preferredContentSize.isAreaZero {
+            _contentViewController.preferredContentSize = _contentViewController.sizeThatFits(.init(fixedSize: (true, true)))
+        }
         
         let _animates = self.animates
         
@@ -63,18 +71,102 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate {
                 }
             }
         }
+                
+        func _show() {
+            assert(!positioningView.frame.size.isAreaZero)
+            
+            let currentFirstResponder = NSWindow._firstKeyInstance?.firstResponder
+            let currentKeyWindow = NSWindow._firstKeyInstance
+
+            if self.behavior == .transient {
+                self.behavior = .applicationDefined
+                self.behavior = .transient
+            }
+            
+            super.show(
+                relativeTo: positioningRect,
+                of: positioningView,
+                preferredEdge: preferredEdge
+            )
+                        
+            assert(isShown)
+                        
+            DispatchQueue.main.async {
+                if self.behavior == .transient {
+                    self.contentViewController?.view.window?.resignKey()
+                    
+                    assert((self.contentViewController?.view.window?.isKeyWindow ?? false) == false)
+                    
+                    currentKeyWindow?.makeKeyAndOrderFront(nil)
+                    currentKeyWindow?.makeFirstResponder(currentFirstResponder)
+                }
+            }
+        }
         
-        super.show(
-            relativeTo: positioningRect,
-            of: positioningView,
-            preferredEdge: preferredEdge
-        )
+        if positioningView.frame.size.isAreaZero && (positioningView.window?.frame.size ?? .zero).isAreaZero {
+            let windowIsPresented = positioningView.window != nil
+            
+            DispatchQueue.main.async {
+                guard positioningView.window != nil else {
+                    assert(windowIsPresented)
+                    
+                    return
+                }
+                
+                _show()
+            }
+        } else {
+            _show()
+        }
+    }
+    
+    override open func close() {
+        super.close()
+    }
+    
+    override open func performClose(_ sender: Any?) {
+        super.performClose(sender)
     }
     
     // MARK: - NSPopoverDelegate -
     
     public func popoverDidClose(_ notification: Notification) {
         contentViewController = nil
+    }
+}
+
+private var _NSHostingPopover_transientPopoverWindowClass: AnyClass? = nil
+
+extension NSHostingPopover {
+    private func swizzleWindowIfNeeded() {
+        guard let window = contentViewController?.view.window else {
+            return
+        }
+        
+        guard type(of: window) != _NSHostingPopover_transientPopoverWindowClass else {
+            return
+        }
+
+        let _NSPopoverWindowClass = type(of: window)
+        
+        if _NSHostingPopover_transientPopoverWindowClass == nil {
+            _NSHostingPopover_transientPopoverWindowClass = objc_allocateClassPair(_NSPopoverWindowClass, "CustomWindow", 0)
+        
+            objc_registerClassPair(_NSHostingPopover_transientPopoverWindowClass!)
+
+            let originalMethod = class_getInstanceMethod(NSWindow.self, #selector(NSWindow.makeKey))
+            let swizzledMethod = class_getInstanceMethod(NSWindow.self, #selector(NSWindow.swizzled_transientPopoverWindowMakeKey))
+            
+            method_exchangeImplementations(originalMethod!, swizzledMethod!)
+        }
+        
+        object_setClass(window, _NSHostingPopover_transientPopoverWindowClass!)
+    }
+}
+
+extension NSWindow {
+    @objc func swizzled_transientPopoverWindowMakeKey() {
+        self.swizzled_transientPopoverWindowMakeKey()
     }
 }
 

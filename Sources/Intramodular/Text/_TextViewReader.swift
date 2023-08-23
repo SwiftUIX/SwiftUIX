@@ -4,8 +4,31 @@
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
+import Combine
 import Swift
 import SwiftUI
+
+@_spi(Internal)
+public enum _TextView_TextEditorEvent: Hashable {
+    case insert(text: NSAttributedString, range: NSRange)
+    case delete(text: NSAttributedString, range: NSRange)
+    case replace(text: NSAttributedString, range: NSRange)
+
+    public var text: String {
+        switch self {
+            case .insert(let text, _):
+                return text.string
+            case .delete(let text, _):
+                return text.string
+            case .replace(let text, _):
+                return text.string
+        }
+    }
+    
+    /*case cursorMoved(position: Int)
+    case selection(range: NSRange)
+    case cut(text: String, range: NSRange)*/
+}
 
 @available(macOS 11.0, *)
 public struct _TextViewReader<Content: View>: View {
@@ -42,6 +65,11 @@ public final class _TextViewProxy: Equatable, ObservableObject {
     
     public var textCursor: _TextCursorTracking {
         base?._trackedTextCursor ?? _fakeTextCursor
+    }
+    
+    @_spi(Internal)
+    public var _textEditorEventsPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? {
+        base?._textEditorEventPublisher
     }
     
     fileprivate init() {

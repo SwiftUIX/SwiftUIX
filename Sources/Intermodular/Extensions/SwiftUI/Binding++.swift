@@ -176,14 +176,18 @@ extension Binding {
     public func isNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
             get: { self.wrappedValue == nil },
-            set: { isNil in self.wrappedValue = isNil ? nil : self.wrappedValue  }
+            set: { isNil in
+                self.wrappedValue = isNil ? nil : self.wrappedValue
+            }
         )
     }
     
     public func isNotNil<Wrapped>() -> Binding<Bool> where Optional<Wrapped> == Value {
         .init(
             get: { self.wrappedValue != nil },
-            set: { isNotNil in self.wrappedValue = isNotNil ? self.wrappedValue : nil  }
+            set: { isNotNil in
+                self.wrappedValue = isNotNil ? self.wrappedValue : nil
+            }
         )
     }
     

@@ -26,7 +26,7 @@ extension Menu {
         self.init(systemImage: systemImage.rawValue, content: content)
     }
 }
-#else
+#elseif !os(tvOS)
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

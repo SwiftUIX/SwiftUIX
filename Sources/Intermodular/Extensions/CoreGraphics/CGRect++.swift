@@ -13,6 +13,14 @@ extension CGRect {
     public var maximumDimensionLength: CGFloat {
         max(width, height)
     }
+    
+    public func _SwiftUIX_hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(CGRect.self))
+        hasher.combine(minX)
+        hasher.combine(minY)
+        hasher.combine(width)
+        hasher.combine(height)
+    }
 }
 
 extension CGRect {
