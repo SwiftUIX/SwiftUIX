@@ -68,8 +68,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     private var _wantsTextKit1: Bool?
     private var _customTextStorage: NSTextStorage?
-    
-    var lastInsertedString: String?
+    private var lastInsertedString: String?
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override open var textStorage: NSTextStorage {
@@ -298,9 +297,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     #elseif os(macOS)
     override open func becomeFirstResponder() -> Bool {
-        self.needsDisplay = true
-        
-        return super.becomeFirstResponder()
+        super.becomeFirstResponder()
     }
     
     override open func resignFirstResponder() -> Bool {
@@ -309,7 +306,10 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     #endif
     
     #if os(macOS)
-    open override func insertText(_ insertString: Any, replacementRange: NSRange) {
+    open override func insertText(
+        _ insertString: Any,
+        replacementRange: NSRange
+    ) {
         super.insertText(insertString, replacementRange: replacementRange)
 
         if let text = insertString as? String {
@@ -356,7 +356,11 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         affinity: NSSelectionAffinity,
         stillSelecting stillSelectingFlag: Bool
     ) {
-        super.setSelectedRange(charRange, affinity: affinity, stillSelecting: stillSelectingFlag)
+        super.setSelectedRange(
+            charRange, 
+            affinity: affinity,
+            stillSelecting: stillSelectingFlag
+        )
     }
     
     override open func deleteBackward(_ sender: Any?) {
