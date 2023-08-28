@@ -29,15 +29,22 @@ public struct TextView<Label: View>: View {
     @State var representableUpdater = EmptyObservableObject()
     
     public var body: some View {
-        ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
-            ZStack(alignment: .top) {
-                if let _fixedSize = configuration._fixedSize {
-                    switch _fixedSize {
-                        case (false, false):
-                            XSpacer()
-                        default:
-                            EmptyView() // TODO: Implement
-                    }
+        ZStack(alignment: .top) {
+            if let _fixedSize = configuration._fixedSize {
+                switch _fixedSize {
+                    case (false, false):
+                        XSpacer()
+                    default:
+                        EmptyView() // TODO: Implement
+                }
+            }
+            
+            ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
+                if data.wrappedValue.isEmpty {
+                    label
+                        .font(configuration.cocoaFont.map(Font.init) ?? font)
+                        .animation(.none)
+                        .padding(configuration.textContainerInset.edgeInsets)
                 }
                 
                 _TextView<Label>(
@@ -46,13 +53,6 @@ public struct TextView<Label: View>: View {
                     configuration: configuration,
                     customAppKitOrUIKitClassConfiguration: customAppKitOrUIKitClassConfiguration
                 )
-            }
-            
-            if data.wrappedValue.isEmpty {
-                label
-                    .font(configuration.cocoaFont.map(Font.init) ?? font)
-                    .animation(.none)
-                    .padding(configuration.textContainerInset.edgeInsets)
             }
         }
     }

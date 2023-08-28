@@ -284,6 +284,10 @@ extension AppKitOrUIKitLayoutSizeProposal {
         )
     }
     
+    public init(width: CGFloat?, height: CGFloat?) {
+        self.init(OptionalDimensions(width: width, height: height), fixedSize: nil)
+    }
+    
     public init(
         fixedSize: (horizontal: Bool, vertical: Bool)
     ) {

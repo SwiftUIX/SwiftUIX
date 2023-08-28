@@ -111,18 +111,16 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
                 assert(view.representatableStateFlags.contains(.updateInProgress))
                 
                 view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
-                view.data = data
-                view.configuration = configuration
                 
                 view._updateTextView(
-                    data: self.data.wrappedValue,
+                    data: self.data,
                     configuration: configuration,
                     context: context
                 )
             } else {
                 _PlatformTextView<Label>._update(
                     view,
-                    data: self.data.wrappedValue,
+                    data: self.data,
                     configuration: configuration,
                     context: context
                 )
@@ -265,13 +263,15 @@ extension _TextView {
             guard let textView = notification.object as? NSTextView else {
                 return
             }
-            
+                        
             let data = textView._currentTextViewData(kind: data.wrappedValue.kind)
             
             guard data != self.data.wrappedValue else {
                 return
             }
             
+            (textView as? _PlatformTextView<Label>)?._needsIntrinsicContentSizeInvalidation = true
+
             self.data.wrappedValue = data
         }
         

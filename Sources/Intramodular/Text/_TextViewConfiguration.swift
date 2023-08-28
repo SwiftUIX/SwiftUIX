@@ -311,7 +311,7 @@ extension AppKitOrUIKitTextView {
         }
     }
     
-    public func setData(
+    public func setDataValue(
         _ data: _TextViewDataBinding.Value
     ) {
         switch data {
@@ -367,7 +367,7 @@ extension AppKitOrUIKitTextView {
         }
     }
 
-    public func setData(
+    public func setDataValue(
         _ data: _TextViewDataBinding.Value
     ) {
         switch data {

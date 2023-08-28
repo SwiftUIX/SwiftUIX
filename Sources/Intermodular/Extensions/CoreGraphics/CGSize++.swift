@@ -153,10 +153,6 @@ extension CGSize {
 extension CGSize {
     /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
     public var _hasUnspecifiedIntrinsicContentSizeDimensions: Bool {
-        guard width >= 0 && height >= 0 else {
-            return true
-        }
-        
         if width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize {
             return true
         }
@@ -168,7 +164,7 @@ extension CGSize {
         var result = self
         
         if result.width._isInvalidForIntrinsicContentSize {
-            result.height = AppKitOrUIKitView.noIntrinsicMetric
+            result.width = AppKitOrUIKitView.noIntrinsicMetric
         }
         
         if result.height._isInvalidForIntrinsicContentSize {

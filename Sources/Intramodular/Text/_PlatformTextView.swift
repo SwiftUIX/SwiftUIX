@@ -28,7 +28,7 @@ public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKit
         
     @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
     func _updateTextView(
-        data: _TextViewDataBinding.Value,
+        data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     )
@@ -58,7 +58,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     public private(set) var _wantsRelayout: Bool = false
     public private(set) var _isTextLayoutInProgress: Bool? = nil
     
-    public var _needsIntrinsicContentSizeInvalidation = false
+    public var _needsIntrinsicContentSizeInvalidation = true
     
     private var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
     private var _lazyTextEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? = nil
@@ -188,26 +188,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         if let result = representableCache._cachedIntrinsicContentSize {
             return result
         } else {
-            if let _fixedSize = configuration._fixedSize {
-                switch _fixedSize {
-                    case (false, false):
-                        break
-                    default:
-                        assertionFailure()
-                        break
-                }
-            }
-            
-            guard 
-                self.bounds.width.isNormal,
-                let result = _sizeThatFits()?.toAppKitOrUIKitIntrinsicContentSize()
-            else {
-                return super.intrinsicContentSize
-            }
-            
-            representableCache._cachedIntrinsicContentSize = result
-            
-            return result
+            return super.intrinsicContentSize
         }
     }
     
@@ -253,7 +234,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     
     open func _updateTextView(
-        data: _TextViewDataBinding.Value,
+        data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
@@ -565,8 +546,31 @@ extension _PlatformTextView {
             }
             
             if !result._hasPlaceholderDimension(.width, for: .textContainer) {
-                result.width = max(result.width, proposal.size.target.width)
+                var _result = result._filterPlaceholderDimensions(for: .textContainer)
+                
+                if let _fixedSize = configuration._fixedSize {
+                    switch _fixedSize {
+                        case (false, false):
+                            _result.width = max(result.width, proposal.size.target.width)
+                        default:
+                            assertionFailure()
+                            
+                            break
+                    }
+                }
+                
+                _result.width = max(result.width, proposal.size.target.width)
+
+                guard let _result = CGSize(_result) else {
+                    return nil
+                }
+                                                
+                result = _result
             } else if let targetWidth = proposal.size.target.width, targetWidth.isNormal {
+                guard !targetWidth.isPlaceholderDimension(for: .textContainer) else {
+                    return nil
+                }
+                
                 result.width = targetWidth
             }
              
@@ -600,14 +604,14 @@ extension _PlatformTextView {
 extension _PlatformTextView {
     public static func _update(
         _ view: AppKitOrUIKitTextView,
-        data: _TextViewDataBinding.Value,
+        data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         let requiresAttributedText = false
         || context.environment.requiresAttributedText
         || configuration.requiresAttributedText
-        || data.isAttributed
+        || data.wrappedValue.isAttributed
         
         var cursorOffset: Int?
         
@@ -665,7 +669,7 @@ extension _PlatformTextView {
         view.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
         view.textContainerInset = configuration.textContainerInset
         
-        if data.kind != .cocoaTextStorage {
+        if data.wrappedValue.kind != .cocoaTextStorage {
             if requiresAttributedText {
                 let paragraphStyle = NSMutableParagraphStyle()
                 
@@ -696,9 +700,9 @@ extension _PlatformTextView {
                     return attributes
                 }
                 
-                view.attributedText = data.toAttributedString(attributes: attributedStringAttributes())
+                view.attributedText = data.wrappedValue.toAttributedString(attributes: attributedStringAttributes())
             } else {
-                if let text = data.stringValue {
+                if let text = data.wrappedValue.stringValue {
                     view.text = text
                 } else {
                     assertionFailure()
@@ -745,6 +749,9 @@ extension _PlatformTextView {
             }
         }
     }
+        
+        (view as? _PlatformTextView<Label>)?.data = data
+        (view as? _PlatformTextView<Label>)?.configuration = configuration
     }
     
     func _sizeThatFits(_ size: CGSize? = nil) -> CGSize? {
@@ -800,7 +807,7 @@ extension _PlatformTextView {
 extension _PlatformTextView {
     public static func _update(
         _ view: AppKitOrUIKitTextView,
-        data: _TextViewDataBinding.Value,
+        data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
@@ -814,7 +821,7 @@ extension _PlatformTextView {
     }
         
     private func _update(
-        data: _TextViewDataBinding.Value,
+        data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
@@ -854,12 +861,15 @@ extension _PlatformTextView {
             _assignIfNotEqual(tintColor, to: \.insertionPointColor)
         }
         
-        if _currentTextViewData(kind: self.data.wrappedValue.kind) != data {
+        if _currentTextViewData(kind: self.data.wrappedValue.kind) != data.wrappedValue {
             _needsIntrinsicContentSizeInvalidation = true
             
-            setData(data)
+            setDataValue(data.wrappedValue)
         }
-                
+        
+        self.data = data
+        self.configuration = configuration
+        
         _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded()
     }
     
@@ -870,6 +880,10 @@ extension _PlatformTextView {
         
         if _needsIntrinsicContentSizeInvalidation {
             invalidateIntrinsicContentSize()
+            
+            if let intrinsicContentSize = _computeIntrinsicContentSize() {
+                self.representableCache._cachedIntrinsicContentSize = intrinsicContentSize
+            }
         }
         
         if _wantsRelayout {
@@ -883,6 +897,28 @@ extension _PlatformTextView {
         
         _needsIntrinsicContentSizeInvalidation = false
         _wantsRelayout = false
+    }
+    
+    private func _computeIntrinsicContentSize() -> CGSize? {
+        if let _fixedSize = configuration._fixedSize {
+            switch _fixedSize {
+                case (false, false):
+                    break
+                default:
+                    assertionFailure()
+                    break
+            }
+        }
+        
+        guard frame.width.isNormal else {
+            return nil
+        }
+        
+        if let cached = representableCache.sizeThatFits(.init(width: frame.size.width, height: nil)) {
+            return cached.toAppKitOrUIKitIntrinsicContentSize()
+        } else {
+            return nil
+        }
     }
     
     private func _correctNSTextContainerSize() {
@@ -918,16 +954,6 @@ extension _PlatformTextView {
         if frame.size.height < intrinsicContentSize.height {
             frame.size.height = intrinsicContentSize.height
         }
-    }
-    
-    func _sizeThatFits(
-        _ size: CGSize? = nil
-    ) -> CGSize? {
-        guard let width = size?.width else {
-            return nil
-        }
-        
-        return _sizeThatFits(width: width)
     }
 }
 #endif
