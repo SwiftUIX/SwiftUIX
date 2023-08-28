@@ -175,27 +175,37 @@ extension AppKitOrUIKitTextView {
         width: CGFloat,
         accountForNewline: Bool
     ) -> CGSize? {
-        guard  let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
+        guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
             return nil
         }
                 
+        let originalSize = frame.size
         let originalTextContainerSize = textContainer.containerSize
       
+        guard width.isNormal else {
+            return nil
+        }
+      
+        // frame.size.width = width
         textContainer.containerSize = CGSize(width: width, height: 10000000.0)
-        
+
         defer {
             textContainer.size = originalTextContainerSize
+            frame.size.width = originalSize.width
         }
         
-        layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: textStorage.length), actualCharacterRange: nil)
+        layoutManager.invalidateLayout(
+            forCharacterRange: NSRange(location: 0, length: textStorage.length),
+            actualCharacterRange: nil
+        )
         
-        /*if let view = self as? (any _PlatformTextView_Type), view.representableCache._sizeThatFitsCache.isEmpty {
-            _ = layoutManager.glyphRange(for: textContainer)
-        }*/
+        /// Uncommenting out this line without also uncommenting out `frame.size.width = width` will result in placeholder max width being returned.
+        // let glyphRange = layoutManager.glyphRange(for: textContainer)
 
         layoutManager.ensureLayout(for: textContainer)
         
         let usedRect = layoutManager.usedRect(for: textContainer)
+        // let boundingRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
         
         if usedRect.isEmpty {
             if (!width.isNormal && !textStorage.string.isEmpty) {
@@ -203,8 +213,6 @@ extension AppKitOrUIKitTextView {
             }
             
             guard textStorage.string.isEmpty else {
-                let originalSize = frame.size
-            
                 frame.size.width = width
                 
                 defer {
@@ -219,10 +227,18 @@ extension AppKitOrUIKitTextView {
                     return nil
                 }
                 
+                if usedRect2.size._hasPlaceholderDimensions(for: .textContainer) {
+                    assertionFailure()
+                }
+                
                 return usedRect2.size
             }
         }
 
+        if usedRect.size._hasPlaceholderDimensions(for: .textContainer) {
+            assertionFailure()
+        }
+        
         return usedRect.size
     }
     

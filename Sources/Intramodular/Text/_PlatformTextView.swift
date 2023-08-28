@@ -542,7 +542,7 @@ extension _PlatformTextView {
             return nil
         }
                 
-        if let cached = representableCache.sizeThatFits(proposal:proposal) {
+        if let cached = representableCache.sizeThatFits(proposal: proposal) {
             return cached
         } else {
             assert(proposal.size.maximum == nil)
