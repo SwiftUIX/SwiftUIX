@@ -255,9 +255,9 @@ extension CGFloat {
     func isPlaceholderDimension(for type: _AppKitOrUIKitPlaceholderDimensionType) -> Bool {
         switch type {
             case .intrinsicContentSize:
-                self == AppKitOrUIKitView.noIntrinsicMetric
+                return self == AppKitOrUIKitView.noIntrinsicMetric
             case .textContainer:
-                self == 10000000.0 || self == CGFloat.greatestFiniteMagnitude
+                return self == 10000000.0 || self == CGFloat.greatestFiniteMagnitude
         }
     }
 }

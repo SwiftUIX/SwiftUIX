@@ -188,7 +188,20 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         if let result = representableCache._cachedIntrinsicContentSize {
             return result
         } else {
-            guard self.bounds.width.isNormal, let result = _sizeThatFits()?.toAppKitOrUIKitIntrinsicContentSize() else {
+            if let _fixedSize = configuration._fixedSize {
+                switch _fixedSize {
+                    case (false, false):
+                        break
+                    default:
+                        assertionFailure()
+                        break
+                }
+            }
+            
+            guard 
+                self.bounds.width.isNormal,
+                let result = _sizeThatFits()?.toAppKitOrUIKitIntrinsicContentSize()
+            else {
                 return super.intrinsicContentSize
             }
             

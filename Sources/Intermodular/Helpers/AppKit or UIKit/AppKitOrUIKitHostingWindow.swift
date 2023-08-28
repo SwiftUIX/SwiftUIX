@@ -23,7 +23,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
 
 public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
-    public var canBecomeKey: Bool = true
+    public var canBecomeKey: Bool?
     public var allowTouchesToPassThrough: Bool = false
     public var windowPosition: CGPoint?
     public var isTitleBarHidden: Bool?
@@ -63,7 +63,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     
     #if os(macOS)
     override public var canBecomeKey: Bool {
-        configuration.canBecomeKey
+        configuration.canBecomeKey ?? super.canBecomeKey
     }
 
     var contentWindowController: NSWindowController?
@@ -299,10 +299,12 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     }
     
     override public func makeKey() {
-        guard configuration.canBecomeKey else {
-            return
+        if let canBecomeKey = configuration.canBecomeKey {
+            guard canBecomeKey else {
+                return
+            }
         }
-        
+
         super.makeKey()
     }
     #elseif os(macOS)
@@ -321,18 +323,22 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     }
     
     override public func makeKey() {
-        guard configuration.canBecomeKey else {
-            return
+        if let canBecomeKey = configuration.canBecomeKey {
+            guard canBecomeKey else {
+                return
+            }
         }
         
         super.makeKey()
     }
     
     override public func becomeKey() {
-        guard configuration.canBecomeKey else {
-            return
+        if let canBecomeKey = configuration.canBecomeKey {
+            guard canBecomeKey else {
+                return
+            }
         }
-        
+
         super.becomeKey()
     }
     #endif
