@@ -26,8 +26,10 @@ public struct _TextViewConfiguration {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var autocapitalization: UITextAutocapitalizationType?
     #endif
-    var cocoaFont: AppKitOrUIKitFont?
-    var cocoaForegroundColor: AppKitOrUIKitColor?
+    @_spi(Internal)
+    public var cocoaFont: AppKitOrUIKitFont?
+    @_spi(Internal)
+    public var cocoaForegroundColor: AppKitOrUIKitColor?
     var tintColor: AppKitOrUIKitColor?
     var kerning: CGFloat?
     var linkForegroundColor: AppKitOrUIKitColor?

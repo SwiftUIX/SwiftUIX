@@ -501,7 +501,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         _ layoutManager: NSLayoutManager,
         shouldBreakLineByWordBeforeCharacterAt charIndex: Int
     ) -> Bool {
-        false
+        true
     }
         
     @objc open func layoutManager(
