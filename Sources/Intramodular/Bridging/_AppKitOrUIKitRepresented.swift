@@ -37,12 +37,27 @@ public struct _AppKitOrUIKitRepresentableCache: ExpressibleByNilLiteral {
         
     }
     
-    mutating func invalidate(_ attribute: Attribute) {
+    public mutating func invalidate(_ attribute: Attribute) {
         switch attribute {
             case .intrinsicContentSize:
                 _cachedIntrinsicContentSize = nil
                 _sizeThatFitsCache = [:]
         }
+    }
+    
+    public func sizeThatFits(_ proposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize? {
+        if let result = _sizeThatFitsCache[proposal] {
+            return result
+        } else if !_sizeThatFitsCache.isEmpty {
+            if let targetSize = CGSize(proposal.size.target),
+               let cached: CGSize = _sizeThatFitsCache.first(where: { $0.key.size.target.width == targetSize.width && $0.key.size.target.height == nil })?.value,
+               cached.height <= targetSize.height
+            {
+                return cached
+            }
+        }
+        
+        return nil
     }
 }
 

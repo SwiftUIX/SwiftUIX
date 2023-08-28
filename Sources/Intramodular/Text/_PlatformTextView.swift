@@ -12,7 +12,13 @@ import SwiftUI
 public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
     associatedtype Label: View
     
+    var _wantsTextKit1: Bool? { get }
+    var _customTextStorage: NSTextStorage?  { get }
+    var _lastInsertedString: String?  { get }
+    var _wantsRelayout: Bool  { get }
+    var _isTextLayoutInProgress: Bool? { get }
     var _needsIntrinsicContentSizeInvalidation: Bool { get set }
+    
     var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> { get }
     var _trackedTextCursor: _TextCursorTracking { get }
     
@@ -53,7 +59,6 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     public private(set) var _isTextLayoutInProgress: Bool? = nil
     
     public var _needsIntrinsicContentSizeInvalidation = false
-
     
     private var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
     private var _lazyTextEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? = nil
@@ -510,7 +515,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         didCompleteLayoutFor textContainer: NSTextContainer?,
         atEnd layoutFinishedFlag: Bool
     ) {
-        _isTextLayoutInProgress = layoutFinishedFlag
+        _isTextLayoutInProgress = !layoutFinishedFlag
     }
     
     // MARK: -
@@ -537,7 +542,7 @@ extension _PlatformTextView {
     func _sizeThatFits(
         _ proposal: AppKitOrUIKitLayoutSizeProposal
     ) -> CGSize? {
-        if let cached = representableCache._sizeThatFitsCache[proposal] {
+        if let cached = representableCache.sizeThatFits(proposal) {
             return cached
         } else {
             assert(proposal.size.maximum == nil)
@@ -566,8 +571,8 @@ extension _PlatformTextView {
         }
         
         let usedRect = layoutManager.usedRect(for: textContainer).size
-        
-        if textContainer.containerSize.width == width, textContainer._isContainerWidthNormal, !usedRect.isAreaZero {
+                
+        if !representableCache._sizeThatFitsCache.isEmpty, textContainer.containerSize.width == width, textContainer._isContainerWidthNormal, !usedRect.isAreaZero {
             return usedRect
         } else {
             return _sizeThatFits(width: width)
@@ -978,8 +983,6 @@ extension _PlatformTextView {
         }
         
         layoutManager.invalidateLayout(forCharacterRange: range, actualCharacterRange: nil)
-        
-        // self._wantsRelayout = true
     }
     
     public func invalidateDisplay(

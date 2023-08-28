@@ -178,25 +178,28 @@ extension AppKitOrUIKitTextView {
         guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager else {
             return nil
         }
-        
-        let originalTextContainerSize = textContainer.containerSize
-        
-        // let originaSize = frame.size
-        // frame.size.width = width
-        
-        textContainer.containerSize = CGSize(width: width, height: 10000000.0)
+                
+        let originalSize = frame.size
+        frame.size.width = width
+
+        // let originalTextContainerSize = textContainer.containerSize
+        //textContainer.containerSize = CGSize(width: width, height: 10000000.0)
         
         layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: 0), actualCharacterRange: nil)
-        layoutManager.glyphRange(for: textContainer)
+        
+        if let view = self as? (any _PlatformTextView_Type), view.representableCache._sizeThatFitsCache.isEmpty {
+            _ = layoutManager.glyphRange(for: textContainer)
+        }
+
         layoutManager.ensureLayout(for: textContainer)
         
         let usedRect = layoutManager.usedRect(for: textContainer)
         
-        // frame.size = originaSize
+        frame.size = originalSize
         
-        if width.isNormal && originalTextContainerSize._isNormal {
+        /*if width.isNormal && originalTextContainerSize._isNormal {
             textContainer.size = originalTextContainerSize
-        }
+        }*/
         
         return usedRect.size
     }
