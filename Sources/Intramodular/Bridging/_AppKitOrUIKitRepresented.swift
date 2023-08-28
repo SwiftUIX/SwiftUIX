@@ -45,7 +45,7 @@ public struct _AppKitOrUIKitRepresentableCache: ExpressibleByNilLiteral {
         }
     }
     
-    public func sizeThatFits(_ proposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize? {
+    public func sizeThatFits(proposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize? {
         if let result = _sizeThatFitsCache[proposal] {
             return result
         } else if !_sizeThatFitsCache.isEmpty {

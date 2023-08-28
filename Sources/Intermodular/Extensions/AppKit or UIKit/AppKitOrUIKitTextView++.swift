@@ -175,32 +175,54 @@ extension AppKitOrUIKitTextView {
         width: CGFloat,
         accountForNewline: Bool
     ) -> CGSize? {
-        guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager else {
+        guard  let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
             return nil
         }
                 
-        let originalSize = frame.size
-        frame.size.width = width
-
-        // let originalTextContainerSize = textContainer.containerSize
-        //textContainer.containerSize = CGSize(width: width, height: 10000000.0)
+        let originalTextContainerSize = textContainer.containerSize
+      
+        textContainer.containerSize = CGSize(width: width, height: 10000000.0)
         
-        layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: 0), actualCharacterRange: nil)
-        
-        if let view = self as? (any _PlatformTextView_Type), view.representableCache._sizeThatFitsCache.isEmpty {
-            _ = layoutManager.glyphRange(for: textContainer)
+        defer {
+            textContainer.size = originalTextContainerSize
         }
+        
+        layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: textStorage.length), actualCharacterRange: nil)
+        
+        /*if let view = self as? (any _PlatformTextView_Type), view.representableCache._sizeThatFitsCache.isEmpty {
+            _ = layoutManager.glyphRange(for: textContainer)
+        }*/
 
         layoutManager.ensureLayout(for: textContainer)
         
         let usedRect = layoutManager.usedRect(for: textContainer)
         
-        frame.size = originalSize
-        
-        /*if width.isNormal && originalTextContainerSize._isNormal {
-            textContainer.size = originalTextContainerSize
-        }*/
-        
+        if usedRect.isEmpty {
+            if (!width.isNormal && !textStorage.string.isEmpty) {
+                return nil
+            }
+            
+            guard textStorage.string.isEmpty else {
+                let originalSize = frame.size
+            
+                frame.size.width = width
+                
+                defer {
+                    frame.size.width = originalSize.width
+                }
+
+                layoutManager.ensureLayout(for: textContainer)
+                
+                let usedRect2 = layoutManager.usedRect(for: textContainer)
+                
+                guard !usedRect2.isEmpty else {
+                    return nil
+                }
+                
+                return usedRect2.size
+            }
+        }
+
         return usedRect.size
     }
     

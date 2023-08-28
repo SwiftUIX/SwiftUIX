@@ -112,13 +112,13 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
                 
                 view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
                 
-                view._updateTextView(
+                view.representableDidUpdate(
                     data: self.data,
                     configuration: configuration,
                     context: context
                 )
             } else {
-                _PlatformTextView<Label>._update(
+                _PlatformTextView<Label>.updateAppKitOrUIKitTextView(
                     view,
                     data: self.data,
                     configuration: configuration,
@@ -304,12 +304,16 @@ extension _TextView {
             return nil // TODO: Implement sizing for custom text views as well
         }
         
-        return view._sizeThatFits(
-            AppKitOrUIKitLayoutSizeProposal(
+        guard let size = view._sizeThatFits(
+            proposal: AppKitOrUIKitLayoutSizeProposal(
                 proposal,
                 fixedSize: configuration._fixedSize
             )
-        )
+        ) else {
+            return nil
+        }
+                
+        return size
     }
 }
 

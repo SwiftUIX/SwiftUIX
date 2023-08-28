@@ -194,7 +194,9 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
         }
     }
     
+    @usableFromInline
     fileprivate(set) var size: _SizingConstraints
+    @usableFromInline
     fileprivate(set) var fit: _Fit
     
     var fixedSize: Bool {
@@ -207,6 +209,25 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
 }
 
 extension AppKitOrUIKitLayoutSizeProposal {
+    @_transparent
+    public var targetWidth: CGFloat? {
+        size.target.width
+    }
+    
+    @_transparent
+    public var targetHeight: CGFloat? {
+        size.target.height
+    }
+    
+    @_transparent
+    public var targetArea: CGFloat? {
+        guard let targetWidth, let targetHeight else {
+            return nil
+        }
+        
+        return targetWidth * targetHeight
+    }
+
     public var maxWidth: CGFloat? {
         size.maximum.width ?? size.target.width
     }
@@ -238,6 +259,16 @@ extension OptionalDimensions {
         result.height = result.height ?? replacement.height
         
         return result
+    }
+    
+    @_disfavoredOverload
+    public func replacingUnspecifiedDimensions(
+        by replacement: CGSize = CGSize(width: 10, height: 10)
+    ) -> CGSize {
+        CGSize(
+            width: width ?? replacement.width,
+            height: height ?? replacement.height
+        )
     }
 }
 
