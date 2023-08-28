@@ -108,9 +108,22 @@ extension Binding {
 }
 
 extension Binding {
-    public func onChange(perform action: @escaping (Value) -> ()) -> Self where Value: Equatable {
+    public func onSet(
+        perform body: @escaping (Value) -> ()
+    ) -> Self {
         return .init(
             get: { self.wrappedValue },
+            set: { self.wrappedValue = $0; body($0) }
+        )
+    }
+
+    public func onChange(
+        perform action: @escaping (Value) -> ()
+    ) -> Self where Value: Equatable {
+        return .init(
+            get: {
+                self.wrappedValue
+            },
             set: { newValue in
                 let oldValue = self.wrappedValue
                 
@@ -123,21 +136,14 @@ extension Binding {
         )
     }
     
-    public func onChange(toggle value: Binding<Bool>) -> Self where Value: Equatable {
+    public func onChange(
+        toggle value: Binding<Bool>
+    ) -> Self where Value: Equatable {
         onChange { _ in
             value.wrappedValue.toggle()
         }
     }
-    
-    public func onSet(
-        perform body: @escaping (Value) -> ()
-    ) -> Self {
-        return .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0; body($0) }
-        )
-    }
-    
+        
     public func mirror(
         to other: Binding<Value>
     ) -> Binding<Value> {

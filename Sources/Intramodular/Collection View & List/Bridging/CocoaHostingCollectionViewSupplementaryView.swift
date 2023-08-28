@@ -91,8 +91,7 @@ class CocoaHostingCollectionViewSupplementaryView<
             if let size = CGSize(dimensions), size.fits(targetSize) {
                 return size
             } else {
-                targetSize = CGSize(dimensions, default: targetSize)
-                    .clamped(to: configuration?.maximumSize)
+                targetSize = CGSize(dimensions, default: targetSize).clamped(to: configuration?.maximumSize ?? nil)
             }
         }
         
@@ -127,7 +126,7 @@ class CocoaHostingCollectionViewSupplementaryView<
                 let result = super.preferredLayoutAttributesFitting(layoutAttributes)
                 
                 if cache.preferredContentSize == nil || result.size != bounds.size {
-                    cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize)
+                    cache.preferredContentSize = result.size.clamped(to: configuration?.maximumSize ?? nil)
                 }
                 
                 updateCollectionCache()

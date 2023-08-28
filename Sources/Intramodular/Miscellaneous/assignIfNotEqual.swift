@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
-@inlinable
+@_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Value
@@ -16,9 +16,22 @@ public func _assignIfNotEqual<Value: Equatable>(
     }
 }
 
+extension NSObjectProtocol {
+    @_spi(Internal)
+    @_transparent
+    public func _assignIfNotEqual<Value: Equatable>(
+        _ newValue: Value,
+        to keyPath: ReferenceWritableKeyPath<Self, Value>
+    ) {
+        if self[keyPath: keyPath] != newValue {
+            self[keyPath: keyPath] = newValue
+        }
+    }
+}
+    
 @_spi(Internal)
 @_disfavoredOverload
-@inlinable
+@_transparent
 public func _assignIfNotEqual<Value: AnyObject>(
     _ value: Value,
     to destination: inout Value
@@ -30,7 +43,7 @@ public func _assignIfNotEqual<Value: AnyObject>(
 
 @_spi(Internal)
 @_disfavoredOverload
-@inlinable
+@_transparent
 public func _assignIfNotEqual<Value: AnyObject>(
     _ value: Value,
     to destination: inout Value?
@@ -41,7 +54,7 @@ public func _assignIfNotEqual<Value: AnyObject>(
 }
 
 @_spi(Internal)
-@inlinable
+@_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Any
@@ -56,7 +69,7 @@ public func _assignIfNotEqual<Value: Equatable>(
 }
 
 @_spi(Internal)
-@inlinable
+@_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
     to destination: inout Any?

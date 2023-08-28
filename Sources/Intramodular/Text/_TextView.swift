@@ -19,6 +19,8 @@ import UIKit
 struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
     
+    @ObservedObject var updater: EmptyObservableObject
+    
     let data: _TextViewDataBinding
     let configuration: Configuration
     let customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
@@ -35,23 +37,36 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         let view: AppKitOrUIKitViewType
         
         if case .cocoaTextStorage(let textStorage) = data {
-            if let type = customAppKitOrUIKitClassConfiguration.class as? _PlatformTextView<Label>.Type {
-                view = type.init(usingTextLayoutManager: false, textStorage: textStorage)
+            if let textStorage = textStorage() {
+                if let type = customAppKitOrUIKitClassConfiguration.class as? _PlatformTextView<Label>.Type {
+                    view = type.init(
+                        usingTextLayoutManager: false,
+                        textStorage: textStorage
+                    )
+                } else {
+                    let layoutManager = NSLayoutManager()
+                    textStorage.addLayoutManager(layoutManager)
+                    let textContainer = NSTextContainer(size: .zero)
+                    layoutManager.addTextContainer(textContainer)
+                    
+                    view = customAppKitOrUIKitClassConfiguration.class.init(
+                        frame: .zero,
+                        textContainer: textContainer
+                    )
+                }
             } else {
-                let layoutManager = NSLayoutManager()
-                textStorage.addLayoutManager(layoutManager)
-                let textContainer = NSTextContainer(size: .zero)
-                layoutManager.addTextContainer(textContainer)
-
-                view = customAppKitOrUIKitClassConfiguration.class.init(
-                    frame: .zero,
-                    textContainer: textContainer
-                )
+                assertionFailure()
+                
+                view = customAppKitOrUIKitClassConfiguration.class.init()
             }
         } else {
             view = customAppKitOrUIKitClassConfiguration.class.init()
         }
         
+        if let _view = view as? _PlatformTextView<Label> {
+            _view.representableUpdater = updater
+        }
+
         customAppKitOrUIKitClassConfiguration.update(view, context)
         
         if let view = view as? _PlatformTextView<Label> {
@@ -93,7 +108,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
 
         _withoutAppKitOrUIKitAnimation(context.transaction.animation == nil) {
             if let view = view as? _PlatformTextView<Label> {
-                assert(view.representationStateFlags.contains(.updateInProgress))
+                assert(view.representatableStateFlags.contains(.updateInProgress))
                 
                 view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
                 view.data = data
@@ -133,13 +148,16 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _TextView {
     class Coordinator: NSObject, UITextViewDelegate {
+        var updater: EmptyObservableObject
         var data: _TextViewDataBinding
         var configuration: Configuration
         
         init(
+            updater: EmptyObservableObject,
             data: _TextViewDataBinding,
             configuration: Configuration
         ) {
+            self.updater = updater
             self.data = data
             self.configuration = configuration
         }
@@ -150,7 +168,7 @@ extension _TextView {
         
         func textViewDidChange(_ textView: UITextView) {
             if let textView = textView as? _PlatformTextView<Label> {
-                guard !textView.representationStateFlags.contains(.dismantled) else {
+                guard !textView.representatableStateFlags.contains(.dismantled) else {
                     return
                 }
             }
@@ -160,7 +178,7 @@ extension _TextView {
             guard textView.markedTextRange == nil, data != self.data.wrappedValue else {
                 return
             }
-            
+                        
             self.data.wrappedValue = data
         }
         
@@ -177,7 +195,7 @@ extension _TextView {
                             return
                         }
                         
-                        self.configuration.onCommit()
+                        self.configuration.onCommit?()
                         
                         textView.resignFirstResponder()
                         #endif
@@ -201,16 +219,37 @@ extension _TextView {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _TextView {
     class Coordinator: NSObject, NSTextViewDelegate {
+        var updater: EmptyObservableObject
         var data: _TextViewDataBinding
         var configuration: Configuration
         
         init(
+            updater: EmptyObservableObject,
             data: _TextViewDataBinding,
             configuration: Configuration
         ) {
+            self.updater = updater
             self.data = data
             self.configuration = configuration
         }
+        
+        /*func textView(
+            _ view: NSTextView,
+            write cell: NSTextAttachmentCellProtocol,
+            at charIndex: Int,
+            to pboard: NSPasteboard,
+            type: NSPasteboard.PasteboardType
+        ) -> Bool {
+            return false // TODO: Implement
+        }
+        
+        func textView(
+            _ view: NSTextView,
+            writablePasteboardTypesFor cell: NSTextAttachmentCellProtocol,
+            at charIndex: Int
+        ) -> [NSPasteboard.PasteboardType] {
+            return [] // TODO: Implement
+        }*/
         
         func textDidBeginEditing(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else {
@@ -252,7 +291,7 @@ extension _TextView {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _TextView {
     func makeCoordinator() -> Coordinator {
-        Coordinator(data: data, configuration: configuration)
+        Coordinator(updater: updater, data: data, configuration: configuration)
     }
 
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
@@ -261,31 +300,16 @@ extension _TextView {
         view: AppKitOrUIKitViewType,
         context: Context
     ) -> CGSize? {
-        if let _fixedSize = configuration._fixedSize {
-            switch _fixedSize {
-                case (false, false):
-                    return nil
-                default:
-                    assertionFailure("unsupported")
-                    
-                    return nil
-            }
-        } else {
-            if let view = view as? _PlatformTextView<Label> {
-                if proposal.width != nil {
-                    return view._sizeThatFits(
-                        AppKitOrUIKitLayoutSizeProposal(
-                            proposal,
-                            fixedSize: nil
-                        )
-                    )
-                } else {
-                    return nil
-                }
-            } else {
-                return nil
-            }
+        guard let view = view as? _PlatformTextView<Label> else {
+            return nil // TODO: Implement sizing for custom text views as well
         }
+        
+        return view._sizeThatFits(
+            AppKitOrUIKitLayoutSizeProposal(
+                proposal,
+                fixedSize: configuration._fixedSize
+            )
+        )
     }
 }
 

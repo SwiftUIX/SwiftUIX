@@ -114,7 +114,15 @@ extension AppKitOrUIKitResponder {
     
     @discardableResult
     public func _SwiftUIX_resignFirstResponder() -> Bool {
-        resignFirstResponder()
+        guard let window = _SwiftUIX_nearestWindow else {
+            return false
+        }
+        
+        if _SwiftUIX_isFirstResponder {
+           return window.makeFirstResponder(nil)
+        } else {
+            return true
+        }
     }
 }
 #endif

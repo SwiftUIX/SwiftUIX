@@ -162,9 +162,9 @@ extension AppKitOrUIKitHostingControllerProtocol {
 
 public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
     public struct _SizingConstraints: Hashable {
-        public let minimum: OptionalDimensions
-        public let target: OptionalDimensions
-        public let maximum: OptionalDimensions
+        public fileprivate(set) var minimum: OptionalDimensions
+        public fileprivate(set) var target: OptionalDimensions
+        public fileprivate(set) var maximum: OptionalDimensions
         
         public init(
             minimum: OptionalDimensions,
@@ -194,8 +194,8 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
         }
     }
     
-    let size: _SizingConstraints
-    let fit: _Fit
+    fileprivate(set) var size: _SizingConstraints
+    fileprivate(set) var fit: _Fit
     
     var fixedSize: Bool {
         if fit.horizontal == .required && fit.vertical == .required {
@@ -204,7 +204,44 @@ public struct AppKitOrUIKitLayoutSizeProposal: Hashable {
             return false
         }
     }
+}
 
+extension AppKitOrUIKitLayoutSizeProposal {
+    public var maxWidth: CGFloat? {
+        size.maximum.width ?? size.target.width
+    }
+    
+    public var maxHeight: CGFloat? {
+        size.maximum.height ?? size.target.height
+    }
+}
+
+extension AppKitOrUIKitLayoutSizeProposal {
+    public func replacingUnspecifiedDimensions(
+        by replacement: CGSize
+    ) -> Self {
+        var result = self
+        
+        result.size.target = self.size.target.replacingUnspecifiedDimensions()
+        
+        return result
+    }
+}
+
+extension OptionalDimensions {
+    public func replacingUnspecifiedDimensions(
+        by replacement: CGSize = CGSize(width: 10, height: 10)
+    ) -> Self {
+        var result = self
+        
+        result.width = result.width ?? replacement.width
+        result.height = result.height ?? replacement.height
+        
+        return result
+    }
+}
+
+extension AppKitOrUIKitLayoutSizeProposal {
     public init(
         size: (target: OptionalDimensions, max: OptionalDimensions),
         fit: _Fit
@@ -273,16 +310,19 @@ extension AppKitOrUIKitLayoutSizeProposal {
         let width = size.target.width ?? ((fit.horizontal ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.width : AppKitOrUIKitView.layoutFittingCompressedSize.width)
         let height = size.target.height ?? ((fit.vertical ?? .defaultLow) != .required ? AppKitOrUIKitView.layoutFittingExpandedSize.height : AppKitOrUIKitView.layoutFittingCompressedSize.height)
         
-        return .init(width: width, height: height)
+        return CGSize(width: width, height: height)
     }
     
     var _fitAppKitOrUIKitSize: CGSize {
+        let targetWidth = size.target.clamped(to: size.maximum).width
+        let targetHeight = size.target.clamped(to: size.maximum).height
+
         let width = fit.horizontal == .required
-            ? size.target.clamped(to: size.maximum).width ?? AppKitOrUIKitView.layoutFittingCompressedSize.width
+            ? (targetWidth ?? AppKitOrUIKitView.layoutFittingCompressedSize.width)
             : (size.maximum.width ?? AppKitOrUIKitView.layoutFittingExpandedSize.width)
         
         let height = fit.vertical == .required
-            ? size.target.clamped(to: size.maximum).height ?? AppKitOrUIKitView.layoutFittingCompressedSize.height
+            ? (targetHeight ?? AppKitOrUIKitView.layoutFittingCompressedSize.height)
             : (size.maximum.height ?? AppKitOrUIKitView.layoutFittingExpandedSize.height)
         
         return CGSize(width: width, height: height)

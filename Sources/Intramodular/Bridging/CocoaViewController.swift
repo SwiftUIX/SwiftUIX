@@ -9,6 +9,8 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public protocol _CocoaHostingControllerOrView: AppKitOrUIKitResponder {
+    var _SwiftUIX_cancellables: [AnyCancellable] { get set }
+    
     var _configuration: CocoaHostingControllerConfiguration { get set }
     var _observedPreferenceValues: _ObservedPreferenceValues { get }
 }
@@ -29,7 +31,8 @@ extension _CocoaHostingControllerOrView {
     }
 
     public func _observePreferenceKey<Key: PreferenceKey>(
-        _ key: Key.Type
+        _ key: Key.Type,
+        _ operation: ((Key.Value) -> Void)? = nil
     ) where Key.Value: Equatable {
         guard !_configuration.observedPreferenceKeys.contains(where: { $0 == key }) else {
             return
@@ -40,6 +43,10 @@ extension _CocoaHostingControllerOrView {
             PreferenceValueObserver<Key>(store: self._observedPreferenceValues)
                 .eraseToAnyViewModifier()
         )
+        
+        if let operation {
+            _observedPreferenceValues.observe(key, operation)
+        }
     }
     
     public subscript<Key: PreferenceKey>(

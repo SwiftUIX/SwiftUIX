@@ -69,6 +69,7 @@ public final class NSEventMonitor {
 
 @available(macOS 11.0, *)
 extension View {
+    /// Return `nil` to prevent the event from being passed on.
     public func onAppKitEvent(
         context: NSEventMonitor.Context = .local,
         matching mask: NSEvent.EventTypeMask,

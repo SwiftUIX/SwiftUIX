@@ -24,19 +24,23 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
             return super.intrinsicContentSize
         }
         
+        let result: CGSize
+        
         if configuration.axes == .horizontal {
-            return .init(
+            result = CGSize(
                 width: super.intrinsicContentSize.width,
                 height: contentSize.height
             )
         } else if configuration.axes == .vertical {
-            return .init(
+            result = CGSize(
                 width: contentSize.width,
                 height: super.intrinsicContentSize.height
             )
         } else {
-            return super.intrinsicContentSize
+            result = super.intrinsicContentSize
         }
+        
+        return result.toAppKitOrUIKitIntrinsicContentSize()
     }
     
     public var rootView: Content {

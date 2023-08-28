@@ -17,6 +17,14 @@ public struct _TryCatchView<Content: View, RecoveryContent: View>: View {
         self.recovery = recover
     }
     
+    public init(
+        @ViewBuilder content: @escaping () throws -> Content,
+        @ViewBuilder recover: @escaping () -> RecoveryContent
+    ) {
+        self.content = content
+        self.recovery = { _ in recover() }
+    }
+    
     public var body: some View {
         ResultView(
             success: {

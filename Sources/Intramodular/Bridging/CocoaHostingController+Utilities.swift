@@ -22,14 +22,12 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
     }
     
     public var body: some View {
-        if let parent = parent {
-            content
-                ._resolveAppKitOrUIKitViewController(with: (parent as? CocoaViewController))
-                .modifiers(parentConfiguration.preferenceValueObservers)
-                ._measureAndRecordSize(parentConfiguration._isMeasuringSize) {
-                    parent._configuration._measuredSizePublisher.send($0)
-                }
-        }
+        content
+            ._resolveAppKitOrUIKitViewController(with: (parent as? CocoaViewController))
+            .modifiers(parentConfiguration.preferenceValueObservers)
+            ._measureAndRecordSize(parentConfiguration._isMeasuringSize) { [weak parent] in
+                parent?._configuration._measuredSizePublisher.send($0)
+            }
     }
 }
 #endif

@@ -373,16 +373,6 @@ struct GreedyFrameModifier: _opaque_FrameModifier, ViewModifier {
     }
 }
 
-extension OptionalDimensions {
-    fileprivate static var greatestFiniteDimensions: OptionalDimensions {
-        .init(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
-    }
-    
-    fileprivate static var infinite: OptionalDimensions {
-        .init(width: .infinity, height: .infinity)
-    }
-}
-
 extension ModifiedContent: _opaque_FrameModifiedContent where Modifier: _opaque_FrameModifier {
     @usableFromInline
     var _opaque_frameModifier: _opaque_FrameModifier {

@@ -6,14 +6,14 @@
 
 import SwiftUI
 
-public protocol _AppKitOrUIKitRepresented: AppKitOrUIKitResponder {
-    var representationStateFlags: _AppKitOrUIKitRepresentationStateFlags { get set }
-    var representationCache: _AppKitOrUIKitRepresentationCache { get set }
+public protocol _AppKitOrUIKitRepresented: AnyObject, AppKitOrUIKitResponder {
+    var representatableStateFlags: _AppKitOrUIKitRepresentableStateFlags { get set }
+    var representableCache: _AppKitOrUIKitRepresentableCache { get set }
     
     func _performOrSchedulePublishingChanges(_: @escaping () -> Void)
 }
 
-public struct _AppKitOrUIKitRepresentationStateFlags: OptionSet {
+public struct _AppKitOrUIKitRepresentableStateFlags: OptionSet {
     public let rawValue: UInt
     
     public init(rawValue: UInt) {
@@ -25,7 +25,7 @@ public struct _AppKitOrUIKitRepresentationStateFlags: OptionSet {
     public static let dismantled = Self(rawValue: 1 << 2)
 }
 
-public struct _AppKitOrUIKitRepresentationCache: ExpressibleByNilLiteral {
+public struct _AppKitOrUIKitRepresentableCache: ExpressibleByNilLiteral {
     public enum Attribute {
         case intrinsicContentSize
     }
@@ -47,11 +47,11 @@ public struct _AppKitOrUIKitRepresentationCache: ExpressibleByNilLiteral {
 }
 
 extension AppKitOrUIKitResponder {
-    public func _performOrSchedulePublishingChanges(
+    @objc open func _performOrSchedulePublishingChanges(
         @_implicitSelfCapture _ operation: @escaping () -> Void
     ) {
         if let responder = self as? _AppKitOrUIKitRepresented {
-            if responder.representationStateFlags.contains(.updateInProgress) {
+            if responder.representatableStateFlags.contains(.updateInProgress) {
                 DispatchQueue.main.async {
                     operation()
                 }
@@ -68,7 +68,7 @@ extension _AppKitOrUIKitRepresented {
     public func _performOrSchedulePublishingChanges(
         @_implicitSelfCapture _ operation: @escaping () -> Void
     ) {
-        if representationStateFlags.contains(.updateInProgress) {
+        if representatableStateFlags.contains(.updateInProgress) {
             DispatchQueue.main.async {
                 operation()
             }

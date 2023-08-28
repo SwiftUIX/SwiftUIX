@@ -15,3 +15,21 @@ extension CGFloat {
     }
 }
 #endif
+
+@_transparent
+func min(_ lhs: Double, _ rhs: CGFloat?) -> Double {
+    guard let rhs = rhs else {
+        return lhs
+    }
+    
+    return Swift.min(lhs, rhs)
+}
+
+@_transparent
+func max(_ lhs: Double, _ rhs: CGFloat?) -> Double {
+    guard let rhs = rhs else {
+        return lhs
+    }
+    
+    return Swift.max(lhs, rhs)
+}

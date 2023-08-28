@@ -49,11 +49,11 @@ public struct _TextViewReader<Content: View>: View {
 }
 
 public final class _TextViewProxy: Equatable, ObservableObject {
-    let _base = WeakReferenceBox<AppKitOrUIKitTextView>(nil)
+    private let _base = WeakReferenceBox<AppKitOrUIKitTextView>(nil)
+    private var _fakeTextCursor = _TextCursorTracking(owner: nil)
     
-    var _fakeTextCursor = _TextCursorTracking(owner: nil)
-    
-    var base: (any _PlatformTextView_Type)? {
+    @_spi(Internal)
+    public var base: (any _PlatformTextView_Type)? {
         get {
             _base.wrappedValue.map({ $0 as! any _PlatformTextView_Type })
         } set {

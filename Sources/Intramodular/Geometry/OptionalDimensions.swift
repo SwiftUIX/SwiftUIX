@@ -11,6 +11,14 @@ public protocol _CustomOptionalDimensionsConvertible {
 
 @_frozen
 public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
+    public static var greatestFiniteDimensions: OptionalDimensions {
+        .init(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)
+    }
+    
+    public static var infinite: OptionalDimensions {
+        .init(width: .infinity, height: .infinity)
+    }
+
     public var width: CGFloat?
     public var height: CGFloat?
     
@@ -37,6 +45,13 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
         
     public init() {
         
+    }
+    
+    public subscript(_ dimensions: Set<FrameDimensionType>) -> Self {
+        Self(
+            width: dimensions.contains(.width) ? self.width : nil,
+            height: dimensions.contains(.height) ? self.height : nil
+        )
     }
 }
 
@@ -110,27 +125,58 @@ extension OptionalDimensions {
 
 extension View {
     /// Sets the preferred maximum layout width for the view.
-    public func preferredMaximumLayoutWidth(_ preferredMaximumLayoutWidth: CGFloat?) -> some View {
+    public func preferredMaximumLayoutWidth(
+        _ preferredMaximumLayoutWidth: CGFloat?
+    ) -> some View {
         environment(\.preferredMaximumLayoutWidth, preferredMaximumLayoutWidth)
     }
     
     /// Sets the preferred maximum layout height for the view.
-    public func preferredMaximumLayoutHeight(_ preferredMaximumLayoutHeight: CGFloat?) -> some View {
+    public func preferredMaximumLayoutHeight(
+        _ preferredMaximumLayoutHeight: CGFloat?
+    ) -> some View {
         environment(\.preferredMaximumLayoutHeight, preferredMaximumLayoutHeight)
     }
     
     /// Sets the preferred maximum layout dimensions for the view.
-    public func preferredMaximumLayoutDimensions(_ size: OptionalDimensions) -> some View {
+    public func preferredMaximumLayoutDimensions(
+        _ size: OptionalDimensions
+    ) -> some View {
         environment(\.preferredMaximumLayoutDimensions, size)
     }
     
     /// Sets the preferred maximum layout dimensions for the view.
-    public func preferredMaximumLayoutDimensions(_ size: CGSize) -> some View {
+    public func preferredMaximumLayoutDimensions(
+        _ size: CGSize
+    ) -> some View {
         preferredMaximumLayoutDimensions(.init(size))
     }
     
-    public func frame(_ dimensions: OptionalDimensions) -> some View {
-        frame(width: dimensions.width, height: dimensions.height)
+    public func frame(
+        min dimensions: OptionalDimensions
+    ) -> some View {
+        frame(
+            minWidth: dimensions.width,
+            minHeight: dimensions.height
+        )
+    }
+    
+    public func frame(
+        _ dimensions: OptionalDimensions
+    ) -> some View {
+        frame(
+            width: dimensions.width,
+            height: dimensions.height
+        )
+    }
+
+    public func frame(
+        max dimensions: OptionalDimensions
+    ) -> some View {
+        frame(
+            minWidth: dimensions.width,
+            minHeight: dimensions.height
+        )
     }
 }
 
@@ -218,21 +264,25 @@ extension CGSize {
         )
     }
     
-    public mutating func clamp(to dimensions: OptionalDimensions?) {
-        if let maxWidth = dimensions?.width {
+    public mutating func clamp(to dimensions: OptionalDimensions) {
+        if let maxWidth = dimensions.width {
             width = min(width, maxWidth)
         }
         
-        if let maxHeight = dimensions?.height {
+        if let maxHeight = dimensions.height {
             height = min(height, maxHeight)
         }
     }
     
-    public func clamped(to dimensions: OptionalDimensions?) -> Self {
+    public func clamped(to dimensions: OptionalDimensions) -> Self {
         var result = self
         
         result.clamp(to: dimensions)
         
         return result
+    }
+    
+    public func clamped(to dimensions: CGSize?) -> Self {
+        clamped(to: OptionalDimensions(dimensions))
     }
 }

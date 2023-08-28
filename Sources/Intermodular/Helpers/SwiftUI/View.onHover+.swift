@@ -24,7 +24,6 @@ private struct _OnHoverViewModifier: ViewModifier {
             fatalError("Use View.onHoverIfAvailable instead.")
         }
     }
-    
 }
 
 @available(iOS 13, OSX 10.15, *)

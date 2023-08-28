@@ -158,11 +158,11 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         }
         
         if self.backgroundColor == .clear {
-            _assignIfNotEqual(false, to: &isOpaque)
-            _assignIfNotEqual(false, to: &hasShadow)
+            _assignIfNotEqual(false, to: \.isOpaque)
+            _assignIfNotEqual(false, to: \.hasShadow)
         } else {
-            _assignIfNotEqual(true, to: &isOpaque)
-            _assignIfNotEqual(true, to: &hasShadow)
+            _assignIfNotEqual(true, to: \.isOpaque)
+            _assignIfNotEqual(true, to: \.hasShadow)
         }
         
         if configuration.style == .default {
@@ -178,9 +178,9 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         }
         
         if configuration.style == .hiddenTitleBar {
-            _assignIfNotEqual(true, to: &isMovableByWindowBackground)
-            _assignIfNotEqual(true, to: &titlebarAppearsTransparent)
-            _assignIfNotEqual(.hidden, to: &titleVisibility)
+            _assignIfNotEqual(true, to: \.isMovableByWindowBackground)
+            _assignIfNotEqual(true, to: \.titlebarAppearsTransparent)
+            _assignIfNotEqual(.hidden, to: \.titleVisibility)
                         
             standardWindowButton(.miniaturizeButton)?.isHidden = true
             standardWindowButton(.closeButton)?.isHidden = true

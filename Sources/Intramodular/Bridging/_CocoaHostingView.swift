@@ -4,20 +4,22 @@
 
 #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
 
+import Combine
 import Swift
 import SwiftUI
 
 open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
     public typealias RootView = CocoaHostingControllerContent<Content>
     
+    public var _SwiftUIX_cancellables: [AnyCancellable] = []
+    public var _observedPreferenceValues = _ObservedPreferenceValues()
+
     public var _configuration: CocoaHostingControllerConfiguration = .init() {
         didSet {
             rootView.parentConfiguration = _configuration
         }
     }
-    
-    public var _observedPreferenceValues = _ObservedPreferenceValues()
-    
+        
     public var mainView: Content {
         get {
             rootView.content
@@ -25,6 +27,16 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
             rootView.content = newValue
         }
     }
+    
+    #if os(macOS)
+    override open var needsLayout: Bool {
+        get {
+            super.needsLayout
+        } set {
+            super.needsLayout = newValue
+        }
+    }
+    #endif
     
     public init(mainView: Content) {
         super.init(
@@ -37,7 +49,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         rootView.parent = self
     }
-    
+        
     public required init(rootView: RootView) {
         super.init(rootView: rootView)
     }
@@ -46,9 +58,29 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         fatalError("init(coder:) has not been implemented")
     }
     
+    override open func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
+    }
+    
     #if os(macOS)
     override open func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+    }
+    
+    override open func resizeSubviews(withOldSize oldSize: NSSize) {
+        super.resizeSubviews(withOldSize: oldSize)
+    }
+    
+    override open func layout() {
+        super.layout()
+    }
+    
+    override open func layoutSubtreeIfNeeded() {
+        super.layoutSubtreeIfNeeded()
+    }
+    
+    override open func resize(withOldSuperviewSize oldSize: NSSize) {
+        super.resize(withOldSuperviewSize: oldSize)
     }
     #endif
 }
@@ -57,31 +89,26 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
 
 #if os(macOS)
 extension _CocoaHostingView {
-    private func setUpSizeObserver() {
+    @_spi(Internal)
+    public func _setUpExperimentalSizeSync() {
         NotificationCenter.default.addObserver(
             forName: NSView.frameDidChangeNotification,
             object: nil,
             queue: .main
-        ) { notification in
-            guard let view = notification.object as? NSView, view.className == "SwiftUI._NSGraphicsView" else {
+        ) { [weak self] notification in
+            guard let `self` = self else {
                 return
             }
             
-            guard view.superview == self else {
+            guard let view = notification.object as? NSView, view.superview == self else {
                 return
             }
             
-            DispatchQueue.main.async { [weak view] in
-                guard let view = view else {
-                    return
-                }
-                
-                guard !view.frame.size.isAreaZero else {
-                    return
-                }
-                
-                self.setFrameSize(view.frame.size)
+            guard view.frame.size._isNormal, self.frame.size._isNormal else {
+                return
             }
+
+            // TODO: Implement
         }
     }
 }

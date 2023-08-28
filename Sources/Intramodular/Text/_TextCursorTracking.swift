@@ -27,7 +27,7 @@ public final class _TextCursorTracking: ObservableObject {
         guard let owner else {
             return
         }
-        
+                        
         owner._performOrSchedulePublishingChanges {
             self.positionInText = owner._caretTextPosition
             self.location = owner._SwiftUIX_caretLocation
@@ -66,7 +66,11 @@ extension _TextCursorTracking {
 
 extension AppKitOrUIKitTextView {
     var _caretTextPosition: Int? {
-        _SwiftUIX_selectedRange.length > 0 ? nil : selectedRange.location
+        guard let selectedTextRange = _SwiftUIX_selectedTextRange else {
+            return nil
+        }
+        
+        return selectedTextRange.length > 0 ? nil : selectedTextRange.location
     }
 }
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)

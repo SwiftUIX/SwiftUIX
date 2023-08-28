@@ -13,7 +13,7 @@ public struct _TextViewConfiguration {
     var isConstant: Bool = false
     
     public var onEditingChanged: (Bool) -> Void = { _ in }
-    public var onCommit: () -> Void = { }
+    public var onCommit: (() -> Void)?
     public var onDeleteBackward: () -> Void = { }
     
     var isInitialFirstResponder: Bool?
@@ -99,7 +99,7 @@ public enum _TextViewDataBinding {
             case attributedString
         }
         
-        case cocoaTextStorage(NSTextStorage)
+        case cocoaTextStorage(() -> NSTextStorage?)
         case string(String)
         case cocoaAttributedString(NSAttributedString)
         case attributedString(Any)
@@ -133,7 +133,7 @@ public enum _TextViewDataBinding {
         var isEmpty: Bool {
             switch self {
                 case .cocoaTextStorage(let storage):
-                    return storage.string.isEmpty
+                    return storage()?.string.isEmpty ?? true
                 case .string(let value):
                     return value.isEmpty
                 case .cocoaAttributedString(let value):
@@ -154,7 +154,7 @@ public enum _TextViewDataBinding {
                 return nil
             }
             
-            return value
+            return value()
         }
         
         var stringValue: String? {
@@ -186,10 +186,10 @@ public enum _TextViewDataBinding {
             attributes: @autoclosure () -> [NSAttributedString.Key: Any]
         ) -> NSAttributedString {
             switch self {
-                case .cocoaTextStorage(let storage):
+                case .cocoaTextStorage:
                     assertionFailure()
                     
-                    return storage.attributedSubstring(from: .init(location: 0, length: storage.length))
+                    return NSAttributedString()
                 case .string(let value):
                     return NSAttributedString(string: value, attributes: attributes())
                 case .cocoaAttributedString(let value):
@@ -226,7 +226,7 @@ public enum _TextViewDataBinding {
         }
     }
     
-    case cocoaTextStorage(NSTextStorage)
+    case cocoaTextStorage(() -> NSTextStorage?)
     case string(Binding<String>)
     case cocoaAttributedString(Binding<NSAttributedString>)
     case attributedString(Any)
@@ -252,7 +252,7 @@ public enum _TextViewDataBinding {
         } nonmutating set {
             switch (self, newValue) {
                 case (.cocoaTextStorage(let value), .cocoaTextStorage(let newValue)):
-                    assert(value === newValue)
+                    assert(value() === newValue())
                 case (.string(let binding), .string(let newValue)):
                     binding.wrappedValue = newValue
                 case (.cocoaAttributedString(let binding), .cocoaAttributedString(let newValue)):
@@ -281,13 +281,15 @@ extension AppKitOrUIKitTextView {
     ) -> _TextViewDataBinding.Value {
         switch kind {
             case .cocoaTextStorage:
-                guard let storage = _SwiftUIX_textStorage else {
+                guard let textStorage = _SwiftUIX_textStorage else {
                     assertionFailure()
                     
-                    return .cocoaTextStorage(.init())
+                    return .cocoaTextStorage({ .init() })
                 }
                 
-                return .cocoaTextStorage(storage)
+                return .cocoaTextStorage({ [weak textStorage] in
+                    textStorage
+                })
             case .string:
                 return .string(text ?? (attributedText?.string ?? ""))
             case .cocoaAttributedString:
@@ -341,13 +343,15 @@ extension AppKitOrUIKitTextView {
     ) -> _TextViewDataBinding.Value {
         switch kind {
             case .cocoaTextStorage:
-                guard let storage = _SwiftUIX_textStorage else {
+                guard let textStorage = _SwiftUIX_textStorage else {
                     assertionFailure()
                     
-                    return .cocoaTextStorage(.init())
+                    return .cocoaTextStorage({ nil })
                 }
-                
-                return .cocoaTextStorage(storage)
+                                
+                return .cocoaTextStorage({ [weak textStorage] in
+                    textStorage
+                })
             case .string:
                 return .string(string)
             case .cocoaAttributedString:

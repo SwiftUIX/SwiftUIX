@@ -8,18 +8,24 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
-    public var _SwiftUIX_layoutManager: NSLayoutManager? {
-        layoutManager
+    public var _SwiftUIX_textContainer: NSTextContainer? {
+        textContainer
     }
     
-    public var _SwiftUIX_selectedRange: NSRange {
-        selectedRange
+    public var _SwiftUIX_layoutManager: NSLayoutManager? {
+        layoutManager
     }
     
     public var _SwiftUIX_textStorage: NSTextStorage? {
         textStorage
     }
-    
+}
+
+extension AppKitOrUIKitTextView {
+    public var _SwiftUIX_selectedTextRange: NSRange? {
+        selectedRange
+    }
+        
     public var _SwiftUIX_text: String {
         text ?? ""
     }
@@ -31,32 +37,7 @@ extension AppKitOrUIKitTextView {
     var defaultParagraphStyle: NSParagraphStyle? {
         NSParagraphStyle.default
     }
-    
-    func _sizeThatFits(
-        width: CGFloat
-    ) -> CGSize? {
-        let storage = NSTextStorage(attributedString: attributedText)
-        let width = bounds.width - textContainerInset.horizontal
-        let containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-        let container = NSTextContainer(size: containerSize)
-        let manager = NSLayoutManager()
         
-        manager.addTextContainer(container)
-        storage.addLayoutManager(manager)
-        
-        container.lineFragmentPadding = textContainer.lineFragmentPadding
-        container.lineBreakMode = textContainer.lineBreakMode
-        
-        _ = manager.glyphRange(for: container)
-        
-        let usedRect = manager.usedRect(for: container)
-        
-        return CGSize(
-            width: ceil(usedRect.size.width + textContainerInset.horizontal),
-            height: ceil(usedRect.size.height + textContainerInset.vertical)
-        )
-    }
-    
     func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
@@ -79,47 +60,30 @@ extension AppKitOrUIKitTextView {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitTextView {
+    public var _SwiftUIX_textContainer: NSTextContainer? {
+        textContainer
+    }
+    
     public var _SwiftUIX_layoutManager: NSLayoutManager? {
         layoutManager
     }
-    
-    public var _SwiftUIX_selectedRange: NSRange {
-        selectedRange()
-    }
-    
+        
     public var _SwiftUIX_textStorage: NSTextStorage? {
         textStorage
     }
-    
+}
+
+extension AppKitOrUIKitTextView {
+    public var _SwiftUIX_selectedTextRange: NSRange? {
+        selectedRanges.first as? NSRange
+    }
+            
     public var _SwiftUIX_text: String {
         string
     }
-    
+
     public var _SwiftUIX_attributedText: NSAttributedString {
         attributedString()
-    }
-    
-    func _sizeThatFits(
-        width: CGFloat
-    ) -> CGSize? {
-        guard let layoutManager, let textContainer else {
-            return nil
-        }
-        
-        let originalWidth = frame.size.width
-        
-        frame.size.width = width
-        
-        textContainer.containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: 0), actualCharacterRange: nil)
-        
-        layoutManager.glyphRange(for: textContainer)
-        
-        let usedRect = layoutManager.usedRect(for: textContainer)
-        
-        frame.size.width = originalWidth
-        
-        return usedRect.size
     }
 }
 #endif
@@ -155,7 +119,9 @@ extension AppKitOrUIKitTextView {
             return defaultParagraphStyle
         }
         
-        let selectedRange = _SwiftUIX_selectedRange
+        guard let selectedRange = _SwiftUIX_selectedTextRange else {
+            return defaultParagraphStyle
+        }
         
         let location: Int
         
@@ -194,6 +160,84 @@ extension AppKitOrUIKitTextView {
         
         return lineHeight + lineSpacing
     }
+        
+    func _sizeThatFits(
+        width: CGFloat,
+        accountForNewline: Bool = false
+    ) -> CGSize? {
+        _sizeThatFitsWithoutCopying(
+            width: width,
+            accountForNewline: accountForNewline
+        )
+    }
+    
+    private func _sizeThatFitsWithoutCopying(
+        width: CGFloat,
+        accountForNewline: Bool
+    ) -> CGSize? {
+        guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager else {
+            return nil
+        }
+        
+        let originalTextContainerSize = textContainer.containerSize
+        
+        // let originaSize = frame.size
+        // frame.size.width = width
+        
+        textContainer.containerSize = CGSize(width: width, height: 10000000.0)
+        
+        layoutManager.invalidateLayout(forCharacterRange: NSRange(location: 0, length: 0), actualCharacterRange: nil)
+        layoutManager.glyphRange(for: textContainer)
+        layoutManager.ensureLayout(for: textContainer)
+        
+        let usedRect = layoutManager.usedRect(for: textContainer)
+        
+        // frame.size = originaSize
+        
+        if width.isNormal && originalTextContainerSize._isNormal {
+            textContainer.size = originalTextContainerSize
+        }
+        
+        return usedRect.size
+    }
+    
+    private func _sizeThatFitsByCopying(
+        width: CGFloat,
+        accountForNewline: Bool
+    ) -> CGSize? {
+        guard let textContainer = _SwiftUIX_textContainer, let textStorage = _SwiftUIX_textStorage else {
+            return nil
+        }
+        
+        let temporaryTextStorage = NSTextStorage(attributedString: textStorage)
+        let width = bounds.width - textContainerInset.horizontal
+        let containerSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        let temporaryTextContainer = NSTextContainer(size: containerSize)
+        let temporaryLayoutManager = NSLayoutManager()
+        
+        temporaryLayoutManager.addTextContainer(temporaryTextContainer)
+        temporaryTextStorage.addLayoutManager(temporaryLayoutManager)
+        
+        temporaryTextContainer.lineFragmentPadding = textContainer.lineFragmentPadding
+        temporaryTextContainer.lineBreakMode = textContainer.lineBreakMode
+        
+        _ = temporaryLayoutManager.glyphRange(for: temporaryTextContainer)
+        
+        let usedRect = temporaryLayoutManager.usedRect(for: temporaryTextContainer)
+        
+        var result = CGSize(
+            width: ceil(usedRect.size.width + textContainerInset.horizontal),
+            height: ceil(usedRect.size.height + textContainerInset.vertical)
+        )
+        
+        if accountForNewline {
+            if temporaryTextStorage.string.hasSuffix("\n") {
+                result.height += (_heightDifferenceForNewline ?? 0)
+            }
+        }
+        
+        return result
+    }
 }
 
 // MARK: - Auxiliary
@@ -204,6 +248,16 @@ extension NSLayoutManager {
         let paragraphStyle = NSParagraphStyle.default
         
         return font.lineHeight * paragraphStyle.lineHeightMultiple + paragraphStyle.lineSpacing
+    }
+}
+#elseif os(macOS)
+extension NSSize {
+    fileprivate var horizontal: CGFloat {
+        width
+    }
+    
+    fileprivate var vertical: CGFloat {
+        height
     }
 }
 #endif

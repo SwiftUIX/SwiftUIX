@@ -212,11 +212,12 @@ class CocoaHostingCollectionViewCell<
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        _assignIfNotEqual(false, to: &_isFocused)
-        _assignIfNotEqual(false, to: &super.isHighlighted)
-        _assignIfNotEqual(false, to: &super.isSelected)
-    }
+        _assignIfNotEqual(false, to: \._isFocused)
         
+        SwiftUIX._assignIfNotEqual(false, to: &super.isHighlighted)
+        SwiftUIX._assignIfNotEqual(false, to: &super.isSelected)
+    }
+
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
@@ -227,7 +228,7 @@ class CocoaHostingCollectionViewCell<
         }
         
         if let size = contentCache.preferredContentSize, lastInvalidationContext == nil {
-            layoutAttributes.size = size.clamped(to: contentConfiguration.maximumSize)
+            layoutAttributes.size = size.clamped(to: contentConfiguration.maximumSize ?? nil)
             
             return layoutAttributes
         } else {
@@ -238,7 +239,7 @@ class CocoaHostingCollectionViewCell<
             if let relativeFrame = contentPreferences.relativeFrame {
                 let size = relativeFrame
                     .sizeThatFits(in: layoutAttributes.size)
-                    .clamped(to: contentConfiguration.maximumSize)
+                    .clamped(to: contentConfiguration.maximumSize ?? nil)
                 
                 layoutAttributes.size = size
                 
@@ -271,7 +272,7 @@ class CocoaHostingCollectionViewCell<
                 if preferredLayoutAttributes.size != contentCache.preferredContentSize {
                     contentCache.preferredContentSize = preferredLayoutAttributes
                         .size
-                        .clamped(to: contentConfiguration.maximumSize)
+                        .clamped(to: contentConfiguration.maximumSize ?? nil)
                 }
                 
                 return preferredLayoutAttributes
@@ -295,7 +296,7 @@ class CocoaHostingCollectionViewCell<
         if let relativeFrame = contentPreferences.relativeFrame {
             if layoutAttributes.size != contentHostingController.view.frame.size {
                 self.contentCache.preferredContentSize = relativeFrame.sizeThatFits(
-                    in: layoutAttributes.size.clamped(to: contentConfiguration.maximumSize)
+                    in: layoutAttributes.size.clamped(to: contentConfiguration.maximumSize ?? nil)
                 )
                 
                 contentHostingController.configure(

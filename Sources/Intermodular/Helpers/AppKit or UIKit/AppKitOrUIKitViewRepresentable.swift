@@ -155,14 +155,14 @@ extension AppKitOrUIKitViewRepresentable {
     ) {
         let represented = view as? _AppKitOrUIKitRepresented
         
-        represented?.representationStateFlags.insert(.updateInProgress)
+        represented?.representatableStateFlags.insert(.updateInProgress)
         
         updateAppKitOrUIKitView(view, context: context)
         
-        represented?.representationStateFlags.remove(.updateInProgress)
+        represented?.representatableStateFlags.remove(.updateInProgress)
         
-        if let represented, !represented.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            represented.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if let represented, !represented.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            represented.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
     
@@ -175,7 +175,7 @@ extension AppKitOrUIKitViewRepresentable {
         
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
         
-        represented?.representationStateFlags.insert(.dismantled)
+        represented?.representatableStateFlags.insert(.dismantled)
     }
 }
 
@@ -190,14 +190,14 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
-        view.representationStateFlags.insert(.updateInProgress)
+        view.representatableStateFlags.insert(.updateInProgress)
         
         updateAppKitOrUIKitView(view, context: context)
         
-        view.representationStateFlags.remove(.updateInProgress)
+        view.representatableStateFlags.remove(.updateInProgress)
         
-        if !view.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            view.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if !view.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            view.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
     
@@ -208,7 +208,7 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
     ) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
         
-        view.representationStateFlags.insert(.dismantled)
+        view.representatableStateFlags.insert(.dismantled)
     }
 }
 
@@ -267,14 +267,14 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
         _ viewController: AppKitOrUIKitViewControllerType,
         context: Context
     ) {
-        viewController.representationStateFlags.insert(.updateInProgress)
+        viewController.representatableStateFlags.insert(.updateInProgress)
         
         updateAppKitOrUIKitViewController(viewController, context: context)
         
-        viewController.representationStateFlags.remove(.updateInProgress)
+        viewController.representatableStateFlags.remove(.updateInProgress)
         
-        if !viewController.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            viewController.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if !viewController.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            viewController.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
     
@@ -285,7 +285,7 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
     ) {
         dismantleAppKitOrUIKitViewController(viewController, coordinator: coordinator)
         
-        viewController.representationStateFlags.insert(.dismantled)
+        viewController.representatableStateFlags.insert(.dismantled)
     }
 }
 
@@ -320,14 +320,14 @@ extension AppKitOrUIKitViewRepresentable {
     ) {
         let represented = view as? _AppKitOrUIKitRepresented
         
-        represented?.representationStateFlags.insert(.updateInProgress)
+        represented?.representatableStateFlags.insert(.updateInProgress)
 
         updateAppKitOrUIKitView(view, context: context)
         
-        represented?.representationStateFlags.remove(.updateInProgress)
+        represented?.representatableStateFlags.remove(.updateInProgress)
         
-        if let represented, !represented.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            represented.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if let represented, !represented.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            represented.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
     
@@ -337,7 +337,7 @@ extension AppKitOrUIKitViewRepresentable {
         
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
         
-        represented?.representationStateFlags.insert(.dismantled)
+        represented?.representatableStateFlags.insert(.dismantled)
     }
 }
 
@@ -352,14 +352,14 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
-        view.representationStateFlags.insert(.updateInProgress)
+        view.representatableStateFlags.insert(.updateInProgress)
         
         updateAppKitOrUIKitView(view, context: context)
         
-        view.representationStateFlags.remove(.updateInProgress)
+        view.representatableStateFlags.remove(.updateInProgress)
         
-        if !view.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            view.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if !view.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            view.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
 
@@ -367,7 +367,7 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
     public static func dismantleNSView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
         
-        view.representationStateFlags.insert(.dismantled)
+        view.representatableStateFlags.insert(.dismantled)
     }
 }
 
@@ -426,14 +426,14 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
         _ viewController: AppKitOrUIKitViewControllerType,
         context: Context
     ) {
-        viewController.representationStateFlags.insert(.updateInProgress)
+        viewController.representatableStateFlags.insert(.updateInProgress)
 
         updateAppKitOrUIKitViewController(viewController, context: context)
         
-        viewController.representationStateFlags.remove(.updateInProgress)
+        viewController.representatableStateFlags.remove(.updateInProgress)
         
-        if !viewController.representationStateFlags.contains(.didUpdateAtLeastOnce) {
-            viewController.representationStateFlags.insert(.didUpdateAtLeastOnce)
+        if !viewController.representatableStateFlags.contains(.didUpdateAtLeastOnce) {
+            viewController.representatableStateFlags.insert(.didUpdateAtLeastOnce)
         }
     }
     
@@ -444,7 +444,7 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
     ) {
         dismantleAppKitOrUIKitViewController(viewController, coordinator: coordinator)
         
-        viewController.representationStateFlags.insert(.dismantled)
+        viewController.representatableStateFlags.insert(.dismantled)
     }
 }
 #endif

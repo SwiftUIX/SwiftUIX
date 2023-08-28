@@ -12,35 +12,53 @@ import SwiftUI
 public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
     associatedtype Label: View
     
+    var _needsIntrinsicContentSizeInvalidation: Bool { get set }
     var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> { get }
     var _trackedTextCursor: _TextCursorTracking { get }
     
+    func _SwiftUIX_makeLayoutManager() -> NSLayoutManager?
+
     func representableWillAssemble(context: some _AppKitOrUIKitViewRepresentableContext)
-    
+        
     @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
     func _updateTextView(
         data: _TextViewDataBinding.Value,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     )
+    
+    func invalidateLayout(for range: NSRange)
+    func invalidateDisplay(for range: NSRange)
+    func _ensureLayoutForTextContainer()
 }
 
 /// The main `UITextView` subclass used by `TextView`.
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManagerDelegate, NSTextStorageDelegate {
-    public var representationStateFlags: _AppKitOrUIKitRepresentationStateFlags = []
-    public var representationCache: _AppKitOrUIKitRepresentationCache = nil
-    
-    var data: _TextViewDataBinding = .string(.constant(""))
-    var configuration = TextView<Label>._Configuration()
-    var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration!
-    
+    public var representatableStateFlags: _AppKitOrUIKitRepresentableStateFlags = []
+    public var representableCache: _AppKitOrUIKitRepresentableCache = nil
+    public var representableUpdater = EmptyObservableObject()
+
     @_spi(Internal)
-    public var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
+    public internal(set) var data: _TextViewDataBinding = .string(.constant(""))
+    @_spi(Internal)
+    public internal(set) var configuration = TextView<Label>._Configuration()
+    @_spi(Internal)
+    public internal(set) var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration!
     
+    public private(set) var _wantsTextKit1: Bool?
+    public private(set) var _customTextStorage: NSTextStorage?
+    public private(set) var _lastInsertedString: String?
+    public private(set) var _wantsRelayout: Bool = false
+    public private(set) var _isTextLayoutInProgress: Bool? = nil
+    
+    public var _needsIntrinsicContentSizeInvalidation = false
+
+    
+    private var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
     private var _lazyTextEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? = nil
     private var _lazyTrackedTextCursor: _TextCursorTracking? = nil
-            
+
     @_spi(Internal)
     public var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> {
         guard let publisher = _lazyTextEditorEventPublisher else {
@@ -55,7 +73,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         
         return publisher
     }
-
+    
     public var _trackedTextCursor: _TextCursorTracking {
         guard let result = _lazyTrackedTextCursor else {
             let result = _TextCursorTracking(owner: self)
@@ -65,10 +83,6 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         
         return result
     }
-    
-    private var _wantsTextKit1: Bool?
-    private var _customTextStorage: NSTextStorage?
-    private var lastInsertedString: String?
     
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     override open var textStorage: NSTextStorage {
@@ -125,7 +139,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         }
     }
     #endif
-    
+        
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var preferredMaximumDimensions: OptionalDimensions = nil {
         didSet {
@@ -134,8 +148,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
-                ? AppKitOrUIKitLayoutPriority.defaultLow
-                : AppKitOrUIKitLayoutPriority.defaultHigh
+            ? AppKitOrUIKitLayoutPriority.defaultLow
+            : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -145,8 +159,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
-                ? AppKitOrUIKitLayoutPriority.defaultLow
-                : AppKitOrUIKitLayoutPriority.defaultHigh
+            ? AppKitOrUIKitLayoutPriority.defaultLow
+            : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -166,28 +180,14 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     #endif
     
     override open var intrinsicContentSize: CGSize {
-        if let fixedSize = configuration._fixedSize {
-            switch fixedSize {
-                case (false, false):
-                    return CGSize(
-                        width: AppKitOrUIKitView.noIntrinsicMetric,
-                        height: AppKitOrUIKitView.noIntrinsicMetric
-                    )
-                default:
-                    assertionFailure("unsupported")
-                    
-                    return super.intrinsicContentSize
-            }
-        }
-        
-        if let result = representationCache._cachedIntrinsicContentSize {
+        if let result = representableCache._cachedIntrinsicContentSize {
             return result
         } else {
-            guard let result = _sizeThatFits() else {
+            guard self.bounds.width.isNormal, let result = _sizeThatFits()?.toAppKitOrUIKitIntrinsicContentSize() else {
                 return super.intrinsicContentSize
             }
             
-            representationCache._cachedIntrinsicContentSize = result
+            representableCache._cachedIntrinsicContentSize = result
             
             return result
         }
@@ -212,17 +212,21 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         }
     }
     
+    open func _SwiftUIX_makeLayoutManager() -> NSLayoutManager? {
+        return nil
+    }
+    
     open func representableWillAssemble(
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
-        assert(!representationStateFlags.contains(.didUpdateAtLeastOnce))
+        assert(!representatableStateFlags.contains(.didUpdateAtLeastOnce))
         
         guard let textStorage = _SwiftUIX_textStorage else {
             assertionFailure()
             
             return
         }
-                
+        
         textStorage.delegate = self
         
         if _wantsTextKit1 == true {
@@ -256,14 +260,18 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         super.resizeSubviews(withOldSize: oldSize)
     }
     
+    override open func layout() {
+        super.layout()
+    }
+    
     override open func layoutSubtreeIfNeeded() {
         super.layoutSubtreeIfNeeded()
     }
     #endif
     
     override open func invalidateIntrinsicContentSize() {
-        representationCache.invalidate(.intrinsicContentSize)
-        
+        representableCache.invalidate(.intrinsicContentSize)
+                
         super.invalidateIntrinsicContentSize()
     }
     
@@ -310,21 +318,21 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         _ insertString: Any,
         replacementRange: NSRange
     ) {
-        super.insertText(insertString, replacementRange: replacementRange)
-
         if let text = insertString as? String {
-            lastInsertedString = text
+            _lastInsertedString = text
             
             _publishTextEditorEvent(.insert(text: .init(string: text), range: replacementRange))
         }
+        
+        super.insertText(insertString, replacementRange: replacementRange)
     }
     
     open override func shouldChangeText(
         in affectedCharRange: NSRange,
         replacementString: String?
     ) -> Bool {
-        if let lastInsertedString = lastInsertedString, replacementString == lastInsertedString {
-            self.lastInsertedString = nil
+        if let _lastInsertedString = _lastInsertedString, replacementString == _lastInsertedString {
+            self._lastInsertedString = nil
         } else if let replacementString = replacementString {
             self._publishTextEditorEvent(.replace(text: .init(string: replacementString), range: affectedCharRange))
         } else {
@@ -335,7 +343,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
         }
         
-        self.lastInsertedString = nil
+        self._lastInsertedString = nil
         
         return super.shouldChangeText(
             in: affectedCharRange,
@@ -357,7 +365,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         stillSelecting stillSelectingFlag: Bool
     ) {
         super.setSelectedRange(
-            charRange, 
+            charRange,
             affinity: affinity,
             stillSelecting: stillSelectingFlag
         )
@@ -387,9 +395,13 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         if let shortcut = KeyboardShortcut(from: event) {
             switch shortcut {
                 case KeyboardShortcut(.return, modifiers: []):
-                    configuration.onCommit()
-                                        
-                    self._SwiftUIX_didCommit()
+                    if let onCommit = configuration.onCommit {
+                        onCommit()
+                        
+                        self._SwiftUIX_didCommit()
+                    } else {
+                        super.keyDown(with: event)
+                    }
                 default:
                     super.keyDown(with: event)
             }
@@ -405,11 +417,11 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     
     private func _synchronizeFocusState() {
-        guard !representationStateFlags.contains(.updateInProgress) else {
+        guard !representatableStateFlags.contains(.updateInProgress) else {
             return
         }
         
-        guard !representationStateFlags.contains(.dismantled) else {
+        guard !representatableStateFlags.contains(.dismantled) else {
             return
         }
         
@@ -420,13 +432,15 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     // MARK: - NSTextStorageDelegate
     
+    private var _isTextStorageEditing: Bool? = nil
+    
     open func textStorage(
         _ textStorage: NSTextStorage,
         willProcessEditing editedMask: NSTextStorage._SwiftUIX_EditActions,
         range editedRange: NSRange,
         changeInLength delta: Int
     ) {
-        
+        _isTextStorageEditing = true
     }
     
     open func textStorage(
@@ -435,17 +449,86 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         range editedRange: NSRange,
         changeInLength delta: Int
     ) {
-        
+        _isTextStorageEditing = false
     }
     
     // MARK: - NSLayoutManagerDelegate
+        
+    @objc open func layoutManagerDidInvalidateLayout(
+        _ sender: NSLayoutManager
+    ) {
+        _isTextLayoutInProgress = true
+    }
+
+    @objc open func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        shouldGenerateGlyphs glyphs: UnsafePointer<CGGlyph>,
+        properties: UnsafePointer<NSLayoutManager.GlyphProperty>,
+        characterIndexes: UnsafePointer<Int>,
+        font: AppKitOrUIKitFont,
+        forGlyphRange range: NSRange
+    ) -> Int {
+        return 0
+    }
     
-    open func layoutManager(
+    @objc open func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        lineSpacingAfterGlyphAt glyphIndex: Int,
+        withProposedLineFragmentRect rect: CGRect
+    ) -> CGFloat {
+        0
+    }
+    
+    @objc open func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        shouldUse action: NSLayoutManager.ControlCharacterAction,
+        forControlCharacterAt charIndex: Int
+    ) -> NSLayoutManager.ControlCharacterAction {
+        return action
+    }
+    
+    @objc open func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        boundingBoxForControlGlyphAt glyphIndex: Int,
+        for textContainer: NSTextContainer,
+        proposedLineFragment proposedRect: CGRect,
+        glyphPosition: CGPoint,
+        characterIndex charIndex: Int
+    ) -> CGRect {
+        return proposedRect
+    }
+
+    @objc open func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        shouldBreakLineByWordBeforeCharacterAt charIndex: Int
+    ) -> Bool {
+        false
+    }
+        
+    @objc open func layoutManager(
         _ layoutManager: NSLayoutManager,
         didCompleteLayoutFor textContainer: NSTextContainer?,
         atEnd layoutFinishedFlag: Bool
     ) {
+        _isTextLayoutInProgress = layoutFinishedFlag
+    }
+    
+    // MARK: -
+    
+    override open func _performOrSchedulePublishingChanges(
+        @_implicitSelfCapture _ operation: @escaping () -> Void
+    ) {
+        guard !(_isTextStorageEditing == true) else {
+            return
+        }
         
+        if representatableStateFlags.contains(.updateInProgress) {
+            DispatchQueue.main.async {
+                operation()
+            }
+        } else {
+            operation()
+        }
     }
 }
 
@@ -454,53 +537,41 @@ extension _PlatformTextView {
     func _sizeThatFits(
         _ proposal: AppKitOrUIKitLayoutSizeProposal
     ) -> CGSize? {
-        if let cachedResult = representationCache._sizeThatFitsCache[proposal] {
-            return cachedResult
-        }
-        
-        guard let targetWidth = proposal.size.target.width else {
-            assertionFailure("unsupported")
-            
-            return nil
-        }
-        
-        guard proposal.size.target.width != .zero else {
-            return nil
-        }
-        
-        let oldFrame = frame
-        
-        defer {
-            if oldFrame != self.frame {
-                self.frame = oldFrame
-            }
-        }
-        
-        guard let idealSize = self._sizeThatFits(CGSize(width: targetWidth, height: .greatestFiniteMagnitude)) else {
-            return .zero
-        }
-        
-        let result: CGSize
-        
-        if proposal.fit.horizontal == .required {
-            result = CGSize(
-                width: min(targetWidth, idealSize.width),
-                height: idealSize.height
-            )
+        if let cached = representableCache._sizeThatFitsCache[proposal] {
+            return cached
         } else {
-            result = CGSize(
-                width: max(targetWidth, idealSize.width),
-                height: idealSize.height
-            )
+            assert(proposal.size.maximum == nil)
+            
+            guard var result = _uncachedSizeThatFits(for: proposal._targetAppKitOrUIKitSize.width) else {
+                return nil
+            }
+            
+            if !result._hasPlaceholderDimension(.width, for: .textContainer) {
+                result.width = max(result.width, proposal.size.target.width)
+            } else if let targetWidth = proposal.size.target.width, targetWidth.isNormal {
+                result.width = targetWidth
+            }
+             
+            representableCache._sizeThatFitsCache[proposal] = result
+
+            return result
         }
-        
-        if result.isAreaZero {
+    }
+    
+    private func _uncachedSizeThatFits(
+        for width: CGFloat
+    ) -> CGSize? {
+        guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager else {
             return nil
         }
         
-        representationCache._sizeThatFitsCache[proposal] = result
+        let usedRect = layoutManager.usedRect(for: textContainer).size
         
-        return result
+        if textContainer.containerSize.width == width, textContainer._isContainerWidthNormal, !usedRect.isAreaZero {
+            return usedRect
+        } else {
+            return _sizeThatFits(width: width)
+        }
     }
 }
 
@@ -516,9 +587,9 @@ extension _PlatformTextView {
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         let requiresAttributedText = false
-            || context.environment.requiresAttributedText
-            || configuration.requiresAttributedText
-            || data.isAttributed
+        || context.environment.requiresAttributedText
+        || configuration.requiresAttributedText
+        || data.isAttributed
         
         var cursorOffset: Int?
         
@@ -528,7 +599,7 @@ extension _PlatformTextView {
         }
         
     updateUserInteractability: do {
-        #if !os(tvOS)
+#if !os(tvOS)
         if !configuration.isEditable {
             view.isEditable = false
         } else {
@@ -536,7 +607,7 @@ extension _PlatformTextView {
             ? false
             : context.environment.isEnabled && configuration.isEditable
         }
-        #endif
+#endif
         view.isScrollEnabled = context.environment._isScrollEnabled
         view.isSelectable = configuration.isSelectable
     }
@@ -555,15 +626,15 @@ extension _PlatformTextView {
         let font: AppKitOrUIKitFont? = configuration.cocoaFont ?? (try? context.environment.font?.toAppKitOrUIKitFont())
         
         if let textColor = configuration.cocoaForegroundColor {
-            _assignIfNotEqual(textColor, to: &view.textColor)
+            view._assignIfNotEqual(textColor, to: \.textColor)
         }
         
         if let tintColor = configuration.tintColor {
-            _assignIfNotEqual(tintColor, to: &view.tintColor)
+            view._assignIfNotEqual(tintColor, to: \.tintColor)
         }
         
         if let linkForegroundColor = configuration.linkForegroundColor {
-            _assignIfNotEqual(linkForegroundColor, to: &view.linkTextAttributes[.foregroundColor])
+            SwiftUIX._assignIfNotEqual(linkForegroundColor, to: &view.linkTextAttributes[.foregroundColor])
         } else {
             if view.linkTextAttributes[.foregroundColor] != nil {
                 view.linkTextAttributes[.foregroundColor] = nil
@@ -580,8 +651,8 @@ extension _PlatformTextView {
             if requiresAttributedText {
                 let paragraphStyle = NSMutableParagraphStyle()
                 
-                _assignIfNotEqual(context.environment.lineBreakMode, to: &paragraphStyle.lineBreakMode)
-                _assignIfNotEqual(context.environment.lineSpacing, to: &paragraphStyle.lineSpacing)
+                paragraphStyle._assignIfNotEqual(context.environment.lineBreakMode, to: \.lineBreakMode)
+                paragraphStyle._assignIfNotEqual(context.environment.lineSpacing, to: \.lineSpacing)
                 
                 context.environment._paragraphSpacing.map {
                     paragraphStyle.paragraphSpacing = $0
@@ -621,16 +692,16 @@ extension _PlatformTextView {
     }
         
     correctCursorOffset: do {
-        #if os(tvOS)
+#if os(tvOS)
         if let cursorOffset = cursorOffset, let position = view.position(from: view.beginningOfDocument, offset: cursorOffset), let textRange = view.textRange(from: position, to: position) {
             view.selectedTextRange = textRange
         }
-        #else
+#else
         // Reset the cursor offset if possible.
         if view.isEditable, let cursorOffset = cursorOffset, let position = view.position(from: view.beginningOfDocument, offset: cursorOffset), let textRange = view.textRange(from: position, to: position) {
             view.selectedTextRange = textRange
         }
-        #endif
+#endif
     }
         
     updateKeyboardConfiguration: do {
@@ -686,13 +757,13 @@ extension _PlatformTextView {
             }
         }
     }
-        
+    
     private func verticallyCenterTextIfNecessary() {
         guard !isScrollEnabled else {
             return
         }
         
-        guard let _cachedIntrinsicContentSize = representationCache._cachedIntrinsicContentSize else {
+        guard let _cachedIntrinsicContentSize = representableCache._cachedIntrinsicContentSize else {
             return
         }
         
@@ -723,102 +794,122 @@ extension _PlatformTextView {
         
         view._update(data: data, configuration: configuration, context: context)
     }
-    
+        
     private func _update(
         data: _TextViewDataBinding.Value,
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
-        _assignIfNotEqual(true, to: &allowsUndo)
-        _assignIfNotEqual(.clear, to: &backgroundColor)
-        _assignIfNotEqual(false, to: &drawsBackground)
-        _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: &isEditable)
-        _assignIfNotEqual(.zero, to: &textContainerInset)
-        _assignIfNotEqual(true, to: &usesAdaptiveColorMappingForDarkAppearance)
+        _assignIfNotEqual(true, to: \.allowsUndo)
+        _assignIfNotEqual(.clear, to: \.backgroundColor)
+        _assignIfNotEqual(false, to: \.drawsBackground)
+        _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: \.isEditable)
+        _assignIfNotEqual(.zero, to: \.textContainerInset)
+        _assignIfNotEqual(true, to: \.usesAdaptiveColorMappingForDarkAppearance)
         
         if let font = try? configuration.cocoaFont ?? context.environment.font?.toAppKitOrUIKitFont() {
-            _assignIfNotEqual(font, to: &self.font)
-            
+            _assignIfNotEqual(font, to: \.self.font)
+
             if let textStorage = _SwiftUIX_textStorage {
-                _assignIfNotEqual(font, to: &textStorage.font)
+                textStorage._assignIfNotEqual(font, to: \.font)
             }
         }
         
-        _assignIfNotEqual(configuration.cocoaForegroundColor, to: &textColor)
+        _assignIfNotEqual(configuration.cocoaForegroundColor, to: \.textColor)
         
         if let foregroundColor = configuration.cocoaForegroundColor {
             if let textStorage = _SwiftUIX_textStorage {
-                _assignIfNotEqual(foregroundColor, to: &textStorage.foregroundColor)
+                textStorage._assignIfNotEqual(foregroundColor, to: \.foregroundColor)
             }
         }
         
         if let textContainer {
-            _assignIfNotEqual(.zero, to: &textContainer.lineFragmentPadding)
-            _assignIfNotEqual((context.environment.lineLimit ?? 0), to: &textContainer.maximumNumberOfLines)
+            textContainer._assignIfNotEqual(.zero, to: \.lineFragmentPadding)
+            textContainer._assignIfNotEqual((context.environment.lineLimit ?? 0), to: \.maximumNumberOfLines)
         }
         
-        _assignIfNotEqual(false, to: &isHorizontallyResizable)
-        _assignIfNotEqual(true, to: &isVerticallyResizable)
-        _assignIfNotEqual([.width], to: &autoresizingMask)
+        _assignIfNotEqual(false, to: \.isHorizontallyResizable)
+        _assignIfNotEqual(true, to: \.isVerticallyResizable)
+        _assignIfNotEqual([.width], to: \.autoresizingMask)
         
         if let tintColor = configuration.tintColor {
-            _assignIfNotEqual(tintColor, to: &insertionPointColor)
+            _assignIfNotEqual(tintColor, to: \.insertionPointColor)
         }
         
         if _currentTextViewData(kind: self.data.wrappedValue.kind) != data {
+            _needsIntrinsicContentSizeInvalidation = true
+            
             setData(data)
+        }
+                
+        _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded()
+    }
+    
+    private func _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded() {
+        guard let textContainer = textContainer else {
+            return
+        }
+        
+        if _needsIntrinsicContentSizeInvalidation {
+            invalidateIntrinsicContentSize()
+        }
+        
+        if _wantsRelayout {
+            _SwiftUIX_layoutManager?.ensureLayout(for: textContainer)
+            
+            if _needsIntrinsicContentSizeInvalidation {
+                _SwiftUIX_setNeedsLayout()
+                _SwiftUIX_layoutIfNeeded()
+            }
+        }
+        
+        _needsIntrinsicContentSizeInvalidation = false
+        _wantsRelayout = false
+    }
+    
+    private func _correctNSTextContainerSize() {
+        guard let textContainer else {
+            return
         }
         
         if let fixedSize = configuration._fixedSize {
             if fixedSize == (false, false) {
-                textContainer?.widthTracksTextView = true
-                textContainer?.containerSize.height = AppKitOrUIKitView.layoutFittingExpandedSize.height
+                if textContainer.heightTracksTextView == false {
+                    textContainer.widthTracksTextView = true
+                    textContainer.heightTracksTextView = true
+                }
+                
+                if textContainer.size.height != 10000000.0 {
+                    textContainer.size.height = 10000000.0
+                }
             } else {
                 assertionFailure("unsupported")
             }
-        } else {
-            invalidateIntrinsicContentSize()
-            
-            let intrinsicContentSize = self.intrinsicContentSize
-            
-            if frame.size.width < intrinsicContentSize.width || frame.size.height < intrinsicContentSize.height {
-                frame.size = intrinsicContentSize
-            }
         }
     }
-        
+    
+    private func _enforcePrecomputedIntrinsicContentSize() {
+        guard let intrinsicContentSize = representableCache._cachedIntrinsicContentSize, !intrinsicContentSize._hasUnspecifiedIntrinsicContentSizeDimensions else {
+            return
+        }
+    
+        if frame.size.width < intrinsicContentSize.width {
+            frame.size.width = intrinsicContentSize.width
+        }
+
+        if frame.size.height < intrinsicContentSize.height {
+            frame.size.height = intrinsicContentSize.height
+        }
+    }
+    
     func _sizeThatFits(
         _ size: CGSize? = nil
     ) -> CGSize? {
-        guard let textContainer = self.textContainer, let layoutManager = self.layoutManager else {
-            assert(_currentTextViewData(kind: self.data.wrappedValue.kind).isEmpty)
-            
+        guard let width = size?.width else {
             return nil
         }
         
-        if let size, textContainer.containerSize != size {
-            textContainer.containerSize = size
-        }
-        
-        layoutManager.ensureLayout(for: textContainer)
-        
-        let measuredSize = layoutManager.boundingRect(
-            forGlyphRange: layoutManager.glyphRange(for: textContainer),
-            in: textContainer
-        ).size
-        
-        var extraHeight: CGFloat = 0
-        
-        if measuredSize.height == 0 || string.hasSuffix("\n") {
-            extraHeight += (_heightDifferenceForNewline ?? 0)
-        }
-        
-        let result = CGSize(
-            width: measuredSize.width,
-            height: measuredSize.height + extraHeight
-        )
-        
-        return result
+        return _sizeThatFits(width: width)
     }
 }
 #endif
@@ -845,7 +936,7 @@ extension _PlatformTextView_Type {
         let layoutManager = NSLayoutManager()
         
         textStorage.addLayoutManager(layoutManager)
-                
+        
         textContainer.replaceLayoutManager(layoutManager)
         
         assert(self.textStorage == textStorage)
@@ -853,28 +944,42 @@ extension _PlatformTextView_Type {
 }
 #elseif os(macOS)
 extension _PlatformTextView_Type {
-    func _SwiftUIX_replaceTextStorage(_ textStorage: NSTextStorage) {
-        guard let layoutManager = _SwiftUIX_layoutManager else {
+    func _SwiftUIX_replaceTextStorage(
+        _ textStorage: NSTextStorage
+    ) {
+        guard let layoutManager = _SwiftUIX_makeLayoutManager() ?? _SwiftUIX_layoutManager else {
             assertionFailure()
             
             return
         }
         
-        textStorage.addLayoutManager(layoutManager)
-                
-        layoutManager.replaceTextStorage(textStorage)
+        if layoutManager != _SwiftUIX_layoutManager {
+            textContainer?.replaceLayoutManager(layoutManager)
+        }
         
+        layoutManager.replaceTextStorage(textStorage)
+
         assert(self.textStorage == textStorage)
+        assert(self.layoutManager == layoutManager)
+
+        setSelectedRange(NSRange(location: string.count, length: 0))
     }
 }
 #endif
 
 @_spi(Internal)
-extension _PlatformTextView_Type {
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+extension _PlatformTextView {
     public func invalidateLayout(
         for range: NSRange
     ) {
-        _SwiftUIX_layoutManager?.invalidateLayout(forCharacterRange: range, actualCharacterRange: nil)
+        guard let layoutManager = _SwiftUIX_layoutManager else {
+            return
+        }
+        
+        layoutManager.invalidateLayout(forCharacterRange: range, actualCharacterRange: nil)
+        
+        // self._wantsRelayout = true
     }
     
     public func invalidateDisplay(
@@ -882,9 +987,26 @@ extension _PlatformTextView_Type {
     ) {
         _SwiftUIX_layoutManager?.invalidateDisplay(forCharacterRange: range)
     }
+    
+    public func _ensureLayoutForTextContainer() {
+        if let textContainer = _SwiftUIX_textContainer {
+            _SwiftUIX_layoutManager?.invalidateLayout(forCharacterRange: .init(location: 0, length: _SwiftUIX_attributedText.length), actualCharacterRange: nil)
+            _SwiftUIX_layoutManager?.ensureLayout(for: textContainer)
+        }
+    }
 }
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+extension NSTextContainer {
+    var containerSize: CGSize {
+        get {
+            size
+        } set {
+            size = newValue
+        }
+    }
+}
+
 extension NSTextStorage {
     public typealias _SwiftUIX_EditActions = EditActions
 }
@@ -893,6 +1015,12 @@ extension NSTextStorage {
     public typealias _SwiftUIX_EditActions = NSTextStorageEditActions
 }
 #endif
+
+extension NSTextContainer {
+    var _isContainerWidthNormal: Bool {
+        containerSize.width.isNormal && containerSize.width != 10000000.0
+    }
+}
 
 extension EnvironmentValues {
     var requiresAttributedText: Bool {

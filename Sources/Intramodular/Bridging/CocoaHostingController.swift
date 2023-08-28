@@ -28,8 +28,9 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
     }
         
+    public var _SwiftUIX_cancellables: [AnyCancellable] = []
+    
     public var _observedPreferenceValues = _ObservedPreferenceValues()
-
     public var _canBecomeFirstResponder: Bool? = nil
         
     var _safeAreaInsetsAreFixed: Bool = false
