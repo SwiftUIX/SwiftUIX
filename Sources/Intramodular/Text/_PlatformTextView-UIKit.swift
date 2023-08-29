@@ -190,7 +190,7 @@ extension _PlatformTextView {
         }
     }
     
-    private func verticallyCenterTextIfNecessary() {
+    func verticallyCenterTextIfNecessary() {
         guard !isScrollEnabled else {
             return
         }
