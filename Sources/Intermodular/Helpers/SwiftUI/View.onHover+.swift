@@ -36,6 +36,7 @@ extension View {
     }
 }
 
+#if os(iOS) || os(macOS)
 @available(iOS 14, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
@@ -99,3 +100,4 @@ extension View {
         modifier(_OnLongHover(enabled: enabled, minimumDuration: minimumDuration, action: action))
     }
 }
+#endif
