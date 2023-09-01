@@ -89,7 +89,26 @@ extension AppKitOrUIKitTextView {
 #endif
 
 extension AppKitOrUIKitTextView {
-    var _numberOfLinesDisplayed: Int {
+    var _numberOfHardLineBreaks: Int? {
+        let string = self._SwiftUIX_text
+        
+        guard !string.isEmpty else {
+            return nil
+        }
+        
+        var numberOfLines = 0
+        var index = string.startIndex
+        
+        while index < string.endIndex {
+            let lineRange = string.lineRange(for: index..<index)
+            numberOfLines += 1
+            index = lineRange.upperBound
+        }
+        
+        return numberOfLines
+    }
+    
+    var _numberOfLinesOfWrappedTextDisplayed: Int {
         guard let layoutManager = _SwiftUIX_layoutManager else {
             return 0
         }
@@ -110,6 +129,21 @@ extension AppKitOrUIKitTextView {
         return numberOfLines
     }
     
+    var _heightDifferenceForNewline: CGFloat? {
+        guard let font = font else {
+            return nil
+        }
+        
+        var lineHeight = font.ascender + font.descender + font.leading
+        let lineSpacing = _lastLineParagraphStyle?.lineSpacing ?? 0
+        
+        if let layoutManager = _SwiftUIX_layoutManager {
+            lineHeight = max(lineHeight, layoutManager.defaultLineHeight(for: font))
+        }
+        
+        return lineHeight + lineSpacing
+    }
+
     var _lastLineParagraphStyle: NSParagraphStyle? {
         guard let textStorage = _SwiftUIX_textStorage else {
             return defaultParagraphStyle
@@ -145,35 +179,15 @@ extension AppKitOrUIKitTextView {
         
         return paragraphStyle
     }
-    
-    var _heightDifferenceForNewline: CGFloat? {
-        guard let font = font else {
-            return nil
-        }
-        
-        var lineHeight = font.ascender + font.descender + font.leading
-        let lineSpacing = _lastLineParagraphStyle?.lineSpacing ?? 0
-        
-        if let layoutManager = _SwiftUIX_layoutManager {
-            lineHeight = max(lineHeight, layoutManager.defaultLineHeight(for: font))
-        }
-        
-        return lineHeight + lineSpacing
-    }
-        
+            
     func _sizeThatFits(
-        width: CGFloat,
-        accountForNewline: Bool = false
+        width: CGFloat
     ) -> CGSize? {
-        _sizeThatFitsWithoutCopying(
-            width: width,
-            accountForNewline: accountForNewline
-        )
+        _sizeThatFitsWithoutCopying(width: width)
     }
     
     private func _sizeThatFitsWithoutCopying(
-        width: CGFloat,
-        accountForNewline: Bool
+        width: CGFloat
     ) -> CGSize? {
         guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
             return nil
@@ -182,7 +196,7 @@ extension AppKitOrUIKitTextView {
         let originalSize = frame.size
         let originalTextContainerSize = textContainer.containerSize
       
-        guard width.isNormal else {
+        guard width.isNormal && width != .greatestFiniteMagnitude else {
             return nil
         }
       

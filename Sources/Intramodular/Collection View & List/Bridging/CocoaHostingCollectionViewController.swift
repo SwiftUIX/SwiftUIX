@@ -90,7 +90,17 @@ final class CocoaHostingCollectionViewController<
     
     var collectionViewLayout: CollectionViewLayout = FlowCollectionViewLayout() {
         didSet {
-            collectionView.setCollectionViewLayout(collectionViewLayout._toUICollectionViewLayout(), animated: true)
+            let layout = collectionViewLayout._toUICollectionViewLayout()
+            
+            if let layout = layout as? UICollectionViewFlowLayout {
+                if _scrollViewConfiguration.axes == [.horizontal] {
+                    layout.scrollDirection = .horizontal
+                } else if _scrollViewConfiguration.axes == [.vertical] {
+                    layout.scrollDirection = .vertical
+                }
+            }
+            
+            collectionView.setCollectionViewLayout(layout, animated: true)
         }
     }
     

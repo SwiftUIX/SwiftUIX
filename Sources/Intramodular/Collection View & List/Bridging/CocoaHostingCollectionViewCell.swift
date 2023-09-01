@@ -16,6 +16,10 @@ class CocoaHostingCollectionViewCell<
     SectionFooterContent: View,
     Content: View
 >: UICollectionViewCell {
+    enum _StateFlag {
+        case ignoreSizeInvalidation
+    }
+    
     typealias ParentViewControllerType = CocoaHostingCollectionViewController<
         SectionType,
         SectionIdentifierType,
@@ -31,6 +35,8 @@ class CocoaHostingCollectionViewCell<
     typealias ContentCache = _CollectionViewCellOrSupplementaryViewCache<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
     typealias ContentHostingController = CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
 
+    private var stateFlags = Set<_StateFlag>()
+    
     var latestRepresentableUpdate: _AppKitOrUIKitViewRepresentableUpdate?
     
     var cellContentConfiguration: ContentConfiguration? {
@@ -185,8 +191,10 @@ class CocoaHostingCollectionViewCell<
         
         if let contentHostingController = contentHostingController {
             if contentHostingController.view.frame.size != bounds.size {
+                stateFlags.insert(.ignoreSizeInvalidation)
                 contentHostingController.view.frame.size = bounds.size
                 contentHostingController.view.layoutIfNeeded()
+                stateFlags.insert(.ignoreSizeInvalidation)
             }
         }
     }
@@ -384,7 +392,12 @@ extension CocoaHostingCollectionViewCell {
     func invalidateContent(
         with context: CellProxy.InvalidationContext
     ) {
-        guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
+        guard
+            let parentViewController = parentViewController,
+            let contentConfiguration = cellContentConfiguration,
+            let contentHostingController, contentHostingController.view.superview != nil,
+            !stateFlags.contains(.ignoreSizeInvalidation)
+        else {
             return
         }
 
@@ -403,9 +416,9 @@ extension CocoaHostingCollectionViewCell {
             parentViewController.collectionView.collectionViewLayout.invalidateLayout()
         }
 
-        contentHostingController?.view.setNeedsDisplay()
-        contentHostingController?.view.setNeedsLayout()
-        contentHostingController?.view.layoutIfNeeded()
+        contentHostingController.view.setNeedsDisplay()
+        contentHostingController.view.setNeedsLayout()
+        contentHostingController.view.layoutIfNeeded()
         
         _withAppKitOrUIKitAnimation(.default) {
             parentViewController.collectionView.layoutIfNeeded()

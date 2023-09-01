@@ -14,6 +14,42 @@ public final class _TextCursorTracking: ObservableObject {
     @_spi(Internal)
     @Published public private(set) var location: _CoordinateSpaceSpecific<CGRect>?
 
+    /// Whether the cursor is at the start of the text.
+    public var isAtStart: Bool {
+        positionInText == 0
+    }
+    
+    /// Whether the cursor is at the very end of the text.
+    public var isAtEnd: Bool {
+        guard let owner else {
+            return false
+        }
+        
+        return positionInText == owner._SwiftUIX_attributedText.length
+    }
+
+    /// Whether the cursor is on the first line.
+    ///
+    /// Returns `true` even if only one line is displayed.
+    public var isOnFirstLine: Bool {
+        guard let owner, let positionInText else {
+            return false
+        }
+        
+        return owner._lineIndexForCharacterAt(positionInText) == 0
+    }
+    
+    /// Whether the cursor is on the last line.
+    ///
+    /// Returns `false` if only one line is displayed.
+    public var isOnLastLine: Bool {
+        guard let owner, let positionInText, let numberOfHardLineBreaks = owner._numberOfHardLineBreaks else {
+            return false
+        }
+        
+        return owner._lineIndexForCharacterAt(positionInText) == numberOfHardLineBreaks
+    }
+    
     init(owner: (any _PlatformTextView_Type)?) {
         self.owner = owner
         
@@ -72,7 +108,39 @@ extension AppKitOrUIKitTextView {
         
         return selectedTextRange.length > 0 ? nil : selectedTextRange.location
     }
+    
+    /// The index of the visible line that the character at the given index is on.
+    func _lineIndexForCharacterAt(
+        _ location: Int
+    ) -> Int? {
+        guard let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage, location >= 0 && location <= textStorage.length else {
+            return nil
+        }
+
+        let glyphIndex = layoutManager.glyphIndexForCharacter(at: location)
+        var lineRange: NSRange = NSRange()
+        layoutManager.lineFragmentRect(forGlyphAt: glyphIndex, effectiveRange: &lineRange)
+        
+        var lineNumber = 1
+        var index = 0
+        
+        while index < glyphIndex {
+            if layoutManager.lineFragmentRect(forGlyphAt: index, effectiveRange: &lineRange).origin.y <
+                layoutManager.lineFragmentRect(forGlyphAt: glyphIndex, effectiveRange: nil).origin.y {
+                lineNumber += 1
+            }
+            
+            index = NSMaxRange(lineRange)
+        }
+        
+        if location == textStorage.length, textStorage.string.last == "\n" {
+            lineNumber += 1
+        }
+        
+        return lineNumber - 1
+    }
 }
+
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     var _SwiftUIX_caretLocation: _CoordinateSpaceSpecific<CGRect>? {

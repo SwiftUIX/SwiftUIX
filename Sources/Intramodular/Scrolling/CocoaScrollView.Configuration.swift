@@ -97,6 +97,14 @@ extension UIScrollView {
     func configure<Content: View>(
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
+        if configuration.axes != [.vertical] {
+            if configuration.axes == [.horizontal] {
+                _assignIfNotEqual(true, to: \.isDirectionalLockEnabled)
+            }
+        } else {
+            _assignIfNotEqual(false, to: \.isDirectionalLockEnabled)
+        }
+        
         if let alwaysBounceVertical = configuration.alwaysBounceVertical {
             _assignIfNotEqual(alwaysBounceVertical, to: \.alwaysBounceVertical)
         }
@@ -193,6 +201,10 @@ extension UIScrollView {
         let afterContentSize = contentSize
         
         if behavior.contains(.maintainOnChangeOfContentSize) {
+            guard afterContentSize != beforeContentSize else {
+                return
+            }
+            
             var deltaX = contentOffset.x + (afterContentSize.width - beforeContentSize.width)
             var deltaY = contentOffset.y + (afterContentSize.height - beforeContentSize.height)
             

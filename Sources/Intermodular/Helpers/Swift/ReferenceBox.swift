@@ -5,6 +5,29 @@
 import Swift
 import SwiftUI
 
+public protocol _AnyIndirectValueBox<Value> {
+    associatedtype Value
+    
+    var wrappedValue: Value { get nonmutating set }
+}
+
+@_spi(Internal)
+public struct _UnsafeIndirectConstantValueBox<Value>: _AnyIndirectValueBox {
+    public let _wrappedValue: Value
+    
+    public var wrappedValue: Value {
+        get {
+            _wrappedValue
+        } nonmutating set {
+            assertionFailure()
+        }
+    }
+    
+    public init(wrappedValue: Value) {
+        self._wrappedValue = wrappedValue
+    }
+}
+
 struct WeakBox<T: AnyObject> {
     weak var value: T?
     
@@ -15,7 +38,7 @@ struct WeakBox<T: AnyObject> {
 
 @propertyWrapper
 @usableFromInline
-final class ReferenceBox<T> {
+final class ReferenceBox<T>: _AnyIndirectValueBox {
     @usableFromInline
     var value: T
     
@@ -39,8 +62,12 @@ final class ReferenceBox<T> {
     }
 }
 
+extension ReferenceBox: @unchecked Sendable where T: Sendable {
+    
+}
+
 @propertyWrapper
-final class LazyReferenceBox<T> {
+final class LazyReferenceBox<T>: _AnyIndirectValueBox {
     private var initializeValue: (() -> T)?
     private var value: T?
     
@@ -69,13 +96,9 @@ final class LazyReferenceBox<T> {
     }
 }
 
-extension ReferenceBox: @unchecked Sendable where T: Sendable {
-    
-}
-
 @propertyWrapper
 @usableFromInline
-final class WeakReferenceBox<T: AnyObject> {
+final class WeakReferenceBox<T: AnyObject>: _AnyIndirectValueBox {
     @usableFromInline
     weak var value: T?
     

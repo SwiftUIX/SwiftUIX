@@ -9,7 +9,7 @@ import SwiftUI
 @dynamicMemberLookup
 @propertyWrapper
 public struct ObservedValue<Value>: DynamicProperty {
-    @ObservedObject var base: ObservableValue<Value>
+    @ObservedObject var base: AnyObservableValue<Value>
     
     public var wrappedValue: Value {
         get {
@@ -40,7 +40,7 @@ public struct ObservedValue<Value>: DynamicProperty {
 // MARK: - API
 
 extension ObservedValue {
-    public init(_ base: ObservableValue<Value>) {
+    public init(_ base: AnyObservableValue<Value>) {
         self.base = base
     }
     
@@ -101,7 +101,7 @@ private struct WithObservedValue<T, Content: View>: View {
 }
 
 private struct WithOptionalObservableValue<T, Content: View>: View {
-    @ObservedObject.Optional var value: ObservableValue<T>?
+    @ObservedObject.Optional var value: AnyObservableValue<T>?
     
     let content: (T?) -> Content
     

@@ -93,9 +93,10 @@ extension View {
 
 extension View {
     public func onChangeOfFrame(
+        threshold: CGFloat? = nil,
         perform action: @escaping (CGSize) -> Void
     ) -> some View {
-        modifier(_OnChangeOfFrame(action: action))
+        modifier(_OnChangeOfFrame(threshold: threshold, action: action))
     }
 }
 
@@ -173,13 +174,37 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
 }
 
 private struct _OnChangeOfFrame: ViewModifier {
+    let threshold: CGFloat?
     let action: (CGSize) -> Void
+    
+    @ViewStorage var oldSize: CGSize? = nil
     
     func body(content: Content) -> some View {
         content.background {
             GeometryReader { proxy in
                 ZeroSizeView()
-                    .onChange(of: proxy.size, perform: { action($0) })
+                    .onAppear {
+                        self.oldSize = proxy.size
+                    }
+                    .onChange(of: proxy.size) { newSize in
+                        if let oldSize {
+                            if let threshold {
+                                guard !oldSize._isNearlyEqual(to: newSize, threshold: threshold) else {
+                                    return
+                                }
+                            } else {
+                                guard oldSize != newSize else {
+                                    return
+                                }
+                            }
+                            
+                            action(newSize)
+                            
+                            self.oldSize = newSize
+                        } else {
+                            self.oldSize = newSize
+                        }
+                    }
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)

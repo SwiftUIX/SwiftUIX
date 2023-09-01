@@ -8,7 +8,7 @@ import SwiftUI
 
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
-    public final class ValueBox: ObservableValue<Value> {
+    public final class ValueBox: AnyObservableValue<Value> {
         @Published fileprivate var value: Value
         
         public override var wrappedValue: Value {

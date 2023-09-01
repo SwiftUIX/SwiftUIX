@@ -5,18 +5,26 @@
 import Swift
 import SwiftUI
 
+#if os(macOS)
 extension View {
     public func sidebarListStyleIfAvailable() -> some View {
-        #if os(macOS)
-        return listStyle(SidebarListStyle())
-        #elseif targetEnvironment(macCatalyst)
-        if #available(macCatalyst 14.0, *) {
-            return AnyView(listStyle(SidebarListStyle()))
-        } else {
-            return AnyView(self)
-        }
-        #else
-        return self
-        #endif
+        listStyle(SidebarListStyle())
     }
 }
+#elseif targetEnvironment(macCatalyst)
+extension View {
+    public func sidebarListStyleIfAvailable() -> some View {
+        if #available(macCatalyst 14.0, *) {
+            listStyle(SidebarListStyle())
+        } else {
+            self
+        }
+    }
+}
+#else
+extension View {
+    public func sidebarListStyleIfAvailable() -> some View {
+        self
+    }
+}
+#endif

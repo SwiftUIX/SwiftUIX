@@ -65,15 +65,16 @@ struct _CollectionView<
                 uiViewController.collectionViewLayout = collectionViewLayout
             }
         }
-        
-        updateCollectionViewProxy()
-        updateCollectionViewLayout()
-        
+
         uiViewController._animateDataSourceDifferences = context.transaction.isAnimated
         uiViewController._dynamicViewContentTraitValues = context.environment._dynamicViewContentTraitValues
         uiViewController._scrollViewConfiguration = context.environment._scrollViewConfiguration
-        uiViewController.dataSourceConfiguration = dataSource.configuration
         uiViewController.configuration = context.environment._collectionViewConfiguration
+
+        updateCollectionViewProxy()
+        updateCollectionViewLayout()
+        
+        uiViewController.dataSourceConfiguration = dataSource.configuration
         uiViewController.viewProvider = viewProvider
         
         if let oldUpdateToken = context.coordinator.dataSourceUpdateToken, let currentUpdateToken =

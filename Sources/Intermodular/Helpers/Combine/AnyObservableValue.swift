@@ -7,7 +7,7 @@ import Swift
 
 /// An abstract base class for an observable value box.
 @dynamicMemberLookup
-public class ObservableValue<Value>: ObservableObject {
+public class AnyObservableValue<Value>: _AnyIndirectValueBox, ObservableObject {
     public var wrappedValue: Value {
         get {
             fatalError() // abstract
@@ -22,7 +22,7 @@ public class ObservableValue<Value>: ObservableObject {
     
     public subscript<Subject>(
         dynamicMember keyPath: WritableKeyPath<Value, Subject>
-    ) -> ObservableValue<Subject> {
+    ) -> AnyObservableValue<Subject> {
         ObservableValues.ValueMember(root: self, keyPath: keyPath)
     }
     
@@ -36,7 +36,7 @@ public class ObservableValue<Value>: ObservableObject {
 }
 
 enum ObservableValues {
-    final class Root<Root>: ObservableValue<Root> {
+    final class Root<Root>: AnyObservableValue<Root> {
         public var root: Root
         
         private let _objectDidChange = PassthroughSubject<Void, Never>()
@@ -49,6 +49,8 @@ enum ObservableValues {
             get {
                 root
             } set {
+                objectWillChange.send()
+
                 root = newValue
                 
                 _objectDidChange.send()
@@ -60,8 +62,8 @@ enum ObservableValues {
         }
     }
     
-    final class ValueMember<Root, Value>: ObservableValue<Value> {
-        unowned let root: ObservableValue<Root>
+    final class ValueMember<Root, Value>: AnyObservableValue<Value> {
+        unowned let root: AnyObservableValue<Root>
         
         let keyPath: WritableKeyPath<Root, Value>
         var subscription: AnyCancellable?
@@ -76,7 +78,7 @@ enum ObservableValues {
             }
         }
         
-        public init(root: ObservableValue<Root>, keyPath: WritableKeyPath<Root, Value>) {
+        public init(root: AnyObservableValue<Root>, keyPath: WritableKeyPath<Root, Value>) {
             self.root = root
             self.keyPath = keyPath
             self.subscription = nil
@@ -89,7 +91,7 @@ enum ObservableValues {
         }
     }
     
-    final class ObjectMember<Root: ObservableObject, Value>: ObservableValue<Value> {
+    final class ObjectMember<Root: ObservableObject, Value>: AnyObservableValue<Value> {
         unowned let root: Root
         
         let keyPath: ReferenceWritableKeyPath<Root, Value>

@@ -10,10 +10,11 @@ import SwiftUI
 
 @_spi(Internal)
 public enum _TextView_TextEditorEvent: Hashable {
-    case insert(text: NSAttributedString, range: NSRange)
+    case insert(text: NSAttributedString, range: NSRange?)
     case delete(text: NSAttributedString, range: NSRange)
     case replace(text: NSAttributedString, range: NSRange)
-
+    case append(text: NSAttributedString)
+    
     public var text: String {
         switch self {
             case .insert(let text, _):
@@ -21,6 +22,8 @@ public enum _TextView_TextEditorEvent: Hashable {
             case .delete(let text, _):
                 return text.string
             case .replace(let text, _):
+                return text.string
+            case .append(let text):
                 return text.string
         }
     }
@@ -32,12 +35,12 @@ public enum _TextView_TextEditorEvent: Hashable {
 
 @available(macOS 11.0, *)
 public struct _TextViewReader<Content: View>: View {
-    private let content: (_TextViewProxy) -> Content
+    private let content: (_TextEditorProxy) -> Content
     
-    @PersistentObject private var proxy = _TextViewProxy()
+    @PersistentObject private var proxy = _TextEditorProxy()
     
     public init(
-        @ViewBuilder content: @escaping (_TextViewProxy) -> Content
+        @ViewBuilder content: @escaping (_TextEditorProxy) -> Content
     ) {
         self.content = content
     }
@@ -48,7 +51,7 @@ public struct _TextViewReader<Content: View>: View {
     }
 }
 
-public final class _TextViewProxy: Equatable, ObservableObject {
+public final class _TextEditorProxy: Equatable, ObservableObject {
     private let _base = WeakReferenceBox<AppKitOrUIKitTextView>(nil)
     private var _fakeTextCursor = _TextCursorTracking(owner: nil)
     
@@ -76,26 +79,26 @@ public final class _TextViewProxy: Equatable, ObservableObject {
         
     }
     
-    public static func == (lhs: _TextViewProxy, rhs: _TextViewProxy) -> Bool {
+    public static func == (lhs: _TextEditorProxy, rhs: _TextEditorProxy) -> Bool {
         lhs.base === rhs.base
     }
 }
 
 // MARK: - Auxiliary
 
-extension _TextViewProxy {
+extension _TextEditorProxy {
     fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        static let defaultValue: Binding<_TextViewProxy>? = nil
+        static let defaultValue: Binding<_TextEditorProxy>? = nil
     }
 }
 
 extension EnvironmentValues {
     @usableFromInline
-    var _textViewProxy: Binding<_TextViewProxy>? {
+    var _textViewProxy: Binding<_TextEditorProxy>? {
         get {
-            self[_TextViewProxy.EnvironmentKey.self]
+            self[_TextEditorProxy.EnvironmentKey.self]
         } set {
-            self[_TextViewProxy.EnvironmentKey.self] = newValue
+            self[_TextEditorProxy.EnvironmentKey.self] = newValue
         }
     }
 }

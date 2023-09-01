@@ -80,15 +80,13 @@ public struct LazyAppearView<Content: View>: View {
         debounceInterval: DispatchTimeInterval? = nil,
         animation: Animation = .default,
         placeholder: Placeholder? = nil,
-        @ViewBuilder destination: () -> Content
+        @ViewBuilder destination: @escaping () -> Content
     ) {
-        let destination = destination()
-        
         self._appearance = .init(initialValue: initial)
         self.placeholder = placeholder
         self.destination = { proxy in
             if proxy.appearance == .active {
-                return destination
+                return destination()
             } else {
                 return nil
             }

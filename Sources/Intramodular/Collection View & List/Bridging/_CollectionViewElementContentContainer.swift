@@ -50,7 +50,7 @@ struct _CollectionViewElementContentContainer<
                     .id(configuration.contentConfiguration.id)
             }
         }
-        .onChangeOfFrame { size in
+        .onChangeOfFrame(threshold: 1) { size in
             guard let proxy = configuration._cellProxyBase else {
                 return
             }

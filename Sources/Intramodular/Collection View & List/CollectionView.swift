@@ -187,7 +187,11 @@ extension CollectionView {
         id: KeyPath<Data.Element, ID>,
         @ViewBuilder rowContent: @escaping (Data.Element) -> Section<Header, ForEach<Items, Items.Element.ID, RowContent>, Footer>
     ) where Items.Element: Identifiable {
-        self.init(sections: data, id: id, rowContent: rowContent)
+        self.init(
+            sections: data,
+            id: id,
+            rowContent: rowContent
+        )
         
         _scrollViewConfiguration.axes = axes
     }

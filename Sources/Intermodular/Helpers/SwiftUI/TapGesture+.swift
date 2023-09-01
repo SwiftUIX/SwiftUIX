@@ -30,3 +30,20 @@ extension View {
         }
     }
 }
+
+#if os(macOS)
+extension View {
+    @available(iOS 13.0, macOS 10.15, tvOS 16.0, watchOS 6.0, *)
+    public func onTapGesture(
+        count: Int = 1,
+        modifiers: EventModifiers,
+        perform: @escaping () -> Void
+    ) -> some View {
+        gesture(
+            TapGesture(count: count)
+                .modifiers(modifiers)
+                .onEnded(perform)
+        )
+    }
+}
+#endif

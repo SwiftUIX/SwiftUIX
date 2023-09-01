@@ -14,9 +14,7 @@ public protocol AppKitOrUIKitHostingPopoverProtocol {
 }
 #elseif os(macOS)
 public protocol AppKitOrUIKitHostingPopoverProtocol: NSPopover {
-    var wantsTransientBehaviorEnforcement: Bool { get }
-    
-    func enforceTransientBehavior(redirecting _: NSEvent?) -> Bool
+    func enforceTransientBehavior()
 }
 #endif
 
@@ -186,6 +184,10 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         
     // MARK: - NSPopoverDelegate -
     
+    public func popoverDidShow(_ notification: Notification) {
+        enforceTransientBehavior()
+    }
+    
     public func popoverDidClose(_ notification: Notification) {
         _cleanUpPostShow()
 
@@ -227,19 +229,14 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         return self.behavior == .transient
     }
     
-    @discardableResult
-    public func enforceTransientBehavior(
-        redirecting event: NSEvent? = nil
-    ) -> Bool {
-        guard wantsTransientBehaviorEnforcement else {
-            return false
-        }
-        
-        guard let popoverWindow = self.contentViewController?.view.window else {
-            return false
+    public func enforceTransientBehavior() {
+        guard wantsTransientBehaviorEnforcement, let popoverWindow = self.contentViewController?.view.window else {
+            return
         }
         
         popoverWindow.collectionBehavior = .transient
+        
+        let popoverWindowWasKey = popoverWindow.isKeyWindow
         
         if popoverWindow.isKeyWindow {
             popoverWindow.resignKey()
@@ -247,26 +244,18 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         
         assert(popoverWindow.isKeyWindow == false)
          
+        guard popoverWindowWasKey else {
+            _cleanUpPostShow()
+            
+            return
+        }
+        
         if let previousKeyWindow = _rightfulKeyWindow {
             previousKeyWindow.makeKeyAndOrderFront(nil)
             
-            if let responder = _rightfulFirstResponder {
+            if let responder = _rightfulFirstResponder, previousKeyWindow.firstResponder != responder {
                 previousKeyWindow.makeFirstResponder(responder)
             }
-        }
-                
-        DispatchQueue.main.async {
-            assert(self.isShown)
-        }
-        
-        if let event {
-            if let window = _rightfulKeyWindow {
-                window.sendEvent(event)
-            }
-            
-            return true
-        } else {
-            return true
         }
     }
 }
@@ -279,12 +268,18 @@ extension NSHostingPopover {
         
         var content: Content
         
+        @State private var didAppear: Bool = false
+        
         var body: some View {
             if parentBox.wrappedValue != nil {
                 content
                     .environment(\.presentationManager, PresentationManager(parentBox))
                     .onChangeOfFrame { _ in
                         parentBox.wrappedValue?._contentViewController.view.layout()
+                    }
+                    .focusable(false)
+                    .onAppear {
+                        didAppear = true
                     }
             }
         }

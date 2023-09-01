@@ -317,13 +317,32 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         _ insertString: Any,
         replacementRange: NSRange
     ) {
+        guard let textStorage = _SwiftUIX_textStorage else {
+            assertionFailure()
+            
+            return
+        }
+        
         if let text = insertString as? String {
             _lastInsertedString = text
             
-            _publishTextEditorEvent(.insert(text: .init(string: text), range: replacementRange))
+            let currentLength = textStorage.length
+            
+            super.insertText(insertString, replacementRange: replacementRange)
+
+            if replacementRange.location == currentLength {
+                _publishTextEditorEvent(.append(text: NSAttributedString(string: text)))
+            } else {
+                _publishTextEditorEvent(
+                    .insert(
+                        text: NSAttributedString(string: text),
+                        range: replacementRange.location == 0 ? nil : replacementRange
+                    )
+                )
+            }
+        } else {
+            super.insertText(insertString, replacementRange: replacementRange)
         }
-        
-        super.insertText(insertString, replacementRange: replacementRange)
     }
     
     open override func shouldChangeText(

@@ -8,10 +8,10 @@ import SwiftUI
 /// A convenience around a closure of the type `() -> Void`.
 public struct Action: DynamicAction, Hashable, Identifiable {
     public let id: AnyHashable?
-
+    
     private let fakeID: AnyHashable?
     private let value: @convention(block) () -> Void
-        
+    
     public init(id: AnyHashable, _ value: @escaping () -> Void) {
         self.value = value
         self.fakeID = nil
@@ -83,26 +83,36 @@ extension Action {
     }
 }
 
-public struct PerformAction: _ActionInitiableView, _ActionPerformingView {
+public struct PerformAction: _ActionPerformingView {
     private let action: Action
+    private let deferred: Bool
     
-    public init(action: Action) {
+    public init(
+        action: Action,
+        deferred: Bool = true
+    ) {
         self.action = action
+        self.deferred = deferred
     }
     
-    public init(action: @escaping () -> Void) {
+    public init(
+        deferred: Bool = true,
+        action: @escaping () -> Void
+    ) {
         self.action = .init(action)
+        self.deferred = deferred
     }
     
-    public var body: some View {
-        DispatchQueue.main.async {
+    public var body: ZeroSizeView {
+        if deferred {
+            DispatchQueue.main.async {
+                self.action.perform()
+            }
+        } else {
             self.action.perform()
         }
         
         return ZeroSizeView()
-            .frameZeroClipped()
-            .allowsHitTesting(false)
-            .accessibility(hidden: true)
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {

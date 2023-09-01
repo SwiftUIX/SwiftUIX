@@ -174,6 +174,10 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             #endif
             
             contentWindow.show()
+            
+            if canBecomeKey == false {
+                assert(!contentWindow.isKeyWindow)
+            }
         } else {
             contentWindow?.hide()
             contentWindow = nil
