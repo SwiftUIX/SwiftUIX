@@ -15,9 +15,9 @@ extension View {
 extension View {
     public func sidebarListStyleIfAvailable() -> some View {
         if #available(macCatalyst 14.0, *) {
-            listStyle(SidebarListStyle())
+            listStyle(SidebarListStyle()).eraseToAnyView()
         } else {
-            self
+            self.eraseToAnyView()
         }
     }
 }

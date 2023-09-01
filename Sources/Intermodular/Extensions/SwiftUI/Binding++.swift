@@ -13,7 +13,9 @@ extension Binding {
 }
 
 extension Binding {
-    public func conditionalCast<T, U>() -> Binding<Optional<U>> where Value == Optional<T> {
+    public func conditionalCast<T, U>(
+        to: U.Type = U.self
+    ) -> Binding<Optional<U>> where Value == Optional<T> {
         Binding<Optional<U>>(
             get: {
                 self.wrappedValue.flatMap({ $0 as? U })
@@ -24,7 +26,7 @@ extension Binding {
         )
     }
 
-    public func _cast<T>(
+    public func _conditionalCast<T>(
         to type: T.Type = T.self
     ) -> Binding<Optional<T>> {
         Binding<Optional<T>>(
@@ -43,7 +45,7 @@ extension Binding {
         )
     }
 
-    public func _cast<T>(
+    public func _conditionalCast<T>(
         to type: T.Type = T.self,
         defaultValue: @escaping () -> T
     ) -> Binding<T> {
