@@ -77,18 +77,20 @@ struct _CollectionView<
         uiViewController.dataSourceConfiguration = dataSource.configuration
         uiViewController.viewProvider = viewProvider
         
-        if let oldUpdateToken = context.coordinator.dataSourceUpdateToken, let currentUpdateToken =
-            context.environment._collectionViewConfiguration.dataSourceUpdateToken {
+        if
+            let oldUpdateToken = context.coordinator.dataSourceUpdateToken,
+            let currentUpdateToken =
+                context.environment._collectionViewConfiguration.dataSourceUpdateToken
+        {
             if oldUpdateToken != currentUpdateToken {
                 uiViewController.dataSource = dataSource.payload
                 uiViewController.refreshVisibleCellsAndSupplementaryViews()
             }
         } else {
             uiViewController.dataSource = dataSource.payload
-            
             uiViewController.refreshVisibleCellsAndSupplementaryViews()
         }
-        
+
         context.coordinator.dataSourceUpdateToken = context.environment._collectionViewConfiguration.dataSourceUpdateToken
     }
 

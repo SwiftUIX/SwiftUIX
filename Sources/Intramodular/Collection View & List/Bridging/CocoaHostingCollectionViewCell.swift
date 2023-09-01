@@ -107,8 +107,14 @@ class CocoaHostingCollectionViewCell<
     }
         
     weak var parentViewController: ParentViewControllerType?
-
-    private var contentHostingController: ContentHostingController?
+ 
+    private var contentHostingController: ContentHostingController? {
+        didSet {
+            if let oldValue, let newValue = contentHostingController, oldValue !== newValue {
+                assert(oldValue.view.superview == nil)
+            }
+        }
+    }
     private var _isFocused: Bool? = nil
         
     private var lastInvalidationContext: CellProxy.InvalidationContext?
@@ -194,7 +200,7 @@ class CocoaHostingCollectionViewCell<
                 stateFlags.insert(.ignoreSizeInvalidation)
                 contentHostingController.view.frame.size = bounds.size
                 contentHostingController.view.layoutIfNeeded()
-                stateFlags.insert(.ignoreSizeInvalidation)
+                stateFlags.remove(.ignoreSizeInvalidation)
             }
         }
     }
@@ -326,16 +332,18 @@ extension CocoaHostingCollectionViewCell {
     }
     
     func cellDidEndDisplaying() {
-        updateCollectionCache()
-        
         contentHostingController?.unmount(from: self)
         
+        updateCollectionCache()
+
         if shouldUseCachedContentHostingController {
             contentHostingController = nil
         }
     }
     
-    func update(disableAnimation: Bool) {
+    func update(
+        disableAnimation: Bool
+    ) {
         assert(Thread.isMainThread)
         
         guard let parentViewController = parentViewController, let contentConfiguration = cellContentConfiguration else {
@@ -359,6 +367,10 @@ extension CocoaHostingCollectionViewCell {
             }
         } else {
             if let newContentHostingController = parentViewController.cache.contentHostingControllerCache[contentConfiguration.id], !newContentHostingController.isLive {
+                guard contentHostingController?.view.superview == nil else {
+                    return
+                }
+                
                 newContentHostingController.configure(with: configuration, context: .init(disableAnimation: disableAnimation))
                 
                 newContentHostingController.view.setNeedsDisplay()
@@ -383,6 +395,15 @@ extension CocoaHostingCollectionViewCell {
     func updateCollectionCache() {
         guard let configuration = cellContentConfiguration, let parentViewController = parentViewController else {
             return
+        }
+        
+        if let contentHostingController, let cellContentConfiguration, contentHostingController.view.superview != nil {
+            if 
+                let cached = parentViewController.cache.contentHostingControllerCache[cellContentConfiguration.id],
+                cached != contentHostingController
+            {
+                // assertionFailure()
+            }
         }
         
         parentViewController.cache.preferences(forID: configuration.id).wrappedValue = contentPreferences
@@ -522,13 +543,13 @@ extension CocoaCollectionElementHostingController {
     fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(from cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
         if cell.shouldUseCachedContentHostingController {
             if parent != nil {
-                UIView.performWithoutAnimation {
+                _withoutAppKitOrUIKitAnimation {
                     willMove(toParent: nil)
                     view.removeFromSuperview()
                     removeFromParent()
                 }
             } else {
-                UIView.performWithoutAnimation {
+                _withoutAppKitOrUIKitAnimation {
                     view.removeFromSuperview()
                 }
             }

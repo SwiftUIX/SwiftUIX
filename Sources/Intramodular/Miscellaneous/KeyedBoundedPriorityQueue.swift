@@ -100,16 +100,27 @@ extension KeyedBoundedPriorityQueue {
         } set {
             guard let newValue = newValue else {
                 nodes[key].map(removeNode)
+                
                 return
             }
             
             if let node = nodes[key] {
                 node.value = newValue
+                
                 moveNodeToLast(node)
             } else {
                 let node = Node(key: key, value: newValue)
+                
                 appendNode(node)
             }
         }
+    }
+}
+
+extension KeyedBoundedPriorityQueue: Sequence {
+    public typealias Iterator = AnyIterator<(key: Key, value: Value)>
+    
+    public func makeIterator() -> AnyIterator<(key: Key, value: Value)> {
+        AnyIterator(nodes.mapValues({ $0.value }).makeIterator())
     }
 }

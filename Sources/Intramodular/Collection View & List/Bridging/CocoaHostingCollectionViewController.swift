@@ -212,7 +212,6 @@ final class CocoaHostingCollectionViewController<
             return cell
         }
         
-
         diffableDataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
             guard let self = self, self.dataSource != nil else {
                 return nil
@@ -231,7 +230,6 @@ final class CocoaHostingCollectionViewController<
             ) as! SupplementaryViewType
             
             view.configuration = self.contentConfiguration(for: indexPath, reuseIdentifier: reuseIdentifier)
-            
             self.cache.preconfigure(supplementaryView: view)
             
             view.update()
@@ -342,11 +340,20 @@ final class CocoaHostingCollectionViewController<
         (cell as? CellType)?.cellWillDisplay(inParent: self)
     }
     
-    public func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplaySupplementaryView view: UICollectionReusableView,
+        forElementKind elementKind: String,
+        at indexPath: IndexPath
+    ) {
         (view as? SupplementaryViewType)?.supplementaryViewWillDisplay(inParent: self)
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didEndDisplaying cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
         (cell as? CellType)?.cellDidEndDisplaying()
     }
     
