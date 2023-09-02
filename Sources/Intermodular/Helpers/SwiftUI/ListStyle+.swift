@@ -13,11 +13,11 @@ extension View {
 }
 #elseif targetEnvironment(macCatalyst)
 extension View {
-    public func sidebarListStyleIfAvailable() -> some View {
+    public func sidebarListStyleIfAvailable() -> AnyView {
         if #available(macCatalyst 14.0, *) {
-            listStyle(SidebarListStyle()).eraseToAnyView()
+            return listStyle(SidebarListStyle()).eraseToAnyView()
         } else {
-            self.eraseToAnyView()
+            return self.eraseToAnyView()
         }
     }
 }
