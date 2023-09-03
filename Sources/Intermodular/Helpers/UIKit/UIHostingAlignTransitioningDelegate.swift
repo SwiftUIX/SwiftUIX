@@ -178,14 +178,14 @@ extension UIHostingAlignTransitioningDelegate {
             weak var parent: CocoaViewController?
             
             var presentationCoordinator: CocoaPresentationCoordinator?
-            var transitionType: PresentationTransitionType?
+            var transitionType: PresentationTransitionPhase?
             
             var body: some View {
                 CocoaHostingControllerContent(
                     parent: parent,
                     parentConfiguration: .init(),
                     content: content
-                        .environment(\.presentationTransitionType, transitionType)
+                        .environment(\._presentationTransitionPhase, transitionType)
                 )
             }
         }
@@ -255,13 +255,13 @@ extension UIHostingAlignTransitioningDelegate {
                 backgroundHostingView.addSubview(presentedViewController.view)
             }
             
-            backgroundHostingView.rootView.transitionType = .presentationWillBegin
+            backgroundHostingView.rootView.transitionType = .willBegin
         }
         
         override func presentationTransitionDidEnd(_ completed: Bool) {
             super.presentationTransitionDidEnd(completed)
             
-            backgroundHostingView.rootView.transitionType = .presentationDidEnd
+            backgroundHostingView.rootView.transitionType = .didEnd
         }
         
         override func dismissalTransitionWillBegin() {
@@ -269,7 +269,7 @@ extension UIHostingAlignTransitioningDelegate {
             
             delegate?.presentationControllerWillDismiss?(self)
             
-            backgroundHostingView.rootView.transitionType = .dismissalWillBegin
+            backgroundHostingView.rootView.transitionType = .willDismiss
         }
         
         override func dismissalTransitionDidEnd(_ completed: Bool) {
@@ -279,7 +279,7 @@ extension UIHostingAlignTransitioningDelegate {
                 delegate?.presentationControllerDidDismiss?(self)
                 
                 backgroundHostingView.rootView.presentationCoordinator = nil
-                backgroundHostingView.rootView.transitionType = .dismissalDidEnd
+                backgroundHostingView.rootView.transitionType = .didDismiss
                 backgroundHostingView.removeFromSuperview()
                 
                 _backgroundHostingView = nil

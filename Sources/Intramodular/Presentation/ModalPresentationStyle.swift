@@ -83,7 +83,9 @@ public enum ModalPresentationStyle: Equatable {
 // MARK: - API
 
 extension View {
-    public func modalPresentationStyle(_ style: ModalPresentationStyle) -> some View {
+    public func modalPresentationStyle(
+        _ style: ModalPresentationStyle
+    ) -> some View {
         environment(\.modalPresentationStyle, style)
     }
 }

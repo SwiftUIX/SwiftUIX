@@ -19,7 +19,7 @@ public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKit
     var _isTextLayoutInProgress: Bool? { get }
     var _needsIntrinsicContentSizeInvalidation: Bool { get set }
     
-    var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> { get }
+    var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> { get }
     var _trackedTextCursor: _TextCursorTracking { get }
     
     func _SwiftUIX_makeLayoutManager() -> NSLayoutManager?
@@ -60,14 +60,14 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     public var _needsIntrinsicContentSizeInvalidation = true
     
-    private var _lazyTextEditorEventSubject: PassthroughSubject<_TextView_TextEditorEvent, Never>? = nil
-    private var _lazyTextEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? = nil
+    private var _lazyTextEditorEventSubject: PassthroughSubject<_SwiftUIX_TextEditorEvent, Never>? = nil
+    private var _lazyTextEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never>? = nil
     private var _lazyTrackedTextCursor: _TextCursorTracking? = nil
 
     @_spi(Internal)
-    public var _textEditorEventPublisher: AnyPublisher<_TextView_TextEditorEvent, Never> {
+    public var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> {
         guard let publisher = _lazyTextEditorEventPublisher else {
-            let subject = PassthroughSubject<_TextView_TextEditorEvent, Never>()
+            let subject = PassthroughSubject<_SwiftUIX_TextEditorEvent, Never>()
             let publisher = subject.eraseToAnyPublisher()
             
             self._lazyTextEditorEventSubject = subject
@@ -637,7 +637,7 @@ extension _PlatformTextView {
 @_spi(Internal)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView: _PlatformTextView_Type {
-    func _publishTextEditorEvent(_ event: _TextView_TextEditorEvent) {
+    func _publishTextEditorEvent(_ event: _SwiftUIX_TextEditorEvent) {
         DispatchQueue.main.async {
             self._performOrSchedulePublishingChanges {
                 self._lazyTextEditorEventSubject?.send(event)

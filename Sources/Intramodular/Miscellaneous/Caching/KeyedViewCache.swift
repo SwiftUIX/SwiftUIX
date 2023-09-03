@@ -5,7 +5,6 @@
 import Swift
 import SwiftUI
 
-@usableFromInline
 protocol KeyedViewCache {
     func cache<T>(_ value: T, forKey key: AnyHashable) throws
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T?
@@ -15,7 +14,6 @@ protocol KeyedViewCache {
 
 // MARK: - Default Implementation
 
-@usableFromInline
 final class InMemoryKeyedViewCache: KeyedViewCache {
     enum Error: Swift.Error {
         case typeMismatch
@@ -27,12 +25,10 @@ final class InMemoryKeyedViewCache: KeyedViewCache {
         
     }
     
-    @usableFromInline
     func cache<T>(_ value: T, forKey key: AnyHashable) throws {
         storage[key] = value
     }
     
-    @usableFromInline
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
         guard let value = storage[key] else {
             return nil
@@ -45,12 +41,10 @@ final class InMemoryKeyedViewCache: KeyedViewCache {
         return castValue
     }
     
-    @usableFromInline
     func removeCachedValue(forKey key: AnyHashable) {
         storage.removeValue(forKey: key)
     }
     
-    @usableFromInline
     func removeAllCachedValues() {
         storage.removeAll()
     }
@@ -58,14 +52,11 @@ final class InMemoryKeyedViewCache: KeyedViewCache {
 
 // MARK: - Auxiliary
 
-@usableFromInline
 struct KeyedViewCacheEnvironmentKey: EnvironmentKey {
-    @usableFromInline
     static let defaultValue: KeyedViewCache = InMemoryKeyedViewCache()
 }
 
 extension EnvironmentValues {
-    @usableFromInline
     var cache: KeyedViewCache {
         get {
             self[KeyedViewCacheEnvironmentKey.self]
@@ -76,7 +67,6 @@ extension EnvironmentValues {
 }
 
 @propertyWrapper
-@usableFromInline
 struct _UniqueKeyedViewCache: DynamicProperty, KeyedViewCache {
     private struct CacheKey: Hashable {
         let base: AnyHashable
@@ -87,7 +77,6 @@ struct _UniqueKeyedViewCache: DynamicProperty, KeyedViewCache {
     
     @Environment(\.cache) private var cache: KeyedViewCache
     
-    @usableFromInline
     var wrappedValue: KeyedViewCache {
         self
     }
@@ -104,22 +93,18 @@ struct _UniqueKeyedViewCache: DynamicProperty, KeyedViewCache {
         self._id = .init(initialValue: AnyHashable(UUID()))
     }
     
-    @usableFromInline
     func cache<T>(_ value: T, forKey key: AnyHashable) throws {
         try cache.cache(value, forKey: CacheKey(base: key, parentID: id))
     }
     
-    @usableFromInline
     func decache<T>(_ type: T.Type, forKey key: AnyHashable) throws -> T? {
         try cache.decache(type, forKey: CacheKey(base: key, parentID: id))
     }
     
-    @usableFromInline
     func removeCachedValue(forKey key: AnyHashable) {
         cache.removeCachedValue(forKey: key)
     }
     
-    @usableFromInline
     func removeAllCachedValues() {
         cache.removeAllCachedValues()
     }

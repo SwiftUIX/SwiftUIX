@@ -10,8 +10,7 @@ import SwiftUI
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
-@usableFromInline
-struct PerformActionOnKeyboardShortcut: ViewModifier {
+private struct PerformActionOnKeyboardShortcut: ViewModifier {
     /// This is needed to work around a bug in `View/keyboardShort(_:)`
     private class ActionTrampoline {
         var value: () -> Void = { }
@@ -27,7 +26,6 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     
     @ViewStorage private var actionTrampoline = ActionTrampoline()
     
-    @usableFromInline
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     init(
@@ -43,14 +41,13 @@ struct PerformActionOnKeyboardShortcut: ViewModifier {
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    @usableFromInline
     func body(content: Content) -> some View {
         content.background {
             ZStack {
                 PerformAction {
                     actionTrampoline.value = action
                 }
-
+                
                 if let shortcut, !disabled {
                     Button(action: performAction) {
                         ZeroSizeView()
@@ -88,7 +85,7 @@ extension View {
             )
         )
     }
-
+    
     /// Adds an action to perform when this view recognizes a keyboard shortcut.
     @available(iOS 14.0, macOS 11.0, *)
     @available(tvOS, unavailable)

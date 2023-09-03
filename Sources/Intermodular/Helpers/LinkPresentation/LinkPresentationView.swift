@@ -10,16 +10,11 @@ import SwiftUI
 
 /// A rich visual representation of a link.
 public struct LinkPresentationView<Placeholder: View>: Identifiable, View {
-    @usableFromInline
     let url: URL?
-    @usableFromInline
     let metadata: LPLinkMetadata?
-    @usableFromInline
     let onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)?
-    @usableFromInline
     let placeholder: Placeholder
     
-    @usableFromInline
     var disableMetadataFetch: Bool = false
     
     public var id: some Hashable {
@@ -42,7 +37,6 @@ public struct LinkPresentationView<Placeholder: View>: Identifiable, View {
 // MARK: - API
 
 extension LinkPresentationView {
-    @inlinable
     public init(
         url: URL,
         onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)? = nil,
@@ -54,7 +48,6 @@ extension LinkPresentationView {
         self.placeholder = placeholder()
     }
     
-    @inlinable
     public init(
         url: URL,
         metadata: LPLinkMetadata?,
@@ -66,7 +59,6 @@ extension LinkPresentationView {
         self.placeholder = placeholder()
     }
     
-    @inlinable
     public init(metadata: LPLinkMetadata, @ViewBuilder placeholder: () -> Placeholder) {
         self.url = nil
         self.metadata = metadata
@@ -76,7 +68,6 @@ extension LinkPresentationView {
 }
 
 extension LinkPresentationView where Placeholder == EmptyView {
-    @inlinable
     public init(
         url: URL,
         onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)? = nil
@@ -86,7 +77,6 @@ extension LinkPresentationView where Placeholder == EmptyView {
         }
     }
     
-    @inlinable
     public init(
         url: URL,
         metadata: LPLinkMetadata?
@@ -94,7 +84,6 @@ extension LinkPresentationView where Placeholder == EmptyView {
         self.init(url: url, metadata: metadata, placeholder: { EmptyView() })
     }
     
-    @inlinable
     public init(metadata: LPLinkMetadata) {
         self.init(metadata: metadata) {
             EmptyView()
@@ -110,36 +99,24 @@ extension LinkPresentationView {
 
 // MARK: - Implementation
 
-@usableFromInline
 struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
-    @usableFromInline
     @Environment(\.handleLocalizedError) var handleLocalizedError
-    @usableFromInline
     @_UniqueKeyedViewCache(for: Self.self) var cache
     
     let url: URL?
-    @usableFromInline
     let metadata: LPLinkMetadata?
-    @usableFromInline
     let onMetadataFetchCompletion: ((Result<LPLinkMetadata, Error>) -> Void)?
-    @usableFromInline
     let placeholder: Placeholder
     
-    @usableFromInline
     var disableMetadataFetch: Bool
     
     #if !os(tvOS)
-    @usableFromInline
     @State var metadataProvider: LPMetadataProvider?
     #endif
-    @usableFromInline
     @State var isFetchingMetadata: Bool = false
-    @usableFromInline
     @State var fetchedMetadata: LPLinkMetadata?
-    @usableFromInline
     @State var proposedMinHeight: CGFloat?
     
-    @usableFromInline
     var id: some Hashable {
         url ?? metadata?.originalURL
     }
@@ -152,7 +129,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
         }
     }
     
-    @usableFromInline
     var body: some View {
         ZStack {
             _LPLinkViewRepresentable<Placeholder>(
@@ -177,7 +153,6 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
     }
     
     #if !os(tvOS)
-    @usableFromInline
     func fetchMetadata() {
         guard !disableMetadataFetch else {
             return
@@ -228,25 +203,19 @@ struct _LinkPresentationView<Placeholder: View>: Identifiable, View {
         }
     }
     #else
-    @usableFromInline
     func fetchMetadata() {
         
     }
     #endif
 }
 
-@usableFromInline
 struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentable, Equatable {
     public typealias AppKitOrUIKitViewType = MutableAppKitOrUIKitViewWrapper<LPLinkView>
     
-    @usableFromInline
     var url: URL?
-    @usableFromInline
     var metadata: LPLinkMetadata?
-    @usableFromInline
     @Binding var proposedMinHeight: CGFloat?
     
-    @usableFromInline
     init(
         url: URL?,
         metadata: LPLinkMetadata?,
@@ -257,7 +226,6 @@ struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentab
         self._proposedMinHeight = proposedMinHeight
     }
     
-    @usableFromInline
     func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
         DispatchQueue.main.async {
             self.proposedMinHeight = nil
@@ -274,7 +242,6 @@ struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentab
         }
     }
     
-    @usableFromInline
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
         if let metadata = metadata {
             let wasMetadataPresent = view.base?.metadata.title != nil
@@ -309,7 +276,6 @@ struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentab
         }
     }
     
-    @usableFromInline
     static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.proposedMinHeight == rhs.proposedMinHeight else {
             return false

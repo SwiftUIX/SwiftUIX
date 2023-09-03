@@ -7,19 +7,19 @@ import SwiftUI
 
 public struct DefaultPresentationBackdrop: View {
     @Environment(\.presentationManager) var presentationManager
-    @Environment(\.presentationTransitionType) var presentationTransitionType
+    @Environment(\._presentationTransitionPhase) var transitionPhase
     
     @State var viewDidAppear = false
     
     var opacity: Double {
-        guard let presentationTransitionType = presentationTransitionType else {
+        guard let transitionPhase = transitionPhase else {
             return 0.0
         }
         
-        switch presentationTransitionType {
-            case .dismissalWillBegin:
+        switch transitionPhase {
+            case .willDismiss:
                 return 0.0
-            case .dismissalDidEnd:
+            case .didDismiss:
                 return 0.0
             default:
                 break

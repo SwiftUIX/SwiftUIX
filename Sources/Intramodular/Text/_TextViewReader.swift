@@ -9,7 +9,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
-public enum _TextView_TextEditorEvent: Hashable {
+public enum _SwiftUIX_TextEditorEvent: Hashable {
     case insert(text: NSAttributedString, range: NSRange?)
     case delete(text: NSAttributedString, range: NSRange)
     case replace(text: NSAttributedString, range: NSRange)
@@ -27,10 +27,6 @@ public enum _TextView_TextEditorEvent: Hashable {
                 return text.string
         }
     }
-    
-    /*case cursorMoved(position: Int)
-    case selection(range: NSRange)
-    case cut(text: String, range: NSRange)*/
 }
 
 @available(macOS 11.0, *)
@@ -71,7 +67,7 @@ public final class _TextEditorProxy: Equatable, ObservableObject {
     }
     
     @_spi(Internal)
-    public var _textEditorEventsPublisher: AnyPublisher<_TextView_TextEditorEvent, Never>? {
+    public var _textEditorEventsPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never>? {
         base?._textEditorEventPublisher
     }
     

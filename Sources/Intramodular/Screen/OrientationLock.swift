@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
-private struct _OrientationLockView<Content: View>: UIViewControllerRepresentable {
+private struct _OrientationLockedView<Content: View>: UIViewControllerRepresentable {
     let rootView: Content
     let supportedInterfaceOrientations: [UserInterfaceOrientation]
     
@@ -66,7 +66,10 @@ extension View {
     public func supportedInterfaceOrientations(
         _ supportedInterfaceOrientations: [UserInterfaceOrientation]
     ) -> some View {
-        _OrientationLockView(rootView: self, supportedInterfaceOrientations: supportedInterfaceOrientations)
+        _OrientationLockedView(
+            rootView: self,
+            supportedInterfaceOrientations: supportedInterfaceOrientations
+        )
     }
 }
 
