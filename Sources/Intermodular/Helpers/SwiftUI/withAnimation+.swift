@@ -71,7 +71,11 @@ public func withAnimation(
 ) {
     if let delay = delay {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            withAnimation(animation) {
+            if let animation {
+                withAnimation(animation) {
+                    body()
+                }
+            } else {
                 body()
             }
         }
