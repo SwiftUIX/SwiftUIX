@@ -181,7 +181,7 @@ extension Collection {
             return false
         }
         
-        for (element, otherElement) in zip(self, other) {
+        for (element, otherElement) in Swift.zip(self, other) {
             guard element.isIdentical(to: otherElement) else {
                 return false
             }
