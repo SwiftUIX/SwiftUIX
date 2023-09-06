@@ -25,18 +25,16 @@ public struct AlertPresentationLink<Label: View, Actions: View, Message: View>: 
             title,
             isPresented: $isPresented,
             actions: {
-                if Action.self == EmptyView.self {
-                    Button("Cancel", role: .destructive) {
+                actions
+                
+                if let onConfirm {
+                    Button("Cancel", role: .cancel) {
                         isPresented = false
                     }
                     
                     Button("Confirm") {
-                        onConfirm?()
-                        
-                        isPresented = false
+                        onConfirm()
                     }
-                } else {
-                    actions
                 }
             },
             message: {
@@ -85,12 +83,13 @@ extension AlertPresentationLink {
     public init(
         _ title: String,
         @ViewBuilder label: () -> Label,
-        @ViewBuilder content: () -> Message,
-        onConfirm: @escaping () -> Void
-    ) where Actions == EmptyView {
+        @ViewBuilder content: () -> Actions,
+        onConfirm: (() -> Void)? = nil
+    ) where Message == EmptyView {
         self.title = Text(title)
         self.label = label()
-        self.actions = EmptyView()
-        self.message = content()
+        self.actions = content()
+        self.message = EmptyView()
+        self.onConfirm = onConfirm
     }
 }

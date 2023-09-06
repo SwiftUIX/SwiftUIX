@@ -64,13 +64,9 @@ public struct _IntrinsicGeometryValueReader<Content: View, Value: Equatable>: Vi
                 ZeroSizeView()
                     .onAppear {
                         self.value = getValue(geometry.frame(in: .global))
-                        
-                        print(self.value)
                     }
                     .onChange(of: geometry.frame(in: .global)) { frame in
                         self.value = getValue(frame)
-                        
-                        print(self.value)
                     }
             }
             .allowsHitTesting(false)

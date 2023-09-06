@@ -113,6 +113,10 @@ extension _ForEachSubview {
 public struct _TypedVariadicView<Content: View>: View {
     public var children: _VariadicViewChildren
     
+    public var isEmpty: Bool {
+        children.isEmpty
+    }
+    
     init(_ children: _VariadicView.Children) {
         self.children = _VariadicViewChildren(erasing: children)
     }
