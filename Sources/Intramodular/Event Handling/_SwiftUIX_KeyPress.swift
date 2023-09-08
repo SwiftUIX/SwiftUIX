@@ -33,6 +33,10 @@ public struct _SwiftUIX_KeyPress: Hashable, Sendable {
         hasher.combine(characters)
         hasher.combine(modifiers.rawValue)
     }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.phase == rhs.phase && lhs.key.character == rhs.key.character && lhs.characters == rhs.characters && lhs.modifiers.rawValue == rhs.modifiers.rawValue
+    }
 }
 
 @available(iOS 14.0, macOS 11.0, *)
