@@ -41,17 +41,6 @@ public struct AlertPresentationLink<Label: View, Actions: View, Message: View>: 
                 message
             }
         )
-        .modify {
-#if os(macOS)
-            if #available(macOS 13.0, *) {
-                $0.dialogIcon(Image(systemName: .clear))
-            } else {
-                $0
-            }
-#else
-            $0
-#endif
-        }
     }
 }
 

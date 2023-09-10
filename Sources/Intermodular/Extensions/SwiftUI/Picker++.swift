@@ -91,6 +91,19 @@ extension Picker where Label == Text, SelectionValue: Hashable, Content == AnyVi
     }
     
     public init(
+        selection: Binding<SelectionValue>,
+        title: KeyPath<SelectionValue, String>
+    ) where SelectionValue: CaseIterable, SelectionValue.AllCases: RandomAccessCollection {
+        self.init("", selection: selection) {
+            ForEach(SelectionValue.allCases, id: \.self) { value in
+                Text(value[keyPath: title])
+                    .tag(value)
+            }
+            .eraseToAnyView()
+        }
+    }
+    
+    public init(
         _ titleKey: LocalizedStringKey,
         selection: Binding<SelectionValue>
     ) where SelectionValue: CaseIterable & CustomStringConvertible, SelectionValue.AllCases: RandomAccessCollection {
