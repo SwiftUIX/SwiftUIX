@@ -12,7 +12,7 @@ struct _DynamicViewContentTraitValues {
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var onDrop: (([DragItem], Int) -> Void)? = nil
     private var _collectionViewDropDelegate: Any?
-    @available(tvOS, unavailable)
+    #if !os(tvOS)
     var collectionViewDropDelegate: CollectionViewDropDelegate? {
         get {
             _collectionViewDropDelegate.flatMap({ $0 as? CollectionViewDropDelegate })
@@ -20,6 +20,7 @@ struct _DynamicViewContentTraitValues {
             _collectionViewDropDelegate = newValue
         }
     }
+    #endif
     #endif
 }
 

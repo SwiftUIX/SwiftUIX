@@ -375,7 +375,11 @@ extension CollectionView {
     @available(iOS 13.4, *)
     @available(tvOS, unavailable)
     public func onDrop(delegate: CollectionViewDropDelegate) -> Self {
-        then({ $0._dynamicViewContentTraitValues.collectionViewDropDelegate = delegate })
+        #if !os(tvOS)
+        return then({ $0._dynamicViewContentTraitValues.collectionViewDropDelegate = delegate })
+        #else
+        return self
+        #endif
     }
     
     @available(iOS 13.4, *)
