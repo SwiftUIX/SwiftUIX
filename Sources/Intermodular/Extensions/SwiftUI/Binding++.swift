@@ -199,6 +199,23 @@ extension Binding {
         )
     }
     
+    public func isNotNil<Wrapped>(
+        default defaultValue: @escaping @autoclosure () -> Wrapped
+    ) -> Binding<Bool> where Optional<Wrapped> == Value {
+        .init(
+            get: { 
+                self.wrappedValue != nil
+            },
+            set: { newValue in
+                if newValue {
+                    self.wrappedValue = self.wrappedValue ?? defaultValue()
+                } else {
+                    self.wrappedValue = nil
+                }
+            }
+        )
+    }
+    
     public func nilIfEmpty<T: Collection>() -> Binding where Value == Optional<T> {
         Binding(
             get: {
