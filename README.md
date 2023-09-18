@@ -3,7 +3,7 @@
 
 ![CI](https://github.com/SwiftUIX/SwiftUIX/workflows/CI/badge.svg)
 
-SwiftUIX attempts to fill the gaps of the still nascent SwiftUI framework, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
+SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
 
 - [Why](#why) 
 - [Requirements](#requirements) 
@@ -21,7 +21,7 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 # Requirements 
 
 - Deployment target: iOS 13, macOS 10.15, tvOS 13, or watchOS 6
-- Xcode 14+
+- Xcode 14.3+
 
 # Installation
 
@@ -239,4 +239,4 @@ SwiftUIX is and will always be free and open. Maintaining SwiftUIX, however, is 
 
 # Credits
 
-SwiftUIX is a project of [@vmanot](https://github.com/vmanot).
+SwiftUIX is a project of [@vatsal_manot](http://twitter.com/vatsal_manot).
