@@ -117,6 +117,26 @@ extension View {
             return action()
         }
     }
+    
+    public func _SwiftUIX_onKeyPress(
+        _ key: KeyEquivalent,
+        modifiers: EventModifiers,
+        action: @escaping () -> _SwiftUIX_KeyPress.Result
+    ) -> some View {
+        _SwiftUIX_onKeyPress { (keyPress: _SwiftUIX_KeyPress) -> _SwiftUIX_KeyPress.Result in
+            guard keyPress.key == key else {
+                assert(keyPress.key.character != key.character)
+                
+                return .ignored
+            }
+            
+            guard keyPress.modifiers == modifiers else {
+                return .ignored
+            }
+            
+            return action()
+        }
+    }
 }
 #endif
 
