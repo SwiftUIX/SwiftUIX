@@ -46,7 +46,13 @@ public struct AttributedText: AppKitOrUIKitViewRepresentable {
     }
     
     public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-        view.configure(with: self)
+		if Thread.isMainThread {
+			view.configure(with: self)
+		} else {
+			DispatchQueue.main.async {
+				view.configure(with: self)
+			}
+		}
     }
 }
 
