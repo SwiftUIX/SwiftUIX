@@ -15,7 +15,6 @@ public struct EditableText: View {
         case onDoubleTap
     }
     
-    @Environment(\.lineLimit) var lineLimit
     @Environment(\.isFocused) var isFocused
 
     #if os(iOS)
@@ -28,7 +27,7 @@ public struct EditableText: View {
     ///
     /// This is disabled by default because Apple can't fucking get `List` right.
     private var respectEditMode: Bool = false
-    
+        
     @available(iOS 15.0, *)
     @available(macOS, unavailable)
     private var editMode: Binding<EditMode>? {
@@ -47,10 +46,12 @@ public struct EditableText: View {
     @Binding private var text: String
     private let activation: Set<Activation>
     private let onCommit: (String) -> Void
-
+    
     @FocusState private var textFieldIsFocused: Bool
     @State private var textBeingEdited: String?
     @StateOrBinding private var isEditing: Bool
+
+    private var lineLimit: Int? = 1
     
     public init(
         _ placeholder: String? = nil,
@@ -172,19 +173,33 @@ public struct EditableText: View {
     @ViewBuilder
     private var editableDisplay: some View {
         Group {
-            TextField(
-                "",
-                text: $textBeingEdited,
-                onEditingChanged: { isEditing in
-                    onEditingChanged(isEditing)
-                },
-                onCommit: {
-                    endEditing()
-                }
-            )
-            .textFieldStyle(.roundedBorder)
-            .fixedSize(horizontal: false, vertical: true)
-            .lineLimit(1)
+            if lineLimit == 1 {
+                TextField(
+                    "",
+                    text: $textBeingEdited,
+                    onEditingChanged: { isEditing in
+                        onEditingChanged(isEditing)
+                    },
+                    onCommit: {
+                        endEditing()
+                    }
+                )
+                .textFieldStyle(.roundedBorder)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(1)
+            } else {
+                TextView(
+                    "",
+                    text: $textBeingEdited,
+                    onEditingChanged: { isEditing in
+                        onEditingChanged(isEditing)
+                    },
+                    onCommit: {
+                        endEditing()
+                    }
+                )
+                .fixedSize(horizontal: false, vertical: true)
+            }
         }
         ._overrideOnExitCommand {
             endEditing()
@@ -255,6 +270,15 @@ public struct EditableText: View {
         self.textBeingEdited = nil
         
         onCommit(textBeingEdited)
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension EditableText {
+    public func lineLimit(_ lineLimit: Int?) -> Self {
+        then({ $0.lineLimit = lineLimit })
     }
 }
 

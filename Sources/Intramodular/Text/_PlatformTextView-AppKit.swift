@@ -53,7 +53,6 @@ extension _PlatformTextView {
         }
         
         if let textContainer {
-            textContainer._assignIfNotEqual(.zero, to: \.lineFragmentPadding)
             textContainer._assignIfNotEqual((context.environment.lineLimit ?? 0), to: \.maximumNumberOfLines)
         }
         

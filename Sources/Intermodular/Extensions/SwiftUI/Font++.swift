@@ -104,12 +104,15 @@ extension Font {
 // MARK: - Auxiliary
 
 private enum _SwiftUIFontProvider {
+    case named(name: String, size: CGFloat, textStyle: Font.TextStyle?)
     case system(size: CGFloat, weight: Font.Weight?, design: Font.Design?)
     case textStyle(Font.TextStyle, weight: Font.Weight?, design: Font.Design?)
     case platform(CTFont)
     
     mutating func setWeight(_ weight: Font.Weight?) {
         switch self {
+            case .named:
+                assertionFailure()
             case let .system(size, _, design):
                 self = .system(size: size, weight: weight, design: design)
             case let .textStyle(style, _, design):
@@ -122,6 +125,12 @@ private enum _SwiftUIFontProvider {
     @available(macOS 11.0, *)
     func toAppKitOrUIKitFont() -> AppKitOrUIKitFont? {
         switch self {
+            case let .named(name, size, textStyle):
+                if textStyle != .body {
+                    assert(textStyle == nil, "unimplemented")
+                }
+                
+                return AppKitOrUIKitFont(name: name, size: size)
             case let .system(size, weight, _):
                 guard let resolvedWeight = weight?.toAppKitOrUIKitFontWeight() else {
                     return nil
@@ -138,19 +147,29 @@ private enum _SwiftUIFontProvider {
     }
     
     init?(from subject: Any) {
+        let mirror = Mirror(reflecting: subject)
+        
         switch String(describing: type(of: subject)) {
             case "ModifierProvider<WeightModifier>":
-                guard let base = Mirror(reflecting: subject)[_SwiftUIX_keyPath: "base.provider.base"] else {
+                guard let base = mirror[_SwiftUIX_keyPath: "base.provider.base"] else {
                     return nil
                 }
                 
-                guard let weight = Mirror(reflecting: subject)[_SwiftUIX_keyPath: "modifier.weight"] as? Font.Weight else {
+                guard let weight = mirror[_SwiftUIX_keyPath: "modifier.weight"] as? Font.Weight else {
                     return nil
                 }
                 
                 self.init(from: base)
 
                 self.setWeight(weight)
+            case "NamedProvider":
+                guard let name = mirror.descendant("name") as? String, let size = mirror.descendant("size") as? CGFloat else {
+                    return nil
+                }
+                
+                let textStyle = mirror.descendant("textStyle") as? Font.TextStyle
+                
+                self = .named(name: name, size: size, textStyle: textStyle)
             case "SystemProvider":
                 var props: (
                     size: CGFloat?,
