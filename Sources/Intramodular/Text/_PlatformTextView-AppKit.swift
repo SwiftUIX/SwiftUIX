@@ -53,8 +53,11 @@ extension _PlatformTextView {
         }
         
         if let textContainer {
+            textContainer._assignIfNotEqual(.zero, to: \.lineFragmentPadding)
             textContainer._assignIfNotEqual((context.environment.lineLimit ?? 0), to: \.maximumNumberOfLines)
         }
+        
+        setLineSpacing(context.environment.lineSpacing)
         
         _assignIfNotEqual(false, to: \.isHorizontallyResizable)
         _assignIfNotEqual(true, to: \.isVerticallyResizable)
@@ -172,6 +175,23 @@ extension _PlatformTextView {
                 assertionFailure("unsupported")
             }
         }
+    }
+}
+
+// MARK: - Auxiliary
+
+extension NSTextView {
+    func setLineSpacing(_ lineSpacing: CGFloat) {
+        if defaultParagraphStyle?.lineSpacing == lineSpacing {
+            return
+        }
+                
+        let newParagraphStyle = (self.defaultParagraphStyle as? NSMutableParagraphStyle) ?? (self.defaultParagraphStyle?.mutableCopy() as? NSMutableParagraphStyle) ?? NSMutableParagraphStyle()
+        
+        newParagraphStyle.lineSpacing = lineSpacing
+        
+        defaultParagraphStyle = newParagraphStyle
+        typingAttributes[.paragraphStyle] = newParagraphStyle
     }
 }
 

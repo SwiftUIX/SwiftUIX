@@ -83,7 +83,11 @@ extension AppKitOrUIKitTextView {
     }
 
     public var _SwiftUIX_attributedText: NSAttributedString {
-        attributedString()
+        get {
+            attributedString()
+        } set {
+            _SwiftUIX_textStorage?.setAttributedString(newValue)
+        }
     }
 }
 #endif
