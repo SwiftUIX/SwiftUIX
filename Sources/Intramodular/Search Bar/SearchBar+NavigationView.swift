@@ -28,7 +28,11 @@ fileprivate struct _NavigationSearchBarConfigurator<SearchResultsContent: View>:
         context.coordinator.base = self
         context.coordinator.searchBarCoordinator.base = searchBar
         
-        searchBar._updateUISearchBar(context.coordinator.searchController.searchBar, environment: context.environment)
+        searchBar._updateUISearchBar(
+            context.coordinator.searchController.searchBar,
+            searchController: context.coordinator.searchController,
+            environment: context.environment
+        )
     }
     
     func makeCoordinator() -> Coordinator {

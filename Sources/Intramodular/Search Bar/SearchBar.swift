@@ -53,6 +53,8 @@ public struct SearchBar: DefaultTextInputType {
     private var focusRingType: NSFocusRingType = .default
     #endif
 
+    private var isEditingValue: Bool? = nil
+    
     public init<S: StringProtocol>(
         _ title: S,
         text: Binding<String>,
@@ -65,6 +67,23 @@ public struct SearchBar: DefaultTextInputType {
         self.onEditingChanged = onEditingChanged
     }
     
+    public init<S: StringProtocol>(
+        _ title: S,
+        text: Binding<String>,
+        isEditing: Binding<Bool>,
+        onCommit: @escaping () -> Void = { }
+    ) {
+        self.placeholder = String(title)
+        self._text = text
+        self.onCommit = onCommit
+        self.onEditingChanged = {
+            isEditing.removeDuplicates().wrappedValue = $0
+        }
+        
+        self.isFocused = isEditing
+        self.isEditingValue = isEditing.wrappedValue
+    }
+
     public init(
         text: Binding<String>,
         onEditingChanged: @escaping (Bool) -> Void = { _ in },
@@ -108,6 +127,7 @@ extension SearchBar: UIViewRepresentable {
     
     func _updateUISearchBar(
         _ uiView: UIViewType,
+        searchController: UISearchController? = nil,
         environment: EnvironmentValues
     ) {
         uiView.isUserInteractionEnabled = environment.isEnabled
@@ -171,17 +191,21 @@ extension SearchBar: UIViewRepresentable {
                 }
             }
         }
-        
+
+        (uiView as? _UISearchBar)?.isFirstResponderBinding = isFocused
+
         updateResponderChain: do {
-            if let uiView = uiView as? _UISearchBar, environment.isEnabled {
+            if environment.isEnabled {
                 DispatchQueue.main.async {
                     if let isFocused = isFocused, uiView.window != nil {
-                        uiView.isFirstResponderBinding = isFocused
-
-                        if isFocused.wrappedValue && !uiView.isFirstResponder {
+                        if isFocused.wrappedValue && !(searchController?.isActive ?? uiView.isFirstResponder) {
                             uiView.becomeFirstResponder()
-                        } else if !isFocused.wrappedValue && uiView.isFirstResponder {
+                            
+                            searchController?.isActive = true
+                        } else if !isFocused.wrappedValue && (searchController?.isActive ?? uiView.isFirstResponder) {
                             uiView.resignFirstResponder()
+                            
+                            searchController?.isActive = false
                         }
                     }
                 }
@@ -197,6 +221,8 @@ extension SearchBar: UIViewRepresentable {
         }
         
         public func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+            base.isFocused?.removeDuplicates().wrappedValue = true
+            
             base.onEditingChanged(true)
         }
         
@@ -205,22 +231,28 @@ extension SearchBar: UIViewRepresentable {
         }
 
         public func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-            true
+            return true
         }
 
         public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
             base.onEditingChanged(false)
+            
+            base.isFocused?.removeDuplicates().wrappedValue = false
         }
         
         public func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
             searchBar.endEditing(true)
             
+            base.isFocused?.removeDuplicates().wrappedValue = false
+
             base.onCancel()
         }
         
         public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
             searchBar.endEditing(true)
             
+            base.isFocused?.removeDuplicates().wrappedValue = false
+
             base.onCommit()
         }
     }
