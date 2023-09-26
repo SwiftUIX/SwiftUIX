@@ -102,7 +102,13 @@ extension View {
             }
         }
     }
-    
+}
+#endif
+
+@available(iOS 14.0, macOS 11.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension View {
     public func _SwiftUIX_onKeyPress(
         _ key: KeyEquivalent,
         action: @escaping () -> _SwiftUIX_KeyPress.Result
@@ -138,7 +144,6 @@ extension View {
         }
     }
 }
-#endif
 
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)

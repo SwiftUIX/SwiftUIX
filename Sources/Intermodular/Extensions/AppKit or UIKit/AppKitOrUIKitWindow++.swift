@@ -2,9 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
@@ -27,5 +28,34 @@ extension AppKitOrUIKitWindow {
         endEditing(true)
         #endif
     }
+    
+    public var _SwiftUIX_contentView: AppKitOrUIKitView? {
+        #if os(iOS)
+        return self
+        #elseif os(macOS)
+        return contentView
+        #endif
+    }
 }
+
+#if os(iOS)
+extension AppKitOrUIKitWindow {
+    fileprivate var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
+        nil
+    }
+}
+#else
+extension AppKitOrUIKitWindow {
+    fileprivate var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
+        guard let windowFrame = self.contentView?.superview?.frame, let contentFrame = self.contentView?.frame else {
+            return nil
+        }
+        
+        let titleBarHeight = windowFrame.height - contentFrame.height
+        
+        return titleBarHeight > 0 ? titleBarHeight : nil
+    }
+}
+#endif
+
 #endif

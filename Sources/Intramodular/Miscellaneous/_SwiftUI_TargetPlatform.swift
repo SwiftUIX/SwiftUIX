@@ -202,6 +202,8 @@ extension EnvironmentValues {
     public var _SwiftUIX_controlActiveState: _SwiftUI_TargetPlatform.macOS._ControlActiveState {
         get {
             .init(controlActiveState)
+        } set {
+            controlActiveState = .init(newValue)
         }
     }
 }
@@ -210,6 +212,8 @@ extension EnvironmentValues {
     public var _SwiftUIX_controlActiveState: _SwiftUI_TargetPlatform.macOS._ControlActiveState {
         get {
             .active
+        } set {
+            // no op
         }
     }
 }

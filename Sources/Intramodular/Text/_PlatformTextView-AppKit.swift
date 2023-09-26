@@ -42,13 +42,23 @@ extension _PlatformTextView {
             if let textStorage = _SwiftUIX_textStorage {
                 textStorage._assignIfNotEqual(font, to: \.font)
             }
+            
+            if let typingAttribute = typingAttributes[NSAttributedString.Key.font] as? AppKitOrUIKitFont, typingAttribute != font {
+                typingAttributes[NSAttributedString.Key.font] = font
+                typingAttributes[NSAttributedString.Key.paragraphStyle] = defaultParagraphStyle
+            }
         }
-        
-        _assignIfNotEqual(configuration.cocoaForegroundColor, to: \.textColor)
-        
+                
         if let foregroundColor = configuration.cocoaForegroundColor {
+            _assignIfNotEqual(foregroundColor, to: \.textColor)
+
             if let textStorage = _SwiftUIX_textStorage {
                 textStorage._assignIfNotEqual(foregroundColor, to: \.foregroundColor)
+            }
+            
+            if let typingAttribute = typingAttributes[NSAttributedString.Key.foregroundColor] as? AppKitOrUIKitColor, typingAttribute != foregroundColor {
+                typingAttributes[NSAttributedString.Key.foregroundColor] = foregroundColor
+                typingAttributes[NSAttributedString.Key.paragraphStyle] = defaultParagraphStyle
             }
         }
         

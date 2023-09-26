@@ -323,7 +323,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             return
         }
         
-        if let text = insertString as? String {
+        if let text = (insertString as? String) ?? (insertString as? NSAttributedString)?.string {
             _lastInsertedString = text
             
             let currentLength = textStorage.length
