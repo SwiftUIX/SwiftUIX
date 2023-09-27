@@ -29,25 +29,26 @@ extension AppKitOrUIKitWindow {
         #endif
     }
     
-    public var _SwiftUIX_contentView: AppKitOrUIKitView? {
-        #if os(iOS)
-        return self
-        #elseif os(macOS)
-        return contentView
-        #endif
-    }
 }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 extension AppKitOrUIKitWindow {
-    fileprivate var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
+    public var _SwiftUIX_contentView: AppKitOrUIKitView? {
+        self
+    }
+
+    public var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
         nil
     }
 }
-#else
+#elseif os(macOS)
 extension AppKitOrUIKitWindow {
-    fileprivate var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
-        guard let windowFrame = self.contentView?.superview?.frame, let contentFrame = self.contentView?.frame else {
+    public var _SwiftUIX_contentView: AppKitOrUIKitView? {
+        contentView
+    }
+    
+    public var _SwiftUIX_macOS_titleBarHeight: CGFloat? {
+        guard let windowFrame = self._SwiftUIX_contentView?.superview?.frame, let contentFrame = self.contentView?.frame else {
             return nil
         }
         
