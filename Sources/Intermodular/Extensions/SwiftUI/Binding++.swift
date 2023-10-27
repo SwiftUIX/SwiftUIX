@@ -379,6 +379,42 @@ extension Binding {
             }
         )
     }
+    
+    public static func boolean<T: Hashable>(
+        _ binding: Binding<Set<T>>,
+        contains value: T
+    ) -> Binding<Bool> {
+        Binding<Bool>(
+            get: {
+                binding.wrappedValue.contains(value)
+            },
+            set: { newValue in
+                if newValue {
+                    binding.wrappedValue.insert(value)
+                } else {
+                    binding.wrappedValue.remove(value)
+                }
+            }
+        )
+    }
+    
+    public static func boolean<T: Hashable>(
+        _ binding: Binding<Set<T>>,
+        equals value: T
+    ) -> Binding<Bool> {
+        Binding<Bool>(
+            get: {
+                binding.wrappedValue == [value]
+            },
+            set: { newValue in
+                if newValue {
+                    binding.wrappedValue = [value]
+                } else {
+                    binding.wrappedValue.remove(value)
+                }
+            }
+        )
+    }
 }
 
 extension Binding {
