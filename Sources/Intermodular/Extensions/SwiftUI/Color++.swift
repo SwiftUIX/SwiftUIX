@@ -440,6 +440,19 @@ fileprivate extension AppKitOrUIKitColor {
             }
         }
     }
+    
+    func resolvedColor(
+        for colorScheme: ColorScheme
+    ) -> UIColor {
+        switch colorScheme {
+            case .light:
+                return self.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
+            case .dark:
+                return self.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark))
+            @unknown default:
+                fatalError()
+        }
+    }
 }
 #elseif os(macOS)
 fileprivate extension AppKitOrUIKitColor {
@@ -454,6 +467,12 @@ fileprivate extension AppKitOrUIKitColor {
                 return light()
             }
         }
+    }
+    
+    func resolvedColor(
+        for colorScheme: ColorScheme
+    ) -> NSColor {
+        fatalError("unimplemented")
     }
 }
 #endif
