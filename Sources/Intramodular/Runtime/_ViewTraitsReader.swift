@@ -27,24 +27,48 @@ public struct _ViewTraitsReader<Key: _ViewTraitKey, Content: View>: View where K
 }
 
 extension View {
+    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
+        _ key: K.Type,
+        id: @escaping (K.Value) -> ID,
+        perform action: @escaping ([ID: K.Value]) -> Void
+    ) -> some View where K.Value: Equatable {
+        modifier(_OnChangeOfViewTraits(key: key, action: action, id: id))
+    }
+    
+    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
+        _ key: K.Type,
+        id: KeyPath<K.Value, ID>,
+        perform action: @escaping ([ID: K.Value]) -> Void
+    ) -> some View where K.Value: Equatable {
+        _onViewTraitsChange(key, id: { $0[keyPath: id] }, perform: action)
+    }
+    
     public func _onViewTraitsChange<K: _ViewTraitKey>(
         _ key: K.Type,
         perform action: @escaping ([AnyHashable: K.Value]) -> Void
     ) -> some View where K.Value: Equatable {
-        modifier(_OnChangeOfViewTraits(key: key, action: action))
+        modifier(_OnChangeOfViewTraits(key: key, action: action, id: nil))
     }
 }
 
-struct _OnChangeOfViewTraits<Key: _ViewTraitKey>: ViewModifier where Key.Value: Equatable {
+struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: ViewModifier where Key.Value: Equatable {
+    typealias Payload = [ID: Key.Value]
+    
     let key: Key.Type
-    let action: ([AnyHashable: Key.Value]) -> Void
-
+    let action: ([ID: Key.Value]) -> Void
+    let id: ((Key.Value) -> ID)?
+    
     @ViewStorage private var payload: [AnyHashable: Key.Value] = [:]
     
     func body(content: Content) -> some View {
         _VariadicViewAdapter(content) { content in
-            let traits = Dictionary(
-                content.children.map({ (AnyHashable($0.id), $0[Key.self]) }),
+            let traits = Payload(
+                content.children.map { (subview: _VariadicViewChildren.Element) in
+                    let trait = subview[Key.self]
+                    let id = id?(trait) ?? AnyHashable(subview.id) as! ID
+                    
+                    return (id, trait)
+                },
                 uniquingKeysWith: { lhs, rhs in lhs }
             )
             
@@ -70,7 +94,7 @@ struct _OnChangeOfViewTraits<Key: _ViewTraitKey>: ViewModifier where Key.Value: 
         }
     }
     
-    private func setPayload(_ payload: [AnyHashable: Key.Value]) {
+    private func setPayload(_ payload: Payload) {
         self.payload = payload
         
         action(payload)
