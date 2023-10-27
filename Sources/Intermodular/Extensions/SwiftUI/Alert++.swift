@@ -4,8 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
+#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension Alert {
     public init(
         title: String,
@@ -19,7 +18,9 @@ extension Alert {
         )
     }
 }
+#endif
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension Alert {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
@@ -99,5 +100,4 @@ private class _AlertWindow: UIWindow {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
 #endif
