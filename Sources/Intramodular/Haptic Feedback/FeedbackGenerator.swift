@@ -2,7 +2,6 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Foundation
 import SwiftUI
 
 /// A utility class encapsulating the capabilities of the device's Taptic Engine (if available).

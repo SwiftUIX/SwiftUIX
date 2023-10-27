@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Foundation
+import SwiftUI
 
 @propertyWrapper
 public struct WeakState<Value: AnyObject>: DynamicProperty {
