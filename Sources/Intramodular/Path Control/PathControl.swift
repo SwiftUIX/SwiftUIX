@@ -17,7 +17,7 @@ public struct PathControl<Label> {
     
     private let url: URL?
     private let label: Label
-    private let onItemClick: OnItemClick
+    private let onItemClick: OnItemClick?
     private var placeholder: String?
 }
 
@@ -31,7 +31,7 @@ extension PathControl where Label == EmptyView {
     public init(path: Binding<String?>) {
         self.init(url: path.toFileURL())
     }
-
+    
     public init(url: URL) {
         self.url = url
         self.onItemClick = .openItem
@@ -43,6 +43,13 @@ extension PathControl where Label == Text {
     public init<S: StringProtocol>(_ title: S, url: Binding<URL?>) {
         self.url = url.wrappedValue
         self.onItemClick = .url(url)
+        self.label = .init(title)
+        self.placeholder = .init(title)
+    }
+    
+    public init<S: StringProtocol>(_ title: S, url: URL) {
+        self.url = url
+        self.onItemClick = .openItem
         self.label = .init(title)
         self.placeholder = .init(title)
     }
@@ -62,13 +69,16 @@ extension PathControl: NSViewRepresentable {
         nsView.action = #selector(context.coordinator.pathItemClicked)
         
         nsView.delegate = context.coordinator
-
+        
         nsView.focusRingType = .none
-
+        
         return nsView
     }
     
-    public func updateNSView(_ nsView: NSViewType, context: Context) {
+    public func updateNSView(
+        _ nsView: NSViewType,
+        context: Context
+    ) {
         context.coordinator.onItemClick = onItemClick
         
         if context.environment.pathControlStyle is StandardPathControlStyle {
@@ -77,8 +87,16 @@ extension PathControl: NSViewRepresentable {
             nsView.pathStyle = .popUp
         }
         
+        nsView.controlSize = .init(context.environment.controlSize)
         nsView.placeholderString = placeholder
-        nsView.isEditable = context.environment.isEnabled
+        
+        switch onItemClick {
+            case .openItem:
+                nsView.isEditable = false
+            default:
+                nsView.isEditable = context.environment.isEnabled
+        }
+
         nsView.url = url
     }
     

@@ -32,6 +32,7 @@ public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, UIV
     static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     func sizeThatFits(
         _ proposal: ProposedViewSize,
         view: AppKitOrUIKitViewType,
@@ -51,6 +52,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresen
     static func dismantleAppKitOrUIKitViewController(_ view: AppKitOrUIKitViewControllerType, coordinator: Coordinator)
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     func sizeThatFits(
         _ proposal: ProposedViewSize,
         viewController: AppKitOrUIKitViewControllerType,
@@ -69,6 +71,7 @@ public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, NSV
     static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     func sizeThatFits(
         _ proposal: ProposedViewSize,
         view: AppKitOrUIKitViewType,
@@ -88,6 +91,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresen
     static func dismantleAppKitOrUIKitViewController(_ view: AppKitOrUIKitViewControllerType, coordinator: Coordinator)
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     func sizeThatFits(
         _ proposal: ProposedViewSize,
         viewController: AppKitOrUIKitViewControllerType,
@@ -101,6 +105,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresen
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitViewRepresentable {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         view: AppKitOrUIKitViewType,
@@ -112,6 +117,7 @@ extension AppKitOrUIKitViewRepresentable {
 
 extension AppKitOrUIKitViewControllerRepresentable {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         viewController: AppKitOrUIKitViewControllerType,
@@ -131,6 +137,7 @@ extension AppKitOrUIKitViewRepresentable {
     public typealias Context = UIViewRepresentableContext<Self>
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         uiView: AppKitOrUIKitViewType,
@@ -216,6 +223,7 @@ extension AppKitOrUIKitViewControllerRepresentable {
     public typealias Context = UIViewControllerRepresentableContext<Self>
 
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         uiViewController: Self.UIViewControllerType,
@@ -298,6 +306,7 @@ extension AppKitOrUIKitViewRepresentable {
     public typealias Context = NSViewRepresentableContext<Self>
         
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         nsView: AppKitOrUIKitViewType,
@@ -375,6 +384,7 @@ extension AppKitOrUIKitViewControllerRepresentable {
     public typealias Context = NSViewControllerRepresentableContext<Self>
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @MainActor
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
         nsViewController: Self.NSViewControllerType,

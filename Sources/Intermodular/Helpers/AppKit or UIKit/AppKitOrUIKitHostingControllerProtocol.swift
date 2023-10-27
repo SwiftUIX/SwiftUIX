@@ -306,7 +306,7 @@ extension AppKitOrUIKitLayoutSizeProposal {
     
     public init<T: _CustomOptionalDimensionsConvertible>(
         _ size: T,
-        fixedSize: (horizontal: Bool, vertical: Bool)?
+        fixedSize: (horizontal: Bool, vertical: Bool)? = nil
     ) {
         self.init(
             targetSize: size,

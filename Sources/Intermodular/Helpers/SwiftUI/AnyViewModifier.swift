@@ -18,9 +18,19 @@ public struct AnyViewModifier: ViewModifier {
     ) {
         self.makeBody = { makeBody($0).eraseToAnyView() }
     }
+    
+    public init() {
+        self.init({ $0.eraseToAnyView() })
+    }
 
     public func body(content: Content) -> some View {
         makeBody(content)
+    }
+    
+    public func concatenate<T: ViewModifier>(
+        _ modifier: T
+    ) -> AnyViewModifier {
+        AnyViewModifier(concat(modifier))
     }
 }
 

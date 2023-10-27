@@ -12,7 +12,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     private var transform: ((_VariadicViewChildren) -> [_VariadicViewChildren.Subview])?
     
     public init(
-        _ content: _TypedVariadicView<Content>,
+        enumerating content: _TypedVariadicView<Content>,
         id: KeyPath<_VariadicViewChildren.Subview, ID>,
         @ViewBuilder _ subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) {
@@ -23,7 +23,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     }
     
     public init<Trait: _ViewTraitKey>(
-        _ content: _TypedVariadicView<Content>,
+        enumerating content: _TypedVariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         id: KeyPath<Trait.Value, ID>,
         @ViewBuilder content subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
@@ -33,14 +33,16 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
         self.subview = subview
         self.transform = nil
     }
-    
+}
+
+extension _ForEachSubview {
     public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
         _ source: _TypedVariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         @ViewBuilder content: @escaping (_VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
     ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == AnyView {
         self.init(
-            source,
+            enumerating: source,
             trait: trait,
             id: \.?.id
         ) { (index: Int, subview: _VariadicViewChildren.Subview) -> AnyView in
@@ -55,12 +57,12 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     }
     
     public init<Key: _ViewTraitKey>(
-        _ content: _TypedVariadicView<Content>,
+        enumerating content: _TypedVariadicView<Content>,
         id: KeyPath<_ViewTraitKeys, Key.Type>,
-        @ViewBuilder _ subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+        @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == Key.Value {
         self.init(
-            content,
+            enumerating: content,
             id: \_VariadicViewChildren.Subview.[trait: id],
             subview
         )
@@ -68,21 +70,24 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     
     public init(
         _ content: _TypedVariadicView<Content>,
-        @ViewBuilder _ subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+        @ViewBuilder subview: @escaping (_VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
-        self.init(
-            content,
-            id: \.id, 
-            subview
-        )
+        self.init(enumerating: content, id: \.id, { index, child in subview(child) })
+    }
+
+    public init(
+        enumerating content: _TypedVariadicView<Content>,
+        @ViewBuilder enumerating subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+    ) where ID == AnyHashable {
+        self.init(enumerating: content, id: \.id, subview)
     }
     
     public init(
         enumerating content: _TypedVariadicView<Content>,
-        @ViewBuilder _ subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+        @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
         self.init(
-            content,
+            enumerating: content,
             id: \.id,
             subview
         )
@@ -159,7 +164,7 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
         @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where Content == _ForEachSubview<Source, AnyHashable, Subview> {
         self.init(source) { content in
-            _ForEachSubview(content, subview)
+            _ForEachSubview(enumerating: content, enumerating: subview)
         }
     }
 

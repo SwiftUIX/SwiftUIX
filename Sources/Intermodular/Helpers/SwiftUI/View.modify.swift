@@ -58,6 +58,7 @@ extension View {
 
 extension View {
     /// Resolves and applies a modifier to a view and returns a new view.
+    @_disfavoredOverload
     public func modify<T: ViewModifier>(
         _ modifier: () -> T
     ) -> ModifiedContent<Self, T> {
