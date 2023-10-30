@@ -11,6 +11,18 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     private let subview: (Int, _VariadicViewChildren.Subview) -> Subview
     private var transform: ((_VariadicViewChildren) -> [_VariadicViewChildren.Subview])?
     
+    public var body: some View {
+        if let transform {
+            ForEach(transform(content.children)._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
+                subview(index, element)
+            }
+        } else {
+            ForEach(content.children._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
+                subview(index, element)
+            }
+        }
+    }
+
     public init(
         enumerating content: _TypedVariadicView<Content>,
         id: KeyPath<_VariadicViewChildren.Subview, ID>,
@@ -56,6 +68,24 @@ extension _ForEachSubview {
         }
     }
     
+    public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
+        enumerating source: _TypedVariadicView<Content>,
+        trait: KeyPath<_ViewTraitKeys, Trait.Type>,
+        @ViewBuilder content: @escaping (Int, _VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
+    ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == _ConditionalContent<_Subview, EmptyView> {
+        self.init(
+            enumerating: source,
+            trait: trait,
+            id: \.?.id
+        ) { (index: Int, subview: _VariadicViewChildren.Subview) -> _ConditionalContent<_Subview, EmptyView> in
+            if let traitValue = subview[trait: trait] {
+                return ViewBuilder.buildEither(first: content(index, subview, traitValue))
+            } else {
+                return ViewBuilder.buildEither(second: EmptyView())
+            }
+        }
+    }
+    
     public init<Key: _ViewTraitKey>(
         enumerating content: _TypedVariadicView<Content>,
         id: KeyPath<_ViewTraitKeys, Key.Type>,
@@ -74,7 +104,7 @@ extension _ForEachSubview {
     ) where ID == AnyHashable {
         self.init(enumerating: content, id: \.id, { index, child in subview(child) })
     }
-
+    
     public init(
         enumerating content: _TypedVariadicView<Content>,
         @ViewBuilder enumerating subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
@@ -91,18 +121,6 @@ extension _ForEachSubview {
             id: \.id,
             subview
         )
-    }
-    
-    public var body: some View {
-        if let transform {
-            ForEach(transform(content.children)._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
-                subview(index, element)
-            }
-        } else {
-            ForEach(content.children._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
-                subview(index, element)
-            }
-        }
     }
 }
 
