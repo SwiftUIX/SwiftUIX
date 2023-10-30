@@ -40,6 +40,13 @@ extension ForEach where Content: View, Data == AnyForEachData, ID == AnyHashable
         let data = content.data
         let content = content.content
         
-        self.init(data.lazy.indices.map({ data.distance(from: data.startIndex, to: $0) }), id: \.self, content: { content(data[data.index(data.startIndex, offsetBy: $0)]) }) // FIXME! - This is a poor hack until `id` is exposed publicly by `ForEach`
+        // FIXME! - This is a poor hack until `id` is exposed publicly by `ForEach`
+        self.init(
+            data.lazy.indices.map({ data.distance(from: data.startIndex, to: $0) }),
+            id: \.self,
+            content: {
+                content(data[data.index(data.startIndex, offsetBy: $0)])
+            }
+        )
     }
 }
