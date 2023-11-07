@@ -10,6 +10,8 @@ public struct _ViewTraitKeys {
     }
 }
 
+// MARK: - Supplementary
+
 extension View {
     public func _trait<TraitKey: _ViewTraitKey>(
         _ key: KeyPath<_ViewTraitKeys, TraitKey.Type>,
@@ -18,6 +20,8 @@ extension View {
         _trait(_ViewTraitKeys()[keyPath: key], value)
     }
 }
+
+// MARK: - Auxiliary
 
 extension _VariadicViewChildren.Subview {
     @dynamicMemberLookup

@@ -18,7 +18,7 @@ private struct _AddTopOrBottomBar<BarContent: View>: ViewModifier {
     let separatorVisibility: Visibility
     
     func body(content: Content) -> some View {
-        if userInterfaceIdiom == .mac {
+        if userInterfaceIdiom == .mac && !userInterfaceIdiom._isMacCatalyst {
             VStack(spacing: 0) {
                 if placement == .top {
                     separator
@@ -34,20 +34,36 @@ private struct _AddTopOrBottomBar<BarContent: View>: ViewModifier {
                 barContent
             }
         } else {
-            content
-                .safeAreaInset(edge: placement == .top ? .top : .bottom) {
-                    VStack(spacing: 0) {
-                        if placement == .bottom {
-                            separator
-                        }
-                        
+            if userInterfaceIdiom._isMacCatalyst {
+                VStack(spacing: 0) {
+                    if placement == .top {
                         barContent
-                        
-                        if placement == .top {
-                            separator
-                        }
+                        separator
+                    }
+
+                    content
+                    
+                    if placement == .bottom {
+                        separator
+                        barContent
                     }
                 }
+            } else {
+                content
+                    .safeAreaInset(edge: placement == .top ? .top : .bottom) {
+                        VStack(spacing: 0) {
+                            if placement == .bottom {
+                                separator
+                            }
+                            
+                            barContent
+                            
+                            if placement == .top {
+                                separator
+                            }
+                        }
+                    }
+            }
         }
     }
     
@@ -72,6 +88,12 @@ extension View {
         separator separatorVisibility: Visibility = .automatic,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        modifier(_AddTopOrBottomBar(barContent: content(), placement: .bottom, separatorVisibility: separatorVisibility))
+        modifier(
+            _AddTopOrBottomBar(
+                barContent: content(),
+                placement: .bottom,
+                separatorVisibility: separatorVisibility
+            )
+        )
     }
 }

@@ -29,7 +29,7 @@ public struct AlertPresentationLink<Label: View, Actions: View, Message: View>: 
                 
                 if let onConfirm {
                     Button("Cancel", role: .cancel) {
-                        isPresented = false
+                        dismiss()
                     }
                     
                     Button("Confirm") {
@@ -41,6 +41,19 @@ public struct AlertPresentationLink<Label: View, Actions: View, Message: View>: 
                 message
             }
         )
+        ._SwiftUIX_onKeyPress(.escape) {
+            if isPresented {
+                dismiss()
+                
+                return .handled
+            } else {
+                return .ignored
+            }
+        }
+    }
+    
+    private func dismiss() {
+        isPresented = false
     }
 }
 

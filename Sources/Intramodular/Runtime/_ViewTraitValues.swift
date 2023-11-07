@@ -7,11 +7,11 @@ import SwiftUI
 /// An interface that exposes reading/writing view traits.
 ///
 /// This type is **WIP**.
-public protocol _ViewTraitValuesStorage {
+public protocol _ViewTraitValuesProtocol {
     subscript<Key: _ViewTraitKey>(_ key: Key.Type) -> Key.Value { get set }
 }
 
-extension _ViewTraitValuesStorage {
+extension _ViewTraitValuesProtocol {
     public subscript<Key: _ViewTraitKey>(
         trait key: KeyPath<_ViewTraitKeys, Key.Type>
     ) -> Key.Value {
@@ -26,9 +26,9 @@ extension _ViewTraitValuesStorage {
 /// An analogue to `EnvironmentValues`, but for view traits.
 @frozen
 public struct _ViewTraitValues {
-    public var base: _ViewTraitValuesStorage
+    public var base: _ViewTraitValuesProtocol
     
-    public init(base: _ViewTraitValuesStorage) {
+    public init(base: _ViewTraitValuesProtocol) {
         self.base = base
     }
     
@@ -42,6 +42,6 @@ public struct _ViewTraitValues {
     }
 }
 
-extension _VariadicViewChildren.Subview: _ViewTraitValuesStorage {
+extension _VariadicViewChildren.Subview: _ViewTraitValuesProtocol {
     
 }

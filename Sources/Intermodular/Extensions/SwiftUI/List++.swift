@@ -52,3 +52,18 @@ extension List {
     }
     #endif
 }
+
+#if os(iOS)
+extension List {
+    @MainActor
+    public init(
+        selection: Binding<SelectionValue>,
+        @ViewBuilder content: () -> Content
+    ) where SelectionValue: CaseIterable {
+        self.init(
+            selection: selection._asOptional(defaultValue: SelectionValue.allCases.first!),
+            content: content
+        )
+    }
+}
+#endif

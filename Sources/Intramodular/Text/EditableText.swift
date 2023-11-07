@@ -15,6 +15,7 @@ public struct EditableText: View {
         case onDoubleTap
     }
     
+    @Environment(\._SwiftUIX_controlActiveState) var controlActiveState
     @Environment(\.isFocused) var isFocused
 
     #if os(iOS)
@@ -108,6 +109,11 @@ public struct EditableText: View {
         }
         .onChange(of: textFieldIsFocused) { isFocused in
             if !isFocused {
+                endEditing()
+            }
+        }
+        .onChange(of: controlActiveState) { controlActiveState in
+            if isFocused {
                 endEditing()
             }
         }

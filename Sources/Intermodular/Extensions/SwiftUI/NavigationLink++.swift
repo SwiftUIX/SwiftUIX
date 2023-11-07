@@ -6,6 +6,21 @@ import Swift
 import SwiftUI
 
 extension NavigationLink {
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+    public init(
+        _isActive isActive: Binding<Bool>,
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(
+            isActive: isActive,
+            destination: destination,
+            label: label
+        )
+    }
+}
+
+extension NavigationLink {
     @_disfavoredOverload
     public init(
         @ViewBuilder destination: () -> Destination,

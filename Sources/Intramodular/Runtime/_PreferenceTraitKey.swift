@@ -27,7 +27,7 @@ open class _ArrayReducePreferenceTraitKey<Element: Equatable>: _PreferenceTraitK
 
 // MARK: - Supplementary
 
-extension _ViewTraitValuesStorage {
+extension _ViewTraitValuesProtocol {
     public subscript<Key: _PreferenceTraitKey>(
         _ key: Key.Type
     ) -> Key.Value {

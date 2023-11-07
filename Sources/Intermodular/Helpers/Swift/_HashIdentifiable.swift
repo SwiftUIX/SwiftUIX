@@ -76,24 +76,28 @@ public struct _KeyPathHashable<Root, Value: Hashable>: Hashable {
     }
 }
 
+@frozen
 public struct _ArbitrarilyIdentifiedValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
     public let value: Value
     public let _id: (Value) -> ID
     
     public var description: String {
-        .init(describing: value)
+        String(describing: value)
     }
     
+    @_transparent
     public var id: ID {
         _id(value)
     }
     
+    @_transparent
     public init(value: Value, id: @escaping (Value) -> ID) {
         self.value = value
         self._id = id
     }
 }
 
+@frozen
 public struct _KeyPathHashIdentifiableValue<Value, ID: Hashable>: CustomStringConvertible, Identifiable {
     public let value: Value
     public let keyPath: KeyPath<Value, ID>

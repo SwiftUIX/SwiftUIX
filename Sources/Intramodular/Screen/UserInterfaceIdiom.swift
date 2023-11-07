@@ -47,6 +47,14 @@ public enum UserInterfaceIdiom: Hashable {
         return .watch
         #endif
     }
+    
+    public var _isMacCatalyst: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return false
+        #endif
+    }
 }
 
 // MARK: - API

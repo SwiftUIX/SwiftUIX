@@ -5,6 +5,66 @@
 import Swift
 import SwiftUI
 
+public protocol _SectionView: View {
+    associatedtype Parent: View
+    associatedtype Content: View
+    associatedtype Footer: View
+    
+    init(
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder header: () -> Parent,
+        @ViewBuilder footer: () -> Footer
+    )
+    
+    init(
+        header: Parent,
+        footer: Footer,
+        content: Content
+    )
+    
+    init(
+        header: Parent,
+        footer: Footer,
+        @ViewBuilder content: () -> Content
+    )
+}
+
+extension _SectionView {
+    public init(
+        header: Parent,
+        footer: Footer,
+        content: Content
+    ) {
+        self.init(content: { content }, header: { header }, footer: { footer })
+    }
+    
+    public init(
+        header: Parent,
+        footer: Footer,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(content: { content() }, header: { header }, footer: { footer })
+    }
+    
+    public init(
+        header: Parent,
+        @ViewBuilder content: () -> Content
+    ) where Footer == EmptyView {
+        self.init(content: { content() }, header: { header }, footer: { EmptyView() })
+    }
+    
+    public init(
+        header: Parent,
+        content: Content
+    ) where Footer == EmptyView {
+        self.init(content: { content }, header: { header }, footer: { EmptyView() })
+    }
+}
+
+extension Section: _SectionView where Parent: View, Content: View, Footer: View {
+    
+}
+
 fileprivate struct _SwiftUI_Section<Parent, Content, Footer> {
     let header: Parent
     let content: Content
@@ -41,34 +101,73 @@ extension Section {
     }
 }
 
-extension Section where Parent == Text, Content: View, Footer == EmptyView {
+extension _SectionView where Parent == Text, Content: View, Footer == EmptyView {
     @_disfavoredOverload
-    public init(_ header: Text, @ViewBuilder content: () -> Content) {
+    public init(
+        _ header: Text,
+        @ViewBuilder content: () -> Content
+    ) {
         self.init(header: header, content: content)
     }
-
+    
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ header: S, @ViewBuilder content: () -> Content) {
+    public init<S: StringProtocol>(
+        _ header: S,
+        @ViewBuilder content: () -> Content
+    ) {
         self.init(header: Text(header), content: content)
     }
     
     @_disfavoredOverload
-    public init(_ header: LocalizedStringKey, @ViewBuilder content: () -> Content) {
+    public init(
+        _ header: LocalizedStringKey,
+        @ViewBuilder content: () -> Content
+    ) {
         self.init(header: Text(header), content: content)
     }
     
     @_disfavoredOverload
-    public init<S: StringProtocol>(header: S, @ViewBuilder content: () -> Content) {
+    public init<S: StringProtocol>(
+        header: S,
+        @ViewBuilder content: () -> Content
+    ) {
         self.init(header: Text(header), content: content)
     }
 }
 
-extension Section where Parent == Text, Content: View, Footer == Text {
+extension _SectionView where Parent == Text, Content: View, Footer == Text {
     public init<S: StringProtocol>(
         header: S,
         footer: S,
         @ViewBuilder content: () -> Content
     ) {
-        self.init(header: Text(header), footer: Text(footer), content: content)
+        self.init(header: Text(header), footer: Text(footer), content: content())
+    }
+}
+
+public struct _SectionX<Header: View, Content: View, Footer: View>: _SectionView {
+    public let header: Header
+    public let content: Content
+    public let footer: Footer
+    
+    public var body: some View {
+        _VariadicViewAdapter(content) { content in
+            Section(
+                header: header,
+                footer: footer
+            ) {
+                content
+            }
+        }
+    }
+    
+    public init(
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder header: () -> Header,
+        @ViewBuilder footer: () -> Footer
+    ) {
+        self.header = header()
+        self.content = content()
+        self.footer = footer()
     }
 }

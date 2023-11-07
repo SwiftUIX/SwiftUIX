@@ -23,6 +23,28 @@ extension View {
         modifier(GreedyFrameModifier(width: .greedy, height: nil, alignment: alignment))
     }
     
+    @_disfavoredOverload
+    @inlinable
+    public func frame(
+        width: _GreedyFrameSize,
+        minHeight: CGFloat? = nil,
+        idealHeight: CGFloat? = nil,
+        maxHeight: CGFloat? = nil,
+        alignment: Alignment = .center
+    ) -> some View {
+        self
+            .frame(
+                width: .greedy,
+                alignment: alignment
+            )
+            .frame(
+                minHeight: minHeight,
+                idealHeight: idealHeight,
+                maxHeight: maxHeight,
+                alignment: alignment
+            )
+    }
+
     @inlinable
     public func frame(
         width: _GreedyFrameSize,

@@ -160,7 +160,7 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 // MARK: - Auxiliary
 
 extension _SwiftUI_TargetPlatform.macOS {
-    public enum _ControlActiveState {
+    public enum _ControlActiveState: Hashable, Sendable {
         case key
         case active
         case inactive

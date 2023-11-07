@@ -274,16 +274,6 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         super.invalidateIntrinsicContentSize()
     }
     
-    #if os(macOS)
-    open override func drawInsertionPoint(
-        in rect: NSRect,
-        color: NSColor,
-        turnedOn flag: Bool
-    ) {
-        super.drawInsertionPoint(in: rect, color: color, turnedOn: flag)
-    }
-    #endif
-    
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     @discardableResult
     override open func becomeFirstResponder() -> Bool {
