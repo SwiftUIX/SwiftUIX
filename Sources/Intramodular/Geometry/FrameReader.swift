@@ -26,6 +26,14 @@ public struct FrameReaderProxy {
     
     public func size(
         for identifier: AnyHashable
+    ) -> CGSize? {
+        viewDescription(forFrameWithID: identifier)?.globalBounds.size
+    }
+    
+    @available(*, deprecated, message: "The returned size is now an `Optional<CGSize>`, not CGSize that defaults to 0 in lieu of a resolved size.")
+    @_disfavoredOverload
+    public func size(
+        for identifier: AnyHashable
     ) -> CGSize {
         viewDescription(forFrameWithID: identifier)?.globalBounds.size ?? .zero
     }
@@ -48,9 +56,12 @@ public struct FrameReaderProxy {
     public func percentageIntersection(
         between x: AnyHashable,
         and y: AnyHashable
-    ) -> Double {
+    ) -> Double? {
         let intersectionSize = self.intersectionSize(between: x, and: y)
-        let xSize = size(for: x)
+        
+        guard let xSize = size(for: x) else {
+            return nil
+        }
         
         let xSizeArea = xSize.width * xSize.height
         let intersectionSizeArea = intersectionSize.width * intersectionSize.height

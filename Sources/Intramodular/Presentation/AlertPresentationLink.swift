@@ -41,14 +41,20 @@ public struct AlertPresentationLink<Label: View, Actions: View, Message: View>: 
                 message
             }
         )
-        ._SwiftUIX_onKeyPress(.escape) {
-            if isPresented {
-                dismiss()
-                
-                return .handled
-            } else {
-                return .ignored
+        .modify {
+            #if os(macOS)
+            $0._SwiftUIX_onKeyPress(.escape) {
+                if isPresented {
+                    dismiss()
+                    
+                    return .handled
+                } else {
+                    return .ignored
+                }
             }
+            #else
+            $0
+            #endif
         }
     }
     

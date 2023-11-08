@@ -457,16 +457,16 @@ fileprivate struct _AdhereToReferenceFrame<Reference: View>: ViewModifier {
                     .hidden()
                     .frame(id: Subviews.reference)
                     .frame(
-                        width: !dimensions.contains(.width) ? proxy.size(for: Subviews.content).width : nil,
-                        height: !dimensions.contains(.height) ? proxy.size(for: Subviews.content).height : nil
+                        width: !dimensions.contains(.width) ? proxy.size(for: Subviews.content)?.width : nil,
+                        height: !dimensions.contains(.height) ? proxy.size(for: Subviews.content)?.height : nil
                     )
                     .clipped()
                 
                 content
                     .frame(id: Subviews.content)
                     .frame(
-                        width: dimensions.contains(.width) ? proxy.size(for: Subviews.reference).width : nil,
-                        height: dimensions.contains(.height) ? proxy.size(for: Subviews.reference).height : nil
+                        width: dimensions.contains(.width) ? proxy.size(for: Subviews.reference)?.width : nil,
+                        height: dimensions.contains(.height) ? proxy.size(for: Subviews.reference)?.height : nil
                     )
             }
         }
