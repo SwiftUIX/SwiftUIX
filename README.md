@@ -1,14 +1,13 @@
-<img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX
-======================================
+# <img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX
 
 ![CI](https://github.com/SwiftUIX/SwiftUIX/workflows/CI/badge.svg)
 
 SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
 
-- [Why](#why) 
-- [Requirements](#requirements) 
+- [Why](#why)
+- [Requirements](#requirements)
 - [Installation](#installation)
-- [Contents](#contents) 
+- [Contents](#contents)
 - [Contributing](#contributing)
 - [License](#license)
 - [Support](#support)
@@ -16,9 +15,9 @@ SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of c
 
 # Why
 
-The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI. 
+The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI.
 
-# Requirements 
+# Requirements
 
 - Deployment target: iOS 13, macOS 10.15, tvOS 13, or watchOS 6
 - Xcode 14.3+
@@ -27,7 +26,7 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
 
->Xcode 11 integrates with libSwiftPM to provide support for iOS, watchOS, macOS and tvOS platforms.
+> Xcode 11 integrates with libSwiftPM to provide support for iOS, watchOS, macOS and tvOS platforms.
 
 1. In Xcode, open your project and navigate to **File** → **Swift Packages** → **Add Package Dependency...**
 2. Paste the repository URL (`https://github.com/SwiftUIX/SwiftUIX`) and click **Next**.
@@ -37,11 +36,11 @@ The preferred way of installing SwiftUIX is via the [Swift Package Manager](http
 
 # Contents
 
-All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki). 
+All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
 
 While the project itself is stable and heavily being used in production, its documentation is **work-in-progress**. Contributions are encouraged and welcomed.
 
-### UIKit → SwiftUI 
+### UIKit → SwiftUI
 
 | UIKit                                   | SwiftUI      | SwiftUIX                                   |
 | --------------------------------------- | ------------ | ------------------------------------------ |
@@ -64,8 +63,6 @@ While the project itself is stable and heavily being used in production, its doc
 | `UIVisualEffectView`                    | -            | `VisualEffectView`                         |
 | `UIWindow`                              | -            | `WindowOverlay`                            |
 
-
-
 ### **Activity**
 
 - `ActivityIndicator`
@@ -76,7 +73,7 @@ While the project itself is stable and heavily being used in production, its doc
       .style(.large)
   ```
 
-- `AppActivityView`  - a SwiftUI port for `UIActivityViewController`.
+- `AppActivityView` - a SwiftUI port for `UIActivityViewController`.
 
   ```swift
   AppActivityView(activityItems: [...])
@@ -91,6 +88,25 @@ While the project itself is stable and heavily being used in production, its doc
 
 - `View/visible(_:)` - Sets a view's visibility.
 
+### CollectionView
+
+Use `CollectionView` within your SwiftUI view, providing it with a data source and a way to build cells.
+
+```swift
+import SwiftUIX
+
+struct MyCollectionView: View {
+    let data: [MyModel] // Your data source
+
+    var body: some View {
+        CollectionView(data, id: \.self) { item in
+            // Build your cell view
+            Text(item.title)
+        }
+    }
+}
+```
+
 ### Error Handling
 
 - `TryButton` - A button capable of performing throwing functions.
@@ -103,23 +119,24 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Keyboard
 
-- `Keyboard` - An object representing the keyboard. 
+- `Keyboard` - An object representing the keyboard.
 - `View/padding(.keyboard) `- Pads this view with the active system height of the keyboard.
 
 ### Link Presentation:
 
-- `LinkPresentationView`
+Use `LinkPresentationView` to display a link preview for a given URL.
 
-  ```swift
-  LinkPresentationView(url: url)
-      .frame(height: 192)
-  ```
+```swift
+LinkPresentationView(url: url)
+    .frame(height: 192)
+```
 
-### Navigation
+### Navigation Bar
 
 - `View/navigationBarColor(_:)` - Configures the color of the navigation bar for this view.
 - `View/navigationBarTranslucent(_:)` - Configures the translucency of the navigation bar for this view.
 - `View/navigationBarTransparent(_:)` - Configures the transparency of the navigation bar for this view.
+- `View/navigationBarLargeTitle(_:)` - Set a custom view for the navigation bar's large view mode.
 
 ### Pagination
 
@@ -152,18 +169,18 @@ While the project itself is stable and heavily being used in production, its doc
 
 - `SearchBar` - A SwiftUI port for `UISearchBar`.
 
-  ````swift
+  ```swift
   struct ContentView: View {
       @State var isEditing: Bool = false
       @State var searchText: String = ""
-      
+
       var body: some View {
           SearchBar("Search...", text: $searchText, isEditing: $isEditing)
               .showsCancelButton(isEditing)
               .onCancel { print("Canceled!") }
       }
   }
-  ````
+  ```
 
 - `View/navigationSearchBar(_:)` - Sets the navigation search bar for this view.
 
@@ -178,13 +195,13 @@ While the project itself is stable and heavily being used in production, its doc
 
 ### Screen
 
-- `Screen` -  A representation of the device's screen.
+- `Screen` - A representation of the device's screen.
 - `UserInterfaceIdiom` - A SwiftUI port for `UIUserInterfaceIdiom`.
 - `UserInterfaceOrientation` - A SwiftUI port for `UserInterfaceOrientation`.
 
-### Scroll 
+### Scroll
 
-- `ScrollIndicatorStyle` -  A type that specifies the appearance and interaction of all scroll indicators within a view hierarchy
+- `ScrollIndicatorStyle` - A type that specifies the appearance and interaction of all scroll indicators within a view hierarchy
   - `HiddenScrollViewIndicatorStyle` - A scroll indicator style that hides all scroll view indicators within a view hierarchy.
 
 ### Status Bar
@@ -218,7 +235,10 @@ While the project itself is stable and heavily being used in production, its doc
       .edgesIgnoringSafeArea(.all)
   ```
 
-### Window 
+> [!Note]
+> This package is under development and is being currently rewritten to fully leverage Swift 5.9.
+
+### Window
 
 - `View/windowOverlay(isKeyAndVisible:content:)` - Makes a window key and visible when a given condition is true.
 
@@ -227,16 +247,23 @@ While the project itself is stable and heavily being used in production, its doc
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
 
 To create an Xcode project for SwiftUIX run `bundle install; bundle exec fastlane generate_xcodeproj`.
-To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`. 
+To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`.
 
 # License
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
 
-# Support 
+# Support
 
-SwiftUIX is and will always be free and open. Maintaining SwiftUIX, however, is a time-consuming endeavour. If you're reliant on SwiftUIX for your app/project and would like to see it grow, consider contributing/donating as way to help.
+SwiftUIX is and will always remain free and open-source.
+
+Maintaining SwiftUIX is a massively time-consuming endeavour. If you're reliant on SwiftUIX for your app/project and would like to see it grow, consider either:
+
+- [Contributing](#contributing)
+- [Donating via Patreon](http://patreon.com/vmanot)
 
 # Credits
 
-SwiftUIX is a project of [@vatsal_manot](http://twitter.com/vatsal_manot).
+SwiftUIX is led and maintained by [@vatsal_manot](http://twitter.com/vatsal_manot).
+
+Special thanks to [Brett Best](https://github.com/Brett-Best), [Nathan Tanner](https://github.com/nathantannar4), [Kabir Oberai](https://github.com/kabiroberai) and many more.
