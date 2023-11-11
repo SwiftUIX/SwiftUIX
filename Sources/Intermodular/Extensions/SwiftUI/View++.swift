@@ -176,10 +176,27 @@ extension View {
     public func _printChanges_printingChanges() -> Self {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
             Self._printChanges()
-
+            
             return self
         } else {
             return self
         }
     }
 }
+
+#if swift(>=5.9)
+#if os(iOS) || os(macOS)
+extension View {
+    @ViewBuilder
+    public func _SwiftUIX_defaultScrollAnchor(
+        _ unitPoint: UnitPoint?
+    ) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            defaultScrollAnchor(.bottom)
+        } else {
+            self
+        }
+    }
+}
+#endif
+#endif

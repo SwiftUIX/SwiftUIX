@@ -211,3 +211,20 @@ private struct _OnChangeOfFrame: ViewModifier {
         }
     }
 }
+
+extension View {
+    public func _onAvailability<Value>(
+        of value: Value?,
+        operation: @escaping (Value) -> Void
+    ) -> some View {
+        self.onChange(of: value != nil) { [value] isNotNil in
+            guard let value = value else {
+                return
+            }
+            
+            assert(isNotNil)
+            
+            operation(value)
+        }
+    }
+}

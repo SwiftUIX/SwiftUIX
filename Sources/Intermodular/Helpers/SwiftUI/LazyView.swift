@@ -7,6 +7,8 @@ import SwiftUI
 
 /// A lazily loaded view.
 public struct LazyView<Body: View>: View {
+    @Environment(\._lazyViewResolver) private var _lazyViewResolver
+    
     private let destination: () -> Body
     
     @_optimize(none)
@@ -18,7 +20,9 @@ public struct LazyView<Body: View>: View {
     @_optimize(none)
     @inline(never)
     public var body: some View {
-        destination()
+        _lazyViewResolver.resolve {
+            destination()
+        }
     }
 }
 
@@ -49,7 +53,7 @@ public struct LazyAppearView<Content: View>: View {
     public enum Placeholder {
         case hiddenFrame // frame of content.hidden()
     }
-
+    
     private let placeholder: Placeholder?
     private let destination: (LazyAppearViewProxy) -> Content?
     private var debounceInterval: DispatchTimeInterval?
@@ -95,7 +99,7 @@ public struct LazyAppearView<Content: View>: View {
         self.explicitAnimation = animation
         self.disableAnimations = false
     }
-        
+    
     public var body: some View {
         ZStack {
             placeholderView
@@ -169,7 +173,7 @@ extension LazyAppearView {
             $0.debounceInterval = delay
         }
     }
-
+    
     public func animation(_ animation: Animation?) -> Self {
         then {
             $0.explicitAnimation = animation
@@ -204,5 +208,54 @@ extension View {
     /// Resets the view's identity every time it disappears.
     public func _destroyOnDisappear() -> some View {
         modifier(_DestroyOnDisappear())
+    }
+}
+
+@_spi(Internal)
+public protocol _LazyViewResolver {
+    func resolve<Content: View>(_ content: () -> Content) -> Content
+}
+
+public struct _AnyLazyViewResolver {
+    public typealias Resolve = (() -> (any View)) -> any View
+    
+    private let _resolve: Resolve
+    
+    public init(resolve: @escaping Resolve) {
+        self._resolve = resolve
+    }
+    
+    public func resolve<Content: View>(
+        _ content: () -> Content
+    ) -> Content {
+        self._resolve(content) as! Content
+    }
+}
+
+@_spi(Internal)
+extension _AnyLazyViewResolver: _LazyViewResolver {
+    
+}
+
+fileprivate struct _DefaultLazyViewResolver: _LazyViewResolver {
+    func resolve<Content: View>(_ content: () -> Content) -> Content {
+        content()
+    }
+}
+
+@_spi(Internal)
+extension EnvironmentValues {
+    struct _LazyViewResolverKey: EnvironmentKey {
+        typealias Value = any _LazyViewResolver
+        
+        static let defaultValue: Value = _DefaultLazyViewResolver()
+    }
+    
+    public var _lazyViewResolver: any _LazyViewResolver {
+        get {
+            self[_LazyViewResolverKey.self]
+        } set {
+            self[_LazyViewResolverKey.self] = newValue
+        }
     }
 }
