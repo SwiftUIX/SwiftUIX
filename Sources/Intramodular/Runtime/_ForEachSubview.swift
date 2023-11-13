@@ -13,12 +13,20 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     
     public var body: some View {
         if let transform {
-            ForEach(transform(content.children)._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
+            ForEach(
+                transform(content.children)._enumerated(),
+                id: \.element[_keyPath: id]
+            ) { (index, element) in
                 subview(index, element)
+                    .id(element[_keyPath: id])
             }
         } else {
-            ForEach(content.children._enumerated(), id: \.element[_keyPath: id]) { (index, element) in
+            ForEach(
+                content.children._enumerated(),
+                id: \.element[_keyPath: id]
+            ) { (index, element) in
                 subview(index, element)
+                    .id(element[_keyPath: id])
             }
         }
     }
@@ -42,6 +50,20 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     ) {
         self.content = content
         self.id = (\_VariadicViewChildren.Subview[trait: trait]).appending(path: id)
+        self.subview = subview
+        self.transform = nil
+    }
+    
+    public init<Trait: _ViewTraitKey>(
+        enumerating content: _TypedVariadicView<Content>,
+        trait: KeyPath<_ViewTraitKeys, Trait.Type>,
+        id: KeyPath<Trait.Value, ID?>,
+        @ViewBuilder content subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+    ) {
+        self.content = content
+        self.id = (\_VariadicViewChildren.Subview[trait: trait])
+            .appending(path: id)
+            .appending(path: \.unsafelyUnwrapped)
         self.subview = subview
         self.transform = nil
     }
@@ -171,7 +193,7 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
     }
     
     public init(
-        @ViewBuilder source: () -> Source,
+        @ViewBuilder _ source: () -> Source,
         @ViewBuilder content: @escaping (_TypedVariadicView<Source>) -> Content
     ) {
         self.init(source(), content: content)
