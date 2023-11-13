@@ -14,11 +14,15 @@ import SwiftUI
 public final class _WindowPresentationController<Content: View>: ObservableObject {
     public var content: Content {
         didSet {
-            if contentWindow == nil {
-                _setNeedsUpdate()
+            guard contentWindow != nil else {
+                return
             }
+            
+            _setNeedsUpdate(immediately: true)
         }
     }
+    
+    weak var _sourceAppKitOrUIKitWindow: AppKitOrUIKitWindow?
     
     public let windowStyle: _WindowStyle
     
@@ -130,6 +134,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         }
         
         if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
+            contentWindow.rootView = content
+
             return
         }
         
@@ -151,6 +157,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
                 rootView: content
             )
             #endif
+            
+            contentWindow.windowPresentationController = self
             
             self.contentWindow = contentWindow
             

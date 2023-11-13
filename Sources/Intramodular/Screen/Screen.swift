@@ -2,9 +2,15 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(macOS)
+import AppKit
+#endif
 import Combine
 import Swift
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(macOS) || os(tvOS) || os(watchOS) || targetEnvironment(macCatalyst)
 
@@ -101,31 +107,6 @@ extension Screen: Hashable {
     
     public static func == (lhs: Screen, rhs: Screen) -> Bool {
         true // FIXME
-    }
-}
-
-// MARK: - Auxiliary
-
-@_spi(Internal)
-public enum _ScreenOrCoordinateSpace: Hashable {
-    case screen(Screen?)
-    case coordinateSpace(CoordinateSpace)
-}
-
-@_spi(Internal)
-public struct _CoordinateSpaceSpecific<T> {
-    private var storage: [_ScreenOrCoordinateSpace: T] = [:]
-    
-    public init() {
-        
-    }
-    
-    public subscript(_ key: _ScreenOrCoordinateSpace) -> T? {
-        get {
-            storage[key]
-        } set {
-            storage[key] = newValue
-        }
     }
 }
 

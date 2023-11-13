@@ -40,6 +40,8 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         _ viewController: AppKitOrUIKitViewControllerType,
         context: Context
     ) {
+        viewController.windowPresentationController._sourceAppKitOrUIKitWindow = viewController.view.window
+        
         viewController.windowPresentationController.preferredColorScheme = context.environment.colorScheme
         viewController.windowPresentationController.content = content
         viewController.windowPresentationController.isVisible = isVisible.wrappedValue
@@ -109,7 +111,13 @@ extension View {
         isVisible: Binding<Bool>,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
-        background(WindowOverlay(content: content(), canBecomeKey: false, isVisible: isVisible))
+        background(
+            WindowOverlay(
+                content: content(),
+                canBecomeKey: false,
+                isVisible: isVisible
+            )
+        )
     }
 
     /// Makes a window key and visible when a given condition is true.
@@ -121,7 +129,13 @@ extension View {
         isKeyAndVisible: Binding<Bool>,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
-        background(WindowOverlay(content: content(), canBecomeKey: true, isVisible: isKeyAndVisible))
+        background(
+            WindowOverlay(
+                content: content(),
+                canBecomeKey: true,
+                isVisible: isKeyAndVisible
+            )
+        )
     }
 }
 

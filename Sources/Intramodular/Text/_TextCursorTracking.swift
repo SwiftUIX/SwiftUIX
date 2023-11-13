@@ -12,7 +12,7 @@ public final class _TextCursorTracking: ObservableObject {
     
     @Published public private(set) var positionInText: Int?
     @_spi(Internal)
-    @Published public private(set) var location: _CoordinateSpaceSpecific<CGRect>?
+    @Published public private(set) var location: _CoordinateSpaceRelative<CGRect>?
 
     /// Whether the cursor is at the start of the text.
     public var isAtStart: Bool {
@@ -143,7 +143,7 @@ extension AppKitOrUIKitTextView {
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
-    var _SwiftUIX_caretLocation: _CoordinateSpaceSpecific<CGRect>? {
+    var _SwiftUIX_caretLocation: _CoordinateSpaceRelative<CGRect>? {
         guard let selectedRange = selectedTextRange else {
             return nil
         }
@@ -152,7 +152,7 @@ extension AppKitOrUIKitTextView {
             return nil
         }
         
-        var result = _CoordinateSpaceSpecific<CGRect>()
+        var result = _CoordinateSpaceRelative<CGRect>()
 
         result[.coordinateSpace(.global)] = caretRect(for: selectedRange.start)
 
@@ -161,7 +161,7 @@ extension AppKitOrUIKitTextView {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitTextView {
-    var _SwiftUIX_caretLocation: _CoordinateSpaceSpecific<CGRect>? {
+    var _SwiftUIX_caretLocation: _CoordinateSpaceRelative<CGRect>? {
         guard let window else {
             return nil
         }
@@ -177,10 +177,10 @@ extension AppKitOrUIKitTextView {
                 unflippedScreenRect.size.width = 1
             }
 
-            var result = _CoordinateSpaceSpecific<CGRect>()
+            var result = _CoordinateSpaceRelative<CGRect>()
             
             result[.coordinateSpace(.global)] = window.flipLocal(window.convertFromScreen(unflippedScreenRect))
-            result[.screen(.main)] = NSScreen.flip(unflippedScreenRect)
+            result[.cocoa(.main)] = NSScreen.flip(unflippedScreenRect)
 
             return result
         }

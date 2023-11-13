@@ -12,12 +12,18 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindo
     var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func show()
+    
+    @_spi(Internal)
+    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
 }
 #else
 public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
     var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func show()
+    
+    @_spi(Internal)
+    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
 }
 #endif
 
@@ -25,7 +31,8 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
     public var canBecomeKey: Bool?
     public var allowTouchesToPassThrough: Bool = false
-    public var windowPosition: CGPoint?
+    @_spi(Internal)
+    public var windowPosition: _CoordinateSpaceRelative<CGPoint>?
     public var isTitleBarHidden: Bool?
     public var backgroundColor: Color?
 }
@@ -35,6 +42,8 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
 @available(tvOSApplicationExtension, unavailable)
 public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
     public typealias PreferredConfiguration = _AppKitOrUIKitHostingWindowConfiguration
+    
+    weak var windowPresentationController: _WindowPresentationController<Content>?
     
     /// The window's preferred configuration.
     ///
@@ -53,7 +62,11 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                     self.setWindowOrigin()
                 }
             }
-            #else
+            #elseif os(macOS)
+            if oldValue.allowTouchesToPassThrough != configuration.allowTouchesToPassThrough {
+                ignoresMouseEvents = oldValue.allowTouchesToPassThrough
+            }
+            
             setWindowOrigin()
             #endif
             
@@ -65,7 +78,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     override public var canBecomeKey: Bool {
         configuration.canBecomeKey ?? super.canBecomeKey
     }
-
+    
     var contentWindowController: NSWindowController?
     #endif
     
@@ -181,12 +194,11 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             _assignIfNotEqual(true, to: \.isMovableByWindowBackground)
             _assignIfNotEqual(true, to: \.titlebarAppearsTransparent)
             _assignIfNotEqual(.hidden, to: \.titleVisibility)
-                        
+            
             standardWindowButton(.miniaturizeButton)?.isHidden = true
             standardWindowButton(.closeButton)?.isHidden = true
             standardWindowButton(.zoomButton)?.isHidden = true
         }
-        
         #endif
     }
     
@@ -239,7 +251,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 
                 self.contentViewController = contentViewController
                 self.configuration.style = style
-
+                
                 backgroundColor = NSColor.clear
                 isOpaque = false
                 styleMask.insert(NSWindow.StyleMask.fullSizeContentView)
@@ -304,7 +316,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 return
             }
         }
-
+        
         super.makeKey()
     }
     #elseif os(macOS)
@@ -338,7 +350,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 return
             }
         }
-
+        
         super.becomeKey()
     }
     #endif
@@ -397,23 +409,8 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         guard let windowPosition = configuration.windowPosition else {
             return
         }
-                        
-        #if os(iOS)
-        let originX = (windowPosition.x - (self.frame.size.width / 2))
-        let originY = (windowPosition.y - (self.frame.size.height / 2))
-
-        self.frame.origin = .init(
-            x: originX,
-            y: originY
-        )
-        #elseif os(macOS)
-        let originX = (windowPosition.x - (self.frame.size.width / 2))
-        let originY = (windowPosition.y - (self.frame.size.height / 2))
-
-        let origin = CGPoint(x: originX, y: originY)
-
-        setFrameOrigin(NSScreen.flip(origin))
-        #endif
+        
+        setPosition(windowPosition)
     }
     
     // MARK: - NSWindowDelegate
@@ -424,7 +421,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         _NSWindow_didWindowJustClose = true
         
         tearDownWindow()
-
+        
         DispatchQueue.main.async {
             self.isVisibleBinding.wrappedValue = false
         }
@@ -470,23 +467,35 @@ extension AppKitOrUIKitHostingWindow {
 @available(tvOSApplicationExtension, unavailable)
 extension View {
     /// Allows touches in the active window overlay to pass through if possible.
-    @available(macOS, unavailable)
-    public func windowAllowsTouchesToPassThrough(_ allowed: Bool) -> some View {
-        preference(key: _SwiftUIX_WindowPreferenceKeys.AllowsTouchesToPassThrough.self, value: allowed)
+    public func windowAllowsTouchesToPassThrough(
+        _ allowed: Bool
+    ) -> some View {
+        preference(
+            key: _SwiftUIX_WindowPreferenceKeys.AllowsTouchesToPassThrough.self,
+            value: allowed
+        )
     }
     
     /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
-    public func windowPosition(_ offset: CGPoint) -> some View {
-        preference(key: _SwiftUIX_WindowPreferenceKeys.Position.self, value: offset)
+    public func windowPosition(
+        _ offset: CGPoint
+    ) -> some View {
+        preference(
+            key: _SwiftUIX_WindowPreferenceKeys.Position.self,
+            value: .init(offset, in: .coordinateSpace(.global))
+        )
     }
     
     /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using an `x` and `y` offset.
-    public func windowPosition(x: CGFloat, y: CGFloat) -> some View {
-        windowPosition(.init(x: x, y: y))
+    public func windowPosition(
+        x: CGFloat,
+        y: CGFloat
+    ) -> some View {
+        windowPosition(CGPoint(x: x, y: y))
     }
     
     /// Sets the background color of the presented window.
@@ -502,7 +511,7 @@ enum _SwiftUIX_WindowPreferenceKeys {
         
     }
     
-    final class Position: TakeLastPreferenceKey<CGPoint> {
+    final class Position: TakeLastPreferenceKey<_CoordinateSpaceRelative<CGPoint>> {
         
     }
     
@@ -610,5 +619,70 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
         }
     }
 }
+
+#if os(iOS) || os(tvOS)
+extension AppKitOrUIKitHostingWindow {
+    @_spi(Internal)
+    public func setPosition(
+        _ position: _CoordinateSpaceRelative<CGPoint>
+    ) {
+        if configuration.windowPosition != position {
+            configuration.windowPosition = position
+        }
+
+        if let position = position[.coordinateSpace(.global)] {
+            let originX: CGFloat = position.x - (self.frame.size.width / 2)
+            let originY: CGFloat = position.y - (self.frame.size.height / 2)
+            
+            self.frame.origin = .init(
+                x: originX,
+                y: originY
+            )
+        } else {
+            assertionFailure("unimplemented")
+        }
+    }
+}
+#elseif os(macOS)
+extension AppKitOrUIKitHostingWindow {
+    @_spi(Internal)
+    public func setPosition(
+        _ position: _CoordinateSpaceRelative<CGPoint>
+    ) {
+        // This isn't a `guard` because we do not want to exit early. Even if the window position is the same, the actual desired position may have changed (window position can be relative).
+        if configuration.windowPosition != position {
+            configuration.windowPosition = position
+        }
+
+        guard let sourceWindow = windowPresentationController?._sourceAppKitOrUIKitWindow ?? position._sourceAppKitOrUIKitWindow else {
+            assertionFailure()
+            
+            return
+        }
+        
+        if var position = position[.coordinateSpace(.global)] {
+            var rect = CGRect(
+                origin: position,
+                size: self.frame.size
+            )
+
+            rect.origin.y = sourceWindow.frame.height - position.y
+            
+            position = sourceWindow.convertToScreen(rect).origin
+                        
+            let origin = CGPoint(
+                x: position.x - (self.frame.size.width / 2),
+                y: position.y - (self.frame.size.height / 2)
+            )
+            
+            setFrameOrigin(origin)
+        } else if let (screen, position) = position.first(where: { $0._cocoaScreen != nil }) {
+            assertionFailure("unimplemented")
+        } else {
+            assertionFailure("unimplemented")
+        }
+    }
+}
+#endif
 
 #endif

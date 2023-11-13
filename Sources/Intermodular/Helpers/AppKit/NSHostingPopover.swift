@@ -25,13 +25,18 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         if let contentViewController = contentViewController {
             return contentViewController as! CocoaHostingController<ContentWrapper>
         } else {
-            let result = CocoaHostingController<ContentWrapper>(mainView: .init(parentBox: .init(nil), content: rootView))
+            let result = CocoaHostingController<ContentWrapper>(
+                mainView: .init(
+                    parentBox: .init(nil),
+                    content: rootView
+                )
+            )
             
             result.parentPopover = self
             result.mainView.parentBox.wrappedValue = self
             
             if #available(macOS 13.0, *) {
-                result.sizingOptions = .preferredContentSize
+                result.sizingOptions = [.intrinsicContentSize, .preferredContentSize]
             }
             
             self.contentViewController = result
@@ -76,7 +81,11 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         preferredEdge: NSRectEdge
     ) {
         if _sizeContentToFit() {
-            _showWellSized(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+            _showWellSized(
+                relativeTo: positioningRect,
+                of: positioningView,
+                preferredEdge: preferredEdge
+            )
         } else {
             DispatchQueue.main.async {
                 assert(self._sizeContentToFit())
@@ -208,17 +217,31 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
             _contentViewController._SwiftUIX_setNeedsLayout()
             _contentViewController._SwiftUIX_layoutIfNeeded()
             
-            let size = _contentViewController.sizeThatFits(
+            var size = _contentViewController.sizeThatFits(
                 AppKitOrUIKitLayoutSizeProposal(fixedSize: (true, true)),
                 layoutImmediately: true
             )
+                        
+            if size.isAreaZero, !_contentViewController.view.fittingSize.isAreaZero {
+                size = _contentViewController.view.fittingSize
+            }
             
             _contentViewController.preferredContentSize = size
+
+            assert(!size.isAreaZero)
             
             _contentViewController._canBecomeFirstResponder = nil
         }
         
-        return !_contentViewController.preferredContentSize.isAreaZero
+        let hasFittingSize = !_contentViewController.preferredContentSize.isAreaZero
+        
+        if hasFittingSize, _contentViewController.view.frame.size.isAreaZero {
+            _contentViewController.view.frame.size = _contentViewController.preferredContentSize
+            
+            _contentViewController.view._SwiftUIX_layoutIfNeeded()
+        }
+        
+        return hasFittingSize
     }
     
     public var wantsTransientBehaviorEnforcement: Bool {

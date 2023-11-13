@@ -30,12 +30,22 @@ public struct IntrinsicGeometryProxy: Equatable {
         safeAreaInsets = geometry?.safeAreaInsets ?? .zero
     }
     
-    public func frame(in coordinateSpace: CoordinateSpace) -> CGRect {
+    public func _frame(
+        in coordinateSpace: CoordinateSpace
+    ) -> CGRect? {
         switch coordinateSpace {
             case .local:
-                return localFrame ?? .init()
+                guard let result = localFrame else {
+                    return nil
+                }
+                
+                return result
             case .global:
-                return globalFrame ?? .init()
+                guard let result = globalFrame else {
+                    return nil
+                }
+                
+                return result
             case .named:
                 if coordinateSpace == customCoordinateSpace {
                     return frameInCustomCoordinateSpace ?? .zero
@@ -45,8 +55,14 @@ public struct IntrinsicGeometryProxy: Equatable {
                     return .init()
                 }
             default:
-                return .init()
+                return nil
         }
+    }
+
+    public func frame(
+        in coordinateSpace: CoordinateSpace
+    ) -> CGRect {
+        _frame(in: coordinateSpace) ?? .zero
     }
 }
 

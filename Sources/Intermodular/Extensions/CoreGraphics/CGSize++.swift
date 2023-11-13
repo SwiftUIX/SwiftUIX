@@ -22,7 +22,7 @@ extension CGSize {
     }
     
     public var minimumDimensionLength: CGFloat {
-        min(width, height)
+        max(min(width, height), 0)
     }
     
     public var maximumDimensionLength: CGFloat {
