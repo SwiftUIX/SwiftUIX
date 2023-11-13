@@ -621,6 +621,9 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
 }
 
 #if os(iOS) || os(tvOS)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
     @_spi(Internal)
     public func setPosition(
@@ -644,6 +647,9 @@ extension AppKitOrUIKitHostingWindow {
     }
 }
 #elseif os(macOS)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
     @_spi(Internal)
     public func setPosition(
@@ -676,7 +682,7 @@ extension AppKitOrUIKitHostingWindow {
             )
             
             setFrameOrigin(origin)
-        } else if let (screen, position) = position.first(where: { $0._cocoaScreen != nil }) {
+        } else if let (_, _) = position.first(where: { $0._cocoaScreen != nil }) {
             assertionFailure("unimplemented")
         } else {
             assertionFailure("unimplemented")
