@@ -279,6 +279,11 @@ extension TextView {
     }
     
     @_disfavoredOverload
+    public func placeholderColor(_ placeholderColor: AppKitOrUIKitColor) -> Self {
+        then({ $0.configuration.placeholderColor = placeholderColor })
+    }
+    
+    @_disfavoredOverload
     public func tint(_ tint: AppKitOrUIKitColor) -> Self {
         then({ $0.configuration.tintColor = tint })
     }
