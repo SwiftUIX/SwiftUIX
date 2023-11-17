@@ -9,19 +9,29 @@ import SwiftUI
 
 #if os(macOS)
 public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindowDelegate {
+    @_spi(Internal)
+    var syncedWindows: [_SwiftUIX_Weak<any AppKitOrUIKitHostingWindowProtocol>] { get set }
+
     var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func show()
     
     @_spi(Internal)
+    func refreshPosition()
+    @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
 }
 #else
 public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
+    @_spi(Internal)
+    var syncedWindows: [_SwiftUIX_Weak<any AppKitOrUIKitHostingWindowProtocol>] { get set }
+    
     var configuration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func show()
     
+    @_spi(Internal)
+    func refreshPosition()
     @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
 }
@@ -43,6 +53,9 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
 public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
     public typealias PreferredConfiguration = _AppKitOrUIKitHostingWindowConfiguration
     
+    @_spi(Internal)
+    public var syncedWindows: [_SwiftUIX_Weak<any AppKitOrUIKitHostingWindowProtocol>] = []
+    
     weak var windowPresentationController: _WindowPresentationController<Content>?
     
     /// The window's preferred configuration.
@@ -50,24 +63,26 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
     /// This is informed by SwiftUIX's window preference key values.
     public var configuration = PreferredConfiguration() {
         didSet {
+            #if os(macOS)
+            refreshPosition()
+            #endif
+            
             guard configuration != oldValue else {
                 return
             }
             
             #if os(iOS)
             if oldValue.windowPosition == nil, configuration.windowPosition != nil {
-                setWindowOrigin()
+                refreshPosition()
             } else {
                 UIView.animate(withDuration: 0.2) {
-                    self.setWindowOrigin()
+                    self.refreshPosition()
                 }
             }
             #elseif os(macOS)
             if oldValue.allowTouchesToPassThrough != configuration.allowTouchesToPassThrough {
                 ignoresMouseEvents = oldValue.allowTouchesToPassThrough
             }
-            
-            setWindowOrigin()
             #endif
             
             applyPreferredConfiguration()
@@ -149,7 +164,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             
             super.frame = newValue
             
-            setWindowOrigin()
+            refreshPosition()
         }
     }
     #endif
@@ -159,7 +174,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             return
         }
         
-        setWindowOrigin()
+        refreshPosition()
         
         #if os(iOS) || os(tvOS)
         if let backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor() {
@@ -403,16 +418,15 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         #endif
     }
     
-    // MARK: - Internal
-    
-    private func setWindowOrigin() {
+    @_spi(Internal)
+    public func refreshPosition() {
         guard let windowPosition = configuration.windowPosition else {
             return
         }
         
         setPosition(windowPosition)
     }
-    
+
     // MARK: - NSWindowDelegate
     
     var _NSWindow_didWindowJustClose: Bool = false
@@ -675,7 +689,7 @@ extension AppKitOrUIKitHostingWindow {
             rect.origin.y = sourceWindow.frame.height - position.y
             
             position = sourceWindow.convertToScreen(rect).origin
-                        
+                             
             let origin = CGPoint(
                 x: position.x - (self.frame.size.width / 2),
                 y: position.y - (self.frame.size.height / 2)

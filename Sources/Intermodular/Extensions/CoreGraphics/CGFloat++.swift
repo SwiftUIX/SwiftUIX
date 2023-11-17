@@ -33,3 +33,23 @@ func max(_ lhs: Double, _ rhs: CGFloat?) -> Double {
     
     return Swift.max(lhs, rhs)
 }
+
+extension CGFloat {
+    func isApproximatelyEqual(
+        to other: CGFloat,
+        withThreshold threshold: CGFloat
+    ) -> Bool {
+        let difference = abs(self - other)
+        
+        return difference <= threshold
+    }
+}
+
+extension CGPoint {
+    func isApproximatelyEqual(
+        to other: CGPoint,
+        withThreshold threshold: CGFloat
+    ) -> Bool {
+        x.isApproximatelyEqual(to: other.x, withThreshold: threshold) && y.isApproximatelyEqual(to: other.y, withThreshold: threshold)
+    }
+}

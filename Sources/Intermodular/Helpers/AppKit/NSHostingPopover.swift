@@ -168,10 +168,6 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         
         assert(isShown)
         
-        if #available(macOS 13.0, *) {
-            enforceTransientBehavior()
-        }
-        
         if self.behavior == .transient {
             DispatchQueue.main.async {
                 self.enforceTransientBehavior()
