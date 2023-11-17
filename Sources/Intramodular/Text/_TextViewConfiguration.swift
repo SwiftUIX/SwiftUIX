@@ -33,6 +33,7 @@ public struct _TextViewConfiguration {
     var tintColor: AppKitOrUIKitColor?
     var kerning: CGFloat?
     var linkForegroundColor: AppKitOrUIKitColor?
+    var placeholderColor: AppKitOrUIKitColor?
     var textContainerInset: AppKitOrUIKitInsets = .init(EdgeInsets.zero)
     #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
     var textContentType: UITextContentType?
