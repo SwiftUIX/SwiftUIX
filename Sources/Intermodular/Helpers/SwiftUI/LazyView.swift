@@ -110,14 +110,27 @@ public struct LazyAppearView<Content: View>: View {
                     setAppearance(.inactive)
                 }
             
-            destination(
-                .init(
-                    _appearance: appearance,
-                    _appearanceBinding: .init(get: { appearance }, set: { setAppearance($0) })
+            if disableAnimations {
+                destination(
+                    LazyAppearViewProxy(
+                        _appearance: appearance,
+                        _appearanceBinding: Binding<LazyAppearViewProxy.Appearance>(
+                            get: { appearance },
+                            set: { setAppearance($0) }
+                        )
+                    )
                 )
-            )
-            .modify(if: disableAnimations) {
-                $0.animation(nil, value: appearance)
+                .animation(nil, value: appearance)
+            } else {
+                destination(
+                    LazyAppearViewProxy(
+                        _appearance: appearance,
+                        _appearanceBinding: Binding<LazyAppearViewProxy.Appearance>(
+                            get: { appearance },
+                            set: { setAppearance($0) }
+                        )
+                    )
+                )
             }
         }
     }

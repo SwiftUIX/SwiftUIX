@@ -7,7 +7,7 @@ import Swift
 
 /// An abstract base class for an observable value box.
 @dynamicMemberLookup
-public class AnyObservableValue<Value>: _AnyIndirectValueBox, ObservableObject {
+public class AnyObservableValue<Value>: _SwiftUIX_AnyIndirectValueBox, ObservableObject {
     public var wrappedValue: Value {
         get {
             fatalError() // abstract
@@ -50,7 +50,7 @@ enum ObservableValues {
                 root
             } set {
                 objectWillChange.send()
-
+                
                 root = newValue
                 
                 _objectDidChange.send()
@@ -73,7 +73,7 @@ enum ObservableValues {
                 root.wrappedValue[keyPath: keyPath]
             } set {
                 objectWillChange.send()
-
+                
                 root.wrappedValue[keyPath: keyPath] = newValue
             }
         }

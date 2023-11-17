@@ -35,12 +35,12 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
             result.parentPopover = self
             result.mainView.parentBox.wrappedValue = self
             
-            if #available(macOS 13.0, *) {
-                result.sizingOptions = [.intrinsicContentSize, .preferredContentSize]
-            }
-            
             self.contentViewController = result
-            
+
+            if #available(macOS 13.0, *) {
+                result.sizingOptions = [.preferredContentSize]
+            }
+                        
             return result
         }
     }
@@ -74,7 +74,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
     
     private weak var _rightfulKeyWindow: NSWindow?
     private weak var _rightfulFirstResponder: AppKitOrUIKitResponder?
-
+    
     override open func show(
         relativeTo positioningRect: NSRect,
         of positioningView: NSView,
@@ -98,7 +98,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
             }
         }
     }
-
+    
     private func _showWellSized(
         relativeTo positioningRect: NSRect,
         of positioningView: NSView,
@@ -117,7 +117,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
                 }
             }
         }
-                        
+        
         let deferShow = positioningView.frame.size.isAreaZero && (positioningView.window?.frame.size ?? .zero).isAreaZero
         
         if deferShow {
@@ -178,7 +178,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
             }
         }
     }
-
+    
     override open func close() {
         _cleanUpPostShow()
         
@@ -190,7 +190,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         
         super.performClose(sender)
     }
-        
+    
     // MARK: - NSPopoverDelegate -
     
     public func popoverDidShow(_ notification: Notification) {
@@ -199,7 +199,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
     
     public func popoverDidClose(_ notification: Notification) {
         _cleanUpPostShow()
-
+        
         contentViewController = nil
     }
     
@@ -209,7 +209,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         _rightfulKeyWindow = nil
         _rightfulFirstResponder = nil
     }
-
+    
     public func _sizeContentToFit() -> Bool {
         if _contentViewController.preferredContentSize.isAreaZero {
             _contentViewController._canBecomeFirstResponder = false
@@ -221,13 +221,13 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
                 AppKitOrUIKitLayoutSizeProposal(fixedSize: (true, true)),
                 layoutImmediately: true
             )
-                        
+            
             if size.isAreaZero, !_contentViewController.view.fittingSize.isAreaZero {
                 size = _contentViewController.view.fittingSize
             }
             
             _contentViewController.preferredContentSize = size
-
+            
             assert(!size.isAreaZero)
             
             _contentViewController._canBecomeFirstResponder = nil
@@ -266,7 +266,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         }
         
         assert(popoverWindow.isKeyWindow == false)
-         
+        
         guard popoverWindowWasKey else {
             _cleanUpPostShow()
             
@@ -287,35 +287,44 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
 
 extension NSHostingPopover {
     private struct ContentWrapper: View {
-        var parentBox: ObservableWeakReferenceBox<NSHostingPopover>
+        var parentBox: _SwiftUIX_ObservableWeakReferenceBox<NSHostingPopover>
         
         var content: Content
         
         @State private var didAppear: Bool = false
         
         var body: some View {
-            if parentBox.wrappedValue != nil {
-                content
-                    .environment(\.presentationManager, PresentationManager(parentBox))
-                    .onChangeOfFrame { _ in
-                        parentBox.wrappedValue?._contentViewController.view.layout()
+            ZStack {
+                if parentBox.wrappedValue != nil {
+                    content
+                        .environment(\.presentationManager, PresentationManager(parentBox))
+                        .onChangeOfFrame { _ in
+                            guard !didAppear else {
+                                return
+                            }
+                            
+                            parentBox.wrappedValue?._contentViewController.view.layout()
+                        }
+                        .onAppear {
+                            didAppear = true
+                        }
+                } else {
+                    PerformAction {
+                        print("Invalid hosting popover.")
                     }
-                    .focusable(false)
-                    .onAppear {
-                        didAppear = true
-                    }
+                }
             }
         }
     }
     
     private struct PresentationManager: SwiftUIX.PresentationManager {
-        public let popoverBox: ObservableWeakReferenceBox<NSHostingPopover>
+        public let popoverBox: _SwiftUIX_ObservableWeakReferenceBox<NSHostingPopover>
         
         public var isPresented: Bool {
             popoverBox.wrappedValue?.isShown ?? false
         }
         
-        public init(_ popoverBox: ObservableWeakReferenceBox<NSHostingPopover>)  {
+        public init(_ popoverBox: _SwiftUIX_ObservableWeakReferenceBox<NSHostingPopover>)  {
             self.popoverBox = popoverBox
         }
         

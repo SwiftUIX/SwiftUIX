@@ -13,6 +13,14 @@ import UIKit
 #endif
 
 public enum _ScreenOrCoordinateSpace: Hashable {
+    public static var local: Self {
+        .coordinateSpace(.local)
+    }
+    
+    public static var global: Self {
+        .coordinateSpace(.global)
+    }
+
     case cocoa(Screen?)
     case coordinateSpace(CoordinateSpace)
     

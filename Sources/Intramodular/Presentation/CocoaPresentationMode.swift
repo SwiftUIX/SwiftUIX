@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaPresentationMode: PresentationManager {
-    var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
+    var presentationCoordinatorBox: _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     private var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value
@@ -18,7 +18,7 @@ public struct CocoaPresentationMode: PresentationManager {
         coordinator != nil
     }
     
-    init(coordinator: ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
+    init(coordinator: _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
         self.presentationCoordinatorBox = coordinator
     }
     

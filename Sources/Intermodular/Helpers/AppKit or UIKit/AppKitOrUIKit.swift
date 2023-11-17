@@ -469,7 +469,7 @@ extension AppKitOrUIKitView {
 
 extension EnvironmentValues {
     struct AppKitOrUIKitViewControllerBoxKey: EnvironmentKey {
-        typealias Value = ObservableWeakReferenceBox<AppKitOrUIKitViewController>?
+        typealias Value = _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitViewController>?
         
         static let defaultValue: Value = nil
     }

@@ -324,13 +324,13 @@ extension CocoaPresentationCoordinator: UIPopoverPresentationControllerDelegate 
 #endif
 
 struct _UseCocoaPresentationCoordinator: ViewModifier {
-    @ObservedObject var presentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator>
+    @ObservedObject var presentationCoordinatorBox: _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>
     
     private var coordinator: CocoaPresentationCoordinator? {
         presentationCoordinatorBox.value
     }
     
-    init(coordinator: ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
+    init(coordinator: _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>) {
         self._presentationCoordinatorBox = .init(initialValue: coordinator)
     }
     
@@ -375,10 +375,10 @@ struct _UseCocoaPresentationCoordinator: ViewModifier {
 
 extension EnvironmentValues {
     struct CocoaPresentationCoordinatorBoxKey: EnvironmentKey {
-        static let defaultValue = ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
+        static let defaultValue = _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
     }
     
-    var cocoaPresentationCoordinatorBox: ObservableWeakReferenceBox<CocoaPresentationCoordinator> {
+    var cocoaPresentationCoordinatorBox: _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator> {
         get {
             self[CocoaPresentationCoordinatorBoxKey.self]
         } set {

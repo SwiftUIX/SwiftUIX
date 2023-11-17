@@ -5,14 +5,39 @@
 import Swift
 import SwiftUI
 
-public protocol _AnyIndirectValueBox<Value> {
+/// A box for arbitrary values.
+public protocol _SwiftUIX_AnyValueBox<Value> {
+    associatedtype Value
+    
+    var wrappedValue: Value { get set }
+    
+    init(wrappedValue: Value)
+}
+
+/// A mutable box for arbitrary values.
+public protocol _SwiftUIX_AnyMutableValueBox<Value>: _SwiftUIX_AnyValueBox {
+    var wrappedValue: Value { get set }
+}
+
+public protocol _SwiftUIX_AnyIndirectValueBox<Value> {
     associatedtype Value
     
     var wrappedValue: Value { get nonmutating set }
 }
 
+// MARK: - Implemented Conformances
+
+@propertyWrapper
+public struct _SwiftUIX_MutableValueBox<Value>: _SwiftUIX_AnyMutableValueBox {
+    public var wrappedValue: Value
+    
+    public init(wrappedValue: Value) {
+        self.wrappedValue = wrappedValue
+    }
+}
+
 @_spi(Internal)
-public struct _UnsafeIndirectConstantValueBox<Value>: _AnyIndirectValueBox {
+public struct _UnsafeIndirectConstantValueBox<Value>: _SwiftUIX_AnyIndirectValueBox {
     public let _wrappedValue: Value
     
     public var wrappedValue: Value {
@@ -38,7 +63,7 @@ struct WeakBox<T: AnyObject> {
 
 @propertyWrapper
 @usableFromInline
-final class ReferenceBox<T>: _AnyIndirectValueBox {
+final class ReferenceBox<T>: _SwiftUIX_AnyIndirectValueBox {
     @usableFromInline
     var value: T
     
@@ -67,7 +92,9 @@ extension ReferenceBox: @unchecked Sendable where T: Sendable {
 }
 
 @propertyWrapper
-final class LazyReferenceBox<T>: _AnyIndirectValueBox {
+final class LazyReferenceBox<T>: _SwiftUIX_AnyIndirectValueBox {
+    public typealias Value = T
+    
     private var initializeValue: (() -> T)?
     private var value: T?
     
@@ -96,9 +123,45 @@ final class LazyReferenceBox<T>: _AnyIndirectValueBox {
     }
 }
 
+@_spi(Internal)
+@propertyWrapper
+public struct _SwiftUIX_Weak<Value>: _SwiftUIX_AnyMutableValueBox {
+    private weak var _weakWrappedValue: AnyObject?
+    private var _strongWrappedValue: Value?
+    
+    public var wrappedValue: Value? {
+        get {
+            _weakWrappedValue.map({ $0 as! Value }) ?? _strongWrappedValue
+        } set {
+            if let newValue {
+                if type(of: newValue) is AnyClass {
+                    _weakWrappedValue = newValue as AnyObject
+                } else {
+                    _strongWrappedValue = newValue
+                }
+            } else {
+                _weakWrappedValue = nil
+                _strongWrappedValue = nil
+            }
+        }
+    }
+    
+    public init(wrappedValue: Value?) {
+        self.wrappedValue = wrappedValue
+    }
+    
+    public init(_ value: Value?) {
+        self.wrappedValue = value
+    }
+    
+    public init() {
+        self.init(wrappedValue: nil)
+    }
+}
+
 @propertyWrapper
 @usableFromInline
-final class WeakReferenceBox<T: AnyObject>: _AnyIndirectValueBox {
+final class WeakReferenceBox<T: AnyObject>: _SwiftUIX_AnyIndirectValueBox {
     @usableFromInline
     weak var value: T?
     
@@ -110,7 +173,7 @@ final class WeakReferenceBox<T: AnyObject>: _AnyIndirectValueBox {
             value = newValue
         }
     }
-
+    
     @usableFromInline
     init(_ value: T?) {
         self.value = value
@@ -122,32 +185,48 @@ final class WeakReferenceBox<T: AnyObject>: _AnyIndirectValueBox {
     }
 }
 
-#if canImport(Combine)
-import Combine
-
-@usableFromInline
-final class ObservableReferenceBox<T>: ObservableObject {
-    @usableFromInline
-    @Published var value: T
+@_spi(Internal)
+@propertyWrapper
+public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
+    @inlinable
+    @Published public var value: Value
     
-    @usableFromInline
-    init(_ value: T) {
+    @inlinable
+    public var wrappedValue: Value {
+        get {
+            self.value
+        } set {
+            self.value = newValue
+        }
+    }
+    
+    @inlinable
+    public var projectedValue: _SwiftUIX_ObservableReferenceBox {
+        self
+    }
+    
+    @inlinable
+    public init(_ value: Value) {
         self.value = value
+    }
+    
+    @inlinable
+    public init(wrappedValue: Value) {
+        self.value = wrappedValue
     }
 }
 
+@_spi(Internal)
 @propertyWrapper
-@usableFromInline
-final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
-    @usableFromInline
-    weak var value: T? {
+public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
+    public weak var value: T? {
         willSet {
             objectWillChange.send()
         }
     }
     
-    @usableFromInline
-    var wrappedValue: T? {
+    @inlinable
+    public var wrappedValue: T? {
         get {
             value
         } set {
@@ -155,9 +234,140 @@ final class ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
         }
     }
     
-    @usableFromInline
-    init(_ value: T?) {
+    @inlinable
+    public init(_ value: T?) {
         self.value = value
     }
 }
-#endif
+
+@_spi(Internal)
+@propertyWrapper
+public final class _SwiftUIX_WeakObservableReferenceBox<Value: AnyObject>: ObservableObject {
+    public weak var value: Value? {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+    
+    @inlinable
+    public var wrappedValue: Value? {
+        get {
+            self.value
+        } set {
+            self.value = newValue
+        }
+    }
+    
+    @inlinable
+    public var projectedValue: _SwiftUIX_WeakObservableReferenceBox<Value> {
+        self
+    }
+    
+    @inlinable
+    public init(_ value: Value?) {
+        self.value = value
+    }
+    
+    @inlinable
+    public convenience init(wrappedValue: Value?) {
+        self.init(wrappedValue)
+    }
+}
+
+@_spi(Internal)
+@propertyWrapper
+public struct _SwiftUIX_ObjectPointer<Value: AnyObject>: Hashable {
+    public var pointee: Value
+    
+    public var wrappedValue: Value {
+        get {
+            pointee
+        } set {
+            pointee = newValue
+        }
+    }
+    
+    public init(_ pointee: Value) {
+        self.pointee = pointee
+    }
+    
+    public init(wrappedValue: Value) {
+        self.init(wrappedValue)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.pointee === rhs.pointee
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(pointee))
+    }
+}
+
+extension _SwiftUIX_ObjectPointer: @unchecked Sendable where Value: Sendable {
+    
+}
+
+@_spi(Internal)
+@propertyWrapper
+public struct _SwiftUIX_WeakObjectPointer<Value: AnyObject>: Hashable {
+    public weak var pointee: Value?
+    
+    public var wrappedValue: Value? {
+        get {
+            pointee
+        } set {
+            pointee = newValue
+        }
+    }
+    
+    public init(_ pointee: Value?) {
+        self.pointee = pointee
+    }
+    
+    public init(wrappedValue: Value?) {
+        self.init(wrappedValue)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.pointee === rhs.pointee
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(pointee.map(ObjectIdentifier.init))
+    }
+}
+
+extension _SwiftUIX_WeakObjectPointer: @unchecked Sendable where Value: Sendable {
+    
+}
+
+@_spi(Internal)
+@propertyWrapper
+public struct _SwiftUIX_Metatype<T>: Hashable {
+    @usableFromInline
+    let _wrappedValue: Any.Type
+    
+    public let wrappedValue: T
+
+    @inlinable
+    public init(wrappedValue: T) {
+        self._wrappedValue = wrappedValue as! Any.Type
+        self.wrappedValue = wrappedValue
+    }
+    
+    @inlinable
+    public init(_ value: T) {
+        self.init(wrappedValue: value)
+    }
+
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs._wrappedValue == rhs._wrappedValue
+    }
+    
+    @inlinable
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(_wrappedValue))
+    }
+}

@@ -170,7 +170,7 @@ public func withAppKitOrUIKitViewController<Content: View>(
     if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
         _WithAppKitOrUIKitViewController(content: content)
     } else {
-        withInlineState(initialValue: ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)) { viewControllerBox in
+        withInlineState(initialValue: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)) { viewControllerBox in
             withInlineObservedObject(viewControllerBox.wrappedValue) { box in
                 content(box.value)
             }
@@ -208,7 +208,7 @@ extension NSViewController {
 private struct _WithAppKitOrUIKitViewController<Content: View>: View {
     let content: (AppKitOrUIKitViewController?) -> Content
 
-    @StateObject private var appKitOrUIKitViewControllerBox = ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
+    @StateObject private var appKitOrUIKitViewControllerBox = _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
 
     var body: some View {
         content(appKitOrUIKitViewControllerBox.value)
@@ -223,8 +223,8 @@ private struct _WithAppKitOrUIKitViewController<Content: View>: View {
 }
 
 private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
-    @State var _appKitOrUIKitViewControllerBox = ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
-    @State var presentationCoordinatorBox = ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
+    @State var _appKitOrUIKitViewControllerBox = _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitViewController>(nil)
+    @State var presentationCoordinatorBox = _SwiftUIX_ObservableWeakReferenceBox<CocoaPresentationCoordinator>(nil)
 
     init(_ appKitOrUIKitViewController: AppKitOrUIKitViewController?) {
         self._appKitOrUIKitViewControllerBox = .init(appKitOrUIKitViewController)
@@ -289,7 +289,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
             }
         }
 
-        @ObservedObject var _appKitOrUIKitViewControllerBox: ObservableWeakReferenceBox<AppKitOrUIKitViewController>
+        @ObservedObject var _appKitOrUIKitViewControllerBox: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitViewController>
 
         func body(content: Content) -> some View {
             content.environment(\.navigator, Navigator(base: _appKitOrUIKitViewControllerBox.value))

@@ -528,7 +528,7 @@ enum _SwiftUIX_WindowPreferenceKeys {
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
-    @ObservedObject var windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
+    @ObservedObject var windowBox: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
     
     var content: Content
     var isPresented: Bool = false
@@ -598,13 +598,13 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
     }
     
     struct _PresentationManager: PresentationManager {
-        let windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
+        let windowBox: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
         
         var isPresented: Bool {
             (windowBox.wrappedValue?.isHidden ?? false) == true
         }
         
-        init(windowBox: ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>) {
+        init(windowBox: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>) {
             self.windowBox = windowBox
         }
         

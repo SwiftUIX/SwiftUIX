@@ -4,54 +4,7 @@
 
 import SwiftUI
 
-public struct _ViewTraitsReader<Key: _ViewTraitKey, Content: View>: View where Key.Value: Equatable {
-    private let key: Key.Type
-    private let content: ([AnyHashable: Key.Value]) -> Content
-    
-    @State private var value = [AnyHashable: Key.Value]()
-    
-    
-    public init(
-        _ key: Key.Type = Key.self,
-        @ViewBuilder content: @escaping ([AnyHashable: Key.Value]) -> Content
-    ) {
-        self.key = key
-        self.content = content
-    }
-    
-    public var body: some View {
-        content(value)._onViewTraitsChange(key) {
-            self.value = $0
-        }
-    }
-}
-
-extension View {
-    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
-        _ key: K.Type,
-        id: @escaping (K.Value) -> ID,
-        perform action: @escaping ([ID: K.Value]) -> Void
-    ) -> some View where K.Value: Equatable {
-        modifier(_OnChangeOfViewTraits(key: key, action: action, id: id))
-    }
-    
-    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
-        _ key: K.Type,
-        id: KeyPath<K.Value, ID>,
-        perform action: @escaping ([ID: K.Value]) -> Void
-    ) -> some View where K.Value: Equatable {
-        _onViewTraitsChange(key, id: { $0[keyPath: id] }, perform: action)
-    }
-    
-    public func _onViewTraitsChange<K: _ViewTraitKey>(
-        _ key: K.Type,
-        perform action: @escaping ([AnyHashable: K.Value]) -> Void
-    ) -> some View where K.Value: Equatable {
-        modifier(_OnChangeOfViewTraits(key: key, action: action, id: nil))
-    }
-}
-
-struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: ViewModifier where Key.Value: Equatable {
+fileprivate struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: ViewModifier where Key.Value: Equatable {
     typealias Payload = [ID: Key.Value]
     
     let key: Key.Type
@@ -98,5 +51,32 @@ struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: ViewModifier whe
         self.payload = payload
         
         action(payload)
+    }
+}
+
+// MARK: - API
+
+extension View {
+    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
+        _ key: K.Type,
+        id: @escaping (K.Value) -> ID,
+        perform action: @escaping ([ID: K.Value]) -> Void
+    ) -> some View where K.Value: Equatable {
+        modifier(_OnChangeOfViewTraits(key: key, action: action, id: id))
+    }
+    
+    public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
+        _ key: K.Type,
+        id: KeyPath<K.Value, ID>,
+        perform action: @escaping ([ID: K.Value]) -> Void
+    ) -> some View where K.Value: Equatable {
+        _onViewTraitsChange(key, id: { $0[keyPath: id] }, perform: action)
+    }
+    
+    public func _onViewTraitsChange<K: _ViewTraitKey>(
+        _ key: K.Type,
+        perform action: @escaping ([AnyHashable: K.Value]) -> Void
+    ) -> some View where K.Value: Equatable {
+        modifier(_OnChangeOfViewTraits(key: key, action: action, id: nil))
     }
 }
