@@ -19,12 +19,21 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 # Requirements
 
-- Deployment target: iOS 13, macOS 10.15, tvOS 13, or watchOS 6
-- Xcode 14.3+
+- Deployment target: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1 beta 6 (Xcode Xcode 15.1 beta 3)
+- Xcode 15.0+ 
 
 # Installation
 
 The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
+
+```swift
+/// Package.swift
+/// ...
+dependencies: [
+    .package(url: "https://github.com/SwiftUIX/SwiftUIX.git", branch: "master"),
+]
+/// ...
+```
 
 > Xcode 11 integrates with libSwiftPM to provide support for iOS, watchOS, macOS and tvOS platforms.
 
