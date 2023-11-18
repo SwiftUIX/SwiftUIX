@@ -171,7 +171,7 @@ private struct DynamicViewPresenterEnvironmentKey: EnvironmentKey {
 extension EnvironmentValues {
     public var presenter: DynamicViewPresenter? {
         get {
-            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+            #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
             return self[DynamicViewPresenterEnvironmentKey.self]
             #else
             return self[DynamicViewPresenterEnvironmentKey.self]
@@ -184,7 +184,7 @@ extension EnvironmentValues {
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController: DynamicViewPresenter {
     private static var presentationCoordinatorKey: UInt = 0

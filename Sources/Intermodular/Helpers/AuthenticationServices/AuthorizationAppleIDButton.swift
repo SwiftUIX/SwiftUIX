@@ -155,6 +155,7 @@ extension AuthorizationAppleIDButton {
 
 // MARK: - API
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || targetEnvironment(macCatalyst)
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
@@ -167,3 +168,4 @@ extension AuthorizationAppleIDButton {
         then({ $0.requestedScopes = requestedScopes })
     }
 }
+#endif

@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
 extension TabView  {
     public init<_Content: View>(
         _ titles: [String],
@@ -25,6 +26,7 @@ extension TabView  {
     }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
 public struct _SwiftUIX_TitledTabViewContent<Content: View>: View {
     let titles: [String]
     let content: Content

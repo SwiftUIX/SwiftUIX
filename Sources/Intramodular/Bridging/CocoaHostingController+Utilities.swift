@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: (any _CocoaHostingControllerOrView)?
 
@@ -56,14 +56,16 @@ extension _CocoaHostingViewWrapped {
     }
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 extension _CocoaHostingViewWrapped: AppKitOrUIKitViewControllerRepresentable {
     typealias AppKitOrUIKitViewControllerType = CocoaHostingController<Content>
     
-    func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
+    func makeAppKitOrUIKitViewController(
+        context: Context
+    ) -> AppKitOrUIKitViewControllerType {
         let viewController = AppKitOrUIKitViewControllerType(mainView: mainView)
         
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
         viewController.view.backgroundColor = .clear
         #endif
         
@@ -74,8 +76,18 @@ extension _CocoaHostingViewWrapped: AppKitOrUIKitViewControllerRepresentable {
         return viewController
     }
     
-    func updateAppKitOrUIKitViewController(_ viewController: AppKitOrUIKitViewControllerType, context: Context) {
+    func updateAppKitOrUIKitViewController(
+        _ viewController: AppKitOrUIKitViewControllerType,
+        context: Context
+    ) {
         viewController.mainView = mainView
+    }
+    
+    static func dismantleAppKitOrUIKitViewController(
+        _ view: AppKitOrUIKitViewControllerType,
+        coordinator: Coordinator
+    ) {
+        
     }
 }
 #else

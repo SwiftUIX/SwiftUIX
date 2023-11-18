@@ -5,8 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
+#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitEdgeInsets {
     public init(_ insets: EdgeInsets) {
         self.init(
@@ -17,5 +16,4 @@ extension AppKitOrUIKitEdgeInsets {
         )
     }
 }
-
 #endif

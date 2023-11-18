@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITableViewCell {
     struct State: Hashable {
@@ -31,7 +31,9 @@ public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITa
     var contentHostingController: UIHostingController<RootView>!
     
     override public func awakeFromNib() {
+        #if !os(xrOS)
         super.awakeFromNib()
+        #endif
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         

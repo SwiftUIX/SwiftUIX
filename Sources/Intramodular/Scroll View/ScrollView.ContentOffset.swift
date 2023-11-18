@@ -136,7 +136,7 @@ extension ScrollView.ContentOffset {
 
 // MARK: - Helpers
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 extension UIScrollView {
     var currentVerticalAlignment: VerticalAlignment? {

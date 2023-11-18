@@ -57,7 +57,7 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
 
 // MARK: - Extensions
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(xrOS)
 extension OptionalDimensions {
     init(intrinsicContentSize: CGSize) {
         self.init(

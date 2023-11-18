@@ -111,7 +111,7 @@ extension EnvironmentValues {
 
     public var presentationManager: PresentationManager {
         get {
-            #if os(iOS) || os(tvOS) || os(macOS) || targetEnvironment(macCatalyst)
+            #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
             if navigator == nil && presentationMode.isPresented {
                 if let existingPresentationManager = self[_PresentationManagerEnvironmentKey.self], existingPresentationManager.isPresented {
                     if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {

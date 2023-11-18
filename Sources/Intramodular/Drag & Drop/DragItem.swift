@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 import UniformTypeIdentifiers
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 /// A representation of an underlying data item being dragged from one location to another.
 public struct DragItem: Hashable {

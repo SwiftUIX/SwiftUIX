@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 public protocol _CocoaHostingControllerOrView: AppKitOrUIKitResponder {
     var _SwiftUIX_cancellables: [AnyCancellable] { get set }

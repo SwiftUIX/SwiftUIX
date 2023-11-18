@@ -11,7 +11,7 @@ extension AppKitOrUIKitBezierPath {
         byRoundingCorners corners: [RectangleCorner],
         cornerRadii: CGFloat
     ) {
-        #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
         self.init(
             roundedRect: rect,
             byRoundingCorners: .init(corners),

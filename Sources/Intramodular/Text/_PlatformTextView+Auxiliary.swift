@@ -2,11 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     func _SwiftUIX_replaceTextStorage(_ textStorage: NSTextStorage) {
         let layoutManager = NSLayoutManager()
@@ -70,7 +70,7 @@ extension _PlatformTextView {
     }
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 extension NSTextContainer {
     var containerSize: CGSize {
         get {

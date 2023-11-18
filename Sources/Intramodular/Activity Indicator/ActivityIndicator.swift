@@ -29,7 +29,7 @@ public struct ActivityIndicator {
     private var style: Style = .regular
     #endif
     
-    #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
     private var tintAppKitOrUIKitColor: AppKitOrUIKitColor?
     #endif
     
@@ -38,7 +38,7 @@ public struct ActivityIndicator {
     }
 }
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 import UIKit
 
@@ -154,7 +154,7 @@ extension ActivityIndicator {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 extension UIActivityIndicatorView.Style {
     public init(_ style: ActivityIndicator.Style) {

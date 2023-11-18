@@ -59,7 +59,7 @@ extension EnvironmentValues {
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
 
 /// A box for `UINavigationController` that adapts it to a `Navigator`.
 ///
