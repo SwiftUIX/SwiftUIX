@@ -1,5 +1,5 @@
 //
-// Copyright (c) Vatsal Maot
+// Copyright (c) Vatsal Manot
 //
 
 import SwiftUI
