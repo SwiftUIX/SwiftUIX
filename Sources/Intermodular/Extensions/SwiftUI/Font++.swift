@@ -132,11 +132,12 @@ private enum _SwiftUIFontProvider {
                 
                 return AppKitOrUIKitFont(name: name, size: size)
             case let .system(size, weight, _):
-                guard let resolvedWeight = weight?.toAppKitOrUIKitFontWeight() else {
-                    return nil
-                }
+                let weight: AppKitOrUIKitFont.Weight = weight?.toAppKitOrUIKitFontWeight() ?? .regular
                 
-                return AppKitOrUIKitFont.systemFont(ofSize: size, weight: resolvedWeight)
+                return AppKitOrUIKitFont.systemFont(
+                    ofSize: size,
+                    weight: weight
+                )
             case let .textStyle(textStyle, _, _):
                 return textStyle
                     .toAppKitOrUIKitFontTextStyle()

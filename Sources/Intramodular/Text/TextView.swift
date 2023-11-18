@@ -290,7 +290,13 @@ extension TextView {
     #endif
     
     public func font(_ font: Font) -> Self {
-        then({ $0.configuration.cocoaFont = try? font.toAppKitOrUIKitFont() })
+        then {
+            do {
+                $0.configuration.cocoaFont = try font.toAppKitOrUIKitFont()
+            } catch {
+                // print(error)
+            }
+        }
     }
     
     @_disfavoredOverload
