@@ -11,48 +11,53 @@ import SwiftUI
 public struct AttributedText: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = AppKitOrUIKitLabel
     
-    struct Configuration: Hashable {
+    fileprivate struct Configuration: Hashable {
         var appKitOrUIKitFont: AppKitOrUIKitFont?
         var appKitOrUIKitForegroundColor: AppKitOrUIKitColor?
     }
     
-    @Environment(\.accessibilityEnabled) var accessibilityEnabled
-    @Environment(\.adjustsFontSizeToFitWidth) var adjustsFontSizeToFitWidth
-    @Environment(\.allowsTightening) var allowsTightening
-    @Environment(\.font) var font
-    @Environment(\.isEnabled) var isEnabled
-    @Environment(\.lineBreakMode) var lineBreakMode
-    @Environment(\.lineLimit) var lineLimit
-    @Environment(\.minimumScaleFactor) var minimumScaleFactor
-    @Environment(\.preferredMaximumLayoutWidth) var preferredMaximumLayoutWidth
+    @Environment(\.accessibilityEnabled) fileprivate var accessibilityEnabled
+    @Environment(\.adjustsFontSizeToFitWidth) fileprivate var adjustsFontSizeToFitWidth
+    @Environment(\.allowsTightening) fileprivate var allowsTightening
+    @Environment(\.font) fileprivate var font
+    @Environment(\.isEnabled) fileprivate var isEnabled
+    @Environment(\.lineBreakMode) fileprivate var lineBreakMode
+    @Environment(\.lineLimit) fileprivate var lineLimit
+    @Environment(\.minimumScaleFactor) fileprivate var minimumScaleFactor
+    @Environment(\.preferredMaximumLayoutWidth) fileprivate var preferredMaximumLayoutWidth
     #if os(macOS)
-    @Environment(\.layoutDirection) var layoutDirection
+    @Environment(\.layoutDirection) fileprivate var layoutDirection
     #endif
     
     public let content: NSAttributedString
     
-    var configuration = Configuration()
+    fileprivate var configuration = Configuration()
     
-    public init(_ content: NSAttributedString) {
+    public init(
+        _ content: NSAttributedString
+    ) {
         self.content = content
     }
     
-    public init<S: StringProtocol>(_ content: S) {
+    public init<S: StringProtocol>(
+        _ content: S
+    ) {
         self.init(NSAttributedString(string: String(content)))
     }
     
-    public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
+    public func makeAppKitOrUIKitView(
+        context: Context
+    ) -> AppKitOrUIKitViewType {
         AppKitOrUIKitViewType()
     }
     
-    public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
-		if Thread.isMainThread {
-			view.configure(with: self)
-		} else {
-			DispatchQueue.main.async {
-				view.configure(with: self)
-			}
-		}
+    public func updateAppKitOrUIKitView(
+        _ view: AppKitOrUIKitViewType,
+        context: Context
+    ) {
+        DispatchQueue.asyncOnMainIfNecessary {
+            view.configure(with: self)
+        }
     }
 }
 
@@ -108,15 +113,15 @@ extension AppKitOrUIKitLabel {
         self.attributedText = attributedText.content
         #endif
         
-        if let preferredMaximumLayoutWidth = attributedText.preferredMaximumLayoutWidth, preferredMaxLayoutWidth != attributedText.preferredMaximumLayoutWidth {
+        if 
+            let preferredMaximumLayoutWidth = attributedText.preferredMaximumLayoutWidth,
+            preferredMaxLayoutWidth != attributedText.preferredMaximumLayoutWidth
+        {
             preferredMaxLayoutWidth = preferredMaximumLayoutWidth
             
             frame.size.width = min(frame.size.width, preferredMaximumLayoutWidth)
             
-            #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-            setNeedsLayout()
-            layoutIfNeeded()
-            #endif
+            _SwiftUIX_layoutIfNeeded()
         }
         
         setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
