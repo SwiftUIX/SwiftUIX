@@ -43,6 +43,7 @@ public struct CocoaTextField<Label: View>: View {
         var placeholder: String?
         var smartDashesType: UITextSmartDashesType?
         var smartQuotesType: UITextSmartQuotesType?
+        var spellCheckingType: UITextSpellCheckingType?
         var secureTextEntry: Bool?
         var textColor: UIColor?
         var textContentType: UITextContentType?
@@ -177,7 +178,10 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         return uiView
     }
     
-    func updateUIView(_ uiView: UIViewType, context: Context) {
+    func updateUIView(
+        _ uiView: UIViewType,
+        context: Context
+    ) {
         context.coordinator.text = text
         context.coordinator.configuration = configuration
         
@@ -207,6 +211,7 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
             uiView.returnKeyType = configuration.returnKeyType ?? .default
             uiView.smartDashesType = configuration.smartDashesType ?? .default
             uiView.smartQuotesType = configuration.smartQuotesType ?? .default
+            uiView.spellCheckingType = configuration.spellCheckingType ?? .default
             uiView.textAlignment = .init(context.environment.multilineTextAlignment)
             uiView.textColor = configuration.textColor ?? uiView.textColor
             uiView.textContentType = configuration.textContentType
@@ -266,7 +271,10 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
         }
     }
     
-    static func dismantleUIView(_ uiView: UIViewType, coordinator: Coordinator) {
+    static func dismantleUIView(
+        _ uiView: UIViewType,
+        coordinator: Coordinator
+    ) {
         if let isFocused = coordinator.configuration.isFocused {
             if isFocused.wrappedValue {
                 isFocused.wrappedValue = false
@@ -275,7 +283,11 @@ fileprivate struct _CocoaTextField<Label: View>: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        .init(text: text, isEditing: isEditing, configuration: configuration)
+        Coordinator(
+            text: text,
+            isEditing: isEditing,
+            configuration: configuration
+        )
     }
 }
 
@@ -390,13 +402,13 @@ extension CocoaTextField {
     public func focused(_ isFocused: Binding<Bool>) -> Self {
         then({ $0.configuration.isFocused = isFocused })
     }
-}
-
-extension CocoaTextField {
+    
     public func focusRingType(_ focusRingType: FocusRingType) -> Self {
         then({ $0.configuration.focusRingType = focusRingType })
     }
-    
+}
+
+extension CocoaTextField {
     public func autocapitalization(_ autocapitalization: UITextAutocapitalizationType) -> Self {
         then({ $0.configuration.autocapitalization = autocapitalization })
     }
@@ -422,19 +434,33 @@ extension CocoaTextField {
         then({ $0.configuration.textColor = foregroundColor })
     }
     
-    public func smartQuotesType(_ smartQuotesType: UITextSmartQuotesType) -> Self {
-        then({ $0.configuration.smartQuotesType = smartQuotesType })
-    }
-    
-    public func smartDashesType(_ smartDashesType: UITextSmartDashesType) -> Self {
-        then({ $0.configuration.smartDashesType = smartDashesType })
-    }
-    
     @available(*, deprecated, renamed: "foregroundColor")
     public func textColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.textColor = foregroundColor.toUIColor() })
     }
+}
+
+extension CocoaTextField {
+    public func smartQuotesType(
+        _ smartQuotesType: UITextSmartQuotesType
+    ) -> Self {
+        then({ $0.configuration.smartQuotesType = smartQuotesType })
+    }
     
+    public func smartDashesType(
+        _ smartDashesType: UITextSmartDashesType
+    ) -> Self {
+        then({ $0.configuration.smartDashesType = smartDashesType })
+    }
+    
+    public func spellCheckingType(
+        _ spellCheckingType: UITextSpellCheckingType
+    ) -> Self {
+        then({ $0.configuration.spellCheckingType = spellCheckingType })
+    }
+}
+
+extension CocoaTextField {
     public func textContentType(_ textContentType: UITextContentType?) -> Self {
         then({ $0.configuration.textContentType = textContentType })
     }
