@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public protocol _opaque_AppKitOrUIKitHostingControllerProtocol {
     func _disableSafeAreaInsets()
@@ -21,7 +21,7 @@ public protocol AppKitOrUIKitHostingControllerProtocol: _opaque_AppKitOrUIKitHos
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension UIHostingController: AppKitOrUIKitHostingControllerProtocol {
     
@@ -35,7 +35,7 @@ extension NSHostingController: AppKitOrUIKitHostingControllerProtocol {
 
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 @MainActor
 extension AppKitOrUIKitHostingControllerProtocol {
@@ -50,7 +50,7 @@ extension AppKitOrUIKitHostingControllerProtocol {
             return targetSize
         }
 
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         if layoutImmediately {
             view.setNeedsLayout()
             view.layoutIfNeeded()

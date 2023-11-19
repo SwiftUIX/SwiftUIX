@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     /// The active modal presentation represented by the corresponding view controller.
@@ -19,7 +19,7 @@ import SwiftUI
             return nil
         }
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         if let presentingViewController = viewController.presentingViewController {
             return presentingViewController.presentationCoordinator
         } else {
@@ -39,7 +39,7 @@ import SwiftUI
             return nil
         }
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         if let presentedViewController = viewController.presentedViewController {
             return presentedViewController.presentationCoordinator
         } else {
@@ -79,7 +79,7 @@ import SwiftUI
             return
         }
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         viewController.isModalInPresentation = disabled
         #elseif os(macOS)
         if let window = viewController.view.window {
@@ -126,7 +126,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
             return
         }
                 
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         guard !viewController.isBeingPresented else {
             return
         }
@@ -175,7 +175,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         
         let presentation = presentedCoordinator?.presentation
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         return .init { attemptToFulfill in
             if let presentedViewController = viewController.presentedViewController {
                 // Don't call `UIViewController.dismiss` if the presented view controller is already being dismissed. Otherwise, it causes the _presenter_ to dismiss itself.
@@ -223,7 +223,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
         // This update is being called on the _presented_ view controller.
         if let presentation = presentation, value.presentationID == presentation.id {
             if let newPresentation = value.presentation, newPresentation.id == presentation.id {
-                #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+                #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
                 if let viewController = viewController as? CocoaPresentationHostingController, !viewController.isBeingPresented {
                     viewController.presentation = newPresentation
                 }
@@ -252,7 +252,7 @@ extension CocoaPresentationCoordinator: DynamicViewPresenter {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension CocoaPresentationCoordinator: UIAdaptivePresentationControllerDelegate {
     public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {

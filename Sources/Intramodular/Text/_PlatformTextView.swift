@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Combine
 import Swift
@@ -89,7 +89,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         return result
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open var textStorage: NSTextStorage {
         if let textStorage = _customTextStorage {
             return textStorage
@@ -107,7 +107,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     #endif
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open var attributedText: NSAttributedString! {
         didSet {
             if preferredMaximumDimensions.height != nil {
@@ -145,7 +145,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     #endif
         
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var preferredMaximumDimensions: OptionalDimensions = nil {
         didSet {
             guard preferredMaximumDimensions != oldValue else {
@@ -248,7 +248,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         _lazyTrackedTextCursor?.update()
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func layoutSubviews() {
         super.layoutSubviews()
         
@@ -274,7 +274,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         super.invalidateIntrinsicContentSize()
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     @discardableResult
     override open func becomeFirstResponder() -> Bool {
         defer {
@@ -360,7 +360,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     #endif
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func deleteBackward() {
         super.deleteBackward()
         

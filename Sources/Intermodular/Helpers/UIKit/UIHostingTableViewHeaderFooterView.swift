@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 class UIHostingTableViewHeaderFooterView<SectionModel: Identifiable, Content: View>: UITableViewHeaderFooterView {
     var parent: UITableViewController!

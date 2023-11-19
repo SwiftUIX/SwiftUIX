@@ -9,7 +9,7 @@ private struct HideNavigationBar: ViewModifier {
     @State private var isVisible: Bool = false
     
     func body(content: Content) -> some View {
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         return content
             .background {
                 PassthroughView {
@@ -57,7 +57,7 @@ extension View {
     
     @inline(never)
     public func hideNavigationBarIfAvailable() -> some View {
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         return hideNavigationBar()
         #else
         return self

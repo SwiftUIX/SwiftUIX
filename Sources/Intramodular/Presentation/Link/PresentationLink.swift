@@ -54,7 +54,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
             self.isPresented.wrappedValue = false
         }
         
-        #if os(iOS) || os(macOS) || os(tvOS) || os(xrOS)
+        #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
         let content = AnyPresentationView {
             #if os(macOS)
             _destination
@@ -250,7 +250,7 @@ public struct PresentationLink<Destination: View, Label: View>: PresentationLink
                     }
                 }
                 .onChange(of: isPresented.wrappedValue) { [weak cocoaPresentationCoordinator] _ in
-                    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+                    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
                     // Attempt to detect an invalid state where the coordinator has a presented coordinator, but no presentation.
                     guard
                         !isPresented.wrappedValue,

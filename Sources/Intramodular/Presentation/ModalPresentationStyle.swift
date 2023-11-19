@@ -32,7 +32,7 @@ public enum ModalPresentationStyle: Equatable {
     case automatic
     case none
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     case custom(UIViewControllerTransitioningDelegate)
     #endif
         
@@ -70,7 +70,7 @@ public enum ModalPresentationStyle: Equatable {
                 return true
             case (.none, .none):
                 return true
-            #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+            #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
             case let (.custom(lhsDelegate), .custom(rhsDelegate)):
                 return lhsDelegate.isEqual(rhsDelegate)
             #endif
@@ -129,7 +129,7 @@ extension EnvironmentValues {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension ModalPresentationStyle {
     public func toTransitioningDelegate() -> UIViewControllerTransitioningDelegate? {

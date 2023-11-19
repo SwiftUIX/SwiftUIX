@@ -13,7 +13,7 @@ public enum FocusRingType: UInt {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitView {
     var _focusRingType: FocusRingType {
         get {

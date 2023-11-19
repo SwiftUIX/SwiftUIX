@@ -21,6 +21,16 @@ extension _ViewTraitValuesProtocol {
             self[_ViewTraitKeys()[keyPath: key]] = newValue
         }
     }
+    
+    public subscript<T>(
+        trait: T.Type
+    ) -> T? {
+        get {
+            self[_TypeToViewTraitKeyAdaptor<T>.self]
+        } set {
+            self[_TypeToViewTraitKeyAdaptor<T>.self] = newValue
+        }
+    }
 }
 
 /// An analogue to `EnvironmentValues`, but for view traits.

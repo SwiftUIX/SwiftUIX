@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     private func toUIColor0() -> UIColor? {
         switch self {
@@ -202,10 +202,10 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     public func toAppKitOrUIKitColor() -> AppKitOrUIKitColor? {
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         return toUIColor()
         #elseif os(macOS)
         if #available(macOS 11.0, *) {

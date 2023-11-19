@@ -18,7 +18,7 @@ public protocol _AppKitOrUIKitViewRepresentableContext {
     var environment: EnvironmentValues { get }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, UIViewRepresentable {
     associatedtype AppKitOrUIKitViewType = UIViewType where AppKitOrUIKitViewType == UIViewType
     
@@ -105,7 +105,7 @@ public protocol AppKitOrUIKitViewControllerRepresentable: _AppKitOrUIKitRepresen
 
 // MARK: - Implementation
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitViewRepresentable {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     @MainActor
@@ -131,7 +131,7 @@ extension AppKitOrUIKitViewControllerRepresentable {
 }
 #endif
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension UIViewRepresentableContext: _AppKitOrUIKitViewRepresentableContext {
     
 }
@@ -462,7 +462,7 @@ extension AppKitOrUIKitViewControllerRepresentable where AppKitOrUIKitViewContro
 }
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitViewRepresentable {
     @MainActor
     public static func dismantleAppKitOrUIKitView(

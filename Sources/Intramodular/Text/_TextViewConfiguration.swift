@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public struct _TextViewConfiguration {
     public var _fixedSize: (Bool, Bool)? = nil
@@ -23,7 +23,7 @@ public struct _TextViewConfiguration {
     public var isEditable: Bool = true
     public var isSelectable: Bool = true
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var autocapitalization: UITextAutocapitalizationType?
     #endif
     @_spi(Internal)
@@ -35,12 +35,12 @@ public struct _TextViewConfiguration {
     var linkForegroundColor: AppKitOrUIKitColor?
     var placeholderColor: AppKitOrUIKitColor?
     var textContainerInset: AppKitOrUIKitInsets = .init(EdgeInsets.zero)
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var textContentType: UITextContentType?
     #endif
     var dismissKeyboardOnReturn: Bool = false
     var enablesReturnKeyAutomatically: Bool?
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var keyboardType: UIKeyboardType = .default
     var returnKeyType: UIReturnKeyType?
     #endif
@@ -93,7 +93,7 @@ extension TextView {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     public func _currentTextViewData(
         kind: _TextViewDataBinding.Value.Kind

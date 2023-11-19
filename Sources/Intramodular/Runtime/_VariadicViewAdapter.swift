@@ -6,17 +6,31 @@ import SwiftUI
 
 @frozen
 public struct _VariadicViewAdapter<Source: View, Content: View>: View {
-    private struct Root: _VariadicView.MultiViewRoot {
+    @frozen
+    @usableFromInline
+    struct Root: _VariadicView.MultiViewRoot {
+        @usableFromInline
         var content: (_TypedVariadicView<Source>) -> Content
         
+        @usableFromInline
+        @_transparent
+        init(content: @escaping (_TypedVariadicView<Source>) -> Content) {
+            self.content = content
+        }
+        
+        @_transparent
+        @usableFromInline
         func body(children: _VariadicView.Children) -> some View {
             content(_TypedVariadicView(children))
         }
     }
     
-    private let source: Source
-    private let content: (_TypedVariadicView<Source>) -> Content
+    @usableFromInline
+    let source: Source
+    @usableFromInline
+    let content: (_TypedVariadicView<Source>) -> Content
     
+    @_transparent
     public init(
         _ source: Source,
         @ViewBuilder content: @escaping (_TypedVariadicView<Source>) -> Content
@@ -25,6 +39,7 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
         self.content = content
     }
     
+    @_transparent
     public init(
         @ViewBuilder _ source: () -> Source,
         @ViewBuilder content: @escaping (_TypedVariadicView<Source>) -> Content
@@ -41,6 +56,7 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
         }
     }
     
+    @_transparent
     public var body: some View {
         _VariadicView.Tree(Root(content: content)) {
             source
@@ -52,14 +68,18 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
 public struct _TypedVariadicView<Content: View>: View {
     public var children: _VariadicViewChildren
     
+    @_transparent
     public var isEmpty: Bool {
         children.isEmpty
     }
     
+    @usableFromInline
+    @_transparent
     init(_ children: _VariadicView.Children) {
         self.children = _VariadicViewChildren(erasing: children)
     }
     
+    @_transparent
     public var body: some View {
         children
     }

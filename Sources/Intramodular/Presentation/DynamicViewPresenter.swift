@@ -184,7 +184,7 @@ extension EnvironmentValues {
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController: DynamicViewPresenter {
     private static var presentationCoordinatorKey: UInt = 0

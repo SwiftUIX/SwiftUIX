@@ -12,7 +12,7 @@ import SwiftUI
 import UIKit
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 /// A representation of the device's screen.
 public class Screen: ObservableObject {
@@ -25,7 +25,7 @@ public class Screen: ObservableObject {
         return NSScreen.main?.frame ?? CGRect.zero
         #elseif os(watchOS)
         return WKInterfaceDevice.current().screenBounds
-        #elseif os(xrOS)
+        #elseif os(visionOS)
         assertionFailure("unimplemented")
         
         return .zero
@@ -39,7 +39,7 @@ public class Screen: ObservableObject {
         return NSScreen.main?.backingScaleFactor ?? 1.0
         #elseif os(watchOS)
         return WKInterfaceDevice.current().screenScale
-        #elseif os(xrOS)
+        #elseif os(visionOS)
         assertionFailure("unimplemented")
 
         return .zero

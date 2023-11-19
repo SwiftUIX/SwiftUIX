@@ -19,7 +19,7 @@ public enum UserInterfaceIdiom: Hashable {
     public static var current: UserInterfaceIdiom {
         #if targetEnvironment(macCatalyst)
         return .mac
-        #elseif os(iOS) || os(tvOS) || os(xrOS)
+        #elseif os(iOS) || os(tvOS) || os(visionOS)
         switch UIDevice.current.userInterfaceIdiom {
             case .carPlay:
                 return .carPlay

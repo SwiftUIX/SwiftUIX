@@ -9,7 +9,7 @@ struct _DynamicViewContentTraitValues {
     var onDelete: ((IndexSet) -> Void)? = nil
     var onMove: ((IndexSet, Int) -> Void)? = nil
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var onDrop: (([DragItem], Int) -> Void)? = nil
     private var _collectionViewDropDelegate: Any?
     #if !os(tvOS)

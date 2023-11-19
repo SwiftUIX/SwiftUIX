@@ -14,7 +14,7 @@ public protocol DynamicViewPresentable {
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension UIView: DynamicViewPresentable {
     public var presentationName: AnyHashable? {

@@ -2,11 +2,11 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     public var _SwiftUIX_textContainer: NSTextContainer? {
         textContainer
@@ -301,7 +301,7 @@ extension AppKitOrUIKitTextView {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension NSLayoutManager {
     public func defaultLineHeight(for font: UIFont) -> CGFloat {
         let paragraphStyle = NSParagraphStyle.default

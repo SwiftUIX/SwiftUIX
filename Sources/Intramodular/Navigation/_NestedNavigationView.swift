@@ -18,7 +18,7 @@ public struct _NestedNavigationView<Content: View>: View {
         #if !os(watchOS)
         withAppKitOrUIKitViewController { controller in
             if let controller = controller {
-                #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+                #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
                 if controller.navigationController == nil {
                     NavigationView {
                         PresentationView {

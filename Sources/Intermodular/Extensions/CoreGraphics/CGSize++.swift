@@ -149,7 +149,7 @@ extension CGSize {
     }
 }
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension CGSize {
     /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
     public var _hasUnspecifiedIntrinsicContentSizeDimensions: Bool {
@@ -222,7 +222,7 @@ extension CGSize {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 enum _AppKitOrUIKitPlaceholderDimensionType {
     case intrinsicContentSize
     case textContainer

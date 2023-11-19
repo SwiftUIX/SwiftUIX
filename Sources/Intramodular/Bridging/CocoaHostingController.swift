@@ -6,7 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public struct CocoaHostingControllerConfiguration {
     var _isMeasuringSize: Bool = false
@@ -36,7 +36,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     var _safeAreaInsetsAreFixed: Bool = false
     var _namedViewDescriptions: [AnyHashable: _NamedViewDescription] = [:]
     var _presentationCoordinator: CocoaPresentationCoordinator
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var _transitioningDelegate: UIViewControllerTransitioningDelegate? {
         didSet {
             transitioningDelegate = _transitioningDelegate
@@ -89,7 +89,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         self.rootView.parent = self
         
         if let mainView = mainView as? AnyPresentationView {
-            #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+            #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
             #if os(iOS) || targetEnvironment(macCatalyst)
             hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
             #endif
@@ -120,7 +120,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         fatalError("init(coder:) has not been implemented")
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func loadView() {
         super.loadView()
     }
@@ -228,7 +228,7 @@ extension CocoaHostingController {
 extension AppKitOrUIKitHostingController {
     /// https://twitter.com/b3ll/status/1193747288302075906
     public func _disableSafeAreaInsets() {
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         guard let viewClass = object_getClass(view), !String(cString: class_getName(viewClass)).hasSuffix("_SwiftUIX_patched") else {
             return
         }

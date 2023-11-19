@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
@@ -33,7 +33,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
     private func presentationDidChange(presentingViewController: UIViewController?) {
         mainView = presentation.content
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         #if os(iOS) || targetEnvironment(macCatalyst)
         hidesBottomBarWhenPushed = mainView.hidesBottomBarWhenPushed
         #endif
@@ -46,7 +46,7 @@ open class CocoaPresentationHostingController: CocoaHostingController<AnyPresent
         fatalError("unimplemented")
         #endif
         
-        #if !os(tvOS) && !os(xrOS)
+        #if !os(tvOS) && !os(visionOS)
         if case let .popover(permittedArrowDirections, attachmentAnchor) = mainView.modalPresentationStyle {
             popoverPresentationController?.delegate = presentationCoordinator
             popoverPresentationController?.permittedArrowDirections = .init(permittedArrowDirections)

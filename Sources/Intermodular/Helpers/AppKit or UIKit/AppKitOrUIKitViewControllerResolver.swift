@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import SwiftUI
 
@@ -106,7 +106,7 @@ fileprivate struct AppKitOrUIKitViewControllerResolver: AppKitOrUIKitViewControl
     var onRemoval: (AppKitOrUIKitViewController) -> Void
     
     func makeAppKitOrUIKitViewController(context: Context) -> AppKitOrUIKitViewControllerType {
-        #if os(iOS) || os(tvOS) || os(xrOS)
+        #if os(iOS) || os(tvOS) || os(visionOS)
         AppKitOrUIKitViewControllerType()
         #elseif os(macOS)
         AppKitOrUIKitViewControllerType(nibName: nil, bundle: nil)
@@ -162,7 +162,7 @@ extension View {
     }
 }
 
-#if os(iOS) ||  os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) ||  os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 @ViewBuilder
 public func withAppKitOrUIKitViewController<Content: View>(
     @ViewBuilder _ content: @escaping (AppKitOrUIKitViewController?) -> Content
@@ -236,7 +236,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
 
     func body(content: Content) -> some View {
         PassthroughView {
-            #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+            #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
             content
                 .modifier(ProvideNavigator(_appKitOrUIKitViewControllerBox: _appKitOrUIKitViewControllerBox))
             #elseif os(macOS)
@@ -267,7 +267,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
         }
     }
 
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     private struct ProvideNavigator: ViewModifier {
         struct Navigator: SwiftUIX.Navigator {
             weak var base: AppKitOrUIKitViewController?
@@ -301,7 +301,7 @@ private struct _ResolveAppKitOrUIKitViewController: ViewModifier {
 #endif
 
 extension View {
-    #if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func _resolveAppKitOrUIKitViewController(
         with viewController: AppKitOrUIKitViewController?
     ) -> some View {

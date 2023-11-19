@@ -72,7 +72,7 @@ extension AttributedText {
         then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor })
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     @_disfavoredOverload
     public func foregroundColor(_ foregroundColor: Color) -> Self {
         then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
@@ -84,7 +84,7 @@ extension AttributedText {
 
 extension AppKitOrUIKitLabel {
     func configure(with attributedText: AttributedText) {
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         self.allowsDefaultTighteningForTruncation = attributedText.allowsTightening
         #endif
         self.font = attributedText.configuration.appKitOrUIKitFont ?? self.font
@@ -99,7 +99,7 @@ extension AppKitOrUIKitLabel {
         self.userInterfaceLayoutDirection = .init(attributedText.layoutDirection)
         #endif
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         if let font = try? attributedText.configuration.appKitOrUIKitFont ?? attributedText.font?.toAppKitOrUIKitFont() {
             let string = NSMutableAttributedString(attributedString: attributedText.content)
             

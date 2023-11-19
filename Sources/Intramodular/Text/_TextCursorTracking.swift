@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
@@ -71,7 +71,7 @@ public final class _TextCursorTracking: ObservableObject {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension _TextCursorTracking {
     private func subscribeToOwner() {
         
@@ -141,7 +141,7 @@ extension AppKitOrUIKitTextView {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitTextView {
     var _SwiftUIX_caretLocation: _CoordinateSpaceRelative<CGRect>? {
         guard let selectedRange = selectedTextRange else {

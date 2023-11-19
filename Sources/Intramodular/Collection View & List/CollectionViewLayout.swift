@@ -12,7 +12,7 @@ import SwiftUI
 public protocol CollectionViewLayout {
     var hashValue: Int { get }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     func _toUICollectionViewLayout() -> UICollectionViewLayout
     #elseif os(macOS)
     func _toNSCollectionViewLayout() -> NSCollectionViewLayout
@@ -45,7 +45,7 @@ extension EnvironmentValues {
 
 // MARK: - Conformances
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public struct FlowCollectionViewLayout: Hashable, CollectionViewLayout {
     public let axes: Axis.Set

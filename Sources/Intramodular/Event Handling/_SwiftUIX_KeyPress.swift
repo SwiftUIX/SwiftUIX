@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(xrOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 
@@ -64,7 +64,7 @@ extension _SwiftUIX_KeyPress {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

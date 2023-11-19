@@ -24,7 +24,7 @@ public struct EmptyAppKitOrUIKitViewRepresentable: View {
     }
 }
 
-#if os(macOS) || os(iOS) || os(tvOS) || os(xrOS)
+#if os(macOS) || os(iOS) || os(tvOS) || os(visionOS)
 extension EmptyAppKitOrUIKitViewRepresentable {
     private struct Guts: AppKitOrUIKitViewRepresentable {
         public typealias AppKitOrUIKitViewType = AppKitOrUIKitView

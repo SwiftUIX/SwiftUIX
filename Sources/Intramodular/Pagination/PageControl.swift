@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
@@ -77,7 +77,7 @@ extension PageControl: UIViewRepresentable {
             uiView.hidesForSinglePage = hidesForSinglePage
         }
         
-        #if !os(xrOS)
+        #if !os(visionOS)
         if let defersCurrentPageDisplay = defersCurrentPageDisplay {
             uiView.defersCurrentPageDisplay = defersCurrentPageDisplay
         }

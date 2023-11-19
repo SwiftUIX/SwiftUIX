@@ -147,7 +147,7 @@ extension _AnyImage.Name: Codable {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || os(watchOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitImage {
     public convenience init?(named name: _AnyImage.Name) {
         switch name {

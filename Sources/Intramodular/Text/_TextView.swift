@@ -2,14 +2,14 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 #if os(macOS)
 import AppKit
 #endif
 import Swift
 import SwiftUI
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 import UIKit
 #endif
 
@@ -142,7 +142,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _TextView {
     class Coordinator: NSObject, UITextViewDelegate {

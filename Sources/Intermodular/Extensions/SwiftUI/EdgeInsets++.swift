@@ -36,7 +36,7 @@ extension EdgeInsets {
 }
 
 extension EdgeInsets {
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public init(_ insets: UIEdgeInsets) {
         self.init(
             top: insets.top,

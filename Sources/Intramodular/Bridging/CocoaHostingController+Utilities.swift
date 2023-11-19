@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: (any _CocoaHostingControllerOrView)?
 
@@ -56,7 +56,7 @@ extension _CocoaHostingViewWrapped {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension _CocoaHostingViewWrapped: AppKitOrUIKitViewControllerRepresentable {
     typealias AppKitOrUIKitViewControllerType = CocoaHostingController<Content>
     
@@ -65,7 +65,7 @@ extension _CocoaHostingViewWrapped: AppKitOrUIKitViewControllerRepresentable {
     ) -> AppKitOrUIKitViewControllerType {
         let viewController = AppKitOrUIKitViewControllerType(mainView: mainView)
         
-        #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+        #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
         viewController.view.backgroundColor = .clear
         #endif
         

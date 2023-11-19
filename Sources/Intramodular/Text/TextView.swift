@@ -2,14 +2,14 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 #if os(macOS)
 import AppKit
 #endif
 import Swift
 import SwiftUI
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 import UIKit
 #endif
 
@@ -260,7 +260,7 @@ extension TextView {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 @available(watchOS, unavailable)
 extension TextView {
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func autocapitalization(
         _ autocapitalization: UITextAutocapitalizationType
     ) -> Self {
@@ -307,7 +307,7 @@ extension TextView {
         then({ $0.configuration.tintColor = tint })
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func linkForegroundColor(
         _ linkForegroundColor: Color?
     ) -> Self {
@@ -353,7 +353,7 @@ extension TextView {
         then({ $0.configuration.textContainerInset = AppKitOrUIKitInsets(textContainerInset) })
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func textContentType(
         _ textContentType: UITextContentType?
     ) -> Self {
@@ -393,7 +393,7 @@ extension TextView {
         then({ $0.configuration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
     }
     
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func keyboardType(
         _ keyboardType: UIKeyboardType
     ) -> Self {

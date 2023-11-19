@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(xrOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 
 import UIKit
 
@@ -352,7 +352,7 @@ public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to
 
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public struct _AppKitOrUIKitViewAnimation: Equatable  {
     public let options: AppKitOrUIKitView.AnimationOptions?
@@ -445,7 +445,7 @@ extension AppKitOrUIKitViewController {
     }
 }
 
-#if os(iOS) || os(tvOS) || os(xrOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 extension AppKitOrUIKitView {
     public func _SwiftUIX_setNeedsLayout() {
         setNeedsLayout()
@@ -484,7 +484,7 @@ extension EnvironmentValues {
 }
 
 public struct AppKitOrUIKitViewAdaptor<Base: AppKitOrUIKitView>: AppKitOrUIKitViewRepresentable {
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public typealias UIViewType = Base
     #elseif os(macOS)
     public typealias NSViewType = Base
@@ -536,7 +536,7 @@ extension AppKitOrUIKitViewAdaptor {
 #endif
 
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public typealias UIViewControllerType = AppKitOrUIKitViewControllerType
 #elseif os(macOS)
     public typealias NSViewControllerType = AppKitOrUIKitViewControllerType

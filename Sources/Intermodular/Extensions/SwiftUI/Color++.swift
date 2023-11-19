@@ -12,7 +12,7 @@ extension Color {
 }
 
 extension Color {
-    #if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public static var lightGray: Color {
         Color(.lightGray)
     }
@@ -161,7 +161,7 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// A foreground color for standard system links.
     public static var link: Color {
@@ -303,7 +303,7 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// Inverts the color.
     @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
@@ -423,7 +423,7 @@ extension Color {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 fileprivate extension AppKitOrUIKitColor {
     class func adaptable(
         light: @escaping @autoclosure () -> AppKitOrUIKitColor,
@@ -477,7 +477,7 @@ fileprivate extension AppKitOrUIKitColor {
 }
 #endif
 
-#if os(iOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitColor {
     func invertedColor() -> AppKitOrUIKitColor {
         var alpha: CGFloat = 1.0

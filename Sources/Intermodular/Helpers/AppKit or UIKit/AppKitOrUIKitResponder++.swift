@@ -2,12 +2,12 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(xrOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(xrOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 extension AppKitOrUIKitResponder {
     private static weak var _firstResponder: AppKitOrUIKitResponder?
     
