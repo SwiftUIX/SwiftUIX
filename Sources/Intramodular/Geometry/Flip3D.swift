@@ -5,6 +5,8 @@
 import Swift
 import SwiftUI
 
+#if !os(visionOS)
+
 fileprivate struct Flip3D<Reverse: View>: ViewModifier {
     let isFlipped: Bool
     let reverse: Reverse
@@ -33,3 +35,5 @@ extension View {
         modifier(Flip3D(isFlipped: flip, reverse: reverse, axis: axis))
     }
 }
+
+#endif

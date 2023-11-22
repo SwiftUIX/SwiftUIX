@@ -34,6 +34,7 @@ public enum Axis3D {
 
 // MARK: - Helpers
 
+#if !os(visionOS)
 extension View {
     /// Rotates this view's rendered output in three dimensions around the given
     /// axis of rotation.
@@ -81,3 +82,4 @@ extension View {
         rotation3DEffect(Angle(degrees: 180), axis: axis.value)
     }
 }
+#endif

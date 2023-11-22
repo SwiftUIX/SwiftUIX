@@ -80,6 +80,15 @@ extension View {
         }
         .onChange(of: value, perform: action)
     }
+    
+    @_disfavoredOverload
+    @ViewBuilder
+    public func _onChange<V: Equatable>(
+        of value: V,
+        perform action: @escaping (V) -> Void
+    ) -> some View {
+        onChange(of: value, perform: action)
+    }
 }
 
 extension View {
