@@ -2,10 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || targetEnvironment(macCatalyst)
-
 import SwiftUI
 
+#if os(iOS) || targetEnvironment(macCatalyst)
 /// A SwiftUI port of `UIImagePickerController`.
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
@@ -134,17 +133,21 @@ extension ImagePicker {
         then({ $0.mediaTypes = mediaTypes })
     }
 }
+#endif
 
 // MARK: - Helpers
 
+#if os(iOS) || os(tvOS) || os(visionOS)
 extension UIImage {
-    @inlinable
-    func data(using encoding: Image.Encoding) -> Data? {
+    @_spi(Internal)
+    public func data(
+        using encoding: Image.Encoding
+    ) -> Data? {
         switch encoding {
             case .png:
                 return pngData()
             case .jpeg(let compressionQuality):
-                return jpegData(compressionQuality: compressionQuality)
+                return jpegData(compressionQuality: compressionQuality ?? 1.0)
         }
     }
     
@@ -164,5 +167,37 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
-
+#elseif os(macOS)
+extension NSImage {
+    @_spi(Internal)
+    public func data(
+        using encoding: Image.Encoding
+    ) -> Data? {
+        guard let tiffRepresentation = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else {
+            return nil
+        }
+                
+        var properties: [NSBitmapImageRep.PropertyKey : Any] = [:]
+        
+        switch encoding {
+            case .png:
+                guard let data = bitmapImage.representation(using: .png, properties: properties) else {
+                    return nil
+                }
+                
+                return data
+            case .jpeg(let compressionQuality):
+                if let compressionQuality {
+                    properties[.compressionFactor] = compressionQuality
+                }
+                
+                guard let data = bitmapImage.representation(using: .jpeg, properties: properties) else {
+                    return nil
+                }
+                
+                return data
+        }
+    }
+}
 #endif

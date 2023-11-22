@@ -6,9 +6,15 @@ import Swift
 import SwiftUI
 
 extension Image {
-    public enum Encoding {
+    public typealias Encoding = _SwiftUIX_Encoding
+    
+    public enum _SwiftUIX_Encoding {
         case png
-        case jpeg(compressionQuality: CGFloat)
+        case jpeg(compressionQuality: CGFloat?)
+        
+        public static var jpeg: Self {
+            .jpeg(compressionQuality: nil)
+        }
     }
     
     public init(image: AppKitOrUIKitImage) {
@@ -85,12 +91,10 @@ extension Image {
 }
 
 #if os(macOS) && swift(<5.3)
-
 extension Image {
     @available(*, deprecated, message: "This function is currently unavailable on macOS.")
     public init(systemName: String) {
         fatalError() // FIXME(@vmanot)
     }
 }
-
 #endif
