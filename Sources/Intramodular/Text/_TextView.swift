@@ -193,6 +193,11 @@ extension _TextView {
                             return
                         }
                         
+                        #if os(visionOS)
+                        guard !textView.text.isEmpty else {
+                            return
+                        }
+                        #endif
                         self.configuration.onCommit?()
                         
                         textView.resignFirstResponder()
