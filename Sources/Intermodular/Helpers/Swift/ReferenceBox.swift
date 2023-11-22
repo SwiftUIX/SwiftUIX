@@ -342,14 +342,17 @@ extension _SwiftUIX_WeakObjectPointer: @unchecked Sendable where Value: Sendable
     
 }
 
-@_spi(Internal)
 @propertyWrapper
-public struct _SwiftUIX_Metatype<T>: Hashable {
+public struct _SwiftUIX_Metatype<T>: CustomStringConvertible, Hashable {
     @usableFromInline
     let _wrappedValue: Any.Type
     
     public let wrappedValue: T
 
+    public var description: String {
+        String(describing: wrappedValue)
+    }
+    
     @inlinable
     public init(wrappedValue: T) {
         self._wrappedValue = wrappedValue as! Any.Type

@@ -169,6 +169,18 @@ extension NSFont {
     }
 }
 
+extension NSImage {
+    @_disfavoredOverload
+    public convenience init?(cgImage: CGImage) {
+        let size = NSSize(
+            width: cgImage.width,
+            height: cgImage.height
+        )
+        
+        self.init(cgImage: cgImage, size: size)
+    }
+}
+
 public struct NSRectCorner: OptionSet {
     public static let allCorners: Self = [.topLeft, .topRight, .bottomLeft, .bottomRight]
     

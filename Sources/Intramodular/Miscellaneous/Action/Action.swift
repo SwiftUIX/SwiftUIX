@@ -11,7 +11,8 @@ public struct Action: DynamicAction, Hashable, Identifiable {
     
     private let fakeID: AnyHashable?
     private let value: @convention(block) () -> Void
-    
+    private var _body: AnyView?
+
     public init(id: AnyHashable, _ value: @escaping () -> Void) {
         self.value = value
         self.fakeID = nil
@@ -40,6 +41,20 @@ public struct Action: DynamicAction, Hashable, Identifiable {
     
     public func callAsFunction() {
         perform()
+    }
+}
+
+extension Action: View {
+    public var body: some View {
+        _body!
+    }
+    
+    @_spi(Internal)
+    public init<V: View>(_body: V, id: AnyHashable? = nil) {
+        self.id = id
+        self.fakeID = nil
+        self.value = { }
+        self._body = _body.eraseToAnyView()
     }
 }
 
