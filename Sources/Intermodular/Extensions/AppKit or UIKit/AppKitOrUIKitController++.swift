@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)

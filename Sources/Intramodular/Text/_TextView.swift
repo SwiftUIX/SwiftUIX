@@ -188,7 +188,7 @@ extension _TextView {
             if configuration.dismissKeyboardOnReturn {
                 if text == "\n" {
                     DispatchQueue.main.async {
-                        #if os(iOS)
+                        #if os(iOS) || os(visionOS)
                         guard textView.isFirstResponder else {
                             return
                         }

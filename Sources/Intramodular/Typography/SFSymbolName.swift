@@ -2585,7 +2585,7 @@ extension Image {
     }
 }
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 @_spi(Internal)
 extension AppKitOrUIKitImage {
     public convenience init?(_SwiftUIX_systemName systemName: String) {

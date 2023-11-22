@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import SwiftUI
 
@@ -31,7 +31,7 @@ extension AppKitOrUIKitWindow {
     
 }
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 extension AppKitOrUIKitWindow {
     public var _SwiftUIX_contentView: AppKitOrUIKitView? {
         self

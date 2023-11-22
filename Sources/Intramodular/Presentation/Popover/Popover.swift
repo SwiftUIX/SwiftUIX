@@ -143,7 +143,7 @@ public struct PopoverArrowDirection: OptionSet {
     public static let all: Self = [.up, .down, .left, .right]
 }
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension PopoverArrowDirection {
     init(_ edge: Edge) {
         self.init()
@@ -202,5 +202,4 @@ extension UIPopoverArrowDirection {
         }
     }
 }
-
 #endif

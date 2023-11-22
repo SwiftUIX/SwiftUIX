@@ -26,6 +26,7 @@ extension KeyEquivalent {
     }
 }
 
+#if !os(visionOS)
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
@@ -38,6 +39,7 @@ extension KeyEquivalent {
         lhs.character == rhs.character
     }
 }
+#endif
 
 #if compiler(>=5.8)
 @available(iOS 14.0, macOS 11.0, *)

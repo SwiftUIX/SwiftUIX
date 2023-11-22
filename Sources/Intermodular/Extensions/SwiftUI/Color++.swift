@@ -36,65 +36,78 @@ extension Color {
     }
 }
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 extension Color {
+    @_disfavoredOverload
     public static var systemRed: Color {
         Color(.systemRed)
     }
     
+    @_disfavoredOverload
     public static var systemGreen: Color {
         Color(.systemGreen)
     }
     
+    @_disfavoredOverload
     public static var systemBlue: Color {
         Color(.systemBlue)
     }
     
+    @_disfavoredOverload
     public static var systemOrange: Color {
         Color(.systemOrange)
     }
     
+    @_disfavoredOverload
     public static var systemYellow: Color {
         Color(.systemYellow)
     }
     
+    @_disfavoredOverload
     public static var systemPink: Color {
         Color(.systemPink)
     }
     
+    @_disfavoredOverload
     public static var systemPurple: Color {
         Color(.systemPurple)
     }
     
+    @_disfavoredOverload
     public static var systemTeal: Color {
         Color(.systemTeal)
     }
     
+    @_disfavoredOverload
     public static var systemIndigo: Color {
         Color(.systemIndigo)
     }
 
+    @_disfavoredOverload
     public static var systemBrown: Color {
         Color(.systemBrown)
     }
 
+    @_disfavoredOverload
     @available(iOS 15.0, tvOS 15.0, *)
     public static var systemMint: Color {
         Color(.systemMint)
     }
 
+    @_disfavoredOverload
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, *)
     public static var systemCyan: Color {
         Color(.systemCyan)
     }
 
+    @_disfavoredOverload
     public static var systemGray: Color {
         Color(.systemGray)
     }
 }
 #endif
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     @_disfavoredOverload
     public static var brown: Color {
@@ -121,7 +134,7 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// The color for text labels that contain primary content.
     public static var label: Color {
@@ -281,7 +294,7 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// A color that adapts to the preferred color scheme.
     ///

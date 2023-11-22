@@ -185,7 +185,7 @@ extension View {
 }
 
 #if swift(>=5.9)
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 extension View {
     @ViewBuilder
     public func _SwiftUIX_defaultScrollAnchor(
