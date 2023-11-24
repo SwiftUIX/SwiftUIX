@@ -328,24 +328,97 @@ extension View {
     /// Sets the amount of space between paragraphs of text in this view.
     ///
     /// Use `paragraphSpacing(_:)` to set the amount of spacing from the bottom of one paragraph to the top of the next for text elements in the view.
-    public func paragraphSpacing(_ paragraphSpacing: CGFloat) -> some View {
-        environment(\._paragraphSpacing, paragraphSpacing)
+    public func paragraphSpacing(
+        _ paragraphSpacing: CGFloat
+    ) -> some View {
+        environment(\._textView_paragraphSpacing, paragraphSpacing)
     }
 }
 
 extension EnvironmentValues {
-    struct _ParagraphSpacing: EnvironmentKey {
+    struct _ParagraphSpacingKey: EnvironmentKey {
         static let defaultValue: CGFloat? = nil
     }
     
-    var _paragraphSpacing: CGFloat? {
+    @_spi(Internal)
+    public var _textView_paragraphSpacing: CGFloat? {
         get {
-            self[_ParagraphSpacing.self]
+            self[_ParagraphSpacingKey.self]
         } set {
-            self[_ParagraphSpacing.self] = newValue
+            self[_ParagraphSpacingKey.self] = newValue
+        }
+    }
+    
+    struct _TextField_KeyboardTypeKey: EnvironmentKey {
+        static let defaultValue: _TextField_KeyboardType = .default
+    }
+    
+    @_spi(Internal)
+    public var _textField_keyboardType: _TextField_KeyboardType {
+        get {
+            self[_TextField_KeyboardTypeKey.self]
+        } set {
+            self[_TextField_KeyboardTypeKey.self] = newValue
         }
     }
 }
+
+/// The keyboard type to be displayed.
+public enum _TextField_KeyboardType {
+    case `default`
+    case asciiCapable
+    case numbersAndPunctuation
+    case URL
+    case numberPad
+    case phonePad
+    case namePhonePad
+    case emailAddress
+    case decimalPad
+    case twitter
+    case webSearch
+    case asciiCapableNumberPad
+}
+
+#if os(iOS) || os(tvOS) || os(visionOS)
+extension UIKeyboardType {
+    public init(from keyboardType: _TextField_KeyboardType) {
+        switch keyboardType {
+            case .default:
+                self = .default
+            case .asciiCapable:
+                self = .asciiCapable
+            case .numbersAndPunctuation:
+                self = .numbersAndPunctuation
+            case .URL:
+                self = .URL
+            case .numberPad:
+                self = .numberPad
+            case .phonePad:
+                self = .phonePad
+            case .namePhonePad:
+                self = .namePhonePad
+            case .emailAddress:
+                self = .emailAddress
+            case .decimalPad:
+                self = .decimalPad
+            case .twitter:
+                self = .twitter
+            case .webSearch:
+                self = .webSearch
+            case .asciiCapableNumberPad:
+                self = .asciiCapable
+        }
+    }
+}
+#else
+extension View {
+    public func keyboardType(
+        _ keyboardType: _TextField_KeyboardType
+    ) -> some View {
+        environment(\._textField_keyboardType, keyboardType)
+    }
+}
+#endif
 
 extension NSTextStorage {
     public var _SwiftUIX_attributedString: NSAttributedString {

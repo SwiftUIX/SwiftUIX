@@ -607,8 +607,12 @@ extension _PlatformTextView {
         guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager else {
             return nil
         }
-                        
-        if !representableCache._sizeThatFitsCache.isEmpty, textContainer.containerSize.width == width, textContainer._isContainerWidthNormal {
+        
+        if
+            !representableCache._sizeThatFitsCache.isEmpty,
+            textContainer.containerSize.width == width,
+            textContainer._hasNormalContainerWidth
+        {
             let usedRect = layoutManager.usedRect(for: textContainer).size
 
             if usedRect.isAreaZero {

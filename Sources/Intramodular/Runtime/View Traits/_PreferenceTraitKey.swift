@@ -13,18 +13,6 @@ public protocol _PreferenceTraitKey {
     static func reduce(value: inout Value, nextValue: () -> Value)
 }
 
-open class _ArrayReducePreferenceTraitKey<Element: Equatable>: _PreferenceTraitKey {
-    public typealias Value = [Element]
-    
-    public static var defaultValue: Value {
-        return []
-    }
-    
-    public static func reduce(value: inout Value, nextValue: () -> Value) {
-        value.append(contentsOf: nextValue())
-    }
-}
-
 // MARK: - Supplementary
 
 extension _ViewTraitValuesProtocol {
@@ -38,11 +26,20 @@ extension _ViewTraitValuesProtocol {
 }
 
 extension View {
-    public func _preferenceTrait<Key: _PreferenceTraitKey>(
-        key: Key.Type,
-        value: Key.Value
+    public func _overrideTrait<Key: _PreferenceTraitKey>(
+        _ key: Key,
+        _ value: Key.Value
     ) -> some View {
-        modifier(AddPreferenceTrait<Key>(key: key, value: value))
+        _trait(_PreferenceTraitKeyOverride<Key>.self, value)
+    }
+}
+
+extension View {
+    public func _preferenceTrait<Key: _PreferenceTraitKey>(
+        _ key: Key.Type,
+        _ value: Key.Value
+    ) -> some View {
+        AddPreferenceTrait<Key, Self>(key: key, value: value).body(content: self)
     }
 }
 
@@ -84,10 +81,29 @@ extension _ViewTraitKeys {
     }
 }
 
-fileprivate struct AddPreferenceTrait<Trait: _PreferenceTraitKey>: ViewModifier {
+public struct _PreferenceTraitKeyOverride<Key: _PreferenceTraitKey>: _ViewTraitKey {
+    public static var defaultValue: Key.Value? {
+        nil
+    }
+}
+
+open class _ArrayReducePreferenceTraitKey<Element: Equatable>: _PreferenceTraitKey {
+    public typealias Value = [Element]
+    
+    public static var defaultValue: Value {
+        return []
+    }
+    
+    public static func reduce(value: inout Value, nextValue: () -> Value) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+struct AddPreferenceTrait<Trait: _PreferenceTraitKey, Content: View> {
     let key: Trait.Type
     let value: Trait.Value
     
+    @ViewBuilder
     func body(content: Content) -> some View {
         _VariadicViewAdapter(content) { content in
             _ForEachSubview(content) { subview in

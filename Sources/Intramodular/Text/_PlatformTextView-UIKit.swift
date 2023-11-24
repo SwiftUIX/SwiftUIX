@@ -16,9 +16,9 @@ extension _PlatformTextView {
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         let requiresAttributedText = false
-        || context.environment.requiresAttributedText
-        || configuration.requiresAttributedText
-        || data.wrappedValue.isAttributed
+            || context.environment._textView_requiresAttributedText
+            || configuration.requiresAttributedText
+            || data.wrappedValue.isAttributed
         
         var cursorOffset: Int?
         
@@ -28,7 +28,7 @@ extension _PlatformTextView {
         }
         
     updateUserInteractability: do {
-#if !os(tvOS)
+        #if !os(tvOS)
         if !configuration.isEditable {
             view.isEditable = false
         } else {
@@ -36,7 +36,7 @@ extension _PlatformTextView {
             ? false
             : context.environment.isEnabled && configuration.isEditable
         }
-#endif
+        #endif
         view.isScrollEnabled = context.environment._isScrollEnabled
         view.isSelectable = configuration.isSelectable
     }
@@ -83,7 +83,7 @@ extension _PlatformTextView {
                 paragraphStyle._assignIfNotEqual(context.environment.lineBreakMode, to: \.lineBreakMode)
                 paragraphStyle._assignIfNotEqual(context.environment.lineSpacing, to: \.lineSpacing)
                 
-                context.environment._paragraphSpacing.map {
+                context.environment._textView_paragraphSpacing.map {
                     paragraphStyle.paragraphSpacing = $0
                 }
                 
@@ -121,16 +121,16 @@ extension _PlatformTextView {
     }
         
     correctCursorOffset: do {
-#if os(tvOS)
+        #if os(tvOS)
         if let cursorOffset = cursorOffset, let position = view.position(from: view.beginningOfDocument, offset: cursorOffset), let textRange = view.textRange(from: position, to: position) {
             view.selectedTextRange = textRange
         }
-#else
+        #else
         // Reset the cursor offset if possible.
         if view.isEditable, let cursorOffset = cursorOffset, let position = view.position(from: view.beginningOfDocument, offset: cursorOffset), let textRange = view.textRange(from: position, to: position) {
             view.selectedTextRange = textRange
         }
-#endif
+        #endif
     }
         
     updateKeyboardConfiguration: do {

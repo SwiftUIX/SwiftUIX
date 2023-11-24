@@ -91,14 +91,16 @@ extension NSTextStorage {
 #endif
 
 extension NSTextContainer {
-    var _isContainerWidthNormal: Bool {
+    @_spi(Internal)
+    public var _hasNormalContainerWidth: Bool {
         containerSize.width.isNormal && containerSize.width != 10000000.0
     }
 }
 
 extension EnvironmentValues {
-    var requiresAttributedText: Bool {
-        _paragraphSpacing != nil
+    @_spi(Internal)
+    public var _textView_requiresAttributedText: Bool {
+        _textView_paragraphSpacing != nil
     }
 }
 
