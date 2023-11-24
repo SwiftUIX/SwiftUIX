@@ -125,6 +125,7 @@ extension Color {
     }
 }
 
+@available(tvOS, unavailable)
 extension Color {
     public static let systemGray2: Color = Color(.systemGray2)
     public static let systemGray3: Color = Color(.systemGray3)
