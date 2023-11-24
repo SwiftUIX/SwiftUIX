@@ -17,6 +17,10 @@ public enum _SwiftUI_TargetPlatform {
         case tvOS
     }
     
+    public enum visionOS {
+        case visionOS
+    }
+
     public enum watchOS {
         case watchOS
     }
@@ -89,6 +93,27 @@ extension View {
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.macOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
+    ) -> some View {
+        modify(.init(root: self))
+    }
+    
+    public func modify<Modified: View>(
+        for platform: _SwiftUI_TargetPlatform.tvOS,
+        @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.tvOS>) -> Modified
+    ) -> some View {
+        modify(.init(root: self))
+    }
+
+    public func modify<Modified: View>(
+        for platform: _SwiftUI_TargetPlatform.watchOS,
+        @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.watchOS>) -> Modified
+    ) -> some View {
+        modify(.init(root: self))
+    }
+
+    public func modify<Modified: View>(
+        for platform: _SwiftUI_TargetPlatform.visionOS,
+        @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.visionOS>) -> Modified
     ) -> some View {
         modify(.init(root: self))
     }
