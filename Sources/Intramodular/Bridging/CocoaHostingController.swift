@@ -161,13 +161,15 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayout() {
         super.viewDidLayout()
         
-        let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
-        
-        DispatchQueue.main.async {
-            if let popover = self.parentPopover {
-                popover.contentSize = size
-            } else {
-                self.preferredContentSize = size
+        if !view.frame.size._isNormal || view.frame.size.isAreaZero {
+            let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
+            
+            DispatchQueue.main.async {
+                if let popover = self.parentPopover {
+                    popover.contentSize = size
+                } else {
+                    self.preferredContentSize = size
+                }
             }
         }
     }
