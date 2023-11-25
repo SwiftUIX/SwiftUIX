@@ -36,6 +36,18 @@ public struct _SwiftUIX_MutableValueBox<Value>: _SwiftUIX_AnyMutableValueBox {
     }
 }
 
+extension _SwiftUIX_MutableValueBox: Equatable where Value: Equatable {
+    
+}
+
+extension _SwiftUIX_MutableValueBox: Hashable where Value: Hashable {
+    
+}
+
+extension _SwiftUIX_MutableValueBox: Sendable where Value: Sendable {
+    
+}
+
 @_spi(Internal)
 public struct _UnsafeIndirectConstantValueBox<Value>: _SwiftUIX_AnyIndirectValueBox {
     public let _wrappedValue: Value

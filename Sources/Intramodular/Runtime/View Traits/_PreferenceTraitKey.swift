@@ -76,6 +76,7 @@ extension _ViewTraitKeys {
         public static let defaultValue = _PreferenceTraitsStorage()
     }
     
+    @_spi(Internal)
     public var _preferenceTraitsStorage: _PreferenceTraitsStorageKey.Type {
         _PreferenceTraitsStorageKey.self
     }

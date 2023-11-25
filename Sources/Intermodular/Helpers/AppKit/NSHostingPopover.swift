@@ -206,6 +206,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         _rightfulFirstResponder = nil
     }
     
+    @discardableResult
     public func _sizeContentToFit() -> Bool {
         if _contentViewController.preferredContentSize.isAreaZero {
             _contentViewController._canBecomeFirstResponder = false

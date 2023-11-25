@@ -126,6 +126,10 @@ extension _CoordinateSpaceRelative where Value == CGPoint {
             _sourceAppKitOrUIKitWindow: __sourceAppKitOrUIKitWindow
         )
     }
+    
+    public func offset(_ offset: CGPoint) -> Self {
+        self.offset(x: offset.x, y: offset.y)
+    }
 }
 
 extension _CoordinateSpaceRelative where Value == CGRect {

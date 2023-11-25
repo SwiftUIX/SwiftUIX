@@ -7,29 +7,33 @@
 import Swift
 import UIKit
 
-extension UIFont {
-    public func withSymbolicTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont? {
+extension AppKitOrUIKitFont {
+    public func withSymbolicTraits(
+        _ traits: UIFontDescriptor.SymbolicTraits
+    ) -> AppKitOrUIKitFont? {
         return fontDescriptor
             .withSymbolicTraits(traits)
             .map({ UIFont(descriptor: $0, size: 0) })
     }
     
-    public func addingAttributes(_ attributes: [UIFontDescriptor.AttributeName: Any]) -> UIFont {
+    public func addingAttributes(
+        _ attributes: [UIFontDescriptor.AttributeName: Any]
+    ) -> AppKitOrUIKitFont {
         return .init(
             descriptor: fontDescriptor.addingAttributes(attributes),
             size: 0
         )
     }
     
-    public var bold: UIFont! {
+    public var bold: AppKitOrUIKitFont! {
         return withSymbolicTraits(.traitBold)
     }
     
-    public var italic: UIFont! {
+    public var italic: AppKitOrUIKitFont! {
         return withSymbolicTraits(.traitItalic)
     }
     
-    public var monospaced: UIFont {
+    public var monospaced: AppKitOrUIKitFont {
         let settings: [UIFontDescriptor.FeatureKey: Any] = [
             .featureIdentifier: kNumberSpacingType,
             .typeIdentifier: kMonospacedNumbersSelector
