@@ -6,21 +6,25 @@ let package = Package(
     name: "SwiftUIX",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_15),
+        .macOS(.v11),
         .tvOS(.v13),
         .watchOS(.v6)
     ],
     products: [
         .library(
             name: "SwiftUIX",
-            targets: ["SwiftUIX"]
+            targets: [
+                "SwiftUIX"
+            ]
         )
     ],
     targets: [
         .target(
             name: "SwiftUIX",
             dependencies: [],
-            path: "Sources"
+            swiftSettings: [
+                .unsafeFlags(["-enable-library-evolution"])
+            ]
         )
     ]
 )
