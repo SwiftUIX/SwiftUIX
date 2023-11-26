@@ -47,6 +47,13 @@ public typealias AppKitOrUIKitView = UIView
 public typealias AppKitOrUIKitViewController = UIViewController
 public typealias AppKitOrUIKitWindow = UIWindow
 
+extension UIColor {
+    @_disfavoredOverload
+    public static var accentColor: UIColor? {
+        UIColor(named: "AccentColor")
+    }
+}
+
 extension UIEdgeInsets {
     var edgeInsets: EdgeInsets {
         .init(top: top, leading: left, bottom: bottom, trailing: right)
@@ -128,6 +135,18 @@ extension NSAppearance {
             default:
                 return nil
         }
+    }
+}
+
+extension NSColor {
+    @_disfavoredOverload
+    public static var label: NSColor {
+        NSColor.labelColor
+    }
+    
+    @_disfavoredOverload
+    public static var separator: NSColor {
+        NSColor.separatorColor
     }
 }
 
@@ -548,11 +567,11 @@ extension AppKitOrUIKitViewAdaptor {
 #endif
 
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
-#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public typealias UIViewControllerType = AppKitOrUIKitViewControllerType
-#elseif os(macOS)
+    #elseif os(macOS)
     public typealias NSViewControllerType = AppKitOrUIKitViewControllerType
-#endif
+    #endif
     
     private let makeAppKitOrUIKitViewControllerImpl: (Context) -> AppKitOrUIKitViewControllerType
     private let updateAppKitOrUIKitViewControllerImpl: (AppKitOrUIKitViewControllerType, Context) -> ()

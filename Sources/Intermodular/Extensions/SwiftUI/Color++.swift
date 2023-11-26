@@ -124,7 +124,9 @@ extension Color {
         Color(.systemTeal)
     }
 }
+#endif
 
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 @available(tvOS, unavailable)
 extension Color {
     public static let systemGray2: Color = Color(.systemGray2)
@@ -132,6 +134,34 @@ extension Color {
     public static let systemGray4: Color = Color(.systemGray4)
     public static let systemGray5: Color = Color(.systemGray5)
     public static let systemGray6: Color = Color(.systemGray6)
+}
+#elseif os(macOS)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Color {
+    public static let systemGray2: Color = .adaptable(
+        light: Color(cube256: .sRGB, red: 174, green: 174, blue: 178, opacity: 1),
+        dark: Color(cube256: .sRGB, red: 99, green: 99, blue: 102, opacity: 1)
+    )
+    
+    public static let systemGray3: Color = .adaptable(
+        light: Color(cube256: .sRGB, red: 199, green: 199, blue: 204, opacity: 1),
+        dark: Color(cube256: .sRGB, red: 72, green: 72, blue: 74, opacity: 1)
+    )
+    
+    public static let systemGray4: Color = .adaptable(
+        light: Color(cube256: .sRGB, red: 209, green: 209, blue: 214, opacity: 1),
+        dark: Color(cube256: .sRGB, red: 58, green: 58, blue: 60, opacity: 1)
+    )
+    
+    public static let systemGray5: Color = .adaptable(
+        light: Color(cube256: .sRGB, red: 229, green: 229, blue: 234, opacity: 1),
+        dark: Color(cube256: .sRGB, red: 44, green: 44, blue: 46, opacity: 1)
+    )
+    
+    public static let systemGray6: Color = .adaptable(
+        light: Color(cube256: .sRGB, red: 242, green: 242, blue: 247, opacity: 1),
+        dark: Color(cube256: .sRGB, red: 28, green: 28, blue: 30, opacity: 1)
+    )
 }
 #endif
 
@@ -530,6 +560,21 @@ extension Color {
 
 #if os(macOS)
 extension NSAppearance {
+    public enum _SwiftUIX_UserInterfaceStyle {
+        case light
+        case dark
+    }
+    
+    var _SwiftUIX_userInterfaceStyle: _SwiftUIX_UserInterfaceStyle {
+        if name == Name.darkAqua ||
+            name == Name.vibrantDark ||
+            name == Name.accessibilityHighContrastDarkAqua ||
+            name == Name.accessibilityHighContrastVibrantDark {
+            return .dark
+        }
+        return .light
+    }
+    
     fileprivate var isDarkMode: Bool {
         switch name {
             case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
