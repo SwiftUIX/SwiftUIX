@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@frozen
 public enum _AnchorSourceValue: Equatable {
     private enum InitializationError: Error {
         case failedToExtract

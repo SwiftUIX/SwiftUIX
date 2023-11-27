@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@frozen
 public enum _SwiftUIX_MoveCommandDirection {
     case up
     case down
@@ -29,7 +30,7 @@ extension Array where Element == CGRect {
         func distance(from: CGRect, to: CGRect) -> CGFloat {
             let dx = to.midX - from.midX
             let dy = to.midY - from.midY
-           
+            
             return sqrt(dx * dx + dy * dy)
         }
         
