@@ -201,10 +201,8 @@ final class WeakReferenceBox<T: AnyObject>: _SwiftUIX_AnyIndirectValueBox {
 @_spi(Internal)
 @propertyWrapper
 public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
-    @inlinable
     @Published public var value: Value
     
-    @inlinable
     public var wrappedValue: Value {
         get {
             self.value
@@ -235,7 +233,6 @@ public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: Observabl
         }
     }
     
-    @inlinable
     public var wrappedValue: T? {
         get {
             value
@@ -258,7 +255,6 @@ public final class _SwiftUIX_WeakObservableReferenceBox<Value: AnyObject>: Obser
         }
     }
     
-    @inlinable
     public var wrappedValue: Value? {
         get {
             self.value
@@ -267,7 +263,6 @@ public final class _SwiftUIX_WeakObservableReferenceBox<Value: AnyObject>: Obser
         }
     }
     
-    @inlinable
     public var projectedValue: _SwiftUIX_WeakObservableReferenceBox<Value> {
         self
     }
@@ -276,7 +271,6 @@ public final class _SwiftUIX_WeakObservableReferenceBox<Value: AnyObject>: Obser
         self.value = value
     }
     
-    @inlinable
     public convenience init(wrappedValue: Value?) {
         self.init(wrappedValue)
     }
@@ -357,28 +351,24 @@ public struct _SwiftUIX_Metatype<T>: CustomStringConvertible, Hashable {
     let _wrappedValue: Any.Type
     
     public let wrappedValue: T
-
+    
     public var description: String {
         String(describing: wrappedValue)
     }
     
-    @inlinable
     public init(wrappedValue: T) {
         self._wrappedValue = wrappedValue as! Any.Type
         self.wrappedValue = wrappedValue
     }
     
-    @inlinable
     public init(_ value: T) {
         self.init(wrappedValue: value)
     }
-
-    @inlinable
+    
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs._wrappedValue == rhs._wrappedValue
     }
     
-    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(_wrappedValue))
     }

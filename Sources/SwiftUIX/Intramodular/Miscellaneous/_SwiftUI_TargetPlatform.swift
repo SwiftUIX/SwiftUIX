@@ -69,7 +69,7 @@ extension _TargetPlatformConditionalModifiable: View where Root: View {
 extension Scene {
     public func modify<Modified: Scene>(
         for platform: _SwiftUI_TargetPlatform.iOS,
-        @SceneBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
+        @SceneBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.iOS>) -> Modified
     ) -> some Scene {
         modify(.init(root: self))
     }
@@ -87,47 +87,72 @@ extension View {
         for platform: _SwiftUI_TargetPlatform.iOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.iOS>) -> Modified
     ) -> some View {
+        #if os(iOS)
         modify(.init(root: self))
+        #else
+        self
+        #endif
     }
     
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.macOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.macOS>) -> Modified
     ) -> some View {
+        #if os(macOS)
         modify(.init(root: self))
+        #else
+        self
+        #endif
     }
     
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.tvOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.tvOS>) -> Modified
     ) -> some View {
+        #if os(tvOS)
         modify(.init(root: self))
+        #else
+        self
+        #endif
     }
 
+    @ViewBuilder
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.watchOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.watchOS>) -> Modified
     ) -> some View {
+        #if os(watchOS)
         modify(.init(root: self))
+        #else
+        self
+        #endif
     }
 
+    @ViewBuilder
     public func modify<Modified: View>(
         for platform: _SwiftUI_TargetPlatform.visionOS,
         @ViewBuilder modify: (_TargetPlatformConditionalModifiable<Self, _SwiftUI_TargetPlatform.visionOS>) -> Modified
     ) -> some View {
+        #if os(visionOS)
         modify(.init(root: self))
+        #else
+        self
+        #endif
     }
 }
 
 @available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
 extension _TargetPlatformConditionalModifiable where Root: Scene, Platform == _SwiftUI_TargetPlatform.macOS {
     @SceneBuilder
-    public func defaultSize(width: CGFloat, height: CGFloat) -> some Scene {
-#if os(macOS)
+    public func defaultSize(
+        width: CGFloat,
+        height: CGFloat
+    ) -> some Scene {
+        #if os(macOS)
         root.defaultSize(width: width, height: height)
-#else
+        #else
         root
-#endif
+        #endif
     }
 }
 
@@ -157,7 +182,9 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 @available(macOS 13.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
 extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.macOS {
     @ViewBuilder
-    public func onExitCommand(perform action: (() -> Void)?) -> some View {
+    public func onExitCommand(
+        perform action: (() -> Void)?
+    ) -> some View {
 #if os(macOS)
         root.onExitCommand(perform: action)
 #else
@@ -169,7 +196,9 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 @available(macOS 13.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.macOS {
     @ViewBuilder
-    public func controlActiveState(_ state: _SwiftUI_TargetPlatform.macOS._ControlActiveState) -> _TargetPlatformConditionalModifiable<some View, Platform> {
+    public func controlActiveState(
+        _ state: _SwiftUI_TargetPlatform.macOS._ControlActiveState
+    ) -> _TargetPlatformConditionalModifiable<some View, Platform> {
         #if os(macOS)
         _TargetPlatformConditionalModifiable<_, Platform> {
             self.environment(\.controlActiveState, .init(state))

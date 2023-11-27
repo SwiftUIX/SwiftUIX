@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 class UIHostingVisualEffectBlurView<Content: View>: UIView {
     private let vibrancyView = UIVisualEffectView()

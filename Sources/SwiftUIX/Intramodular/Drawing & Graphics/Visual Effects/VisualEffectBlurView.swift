@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 import Swift
 import SwiftUI
