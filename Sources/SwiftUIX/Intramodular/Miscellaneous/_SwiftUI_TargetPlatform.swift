@@ -156,8 +156,7 @@ extension _TargetPlatformConditionalModifiable where Root: Scene, Platform == _S
     }
 }
 
-@available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)
-extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.iOS {
+@available(macOS 11.0, iOS 14.0, watchOS 8.0, tvOS 14.0, *)extension _TargetPlatformConditionalModifiable where Root: View, Platform == _SwiftUI_TargetPlatform.iOS {
     @ViewBuilder
     public func navigationBarTitleDisplayMode(
         _ mode: SpecificTypes.NavigationBarItemTitleDisplayMode

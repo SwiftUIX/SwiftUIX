@@ -8,13 +8,13 @@ import SwiftUI
 /// A container view that recursively defines its content as a function of the content's size.
 public struct IntrinsicSizeReader<Content: View>: View {
     private let content: (CGSize) -> Content
-
+    
     @State private var size: CGSize = .zero
     
     public init(@ViewBuilder content: @escaping (CGSize) -> Content) {
         self.content = content
     }
-        
+    
     public var body: some View {
         content(size).background {
             GeometryReader { geometry in
@@ -28,6 +28,37 @@ public struct IntrinsicSizeReader<Content: View>: View {
             }
             .allowsHitTesting(false)
             .accessibility(hidden: true)
+        }
+    }
+}
+
+public struct _AxisSizeReader<Content: View>: View {
+    let axis: Axis
+    let content: (CGSize) -> Content
+    
+    public init(
+        _ axis: Axis,
+        content: @escaping (CGSize) -> Content
+    ) {
+        self.axis = axis
+        self.content = content
+    }
+    
+    public var body: some View {
+        IntrinsicSizeReader { proxy in
+            ZStack {
+                if axis == .horizontal {
+                    HStack {
+                        Spacer()
+                    }
+                } else if axis == .horizontal {
+                    VStack {
+                        Spacer()
+                    }
+                }
+                
+                content(proxy)
+            }
         }
     }
 }
