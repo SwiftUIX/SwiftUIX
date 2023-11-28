@@ -147,6 +147,33 @@ extension _ActionInitiableView {
     }
 }
 
+public func withActionTrampoline<Content: View>(
+    for action: Action,
+    @ViewBuilder content: @escaping (Action) -> Content
+) -> some View {
+    _CreateActionTrampoline(action: action, content: {
+        content($0)
+    })
+}
+
+struct _CreateActionTrampoline<Content: View>: View {
+    private let action: Action
+    private let content: (Action) -> Content
+    
+    @State private var id = UUID()
+
+    public init(action: Action, content: @escaping (Action) -> Content) {
+        self.action = action
+        self.content = content
+    }
+        
+    var body: some View {
+        _CreateActionTrampolines(actions: [id: action]) { actions in
+            content(actions[id]!)
+        }
+    }
+}
+
 @_spi(Internal)
 public struct _CreateActionTrampolines<Key: Hashable, Content: View>: View {
     private class ActionTrampoline {
