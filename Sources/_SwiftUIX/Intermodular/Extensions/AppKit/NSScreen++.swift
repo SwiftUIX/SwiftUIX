@@ -7,8 +7,8 @@
 import AppKit
 import SwiftUI
 
+@_spi(Internal)
 extension NSScreen {
-    @_spi(Internal)
     public static var _primary: NSScreen? {
         assert(NSScreen.screens.count <= 1)
         
@@ -45,12 +45,17 @@ extension NSScreen {
     }
 }
 
+@_spi(Internal)
 extension NSWindow {
-    func flipLocal(_ point: CGPoint) -> CGPoint {
+    public func flipLocal(
+        _ point: CGPoint
+    ) -> CGPoint {
         CGPoint(x: point.x, y: frame.height - point.y)
     }
     
-    func flipLocal(_ rect: CGRect) -> CGRect {
+    public func flipLocal(
+        _ rect: CGRect
+    ) -> CGRect {
         CGRect(
             x: rect.origin.x,
             y: frame.height - (rect.origin.y + rect.height),

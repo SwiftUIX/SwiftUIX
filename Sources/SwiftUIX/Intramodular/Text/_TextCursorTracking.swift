@@ -6,7 +6,7 @@
 
 import Combine
 import Swift
-import SwiftUI
+@_spi(Internal) import _SwiftUIX
 
 public final class _TextCursorTracking: ObservableObject {
     private weak var owner: (any _PlatformTextView_Type)?

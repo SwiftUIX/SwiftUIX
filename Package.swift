@@ -14,14 +14,24 @@ let package = Package(
         .library(
             name: "SwiftUIX",
             targets: [
+                "_SwiftUIX",
                 "SwiftUIX"
             ]
         )
     ],
     targets: [
         .target(
-            name: "SwiftUIX",
+            name: "_SwiftUIX",
             dependencies: [],
+            swiftSettings: [
+                .unsafeFlags(["-enable-library-evolution"])
+            ]
+        ),
+        .target(
+            name: "SwiftUIX",
+            dependencies: [
+                "_SwiftUIX"
+            ],
             swiftSettings: [
                 .unsafeFlags(["-enable-library-evolution"])
             ]

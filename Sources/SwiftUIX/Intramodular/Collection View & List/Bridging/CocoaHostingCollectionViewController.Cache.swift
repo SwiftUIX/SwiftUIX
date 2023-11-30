@@ -87,7 +87,7 @@ extension CocoaHostingCollectionViewController.Cache {
         } else {
             let contentHostingController: CocoaCollectionElementHostingController<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>
             
-            let contentHostingControllerConfiguration = _CollectionViewElementContentContainer.Configuration(
+            let contentHostingControllerConfiguration = _CollectionViewElementContent.Configuration(
                 _reuseCellRender: parent.configuration.unsafeFlags.contains(.reuseCellRender),
                 _collectionViewProxy: .init(parent),
                 _cellProxyBase: nil,

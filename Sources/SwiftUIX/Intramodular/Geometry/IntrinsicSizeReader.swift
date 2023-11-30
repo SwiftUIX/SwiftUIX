@@ -7,12 +7,17 @@ import SwiftUI
 
 /// A container view that recursively defines its content as a function of the content's size.
 public struct IntrinsicSizeReader<Content: View>: View {
-    private let content: (CGSize) -> Content
+    private let content: (CGSize?) -> Content
     
-    @State private var size: CGSize = .zero
+    @State private var size: CGSize? = nil
     
-    public init(@ViewBuilder content: @escaping (CGSize) -> Content) {
+    public init(@ViewBuilder content: @escaping (CGSize?) -> Content) {
         self.content = content
+    }
+    
+    @_disfavoredOverload
+    public init(@ViewBuilder content: @escaping (CGSize) -> Content) {
+        self.content = { content($0 ?? .zero) }
     }
     
     public var body: some View {
@@ -34,11 +39,11 @@ public struct IntrinsicSizeReader<Content: View>: View {
 
 public struct _AxisSizeReader<Content: View>: View {
     let axis: Axis
-    let content: (CGSize) -> Content
+    let content: (CGSize?) -> Content
     
     public init(
         _ axis: Axis,
-        content: @escaping (CGSize) -> Content
+        content: @escaping (CGSize?) -> Content
     ) {
         self.axis = axis
         self.content = content

@@ -7,7 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
-public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITableViewCell {
+public class _PlatformTableViewCell<ItemType: Identifiable, Content: View>: UITableViewCell {
     struct State: Hashable {
         let isFocused: Bool
         let isHighlighted: Bool
@@ -62,7 +62,7 @@ public class UIHostingTableViewCell<ItemType: Identifiable, Content: View>: UITa
     }
 }
 
-extension UIHostingTableViewCell {
+extension _PlatformTableViewCell {
     func update() {
         if contentHostingController == nil {
             backgroundColor = .clear
@@ -105,10 +105,10 @@ extension UIHostingTableViewCell {
 
 // MARK: - Auxiliary
 
-extension UIHostingTableViewCell {
+extension _PlatformTableViewCell {
     struct RootView: View {
         private struct _CellProxyBase: SwiftUIX._CellProxyBase {
-            weak var base: UIHostingTableViewCell<ItemType, Content>?
+            weak var base: _PlatformTableViewCell<ItemType, Content>?
             
             var globalFrame: CGRect {
                 guard let base = base, let parentViewController = base._parentViewController, let coordinateSpace = parentViewController.view.window?.coordinateSpace else {
@@ -142,7 +142,7 @@ extension UIHostingTableViewCell {
         private let content: Content
         private let state: State
         
-        init(base: UIHostingTableViewCell<ItemType, Content>) {
+        init(base: _PlatformTableViewCell<ItemType, Content>) {
             self._cellProxyBase = .init(base: base)
             self.id = base.item.id
             self.content = base.makeContent(base.item)
@@ -163,7 +163,7 @@ extension UIHostingTableViewCell {
 // MARK: - Helpers
 
 extension String {
-    static let hostingTableViewCellIdentifier = "UIHostingTableViewCell"
+    static let hostingTableViewCellIdentifier = "_PlatformTableViewCell"
 }
 
 #endif

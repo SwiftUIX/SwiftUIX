@@ -16,7 +16,7 @@ public struct CocoaList<
     RowContent: View
 >: UIViewControllerRepresentable where Data.Element == ListSection<SectionType, ItemType> {
     public typealias Offset = ScrollView<AnyView>.ContentOffset
-    public typealias UIViewControllerType = UIHostingTableViewController<SectionType, ItemType, Data, SectionHeader, SectionFooter, RowContent>
+    public typealias UIViewControllerType = _PlatformTableViewController<SectionType, ItemType, Data, SectionHeader, SectionFooter, RowContent>
     
     @usableFromInline
     let data: Data

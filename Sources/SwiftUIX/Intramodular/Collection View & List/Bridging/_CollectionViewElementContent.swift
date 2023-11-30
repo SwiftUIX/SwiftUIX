@@ -7,7 +7,7 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
-struct _CollectionViewElementContentContainer<
+struct _CollectionViewElementContent<
     ItemType,
     ItemIdentifierType: Hashable,
     SectionType,
@@ -126,7 +126,7 @@ struct _CollectionViewElementContentContainer<
     }
 }
 
-extension _CollectionViewElementContentContainer {
+extension _CollectionViewElementContent {
     init<SectionHeaderContent, SectionFooterContent, CellContent>(base: CocoaHostingCollectionViewSupplementaryView<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, CellContent>) {
         self.init(
             configuration: .init(

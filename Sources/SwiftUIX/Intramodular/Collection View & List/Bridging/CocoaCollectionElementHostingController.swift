@@ -12,8 +12,8 @@ class CocoaCollectionElementHostingController<
     ItemIdentifierType: Hashable,
     SectionType,
     SectionIdentifierType: Hashable
->: UIHostingController<_CollectionViewElementContentContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
-    typealias Configuration = _CollectionViewElementContentContainer<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>.Configuration
+>: UIHostingController<_CollectionViewElementContent<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>> {
+    typealias Configuration = _CollectionViewElementContent<ItemType, ItemIdentifierType, SectionType, SectionIdentifierType>.Configuration
     
     var isLive: Bool {
         view.superview != nil
