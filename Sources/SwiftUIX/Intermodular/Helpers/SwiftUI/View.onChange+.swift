@@ -13,7 +13,7 @@ extension View {
         of value: V,
         perform action: @escaping (V) -> Void
     ) -> some View {
-        if #available(iOS 17.0, *) {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             self.onChange(of: value) { oldValue, newValue in
                 action(newValue)
             }
