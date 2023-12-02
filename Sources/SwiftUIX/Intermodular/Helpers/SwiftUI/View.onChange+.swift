@@ -6,6 +6,34 @@ import Combine
 import Swift
 import SwiftUI
 
+#if swift(>=5.9)
+extension View {
+    @ViewBuilder
+    public func _onChange<V: Equatable>(
+        of value: V,
+        perform action: @escaping (V) -> Void
+    ) -> some View {
+        if #available(iOS 17.0, *) {
+            self.onChange(of: value) { oldValue, newValue in
+                action(newValue)
+            }
+        } else {
+            onChange(of: value, perform: action)
+        }
+    }
+}
+#else
+extension View {
+    @ViewBuilder
+    public func _onChange<V: Equatable>(
+        of value: V,
+        perform action: @escaping (V) -> Void
+    ) -> some View {
+        onChange(of: value, perform: action)
+    }
+}
+#endif
+
 extension View {
     /// Adds a modifier for this view that fires an action when a specific
     /// value changes.
@@ -78,16 +106,7 @@ extension View {
         onAppear {
             action(value)
         }
-        .onChange(of: value, perform: action)
-    }
-    
-    @_disfavoredOverload
-    @ViewBuilder
-    public func _onChange<V: Equatable>(
-        of value: V,
-        perform action: @escaping (V) -> Void
-    ) -> some View {
-        onChange(of: value, perform: action)
+        ._onChange(of: value, perform: action)
     }
 }
 
@@ -159,7 +178,7 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
         content
             .background {
                 ZeroSizeView()
-                    .onChange(of: value) { newValue in
+                    ._onChange(of: value) { newValue in
                         subscribeIfNecessary()
                         
                         valuePublisher.send(newValue)
@@ -195,7 +214,7 @@ private struct _OnChangeOfFrame: ViewModifier {
                     .onAppear {
                         self.oldSize = proxy.size
                     }
-                    .onChange(of: proxy.size) { newSize in
+                    ._onChange(of: proxy.size) { newSize in
                         if let oldSize {
                             if let threshold {
                                 guard !oldSize._isNearlyEqual(to: newSize, threshold: threshold) else {
@@ -226,7 +245,7 @@ extension View {
         of value: Value?,
         operation: @escaping (Value) -> Void
     ) -> some View {
-        self.onChange(of: value != nil) { [value] isNotNil in
+        self._onChange(of: value != nil) { [value] isNotNil in
             guard let value = value else {
                 return
             }

@@ -15,6 +15,7 @@ public struct EditableText: View {
         case onDoubleTap
     }
     
+    @Environment(\._activateNavigationLink) var _activateNavigationLink
     @Environment(\._SwiftUIX_controlActiveState) var controlActiveState
     @Environment(\.isFocused) var isFocused
 
@@ -100,19 +101,19 @@ public struct EditableText: View {
             nonEditModeContent()
             #endif
         }
-        .onChange(of: isEditing) { isEditing in
+        ._onChange(of: isEditing) { isEditing in
             if isEditing {
                 beginEditing()
             } else {
                 endEditing()
             }
         }
-        .onChange(of: textFieldIsFocused) { isFocused in
+        ._onChange(of: textFieldIsFocused) { isFocused in
             if !isFocused {
                 endEditing()
             }
         }
-        .onChange(of: controlActiveState) { controlActiveState in
+        ._onChange(of: controlActiveState) { controlActiveState in
             if isFocused {
                 endEditing()
             }
@@ -127,17 +128,24 @@ public struct EditableText: View {
                 case .active:
                     editableDisplay
                 case .inactive:
-                    staticDisplay.onTapGesture(
-                        count: 2,
-                        disabled: !activation.contains(.onDoubleTap)
-                    ) {
-                        beginEditing()
-                    }
+                    staticDisplay
+                        .onTapGesture(
+                            count: 2,
+                            disabled: !activation.contains(.onDoubleTap)
+                        ) {
+                            beginEditing()
+                        }
+                        .highPriorityGesture(
+                            TapGesture(count: 1).onEnded {
+                                _activateNavigationLink?.action()
+                            },
+                            including: _activateNavigationLink != nil ? .all : .subviews
+                        )
                 default:
                     staticDisplay
             }
         }
-        .onChange(of: editMode.wrappedValue) { editMode in
+        ._onChange(of: editMode.wrappedValue) { editMode in
             if editMode == .active {
                 beginEditing()
             } else if editMode == .inactive {
@@ -156,6 +164,12 @@ public struct EditableText: View {
                 ) {
                     beginEditing()
                 }
+                .simultaneousGesture(
+                    TapGesture(count: 1).onEnded {
+                        _activateNavigationLink?.action()
+                    },
+                    including: _activateNavigationLink != nil ? .all : .subviews
+                )
         } else {
             editableDisplay
                 .focused($textFieldIsFocused)

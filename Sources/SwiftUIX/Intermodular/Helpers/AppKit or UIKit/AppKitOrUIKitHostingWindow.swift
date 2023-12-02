@@ -608,7 +608,7 @@ fileprivate struct AppKitOrUIKitHostingWindowContent<Content: View>: View {
         }
         .environment(\.presentationManager, presentationManager)
         .id(isPresented)
-        .onChange(of: windowBox.wrappedValue != nil) { isWindowNotNil in
+        ._onChange(of: windowBox.wrappedValue != nil) { isWindowNotNil in
             if isWindowNotNil {
                 queuedWindowUpdates.forEach({ $0(windowBox.wrappedValue!) })
                 queuedWindowUpdates = []

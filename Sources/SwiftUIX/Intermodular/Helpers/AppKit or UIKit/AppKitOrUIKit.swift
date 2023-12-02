@@ -60,6 +60,30 @@ extension UIEdgeInsets {
     }
 }
 
+@_spi(Internal)
+extension UIImage.Orientation {
+    public init(_ orientation: CGImagePropertyOrientation) {
+        switch orientation {
+            case .up:
+                self = .up
+            case .upMirrored:
+                self = .upMirrored
+            case .down:
+                self = .down
+            case .downMirrored: 
+                self = .downMirrored
+            case .left:
+                self = .left
+            case .leftMirrored:
+                self = .leftMirrored
+            case .right:
+                self = .right
+            case .rightMirrored:
+                self = .rightMirrored
+        }
+    }
+}
+
 extension UIUserInterfaceStyle {
     public init(from colorScheme: ColorScheme) {
         switch colorScheme {

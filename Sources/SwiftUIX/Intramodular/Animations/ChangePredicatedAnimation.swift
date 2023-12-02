@@ -34,7 +34,7 @@ private struct ChangePredicatedAnimation<Value: Equatable>: ViewModifier {
                     }
                 }
             }
-            .onChange(of: value) { value in
+            ._onChange(of: value) { value in
                 self.lastValue = value
             }
     }

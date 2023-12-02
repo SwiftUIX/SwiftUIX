@@ -48,6 +48,30 @@ public struct LazyAppearViewProxy {
     }
 }
 
+@_spi(Internal)
+@frozen
+public struct _LazyAppearView<Content: View>: View {
+    @usableFromInline
+    let content: () -> Content
+    
+    @usableFromInline
+    @State var didAppear: Bool = false
+
+    public init(content: @escaping () -> Content) {
+        self.content = content
+    }
+        
+    public var body: some View {
+        if didAppear {
+            content()
+        } else {
+            ZeroSizeView().onAppear {
+                didAppear = true
+            }
+        }
+    }
+}
+
 /// A view that appears lazily.
 public struct LazyAppearView<Content: View>: View {
     public enum Placeholder {

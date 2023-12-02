@@ -50,3 +50,25 @@ extension NavigationLink where Label == Text {
         self.init(title, destination: destination(), isActive: isActive)
     }
 }
+
+public struct _ActivateNavigationLink: Hashable {
+    public let action: Action
+    
+    public init(action: Action) {
+        self.action = action
+    }
+    
+    public func callAsFunction() {
+        action()
+    }
+}
+
+extension EnvironmentValues {
+    public var _activateNavigationLink: _ActivateNavigationLink? {
+        get {
+            self[DefaultEnvironmentKey<_ActivateNavigationLink>.self]
+        } set {
+            self[DefaultEnvironmentKey<_ActivateNavigationLink>.self] = newValue
+        }
+    }
+}

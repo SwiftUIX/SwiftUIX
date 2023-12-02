@@ -30,7 +30,7 @@ fileprivate struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: View
                     Group {
                         // Only attach to the first view, we don't want to add a change observer n times.
                         if index == 0 {
-                            subview.onChange(of: traits) { _ in
+                            subview._onChange(of: traits) { _ in
                                 setPayload(traits)
                             }
                         }
