@@ -556,7 +556,9 @@ extension _PlatformTextView {
         } else {
             assert(proposal.size.maximum == nil)
             
-            guard var result = _uncachedSizeThatFits(for: targetWidth) else {
+            let _sizeThatFits = _uncachedSizeThatFits(for: targetWidth)
+            
+            guard var result = _sizeThatFits else {
                 return nil
             }
             
@@ -568,6 +570,16 @@ extension _PlatformTextView {
                         case (false, false):
                             if (_result.width ?? 0) < targetWidth {
                                 _result.width = targetWidth
+                            }
+                            
+                            if let targetHeight = proposal.targetHeight, (_result.height ?? 0) < targetHeight {
+                                _result.height = targetHeight
+                            }
+                        case (false, true):
+                            if (_result.width ?? 0) < targetWidth {
+                                if _numberOfLinesOfWrappedTextDisplayed > 1 {
+                                    _result.width = targetWidth
+                                }
                             }
                             
                             if let targetHeight = proposal.targetHeight, (_result.height ?? 0) < targetHeight {

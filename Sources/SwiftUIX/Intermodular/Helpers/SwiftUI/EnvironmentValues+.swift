@@ -59,6 +59,10 @@ extension View {
     public func _environment<T>(_ value: T?) -> some View {
         environment(\.[_type: _SwiftUIX_Metatype<T.Type>(T.self)], value)
     }
+    
+    public func _environment<T>(_ key: T.Type, _ value: T) -> some View {
+        environment(\.[_type: _SwiftUIX_Metatype<T.Type>(key)], value)
+    }
 }
 
 extension EnvironmentValues {

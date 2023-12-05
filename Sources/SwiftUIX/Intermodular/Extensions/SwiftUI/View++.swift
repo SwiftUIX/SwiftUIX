@@ -74,6 +74,16 @@ extension View {
     }
 }
 
+// MARK: - View.listRowBackground
+
+extension View {
+    public func listRowBackground<Content: View>(
+        @ViewBuilder background: () -> Content
+    ) -> some View {
+        listRowBackground(background())
+    }
+}
+
 // MARK: - View.overlay
 
 extension View {

@@ -145,3 +145,51 @@ extension CocoaNavigationView {
 }
 
 #endif
+
+
+/// Useful for suppressing deprecation warnings with `NavigationView`.
+///
+/// ```swift
+///
+/// _NavigationView {
+///    List {
+///        NavigationLink(_isActive: ...) {
+///            // <your destination view>
+///        } label: {
+///            // <your label view>
+///        }
+///    }
+///
+///    Text("Hello, Placeholder!")
+/// }
+/// ```
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+@frozen
+public struct _NavigationView<Content: View>: View {
+    private let content: Content
+    
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    public var body: some View {
+        NavigationView {
+            content
+        }
+    }
+}
+
+extension NavigationLink {
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+    public init(
+        _isActive isActive: Binding<Bool>,
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(
+            isActive: isActive,
+            destination: destination,
+            label: label
+        )
+    }
+}

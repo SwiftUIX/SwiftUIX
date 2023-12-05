@@ -32,4 +32,16 @@ extension GridItem {
             alignment: alignment
         )
     }
+    
+    public static func adaptive(
+        width: CGFloat,
+        spacing: CGFloat? = nil,
+        alignment: Alignment? = nil
+    ) -> Self {
+        GridItem(
+            .adaptive(minimum: width, maximum: width),
+            spacing: spacing,
+            alignment: alignment
+        )
+    }
 }

@@ -276,7 +276,7 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(macOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Color {
     /// A color  appropriate for filling thin and small shapes.
     ///

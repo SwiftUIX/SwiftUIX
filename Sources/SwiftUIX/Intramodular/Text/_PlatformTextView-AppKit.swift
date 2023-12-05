@@ -125,6 +125,8 @@ extension _PlatformTextView {
             switch _fixedSize {
                 case (false, false):
                     return nil
+                case (false, true):
+                    return nil
                 default:
                     assertionFailure()
                     
