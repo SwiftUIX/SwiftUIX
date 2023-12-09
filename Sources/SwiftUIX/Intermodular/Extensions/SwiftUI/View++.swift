@@ -151,6 +151,24 @@ extension View {
     }
 }
 
+// MARK: - View.onAppear
+
+extension View {
+    public func onAppearOnce(perform action: @escaping () -> Void) -> some View {
+        withInlineState(initialValue: false) { $didAppear in
+            self.onAppear {
+                guard !didAppear else {
+                    return
+                }
+                
+                action()
+                
+                didAppear = true
+            }
+        }
+    }
+}
+
 // MARK: - View.transition
 
 extension View {

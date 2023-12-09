@@ -13,6 +13,7 @@ public struct _ViewTraitKeys {
 // MARK: - Supplementary
 
 extension View {
+    /// Adds a trait value for a given trait key.
     public func _trait<TraitKey: _ViewTraitKey>(
         _ key: KeyPath<_ViewTraitKeys, TraitKey.Type>,
         _ value: TraitKey.Value
@@ -20,6 +21,7 @@ extension View {
         _trait(_ViewTraitKeys()[keyPath: key], value)
     }
     
+    /// Adds a view trait value that can referenced by the value's type.
     public func _trait<T>(
         _ key: T.Type,
         _ value: T
@@ -67,13 +69,5 @@ extension _VariadicViewChildren.Subview {
         } set {
             self = newValue.base
         }
-    }
-}
-
-public struct _TypeToViewTraitKeyAdaptor<T>: _ViewTraitKey {
-    public typealias Value = T?
-    
-    public static var defaultValue: T? {
-        nil
     }
 }

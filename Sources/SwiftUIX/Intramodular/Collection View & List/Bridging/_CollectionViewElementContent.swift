@@ -26,7 +26,7 @@ struct _CollectionViewElementContent<
         let contentState: ContentState?
         let contentPreferences: Binding<ContentPreferences>?
         let contentCache: ContentCache
-        let content: _CollectionViewCellOrSupplementaryViewContent
+        let content: _CollectionViewItemContent.ResolvedView
     }
     
     var configuration: Configuration

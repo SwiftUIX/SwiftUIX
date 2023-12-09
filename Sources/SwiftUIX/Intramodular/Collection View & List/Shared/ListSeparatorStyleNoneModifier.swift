@@ -9,11 +9,12 @@ import SwiftUI
 public struct ListSeparatorStyleNoneModifier: ViewModifier {
     @inlinable
     public func body(content: Content) -> some View {
-        content.onAppear {
-            UITableView.appearance().separatorStyle = .none
-        }.onDisappear {
-            UITableView.appearance().separatorStyle = .singleLine
-        }
+        content
+            .onAppear {
+                UITableView.appearance().separatorStyle = .none
+            }.onDisappear {
+                UITableView.appearance().separatorStyle = .singleLine
+            }
     }
     
     @usableFromInline

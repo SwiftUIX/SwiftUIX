@@ -35,30 +35,6 @@ public struct _CollectionViewConfiguration: ExpressibleByNilLiteral {
     }
 }
 
-struct _CollectionViewCellOrSupplementaryViewContent: View {
-    private let base: Any
-    private let baseAsErasedView: AnyView
-    
-    var body: some View {
-        baseAsErasedView
-    }
-    
-    init<T: View>(_ base: T) {
-        self.base = base
-        self.baseAsErasedView = base.eraseToAnyView()
-    }
-    
-    func _precomputedDimensionsThatFit(
-        in dimensions: OptionalDimensions
-    ) -> OptionalDimensions? {
-        if let base = base as? _opaque_FrameModifiedContent {
-            return base._opaque_frameModifier.dimensionsThatFit(in: dimensions)
-        } else {
-            return nil
-        }
-    }
-}
-
 struct _CollectionViewCellOrSupplementaryViewConfiguration<
     ItemType,
     ItemIdentifierType: Hashable,
@@ -81,7 +57,7 @@ struct _CollectionViewCellOrSupplementaryViewConfiguration<
     let itemIdentifier: ItemIdentifierType?
     let sectionIdentifier: SectionIdentifierType
     let indexPath: IndexPath
-    let makeContent: () -> _CollectionViewCellOrSupplementaryViewContent
+    let makeContent: () -> _CollectionViewItemContent.ResolvedView
     
     var maximumSize: OptionalDimensions?
     
@@ -131,7 +107,7 @@ struct _CollectionViewCellOrSupplementaryViewCache<
     SectionType,
     SectionIdentifierType: Hashable
 > {
-    var content: _CollectionViewCellOrSupplementaryViewContent?
+    var content: _CollectionViewItemContent.ResolvedView?
     var contentSize: CGSize?
     var preferredContentSize: CGSize? 
     

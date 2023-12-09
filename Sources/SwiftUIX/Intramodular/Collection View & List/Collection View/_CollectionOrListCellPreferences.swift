@@ -6,12 +6,13 @@ import Swift
 import SwiftUI
 
 /// An internal structure used to manage cell preferences for `CocoaList` and `CollectionView`.
-@usableFromInline
-struct _CollectionOrListCellPreferences: Hashable {
-    var isFocusable: Bool?
-    var isHighlightable: Bool?
-    var isReorderable: Bool?
-    var isSelectable: Bool?
+@_spi(Internal)
+@frozen
+public struct _CollectionOrListCellPreferences: Hashable {
+    public var isFocusable: Bool?
+    public var isHighlightable: Bool?
+    public var isReorderable: Bool?
+    public var isSelectable: Bool?
 }
 
 extension _CollectionOrListCellPreferences {
@@ -66,21 +67,27 @@ extension View {
 
 extension View {
     @available(*, deprecated)
-    public func cellFocusable(_ focusable: Bool) -> some View {
+    public func cellFocusable(
+        _ focusable: Bool
+    ) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isFocusable = focusable
         }
     }
     
     @available(*, deprecated)
-    public func cellHighlightable(_ highlightable: Bool) -> some View {
+    public func cellHighlightable(
+        _ highlightable: Bool
+    ) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isHighlightable = highlightable
         }
     }
     
     @available(*, deprecated, renamed: "_SwiftUIX_moveDisabled(_:)")
-    public func cellReorderable(_ reorderable: Bool) -> some View {
+    public func cellReorderable(
+        _ reorderable: Bool
+    ) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isReorderable = reorderable
         }
@@ -88,7 +95,9 @@ extension View {
     }
     
     @available(*, deprecated, renamed: "_SwiftUIX_selectionDisabled(_:)")
-    public func cellSelectable(_ selectable: Bool) -> some View {
+    public func cellSelectable(
+        _ selectable: Bool
+    ) -> some View {
         transformPreference(_CollectionOrListCellPreferences.PreferenceKey.self) { value in
             value.isSelectable = selectable
         }

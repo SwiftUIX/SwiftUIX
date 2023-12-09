@@ -70,7 +70,7 @@ class CocoaHostingCollectionViewCell<
     
     var contentCache = ContentCache()
     
-    var content: _CollectionViewCellOrSupplementaryViewContent {
+    var content: _CollectionViewItemContent.ResolvedView {
         if let content = contentCache.content {
             return content
         } else if let configuration = cellContentConfiguration {

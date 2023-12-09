@@ -39,11 +39,11 @@ protocol _CollectionViewProxyBase: AppKitOrUIKitViewController {
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CollectionViewProxy: Hashable {
     weak var base: _CollectionViewProxyBase?
-
+    
     public var appKitOrUIKitCollectionView: AppKitOrUIKitCollectionView? {
         base?.appKitOrUIKitCollectionView
     }
-
+    
     public var contentSize: CGSize {
         base?.collectionViewContentSize ?? .zero
     }

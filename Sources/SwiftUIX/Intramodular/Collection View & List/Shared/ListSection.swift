@@ -17,6 +17,12 @@ public struct ListSection<SectionType, ItemType> {
     
     public let items: AnyRandomAccessCollection<ItemType>
     
+    public subscript(_ index: Int) -> ItemType {
+        get {
+            items[items.index(items.startIndex, offsetBy: index)]
+        }
+    }
+    
     public init<Items: RandomAccessCollection>(
         _ model: SectionType,
         items: Items

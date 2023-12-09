@@ -34,7 +34,7 @@ class CocoaHostingCollectionViewSupplementaryView<
     var configuration: ContentConfiguration?
     var cache = ContentCache()
     
-    var content: _CollectionViewCellOrSupplementaryViewContent {
+    var content: _CollectionViewItemContent.ResolvedView {
         if let content = cache.content {
             return content
         } else if let configuration = configuration {

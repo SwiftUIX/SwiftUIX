@@ -402,7 +402,6 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             contentWindowController?.showWindow(self)
             
             DispatchQueue.main.async {
-                self.center()
                 self.applyPreferredConfiguration()
                 self.alphaValue = 1.0
             }

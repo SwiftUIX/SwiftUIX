@@ -75,7 +75,34 @@ extension Picker where Label == Text, SelectionValue: Hashable, Content == AnyVi
             .eraseToAnyView()
         }
     }
-
+    
+    public init(
+        _ titleKey: LocalizedStringKey,
+        values: some RandomAccessCollection<SelectionValue>,
+        selection: Binding<SelectionValue>,
+        title: KeyPath<SelectionValue, String>,
+        section: KeyPath<SelectionValue, String>
+    ) {
+        let groupedValues = Dictionary(
+            grouping: values.map({ ($0, $0[keyPath: title]) }),
+            by: { value, title in
+                value[keyPath: section]
+            }
+        ).mapValues({ $0.sorted(by: { $0.1 < $1.1 }) }).sorted(by: { $0.key < $1.key })
+        
+        self.init(titleKey, selection: selection) {
+            ForEach(groupedValues, id: \.key) { (sectionTitle, sectionChildren) in
+                Section(header: Text(verbatim: sectionTitle)) {
+                    ForEach(sectionChildren, id: \.0) { element in
+                        Text(element.1)
+                            .tag(element.0)
+                    }
+                }
+            }
+            .eraseToAnyView()
+        }
+    }
+    
     public init(
         _ titleKey: LocalizedStringKey,
         selection: Binding<SelectionValue>,

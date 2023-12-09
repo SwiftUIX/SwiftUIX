@@ -100,7 +100,7 @@ extension _CollectionView.DataSource.Payload: CustomStringConvertible {
                 
                 return true
             }
-            
+                
             case .diffableDataSource(let dataSource): do {
                 guard let dataSource = dataSource.wrappedValue else {
                     return false
