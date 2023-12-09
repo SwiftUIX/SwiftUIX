@@ -4,18 +4,9 @@
 
 #if os(macOS)
 
+import AppKit
 import Swift
 import SwiftUI
-
-struct _CocoaList<Configuration: _CocoaListConfigurationType> {
-    typealias Offset = ScrollView<AnyView>.ContentOffset
-    
-    let configuration: Configuration
-        
-    init(configuration: Configuration) {
-        self.configuration = configuration
-    }
-}
 
 extension _CocoaList: NSViewRepresentable {
     public typealias Coordinator = _PlatformTableView<Configuration>.Coordinator
@@ -31,9 +22,19 @@ extension _CocoaList: NSViewRepresentable {
         _ view: NSViewType,
         context: Context
     ) {
-        context.coordinator.configuration = configuration
+        func updateCocoaScrollProxy() {
+            if !(context.environment._cocoaScrollViewProxy?.base.wrappedValue === view) {
+                context.environment._cocoaScrollViewProxy?.base.wrappedValue = view
+            }
+        }
         
-        view.tableView.reloadData()
+        updateCocoaScrollProxy()
+        
+        context.coordinator.representableWillUpdate()
+        
+        context.coordinator.configuration = configuration
+                
+        context.coordinator.representableDidUpdate()
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -41,64 +42,93 @@ extension _CocoaList: NSViewRepresentable {
     }
 }
 
-// MARK: - Initializers
-
-extension _CocoaList {
-    init<
-        SectionType: Identifiable,
-        ItemType: Identifiable,
-        Data: RandomAccessCollection<ListSection<SectionType, ItemType>>,
-        SectionHeader: View,
-        SectionFooter: View,
-        RowContent: View
-    >(
-        _ data: Data,
-        sectionHeader: @escaping (SectionType) -> SectionHeader,
-        sectionFooter: @escaping (SectionType) -> SectionFooter,
-        rowContent: @escaping (ItemType) -> RowContent
-    ) where Configuration == _CocoaListConfiguration<_CocoaListData<SectionType, ItemType>, _CocoaListViewProvider<SectionType, ItemType, SectionHeader, SectionFooter, RowContent>> {
-        self.init(
-            configuration: .init(
-                data: .init(data),
-                viewProvider: .init(
-                    sectionHeader: sectionHeader,
-                    sectionFooter: sectionFooter,
-                    rowContent: rowContent
-                )
-            )
-        )
-    }
-}
-
-extension _CocoaList {
-    init<
-        Data: RandomAccessCollection,
-        ItemType,
-        ID: Hashable,
-        RowContent: View
-    >(
-        _ data: Data,
-        id: KeyPath<ItemType, ID>,
-        @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
-    ) where Data.Element == ItemType, Configuration == _CocoaListConfiguration<_CocoaListData<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>>, _CocoaListViewProvider<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>, Never, Never, RowContent>> {
-        self.init(
-            AnyRandomAccessCollection(
-                [
-                    ListSection(
-                        _KeyPathHashIdentifiableValue(
-                            value: 0,
-                            keyPath: \.self
-                        ),
-                        items: data.elements(identifiedBy: id)
-                    )
-                ]
-            ),
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
-            rowContent: {
-                rowContent($0.value)
+extension _PlatformTableView {
+    class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
+        enum DirtyFlag {
+            case dataChanged
+        }
+        
+        var dirtyFlags: Set<DirtyFlag> = []
+        
+        public var configuration: Configuration {
+            didSet {
+                if oldValue.data.id != configuration.data.id {
+                    dirtyFlags.insert(.dataChanged)
+                }
             }
-        )
+        }
+        
+        weak var tableView: NSTableView?
+        
+        public init(configuration: Configuration) {
+            self.configuration = configuration
+        }
+        
+        func representableWillUpdate() {
+            
+        }
+        
+        func representableDidUpdate() {
+            if self.dirtyFlags.contains(.dataChanged) {
+                tableView?.reloadData()
+                tableView?.scrollToEndOfDocument(nil)
+            } else {
+                _ = tableView
+            }
+            
+            self.dirtyFlags = []
+        }
+        
+        func numberOfRows(
+            in tableView: NSTableView
+        ) -> Int {
+            configuration.data.payload.map(\.items.count).reduce(into: 0, +=)
+        }
+        
+        func tableView(
+            _ tableView: NSTableView,
+            objectValueFor tableColumn: NSTableColumn?,
+            row: Int
+        ) -> Any? {
+            configuration.data.payload.first?[row]
+        }
+        
+        func tableView(
+            _ tableView: NSTableView,
+            viewFor tableColumn: NSTableColumn?,
+            row: Int
+        ) -> NSView? {
+            let identifier = NSUserInterfaceItemIdentifier("messageTableCellView")
+            let cellView: _PlatformTableCellView<Configuration>
+            let item = configuration.data.payload.first![row]
+            let itemIdentifier = item[keyPath: configuration.data.itemID]
+            
+            if let _cellView = tableView.makeView(
+                withIdentifier: identifier,
+                owner: self
+            ) as? _PlatformTableCellView<Configuration> {
+                cellView = _cellView
+            } else {
+                let _cellView = _PlatformTableCellView<Configuration>()
+                
+                _cellView.identifier = identifier
+                
+                cellView = _cellView
+            }
+            
+            cellView.hostingView.rootView.item = itemIdentifier
+            cellView.hostingView.rootView.base = configuration.viewProvider.rowContent(item)
+            
+            return cellView
+        }
+        
+        func tableView(
+            _ tableView: NSTableView,
+            didAdd rowView: NSTableRowView,
+            forRow row: Int
+        ) {
+            rowView.translatesAutoresizingMaskIntoConstraints = false
+        }
     }
 }
 

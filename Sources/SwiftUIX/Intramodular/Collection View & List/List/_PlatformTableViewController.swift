@@ -180,7 +180,10 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
     
     // MARK: - Delegate
     
-    override public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    override public func tableView(
+        _ tableView: UITableView,
+        heightForHeaderInSection section: Int
+    ) -> CGFloat {
         guard SectionHeader.self != Never.self else {
             return 0
         }
@@ -207,7 +210,10 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         return max(1, height)
     }
     
-    override public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    override public func tableView(
+        _ tableView: UITableView,
+        viewForHeaderInSection section: Int
+    ) -> UIView? {
         guard SectionHeader.self != Never.self else {
             return nil
         }
@@ -228,7 +234,10 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         return view
     }
     
-    override public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override public func tableView(
+        _ tableView: UITableView,
+        heightForFooterInSection section: Int
+    ) -> CGFloat {
         guard SectionFooter.self != Never.self else {
             return 0
         }
@@ -255,7 +264,10 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         return max(1, height)
     }
     
-    override public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    override public func tableView(
+        _ tableView: UITableView,
+        viewForFooterInSection section: Int
+    ) -> UIView? {
         guard SectionFooter.self != Never.self else {
             return nil
         }
@@ -276,7 +288,10 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         return view
     }
     
-    override public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    override public func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
         let item = data[indexPath]
         
         if let cachedHeight = _rowContentHeightCache[item.id] {

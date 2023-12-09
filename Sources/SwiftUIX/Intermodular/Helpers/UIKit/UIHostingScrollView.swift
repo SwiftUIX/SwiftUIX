@@ -7,11 +7,7 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
-protocol _opaque_UIHostingScrollView: UIScrollView {
-    func scrollTo(_ edge: Edge)
-}
-
-open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingScrollView, UIScrollViewDelegate {
+open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate, _AppKitOrUIKitHostingScrollViewType {
     var _isUpdating: Bool = false
     
     private let hostingContentView: UIHostingView<RootViewContainer>
@@ -259,11 +255,11 @@ open class UIHostingScrollView<Content: View>: UIScrollView, _opaque_UIHostingSc
 // MARK: - Auxiliary
 
 extension UIHostingScrollView {
-    struct RootViewContainer: View {
+    fileprivate struct RootViewContainer: View {
         weak var base: UIHostingScrollView<Content>?
         
         var content: Content
-        
+
         var body: some View {
             PassthroughView {
                 if base?._isPagingEnabled ?? false {
@@ -274,49 +270,6 @@ extension UIHostingScrollView {
                 } else {
                     content
                 }
-            }
-        }
-    }
-}
-
-// MARK: - Conformances
-
-extension UIHostingScrollView {
-    public func scrollTo(_ edge: Edge) {
-        let animated = _areAnimationsDisabledGlobally ? false : true
-        
-        switch edge {
-            case .top: do {
-                setContentOffset(
-                    CGPoint(x: contentOffset.x, y: -contentInset.top),
-                    animated: animated
-                )
-            }
-            case .leading: do {
-                guard contentSize.width > frame.width else {
-                    return
-                }
-
-                setContentOffset(
-                    CGPoint(x: contentInset.left, y: contentOffset.y),
-                    animated: animated
-                )
-            }
-            case .bottom: do {
-                setContentOffset(
-                    CGPoint(x: contentOffset.x, y: (contentSize.height - bounds.size.height) + contentInset.bottom),
-                    animated: animated
-                )
-            }
-            case .trailing: do {
-                guard contentSize.width > frame.width else {
-                    return
-                }
-                
-                setContentOffset(
-                    CGPoint(x: (contentSize.width - bounds.size.width) + contentInset.right, y: contentOffset.y),
-                    animated: animated
-                )
             }
         }
     }

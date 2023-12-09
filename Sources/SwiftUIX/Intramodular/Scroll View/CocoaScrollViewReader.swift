@@ -2,43 +2,28 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
+
+import Foundation
 import Swift
 import SwiftUI
 
-#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
-
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
-public struct CocoaScrollViewProxy: Hashable {
-    private let _baseBox: WeakReferenceBox<AnyObject>
+public struct CocoaScrollViewProxy {
+    weak var base: (any _AppKitOrUIKitHostingScrollViewType)?
     
-    @ReferenceBox var onBaseChange: (() -> Void)? = nil
-    
-    var base: _opaque_UIHostingScrollView? {
-        get {
-            _baseBox.value as? _opaque_UIHostingScrollView
-        } set {
-            _baseBox.value = newValue
-            
-            onBaseChange?()
-        }
-    }
-    
-    #if os(iOS)
-    public var underlyingAppKitOrUIKitScrollView: AppKitOrUIKitScrollView? {
-        base
-    }
-    #endif
-    
-    init(_ base: _opaque_UIHostingScrollView? = nil) {
-        self._baseBox = .init(base)
+    init(base: (any _AppKitOrUIKitHostingScrollViewType)? = nil) {
+        self.base = base
     }
     
     public func scrollTo(_ edge: Edge) {
-        base?.scrollTo(edge)
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(base?.hashValue)
+        guard let base else {
+            assertionFailure()
+            
+            return
+        }
+        
+        base.scrollTo(edge)
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -64,32 +49,21 @@ public struct CocoaScrollViewReader<Content: View>: View {
     public var body: some View {
         content(_environment_cocoaScrollViewProxy?.wrappedValue ?? _cocoaScrollViewProxy)
             .environment(\._cocoaScrollViewProxy, $_cocoaScrollViewProxy)
-            .background {
-                PerformAction {
-                    _cocoaScrollViewProxy.onBaseChange = {
-                        invalidate.toggle()
-                    }
-                }
-                .id(invalidate)
-            }
     }
 }
 
 // MARK: - Auxiliary
 
-extension CocoaScrollViewProxy {
-    fileprivate struct EnvironmentKey: SwiftUI.EnvironmentKey {
+extension EnvironmentValues {
+    fileprivate struct _CocoaScrollViewProxyKey: SwiftUI.EnvironmentKey {
         static let defaultValue: Binding<CocoaScrollViewProxy>? = nil
     }
-}
-
-extension EnvironmentValues {
-    @usableFromInline
+    
     var _cocoaScrollViewProxy: Binding<CocoaScrollViewProxy>? {
         get {
-            self[CocoaScrollViewProxy.EnvironmentKey.self]
+            self[_CocoaScrollViewProxyKey.self]
         } set {
-            self[CocoaScrollViewProxy.EnvironmentKey.self] = newValue
+            self[_CocoaScrollViewProxyKey.self] = newValue
         }
     }
 }

@@ -23,7 +23,7 @@ public struct CocoaList<Content: View>: View {
         @ViewBuilder content: () -> Content
     ) {
         let content = _VariadicViewAdapter(content) { content in
-            _CocoaList(configuration: _CocoaListVariadicViewContent(content.children))
+            _CocoaList(configuration: _VariadicViewChildren._CocoaListContentAdapter(content.children))
         }
         
         self.init(_content: content.eraseToAnyView())

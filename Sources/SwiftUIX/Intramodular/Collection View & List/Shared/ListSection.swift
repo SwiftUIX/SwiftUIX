@@ -47,6 +47,26 @@ public struct ListSection<SectionType, ItemType> {
     }
 }
 
+extension ListSection {
+    public func map<T>(
+        _ transform: (SectionType) -> T
+    ) -> ListSection<T, ItemType> {
+        ListSection<T, ItemType>(
+            transform(self.model),
+            items: items
+        )
+    }
+
+    public func mapItems<T>(
+        _ transform: (ItemType) -> T
+    ) -> ListSection<SectionType, T> {
+        ListSection<SectionType, T>(
+            self.model,
+            items: items.map(transform)
+        )
+    }
+}
+
 extension ListSection where SectionType: Equatable {
     public static func == (lhs: Self, rhs: SectionType) -> Bool {
         lhs.model == rhs

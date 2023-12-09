@@ -7,6 +7,7 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
+/// WIP: Should be renamed to `_CocoaList`.
 public struct CocoaList<
     SectionType: Identifiable,
     ItemType: Identifiable,
@@ -50,7 +51,9 @@ public struct CocoaList<
         self.rowContent = rowContent
     }
     
-    public func makeUIViewController(context: Context) -> UIViewControllerType {
+    public func makeUIViewController(
+        context: Context
+    ) -> UIViewControllerType {
         .init(
             data,
             style: style,
@@ -60,7 +63,10 @@ public struct CocoaList<
         )
     }
     
-    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+    public func updateUIViewController(
+        _ uiViewController: UIViewControllerType,
+        context: Context
+    ) {
         uiViewController.data = data
         uiViewController.sectionHeader = sectionHeader
         uiViewController.sectionFooter = sectionFooter

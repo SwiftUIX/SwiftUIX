@@ -66,7 +66,9 @@ public struct _LazyAppearView<Content: View>: View {
             content()
         } else {
             ZeroSizeView().onAppear {
-                didAppear = true
+                withoutAnimation {
+                    didAppear = true
+                }
             }
         }
     }
