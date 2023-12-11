@@ -107,7 +107,7 @@ extension _CocoaList {
             } else {
                 updateTableViewCells()
             }
-                        
+            
             self.dirtyFlags = []
         }
         
@@ -127,40 +127,40 @@ extension _CocoaList {
                 }
             }
         }
-    
+        
         func numberOfRows(in tableView: NSTableView) -> Int {
             configuration.data.itemsCount
         }
-
+        
         /*func tableView(
-            _ tableView: NSTableView,
-            heightOfRow row: Int
-        ) -> CGFloat {
-            let defaultHeight: CGFloat = 44
-            
-            guard let view = self.tableView(tableView, viewFor: nil, row: row) as? _PlatformTableCellView<Configuration> else {
-                assertionFailure()
-
-                return defaultHeight
-            }
-            
-            if view.isCellInDisplay {
-                view._SwiftUIX_setNeedsLayout()
-                view._SwiftUIX_layoutIfNeeded()
-
-                let height = view.fittingSize.height
-                
-                if height.isNormal && !height.isZero {
-                    return height
-                } else {
-                    assertionFailure()
-                    
-                    return defaultHeight
-                }
-            } else {
-                return self.cache[cheap: IndexPath(item: row, section: 0)]?.lastContentSize?.height ?? defaultHeight
-            }
-        }*/
+         _ tableView: NSTableView,
+         heightOfRow row: Int
+         ) -> CGFloat {
+         let defaultHeight: CGFloat = 44
+         
+         guard let view = self.tableView(tableView, viewFor: nil, row: row) as? _PlatformTableCellView<Configuration> else {
+         assertionFailure()
+         
+         return defaultHeight
+         }
+         
+         if view.isCellInDisplay {
+         view._SwiftUIX_setNeedsLayout()
+         view._SwiftUIX_layoutIfNeeded()
+         
+         let height = view.fittingSize.height
+         
+         if height.isNormal && !height.isZero {
+         return height
+         } else {
+         assertionFailure()
+         
+         return defaultHeight
+         }
+         } else {
+         return self.cache[cheap: IndexPath(item: row, section: 0)]?.lastContentSize?.height ?? defaultHeight
+         }
+         }*/
         
         func tableView(
             _ tableView: NSTableView,
@@ -201,7 +201,7 @@ extension _CocoaList {
                     content: configuration.viewProvider.rowContent(item)
                 )
             )
-
+            
             return view
         }
         
@@ -214,7 +214,7 @@ extension _CocoaList {
                 guard let cell = cell as? _PlatformTableCellView<Configuration>, !cell.stateFlags.contains(.wasJustPutIntoUse) else {
                     continue
                 }
-
+                
                 guard let item = cell.payload?.item else {
                     continue
                 }

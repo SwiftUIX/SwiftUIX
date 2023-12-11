@@ -51,21 +51,21 @@ public struct LazyAppearViewProxy {
 @frozen
 public struct _DeferredView<Content: View>: View {
     @usableFromInline
-    let content: Content
+    let content: () -> Content
     
     @usableFromInline
     @State var didAppear: Bool = false
     @usableFromInline
     @State var didAppear2: Bool = false
 
-    public init(@ViewBuilder content: () -> Content) {
-        self.content = content()
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
     }
     
     public var body: some View {
         PassthroughView {
             if didAppear2 {
-                content
+                content()
             } else if didAppear {
                 ZeroSizeView().onAppear {
                     if !didAppear2 {
