@@ -8,17 +8,26 @@ import AppKit
 import Swift
 import SwiftUI
 
+final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTableView {
+    override func noteHeightOfRows(withIndexesChanged indexSet: IndexSet) {
+        super.noteHeightOfRows(withIndexesChanged: indexSet)
+    }
+}
+
 @_spi(Internal)
-open class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSScrollView {
-    var coordinator: Coordinator!
+open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationType>: NSScrollView {
+    var _coordinator: _CocoaList<Configuration>.Coordinator!
     
-    private var _tableView: NSTableView = {
-        let tableView = NSTableView()
+    var coordinator: _CocoaList<Configuration>.Coordinator {
+        _coordinator!
+    }
+    
+    private var _tableView: _PlatformTableView<Configuration> = {
+        let tableView = _PlatformTableView<Configuration>()
         
         tableView.headerView = nil
         tableView.usesAutomaticRowHeights = true
         tableView.backgroundColor = .clear
-        tableView.intercellSpacing = NSSize(width: 0, height: 12)
         tableView.selectionHighlightStyle = .none
 
         return tableView
@@ -28,12 +37,14 @@ open class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSScr
         
     private var _tableViewFrameObserver: NSObjectProtocol?
     
-    public var tableView: NSTableView {
+    var tableView: _PlatformTableView<Configuration> {
         _tableView
     }
 
-    init(coordinator: Coordinator) {
-        self.coordinator = coordinator
+    init(
+        coordinator: _CocoaList<Configuration>.Coordinator
+    ) {
+        self._coordinator = coordinator
         
         super.init(frame: .zero)
         
@@ -50,11 +61,10 @@ open class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSScr
         hasHorizontalScroller = false
         autohidesScrollers = true
                         
-        self.coordinator.tableView = tableView
+        self.coordinator.tableViewContainer = self
         
         _latestTableViewFrame = _tableView.frame
 
-        
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "SwiftUIX"))
       
         column.title = ""
@@ -65,8 +75,6 @@ open class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSScr
         tableView.dataSource = coordinator
         tableView.delegate = coordinator
         
-        self.scrollerInsets = .init(top: .zero, left: .zero, bottom: .zero, right: .zero)
-        contentInsets = .init(top: .zero, left: .zero, bottom: .zero, right: .zero)
         documentView = _tableView
     }
     

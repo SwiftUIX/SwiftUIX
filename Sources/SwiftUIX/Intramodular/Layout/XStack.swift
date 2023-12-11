@@ -11,12 +11,7 @@ import SwiftUI
 public struct XStack<Content: View>: View {
     public let alignment: Alignment
     public let content: Content
-    
-    public init(alignment: Alignment = .center, @ViewBuilder content: () -> Content) {
-        self.alignment = alignment
-        self.content = content()
-    }
-    
+        
     @inlinable
     public var body: some View {
         ZStack(alignment: alignment) {
@@ -25,12 +20,52 @@ public struct XStack<Content: View>: View {
             content
         }
     }
+    
+    public init(
+        alignment: Alignment = .center,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.alignment = alignment
+        self.content = content()
+    }
+    
+    public init() where Content == ZeroSizeView {
+        self.init {
+            ZeroSizeView()
+        }
+    }
 }
 
-extension XStack where Content == EmptyView {
-    public init() {
+public struct _DeferredXStack<Content: View>: View {
+    public let alignment: Alignment
+    public let content: Content
+    
+    @inlinable
+    public var body: some View {
+        XStack {
+            ZeroSizeView()
+            
+            _VariadicViewAdapter(content) { content in
+                _ForEachSubview(content) { subview in
+                    _DeferredView {
+                        subview
+                    }
+                }
+            }
+        }
+    }
+    
+    public init(
+        alignment: Alignment = .center,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.alignment = alignment
+        self.content = content()
+    }
+    
+    public init() where Content == ZeroSizeView {
         self.init {
-            EmptyView()
+            ZeroSizeView()
         }
     }
 }

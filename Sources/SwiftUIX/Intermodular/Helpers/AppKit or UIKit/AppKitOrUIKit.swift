@@ -502,6 +502,10 @@ extension AppKitOrUIKitViewController {
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 extension AppKitOrUIKitView {
+    public func _SwiftUIX_setNeedsDisplay() {
+
+    }
+
     public func _SwiftUIX_setNeedsLayout() {
         setNeedsLayout()
     }
@@ -512,6 +516,10 @@ extension AppKitOrUIKitView {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitView {
+    public func _SwiftUIX_setNeedsDisplay() {
+        needsDisplay = true
+    }
+
     public func _SwiftUIX_setNeedsLayout() {
         needsLayout = true
     }

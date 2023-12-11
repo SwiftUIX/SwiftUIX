@@ -11,40 +11,42 @@ extension _CollectionView {
     struct DataSource {
         typealias UICollectionViewDiffableDataSourceType = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
         
-        struct Configuration {
-            struct IdentifierMap {
-                var getSectionID: (SectionType) -> SectionIdentifierType
-                var getSectionFromID: (SectionIdentifierType) -> SectionType
-                var getItemID: (ItemType) -> ItemIdentifierType
-                var getItemFromID: (ItemIdentifierType) -> ItemType
-                
-                subscript(_ section: SectionType) -> SectionIdentifierType {
-                    getSectionID(section)
-                }
-                
-                subscript(_ sectionIdentifier: SectionIdentifierType) -> SectionType {
-                    getSectionFromID(sectionIdentifier)
-                }
-                
-                subscript(_ item: ItemType) -> ItemIdentifierType {
-                    getItemID(item)
-                }
-                
-                subscript(_ itemID: ItemIdentifierType) -> ItemType {
-                    getItemFromID(itemID)
-                }
-            }
-            
-            let identifierMap: IdentifierMap
-        }
-        
-        enum Payload {
-            case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
-            case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
-        }
-        
         let configuration: Configuration
         let payload: UIViewControllerType.DataSource.Payload
+    }
+}
+
+extension _CollectionView.DataSource {
+    struct Configuration {
+        struct IdentifierMap {
+            var getSectionID: (SectionType) -> SectionIdentifierType
+            var getSectionFromID: (SectionIdentifierType) -> SectionType
+            var getItemID: (ItemType) -> ItemIdentifierType
+            var getItemFromID: (ItemIdentifierType) -> ItemType
+            
+            subscript(_ section: SectionType) -> SectionIdentifierType {
+                getSectionID(section)
+            }
+            
+            subscript(_ sectionIdentifier: SectionIdentifierType) -> SectionType {
+                getSectionFromID(sectionIdentifier)
+            }
+            
+            subscript(_ item: ItemType) -> ItemIdentifierType {
+                getItemID(item)
+            }
+            
+            subscript(_ itemID: ItemIdentifierType) -> ItemType {
+                getItemFromID(itemID)
+            }
+        }
+        
+        let identifierMap: IdentifierMap
+    }
+    
+    enum Payload {
+        case diffableDataSource(Binding<UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>?>)
+        case `static`(AnyRandomAccessCollection<ListSection<SectionType, ItemType>>)
     }
 }
 
@@ -203,15 +205,19 @@ extension CocoaHostingCollectionViewController {
             return
         }
         
-        let oldSections = oldData.map({ $0.model })
-        let sections = data.map({ $0.model })
+        let oldSections: [SectionType] = oldData.map({ $0.model })
+        let sections: [SectionType] = data.map({ $0.model })
         
         var snapshot = _internalDataSource.snapshot()
         
-        let sectionDifference = sections.lazy
-            .map({ self.dataSourceConfiguration.identifierMap[$0] })
+        let sectionDifference: CollectionDifference<SectionIdentifierType> = sections
+            .map {
+                self.dataSourceConfiguration.identifierMap[$0]
+            }
             .difference(
-                from: oldSections.map({ self.dataSourceConfiguration.identifierMap[$0] })
+                from: oldSections.map {
+                    self.dataSourceConfiguration.identifierMap[$0]
+                }
             )
         
         snapshot.applySectionDifference(sectionDifference)
@@ -225,13 +231,24 @@ extension CocoaHostingCollectionViewController {
         for sectionData in data {
             let section = sectionData.model
             let sectionItems = sectionData.items
-            let oldSectionData = oldData.first(where: { self.dataSourceConfiguration.identifierMap[$0.model] == self.dataSourceConfiguration.identifierMap[sectionData.model] })
+            
+            let oldSectionData = oldData.first(where: {
+                let sectionID: SectionIdentifierType = self.dataSourceConfiguration.identifierMap[sectionData.model]
+                
+                return self.dataSourceConfiguration.identifierMap[$0.model] == sectionID
+            })
+            
             let oldSectionItems = oldSectionData?.items ?? AnyRandomAccessCollection([])
             
-            let difference = sectionItems.lazy
-                .map({ self.dataSourceConfiguration.identifierMap[$0] })
-                .difference(from: oldSectionItems.lazy.map { self.dataSourceConfiguration.identifierMap[$0]
-                })
+            let difference: CollectionDifference<ItemIdentifierType> = sectionItems
+                .map {
+                    self.dataSourceConfiguration.identifierMap[$0]
+                }
+                .difference(
+                    from: oldSectionItems.map {
+                        self.dataSourceConfiguration.identifierMap[$0]
+                    }
+                )
             
             if !difference.isEmpty {
                 let sectionIdentifier = self.dataSourceConfiguration.identifierMap[section]
@@ -268,9 +285,15 @@ extension CocoaHostingCollectionViewController {
         }
     }
     
-    private func maintainScrollContentOffsetBehavior(animated: Bool, _ update: () -> Void) {
-        collectionView.maintainScrollContentOffsetBehavior(_scrollViewConfiguration.contentOffsetBehavior, animated: animated) {
-            update()
+    private func maintainScrollContentOffsetBehavior(
+        animated: Bool,
+        perform operaton: () -> Void
+    ) {
+        collectionView.maintainScrollContentOffsetBehavior(
+            _scrollViewConfiguration.contentOffsetBehavior,
+            animated: animated
+        ) {
+            operaton()
         }
     }
 }
@@ -284,11 +307,15 @@ fileprivate extension NSDiffableDataSourceSnapshot {
         }
     }
     
-    mutating func applySectionDifference(_ difference: CollectionDifference<SectionIdentifierType>) {
+    mutating func applySectionDifference(
+        _ difference: CollectionDifference<SectionIdentifierType>
+    ) {
         difference.forEach({ applySectionChanges($0) })
     }
     
-    mutating func applySectionChanges(_ change: CollectionDifference<SectionIdentifierType>.Change) {
+    mutating func applySectionChanges(
+        _ change: CollectionDifference<SectionIdentifierType>.Change
+    ) {
         switch change {
             case .insert(offset: sectionIdentifiers.count, let element, _):
                 appendSections([element])

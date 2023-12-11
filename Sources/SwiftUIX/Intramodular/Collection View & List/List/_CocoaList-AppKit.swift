@@ -9,9 +9,8 @@ import Swift
 import SwiftUI
 
 extension _CocoaList: NSViewRepresentable {
-    public typealias Coordinator = _PlatformTableView<Configuration>.Coordinator
-    public typealias NSViewType = _PlatformTableView<Configuration>
-
+    public typealias NSViewType = _PlatformTableViewContainer<Configuration>
+    
     func makeNSView(
         context: Context
     ) -> NSViewType {
@@ -33,7 +32,7 @@ extension _CocoaList: NSViewRepresentable {
         context.coordinator.representableWillUpdate()
         
         context.coordinator.configuration = configuration
-                
+        
         context.coordinator.representableDidUpdate()
     }
     
@@ -42,26 +41,48 @@ extension _CocoaList: NSViewRepresentable {
     }
 }
 
-extension _PlatformTableView {
+extension _CocoaList {
     class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         enum DirtyFlag {
+            case isFirstRun
             case dataChanged
         }
         
         var dirtyFlags: Set<DirtyFlag> = []
+        var cache = _CocoaListCache<Configuration>()
+        var preferredScrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
+        
+        private var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
+            var result = preferredScrollViewConfiguration
+            
+            if dirtyFlags.contains(.isFirstRun) {
+                result.showsVerticalScrollIndicator = false
+                result.showsHorizontalScrollIndicator = false
+            }
+            
+            return result
+        }
         
         public var configuration: Configuration {
             didSet {
-                if oldValue.data.id != configuration.data.id {
+                let reload = cache.update(configuration: configuration)
+                
+                if reload {
                     dirtyFlags.insert(.dataChanged)
                 }
             }
         }
         
-        weak var tableView: NSTableView?
+        weak var tableViewContainer: _PlatformTableViewContainer<Configuration>?
+        
+        var tableView: NSTableView? {
+            tableViewContainer?.tableView
+        }
         
         public init(configuration: Configuration) {
             self.configuration = configuration
+            
+            self.dirtyFlags.insert(.isFirstRun)
         }
         
         func representableWillUpdate() {
@@ -69,21 +90,77 @@ extension _PlatformTableView {
         }
         
         func representableDidUpdate() {
-            if self.dirtyFlags.contains(.dataChanged) {
-                tableView?.reloadData()
-                tableView?.scrollToEndOfDocument(nil)
-            } else {
-                _ = tableView
+            guard let view = tableViewContainer else {
+                return
             }
             
+            defer {
+                DispatchQueue.main.async {
+                    self.dirtyFlags.remove(.isFirstRun)
+                }
+            }
+            
+            view.configure(with: scrollViewConfiguration)
+            
+            if self.dirtyFlags.contains(.dataChanged) {
+                reload()
+            } else {
+                updateTableViewCells()
+            }
+                        
             self.dirtyFlags = []
         }
         
-        func numberOfRows(
-            in tableView: NSTableView
-        ) -> Int {
-            configuration.data.payload.map(\.items.count).reduce(into: 0, +=)
+        private func reload() {
+            guard let tableView else {
+                return
+            }
+            
+            _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
+                tableView.reloadData()
+                tableView.scrollToEndOfDocument(nil)
+                
+                if self.dirtyFlags.contains(.isFirstRun) {
+                    DispatchQueue.main.async {
+                        tableView.scrollToEndOfDocument(nil)
+                    }
+                }
+            }
         }
+    
+        func numberOfRows(in tableView: NSTableView) -> Int {
+            configuration.data.itemsCount
+        }
+
+        /*func tableView(
+            _ tableView: NSTableView,
+            heightOfRow row: Int
+        ) -> CGFloat {
+            let defaultHeight: CGFloat = 44
+            
+            guard let view = self.tableView(tableView, viewFor: nil, row: row) as? _PlatformTableCellView<Configuration> else {
+                assertionFailure()
+
+                return defaultHeight
+            }
+            
+            if view.isCellInDisplay {
+                view._SwiftUIX_setNeedsLayout()
+                view._SwiftUIX_layoutIfNeeded()
+
+                let height = view.fittingSize.height
+                
+                if height.isNormal && !height.isZero {
+                    return height
+                } else {
+                    assertionFailure()
+                    
+                    return defaultHeight
+                }
+            } else {
+                return self.cache[cheap: IndexPath(item: row, section: 0)]?.lastContentSize?.height ?? defaultHeight
+            }
+        }*/
         
         func tableView(
             _ tableView: NSTableView,
@@ -98,28 +175,54 @@ extension _PlatformTableView {
             viewFor tableColumn: NSTableColumn?,
             row: Int
         ) -> NSView? {
-            let identifier = NSUserInterfaceItemIdentifier("messageTableCellView")
-            let cellView: _PlatformTableCellView<Configuration>
-            let item = configuration.data.payload.first![row]
-            let itemIdentifier = item[keyPath: configuration.data.itemID]
-            
-            if let _cellView = tableView.makeView(
-                withIdentifier: identifier,
-                owner: self
-            ) as? _PlatformTableCellView<Configuration> {
-                cellView = _cellView
-            } else {
-                let _cellView = _PlatformTableCellView<Configuration>()
+            guard let tableViewContainer, let tableView = self.tableView else {
+                assertionFailure()
                 
-                _cellView.identifier = identifier
-                
-                cellView = _cellView
+                return nil
             }
             
-            cellView.hostingView.rootView.item = itemIdentifier
-            cellView.hostingView.rootView.base = configuration.viewProvider.rowContent(item)
+            let identifier = NSUserInterfaceItemIdentifier("_PlatformTableCellView")
+            let item = configuration.data.payload.first![row]
+            let itemID = item[keyPath: configuration.data.itemID]
+            let sectionID = configuration.data.payload.first!.model[keyPath: configuration.data.sectionID]
+            let itemPath = _CocoaListCache<Configuration>.ItemPath(item: itemID, section: sectionID)
             
-            return cellView
+            let view = _withoutAppKitOrUIKitAnimation {
+                (tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableCellView<Configuration>) ?? _PlatformTableCellView<Configuration>(
+                    parent: tableViewContainer,
+                    identifier: identifier
+                )
+            }
+            
+            view.prepareForUse(
+                payload: .init(
+                    itemPath: itemPath,
+                    item: item,
+                    content: configuration.viewProvider.rowContent(item)
+                )
+            )
+
+            return view
+        }
+        
+        func updateTableViewCells() {
+            guard let tableView else {
+                return
+            }
+            
+            for cell in tableView._visibleTableViewCellViews() {
+                guard let cell = cell as? _PlatformTableCellView<Configuration>, !cell.stateFlags.contains(.wasJustPutIntoUse) else {
+                    continue
+                }
+
+                guard let item = cell.payload?.item else {
+                    continue
+                }
+                
+                assert(cell.payload != nil)
+                
+                cell.payload?.content = configuration.viewProvider.rowContent(item)
+            }
         }
         
         func tableView(
@@ -127,8 +230,26 @@ extension _PlatformTableView {
             didAdd rowView: NSTableRowView,
             forRow row: Int
         ) {
-            rowView.translatesAutoresizingMaskIntoConstraints = false
+            if rowView.translatesAutoresizingMaskIntoConstraints {
+                rowView.translatesAutoresizingMaskIntoConstraints = false
+            }
         }
+    }
+}
+
+extension NSTableView {
+    func _visibleTableViewCellViews() -> [NSTableCellView] {
+        var cellViews: [NSTableCellView] = []
+        
+        for row in 0..<self.numberOfRows {
+            for column in 0..<self.numberOfColumns {
+                if let cellView = view(atColumn: column, row: row, makeIfNecessary: false) as? NSTableCellView {
+                    cellViews.append(cellView)
+                }
+            }
+        }
+        
+        return cellViews
     }
 }
 

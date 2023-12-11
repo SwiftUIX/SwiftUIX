@@ -78,7 +78,7 @@ extension View {
 
 extension View {
     public func listRowBackground<Content: View>(
-        @ViewBuilder background: () -> Content
+        @ViewBuilder _ background: () -> Content
     ) -> some View {
         listRowBackground(background())
     }

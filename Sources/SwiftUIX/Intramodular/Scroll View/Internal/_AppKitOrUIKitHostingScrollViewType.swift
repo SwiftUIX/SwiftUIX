@@ -56,7 +56,7 @@ extension UIHostingScrollView {
     }
 }
 #elseif os(macOS)
-extension _PlatformTableView: _AppKitOrUIKitHostingScrollViewType {
+extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
     public func scrollTo(_ edge: Edge) {
         let point: NSPoint
         

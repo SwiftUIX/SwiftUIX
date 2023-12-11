@@ -5,31 +5,18 @@
 import Swift
 import SwiftUI
 
-final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
-    private class Node {
-        var key: Key
-        var value: Value
-        var next: Node?
-        
-        weak var previous: Node?
-        
-        init(key: Key, value: Value) {
-            self.key = key
-            self.value = value
-        }
-    }
-
-    var maximumCapacity: Int?
-    
+@_spi(Internal)
+public final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
+    private var maximumCapacity: Int?
     private var nodes: [Key: Node] = [:]
     private var head: Node?
     private var tail: Node?
-        
-    init(maximumCapacity: Int? = 100) {
+    
+    public init(maximumCapacity: Int? = 100) {
         self.maximumCapacity = maximumCapacity
     }
     
-    private func appendNode(_ node: Node) {
+    private func _appendNode(_ node: Node) {
         nodes[node.key] = node
         
         if let oldTail = tail {
@@ -43,12 +30,12 @@ final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
         
         if let maxSize = maximumCapacity {
             if nodes.count > maxSize {
-                removeFirstNode()
+                _removeFirstNode()
             }
         }
     }
     
-    private func removeNode(_ node: Node) {
+    private func _removeNode(_ node: Node) {
         node.previous?.next = node.next
         node.next?.previous = node.previous
         
@@ -63,12 +50,12 @@ final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
         nodes[node.key] = nil
     }
     
-    private func removeFirstNode() {
-        head.map(removeNode)
+    private func _removeFirstNode() {
+        head.map(_removeNode)
     }
     
-    private func removeLastNode() {
-        tail.map(removeNode)
+    private func _removeLastNode() {
+        tail.map(_removeNode)
     }
     
     private func moveNodeToLast(_ node: Node) {
@@ -76,30 +63,30 @@ final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
             return
         }
         
-        removeNode(node)
-        appendNode(node)
+        _removeNode(node)
+        _appendNode(node)
     }
 }
 
 extension KeyedBoundedPriorityQueue {
-    var count: Int {
+    public var count: Int {
         nodes.count
     }
     
-    var first: Value? {
+    public var first: Value? {
         head?.value
     }
     
-    var last: Value? {
+    public var last: Value? {
         tail?.value
     }
     
-    subscript(_ key: Key) -> Value? {
+    public subscript(_ key: Key) -> Value? {
         get {
             nodes[key]?.value
         } set {
             guard let newValue = newValue else {
-                nodes[key].map(removeNode)
+                nodes[key].map(_removeNode)
                 
                 return
             }
@@ -111,8 +98,24 @@ extension KeyedBoundedPriorityQueue {
             } else {
                 let node = Node(key: key, value: newValue)
                 
-                appendNode(node)
+                _appendNode(node)
             }
+        }
+    }
+    
+    public func removeValue(forKey key: Key) {
+        self[key] = nil
+    }
+}
+
+// MARK: - Conformances
+
+extension KeyedBoundedPriorityQueue: ExpressibleByDictionaryLiteral {
+    public convenience init(dictionaryLiteral elements: (Key, Value)...) {
+        self.init(maximumCapacity: elements.count)
+        
+        for (key, value) in elements {
+            self[key] = value
         }
     }
 }
@@ -122,5 +125,22 @@ extension KeyedBoundedPriorityQueue: Sequence {
     
     public func makeIterator() -> AnyIterator<(key: Key, value: Value)> {
         AnyIterator(nodes.mapValues({ $0.value }).makeIterator())
+    }
+}
+
+// MARK: - Auxiliary
+
+extension KeyedBoundedPriorityQueue {
+    private class Node {
+        fileprivate var key: Key
+        fileprivate var value: Value
+        fileprivate var next: Node?
+        
+        fileprivate weak var previous: Node?
+        
+        fileprivate init(key: Key, value: Value) {
+            self.key = key
+            self.value = value
+        }
     }
 }

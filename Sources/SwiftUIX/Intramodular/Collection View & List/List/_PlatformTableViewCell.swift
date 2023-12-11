@@ -130,7 +130,9 @@ extension _PlatformTableViewCell {
                 base?.isSelected = false
             }
 
-            private func performWithAnimation(_ action: () -> ()) {
+            private func performWithAnimation(
+                _ action: () -> ()
+            ) {
                 base?.tableViewController.tableView.beginUpdates()
                 action()
                 base?.tableViewController.tableView.endUpdates()
@@ -142,7 +144,9 @@ extension _PlatformTableViewCell {
         private let content: Content
         private let state: State
         
-        init(base: _PlatformTableViewCell<ItemType, Content>) {
+        init(
+            base: _PlatformTableViewCell<ItemType, Content>
+        ) {
             self._cellProxyBase = .init(base: base)
             self.id = base.item.id
             self.content = base.makeContent(base.item)

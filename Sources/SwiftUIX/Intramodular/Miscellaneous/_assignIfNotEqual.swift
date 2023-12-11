@@ -31,6 +31,21 @@ extension NSObjectProtocol {
     @_spi(Internal)
     @_transparent
     public func _assignIfNotEqual<Value: Equatable>(
+        _ newValue: Value?,
+        to keyPath: ReferenceWritableKeyPath<Self, Value>
+    ) {
+        guard let newValue else {
+            return
+        }
+        
+        if self[keyPath: keyPath] != newValue {
+            self[keyPath: keyPath] = newValue
+        }
+    }
+
+    @_spi(Internal)
+    @_transparent
+    public func _assignIfNotEqual<Value: Equatable>(
         _ newValue: Value,
         to keyPath: ReferenceWritableKeyPath<Self, Value?>
     ) {

@@ -32,7 +32,7 @@ extension _CocoaList {
         sectionHeader: @escaping (SectionType) -> SectionHeader,
         sectionFooter: @escaping (SectionType) -> SectionFooter,
         rowContent: @escaping (ItemType) -> RowContent
-    ) where Configuration == _CocoaListConfiguration<_CocoaListData<SectionType, ItemType>, _CocoaListViewProvider<SectionType, ItemType, SectionHeader, SectionFooter, RowContent>> {
+    ) where Configuration == _CocoaListConfiguration<_AnyCocoaListDataSource<SectionType, ItemType>, _CocoaListViewProvider<SectionType, ItemType, SectionHeader, SectionFooter, RowContent>> {
         self.init(
             configuration: .init(
                 data: .init(data),
@@ -54,7 +54,7 @@ extension _CocoaList {
         _ data: Data,
         id: KeyPath<ItemType, ID>,
         @ViewBuilder rowContent: @escaping (ItemType) -> RowContent
-    ) where Data.Element == ItemType, Configuration == _CocoaListConfiguration<_CocoaListData<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>>, _CocoaListViewProvider<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>, Never, Never, RowContent>> {
+    ) where Data.Element == ItemType, Configuration == _CocoaListConfiguration<_AnyCocoaListDataSource<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>>, _CocoaListViewProvider<_KeyPathHashIdentifiableValue<Int, Int>, _KeyPathHashIdentifiableValue<ItemType, ID>, Never, Never, RowContent>> {
         self.init(
             AnyRandomAccessCollection(
                 [

@@ -5,37 +5,56 @@
 import Swift
 import SwiftUI
 
+@usableFromInline
 var _areAnimationsDisabledGlobally: Bool = false
 
-public func _withoutAnimation<T>(_ flag: Bool = true, _ body: () -> T) -> T {
+@_transparent
+public func _withoutAnimation<T>(
+    _ flag: Bool = true,
+    _ body: () -> T
+) -> T {
     guard flag else {
         return body()
     }
-
+    
     var transaction = Transaction(animation: .none)
-
+    
     transaction.disablesAnimations = true
-
+    
     return withTransaction(transaction) {
         body()
     }
 }
 
-public func _withoutAppKitOrUIKitAnimation(_ flag: Bool = true, _ body: () -> ()) {
+@_transparent
+public func _withoutAppKitOrUIKitAnimation<Result>(
+    _ flag: Bool = true,
+    _ body: () -> Result
+) -> Result {
     guard flag else {
         return body()
     }
     
+    var result: Result!
+        
     #if os(iOS)
     UIView.performWithoutAnimation {
-        body()
+        result = body()
     }
+    #elseif os(macOS)
+    NSAnimationContext.beginGrouping()
+    NSAnimationContext.current.duration = 0
+    result = body()
+    NSAnimationContext.endGrouping()
     #else
-    body()
+    result = body()
     #endif
+    
+    return result
 }
 
 /// Returns the result of recomputing the view’s body with animations disabled.
+@_transparent
 public func withoutAnimation(
     _ flag: Bool = true,
     after delay: DispatchTimeInterval? = nil,

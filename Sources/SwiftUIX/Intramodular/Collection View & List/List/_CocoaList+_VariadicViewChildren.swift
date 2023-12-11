@@ -47,18 +47,14 @@ extension _VariadicViewChildren {
 }
 
 extension _VariadicViewChildren._CocoaListContentAdapter {
-    struct Data: _CocoaListDataType {
-        public typealias ID = _DefaultCocoaListDataID
+    struct Data: _CocoaListDataSourceType {
+        public typealias ID = _DefaultCocoaListDataSourceID
 
         public typealias SectionType = Int
         public typealias ItemType = _CocoaListItemID
         
         let parent: _VariadicViewChildren._CocoaListContentAdapter
-        
-        var id: ID {
-            ID(rawValue: payload.map({ $0.map({ $0[keyPath: sectionID] }).mapItems({ $0[keyPath: itemID] }) }))
-        }
-        
+                
         var payload: AnyRandomAccessCollection<ListSection<SectionType, ItemType>> {
             AnyRandomAccessCollection([
                 ListSection(0, items: {
@@ -67,12 +63,12 @@ extension _VariadicViewChildren._CocoaListContentAdapter {
             ])
         }
         
-        var sectionID: KeyPath<Int, AnyHashable> {
-            \.self._SwiftUIX_erasedAsAnyHashable
+        var sectionID: KeyPath<Int, _AnyCocoaListSectionID> {
+            \.self._SwiftUIX_erasedAsCocoaListSectionID
         }
         
-        var itemID: KeyPath<ItemType, AnyHashable> {
-            \.self._SwiftUIX_erasedAsAnyHashable
+        var itemID: KeyPath<ItemType, _AnyCocoaListItemID> {
+            \.self._SwiftUIX_erasedAsCocoaListItemID
         }
         
         init(parent: _VariadicViewChildren._CocoaListContentAdapter) {

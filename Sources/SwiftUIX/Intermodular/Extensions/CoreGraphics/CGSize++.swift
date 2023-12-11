@@ -151,6 +151,10 @@ extension CGSize {
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension CGSize {
+    var _isInvalidForIntrinsicContentSize: Bool {
+        width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize
+    }
+
     /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
     public var _hasUnspecifiedIntrinsicContentSizeDimensions: Bool {
         if width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize {
@@ -229,7 +233,7 @@ enum _AppKitOrUIKitPlaceholderDimensionType {
 }
 
 extension CGFloat {
-    fileprivate var _isInvalidForIntrinsicContentSize: Bool {
+    var _isInvalidForIntrinsicContentSize: Bool {
         guard isNormal else {
             return true
         }
@@ -242,6 +246,8 @@ extension CGFloat {
             case CGFloat.infinity:
                 return true
             case 10000000.0:
+                return true
+            case 10000000000.0:
                 return true
             default:
                 return false
