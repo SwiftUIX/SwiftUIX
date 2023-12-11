@@ -27,11 +27,7 @@ extension _VariadicViewChildren {
             var idToSubviewMap: [_CocoaListItemID: _VariadicViewChildren.Element] = [:]
             
             for (index, subview) in data.enumerated() {
-                guard let id = subview[_CocoaListItemID.self] else {
-                    assertionFailure()
-                    
-                    continue
-                }
+                let id = subview[_CocoaListItemID.self] ?? _CocoaListItemID(id: subview.id)
                 
                 identifiers.append(id)
                 
@@ -49,12 +45,12 @@ extension _VariadicViewChildren {
 extension _VariadicViewChildren._CocoaListContentAdapter {
     struct Data: _CocoaListDataSourceType {
         public typealias ID = _DefaultCocoaListDataSourceID
-
+        
         public typealias SectionType = Int
         public typealias ItemType = _CocoaListItemID
         
         let parent: _VariadicViewChildren._CocoaListContentAdapter
-                
+        
         var payload: AnyRandomAccessCollection<ListSection<SectionType, ItemType>> {
             AnyRandomAccessCollection([
                 ListSection(0, items: {
