@@ -8,6 +8,24 @@ import Swift
 import SwiftUI
 
 #if os(macOS)
+/// `CocoaList` is a port of `NSTableView` for SwiftUI.
+///
+/// Use it with the `View.cocoaListItem(id:)` modifier to build a high-performance plain list in SwiftUI.
+///
+/// Usage:
+///
+/// ```swift
+/// struct ContentView: View {
+///     var body: some View {
+///         CocoaList {
+///             ForEach(0..<100, id: \.self) { index in
+///                 Text(verbatim: "Item \(index)")
+///                     .cocoaListItem(id: index)
+///             }
+///         }
+///     }
+/// }
+/// ```
 public struct CocoaList<Content: View>: View {
     private let _content: AnyView
     

@@ -13,21 +13,18 @@ public final class _PlatformTableContentHostingViewCoordinator<ListConfiguration
 }
 
 class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTableCellView {
+    weak var parent: _PlatformTableViewContainer<Configuration>?
+
     private var _frameObserver: NSObjectProtocol?
     private var _lastFrameSize: CGSize? = nil
     private var _stateFlags: Set<_StateFlag> = []
-    
-    let contentHostingViewCoordinator = _PlatformTableContentHostingViewCoordinator<Configuration>()
-    
+        
     var indexPath: IndexPath?
-    
     var _payload: Payload? {
         didSet {
             if let payload = _payload {
                 _contentHostingView?.rootView.payload = payload
             } else {
-                assertionFailure("unhandled")
-                
                 _tearDownContentHostingView()
             }
         }
@@ -35,28 +32,6 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     
     var stateFlags: Set<_StateFlag> {
         _stateFlags
-    }
-    
-    /*override var intrinsicContentSize: CGSize {
-        if let _contentHostingView {
-            return CGSize(
-                width: AppKitOrUIKitView.noIntrinsicMetric,
-                height: _contentHostingView.intrinsicContentSize.height
-            )
-        } else {
-            return CGSize(
-                width: AppKitOrUIKitView.noIntrinsicMetric,
-                height: AppKitOrUIKitView.noIntrinsicMetric
-            )
-        }
-    }*/
-    
-    override func invalidateIntrinsicContentSize() {
-        guard !stateFlags.contains(.wasJustPutIntoUse) else {
-            return
-        }
-        
-        super.invalidateIntrinsicContentSize()
     }
     
     override var fittingSize: NSSize {
@@ -75,6 +50,8 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         }
     }
     
+    let contentHostingViewCoordinator = _PlatformTableContentHostingViewCoordinator<Configuration>()
+
     private var _contentHostingView: _ContentHostingView? {
         didSet {
             if let oldValue, oldValue.superview != nil {
@@ -107,25 +84,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     var isCellInDisplay: Bool {
         _contentHostingView != nil
     }
-    
-    fileprivate var _cheapCache: _CocoaListCache<Configuration>.CheapItemCache? {
-        guard let payload else {
-            return nil
-        }
-        
-        return parent.coordinator.cache[cheap: payload.itemPath]
-    }
-    
-    fileprivate var _expensiveCache: _CocoaListCache<Configuration>.ExpensiveItemCache? {
-        guard let payload else {
-            return nil
-        }
-        
-        return parent.coordinator.cache[expensive: payload.itemPath]
-    }
-    
-    unowned let parent: _PlatformTableViewContainer<Configuration>
-    
+            
     init(
         parent: _PlatformTableViewContainer<Configuration>,
         identifier: NSUserInterfaceItemIdentifier
@@ -137,19 +96,6 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         self.identifier = identifier
         
         _setUpFrameObserver()
-    }
-    
-    private func _setUpFrameObserver() {
-        postsFrameChangedNotifications = true
-        
-        _frameObserver = NotificationCenter.default.addObserver(
-            forName: NSView.frameDidChangeNotification,
-            object: self,
-            queue: .main,
-            using: { [weak self] _ in
-                self?._updateContentHostingView()
-            }
-        )
     }
     
     required init?(coder: NSCoder) {
@@ -170,7 +116,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
                     guard _contentHostingView.superview != nil else {
                         return
                     }
-
+                    
                     assert(_contentHostingView.superview != nil)
                     
                     _contentHostingView._SwiftUIX_layoutIfNeeded()
@@ -201,6 +147,14 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
                 _contentHostingView._SwiftUIX_layoutIfNeeded()
             }
         }
+    }
+    
+    override func invalidateIntrinsicContentSize() {
+        guard !stateFlags.contains(.wasJustPutIntoUse) else {
+            return
+        }
+        
+        super.invalidateIntrinsicContentSize()
     }
     
     func prepareForUse(
@@ -236,10 +190,25 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         self._stateFlags.remove(.wasJustPutIntoUse)
         self._stateFlags.insert(.preparedForReuse)
         
-         _tearDownContentHostingView()
+        _tearDownContentHostingView()
         
-        // self.indexPath = nil
-        // self.payload = nil
+        self.indexPath = nil
+        self.payload = nil
+    }
+    
+    // MARK: - Internal
+    
+    private func _setUpFrameObserver() {
+        postsFrameChangedNotifications = true
+        
+        _frameObserver = NotificationCenter.default.addObserver(
+            forName: NSView.frameDidChangeNotification,
+            object: self,
+            queue: .main,
+            using: { [weak self] _ in
+                self?._updateContentHostingView()
+            }
+        )
     }
     
     @discardableResult
@@ -258,14 +227,14 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         
         if let _result = self._expensiveCache?.cellContentView as? _ContentHostingView {
             result = _result
-                        
+            
             self._contentHostingView = result
             self._contentHostingView?.rootView.maxContentViewWidth = _maximumContentViewWidth
             
             if result.frame.size != self.frame.size, !result.frame.size._isInvalidForIntrinsicContentSize {
                 self.frame.size = result.frame.size
             }
-
+            
             self._SwiftUIX_setNeedsLayout()
             self._SwiftUIX_layoutIfNeeded()
         } else {
@@ -321,6 +290,14 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     }
     
     private func _tearDownContentHostingView() {
+        guard _contentHostingView != nil else {
+            if _stateFlags.contains(.preparedForReuse) {
+                assert(payload == nil)
+            }
+            
+            return
+        }
+        
         assert(payload != nil)
         
         guard let _contentHostingView = _contentHostingView else {
@@ -332,6 +309,24 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         }
         
         self._contentHostingView = nil
+    }
+}
+
+extension _PlatformTableCellView {
+    fileprivate var _cheapCache: _CocoaListCache<Configuration>.CheapItemCache? {
+        guard let payload else {
+            return nil
+        }
+        
+        return parent?.coordinator.cache[cheap: payload.itemPath]
+    }
+    
+    fileprivate var _expensiveCache: _CocoaListCache<Configuration>.ExpensiveItemCache? {
+        guard let payload else {
+            return nil
+        }
+        
+        return parent?.coordinator.cache[expensive: payload.itemPath]
     }
 }
 

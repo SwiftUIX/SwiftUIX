@@ -118,11 +118,11 @@ extension _CocoaList {
             
             _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
                 tableView.reloadData()
-                tableView.scrollToEndOfDocument(nil)
+                // tableView.scrollToEndOfDocument(nil)
                 
                 if self.dirtyFlags.contains(.isFirstRun) {
                     DispatchQueue.main.async {
-                        tableView.scrollToEndOfDocument(nil)
+                        // tableView.scrollToEndOfDocument(nil)
                     }
                 }
             }
