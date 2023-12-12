@@ -11,7 +11,6 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
     private var _cheapItemCaches: [ItemPath: CheapItemCache] = [:]
     private var _expensiveItemCaches = KeyedBoundedPriorityQueue<ItemPath, ExpensiveItemCache>(maximumCapacity: 100)
     private var _itemPathsBySection: [_AnyCocoaListSectionID: Set<ItemPath>] = [:]
-    
     private var _configuration: ResolvedConfiguration?
     
     func update(
@@ -69,7 +68,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
             }
         }
     }
-
+    
     subscript(
         cheap indexPath: IndexPath
     ) -> CheapItemCache? {
@@ -79,7 +78,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         
         return self[cheap: path]
     }
-
+    
     subscript(
         expensive path: ItemPath
     ) -> ExpensiveItemCache {
@@ -116,12 +115,12 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         let itemPaths = self._itemPathsBySection[section] ?? []
         
         self._itemPathsBySection[section] =  nil
-    
+        
         for path in itemPaths {
             self._cheapItemCaches.removeValue(forKey: path)
         }
     }
-
+    
     func invalidate() {
         self._configuration = nil
         self._cheapItemCaches = [:]
@@ -137,7 +136,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         private(set) var sectionIDToItemIDsMap: [AnyHashable: Set<AnyHashable>] = [:]
         private(set) var indexPathToItemPathMap: [IndexPath: ItemPath] = [:]
         private(set) var itemPathToIndexPathMap: [ItemPath: IndexPath] = [:]
-
+        
         init(from base: Configuration) {
             self.base = base
             self.id = .init(from: base.data)
@@ -152,7 +151,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
                     let itemID = element[keyPath: base.data.itemID]
                     let indexPath = IndexPath(item: itemIndex, section: sectionIndex)
                     let itemPath = ItemPath(item: itemID, section: sectionID)
-
+                    
                     _ = self.sectionIDToItemIDsMap[sectionID, default: []].insert(itemID)
                     
                     self.indexPathToItemPathMap[indexPath] = itemPath

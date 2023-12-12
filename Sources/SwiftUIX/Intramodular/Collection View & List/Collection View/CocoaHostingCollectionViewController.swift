@@ -322,15 +322,12 @@ final class CocoaHostingCollectionViewController<
     }
     
     public func invalidateLayout(animated: Bool) {
-        if !animated {
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-        }
-        
-        collectionView.collectionViewLayout.invalidateLayout()
-        
-        if !animated {
-            CATransaction.commit()
+        CATransaction._withDisabledActions(!animated) {
+            collectionView.collectionViewLayout.invalidateLayout()
+            
+            if !animated {
+                CATransaction.commit()
+            }
         }
     }
     

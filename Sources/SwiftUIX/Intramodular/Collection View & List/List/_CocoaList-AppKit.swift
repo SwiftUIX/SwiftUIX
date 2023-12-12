@@ -118,7 +118,14 @@ extension _CocoaList {
             
             _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
                 tableView.reloadData()
-                // tableView.scrollToEndOfDocument(nil)
+                
+                if !self.dirtyFlags.contains(.isFirstRun) {
+                    tableView.scrollToEndOfDocument(nil)
+
+                    DispatchQueue.main.async {
+                        tableView.scrollToEndOfDocument(nil)
+                    }
+                }
                 
                 if self.dirtyFlags.contains(.isFirstRun) {
                     DispatchQueue.main.async {
@@ -187,19 +194,18 @@ extension _CocoaList {
             let sectionID = configuration.data.payload.first!.model[keyPath: configuration.data.sectionID]
             let itemPath = _CocoaListCache<Configuration>.ItemPath(item: itemID, section: sectionID)
             
-            let view = _withoutAppKitOrUIKitAnimation {
-                (tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableCellView<Configuration>) ?? _PlatformTableCellView<Configuration>(
-                    parent: tableViewContainer,
-                    identifier: identifier
-                )
-            }
+            let view = (tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableCellView<Configuration>) ?? _PlatformTableCellView<Configuration>(
+                parent: tableViewContainer,
+                identifier: identifier
+            )
             
             view.prepareForUse(
                 payload: .init(
                     itemPath: itemPath,
                     item: item,
                     content: configuration.viewProvider.rowContent(item)
-                )
+                ),
+                tableView: tableView
             )
             
             return view

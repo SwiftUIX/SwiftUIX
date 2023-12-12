@@ -12,11 +12,15 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
     override func noteHeightOfRows(withIndexesChanged indexSet: IndexSet) {
         super.noteHeightOfRows(withIndexesChanged: indexSet)
     }
+    
+    override func resizeSubviews(withOldSize oldSize: NSSize) {
+        super.resizeSubviews(withOldSize: oldSize)
+    }
 }
 
 @_spi(Internal)
 open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationType>: NSScrollView {
-    var _coordinator: _CocoaList<Configuration>.Coordinator!
+    private var _coordinator: _CocoaList<Configuration>.Coordinator!
     
     var coordinator: _CocoaList<Configuration>.Coordinator {
         _coordinator!
@@ -63,9 +67,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
                         
         self.coordinator.tableViewContainer = self
         
-        _latestTableViewFrame = _tableView.frame
-
-        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "SwiftUIX"))
+        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer"))
       
         column.title = ""
         
@@ -76,9 +78,13 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         tableView.delegate = coordinator
         
         documentView = _tableView
+        
+       // _setUpTableViewObserver()
     }
     
     private func _setUpTableViewObserver() {
+        tableView.postsBoundsChangedNotifications = true
+
         _tableViewFrameObserver = NotificationCenter.default.addObserver(
             forName: NSView.frameDidChangeNotification,
             object: _tableView,
@@ -87,11 +93,15 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
                 self?._observeTableViewFrameChange()
             }
         )
-        
-        tableView.postsBoundsChangedNotifications = true
     }
     
     func _observeTableViewFrameChange() {
+        guard _latestTableViewFrame != nil else {
+            _latestTableViewFrame = _tableView.frame
+            
+            return
+        }
+        
         guard _latestTableViewFrame != _tableView.frame else {
             return
         }

@@ -13,7 +13,7 @@ extension _VariadicViewChildren {
         let indexToIDMap: [Int: _CocoaListItemID]
         let idToSubviewMap: [_CocoaListItemID: _VariadicViewChildren.Element]
         
-        var data: Data {
+        var data: DataSource {
             .init(parent: self)
         }
         
@@ -43,7 +43,7 @@ extension _VariadicViewChildren {
 }
 
 extension _VariadicViewChildren._CocoaListContentAdapter {
-    struct Data: _CocoaListDataSourceType {
+    struct DataSource: _CocoaListDataSourceType {
         public typealias ID = _DefaultCocoaListDataSourceID
         
         public typealias SectionType = Int

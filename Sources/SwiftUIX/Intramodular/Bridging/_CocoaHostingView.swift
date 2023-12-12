@@ -48,14 +48,26 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         )
         
         rootView.parent = self
+        
+        _assembleCocoaHostingView()
     }
         
     public required init(rootView: RootView) {
         super.init(rootView: rootView)
+        
+        assert(self.rootView.parent == nil)
+        
+        self.rootView.parent = self
+        
+        _assembleCocoaHostingView()
     }
     
     public required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    open func _assembleCocoaHostingView() {
+        
     }
     
     override open func invalidateIntrinsicContentSize() {

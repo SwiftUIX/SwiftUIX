@@ -26,6 +26,9 @@ public func _withoutAnimation<T>(
     }
 }
 
+@usableFromInline
+var _SwiftUIX_AppKitOrUIKitAnimationIsDisabled: Bool = false
+
 @_transparent
 public func _withoutAppKitOrUIKitAnimation<Result>(
     _ flag: Bool = true,
@@ -34,6 +37,12 @@ public func _withoutAppKitOrUIKitAnimation<Result>(
     guard flag else {
         return body()
     }
+    
+    guard !_SwiftUIX_AppKitOrUIKitAnimationIsDisabled else {
+        return body()
+    }
+    
+    _SwiftUIX_AppKitOrUIKitAnimationIsDisabled = true
     
     var result: Result!
         
@@ -50,7 +59,50 @@ public func _withoutAppKitOrUIKitAnimation<Result>(
     result = body()
     #endif
     
+    _SwiftUIX_AppKitOrUIKitAnimationIsDisabled = false
+    
     return result
+}
+
+extension CATransaction {
+    @usableFromInline
+    static var _SwiftUIX_actionsAreDisabled: Bool = false
+    
+    @_transparent
+    @MainActor
+    public static func _withDisabledActions<T>(
+        _ flag: Bool = true,
+        @_implicitSelfCapture _ body: () throws -> T
+    ) rethrows -> T {
+        guard flag else {
+            return try body()
+        }
+
+        guard !_SwiftUIX_actionsAreDisabled else {
+            return try body()
+        }
+        
+        _SwiftUIX_actionsAreDisabled = true
+        
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+                
+        do {
+            let result = try body()
+            
+            CATransaction.commit()
+
+            _SwiftUIX_actionsAreDisabled = false
+            
+            return result
+        } catch {
+            CATransaction.commit()
+            
+            _SwiftUIX_actionsAreDisabled = false
+            
+            throw error
+        }
+    }
 }
 
 /// Returns the result of recomputing the view’s body with animations disabled.

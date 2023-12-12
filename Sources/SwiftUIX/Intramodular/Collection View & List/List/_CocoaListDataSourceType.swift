@@ -14,17 +14,15 @@ public protocol _CocoaListDataSourceType<SectionType, ItemType>: Identifiable {
     var itemID: KeyPath<ItemType, _AnyCocoaListItemID> { get }
 }
 
+// MARK: - Extensions
+
 extension _CocoaListDataSourceType {
     public var itemsCount: Int {
         payload.map({ $0.items.count }).reduce(into: 0, +=)
     }
 }
 
-extension _CocoaListDataSourceType where ID == _DefaultCocoaListDataSourceID {
-    public var id: ID {
-        ID(from: self)
-    }
-}
+// MARK: - Auxiliary
 
 public struct _DefaultCocoaListDataSourceID: Hashable {
     let rawValue: [ListSection<_AnyCocoaListSectionID, _AnyCocoaListItemID>]
@@ -38,13 +36,14 @@ public struct _DefaultCocoaListDataSourceID: Hashable {
         section: KeyPath<Section, SectionID>,
         item: KeyPath<Item, ItemID>
     ) {
-        self.rawValue = data.map {
-            $0.map {
-                _AnyCocoaListSectionID($0[keyPath: section])
-            }
-            .mapItems {
-                _AnyCocoaListItemID( $0[keyPath: item])
-            }
+        self.rawValue = data.map { (data: ListSection) in
+            data
+                .map {
+                    _AnyCocoaListSectionID($0[keyPath: section])
+                }
+                .mapItems {
+                    _AnyCocoaListItemID( $0[keyPath: item])
+                }
         }
     }
     
@@ -56,6 +55,14 @@ public struct _DefaultCocoaListDataSourceID: Hashable {
         )
     }
 }
+
+extension _CocoaListDataSourceType where ID == _DefaultCocoaListDataSourceID {
+    public var id: ID {
+        ID(from: self)
+    }
+}
+
+// MARK: - Implemented Conformances
 
 public struct _AnyCocoaListDataSource<SectionType, ItemType>: _CocoaListDataSourceType {
     public typealias ID = _DefaultCocoaListDataSourceID
