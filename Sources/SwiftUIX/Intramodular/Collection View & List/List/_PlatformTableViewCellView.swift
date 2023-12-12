@@ -268,11 +268,11 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             return
         }
         
-        defer {
+        /*defer {
             _lastFrameSize = self.frame.size
         }
         
-        /*guard let _contentHostingView = _contentHostingView else {
+        guard let _contentHostingView = _contentHostingView else {
             return
         }
         

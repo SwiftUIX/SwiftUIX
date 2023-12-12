@@ -306,6 +306,7 @@ extension SearchBar: NSViewRepresentable {
 
         nsView.isFirstResponderBinding = isFocused
 
+        _assignIfNotEqual(NSControl.ControlSize(context.environment.controlSize), to: &nsView.controlSize)
         _assignIfNotEqual(.roundedBezel, to: &nsView.bezelStyle)
         _assignIfNotEqual(focusRingType, to: &nsView.focusRingType)
         _assignIfNotEqual(false, to: &nsView.isBordered)

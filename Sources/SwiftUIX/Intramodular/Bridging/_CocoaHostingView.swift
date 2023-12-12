@@ -47,7 +47,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
             )
         )
         
-        rootView.parent = self
+        self.rootView.parent = self
         
         _assembleCocoaHostingView()
     }
@@ -82,11 +82,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     override open func resizeSubviews(withOldSize oldSize: NSSize) {
         super.resizeSubviews(withOldSize: oldSize)
     }
-    
-    override open func layout() {
-        super.layout()
-    }
-    
+        
     override open func layoutSubtreeIfNeeded() {
         super.layoutSubtreeIfNeeded()
     }
