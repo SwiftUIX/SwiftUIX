@@ -184,11 +184,19 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     }
     #endif
     
+    var _cachedIntrinsicContentSizeUsedAtLeastOnce: Bool = false
+    
     override open var intrinsicContentSize: CGSize {
         if let result = representableCache._cachedIntrinsicContentSize {
+            _cachedIntrinsicContentSizeUsedAtLeastOnce = true
+            
             return result
         } else {
-            return super.intrinsicContentSize
+            let result = super.intrinsicContentSize
+            
+            representableCache._cachedIntrinsicContentSize = result
+            
+            return result
         }
     }
     
@@ -272,6 +280,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         representableCache.invalidate(.intrinsicContentSize)
                 
         super.invalidateIntrinsicContentSize()
+        
+        _cachedIntrinsicContentSizeUsedAtLeastOnce = false
     }
     
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
@@ -627,6 +637,7 @@ extension _PlatformTextView {
         {
             let usedRect = layoutManager.usedRect(for: textContainer).size
 
+            /// DO NOT REMOVE.
             if usedRect.isAreaZero {
                 return _sizeThatFits(width: width)
             }

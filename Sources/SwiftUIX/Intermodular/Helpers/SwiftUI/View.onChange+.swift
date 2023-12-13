@@ -124,7 +124,14 @@ extension View {
         threshold: CGFloat? = nil,
         perform action: @escaping (CGSize) -> Void
     ) -> some View {
-        modifier(_OnChangeOfFrame(threshold: threshold, action: action))
+        modifier(_OnChangeOfFrame(threshold: threshold, action: action, onAppear: false))
+    }
+    
+    public func onAppearAndChangeOfFrame(
+        threshold: CGFloat? = nil,
+        perform action: @escaping (CGSize) -> Void
+    ) -> some View {
+        modifier(_OnChangeOfFrame(threshold: threshold, action: action, onAppear: true))
     }
 }
 
@@ -204,7 +211,8 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
 private struct _OnChangeOfFrame: ViewModifier {
     let threshold: CGFloat?
     let action: (CGSize) -> Void
-    
+    let onAppear: Bool
+
     @ViewStorage var oldSize: CGSize? = nil
     
     func body(content: Content) -> some View {
@@ -213,6 +221,10 @@ private struct _OnChangeOfFrame: ViewModifier {
                 ZeroSizeView()
                     .onAppear {
                         self.oldSize = proxy.size
+                        
+                        if onAppear {
+                            self.action(proxy.size)
+                        }
                     }
                     ._onChange(of: proxy.size) { newSize in
                         if let oldSize {

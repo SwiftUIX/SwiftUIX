@@ -106,7 +106,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
 
         customAppKitOrUIKitClassConfiguration.update(view, context)
 
-        _withoutAppKitOrUIKitAnimation(context.transaction.animation == nil) {
+        _withoutAppKitOrUIKitAnimation(context.transaction.disablesAnimations) {
             if let view = view as? _PlatformTextView<Label> {
                 assert(view.representatableStateFlags.contains(.updateInProgress))
                 
@@ -309,6 +309,10 @@ extension _TextView {
             return nil // TODO: Implement sizing for custom text views as well
         }
         
+        guard !view.representatableStateFlags.contains(.dismantled) else {
+            return nil
+        }
+
         guard let size = view._sizeThatFits(
             proposal: AppKitOrUIKitLayoutSizeProposal(
                 proposal,

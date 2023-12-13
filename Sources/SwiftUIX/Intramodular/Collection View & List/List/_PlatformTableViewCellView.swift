@@ -8,10 +8,6 @@ import SwiftUI
 
 #if os(macOS)
 
-public final class _PlatformTableContentHostingViewCoordinator<ListConfiguration: _CocoaListConfigurationType>: ObservableObject {
-    
-}
-
 class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTableCellView {
     weak var parent: _PlatformTableViewContainer<Configuration>?
 
@@ -50,8 +46,6 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         }
     }
     
-    let contentHostingViewCoordinator = _PlatformTableContentHostingViewCoordinator<Configuration>()
-
     private var _contentHostingView: _ContentHostingView? {
         didSet {
             if let oldValue, oldValue.superview != nil {
@@ -234,7 +228,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         } else {
             result = _ContentHostingView(
                 mainView: ContentHostingContainer(
-                    coordinator: contentHostingViewCoordinator,
+                    coordinator: .init(parent: nil),
                     payload: payload
                 )
             )
@@ -358,23 +352,54 @@ extension _PlatformTableCellView {
             itemPath.item
         }
     }
-    
+}
+
+extension _PlatformTableCellView {
     fileprivate struct ContentHostingContainer: View {
-        @ObservedObject var coordinator: _PlatformTableContentHostingViewCoordinator<Configuration>
+        @ObservedObject var coordinator: ContentHostingViewCoordinator
         
         var payload: Payload
-        var maxContentViewWidth: CGFloat?
+        
+        @State private var didAppear: Bool = false
                 
         var body: some View {
             payload.content
+                .frame(width: didAppear ? nil : coordinator.parent?.frame.width)
+                .frame(idealWidth: .greatestFiniteMagnitude, minHeight: 44)
                 .id(payload.itemID)
+                .onAppear {
+                    if !didAppear {
+                        didAppear = true
+                    }
+                }
+                .transaction { transaction in
+                    if !didAppear {
+                        transaction.disablesAnimations = true
+                    }
+                }
         }
     }
     
+    fileprivate final class ContentHostingViewCoordinator: ObservableObject {
+        private enum StateFlag {
+            case firstRenderComplete
+        }
+        
+        private var stateFlags: Set<StateFlag> = []
+        
+        weak var parent: _ContentHostingView?
+        
+        init(parent: _ContentHostingView?) {
+            self.parent = parent
+        }
+    }
+
     fileprivate final class _ContentHostingView: _CocoaHostingView<ContentHostingContainer> {
         private var _constraintsWithSuperview: [NSLayoutConstraint]? = []
         
-        var parent: _PlatformTableCellView? {
+        fileprivate lazy var contentHostingViewCoordinator = ContentHostingViewCoordinator(parent: self)
+
+        fileprivate var parent: _PlatformTableCellView? {
             guard let result = superview as? _PlatformTableCellView else {
                 return nil
             }
@@ -385,8 +410,10 @@ extension _PlatformTableCellView {
             
             return result
         }
-        
+                
         override func _assembleCocoaHostingView() {
+            self.mainView.coordinator = contentHostingViewCoordinator
+            
             translatesAutoresizingMaskIntoConstraints = false
             
             if #available(macOS 13.0, *) {

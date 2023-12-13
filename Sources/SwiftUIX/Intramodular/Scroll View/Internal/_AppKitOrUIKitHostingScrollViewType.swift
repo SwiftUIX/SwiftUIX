@@ -76,6 +76,10 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
                     x: self.contentView.bounds.origin.x,
                     y: 0
                 )
+                
+                tableView.scrollToEndOfDocument(nil)
+                
+                return
             case .trailing:
                 point = NSPoint(
                     x: self.documentView!.bounds.width - self.contentView.bounds.width,

@@ -96,7 +96,7 @@ extension _PlatformTextView {
         guard let textContainer = textContainer else {
             return
         }
-        
+                
         if _needsIntrinsicContentSizeInvalidation {
             invalidateIntrinsicContentSize()
             
@@ -128,7 +128,7 @@ extension _PlatformTextView {
                 case (false, true):
                     return nil
                 default:
-                    assertionFailure()
+                    assertionFailure("\(_fixedSize) is currently unsupported.")
                     
                     break
             }
@@ -194,6 +194,10 @@ extension _PlatformTextView {
 
 extension NSTextView {
     func setLineSpacing(_ lineSpacing: CGFloat) {
+        if defaultParagraphStyle == nil && lineSpacing == 0 {
+            return
+        }
+        
         if defaultParagraphStyle?.lineSpacing == lineSpacing {
             return
         }

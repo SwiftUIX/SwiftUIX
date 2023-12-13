@@ -9,11 +9,31 @@ import Swift
 import SwiftUI
 
 final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTableView {
-    override func noteHeightOfRows(withIndexesChanged indexSet: IndexSet) {
+    private let heightUpdatesQueue = DispatchQueue.main._debounce()
+    
+    func noteHeightOfRowsChanged() {
+        heightUpdatesQueue.schedule {
+            self.reloadData()
+            
+            DispatchQueue.main.async {
+                NSAnimationContext.beginGrouping()
+                NSAnimationContext.current.duration = 0
+                let entireTableView: IndexSet = .init(0..<self.numberOfRows)
+                self.noteHeightOfRows(withIndexesChanged: entireTableView)
+                NSAnimationContext.endGrouping()
+            }
+        }
+    }
+    
+    override func noteHeightOfRows(
+        withIndexesChanged indexSet: IndexSet
+    ) {
         super.noteHeightOfRows(withIndexesChanged: indexSet)
     }
     
-    override func resizeSubviews(withOldSize oldSize: NSSize) {
+    override func resizeSubviews(
+        withOldSize oldSize: NSSize
+    ) {
         super.resizeSubviews(withOldSize: oldSize)
     }
 }
@@ -47,7 +67,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
 
     init(
         coordinator: _CocoaList<Configuration>.Coordinator
-    ) {
+    ) {        
         self._coordinator = coordinator
         
         super.init(frame: .zero)

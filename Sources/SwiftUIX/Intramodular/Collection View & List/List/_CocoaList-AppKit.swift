@@ -112,18 +112,20 @@ extension _CocoaList {
         }
         
         private func reload() {
-            guard let tableView else {
+            guard let tableViewContainer else {
                 return
             }
             
             _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
-                tableView.reloadData()
+                tableViewContainer.tableView.reloadData()
+                
+                dirtyFlags.remove(.dataChanged)
                 
                 if !self.dirtyFlags.contains(.isFirstRun) {
-                    tableView.scrollToEndOfDocument(nil)
+                    tableViewContainer.scrollTo(.bottom)
 
                     DispatchQueue.main.async {
-                        tableView.scrollToEndOfDocument(nil)
+                        tableViewContainer.scrollTo(.bottom)
                     }
                 }
                 
@@ -138,36 +140,6 @@ extension _CocoaList {
         func numberOfRows(in tableView: NSTableView) -> Int {
             configuration.data.itemsCount
         }
-        
-        /*func tableView(
-         _ tableView: NSTableView,
-         heightOfRow row: Int
-         ) -> CGFloat {
-         let defaultHeight: CGFloat = 44
-         
-         guard let view = self.tableView(tableView, viewFor: nil, row: row) as? _PlatformTableCellView<Configuration> else {
-         assertionFailure()
-         
-         return defaultHeight
-         }
-         
-         if view.isCellInDisplay {
-         view._SwiftUIX_setNeedsLayout()
-         view._SwiftUIX_layoutIfNeeded()
-         
-         let height = view.fittingSize.height
-         
-         if height.isNormal && !height.isZero {
-         return height
-         } else {
-         assertionFailure()
-         
-         return defaultHeight
-         }
-         } else {
-         return self.cache[cheap: IndexPath(item: row, section: 0)]?.lastContentSize?.height ?? defaultHeight
-         }
-         }*/
         
         func tableView(
             _ tableView: NSTableView,
@@ -198,6 +170,8 @@ extension _CocoaList {
                 parent: tableViewContainer,
                 identifier: identifier
             )
+            
+            view.indexPath = IndexPath(item: row, section: 0)
             
             view.prepareForUse(
                 payload: .init(
