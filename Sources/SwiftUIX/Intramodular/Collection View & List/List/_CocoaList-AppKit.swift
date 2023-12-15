@@ -46,6 +46,7 @@ extension _CocoaList {
         enum DirtyFlag {
             case isFirstRun
             case dataChanged
+            case didJustReload
         }
         
         var dirtyFlags: Set<DirtyFlag> = []
@@ -105,10 +106,10 @@ extension _CocoaList {
             if self.dirtyFlags.contains(.dataChanged) {
                 reload()
             } else {
-                updateTableViewCells()
+                if !dirtyFlags.contains(.didJustReload) {
+                    updateTableViewCells()
+                }
             }
-            
-            self.dirtyFlags = []
         }
         
         private func reload() {
@@ -117,22 +118,22 @@ extension _CocoaList {
             }
             
             _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
-                tableViewContainer.tableView.reloadData()
-                
                 dirtyFlags.remove(.dataChanged)
                 
-                if !self.dirtyFlags.contains(.isFirstRun) {
-                    tableViewContainer.scrollTo(.bottom)
-
+                guard !dirtyFlags.contains(.didJustReload) else {
                     DispatchQueue.main.async {
-                        tableViewContainer.scrollTo(.bottom)
+                        tableViewContainer.reloadData()
                     }
+                    
+                    return
                 }
                 
-                if self.dirtyFlags.contains(.isFirstRun) {
-                    DispatchQueue.main.async {
-                        // tableView.scrollToEndOfDocument(nil)
-                    }
+                tableViewContainer.reloadData()
+                
+                dirtyFlags.insert(.didJustReload)
+                
+                DispatchQueue.main.async {
+                    self.dirtyFlags.remove(.didJustReload)
                 }
             }
         }

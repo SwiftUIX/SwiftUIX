@@ -131,7 +131,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                         content: copyOfRootView!
                     )
                 )
-                
+                                
                 copyOfRootView = nil
                 
                 self.contentViewController = contentViewController
@@ -255,6 +255,10 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 content: rootView
             )
         )
+        
+        if #available(macOS 13.0, *) {
+            contentViewController.sizingOptions = [.intrinsicContentSize, .preferredContentSize]
+        }
         
         switch style {
             case .`default`:
@@ -407,6 +411,8 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             }
         } else {
             contentWindowController?.showWindow(self)
+            
+            self.alphaValue = 1.0
         }
         #else
         isHidden = false
@@ -512,11 +518,11 @@ extension View {
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
     public func windowPosition(
-        _ offset: CGPoint
+        _ offset: CGPoint?
     ) -> some View {
         preference(
             key: _SwiftUIX_WindowPreferenceKeys.Position.self,
-            value: .init(offset, in: .coordinateSpace(.global))
+            value: offset.map({ _CoordinateSpaceRelative<CGPoint>($0, in: .coordinateSpace(.global)) })
         )
     }
     

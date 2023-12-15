@@ -58,6 +58,10 @@ extension UIHostingScrollView {
 #elseif os(macOS)
 extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
     public func scrollTo(_ edge: Edge) {
+        guard !isContentWithinBounds else {
+            return
+        }
+        
         let point: NSPoint
         
         switch edge {
@@ -94,4 +98,27 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
 }
 #endif
 
+#endif
+
+// MARK: - Auxiliary
+
+#if os(macOS)
+extension NSScrollView {
+    var isContentWithinBounds: Bool {
+        guard let documentView = self.documentView else {
+            return false
+        }
+        
+        let contentSize = documentView.frame.size
+        let scrollViewSize = self.bounds.size
+        let insets = self.contentInsets
+        
+        // Calculate effective content size by considering insets
+        let effectiveWidth = contentSize.width + insets.left + insets.right
+        let effectiveHeight = contentSize.height + insets.top + insets.bottom
+        
+        // Check if content size is within or equal to the scroll view's bounds
+        return effectiveWidth <= scrollViewSize.width && effectiveHeight <= scrollViewSize.height
+    }
+}
 #endif

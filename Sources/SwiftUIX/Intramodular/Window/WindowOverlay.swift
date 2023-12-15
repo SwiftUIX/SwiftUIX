@@ -29,7 +29,7 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     func makeAppKitOrUIKitViewController(
         context: Context
     ) -> AppKitOrUIKitViewControllerType {
-        .init(
+        AppKitOrUIKitViewControllerType(
             content: content,
             canBecomeKey: canBecomeKey,
             isVisible: isVisible.wrappedValue
@@ -69,7 +69,7 @@ extension WindowOverlay {
         var windowPresentationController: _WindowPresentationController<Content>
         
         init(content: Content, canBecomeKey: Bool, isVisible: Bool) {
-            self.windowPresentationController = .init(
+            self.windowPresentationController = _WindowPresentationController(
                 content: content,
                 canBecomeKey: canBecomeKey,
                 isVisible: isVisible

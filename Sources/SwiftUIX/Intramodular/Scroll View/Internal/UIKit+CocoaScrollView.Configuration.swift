@@ -6,7 +6,6 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS)
-
 extension UIScrollView {
     var isScrolling: Bool {
         layer.animation(forKey: "bounds") != nil
@@ -100,7 +99,7 @@ extension UIScrollView {
         #endif
     }
     
-    func maintainScrollContentOffsetBehavior(
+    func performEnforcingScrollOffsetBehavior(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
         _ update: () -> Void

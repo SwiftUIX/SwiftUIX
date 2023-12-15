@@ -66,8 +66,8 @@ public final class _TextCursorTracking: ObservableObject {
         }
                         
         owner._performOrSchedulePublishingChanges {
-            self.positionInText = owner._caretTextPosition
-            self.location = owner._SwiftUIX_caretLocation
+            _assignIfNotEqual(owner._caretTextPosition, to: &self.positionInText)
+            _assignIfNotEqual(owner._SwiftUIX_caretLocation, to: &self.location)
         }
     }
 }
@@ -120,6 +120,7 @@ extension AppKitOrUIKitTextView {
 
         let glyphIndex = layoutManager.glyphIndexForCharacter(at: location)
         var lineRange: NSRange = NSRange()
+        
         layoutManager.lineFragmentRect(forGlyphAt: glyphIndex, effectiveRange: &lineRange)
         
         var lineNumber = 1

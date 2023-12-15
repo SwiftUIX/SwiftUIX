@@ -83,6 +83,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         guard let result = _lazyTrackedTextCursor else {
             let result = _TextCursorTracking(owner: self)
             
+            self._lazyTrackedTextCursor = result
+            
             return result
         }
         

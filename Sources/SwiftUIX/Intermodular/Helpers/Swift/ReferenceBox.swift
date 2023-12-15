@@ -228,7 +228,7 @@ public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
 @propertyWrapper
 public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
     public weak var value: T? {
-        willSet {
+        willSet {            
             objectWillChange.send()
         }
     }

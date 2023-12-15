@@ -517,14 +517,14 @@ extension _PlatformTableCellView {
 
 // MARK: - Diagnostics
 
-extension NSTableCellView {
+extension NSView {
     private struct AssociatedKeys {
-        static var backgroundView: Void = ()
+        static var debugBackgroundView: Void = ()
     }
     
-    var backgroundView: NSView {
+    var _SwiftUIX_debugBackgroundView: NSView {
         get {
-            if let bgView = objc_getAssociatedObject(self, &AssociatedKeys.backgroundView) as? NSView {
+            if let bgView = objc_getAssociatedObject(self, &AssociatedKeys.debugBackgroundView) as? NSView {
                 return bgView
             }
             
@@ -535,18 +535,18 @@ extension NSTableCellView {
             
             self.addSubview(newView, positioned: .below, relativeTo: self.subviews.first)
             
-            objc_setAssociatedObject(self, &AssociatedKeys.backgroundView, newView, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &AssociatedKeys.debugBackgroundView, newView, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             
             return newView
         }
         set {
-            objc_setAssociatedObject(self, &AssociatedKeys.backgroundView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &AssociatedKeys.debugBackgroundView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
-    func setBackgroundColor(_ color: NSColor) {
+    func _SwiftUIX_setDebugBackgroundColor(_ color: NSColor) {
         DispatchQueue.main.async {
-            self.backgroundView.layer?.backgroundColor = color.cgColor
+            self._SwiftUIX_debugBackgroundView.layer?.backgroundColor = color.cgColor
         }
     }
 }

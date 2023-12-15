@@ -64,6 +64,7 @@ public func _withoutAppKitOrUIKitAnimation<Result>(
     return result
 }
 
+#if canImport(QuartzCore)
 extension CATransaction {
     @usableFromInline
     static var _SwiftUIX_actionsAreDisabled: Bool = false
@@ -104,6 +105,7 @@ extension CATransaction {
         }
     }
 }
+#endif
 
 /// Returns the result of recomputing the view’s body with animations disabled.
 @_transparent

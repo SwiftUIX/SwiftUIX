@@ -198,7 +198,7 @@ extension CocoaHostingCollectionViewController {
             
             snapshot.deleteAllItems()
             
-            maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
+            performEnforcingScrollOffsetBehavior(animated: _animateDataSourceDifferences) {
                 _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
             }
             
@@ -263,7 +263,7 @@ extension CocoaHostingCollectionViewController {
                 )
                 
                 if !itemDifferencesApplied {
-                    maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
+                    performEnforcingScrollOffsetBehavior(animated: _animateDataSourceDifferences) {
                         newValue?.reset(
                             _internalDataSource,
                             withConfiguration: dataSourceConfiguration,
@@ -279,17 +279,17 @@ extension CocoaHostingCollectionViewController {
         if hasDataSourceChanged {
             cache.invalidate()
             
-            maintainScrollContentOffsetBehavior(animated: _animateDataSourceDifferences) {
+            performEnforcingScrollOffsetBehavior(animated: _animateDataSourceDifferences) {
                 _internalDataSource.apply(snapshot, animatingDifferences: _animateDataSourceDifferences)
             }
         }
     }
     
-    private func maintainScrollContentOffsetBehavior(
+    private func performEnforcingScrollOffsetBehavior(
         animated: Bool,
         perform operaton: () -> Void
     ) {
-        collectionView.maintainScrollContentOffsetBehavior(
+        collectionView.performEnforcingScrollOffsetBehavior(
             _scrollViewConfiguration.contentOffsetBehavior,
             animated: animated
         ) {

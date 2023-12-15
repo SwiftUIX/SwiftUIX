@@ -95,7 +95,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         self.canBecomeKey = canBecomeKey
         self.isVisible = isVisible
         
-        DispatchQueue.asyncOnMainIfNecessary {
+        DispatchQueue.main.async {
             self._update()
         }
     }
@@ -137,6 +137,14 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
             contentWindow.rootView = content
 
+            #if os(macOS)
+            if contentWindow.configuration.canBecomeKey == true, !contentWindow.isKeyWindow {
+                if let appKeyWindow = AppKitOrUIKitApplication.shared.firstKeyWindow, appKeyWindow !== contentWindow {
+                    _assignIfNotEqual(NSWindow.Level(rawValue: appKeyWindow.level.rawValue + 1), to: &contentWindow.level)
+                }
+            }
+            #endif
+            
             return
         }
         
