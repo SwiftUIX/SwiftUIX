@@ -102,6 +102,8 @@ extension UserStorage {
         
         private var storeSubscription: AnyCancellable?
         
+        private var _isEncodingValueToStore: Bool = false
+        
         var value: Value {
             get {
                 storedValue ?? defaultValue
@@ -111,7 +113,9 @@ extension UserStorage {
 
                     storedValue = newValue
                     
+                    _isEncodingValueToStore = true
                     try store.encode(newValue, forKey: key)
+                    _isEncodingValueToStore = false
                 } catch {
                     if _isStrict {
                         assertionFailure(String(describing: error))
@@ -143,7 +147,9 @@ extension UserStorage {
             
             storeSubscription = store
                 .publisher(for: key, type: Any.self)
-                .receive(on: DispatchQueue.main)
+                .filter { _ in
+                    !self._isEncodingValueToStore
+                }
                 .map {
                     do {
                         return try store.decode(Value.self, from: $0)
@@ -153,6 +159,7 @@ extension UserStorage {
                         return nil
                     }
                 }
+                .receive(on: DispatchQueue.main)
                 .sink { [weak self] (newValue: Value?) in
                     guard let `self` = self else {
                         return

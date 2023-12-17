@@ -161,19 +161,35 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidLayout() {
         super.viewDidLayout()
         
-        if !view.frame.size._isNormal || view.frame.size.isAreaZero {
-            let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
+        if #available(macOS 13.0, *) {
+            let isManagedBySwiftUI = sizingOptions.contains(.preferredContentSize) || sizingOptions.contains(.intrinsicContentSize)
             
-            DispatchQueue.main.async {
-                if let popover = self.parentPopover {
-                    popover.contentSize = size
+            if !isManagedBySwiftUI {
+                _determineAndSetPreferredContentSize()
+            }
+        } else {
+            _determineAndSetPreferredContentSize()
+        }
+    }
+    #endif
+    
+    private func _determineAndSetPreferredContentSize() {
+        guard !view.frame.size._isNormal || view.frame.size.isAreaZero else {
+            return
+        }
+        
+        let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
+
+        if !size.isAreaZero {
+            DispatchQueue.main.async { [weak self] in
+                if let popover = self?.parentPopover {
+                    popover._assignIfNotEqual(size, to: \.contentSize)
                 } else {
-                    self.preferredContentSize = size
+                    self?._assignIfNotEqual(size, to: \.preferredContentSize)
                 }
             }
         }
     }
-    #endif
     
     public func _namedViewDescription(for name: AnyHashable) -> _NamedViewDescription? {
         _namedViewDescriptions[name]

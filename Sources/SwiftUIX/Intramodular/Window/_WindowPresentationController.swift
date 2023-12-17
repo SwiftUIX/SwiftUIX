@@ -190,7 +190,9 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             _assignIfNotEqual(UIWindow.Level(rawValue: window.windowLevel.rawValue + 1), to: &contentWindow.windowLevel)
             #endif
             
-            contentWindow.show()
+            contentWindow._withWellSizedWindow {
+                contentWindow.show()
+            }
             
             if canBecomeKey == false {
                 assert(!contentWindow.isKeyWindow)
@@ -287,6 +289,27 @@ public enum _WindowStyle {
                 assertionFailure("unimplemented")
                 
                 self = .default
+        }
+    }
+}
+
+extension AppKitOrUIKitHostingWindow {
+    func _withWellSizedWindow(
+        perform action: @escaping () -> Void
+    ) {
+        guard let contentView = _SwiftUIX_contentView else {
+            return
+        }
+        
+        if contentView.frame.size.isAreaZero {
+            contentView._SwiftUIX_setNeedsLayout()
+            contentView._SwiftUIX_layoutIfNeeded()
+            
+            DispatchQueue.main.async {
+                action()
+            }
+        } else {
+            action()
         }
     }
 }

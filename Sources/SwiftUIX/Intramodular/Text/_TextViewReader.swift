@@ -62,6 +62,10 @@ public final class _TextEditorProxy: Equatable, ObservableObject {
         }
     }
     
+    public var isFocused: Bool {
+        base?._SwiftUIX_isFirstResponder ?? false
+    }
+
     public var textCursor: _TextCursorTracking {
         base?._trackedTextCursor ?? _fakeTextCursor
     }

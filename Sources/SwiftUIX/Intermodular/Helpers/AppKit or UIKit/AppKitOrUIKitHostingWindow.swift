@@ -693,6 +693,8 @@ extension AppKitOrUIKitHostingWindow {
     public func setPosition(
         _ position: _CoordinateSpaceRelative<CGPoint>
     ) {
+        // contentView?._SwiftUIX_setDebugBackgroundColor(NSColor.red)
+        
         // This isn't a `guard` because we do not want to exit early. Even if the window position is the same, the actual desired position may have changed (window position can be relative).
         if configuration.windowPosition != position {
             configuration.windowPosition = position

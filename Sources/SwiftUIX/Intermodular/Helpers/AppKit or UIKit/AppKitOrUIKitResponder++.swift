@@ -40,6 +40,12 @@ extension AppKitOrUIKitResponder {
         return try next?._SwiftUIX_nearestResponder(where: predicate)
     }
     
+    public func _SwiftUIX_nearestResponder<Responder: NSResponder>(
+        ofKind kind: Responder.Type
+    ) -> Responder? {
+        _SwiftUIX_nearestResponder(where: { $0 is Responder }) as? Responder
+    }
+    
     @objc private func acquireFirstResponder(_ sender: Any) {
         AppKitOrUIKitResponder._firstResponder = self
     }
@@ -88,11 +94,56 @@ extension AppKitOrUIKitResponder {
     public func _SwiftUIX_nearestResponder(
         where predicate: (AppKitOrUIKitResponder) throws -> Bool
     ) rethrows -> AppKitOrUIKitResponder? {
+        var seen: Set<ObjectIdentifier> = []
+        
+        return try __SwiftUIX_nearestResponder(where: predicate, seen: &seen)
+    }
+
+    private func __SwiftUIX_nearestResponder(
+        where predicate: (AppKitOrUIKitResponder) throws -> Bool,
+        seen: inout Set<ObjectIdentifier>
+    ) rethrows -> AppKitOrUIKitResponder? {
         if try predicate(self) {
             return self
         }
         
-        return try nextResponder?._SwiftUIX_nearestResponder(where: predicate)
+        seen.insert(ObjectIdentifier(self))
+                
+        if let view = self as? NSView {
+            for subview in view.subviews {
+                guard !seen.contains(ObjectIdentifier(subview)) else {
+                    continue
+                }
+                
+                if let responder = try subview.__SwiftUIX_nearestResponder(where: predicate, seen: &seen) {
+                    return responder
+                }
+                
+                seen.insert(ObjectIdentifier(subview))
+            }
+        } else if let window = self as? NSWindow, let contentView = window.contentView {
+            if !seen.contains(ObjectIdentifier(contentView)) {
+                if let responder = try contentView.__SwiftUIX_nearestResponder(where: predicate, seen: &seen) {
+                    return responder
+                }
+                
+                seen.insert(ObjectIdentifier(contentView))
+            }
+        }
+        
+        if let nextResponder {
+            guard !seen.contains(ObjectIdentifier(nextResponder)) else {
+                return nil
+            }
+        }
+        
+        return try nextResponder?.__SwiftUIX_nearestResponder(where: predicate, seen: &seen)
+    }
+    
+    public func _SwiftUIX_nearestResponder<Responder: NSResponder>(
+        ofKind kind: Responder.Type
+    ) -> Responder? {
+        _SwiftUIX_nearestResponder(where: { $0 is Responder }) as? Responder
     }
     
     @discardableResult
