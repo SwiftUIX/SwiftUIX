@@ -36,6 +36,10 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
     ) {
         super.resizeSubviews(withOldSize: oldSize)
     }
+    
+    override func invalidateIntrinsicContentSize() {
+        
+    }
 }
 
 @_spi(Internal)
@@ -50,9 +54,10 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         let tableView = _PlatformTableView<Configuration>()
         
         tableView.headerView = nil
-        tableView.usesAutomaticRowHeights = true
         tableView.backgroundColor = .clear
         tableView.selectionHighlightStyle = .none
+        tableView.style = .plain
+        tableView.usesAutomaticRowHeights = true
         
         return tableView
     }()
@@ -106,26 +111,12 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         
         tableView.addTableColumn(column)
         
-        tableView.style = .plain
         tableView.dataSource = coordinator
         tableView.delegate = coordinator
         
         documentView = _tableView
         
         _setUpTableViewObserver()
-    }
-    
-    private func _performHidingScrollIndicators(_ operation: () -> Void) {
-        let _hasVerticalScroller = hasVerticalScroller
-        let _hasHorizontalScroller = hasHorizontalScroller
-        
-        hasVerticalScroller = false
-        hasHorizontalScroller = false
-        
-        operation()
-        
-        hasVerticalScroller = _hasVerticalScroller
-        hasHorizontalRuler = _hasHorizontalScroller
     }
     
     var _disableScrollFuckery: Bool = false
@@ -138,7 +129,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         super.reflectScrolledClipView(cView)
     }
     
-    func performEnforcingScrollOffsetBehavior(
+    func performEnforcingScrollOffsetBehavior2(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
         _ update: () -> Void
@@ -156,7 +147,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         }
     }
     
-    func _performEnforcingScrollOffsetBehavior(
+    func performEnforcingScrollOffsetBehavior(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
         _ update: () -> Void
@@ -262,11 +253,28 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             _scrollOffsetCorrectionOnTableViewFrameChange = nil
         }
         
-        /*if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
-         scrollTo(.bottom)
-         }*/
+        if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
+            scrollTo(.bottom)
+        }
     }
     
+    private func _performHidingScrollIndicators(_ operation: () -> Void) {
+        let _hasVerticalScroller = hasVerticalScroller
+        let _hasHorizontalScroller = hasHorizontalScroller
+        
+        hasVerticalScroller = false
+        hasHorizontalScroller = false
+        
+        operation()
+        
+        hasVerticalScroller = _hasVerticalScroller
+        hasHorizontalRuler = _hasHorizontalScroller
+    }
+}
+
+// MARK: - Auxiliary
+
+extension _PlatformTableViewContainer {
     class _ClipView: NSClipView {
         var parent: _PlatformTableViewContainer!
         
@@ -302,12 +310,16 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
 
 extension NSScrollView {
     func saveScrollOffset() -> NSPoint {
-        guard let documentView = self.documentView else { return NSZeroPoint }
+        guard let documentView = self.documentView else {
+            return NSZeroPoint
+        }
+        
         let documentVisibleRect = documentView.visibleRect
         let savedRelativeScrollPosition = NSPoint(
             x: documentVisibleRect.minX,
             y: documentVisibleRect.maxY - bounds.height
         )
+        
         return savedRelativeScrollPosition
     }
     
