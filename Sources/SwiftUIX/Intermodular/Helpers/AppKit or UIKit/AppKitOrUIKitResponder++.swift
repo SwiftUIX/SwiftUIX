@@ -40,7 +40,7 @@ extension AppKitOrUIKitResponder {
         return try next?._SwiftUIX_nearestResponder(where: predicate)
     }
     
-    public func _SwiftUIX_nearestResponder<Responder: NSResponder>(
+    public func _SwiftUIX_nearestResponder<Responder: AppKitOrUIKitResponder>(
         ofKind kind: Responder.Type
     ) -> Responder? {
         _SwiftUIX_nearestResponder(where: { $0 is Responder }) as? Responder

@@ -178,8 +178,9 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             return
         }
         
-        let size = sizeThatFits(in: NSView.layoutFittingCompressedSize)
+        let size = sizeThatFits(in: AppKitOrUIKitView.layoutFittingCompressedSize)
 
+        #if os(macOS)
         if !size.isAreaZero {
             DispatchQueue.main.async { [weak self] in
                 if let popover = self?.parentPopover {
@@ -189,6 +190,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
                 }
             }
         }
+        #endif
     }
     
     public func _namedViewDescription(for name: AnyHashable) -> _NamedViewDescription? {
