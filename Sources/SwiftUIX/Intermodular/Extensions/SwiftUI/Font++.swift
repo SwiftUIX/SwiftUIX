@@ -101,6 +101,14 @@ extension Font {
 }
 #endif
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
+extension Font {
+    public func scaled(by ratio: CGFloat) -> Self {
+        (try? toAppKitOrUIKitFont().scaled(by: ratio)).map({ Font($0) }) ?? self
+    }
+}
+#endif
+
 // MARK: - Auxiliary
 
 private enum _SwiftUIFontProvider {
