@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-fileprivate struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: ViewModifier where Key.Value: Equatable {
+fileprivate struct _OnViewTraitsChange<Key: _ViewTraitKey, ID: Hashable>: ViewModifier where Key.Value: Equatable {
     typealias Payload = [ID: Key.Value]
     
     let key: Key.Type
@@ -30,9 +30,13 @@ fileprivate struct _OnChangeOfViewTraits<Key: _ViewTraitKey, ID: Hashable>: View
                     Group {
                         // Only attach to the first view, we don't want to add a change observer n times.
                         if index == 0 {
-                            subview._onChange(of: traits) { _ in
-                                setPayload(traits)
-                            }
+                            subview
+                                .onAppear {
+                                    setPayload(traits)
+                                }
+                                ._onChange(of: traits) { _ in
+                                    setPayload(traits)
+                                }
                         }
                     }
                 }
@@ -62,7 +66,7 @@ extension View {
         id: @escaping (K.Value) -> ID,
         perform action: @escaping ([ID: K.Value]) -> Void
     ) -> some View where K.Value: Equatable {
-        modifier(_OnChangeOfViewTraits(key: key, action: action, id: id))
+        modifier(_OnViewTraitsChange(key: key, action: action, id: id))
     }
     
     public func _onViewTraitsChange<K: _ViewTraitKey, ID: Hashable>(
@@ -77,6 +81,6 @@ extension View {
         _ key: K.Type,
         perform action: @escaping ([AnyHashable: K.Value]) -> Void
     ) -> some View where K.Value: Equatable {
-        modifier(_OnChangeOfViewTraits(key: key, action: action, id: nil))
+        modifier(_OnViewTraitsChange(key: key, action: action, id: nil))
     }
 }
