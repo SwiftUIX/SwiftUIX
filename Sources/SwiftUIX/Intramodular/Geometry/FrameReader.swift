@@ -170,6 +170,15 @@ private final class CaptureViewSizePreferenceKey<T: View>: TakeLastPreferenceKey
 }
 
 extension View {
+    /// Measures and records the size of the view.
+    ///
+    /// - Parameters:
+    ///   - shouldMeasure: A Boolean value that determines if the size measurement should occur. Defaults to `true`.
+    ///   - binding: A binding to an optional CGSize to store the measured size.
+    /// - Returns: A modified view that measures its size and updates the binding.
+    ///
+    /// This function uses a GeometryReader to measure the size of the view. When `shouldMeasure` is `true`,
+    /// it updates the binding with the current size. The size is set to `nil` when the view disappears.
     @ViewBuilder
     public func _measureAndRecordSize(
         _ shouldMeasure: Bool = true,
@@ -196,6 +205,15 @@ extension View {
         }
     }
     
+    /// Measures and records the size of the view.
+    ///
+    /// - Parameters:
+    ///   - shouldMeasure: A Boolean value that determines if the size measurement should occur. Defaults to `true`.
+    ///   - binding: A non-optional binding to a CGSize to store the measured size.
+    /// - Returns: A modified view that measures its size and updates the binding.
+    ///
+    /// This function is similar to the first, but uses a non-optional CGSize binding.
+    /// It internally converts the non-optional binding into an optional binding, providing a default value of `.zero`.
     public func _measureAndRecordSize(
         _ shouldMeasure: Bool = true,
         into binding: Binding<CGSize>
@@ -203,6 +221,15 @@ extension View {
         _measureAndRecordSize(shouldMeasure, into: binding._asOptional(defaultValue: .zero))
     }
     
+    /// Measures and records the size of the view using a closure.
+    ///
+    /// - Parameters:
+    ///   - shouldMeasure: A Boolean value that determines if the size measurement should occur. Defaults to `true`.
+    ///   - fn: A closure that is called with the new size value.
+    /// - Returns: A modified view that measures its size and calls the closure with the new size.
+    ///
+    /// This variant allows passing a closure that will be called with the new size value.
+    /// It internally creates a binding that calls this closure when the size changes.
     public func _measureAndRecordSize(
         _ shouldMeasure: Bool = true,
         _ fn: @escaping (CGSize) -> Void
