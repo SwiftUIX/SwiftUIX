@@ -190,7 +190,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             _assignIfNotEqual(UIWindow.Level(rawValue: window.windowLevel.rawValue + 1), to: &contentWindow.windowLevel)
             #endif
             
-            contentWindow._withWellSizedWindow {
+            contentWindow._sizeWindowToNonZeroFitThenPerform {
                 contentWindow.show()
             }
             
@@ -293,8 +293,11 @@ public enum _WindowStyle {
     }
 }
 
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
-    func _withWellSizedWindow(
+    func _sizeWindowToNonZeroFitThenPerform(
         perform action: @escaping () -> Void
     ) {
         guard let contentView = _SwiftUIX_contentView else {
