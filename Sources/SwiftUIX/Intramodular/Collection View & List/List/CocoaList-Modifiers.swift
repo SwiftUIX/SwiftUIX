@@ -5,10 +5,19 @@
 import Swift
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
+
+extension CocoaList {
+    public func _overridePreferences(
+        _ preferences: _CocoaListPreferences
+    ) -> Self {
+        then {
+            $0._cocoaListPreferences = preferences
+        }
+    }
+}
+
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
-
-// MARK: - API
-
 extension CocoaList {
     public func listStyle(_ style: UITableView.Style) -> Self {
         then({ $0.style = style })
@@ -73,5 +82,6 @@ extension CocoaList {
         then({ $0.scrollViewConfiguration.refreshControlTintColor = color })
     }
 }
+#endif
 
 #endif

@@ -29,12 +29,17 @@ import SwiftUI
 public struct CocoaList<Content: View>: View {
     private let _content: AnyView
     
+    var _cocoaListPreferences: _CocoaListPreferences = nil
+    
     public init(_content: AnyView) {
         self._content = _content
     }
     
     public var body: some View {
         _content
+            .transformEnvironment(\._cocoaListPreferences) {
+                $0.mergeInPlace(with: _cocoaListPreferences)
+            }
     }
     
     public init(

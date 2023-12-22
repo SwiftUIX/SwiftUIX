@@ -322,6 +322,16 @@ extension _PlatformTableCellView {
         
         return parent?.coordinator.cache[expensive: payload.itemPath]
     }
+    
+    fileprivate var _fastRowHeight: CGFloat? {
+        guard let parent, let indexPath else {
+            assertionFailure()
+            
+            return nil
+        }
+        
+        return parent.coordinator._fastHeight(for: indexPath)
+    }
 }
 
 extension _PlatformTableCellView {
@@ -366,6 +376,7 @@ extension _PlatformTableCellView {
             payload.content
                 .frame(width: didAppear ? nil : coordinator.parent?.frame.width)
                 .frame(idealWidth: .greatestFiniteMagnitude, minHeight: 44)
+                .frame(height: coordinator._fastHeight)
                 .id(payload.itemID)
                 .onAppear {
                     if !didAppear {
@@ -389,6 +400,8 @@ extension _PlatformTableCellView {
         
         weak var parent: _ContentHostingView?
         
+        var _fastHeight: CGFloat?
+        
         init(parent: _ContentHostingView?) {
             self.parent = parent
         }
@@ -398,12 +411,21 @@ extension _PlatformTableCellView {
         private var _constraintsWithSuperview: [NSLayoutConstraint]? = []
         
         fileprivate lazy var contentHostingViewCoordinator = ContentHostingViewCoordinator(parent: self)
+        var didJustMoveToSuperview: Bool = false
 
+        override var intrinsicContentSize: CGSize {
+            if let fastHeight = contentHostingViewCoordinator._fastHeight {
+                return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: fastHeight)
+            } else {
+                return super.intrinsicContentSize
+            }
+        }
+                
         fileprivate var parent: _PlatformTableCellView? {
             guard let result = superview as? _PlatformTableCellView else {
                 return nil
             }
-            
+                        
             guard !result.stateFlags.contains(.preparedForReuse) else {
                 return nil
             }
@@ -413,22 +435,36 @@ extension _PlatformTableCellView {
                 
         override func _assembleCocoaHostingView() {
             self.mainView.coordinator = contentHostingViewCoordinator
-            
-            translatesAutoresizingMaskIntoConstraints = false
-            
-            if #available(macOS 13.0, *) {
-                sizingOptions = .standardBounds
-            }
-            
+                                    
             #if swift(>=5.9)
             if #available(macOS 14.0, *) {
                 sceneBridgingOptions = []
             }
             #endif
         }
-                
-        var didJustMoveToSuperview: Bool = false
         
+        private func _updateSizingOptions(parent: _PlatformTableCellView?) {
+            guard let parent = parent else {
+                return
+            }
+            
+            _assignIfNotEqual(false, to: \.translatesAutoresizingMaskIntoConstraints)
+                    
+            if let height = parent._fastRowHeight {
+                if #available(macOS 13.0, *) {
+                    _assignIfNotEqual([], to: \.sizingOptions)
+                }
+                
+                self.contentHostingViewCoordinator._fastHeight = height
+                
+                _assignIfNotEqual(height, to: \.frame.size.height)
+            } else {
+                if #available(macOS 13.0, *) {
+                    _assignIfNotEqual([.standardBounds], to: \.sizingOptions)
+                }
+            }
+        }
+                        
         override func viewWillMove(
             toSuperview newSuperview: NSView?
         ) {
@@ -447,6 +483,8 @@ extension _PlatformTableCellView {
                     }
                 }
             }
+            
+            _updateSizingOptions(parent: newSuperview as? _PlatformTableCellView)
         }
         
         override func viewDidMoveToSuperview() {

@@ -263,6 +263,10 @@ extension NSSize {
     }
 }
 
+extension NSTableCellView {
+    public static let automaticSize = CGSize(width: -1, height: -1)
+}
+
 extension NSView {
     public struct AnimationOptions: OptionSet {
         public static let curveEaseInOut = AnimationOptions(rawValue: 1 << 0)

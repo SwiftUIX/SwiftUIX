@@ -32,12 +32,16 @@ extension _CocoaList: NSViewRepresentable {
         context.coordinator.representableWillUpdate()
         
         context.coordinator.configuration = configuration
-        
+        context.coordinator.preferences = _cocoaListPreferences
+
         context.coordinator.representableDidUpdate()
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator(configuration: configuration)
+        Coordinator(
+            configuration: configuration,
+            preferences: _cocoaListPreferences
+        )
     }
 }
 
@@ -74,14 +78,17 @@ extension _CocoaList {
             }
         }
         
+        public var preferences: _CocoaListPreferences
+        
         weak var tableViewContainer: _PlatformTableViewContainer<Configuration>?
         
         var tableView: NSTableView? {
             tableViewContainer?.tableView
         }
         
-        public init(configuration: Configuration) {
+        public init(configuration: Configuration, preferences: _CocoaListPreferences) {
             self.configuration = configuration
+            self.preferences = preferences
             
             self.dirtyFlags.insert(.isFirstRun)
         }
@@ -135,6 +142,37 @@ extension _CocoaList {
                 DispatchQueue.main.async {
                     self.dirtyFlags.remove(.didJustReload)
                 }
+            }
+        }
+        
+        func tableView(
+            _ tableView: NSTableView,
+            heightOfRow row: Int
+        ) -> CGFloat {
+            switch preferences.cell.sizingOptions {
+                case .auto:
+                    return NSTableCellView.automaticSize.height
+                case .fixed(let width, let height):
+                    assert(width == nil, "Fixed width is currently unsupported.")
+                    
+                    guard let height else {
+                        return NSTableCellView.automaticSize.height
+                    }
+                    
+                    return height
+                case .custom(let height):
+                    switch height {
+                        case .indexPath(let height):
+                            let size = height(IndexPath(item: row, section: 0))
+                            
+                            assert(size.width == nil, "Fixed width is currently unsupported.")
+                            
+                            guard let height = size.height else {
+                                return NSTableCellView.automaticSize.height
+                            }
+                            
+                            return height
+                    }
             }
         }
         
@@ -217,6 +255,40 @@ extension _CocoaList {
         }
     }
 }
+
+extension _CocoaList.Coordinator {
+    func _fastHeight(
+        for indexPath: IndexPath
+    ) -> CGFloat? {
+        switch preferences.cell.sizingOptions {
+            case .auto:
+                return nil
+            case .fixed(let width, let height):
+                assert(width == nil, "Fixed width is currently unsupported.")
+                
+                guard let height else {
+                    return nil
+                }
+                
+                return height
+            case .custom(let height):
+                switch height {
+                    case .indexPath(let height):
+                        let size = height(indexPath)
+                        
+                        assert(size.width == nil, "Fixed width is currently unsupported.")
+                        
+                        guard let height = size.height else {
+                            return nil
+                        }
+                        
+                        return height
+                }
+        }
+    }
+}
+
+// MARK: - Helpers
 
 extension NSTableView {
     func _visibleTableViewCellViews() -> [NSTableCellView] {

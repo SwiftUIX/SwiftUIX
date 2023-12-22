@@ -8,11 +8,15 @@ import Swift
 import SwiftUI
 
 struct _CocoaList<Configuration: _CocoaListConfigurationType> {
+    @Environment(\._cocoaListPreferences) var _cocoaListPreferences
+    
     typealias Offset = ScrollView<AnyView>.ContentOffset
     
     let configuration: Configuration
     
-    init(configuration: Configuration) {
+    init(
+        configuration: Configuration
+    ) {
         self.configuration = configuration
     }
 }

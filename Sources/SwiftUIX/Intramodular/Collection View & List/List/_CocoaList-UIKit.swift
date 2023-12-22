@@ -38,7 +38,9 @@ public struct CocoaList<
     
     @usableFromInline
     var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
-    
+    @usableFromInline
+    var _cocoaListPreferences: _CocoaListPreferences = nil
+
     public init(
         _ data: Data,
         sectionHeader: @escaping (SectionType) -> SectionHeader,
