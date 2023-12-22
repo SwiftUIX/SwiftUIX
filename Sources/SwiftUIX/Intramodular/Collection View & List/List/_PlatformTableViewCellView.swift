@@ -420,9 +420,11 @@ extension _PlatformTableCellView {
                 sizingOptions = .standardBounds
             }
             
+            #if swift(>=5.9)
             if #available(macOS 14.0, *) {
                 sceneBridgingOptions = []
             }
+            #endif
         }
                 
         var didJustMoveToSuperview: Bool = false

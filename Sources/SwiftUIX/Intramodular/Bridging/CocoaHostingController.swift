@@ -120,6 +120,19 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         fatalError("init(coder:) has not been implemented")
     }
     
+    func _configureSizingOptions(for type: AppKitOrUIKitResponder.Type) {
+        #if os(macOS)
+        switch type {
+            case is AppKitOrUIKitWindow.Type:
+                if #available(macOS 13.0, *) {
+                    sizingOptions = [.intrinsicContentSize, .preferredContentSize]
+                }
+            default:
+                assertionFailure()
+        }
+        #endif
+    }
+    
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func loadView() {
         super.loadView()
