@@ -256,9 +256,7 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
             )
         )
         
-        if #available(macOS 13.0, *) {
-            contentViewController.sizingOptions = [.intrinsicContentSize, .preferredContentSize]
-        }
+        contentViewController._configureSizingOptions(for: AppKitOrUIKitWindow.self)
         
         switch style {
             case .`default`:

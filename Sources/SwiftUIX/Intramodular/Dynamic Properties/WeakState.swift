@@ -18,6 +18,8 @@ public struct WeakState<Value: AnyObject>: DynamicProperty {
     
     @usableFromInline
     @State var storage: Storage
+
+    @State private var foo: Bool = false
     
     public var wrappedValue: Value? {
         get {
@@ -39,7 +41,13 @@ public struct WeakState<Value: AnyObject>: DynamicProperty {
                 storage.wrappedValue
             },
             set: { newValue in
+                guard !(storage.wrappedValue === newValue) else {
+                    return
+                }
+                
                 storage.wrappedValue = newValue
+                
+                self.foo.toggle()
             }
         )
     }

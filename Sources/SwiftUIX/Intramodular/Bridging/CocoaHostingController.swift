@@ -120,7 +120,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         fatalError("init(coder:) has not been implemented")
     }
     
-    func _configureSizingOptions(for type: AppKitOrUIKitResponder.Type) {
+    public func _configureSizingOptions(for type: AppKitOrUIKitResponder.Type) {
         #if os(macOS)
         switch type {
             case is AppKitOrUIKitWindow.Type:

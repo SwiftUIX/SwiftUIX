@@ -239,6 +239,21 @@ public struct NSRectCorner: OptionSet {
     }
 }
 
+extension NSRectEdge {
+    public init(_ edge: Edge) {
+        switch edge {
+            case .top:
+                self = .maxY
+            case .leading:
+                self = .minX
+            case .bottom:
+                self = .minY
+            case .trailing:
+                self = .maxX
+        }
+    }
+}
+
 extension NSSize {
     public init(_ edgeInsets: EdgeInsets) {
         self.init(
