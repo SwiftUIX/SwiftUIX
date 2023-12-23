@@ -19,38 +19,53 @@ public func _assignIfNotEqual<Value: Equatable>(
 extension NSObjectProtocol {
     @_spi(Internal)
     @_transparent
+    @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
         _ newValue: Value,
         to keyPath: ReferenceWritableKeyPath<Self, Value>
-    ) {
+    ) -> Bool {
         if self[keyPath: keyPath] != newValue {
             self[keyPath: keyPath] = newValue
+            
+            return true
+        } else {
+            return false
         }
     }
     
     @_spi(Internal)
     @_transparent
+    @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
         _ newValue: Value?,
         to keyPath: ReferenceWritableKeyPath<Self, Value>
-    ) {
+    ) -> Bool {
         guard let newValue else {
-            return
+            return false
         }
         
         if self[keyPath: keyPath] != newValue {
             self[keyPath: keyPath] = newValue
+            
+            return true
+        } else {
+            return false
         }
     }
 
     @_spi(Internal)
     @_transparent
+    @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
         _ newValue: Value,
         to keyPath: ReferenceWritableKeyPath<Self, Value?>
-    ) {
+    ) -> Bool {
         if self[keyPath: keyPath] != newValue {
             self[keyPath: keyPath] = newValue
+            
+            return true
+        } else {
+            return false
         }
     }
 }

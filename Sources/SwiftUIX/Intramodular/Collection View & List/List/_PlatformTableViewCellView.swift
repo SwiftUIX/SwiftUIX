@@ -186,6 +186,13 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         self.payload = nil
     }
     
+    /// Refreshes the content hosting view.
+    ///
+    /// This is typically called when there is no major data update, but the outer SwiftUI context has updated.
+    open func refreshCellContent() {
+        contentHostingView._refreshCocoaHostingView()
+    }
+    
     // MARK: - Internal
     
     private func _setUpFrameObserver() {
@@ -443,28 +450,10 @@ extension _PlatformTableCellView {
             #endif
         }
         
-        private func _updateSizingOptions(parent: _PlatformTableCellView?) {
-            guard let parent = parent else {
-                return
-            }
-            
-            _assignIfNotEqual(false, to: \.translatesAutoresizingMaskIntoConstraints)
-                    
-            if let height = parent._fastRowHeight {
-                if #available(macOS 13.0, *) {
-                    _assignIfNotEqual([], to: \.sizingOptions)
-                }
-                
-                self.contentHostingViewCoordinator._fastHeight = height
-                
-                _assignIfNotEqual(height, to: \.frame.size.height)
-            } else {
-                if #available(macOS 13.0, *) {
-                    _assignIfNotEqual([.standardBounds], to: \.sizingOptions)
-                }
-            }
+        override func _refreshCocoaHostingView() {
+            _updateSizingOptions(parent: parent)
         }
-                        
+                                
         override func viewWillMove(
             toSuperview newSuperview: NSView?
         ) {
@@ -551,6 +540,36 @@ extension _PlatformTableCellView {
             parent?._cheapCache?.lastContentSize = nil
             
             super.invalidateIntrinsicContentSize()
+        }
+        
+        private func _updateSizingOptions(parent: _PlatformTableCellView?) {
+            guard let parent = parent else {
+                return
+            }
+            
+            guard !didJustMoveToSuperview else {
+                return
+            }
+            
+            _assignIfNotEqual(false, to: \.translatesAutoresizingMaskIntoConstraints)
+            
+            if let height = parent._fastRowHeight {
+                if #available(macOS 13.0, *) {
+                    _assignIfNotEqual([], to: \.sizingOptions)
+                }
+                
+                let didUpdate = _assignIfNotEqual(height, to: \.contentHostingViewCoordinator._fastHeight)
+                
+                if didUpdate {
+                    self.invalidateIntrinsicContentSize()
+                }
+                
+                _assignIfNotEqual(height, to: \.frame.size.height)
+            } else {
+                if #available(macOS 13.0, *) {
+                    _assignIfNotEqual([.standardBounds], to: \.sizingOptions)
+                }
+            }
         }
     }
 }

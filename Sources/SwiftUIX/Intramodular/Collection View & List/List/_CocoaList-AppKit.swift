@@ -241,6 +241,8 @@ extension _CocoaList {
                 assert(cell.payload != nil)
                 
                 cell.payload?.content = configuration.viewProvider.rowContent(item)
+                
+                cell.refreshCellContent()
             }
         }
         

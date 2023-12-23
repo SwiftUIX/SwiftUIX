@@ -70,6 +70,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
     }
     
+    open func _refreshCocoaHostingView() {
+        
+    }
+    
     override open func invalidateIntrinsicContentSize() {
         super.invalidateIntrinsicContentSize()
     }
