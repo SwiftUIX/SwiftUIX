@@ -66,13 +66,42 @@ extension Binding {
     }
 
     /// Creates a `Binding` by force-casting this binding's value.
-    public func forceCast<T>(to type: T.Type = T.self) -> Binding<T> {
+    public func forceCast<T>(
+        to type: T.Type = T.self
+    ) -> Binding<T> {
         Binding<T>(
             get: {
                 self.wrappedValue as! T
             },
             set: { newValue in
                 self.wrappedValue = newValue as! Value
+            }
+        )
+    }
+    
+    public func _conditionallyCast<T>(
+        as type: T.Type
+    ) -> Binding<T>? {
+        guard let currentValue = self.wrappedValue as? T else {
+            return nil
+        }
+         
+        return Binding<T>(
+            get: {
+                guard let result = self.wrappedValue as? T else {
+                    return currentValue
+                }
+                
+                return result
+            },
+            set: { newValue in
+                guard let newValue = newValue as? Value else {
+                    assertionFailure()
+                    
+                    return
+                }
+                
+                self.wrappedValue = newValue
             }
         )
     }
