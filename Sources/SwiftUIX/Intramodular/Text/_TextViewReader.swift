@@ -49,7 +49,7 @@ public struct _TextViewReader<Content: View>: View {
 
 public final class _TextEditorProxy: Equatable, ObservableObject {
     private let _base = WeakReferenceBox<AppKitOrUIKitTextView>(nil)
-    private var _fakeTextCursor = _TextCursorTracking(owner: nil)
+    private var _fakeTextCursor = _ObservableTextCursor(owner: nil)
     
     @_spi(Internal)
     public var base: (any _PlatformTextView_Type)? {
@@ -66,8 +66,8 @@ public final class _TextEditorProxy: Equatable, ObservableObject {
         base?._SwiftUIX_isFirstResponder ?? false
     }
 
-    public var textCursor: _TextCursorTracking {
-        base?._trackedTextCursor ?? _fakeTextCursor
+    public var textCursor: _ObservableTextCursor {
+        base?._observableTextCursor ?? _fakeTextCursor
     }
     
     @_spi(Internal)

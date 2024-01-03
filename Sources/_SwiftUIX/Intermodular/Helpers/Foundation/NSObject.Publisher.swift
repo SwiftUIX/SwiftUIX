@@ -6,27 +6,28 @@ import Combine
 import Foundation
 import Swift
 
+@_spi(Internal)
 extension NSObject {
     /// Publish values when the value identified by a KVO-compliant keypath changes.
-    func publisher<Value>(
+    public func publisher<Value>(
         for keyPath: String,
         type: Value.Type = Value.self,
         initial: Bool = false
     ) -> StringKeyValueObservingPublisher<Value> {
-        .init(
+        StringKeyValueObservingPublisher(
             object: self,
             keyPath: keyPath,
             initial: initial
         )
     }
     
-    struct StringKeyValueObservingPublisher<Value>: Combine.Publisher {
+    public struct StringKeyValueObservingPublisher<Value>: Combine.Publisher {
         public typealias Output = Value
         public typealias Failure = Never
         
-        let object: NSObject
-        let keyPath: String
-        let initial: Bool
+        public let object: NSObject
+        public let keyPath: String
+        public let initial: Bool
         
         public func receive<S: Combine.Subscriber>(
             subscriber: S

@@ -75,7 +75,11 @@ extension AppKitOrUIKitTextView {
 
 extension AppKitOrUIKitTextView {
     public var _SwiftUIX_selectedTextRange: NSRange? {
-        selectedRanges.first as? NSRange
+        guard let range = selectedRanges.first as? NSRange else {
+            return nil
+        }
+
+        return range
     }
             
     public var _SwiftUIX_text: String {

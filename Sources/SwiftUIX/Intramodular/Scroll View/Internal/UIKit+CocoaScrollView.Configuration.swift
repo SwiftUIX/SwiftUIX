@@ -145,7 +145,7 @@ extension UIScrollView {
 }
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 final class _UIRefreshControl: UIRefreshControl {
     var onRefresh: () -> Void
     

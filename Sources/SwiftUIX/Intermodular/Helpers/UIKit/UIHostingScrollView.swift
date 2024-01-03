@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS)
 
 open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate, _AppKitOrUIKitHostingScrollViewType {
     var _isUpdating: Bool = false

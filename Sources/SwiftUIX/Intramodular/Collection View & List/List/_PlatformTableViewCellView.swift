@@ -390,6 +390,7 @@ extension _PlatformTableCellView {
                         didAppear = true
                     }
                 }
+                ._geometryGroup(.if(.available))
                 .transaction { transaction in
                     if !didAppear {
                         transaction.disablesAnimations = true
@@ -611,3 +612,22 @@ extension NSView {
 }
 
 #endif
+
+extension View {
+    @ViewBuilder
+    public func _geometryGroup(_: _IfAvailable) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            geometryGroup()
+        } else {
+            self
+        }
+    }
+}
+
+public enum _IfAvailable {
+    public enum Available {
+        case available
+    }
+    
+    case `if`(Available)
+}

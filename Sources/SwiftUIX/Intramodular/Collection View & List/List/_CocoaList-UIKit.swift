@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(tvOS) || os(visionOS)
 
 /// WIP: Should be renamed to `_CocoaList`.
 public struct CocoaList<

@@ -41,6 +41,7 @@ public struct CocoaScrollViewConfiguration<Content: View>: ExpressibleByNilLiter
     
     #if os(iOS) || os(tvOS) || os(visionOS)
     @available(tvOS, unavailable)
+    @available(visionOS, unavailable)
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode {
         get {
             _keyboardDismissMode.flatMap({ $0 as? UIScrollView.KeyboardDismissMode }) ?? .none

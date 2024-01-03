@@ -20,7 +20,7 @@ public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKit
     var _needsIntrinsicContentSizeInvalidation: Bool { get set }
     
     var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> { get }
-    var _trackedTextCursor: _TextCursorTracking { get }
+    var _observableTextCursor: _ObservableTextCursor { get }
     
     func _SwiftUIX_makeLayoutManager() -> NSLayoutManager?
 
@@ -62,7 +62,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     private var _lazyTextEditorEventSubject: PassthroughSubject<_SwiftUIX_TextEditorEvent, Never>? = nil
     private var _lazyTextEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never>? = nil
-    private var _lazyTrackedTextCursor: _TextCursorTracking? = nil
+    
+    private var _lazy_observableTextCursor: _ObservableTextCursor? = nil
 
     @_spi(Internal)
     public var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> {
@@ -79,11 +80,11 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         return publisher
     }
     
-    public var _trackedTextCursor: _TextCursorTracking {
-        guard let result = _lazyTrackedTextCursor else {
-            let result = _TextCursorTracking(owner: self)
+    public var _observableTextCursor: _ObservableTextCursor {
+        guard let result = _lazy_observableTextCursor else {
+            let result = _ObservableTextCursor(owner: self)
             
-            self._lazyTrackedTextCursor = result
+            self._lazy_observableTextCursor = result
             
             return result
         }
@@ -255,7 +256,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             context: context
         )
         
-        _lazyTrackedTextCursor?.update()
+        _lazy_observableTextCursor?.update()
     }
     
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
@@ -389,12 +390,16 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             affinity: affinity,
             stillSelecting: stillSelectingFlag
         )
+        
+        _lazy_observableTextCursor?.update()
     }
     
     override open func deleteBackward(_ sender: Any?) {
         super.deleteBackward(sender)
         
         configuration.onDeleteBackward()
+        
+        _lazy_observableTextCursor?.update()
     }
     
     override open func preferredPasteboardType(

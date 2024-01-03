@@ -12,15 +12,8 @@ import SwiftUI
 import UIKit
 #endif
 
+/// An enumeration that represents either a screen or a SwiftUI `CoordinateSpace`.
 public enum _ScreenOrCoordinateSpace: Hashable {
-    public static var local: Self {
-        .coordinateSpace(.local)
-    }
-    
-    public static var global: Self {
-        .coordinateSpace(.global)
-    }
-
     case cocoa(Screen?)
     case coordinateSpace(CoordinateSpace)
     
@@ -30,6 +23,16 @@ public enum _ScreenOrCoordinateSpace: Hashable {
         }
         
         return screen
+    }
+}
+
+extension _ScreenOrCoordinateSpace {
+    public static var local: Self {
+        .coordinateSpace(.local)
+    }
+    
+    public static var global: Self {
+        .coordinateSpace(.global)
     }
 }
 
@@ -115,7 +118,7 @@ extension _CoordinateSpaceRelative where Value == CGPoint {
         for (key, value) in storage {
             switch key {
                 case .cocoa:
-                    fatalError("unimplemented")
+                    storage[key] = CGPoint(x: value.x + x, y: value.y + y)
                 case .coordinateSpace:
                     storage[key] = CGPoint(x: value.x + x, y: value.y + y)
             }
