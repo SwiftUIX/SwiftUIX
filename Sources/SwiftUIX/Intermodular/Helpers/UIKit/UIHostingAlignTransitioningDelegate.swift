@@ -48,7 +48,9 @@ class UIHostingAlignTransitioningDelegate<Background: View, Content: View>: UIHo
         )
     }
     
-    override func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    override func interactionControllerForDismissal(
+        using animator: UIViewControllerAnimatedTransitioning
+    ) -> UIViewControllerInteractiveTransitioning? {
         dismissalInteractionController
     }
     
@@ -89,6 +91,56 @@ extension ModalPresentationStyle {
         source: Alignment
     ) -> Self {
         .align(source: source, destination: source)
+    }
+    
+    private struct DefaultPresentationBackdrop: View {
+        @Environment(\.presentationManager) var presentationManager
+        @Environment(\._presentationTransitionPhase) var transitionPhase
+        
+        @State private var viewDidAppear = false
+        
+        private var opacity: Double {
+            guard let transitionPhase = transitionPhase else {
+                return 0.0
+            }
+            
+            switch transitionPhase {
+                case .willDismiss:
+                    return 0.0
+                case .didDismiss:
+                    return 0.0
+                default:
+                    break
+            }
+            
+            if viewDidAppear {
+                return 0.3
+            } else {
+                return 0.0
+            }
+        }
+        
+        var body: some View {
+            Color.black
+                .opacity(opacity)
+                .edgesIgnoringSafeArea(.all)
+                .onAppear {
+                    withAnimation {
+                        self.viewDidAppear = true
+                    }
+                }
+                .modify { content in
+                    #if os(tvOS)
+                    content.onTapGesture(perform: dismiss)
+                    #else
+                    content
+                    #endif
+                }
+        }
+        
+        func dismiss() {
+            presentationManager.dismiss()
+        }
     }
 }
 

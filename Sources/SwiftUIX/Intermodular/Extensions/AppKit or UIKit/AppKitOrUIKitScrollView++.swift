@@ -37,21 +37,20 @@ extension NSScrollView {
         }
     }
     
-    var contentOffset: NSPoint {
+    var contentOffset: CGPoint {
         get {
-            return contentView.documentVisibleRect.origin
-        }
-        set {
-            self.contentView.scroll(to: newValue)
+            contentView.documentVisibleRect.origin
+        } set {
+            contentView.scroll(to: newValue)
             
-            self.reflectScrolledClipView(self.contentView)
+            reflectScrolledClipView(contentView)
         }
     }
     
     var contentInset: NSEdgeInsets {
         get {
             contentInsets
-        }  set {
+        } set {
             contentInsets = newValue
         }
     }

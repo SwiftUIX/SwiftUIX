@@ -8,12 +8,16 @@ public struct _CocoaListPreferences: Sendable {
     public var cell: Cell = nil
     
     mutating func mergeInPlace(with other: Self) {
-        self.cell = other.cell
+        self.cell.mergeInPlace(with: other.cell)
     }
 }
 
 extension _CocoaListPreferences {
     public struct Cell: Sendable {
+        public struct ViewHostingOptions: Hashable, Sendable {
+            public var detachHostingView: Bool = false
+        }
+        
         public enum SizingOptions: Sendable {
             public enum Custom: Sendable {
                 case indexPath(@Sendable (IndexPath) -> OptionalDimensions)
@@ -24,7 +28,13 @@ extension _CocoaListPreferences {
             case custom(Custom)
         }
         
+        public var viewHostingOptions: ViewHostingOptions = .init()
         public var sizingOptions: SizingOptions = .auto
+        
+        mutating func mergeInPlace(with other: Self) {
+            self.viewHostingOptions = other.viewHostingOptions
+            self.sizingOptions = other.sizingOptions
+        }
     }
 }
 

@@ -11,11 +11,11 @@ extension NSScrollView {
         with configuration: CocoaScrollViewConfiguration<Content>
     ) {
         if let showsVerticalScrollIndicator = configuration.showsVerticalScrollIndicator {
-            self.hasVerticalScroller = showsVerticalScrollIndicator
+            _assignIfNotEqual(showsVerticalScrollIndicator, to: \.hasVerticalScroller)
         }
         
         if let showsHorizontalScrollIndicator = configuration.showsHorizontalScrollIndicator {
-            self.hasHorizontalScroller = showsHorizontalScrollIndicator
+            _assignIfNotEqual(showsHorizontalScrollIndicator, to: \.hasHorizontalScroller)
         }
     }
 }

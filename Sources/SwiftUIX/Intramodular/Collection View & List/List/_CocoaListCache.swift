@@ -13,6 +13,12 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
     private var _itemPathsBySection: [_AnyCocoaListSectionID: Set<ItemPath>] = [:]
     private var _configuration: ResolvedConfiguration?
     
+    weak var owner: _CocoaList<Configuration>.Coordinator?
+    
+    init(owner: _CocoaList<Configuration>.Coordinator?) {
+        self.owner = owner
+    }
+    
     func update(
         configuration: Configuration
     ) -> Bool {
@@ -48,13 +54,17 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         }
     }
     
+    @usableFromInline
+    @inline(__always)
     func itemPath(for indexPath: IndexPath) -> ItemPath? {
         self._configuration?.indexPathToItemPathMap[indexPath]
     }
-    
+        
+    @_optimize(speed)
     subscript(
         cheap path: ItemPath
     ) -> CheapItemCache {
+        @_optimize(speed)
         get {
             if let result = _cheapItemCaches[path] {
                 return result
@@ -69,6 +79,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         }
     }
     
+    @_optimize(speed)
     subscript(
         cheap indexPath: IndexPath
     ) -> CheapItemCache? {
@@ -79,6 +90,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
         return self[cheap: path]
     }
     
+    @_optimize(speed)
     subscript(
         expensive path: ItemPath
     ) -> ExpensiveItemCache {
@@ -162,11 +174,39 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
     }
 }
 
+#if os(macOS)
 extension _CocoaListCache {
-    public final class CheapItemCache {
+    var _calculatedContentHeight: CGFloat? {
+        guard let owner, let tableView = owner.tableView else {
+            assertionFailure()
+            
+            return nil
+        }
+        
+        var result: CGFloat = 0
+        
+        guard self._cheapItemCaches.count == tableView.numberOfRows else {
+            return nil
+        }
+        
+        for cache in _cheapItemCaches.values {
+            guard let contentSize = cache.lastContentSize, contentSize.isRegularAndNonZero else {
+                return nil
+            }
+            
+            result += contentSize.height
+        }
+        
+        return result
+    }
+}
+#endif
+
+extension _CocoaListCache {
+    public final class CheapItemCache: Identifiable {
         private unowned let parent: _CocoaListCache
         
-        private let id: ItemPath
+        public let id: ItemPath
         
         var lastContentSize: CGSize?
         
@@ -179,10 +219,10 @@ extension _CocoaListCache {
         }
     }
     
-    public final class ExpensiveItemCache {
+    public final class ExpensiveItemCache: Identifiable {
         private unowned let parent: _CocoaListCache
         
-        private let id: ItemPath
+        public let id: ItemPath
         
         #if os(macOS)
         var cellContentView: AppKitOrUIKitView?

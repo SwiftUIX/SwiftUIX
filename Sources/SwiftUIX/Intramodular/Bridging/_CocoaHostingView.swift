@@ -2,24 +2,40 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 
 import Combine
 import Swift
 import SwiftUI
+
+@frozen
+public enum _CocoaHostingViewStateFlag {
+    case didJustMoveToSuperview
+}
+
+@frozen
+public enum _CocoaHostingViewConfigurationFlag {
+    case disableResponderChain
+    case suppressRelayout
+}
 
 open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
     public typealias RootView = CocoaHostingControllerContent<Content>
     
     public var _SwiftUIX_cancellables: [AnyCancellable] = []
     public var _observedPreferenceValues = _ObservedPreferenceValues()
-
+    
+    public var _hostingViewConfigurationFlags: Set<_CocoaHostingViewConfigurationFlag> = []
+    public var _hostingViewStateFlags: Set<_CocoaHostingViewStateFlag> = []
+    
     public var _configuration: CocoaHostingControllerConfiguration = .init() {
         didSet {
             rootView.parentConfiguration = _configuration
         }
     }
-        
+    
+    @_optimize(speed)
+    @inline(__always)
     public var mainView: Content {
         get {
             rootView.content
@@ -28,7 +44,9 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         }
     }
     
-    #if os(macOS)
+#if os(macOS)
+    @_optimize(speed)
+    @inline(__always)
     override open var needsLayout: Bool {
         get {
             super.needsLayout
@@ -36,7 +54,27 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
             super.needsLayout = newValue
         }
     }
-    #endif
+#endif
+    
+#if os(macOS)
+    override open var acceptsFirstResponder: Bool {
+        if _hostingViewConfigurationFlags.contains(.disableResponderChain) {
+            return false
+        }
+        
+        return true
+    }
+#endif
+    
+#if os(macOS)
+    override open func becomeFirstResponder() -> Bool {
+        if _hostingViewConfigurationFlags.contains(.disableResponderChain) {
+            return false
+        }
+        
+        return super.becomeFirstResponder()
+    }
+#endif
     
     public init(mainView: Content) {
         super.init(
@@ -51,7 +89,8 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         _assembleCocoaHostingView()
     }
-        
+    
+    @inline(__always)
     public required init(rootView: RootView) {
         super.init(rootView: rootView)
         
@@ -75,26 +114,84 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     }
     
     override open func invalidateIntrinsicContentSize() {
+        guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+            return
+        }
+        
         super.invalidateIntrinsicContentSize()
     }
     
-    #if os(macOS)
+#if os(macOS)
     override open func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
     }
     
-    override open func resizeSubviews(withOldSize oldSize: NSSize) {
-        super.resizeSubviews(withOldSize: oldSize)
-    }
+    override open func viewDidMoveToSuperview() {
+        super.viewDidMoveToSuperview()
         
-    override open func layoutSubtreeIfNeeded() {
-        super.layoutSubtreeIfNeeded()
+        if superview != nil {
+            _hostingViewStateFlags.insert(.didJustMoveToSuperview)
+        } else {
+            _hostingViewStateFlags.remove(.didJustMoveToSuperview)
+        }
+        
+        DispatchQueue.main.async {
+            self._hostingViewStateFlags.remove(.didJustMoveToSuperview)
+        }
     }
     
-    override open func resize(withOldSuperviewSize oldSize: NSSize) {
+    @_optimize(speed)
+    override open func layout() {
+        guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+            return
+        }
+        
+        super.layout()
+    }
+    
+    @_optimize(speed)
+    override open func resizeSubviews(
+        withOldSize oldSize: NSSize
+    ) {
+        guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+            return
+        }
+        
+        super.resizeSubviews(withOldSize: oldSize)
+    }
+    
+    @_optimize(speed)
+    override open func resize(
+        withOldSuperviewSize oldSize: NSSize
+    ) {
+        guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+            return
+        }
+        
         super.resize(withOldSuperviewSize: oldSize)
     }
-    #endif
+#endif
+}
+
+extension _CocoaHostingView {
+    @_optimize(speed)
+    @_transparent
+    @inlinable
+    @inline(__always)
+    public func withCriticalScope<Result>(
+        _ flags: Set<_CocoaHostingViewConfigurationFlag>,
+        perform action: () -> Result
+    ) -> Result {
+        let currentFlags = self._hostingViewConfigurationFlags
+        
+        defer {
+            self._hostingViewConfigurationFlags = currentFlags
+        }
+        
+        self._hostingViewConfigurationFlags.formUnion(flags)
+        
+        return action()
+    }
 }
 
 // MARK: - WIP
@@ -119,7 +216,7 @@ extension _CocoaHostingView {
             guard view.frame.size._isNormal, self.frame.size._isNormal else {
                 return
             }
-
+            
             // TODO: Implement
         }
     }

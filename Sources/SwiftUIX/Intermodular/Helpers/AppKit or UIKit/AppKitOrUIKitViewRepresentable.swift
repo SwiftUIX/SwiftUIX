@@ -10,7 +10,7 @@ public protocol _AppKitOrUIKitRepresentable {
     associatedtype Coordinator
 }
 
-public protocol _AppKitOrUIKitViewRepresentableContext {
+public protocol _AppKitOrUIKitViewRepresentableContext<Coordinator> {
     associatedtype Coordinator
     
     var coordinator: Coordinator { get }

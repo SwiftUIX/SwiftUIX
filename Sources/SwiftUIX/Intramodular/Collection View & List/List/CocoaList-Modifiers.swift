@@ -15,6 +15,14 @@ extension CocoaList {
             $0._cocoaListPreferences = preferences
         }
     }
+    
+    public func _overridePreferences(
+        _ operation: (inout _CocoaListPreferences) -> Void
+    ) -> Self {
+        then {
+            operation(&$0._cocoaListPreferences)
+        }
+    }
 }
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)

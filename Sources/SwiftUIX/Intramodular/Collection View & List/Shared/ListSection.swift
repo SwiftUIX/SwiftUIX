@@ -7,6 +7,11 @@ import SwiftUI
 
 /// A model suitable for representing sections of a list.
 public struct ListSection<SectionType, ItemType> {
+    enum _ItemsStorage {
+        case array([ItemType])
+        case collection(AnyRandomAccessCollection<ItemType>)
+    }
+    
     public typealias Items = AnyRandomAccessCollection<ItemType>
     
     private let _model: SectionType?
@@ -56,7 +61,7 @@ extension ListSection {
             items: items
         )
     }
-
+    
     public func mapItems<T>(
         _ transform: (ItemType) -> T
     ) -> ListSection<SectionType, T> {
@@ -169,8 +174,8 @@ extension ListSection: Identifiable where SectionType: Identifiable, ItemType: I
 
 // MARK: - Helpers
 
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension Collection {
-    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     subscript<SectionType, ItemType>(
         _ indexPath: IndexPath
     ) -> ItemType where Element == ListSection<SectionType, ItemType> {
@@ -198,8 +203,10 @@ extension Collection {
             return self[sectionIndex].items[rowIndex]
         }
     }
-    #endif
+}
+#endif
     
+extension Collection {
     public func isIdentical<SectionModel: Identifiable, Item: Identifiable>(
         to other: Self
     ) -> Bool where Element == ListSection<SectionModel, Item> {

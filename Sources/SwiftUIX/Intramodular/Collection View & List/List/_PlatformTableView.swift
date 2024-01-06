@@ -9,26 +9,30 @@ import Swift
 import SwiftUI
 
 final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTableView {
-    private let heightUpdatesQueue = DispatchQueue.main._debounce()
+    let listRepresentable: _CocoaList<Configuration>.Coordinator
     
-    func noteHeightOfRowsChanged() {
-        heightUpdatesQueue.schedule {
-            self.reloadData()
-            
-            DispatchQueue.main.async {
-                NSAnimationContext.beginGrouping()
-                NSAnimationContext.current.duration = 0
-                let entireTableView: IndexSet = .init(0..<self.numberOfRows)
-                self.noteHeightOfRows(withIndexesChanged: entireTableView)
-                NSAnimationContext.endGrouping()
-            }
+    override var rowHeight: CGFloat {
+        get {
+            super.rowHeight
+        } set {
+            super.rowHeight = newValue
         }
     }
     
-    override func noteHeightOfRows(
-        withIndexesChanged indexSet: IndexSet
-    ) {
-        super.noteHeightOfRows(withIndexesChanged: indexSet)
+    init(listRepresentable: _CocoaList<Configuration>.Coordinator) {
+        UserDefaults.standard.set(false, forKey: "NSTableViewCanEstimateRowHeights")
+        
+        self.listRepresentable = listRepresentable
+        
+        super.init(frame: .zero)
+        
+        self.rowSizeStyle = .custom
+        self.cornerView = nil
+        self.usesAutomaticRowHeights = true
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func resizeSubviews(
@@ -39,6 +43,22 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
     
     override func invalidateIntrinsicContentSize() {
         
+    }
+    
+    override func prepareContent(in rect: NSRect) {
+        listRepresentable.stateFlags.insert(.isNSTableViewPreparingContent)
+        
+        defer {
+            listRepresentable.stateFlags.remove(.isNSTableViewPreparingContent)
+        }
+        
+        super.prepareContent(in: visibleRect)
+    }
+    
+    override func noteHeightOfRows(
+        withIndexesChanged indexSet: IndexSet
+    ) {
+        super.noteHeightOfRows(withIndexesChanged: indexSet)
     }
 }
 

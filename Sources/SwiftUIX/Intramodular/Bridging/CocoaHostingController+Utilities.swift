@@ -28,6 +28,12 @@ public struct CocoaHostingControllerContent<Content: View>: View  {
             ._measureAndRecordSize(parentConfiguration._isMeasuringSize) { [weak parent] in
                 parent?._configuration._measuredSizePublisher.send($0)
             }
+            .transaction { transaction in
+                if parent?._hostingViewConfigurationFlags.contains(.suppressRelayout) == true {
+                    transaction.animation = nil
+                    transaction.disablesAnimations = true
+                }
+            }
     }
 }
 #endif

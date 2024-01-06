@@ -68,7 +68,7 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
             case .top:
                 point = NSPoint(
                     x: self.contentView.bounds.origin.x,
-                    y: self.documentView!.bounds.height - self.contentView.bounds.height
+                    y: self.documentSize.height - self.contentView.bounds.height
                 )
             case .leading:
                 point = NSPoint(
@@ -86,7 +86,7 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
                 return
             case .trailing:
                 point = NSPoint(
-                    x: self.documentView!.bounds.width - self.contentView.bounds.width,
+                    x: self.documentSize.width - self.contentView.bounds.width,
                     y: self.contentView.bounds.origin.y
                 )
         }
@@ -104,12 +104,12 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
 
 #if os(macOS)
 extension NSScrollView {
+    public var documentSize: NSSize {
+        contentView.documentRect.size
+    }
+    
     var isContentWithinBounds: Bool {
-        guard let documentView = self.documentView else {
-            return false
-        }
-        
-        let contentSize = documentView.frame.size
+        let contentSize = documentSize
         let scrollViewSize = self.bounds.size
         let insets = self.contentInsets
         

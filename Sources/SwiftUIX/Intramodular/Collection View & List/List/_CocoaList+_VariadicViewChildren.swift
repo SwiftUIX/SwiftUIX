@@ -13,6 +13,8 @@ extension _VariadicViewChildren {
         let indexToIDMap: [Int: _CocoaListItemID]
         let idToSubviewMap: [_CocoaListItemID: _VariadicViewChildren.Element]
         
+        public var preferences: _CocoaListPreferences = nil
+
         var data: DataSource {
             .init(parent: self)
         }
@@ -21,7 +23,10 @@ extension _VariadicViewChildren {
             .init(parent: self)
         }
         
-        init(_ data: _VariadicViewChildren) {
+        init(
+            _ data: _VariadicViewChildren,
+            preferences: _CocoaListPreferences
+        ) {
             var identifiers: [_CocoaListItemID] = Array()
             var indexToIDMap: [Int: _CocoaListItemID] = [:]
             var idToSubviewMap: [_CocoaListItemID: _VariadicViewChildren.Element] = [:]
@@ -38,6 +43,7 @@ extension _VariadicViewChildren {
             self.identifiers = identifiers
             self.indexToIDMap = indexToIDMap
             self.idToSubviewMap = idToSubviewMap
+            self.preferences = preferences
         }
     }
 }

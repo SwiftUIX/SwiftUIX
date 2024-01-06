@@ -9,65 +9,39 @@ import SwiftUI
 #if os(macOS)
 
 class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTableCellView {
-    weak var parent: _PlatformTableViewContainer<Configuration>?
-
+    let parent: _CocoaList<Configuration>.Coordinator
+    
     private var _frameObserver: NSObjectProtocol?
     private var _lastFrameSize: CGSize? = nil
     private var _stateFlags: Set<_StateFlag> = []
-        
+    
     var indexPath: IndexPath?
-    var _payload: Payload? {
-        didSet {
-            if let payload = _payload {
-                _contentHostingView?.mainView.payload = payload
-            } else {
-                _tearDownContentHostingView()
-            }
-        }
-    }
+    var payload: Payload?
     
     var stateFlags: Set<_StateFlag> {
         _stateFlags
     }
-    
-    override var fittingSize: NSSize {
-        if let contentHostingView = _contentHostingView {
-            return contentHostingView.fittingSize
-        } else {
-            return .zero
-        }
-    }
-    
-    var payload: Payload? {
-        get {
-            _payload
-        } set {
-            _payload = newValue
-        }
-    }
-    
-    private var _contentHostingView: _ContentHostingView? {
+
+    private var _contentHostingView: ContentHostingView? {
         didSet {
             if let oldValue, oldValue.superview != nil {
                 oldValue.removeFromSuperview()
             }
             
             if let _contentHostingView {
-                CATransaction._withDisabledActions {
+                _contentHostingView.withCriticalScope([.suppressRelayout]) {
                     addSubview(_contentHostingView)
                 }
             }
         }
     }
     
-    fileprivate var contentHostingView: _ContentHostingView {
+    var contentHostingView: ContentHostingView {
         get {
             let result = _contentHostingView ?? _initializeContentHostingView()
             
             if !(result.superview === self) {
-                CATransaction._withDisabledActions {
-                    addSubview(result)
-                }
+                addSubview(result)
             }
             
             return result
@@ -76,22 +50,20 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         }
     }
     
-    
     var isCellInDisplay: Bool {
         _contentHostingView != nil
     }
-            
+    
     init(
         parent: _PlatformTableViewContainer<Configuration>,
         identifier: NSUserInterfaceItemIdentifier
     ) {
-        self.parent = parent
+        self.parent = parent.coordinator
         
         super.init(frame: .zero)
         
+        self.autoresizesSubviews = false
         self.identifier = identifier
-        
-        _setUpFrameObserver()
     }
     
     required init?(coder: NSCoder) {
@@ -101,22 +73,28 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     override func viewDidMoveToSuperview() {
         super.viewDidMoveToSuperview()
         
-        if let _contentHostingView, _contentHostingView.frame.size._isInvalidForIntrinsicContentSize {
-            if !frame.size._isInvalidForIntrinsicContentSize {
-                _contentHostingView.frame.size.width = self.frame.size.width
-                
-                _contentHostingView._SwiftUIX_setNeedsLayout()
-                
-                DispatchQueue.main.async {
-                    guard _contentHostingView.superview != nil else {
-                        return
-                    }
-                    
-                    assert(_contentHostingView.superview != nil)
-                    
-                    _contentHostingView._SwiftUIX_layoutIfNeeded()
-                }
+        _fixContentHostingViewSizeIfNeeded()
+    }
+    
+    private func _fixContentHostingViewSizeIfNeeded() {
+        guard let _contentHostingView, _contentHostingView.frame.size.width._isInvalidForIntrinsicContentSize else {
+            return
+        }
+        
+        guard !frame.size._isInvalidForIntrinsicContentSize else {
+            return
+        }
+        
+        _contentHostingView.frame.size.width = self.frame.size.width
+        
+        DispatchQueue.main.async {
+            guard _contentHostingView.superview != nil else {
+                return
             }
+            
+            assert(_contentHostingView.superview != nil)
+            
+            _contentHostingView._SwiftUIX_layoutIfNeeded()
         }
     }
     
@@ -128,13 +106,11 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
                 return
             }
         }
-
+        
         super.resizeSubviews(withOldSize: oldSize)
-                
-        let _contentHostingView = contentHostingView
         
         if !(_stateFlags.contains(.isInitializingContentHostingView) || inLiveResize) {
-            _contentHostingView._SwiftUIX_setNeedsLayout()
+            _contentHostingView?._SwiftUIX_setNeedsLayout()
         }
     }
     
@@ -165,18 +141,34 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             self._stateFlags.remove(.wasJustPutIntoUse)
         }
         
-        if self.payload == nil || !(self.payload?.itemPath == payload.itemPath) {
-            self.payload = payload
+        self.payload = payload
+
+        if let contentHostingView = _contentHostingView {
+            assert(!parent.configuration.preferences.cell.viewHostingOptions.detachHostingView)
+            
+            _withoutAppKitOrUIKitAnimation {
+                if let size = self._cheapCache?.lastContentSize, size != self.frame.size {
+                    contentHostingView.frame.size = size
+                }
+                
+                contentHostingView.withCriticalScope([.suppressRelayout]) {
+                    contentHostingView.payload = payload
+                }
+                
+                contentHostingView.isHidden = false
+            }
+        } else {
+            _initializeContentHostingView(tableView: tableView)
         }
-        
-        _initializeContentHostingView(tableView: tableView)
     }
     
     override func prepareForReuse() {
         guard self.payload != nil || _contentHostingView != nil else {
             return
         }
-        
+                
+        _contentHostingView?.isHidden = true
+
         self._stateFlags.remove(.wasJustPutIntoUse)
         self._stateFlags.insert(.preparedForReuse)
         
@@ -193,25 +185,10 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         contentHostingView._refreshCocoaHostingView()
     }
     
-    // MARK: - Internal
-    
-    private func _setUpFrameObserver() {
-        postsFrameChangedNotifications = true
-        
-        _frameObserver = NotificationCenter.default.addObserver(
-            forName: NSView.frameDidChangeNotification,
-            object: self,
-            queue: .main,
-            using: { [weak self] _ in
-                self?._updateContentHostingView()
-            }
-        )
-    }
-    
     @discardableResult
     private func _initializeContentHostingView(
         tableView: NSTableView? = nil
-    ) -> _ContentHostingView {
+    ) -> ContentHostingView {
         guard let payload else {
             fatalError()
         }
@@ -222,74 +199,31 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             self._stateFlags.remove(.isInitializingContentHostingView)
         }
         
-        let result: _ContentHostingView
+        let result: ContentHostingView
         
-        if let _result = self._expensiveCache?.cellContentView as? _ContentHostingView {
+        if let _result = self._expensiveCache?.cellContentView as? ContentHostingView {
             result = _result
-        
+            
             if result.frame.size != self.frame.size, !result.frame.size._isInvalidForIntrinsicContentSize {
                 self.frame.size = result.frame.size
             }
-
+            
             self._contentHostingView = result
         } else {
-            result = _ContentHostingView(
-                mainView: ContentHostingContainer(
-                    coordinator: .init(parent: nil),
-                    payload: payload
-                )
-            )
-            
-            if superview == nil, frame.size.width == 0 {
-                if let tableView, !tableView.frame.width._isInvalidForIntrinsicContentSize {
-                    self.frame.size.width = tableView.frame.width
-                }
-            }
-            
-            if !frame.size.width._isInvalidForIntrinsicContentSize {
-                if result.frame.size.width != frame.size.width {
-                    result.frame.size.width = frame.size.width
-            
-                    // self._SwiftUIX_setNeedsLayout()
-                    // self._SwiftUIX_layoutIfNeeded()
-                }
-            }
+            result = ContentHostingView(payload: payload, listRepresentable: self.parent)
             
             self._contentHostingView = result
-            self._expensiveCache?.cellContentView = result
+            
+            if parent.configuration.preferences.cell.viewHostingOptions.detachHostingView {
+                self._expensiveCache?.cellContentView = result
+            }
         }
         
         assert(result.superview != nil)
         
         return result
     }
-    
-    private func _updateContentHostingView() {
-        guard !(self.frame.size == _lastFrameSize) else {
-            return
-        }
         
-        /*defer {
-            _lastFrameSize = self.frame.size
-        }
-        
-        guard let _contentHostingView = _contentHostingView else {
-            return
-        }
-        
-        if let maxWidth = _maximumContentViewWidth {
-            if _contentHostingView.mainView.maxContentViewWidth != maxWidth {
-                _withoutAppKitOrUIKitAnimation {
-                    if maxWidth.isNormal && maxWidth > 0 {
-                        _contentHostingView.mainView.maxContentViewWidth = maxWidth
-                    } else {
-                        _contentHostingView.mainView.maxContentViewWidth = nil
-                    }
-                }
-            }
-        }*/
-    }
-    
     private func _tearDownContentHostingView() {
         guard _contentHostingView != nil else {
             if _stateFlags.contains(.preparedForReuse) {
@@ -301,43 +235,44 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         
         assert(payload != nil)
         
-        guard let _contentHostingView = _contentHostingView else {
-            return
+        if parent.configuration.preferences.cell.viewHostingOptions.detachHostingView {
+            _detachContentHostingView()
         }
+    }
+    
+    private func _detachContentHostingView() {
+        assert(parent.configuration.preferences.cell.viewHostingOptions.detachHostingView)
         
-        CATransaction._withDisabledActions {
-            _contentHostingView.removeFromSuperview()
-        }
-        
+        self._contentHostingView?.removeFromSuperview()
         self._contentHostingView = nil
     }
 }
 
 extension _PlatformTableCellView {
-    fileprivate var _cheapCache: _CocoaListCache<Configuration>.CheapItemCache? {
+    var _cheapCache: _CocoaListCache<Configuration>.CheapItemCache? {
         guard let payload else {
             return nil
         }
         
-        return parent?.coordinator.cache[cheap: payload.itemPath]
+        return parent.cache[cheap: payload.itemPath]
     }
     
-    fileprivate var _expensiveCache: _CocoaListCache<Configuration>.ExpensiveItemCache? {
+    var _expensiveCache: _CocoaListCache<Configuration>.ExpensiveItemCache? {
         guard let payload else {
             return nil
         }
         
-        return parent?.coordinator.cache[expensive: payload.itemPath]
+        return parent.cache[expensive: payload.itemPath]
     }
     
-    fileprivate var _fastRowHeight: CGFloat? {
-        guard let parent, let indexPath else {
+    var _fastRowHeight: CGFloat? {
+        guard let indexPath else {
             assertionFailure()
             
             return nil
         }
         
-        return parent.coordinator._fastHeight(for: indexPath)
+        return parent._fastHeight(for: indexPath)
     }
 }
 
@@ -368,245 +303,9 @@ extension _PlatformTableCellView {
         var itemID: _AnyCocoaListItemID {
             itemPath.item
         }
-    }
-}
-
-extension _PlatformTableCellView {
-    fileprivate struct ContentHostingContainer: View {
-        @ObservedObject var coordinator: ContentHostingViewCoordinator
         
-        var payload: Payload
-        
-        @State private var didAppear: Bool = false
-                
-        var body: some View {
-            payload.content
-                .frame(width: didAppear ? nil : coordinator.parent?.frame.width)
-                .frame(idealWidth: .greatestFiniteMagnitude, minHeight: 44)
-                .frame(height: coordinator._fastHeight)
-                .id(payload.itemID)
-                .onAppear {
-                    if !didAppear {
-                        didAppear = true
-                    }
-                }
-                ._geometryGroup(.if(.available))
-                .transaction { transaction in
-                    if !didAppear {
-                        transaction.disablesAnimations = true
-                    }
-                }
-        }
-    }
-    
-    fileprivate final class ContentHostingViewCoordinator: ObservableObject {
-        private enum StateFlag {
-            case firstRenderComplete
-        }
-        
-        private var stateFlags: Set<StateFlag> = []
-        
-        weak var parent: _ContentHostingView?
-        
-        var _fastHeight: CGFloat?
-        
-        init(parent: _ContentHostingView?) {
-            self.parent = parent
-        }
-    }
-
-    fileprivate final class _ContentHostingView: _CocoaHostingView<ContentHostingContainer> {
-        private var _constraintsWithSuperview: [NSLayoutConstraint]? = []
-        
-        fileprivate lazy var contentHostingViewCoordinator = ContentHostingViewCoordinator(parent: self)
-        var didJustMoveToSuperview: Bool = false
-
-        override var intrinsicContentSize: CGSize {
-            if let fastHeight = contentHostingViewCoordinator._fastHeight {
-                return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: fastHeight)
-            } else {
-                return super.intrinsicContentSize
-            }
-        }
-                
-        fileprivate var parent: _PlatformTableCellView? {
-            guard let result = superview as? _PlatformTableCellView else {
-                return nil
-            }
-                        
-            guard !result.stateFlags.contains(.preparedForReuse) else {
-                return nil
-            }
-            
-            return result
-        }
-                
-        override func _assembleCocoaHostingView() {
-            self.mainView.coordinator = contentHostingViewCoordinator
-                                    
-            #if swift(>=5.9)
-            if #available(macOS 14.0, *) {
-                sceneBridgingOptions = []
-            }
-            #endif
-        }
-        
-        override func _refreshCocoaHostingView() {
-            _updateSizingOptions(parent: parent)
-        }
-                                
-        override func viewWillMove(
-            toSuperview newSuperview: NSView?
-        ) {
-            super.viewWillMove(toSuperview: newSuperview)
-                        
-            if newSuperview == nil {
-                if let currentConstraints = self._constraintsWithSuperview {
-                    NSLayoutConstraint.deactivate(currentConstraints)
-                    
-                    self._constraintsWithSuperview = nil
-                }
-            } else {
-                if let lastContentSize = (newSuperview as? _PlatformTableCellView)?._cheapCache?.lastContentSize {
-                    if frame.size != lastContentSize {
-                        self.frame.size = lastContentSize
-                    }
-                }
-            }
-            
-            _updateSizingOptions(parent: newSuperview as? _PlatformTableCellView)
-        }
-        
-        override func viewDidMoveToSuperview() {
-            super.viewDidMoveToSuperview()
-            
-            if let superview {
-                let constraints = [
-                    self.topAnchor.constraint(equalTo: superview.topAnchor),
-                    self.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
-                    self.bottomAnchor.constraint(equalTo: superview.bottomAnchor),
-                    self.leadingAnchor.constraint(equalTo: superview.leadingAnchor)
-                ]
-                
-                NSLayoutConstraint.activate(constraints)
-                
-                self._constraintsWithSuperview = constraints
-                
-                didJustMoveToSuperview = true
-            } else {
-                didJustMoveToSuperview = false
-            }
-            
-            DispatchQueue.main.async {
-                self.didJustMoveToSuperview = false
-            }
-        }
-                
-        override func setFrameSize(_ newSize: NSSize) {
-            guard !newSize.width._isInvalidForIntrinsicContentSize else {
-                return
-            }
-
-            /*if !self.frame.size.isAreaZero {
-                if self.frame.size.width == newSize.width, self.frame.size.height.isApproximatelyEqual(to: newSize.height, withThreshold: 1) {
-                    print("HOL UP")
-                }
-                print(self.frame.size, newSize)
-            }*/
-
-            super.setFrameSize(newSize)
-        }
-        
-        override func resizeSubviews(
-            withOldSize oldSize: NSSize
-        ) {
-            guard !self.frame.width._isInvalidForIntrinsicContentSize else {
-                return
-            }
-            
-            super.resizeSubviews(withOldSize: oldSize)
-            
-            guard let parent else {
-                return
-            }
-            
-            parent._cheapCache?.lastContentSize = frame.size
-        }
-
-        override func invalidateIntrinsicContentSize() {
-            guard !didJustMoveToSuperview else {
-                return
-            }
-            
-            parent?._cheapCache?.lastContentSize = nil
-            
-            super.invalidateIntrinsicContentSize()
-        }
-        
-        private func _updateSizingOptions(parent: _PlatformTableCellView?) {
-            guard let parent = parent else {
-                return
-            }
-            
-            guard !didJustMoveToSuperview else {
-                return
-            }
-            
-            _assignIfNotEqual(false, to: \.translatesAutoresizingMaskIntoConstraints)
-            
-            if let height = parent._fastRowHeight {
-                if #available(macOS 13.0, *) {
-                    _assignIfNotEqual([], to: \.sizingOptions)
-                }
-                
-                let didUpdate = _assignIfNotEqual(height, to: \.contentHostingViewCoordinator._fastHeight)
-                
-                if didUpdate {
-                    self.invalidateIntrinsicContentSize()
-                }
-                
-                _assignIfNotEqual(height, to: \.frame.size.height)
-            } else {
-                if #available(macOS 13.0, *) {
-                    _assignIfNotEqual([.standardBounds], to: \.sizingOptions)
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Diagnostics
-
-extension NSView {
-    private struct AssociatedKeys {
-        static var debugBackgroundView: Void = ()
-    }
-    
-    var _SwiftUIX_debugBackgroundView: NSView {
-        get {
-            if let bgView = objc_getAssociatedObject(self, &AssociatedKeys.debugBackgroundView) as? NSView {
-                return bgView
-            }
-            
-            let newView = NSView(frame: self.bounds)
-            
-            newView.autoresizingMask = [.width, .height]
-            newView.wantsLayer = true
-            
-            self.addSubview(newView, positioned: .below, relativeTo: self.subviews.first)
-            
-            objc_setAssociatedObject(self, &AssociatedKeys.debugBackgroundView, newView, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            
-            return newView
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.debugBackgroundView, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-    func _SwiftUIX_setDebugBackgroundColor(_ color: NSColor) {
-        DispatchQueue.main.async {
-            self._SwiftUIX_debugBackgroundView.layer?.backgroundColor = color.cgColor
+        var id: AnyHashable {
+            return itemPath
         }
     }
 }

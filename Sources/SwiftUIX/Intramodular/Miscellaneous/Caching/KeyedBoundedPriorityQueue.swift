@@ -7,35 +7,42 @@ import SwiftUI
 
 @_spi(Internal)
 public final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
-    private var maximumCapacity: Int?
-    private var nodes: [Key: Node] = [:]
-    private var head: Node?
-    private var tail: Node?
+    @usableFromInline
+    var maximumCapacity: Int
+    @usableFromInline
+    var nodes: [Key: Node] = [:]
+    @usableFromInline
+    var head: Node?
+    @usableFromInline
+    var tail: Node?
+    @usableFromInline
+    var markedForDeletion: Set<Key> = []
     
-    public init(maximumCapacity: Int? = 100) {
+    public init(maximumCapacity: Int = 100) {
         self.maximumCapacity = maximumCapacity
     }
     
-    private func _appendNode(_ node: Node) {
-        nodes[node.key] = node
+    @_optimize(speed)
+    @usableFromInline
+    func _appendNode(_ node: Node) {
+        if nodes.count - markedForDeletion.count >= maximumCapacity {
+            _removeFirstValidNode()
+        }
         
         if let oldTail = tail {
             oldTail.next = node
             node.previous = oldTail
-            tail = node
         } else {
             head = node
-            tail = node
         }
         
-        if let maxSize = maximumCapacity {
-            if nodes.count > maxSize {
-                _removeFirstNode()
-            }
-        }
+        tail = node
+        nodes[node.key] = node
     }
     
-    private func _removeNode(_ node: Node) {
+    @_optimize(speed)
+    @usableFromInline
+    func _removeNode(_ node: Node) {
         node.previous?.next = node.next
         node.next?.previous = node.previous
         
@@ -47,46 +54,74 @@ public final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
             tail = node.previous
         }
         
-        nodes[node.key] = nil
+        nodes.removeValue(forKey: node.key)
     }
     
-    private func _removeFirstNode() {
-        head.map(_removeNode)
+    @_optimize(speed)
+    @usableFromInline
+    func _removeFirstValidNode() {
+        while let key = head?.key, markedForDeletion.contains(key) {
+            _removeNode(head!)
+            markedForDeletion.remove(key)
+        }
     }
     
-    private func _removeLastNode() {
-        tail.map(_removeNode)
-    }
-    
-    private func moveNodeToLast(_ node: Node) {
+    @_optimize(speed)
+    @usableFromInline
+    func _moveNodeToLast(_ node: Node) {
         guard node !== tail else {
             return
         }
         
-        _removeNode(node)
-        _appendNode(node)
+        if node === head {
+            head = node.next
+        }
+        
+        node.next?.previous = node.previous
+        node.previous?.next = node.next
+        
+        tail?.next = node
+        node.previous = tail
+        node.next = nil
+        tail = node
     }
 }
 
 extension KeyedBoundedPriorityQueue {
     public var count: Int {
-        nodes.count
+        @_optimize(speed)
+        @inline(__always)
+        get {
+            nodes.count
+        }
     }
     
     public var first: Value? {
-        head?.value
+        @_optimize(speed)
+        @inline(__always)
+        get {
+            head?.value
+        }
     }
     
     public var last: Value? {
-        tail?.value
+        @_optimize(speed)
+        @inline(__always)
+        get {
+            tail?.value
+        }
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public subscript(_ key: Key) -> Value? {
         get {
             nodes[key]?.value
         } set {
             guard let newValue = newValue else {
-                nodes[key].map(_removeNode)
+                if let existing = nodes[key] {
+                    _removeNode(existing)
+                }
                 
                 return
             }
@@ -94,7 +129,7 @@ extension KeyedBoundedPriorityQueue {
             if let node = nodes[key] {
                 node.value = newValue
                 
-                moveNodeToLast(node)
+                _moveNodeToLast(node)
             } else {
                 let node = Node(key: key, value: newValue)
                 
@@ -103,6 +138,8 @@ extension KeyedBoundedPriorityQueue {
         }
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public func removeValue(forKey key: Key) {
         self[key] = nil
     }
@@ -121,24 +158,36 @@ extension KeyedBoundedPriorityQueue: ExpressibleByDictionaryLiteral {
 }
 
 extension KeyedBoundedPriorityQueue: Sequence {
-    public typealias Iterator = AnyIterator<(key: Key, value: Value)>
-    
     public func makeIterator() -> AnyIterator<(key: Key, value: Value)> {
-        AnyIterator(nodes.mapValues({ $0.value }).makeIterator())
+        var current = head
+        
+        return AnyIterator {
+            defer {
+                current = current?.next
+            }
+            
+            return current.map({ ($0.key, $0.value) })
+        }
     }
 }
 
 // MARK: - Auxiliary
 
 extension KeyedBoundedPriorityQueue {
-    private class Node {
-        fileprivate var key: Key
-        fileprivate var value: Value
-        fileprivate var next: Node?
+    @usableFromInline
+    class Node {
+        @usableFromInline
+        var key: Key
+        @usableFromInline
+        var value: Value
+        @usableFromInline
+        var next: Node?
         
-        fileprivate weak var previous: Node?
+        @usableFromInline
+        weak var previous: Node?
         
-        fileprivate init(key: Key, value: Value) {
+        @usableFromInline
+        init(key: Key, value: Value) {
             self.key = key
             self.value = value
         }

@@ -333,7 +333,11 @@ final class CocoaHostingCollectionViewController<
     
     // MARK: - UICollectionViewDelegate
     
-    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
         (cell as? CellType)?.cellWillDisplay(inParent: self)
     }
     
@@ -354,23 +358,40 @@ final class CocoaHostingCollectionViewController<
         (cell as? CellType)?.cellDidEndDisplaying()
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didEndDisplayingSupplementaryView view: UICollectionReusableView,
+        forElementOfKind elementKind: String,
+        at indexPath: IndexPath
+    ) {
         (view as? SupplementaryViewType)?.supplementaryViewDidEndDisplaying()
     }
     
-    public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        shouldHighlightItemAt indexPath: IndexPath
+    ) -> Bool {
         cellForItem(at: indexPath)?.isHighlightable ?? false
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didHighlightItemAt indexPath: IndexPath
+    ) {
         cellForItem(at: indexPath)?.isHighlighted = true
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didUnhighlightItemAt indexPath: IndexPath
+    ) {
         cellForItem(at: indexPath)?.isHighlighted = false
     }
     
-    public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        shouldSelectItemAt indexPath: IndexPath
+    ) -> Bool {
         guard let cell = cellForItem(at: indexPath) else {
             return false
         }
@@ -384,23 +405,38 @@ final class CocoaHostingCollectionViewController<
         return cell.isSelectable
     }
     
-    public func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        shouldDeselectItemAt indexPath: IndexPath
+    ) -> Bool {
         cellForItem(at: indexPath)?.isSelectable ?? true
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         cellForItem(at: indexPath)?.isSelected = true
     }
     
-    public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        didDeselectItemAt indexPath: IndexPath
+    ) {
         cellForItem(at: indexPath)?.isSelected = false
     }
     
-    public func collectionView(_ collectionView: UICollectionView, canFocusItemAt indexPath: IndexPath) -> Bool {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        canFocusItemAt indexPath: IndexPath
+    ) -> Bool {
         cellForItem(at: indexPath)?.isFocusable ?? true
     }
     
-    public func collectionView(_ collectionView: UICollectionView, shouldUpdateFocusIn context: UICollectionViewFocusUpdateContext) -> Bool {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        shouldUpdateFocusIn context: UICollectionViewFocusUpdateContext
+    ) -> Bool {
         if let previousCell = context.previouslyFocusedView as? CellType {
             if previousCell.isFocused {
                 previousCell.isFocused = false
@@ -515,7 +551,9 @@ final class CocoaHostingCollectionViewController<
         #endif
     }
     
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(
+        _ scrollView: UIScrollView
+    ) {
         if let onOffsetChange = _scrollViewConfiguration.onOffsetChange {
             onOffsetChange(scrollView.contentOffset(forContentType: AnyView.self))
         }
@@ -525,7 +563,10 @@ final class CocoaHostingCollectionViewController<
         }
     }
     
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    public func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
         _scrollViewConfiguration.onDragEnd?()
     }
 }

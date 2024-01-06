@@ -56,7 +56,7 @@ struct _CollectionViewElementContent<
             }
             
             proxy.invalidateLayout(
-                with: .init(newPreferredContentSize: .init(size))
+                with: CellProxy.InvalidationContext(newPreferredContentSize: .init(size))
             )
         }
     }

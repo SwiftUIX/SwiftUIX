@@ -10,12 +10,14 @@ import SwiftUI
 open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationType>: NSScrollView {
     private var _coordinator: _CocoaList<Configuration>.Coordinator!
     
+    var _disableScrollFuckery: Bool = false
+
     var coordinator: _CocoaList<Configuration>.Coordinator {
         _coordinator!
     }
     
-    private var _tableView: _PlatformTableView<Configuration> = {
-        let tableView = _PlatformTableView<Configuration>()
+    private lazy var _tableView: _PlatformTableView<Configuration> = {
+        let tableView = _PlatformTableView<Configuration>(listRepresentable: self.coordinator)
         
         tableView.headerView = nil
         tableView.backgroundColor = .clear
@@ -31,6 +33,13 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     private var _tableViewFrameObserver: NSObjectProtocol?
     private var _scrollOffsetCorrectionOnTableViewFrameChange: (() -> Void)?
     
+    func representableDidUpdate(
+        _ view: _CocoaList<Configuration>,
+        context: any _AppKitOrUIKitViewRepresentableContext
+    ) {
+        
+    }
+
     var tableView: _PlatformTableView<Configuration> {
         _tableView
     }
@@ -50,8 +59,10 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     }
     
     func reloadData(animated: Bool = true) {
-        performEnforcingScrollOffsetBehavior(.maintainOnChangeOfContentSize, animated: animated) {
+        performEnforcingScrollOffsetBehavior([], animated: animated) {
             tableView.reloadData()
+            
+            invalidateEntireRowHeightCache()
         }
     }
     
@@ -60,10 +71,13 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         hasVerticalScroller = true
         hasHorizontalScroller = false
         autohidesScrollers = true
+        automaticallyAdjustsContentInsets = false
         
         self.coordinator.tableViewContainer = self
         
-        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer"))
+        let column = NSTableColumn(
+            identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer")
+        )
         
         column.title = ""
         
@@ -82,104 +96,49 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         
         _setUpTableViewObserver()
     }
-    
-    var _disableScrollFuckery: Bool = false
-    
-    override open func reflectScrolledClipView(_ cView: NSClipView) {
-        guard !_disableScrollFuckery else {
-            return
-        }
-        
-        super.reflectScrolledClipView(cView)
-    }
-    
-    func performEnforcingScrollOffsetBehavior2(
-        _ behavior: ScrollContentOffsetBehavior,
-        animated: Bool,
-        _ update: () -> Void
-    ) {
-        let savedScrollPosition = saveScrollOffset()
-        
-        _disableScrollFuckery = true
-        update()
-        _disableScrollFuckery = false
-        
-        self.restoreScrollOffset(to: savedScrollPosition)
-        
-        DispatchQueue.main.async {
-            self.restoreScrollOffset(to: savedScrollPosition)
-        }
-    }
-    
+            
     func performEnforcingScrollOffsetBehavior(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
-        _ update: () -> Void
+        _ operation: () -> Void
     ) {
-        guard behavior == .maintainOnChangeOfContentSize else {
-            assertionFailure("unimplemented")
+        guard behavior == .maintainOnChangeOfBounds else {
+            assert(behavior == []) // other behaviors aren't supported right now
+            
+            operation()
             
             return
         }
         
-        let verticalScrollPosition = self.verticalScrollPosition
-        let beforeContentOffset = contentOffset
-        let beforeContentSize = contentSize
-        
-        update()
-        
-        if self.verticalScrollPosition != verticalScrollPosition {
-            self.verticalScrollPosition = verticalScrollPosition
-        }
-        
-        var corrected: Bool = false
-        
-        _scrollOffsetCorrectionOnTableViewFrameChange = {
-            guard !corrected else {
+        NSAnimationContext.runAnimationGroup { context in
+            if visibleRect.origin.y > 0 {
+                context.duration = 0
+            }
+            
+            let SwiftUIX_scrollOffset = self.contentOffset
+            let oldScrollOffset = tableView.visibleRect.origin
+            let previousHeight = tableView.bounds.size.height
+            
+            operation()
+            
+            guard !isContentWithinBounds else {
                 return
             }
             
-            if self.verticalScrollPosition != verticalScrollPosition {
-                self.verticalScrollPosition = verticalScrollPosition
-                
-                DispatchQueue.main.async {
-                    self.verticalScrollPosition = verticalScrollPosition
-                }
-                
-                DispatchQueue.main.async {
-                    self.verticalScrollPosition = verticalScrollPosition
-                }
-            }
+            let SwiftUIX_newScrollOffset = self.contentOffset
             
-            defer {
-                corrected = true
-            }
-            
-            let afterContentSize = self.contentSize
-            
-            guard afterContentSize != beforeContentSize else {
-                if self.contentOffset != beforeContentOffset {
-                    self.contentOffset = beforeContentOffset
-                }
-                
+            if SwiftUIX_scrollOffset == SwiftUIX_newScrollOffset {
                 return
             }
             
-            var deltaX = self.contentOffset.x + (afterContentSize.width - beforeContentSize.width)
-            var deltaY = self.contentOffset.y + (afterContentSize.height - beforeContentSize.height)
+            var newScrollOffset = oldScrollOffset
             
-            deltaX = beforeContentSize.width == 0 ? 0 : max(0, deltaX)
-            deltaY = beforeContentSize.height == 0 ? 0 : max(0, deltaY)
+            newScrollOffset.y += (tableView.bounds.size.height - previousHeight)
             
-            let newOffset = CGPoint(
-                x: self.contentOffset.x + deltaX,
-                y: self.contentOffset.y + deltaY
-            )
-            
-            if self.contentOffset != newOffset {
-                self.contentOffset = newOffset
-            } else if self.contentOffset != beforeContentOffset {
-                self.contentOffset = beforeContentOffset
+            if oldScrollOffset.y == 0 {
+                self.contentOffset = oldScrollOffset
+            } else if newScrollOffset.y > oldScrollOffset.y {
+                self.contentOffset = newScrollOffset
             }
         }
     }
@@ -198,31 +157,35 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     }
     
     func _observeTableViewFrameChange() {
-        guard _latestTableViewFrame != nil else {
+        guard let oldFrame = _latestTableViewFrame else {
             _latestTableViewFrame = _tableView.frame
             
             return
         }
         
-        guard _latestTableViewFrame != _tableView.frame else {
+        guard oldFrame.size.isRegularAndNonZero else {
             return
         }
         
-        defer {
-            _latestTableViewFrame = _tableView.frame
-        }
+        let newFrame = _tableView.frame
         
+        _latestTableViewFrame = newFrame
+                
         _performHidingScrollIndicators {
             _scrollOffsetCorrectionOnTableViewFrameChange?()
             _scrollOffsetCorrectionOnTableViewFrameChange = nil
         }
         
-        if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
-            scrollTo(.bottom)
-        }
+        /*if oldFrame.height != newFrame.height {
+            if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
+                scrollTo(.bottom)
+            }
+        }*/
     }
     
-    private func _performHidingScrollIndicators(_ operation: () -> Void) {
+    private func _performHidingScrollIndicators(
+        _ operation: () -> Void
+    ) {
         let _hasVerticalScroller = hasVerticalScroller
         let _hasHorizontalScroller = hasHorizontalScroller
         
@@ -240,7 +203,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
 
 extension _PlatformTableViewContainer {
     class _ClipView: NSClipView {
-        var parent: _PlatformTableViewContainer!
+        weak var parent: _PlatformTableViewContainer!
         
         override func scroll(_ point: NSPoint) {
             guard !parent._disableScrollFuckery else {
@@ -254,7 +217,9 @@ extension _PlatformTableViewContainer {
             super.awakeFromNib()
         }
         
-        override func viewBoundsChanged(_ notification: Notification) {
+        override func viewBoundsChanged(
+            _ notification: Notification
+        ) {
             super.viewBoundsChanged(notification)
         }
         
@@ -266,16 +231,56 @@ extension _PlatformTableViewContainer {
             super.setBoundsOrigin(newOrigin)
         }
         
-        override func constrainBoundsRect(_ proposedBounds: NSRect) -> NSRect {
-            return super.constrainBoundsRect(proposedBounds)
+        override func constrainBoundsRect(
+            _ proposedBounds: NSRect
+        ) -> NSRect {
+             super.constrainBoundsRect(proposedBounds)
+        }
+    }
+}
+
+extension _PlatformTableViewContainer {
+    func invalidateEntireRowHeightCache() {
+        NSAnimationContext.beginGrouping()
+        NSAnimationContext.current.duration = 0
+        let entireTableView: IndexSet = .init(0 ..< self.tableView.numberOfRows)
+        self.tableView.noteHeightOfRows(withIndexesChanged: entireTableView)
+        NSAnimationContext.endGrouping()
+    }
+}
+
+extension NSTableView {
+    func performEnforcingScrollOffsetBehavior(
+        _ behavior: ScrollContentOffsetBehavior,
+        animated: Bool,
+        operation update: () -> Void
+    ) {
+        NSAnimationContext.runAnimationGroup { context in
+            if visibleRect.origin.y > 0 {
+                context.duration = 0
+            }
+            
+            let oldScrollOffset = visibleRect.origin
+            let previousHeight = bounds.size.height
+            
+            update()
+            
+            var newScrollOffset = oldScrollOffset
+            newScrollOffset.y += (bounds.size.height - previousHeight)
+            
+            if oldScrollOffset.y == 0 {
+                scroll(oldScrollOffset)
+            } else if newScrollOffset.y > oldScrollOffset.y {
+                scroll(newScrollOffset)
+            }
         }
     }
 }
 
 extension NSScrollView {
-    func saveScrollOffset() -> NSPoint {
+    fileprivate func saveScrollOffset() -> CGPoint {
         guard let documentView = self.documentView else {
-            return NSZeroPoint
+            return .zero
         }
         
         let documentVisibleRect = documentView.visibleRect
@@ -287,15 +292,20 @@ extension NSScrollView {
         return savedRelativeScrollPosition
     }
     
-    func restoreScrollOffset(to savedRelativeScrollPosition: NSPoint) {
+    fileprivate func restoreScrollOffset(
+        to savedRelativeScrollPosition: NSPoint
+    ) {
+        guard let documentView = self.documentView else {
+            return
+        }
+        
         _withoutAppKitOrUIKitAnimation {
-            if let documentView = self.documentView {
-                let newScrollOrigin = NSPoint(
-                    x: savedRelativeScrollPosition.x,
-                    y: documentView.bounds.maxY - bounds.height - savedRelativeScrollPosition.y
-                )
-                self.contentView.setBoundsOrigin(newScrollOrigin)
-            }
+            let newScrollOrigin = NSPoint(
+                x: savedRelativeScrollPosition.x,
+                y: documentView.bounds.maxY - bounds.height - savedRelativeScrollPosition.y
+            )
+            
+            self.contentView.setBoundsOrigin(newScrollOrigin)
         }
     }
 }

@@ -46,7 +46,14 @@ public struct CocoaList<Content: View>: View {
         @ViewBuilder content: () -> Content
     ) {
         let content = _VariadicViewAdapter(content) { content in
-            _CocoaList(configuration: _VariadicViewChildren._CocoaListContentAdapter(content.children))
+            withEnvironmentValue(\._cocoaListPreferences) { preferences in
+                _CocoaList(
+                    configuration: _VariadicViewChildren._CocoaListContentAdapter(
+                        content.children,
+                        preferences: preferences
+                    )
+                )
+            }
         }
         
         self.init(_content: content.eraseToAnyView())

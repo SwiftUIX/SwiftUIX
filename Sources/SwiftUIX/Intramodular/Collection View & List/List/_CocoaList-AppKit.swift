@@ -30,37 +30,44 @@ extension _CocoaList: NSViewRepresentable {
         updateCocoaScrollProxy()
         
         context.coordinator.representableWillUpdate()
-        
+                
         context.coordinator.configuration = configuration
-        context.coordinator.preferences = _cocoaListPreferences
 
         context.coordinator.representableDidUpdate()
+        
+        view.representableDidUpdate(self, context: context)
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator(
-            configuration: configuration,
-            preferences: _cocoaListPreferences
-        )
+        Coordinator(configuration: configuration)
+    }
+}
+
+extension _CocoaList.Coordinator {
+    func measureRowHeight() -> Double {
+0
     }
 }
 
 extension _CocoaList {
     class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
-        enum DirtyFlag {
+        enum StateFlag {
             case isFirstRun
             case dataChanged
             case didJustReload
+            case isNSTableViewPreparingContent
         }
         
-        var dirtyFlags: Set<DirtyFlag> = []
-        var cache = _CocoaListCache<Configuration>()
+        lazy var template = _PlatformTableCellView(parent: self.tableViewContainer!, identifier: NSUserInterfaceItemIdentifier("_PlatformTableCellView"))
+        
+        var stateFlags: Set<StateFlag> = []
+        lazy var cache = _CocoaListCache<Configuration>(owner: self)
         var preferredScrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
         
         private var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
             var result = preferredScrollViewConfiguration
             
-            if dirtyFlags.contains(.isFirstRun) {
+            if stateFlags.contains(.isFirstRun) {
                 result.showsVerticalScrollIndicator = false
                 result.showsHorizontalScrollIndicator = false
             }
@@ -73,24 +80,21 @@ extension _CocoaList {
                 let reload = cache.update(configuration: configuration)
                 
                 if reload {
-                    dirtyFlags.insert(.dataChanged)
+                    stateFlags.insert(.dataChanged)
                 }
             }
         }
-        
-        public var preferences: _CocoaListPreferences
-        
+                
         weak var tableViewContainer: _PlatformTableViewContainer<Configuration>?
         
         var tableView: NSTableView? {
             tableViewContainer?.tableView
         }
         
-        public init(configuration: Configuration, preferences: _CocoaListPreferences) {
+        public init(configuration: Configuration) {
             self.configuration = configuration
-            self.preferences = preferences
             
-            self.dirtyFlags.insert(.isFirstRun)
+            self.stateFlags.insert(.isFirstRun)
         }
         
         func representableWillUpdate() {
@@ -104,16 +108,16 @@ extension _CocoaList {
             
             defer {
                 DispatchQueue.main.async {
-                    self.dirtyFlags.remove(.isFirstRun)
+                    self.stateFlags.remove(.isFirstRun)
                 }
             }
             
             view.configure(with: scrollViewConfiguration)
             
-            if self.dirtyFlags.contains(.dataChanged) {
+            if self.stateFlags.contains(.dataChanged) {
                 reload()
             } else {
-                if !dirtyFlags.contains(.didJustReload) {
+                if !stateFlags.contains(.didJustReload) {
                     updateTableViewCells()
                 }
             }
@@ -124,10 +128,10 @@ extension _CocoaList {
                 return
             }
             
-            _withoutAppKitOrUIKitAnimation(self.dirtyFlags.contains(.isFirstRun)) {
-                dirtyFlags.remove(.dataChanged)
+            _withoutAppKitOrUIKitAnimation(self.stateFlags.contains(.isFirstRun)) {
+                stateFlags.remove(.dataChanged)
                 
-                guard !dirtyFlags.contains(.didJustReload) else {
+                guard !stateFlags.contains(.didJustReload) else {
                     DispatchQueue.main.async {
                         tableViewContainer.reloadData()
                     }
@@ -137,10 +141,10 @@ extension _CocoaList {
                 
                 tableViewContainer.reloadData()
                 
-                dirtyFlags.insert(.didJustReload)
+                stateFlags.insert(.didJustReload)
                 
                 DispatchQueue.main.async {
-                    self.dirtyFlags.remove(.didJustReload)
+                    self.stateFlags.remove(.didJustReload)
                 }
             }
         }
@@ -149,7 +153,13 @@ extension _CocoaList {
             _ tableView: NSTableView,
             heightOfRow row: Int
         ) -> CGFloat {
-            switch preferences.cell.sizingOptions {
+            if let cache = cache[cheap: IndexPath(item: row, section: 0)] {
+                if let height = cache.lastContentSize?.height {
+                    return height
+                }
+            }
+            
+            switch configuration.preferences.cell.sizingOptions {
                 case .auto:
                     return NSTableCellView.automaticSize.height
                 case .fixed(let width, let height):
@@ -213,7 +223,7 @@ extension _CocoaList {
             view.indexPath = IndexPath(item: row, section: 0)
             
             view.prepareForUse(
-                payload: .init(
+                payload: _PlatformTableCellView.Payload(
                     itemPath: itemPath,
                     item: item,
                     content: configuration.viewProvider.rowContent(item)
@@ -225,6 +235,10 @@ extension _CocoaList {
         }
         
         func updateTableViewCells() {
+            if self.tableView?.inLiveResize == true {
+                return
+            }
+
             guard let tableView else {
                 return
             }
@@ -262,7 +276,7 @@ extension _CocoaList.Coordinator {
     func _fastHeight(
         for indexPath: IndexPath
     ) -> CGFloat? {
-        switch preferences.cell.sizingOptions {
+        switch configuration.preferences.cell.sizingOptions {
             case .auto:
                 return nil
             case .fixed(let width, let height):

@@ -27,7 +27,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             rootView.parentConfiguration = _configuration
         }
     }
-        
+    
+    public var _hostingViewConfigurationFlags: Set<_CocoaHostingViewConfigurationFlag> = []
+    public var _hostingViewStateFlags: Set<_CocoaHostingViewStateFlag> = []
+            
     public var _SwiftUIX_cancellables: [AnyCancellable] = []
     
     public var _observedPreferenceValues = _ObservedPreferenceValues()

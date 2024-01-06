@@ -21,6 +21,14 @@ struct _CocoaList<Configuration: _CocoaListConfigurationType> {
     }
 }
 
+#if os(iOS) || os(tvOS) || os(visionOS)
+extension _CocoaList {
+    class Coordinator {
+        
+    }
+}
+#endif
+
 // MARK: - Initializers
 
 extension _CocoaList {

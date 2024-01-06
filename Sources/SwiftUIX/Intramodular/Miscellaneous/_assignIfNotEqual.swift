@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
+@_optimize(speed)
 @_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
@@ -18,6 +19,7 @@ public func _assignIfNotEqual<Value: Equatable>(
 
 extension NSObjectProtocol {
     @_spi(Internal)
+    @_optimize(speed)
     @_transparent
     @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
@@ -34,6 +36,7 @@ extension NSObjectProtocol {
     }
     
     @_spi(Internal)
+    @_optimize(speed)
     @_transparent
     @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
@@ -54,6 +57,7 @@ extension NSObjectProtocol {
     }
 
     @_spi(Internal)
+    @_optimize(speed)
     @_transparent
     @discardableResult
     public func _assignIfNotEqual<Value: Equatable>(
@@ -72,6 +76,7 @@ extension NSObjectProtocol {
     
 @_spi(Internal)
 @_disfavoredOverload
+@_optimize(speed)
 @_transparent
 public func _assignIfNotEqual<Value: AnyObject>(
     _ value: Value,
@@ -84,6 +89,7 @@ public func _assignIfNotEqual<Value: AnyObject>(
 
 @_spi(Internal)
 @_disfavoredOverload
+@_optimize(speed)
 @_transparent
 public func _assignIfNotEqual<Value: AnyObject>(
     _ value: Value,
@@ -95,6 +101,7 @@ public func _assignIfNotEqual<Value: AnyObject>(
 }
 
 @_spi(Internal)
+@_optimize(speed)
 @_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,
@@ -110,6 +117,7 @@ public func _assignIfNotEqual<Value: Equatable>(
 }
 
 @_spi(Internal)
+@_optimize(speed)
 @_transparent
 public func _assignIfNotEqual<Value: Equatable>(
     _ value: Value,

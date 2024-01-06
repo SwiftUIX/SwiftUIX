@@ -15,11 +15,13 @@ public protocol _CocoaListConfigurationType {
     
     var data: Data { get }
     var viewProvider: ViewProvider { get }
+    var preferences: _CocoaListPreferences { get set }
 }
 
 public struct _CocoaListConfiguration<Data: _CocoaListDataSourceType, ViewProvider: _CocoaListViewProviderType>: _CocoaListConfigurationType where Data.SectionType == ViewProvider.SectionType, Data.ItemType == ViewProvider.ItemType {
     public let data: Data
     public let viewProvider: ViewProvider
+    public var preferences: _CocoaListPreferences = nil
 }
 
 // MARK: - Auxiliary

@@ -7,6 +7,8 @@ import Swift
 import SwiftUI
 
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     public static var infinite: CGSize {
         .init(
             width: CGFloat.infinity,
@@ -14,6 +16,8 @@ extension CGSize {
         )
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public static var greatestFiniteSize: CGSize {
         .init(
             width: CGFloat.greatestFiniteMagnitude,
@@ -21,10 +25,14 @@ extension CGSize {
         )
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public var minimumDimensionLength: CGFloat {
         max(min(width, height), 0)
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public var maximumDimensionLength: CGFloat {
         max(width, height)
     }
@@ -32,21 +40,29 @@ extension CGSize {
 
 extension CGSize {
     @_spi(Internal)
+    @_optimize(speed)
+    @inline(__always)
     public var _isNormal: Bool {
         width.isNormal && height.isNormal && (width != .greatestFiniteMagnitude) && (height != .greatestFiniteMagnitude)
     }
         
     @_spi(Internal)
+    @_optimize(speed)
+    @inline(__always)
     public var isAreaZero: Bool {
         minimumDimensionLength.isZero
     }
     
     @_spi(Internal)
+    @_optimize(speed)
+    @inline(__always)
     public var isAreaPracticallyInfinite: Bool {
         maximumDimensionLength == .greatestFiniteMagnitude || maximumDimensionLength == .infinity
     }
     
     @_spi(Internal)
+    @_optimize(speed)
+    @inline(__always)
     public var isRegularAndNonZero: Bool {
         guard !isAreaPracticallyInfinite else {
             return false
@@ -60,6 +76,8 @@ extension CGSize {
     }
     
     @_spi(Internal)
+    @_optimize(speed)
+    @inline(__always)
     public func _isNearlyEqual(
         to size: CGSize,
         threshold: CGFloat
@@ -69,6 +87,8 @@ extension CGSize {
 }
 
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     public static func _maxByArea(_ lhs: CGSize, rhs: CGSize) -> CGSize {
         guard lhs.isRegularAndNonZero, rhs.isRegularAndNonZero else {
             return lhs
@@ -84,12 +104,16 @@ extension CGSize {
         }
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public static func _maxByCombining(_ lhs: CGSize, _ rhs: CGSize) -> CGSize {
         CGSize(width: max(lhs.width, rhs.width), height: max(lhs.height, rhs.height))
     }
 }
 
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     public func dimensionLength(for axis: Axis) -> CGFloat {
         switch axis {
             case .horizontal:
@@ -99,6 +123,8 @@ extension CGSize {
         }
     }
     
+    @_optimize(speed)
+    @inline(__always)
     public func anchorPoint(for alignment: Alignment) {
         var result: CGPoint = .zero
         
@@ -127,6 +153,8 @@ extension CGSize {
 }
 
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     func rounded(_ rule: FloatingPointRoundingRule) -> Self {
         .init(
             width: width.rounded(rule),
@@ -136,6 +164,8 @@ extension CGSize {
 }
 
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     func fits(_ other: Self) -> Bool {
         guard width <= other.width else {
             return false
@@ -151,11 +181,15 @@ extension CGSize {
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension CGSize {
+    @_optimize(speed)
+    @inline(__always)
     var _isInvalidForIntrinsicContentSize: Bool {
         width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize
     }
 
     /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
+    @_optimize(speed)
+    @inline(__always)
     public var _hasUnspecifiedIntrinsicContentSizeDimensions: Bool {
         if width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize {
             return true
@@ -164,6 +198,8 @@ extension CGSize {
         return false
     }
     
+    @_optimize(speed)
+    @inline(__always)
     func toAppKitOrUIKitIntrinsicContentSize() -> CGSize {
         var result = self
         
@@ -233,6 +269,8 @@ enum _AppKitOrUIKitPlaceholderDimensionType {
 }
 
 extension CGFloat {
+    @_optimize(speed)
+    @inline(__always)
     var _isInvalidForIntrinsicContentSize: Bool {
         guard isNormal else {
             return true

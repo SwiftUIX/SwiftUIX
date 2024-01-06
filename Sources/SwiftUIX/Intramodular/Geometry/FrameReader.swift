@@ -191,6 +191,7 @@ extension View {
                 GeometryReader { proxy in
                     Color.clear
                         .hidden()
+                        .accessibility(hidden: true)
                         .onAppear {
                             binding.wrappedValue = proxy.size
                         }
@@ -201,6 +202,8 @@ extension View {
                             binding.wrappedValue = size
                         }
                 }
+                .allowsHitTesting(false)
+                .accessibility(hidden: true)
             }
         }
     }
