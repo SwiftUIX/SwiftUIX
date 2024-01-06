@@ -47,7 +47,23 @@ extension AppKitOrUIKitHostingControllerProtocol {
         let fitSize = sizeProposal._fitAppKitOrUIKitSize
 
         guard !sizeProposal.fixedSize else {
-            return targetSize
+            var result = targetSize
+            
+            if layoutImmediately {
+                view._UIKit_only_sizeToFit()
+            }
+            
+            let intrinsicContentSize = view.intrinsicContentSize
+            
+            if !intrinsicContentSize.width._isInvalidForIntrinsicContentSize {
+                result.width = intrinsicContentSize.width
+            }
+            
+            if !intrinsicContentSize.height._isInvalidForIntrinsicContentSize {
+                result.height = intrinsicContentSize.height
+            }
+            
+            return result
         }
 
         #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
