@@ -20,6 +20,10 @@ extension _PlatformTableCellView {
             super.fittingSize
         }
         
+        var _preferredIntrinsicContentSize: OptionalDimensions {
+            OptionalDimensions(width: nil, height: parent?._fastRowHeight)
+        }
+        
         override var intrinsicContentSize: CGSize {
             if contentHostingViewCoordinator.stateFlags.contains(.payloadDidJustUpdate) {
                 if let parent = parent, let cache = self.parent?._cheapCache, let size = cache.lastContentSize {
@@ -27,11 +31,10 @@ extension _PlatformTableCellView {
                 }
             }
             
-            if let fastHeight = contentHostingViewCoordinator._fastHeight {
-                return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: fastHeight)
-            } else {
-                return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: super.intrinsicContentSize.height)
-            }
+            return CGSize(
+                width: _preferredIntrinsicContentSize.width ?? AppKitOrUIKitView.noIntrinsicMetric,
+                height: _preferredIntrinsicContentSize.height ?? super.intrinsicContentSize.height
+            )
         }
         
         var parent: _PlatformTableCellView? {
@@ -158,6 +161,10 @@ extension _PlatformTableCellView {
                 return
             }
             
+            var size = size
+            
+            size = _preferredIntrinsicContentSize.replacingUnspecifiedDimensions(by: size)
+            
             if size.isRegularAndNonZero {
                 parent?._cheapCache?.lastContentSize = size
             } else {
@@ -198,13 +205,7 @@ extension _PlatformTableCellView {
                 if #available(macOS 13.0, *) {
                     _assignIfNotEqual([], to: \.sizingOptions)
                 }
-                
-                let didUpdate = _assignIfNotEqual(height, to: \.contentHostingViewCoordinator._fastHeight)
-                
-                if didUpdate {
-                    self.invalidateIntrinsicContentSize()
-                }
-                
+                                
                 _assignIfNotEqual(height, to: \.frame.size.height)
             } else {
                 if #available(macOS 13.0, *) {
@@ -289,7 +290,7 @@ extension _PlatformTableCellView {
         }
         
         var height: CGFloat? {
-            if let height = coordinator._fastHeight {
+            if let height = coordinator.parent?._preferredIntrinsicContentSize.height {
                 return height
             }
             
@@ -326,8 +327,6 @@ extension _PlatformTableCellView {
         fileprivate(set) weak var parent: ContentHostingView?
         
         let listRepresentable: _CocoaList<Configuration>.Coordinator
-        
-        var _fastHeight: CGFloat?
         
         init(listRepresentable: _CocoaList<Configuration>.Coordinator) {
             self.listRepresentable = listRepresentable
