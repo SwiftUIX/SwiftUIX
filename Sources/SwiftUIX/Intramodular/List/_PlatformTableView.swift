@@ -19,6 +19,14 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         }
     }
     
+    public override func viewDidChangeBackingProperties() {
+        
+    }
+
+    override var intrinsicContentSize: NSSize {
+        CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
+    }
+    
     init(listRepresentable: _CocoaList<Configuration>.Coordinator) {
         UserDefaults.standard.set(false, forKey: "NSTableViewCanEstimateRowHeights")
         
@@ -29,6 +37,13 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         self.rowSizeStyle = .custom
         self.cornerView = nil
         self.usesAutomaticRowHeights = true
+        self.wantsLayer = true
+    }
+    
+    public override func setFrameOrigin(_ newOrigin: NSPoint) {
+        super.setFrameOrigin(newOrigin)
+        
+        self.updateTrackingAreas()
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +69,7 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         
         super.prepareContent(in: visibleRect)
     }
-    
+            
     override func noteHeightOfRows(
         withIndexesChanged indexSet: IndexSet
     ) {

@@ -4,6 +4,7 @@
 
 #if os(macOS)
 
+@_spi(Internal) import _SwiftUIX
 import AppKit
 import Swift
 import SwiftUI
@@ -14,7 +15,11 @@ extension _CocoaList: NSViewRepresentable {
     func makeNSView(
         context: Context
     ) -> NSViewType {
-        NSViewType(coordinator: context.coordinator)
+        context.coordinator.configuration = configuration
+
+        let view = NSViewType(coordinator: context.coordinator)
+        
+        return view
     }
     
     func updateNSView(
@@ -43,30 +48,31 @@ extension _CocoaList: NSViewRepresentable {
     }
 }
 
-extension _CocoaList.Coordinator {
-    func measureRowHeight() -> Double {
-0
+extension _CocoaList {
+    enum StateFlag {
+        case isFirstRun
+        case dataChanged
+        case didJustReload
+        case isNSTableViewPreparingContent
+    }
+    
+    class InvalidationContext {
+        var indexes: IndexSet = []
     }
 }
 
 extension _CocoaList {
     class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
-        enum StateFlag {
-            case isFirstRun
-            case dataChanged
-            case didJustReload
-            case isNSTableViewPreparingContent
-        }
-        
         lazy var template = _PlatformTableCellView(parent: self.tableViewContainer!, identifier: NSUserInterfaceItemIdentifier("_PlatformTableCellView"))
         
         var stateFlags: Set<StateFlag> = []
         lazy var cache = _CocoaListCache<Configuration>(owner: self)
         var preferredScrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
         
+        var invalidationContext = InvalidationContext()
+        
         private var scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> {
             var result = preferredScrollViewConfiguration
-            
             if stateFlags.contains(.isFirstRun) {
                 result.showsVerticalScrollIndicator = false
                 result.showsHorizontalScrollIndicator = false
@@ -116,37 +122,22 @@ extension _CocoaList {
             
             if self.stateFlags.contains(.dataChanged) {
                 reload()
-            } else {
-                if !stateFlags.contains(.didJustReload) {
-                    updateTableViewCells()
-                }
             }
-        }
-        
-        private func reload() {
-            guard let tableViewContainer else {
-                return
+                        
+            if !stateFlags.contains(.didJustReload) && !stateFlags.contains(.dataChanged) {
+                updateTableViewCells()
             }
             
-            _withoutAppKitOrUIKitAnimation(self.stateFlags.contains(.isFirstRun)) {
-                stateFlags.remove(.dataChanged)
+            clearInvalidationContext()
+        }
                 
-                guard !stateFlags.contains(.didJustReload) else {
-                    DispatchQueue.main.async {
-                        tableViewContainer.reloadData()
-                    }
-                    
-                    return
-                }
-                
-                tableViewContainer.reloadData()
-                
-                stateFlags.insert(.didJustReload)
-                
-                DispatchQueue.main.async {
-                    self.stateFlags.remove(.didJustReload)
-                }
-            }
+        // MARK: - NSTableViewDataSource
+        
+        func tableView(
+            _ tableView: NSTableView,
+            rowViewForRow row: Int
+        ) -> NSTableRowView? {
+            _PlatformTableView<Configuration>._NSTableRowView(parent: tableView as! _PlatformTableView)
         }
         
         func tableView(
@@ -233,33 +224,7 @@ extension _CocoaList {
             
             return view
         }
-        
-        func updateTableViewCells() {
-            if self.tableView?.inLiveResize == true {
-                return
-            }
-
-            guard let tableView else {
-                return
-            }
             
-            for cell in tableView._visibleTableViewCellViews() {
-                guard let cell = cell as? _PlatformTableCellView<Configuration>, !cell.stateFlags.contains(.wasJustPutIntoUse) else {
-                    continue
-                }
-                
-                guard let item = cell.payload?.item else {
-                    continue
-                }
-                
-                assert(cell.payload != nil)
-                
-                cell.payload?.content = configuration.viewProvider.rowContent(item)
-                
-                cell.refreshCellContent()
-            }
-        }
-        
         func tableView(
             _ tableView: NSTableView,
             didAdd rowView: NSTableRowView,
@@ -272,7 +237,154 @@ extension _CocoaList {
     }
 }
 
+extension _PlatformTableView {
+    class _NSTableRowView: NSTableRowView {
+        unowned let parent: _PlatformTableView
+        
+        override var fittingSize: NSSize {
+            var result = super.fittingSize
+            
+            if let superview = self.superview {
+                if superview.frame.size.isRegularAndNonZero {
+                    result.width = superview.frame.size.width
+                }
+            }
+            
+            if result.height == 0 {
+                if let cell = self.cell {
+                    result.height = cell._cheapCache?.lastContentSize?.height ?? 0
+                    
+                    cell.contentHostingView._SwiftUIX_layoutIfNeeded()
+                }
+            }
+            
+            return result
+        }
+
+        override var intrinsicContentSize: NSSize {
+            if let cell {
+                return cell.intrinsicContentSize
+            } else {
+                var result = CGSize(
+                    width: AppKitOrUIKitView.noIntrinsicMetric,
+                    height: AppKitOrUIKitView.noIntrinsicMetric
+                )
+                
+                if let superview = self.superview {
+                    if superview.frame.size.isRegularAndNonZero {
+                        result.width = superview.frame.size.width
+                    }
+                }
+                
+                return result
+            }
+        }
+        
+        var cell: _PlatformTableCellView<Configuration>? {
+            if let cell = (self.subviews.first as? _PlatformTableCellView<Configuration>), cell._cheapCache?.lastContentSize != nil {
+                return cell
+            }
+            
+            return nil
+        }
+        
+        /*override var fittingSize: NSSize {
+            if let cell {
+                return cell.contentHostingView.fittingSize
+            }
+            
+            return super.fittingSize
+        }*/
+        
+        init(parent: _PlatformTableView) {
+            self.parent = parent
+            
+            super.init(frame: .zero)
+            
+            self.autoresizingMask = []
+            self.autoresizesSubviews = false
+            self.translatesAutoresizingMaskIntoConstraints = true
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+                
+        override func updateConstraintsForSubtreeIfNeeded() {
+            super.updateConstraintsForSubtreeIfNeeded()
+        }
+    }
+}
+
 extension _CocoaList.Coordinator {
+    func reload() {
+        guard let tableViewContainer, let tableView else {
+            return
+        }
+        
+        _withoutAppKitOrUIKitAnimation(self.stateFlags.contains(.isFirstRun)) {
+            stateFlags.remove(.dataChanged)
+            
+            guard !stateFlags.contains(.didJustReload) else {
+                DispatchQueue.main.async {
+                    tableViewContainer.reloadData()
+                }
+                
+                return
+            }
+            
+            if !invalidationContext.indexes.isEmpty {
+                tableView.noteHeightOfRows(withIndexesChanged: invalidationContext.indexes)
+                
+                invalidationContext = .init()
+            }
+            
+            tableViewContainer.reloadData()
+
+            stateFlags.insert(.didJustReload)
+            
+            DispatchQueue.main.async {
+                self.stateFlags.remove(.didJustReload)
+            }
+        }
+    }
+    
+    func clearInvalidationContext() {
+        let context = invalidationContext
+        
+        if !context.indexes.isEmpty {
+            tableView?.noteHeightOfRows(withIndexesChanged: context.indexes)
+            
+            DispatchQueue.main.async {
+                self.tableView?.reloadData()
+            }
+        }
+        
+        self.invalidationContext = .init()
+    }
+    
+    func updateTableViewCells() {
+        guard let tableView else {
+            return
+        }
+        
+        for cell in tableView.visibleTableViewCellViews() {
+            guard let cell = cell as? _PlatformTableCellView<Configuration>, !cell.stateFlags.contains(.wasJustPutIntoUse) else {
+                continue
+            }
+            
+            guard let item = cell.payload?.item else {
+                continue
+            }
+            
+            assert(cell.payload != nil)
+            
+            cell.payload?.content = configuration.viewProvider.rowContent(item)
+            
+            cell.refreshCellContent()
+        }
+    }
+
     func _fastHeight(
         for indexPath: IndexPath
     ) -> CGFloat? {
@@ -301,24 +413,6 @@ extension _CocoaList.Coordinator {
                         return height
                 }
         }
-    }
-}
-
-// MARK: - Helpers
-
-extension NSTableView {
-    func _visibleTableViewCellViews() -> [NSTableCellView] {
-        var cellViews: [NSTableCellView] = []
-        
-        for row in 0..<self.numberOfRows {
-            for column in 0..<self.numberOfColumns {
-                if let cellView = view(atColumn: column, row: row, makeIfNecessary: false) as? NSTableCellView {
-                    cellViews.append(cellView)
-                }
-            }
-        }
-        
-        return cellViews
     }
 }
 

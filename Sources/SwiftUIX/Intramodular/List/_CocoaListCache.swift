@@ -59,7 +59,7 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
     func itemPath(for indexPath: IndexPath) -> ItemPath? {
         self._configuration?.indexPathToItemPathMap[indexPath]
     }
-        
+    
     @_optimize(speed)
     subscript(
         cheap path: ItemPath
@@ -207,9 +207,10 @@ extension _CocoaListCache {
         private unowned let parent: _CocoaListCache
         
         public let id: ItemPath
-        
+                
+        var displayAttributes = _PlatformTableCellView<Configuration>.ContentHostingView.DisplayAttributesCache()
         var lastContentSize: CGSize?
-        
+
         public init(
             parent: _CocoaListCache,
             id: ItemPath
@@ -224,9 +225,49 @@ extension _CocoaListCache {
         
         public let id: ItemPath
         
-        #if os(macOS)
-        var cellContentView: AppKitOrUIKitView?
-        #endif
+#if os(macOS)
+        private var _stored_cellContentView: _PlatformTableCellView<Configuration>.ContentHostingView? {
+            didSet {
+                if let _stored_cellContentView {
+                    assert(_stored_cellContentView.superview == nil)
+                    
+                    _stored_cellContentView.contentHostingViewCoordinator.stateFlags.insert(.isStoredInCache)
+                }
+            }
+        }
+        
+        var cellContentView: _PlatformTableCellView<Configuration>.ContentHostingView? {
+            get {
+                if _stored_cellContentView?.superview != nil {
+                    assertionFailure()
+                }
+                
+                return _stored_cellContentView
+            } set {
+                if let newValue {
+                    assert(!newValue.contentHostingViewCoordinator.stateFlags.contains(.isStoredInCache))
+                    
+                    _stored_cellContentView = newValue
+                } else {
+                    _stored_cellContentView = nil
+                }
+            }
+        }
+        
+        func decacheContentView() -> _PlatformTableCellView<Configuration>.ContentHostingView?{
+            guard let result = cellContentView else {
+                return nil
+            }
+            
+            assert(result.contentHostingViewCoordinator.stateFlags.contains(.isStoredInCache))
+            
+            result.contentHostingViewCoordinator.stateFlags.remove(.isStoredInCache)
+            
+            _stored_cellContentView = nil
+            
+            return result
+        }
+#endif
         
         public init(
             parent: _CocoaListCache,
@@ -234,6 +275,10 @@ extension _CocoaListCache {
         ) {
             self.parent = parent
             self.id = id
+        }
+        
+        deinit {
+            
         }
     }
     

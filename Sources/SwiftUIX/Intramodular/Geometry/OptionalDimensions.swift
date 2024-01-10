@@ -57,19 +57,26 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
 
 // MARK: - Extensions
 
-#if os(iOS) || os(tvOS) || os(visionOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 extension OptionalDimensions {
-    init(intrinsicContentSize: CGSize) {
+    public init(normalNonZeroDimensionsFrom size: CGSize) {
         self.init(
-            width: (intrinsicContentSize.width == UIView.noIntrinsicMetric || intrinsicContentSize.width == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.width,
-            height: (intrinsicContentSize.height == UIView.noIntrinsicMetric || intrinsicContentSize.height == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.height
+            width: (size.width.isNormal && !size.width.isZero) ? size.width : nil,
+            height: (size.height.isNormal && !size.height.isZero) ? size.height : nil
         )
     }
     
-    func toAppKitOrUIKitIntrinsicContentSize() -> CGSize {
+    public init(intrinsicContentSize: CGSize) {
+        self.init(
+            width: (intrinsicContentSize.width == AppKitOrUIKitView.noIntrinsicMetric || intrinsicContentSize.width == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.width,
+            height: (intrinsicContentSize.height == AppKitOrUIKitView.noIntrinsicMetric || intrinsicContentSize.height == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.height
+        )
+    }
+    
+    public func toAppKitOrUIKitIntrinsicContentSize() -> CGSize {
         CGSize(
-            width: width ?? UIView.noIntrinsicMetric,
-            height: height ?? UIView.noIntrinsicMetric
+            width: width ?? AppKitOrUIKitView.noIntrinsicMetric,
+            height: height ?? AppKitOrUIKitView.noIntrinsicMetric
         )
     }
 }

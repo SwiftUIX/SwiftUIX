@@ -15,6 +15,7 @@ public enum _CocoaHostingViewStateFlag {
 
 @frozen
 public enum _CocoaHostingViewConfigurationFlag {
+    case invisible
     case disableResponderChain
     case suppressRelayout
 }
@@ -51,6 +52,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         get {
             super.needsLayout
         } set {
+            guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+                return
+            }
+
             super.needsLayout = newValue
         }
     }
@@ -68,6 +73,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     
 #if os(macOS)
     override open func becomeFirstResponder() -> Bool {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return false
+        }
+
         if _hostingViewConfigurationFlags.contains(.disableResponderChain) {
             return false
         }
@@ -75,6 +84,100 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         return super.becomeFirstResponder()
     }
 #endif
+    
+    #if os(macOS)
+    override open func draw(_ dirtyRect: NSRect) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        super.draw(dirtyRect)
+    }
+    
+    open override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return false
+        }
+        
+        return super.acceptsFirstMouse(for: event)
+    }
+    
+    override open func isMousePoint(_ point: NSPoint, in rect: NSRect) -> Bool {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return false
+        }
+        
+        return super.isMousePoint(point, in: rect)
+    }
+    
+    override open func setNeedsDisplay(_ invalidRect: NSRect) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        super.setNeedsDisplay(invalidRect)
+    }
+        
+    override open func hitTest(_ point: NSPoint) -> NSView? {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return nil
+        }
+        
+        return super.hitTest(point)
+    }
+    
+    override open func cursorUpdate(with event: NSEvent) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        return super.cursorUpdate(with: event)
+    }
+
+    override open func scrollWheel(with event: NSEvent) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        return super.scrollWheel(with: event)
+    }
+    
+    override open func wantsForwardedScrollEvents(for axis: NSEvent.GestureAxis) -> Bool {
+        return super.wantsForwardedScrollEvents(for: axis)
+    }
+    
+    override open func display() {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        super.display()
+    }
+    
+    override open func touchesBegan(with event: NSEvent) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        return super.touchesBegan(with: event)
+    }
+
+    override open func touchesMoved(with event: NSEvent) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        return super.touchesMoved(with: event)
+    }
+    
+    override open func touchesEnded(with event: NSEvent) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
+        return super.touchesEnded(with: event)
+    }
+    #endif
     
     public init(mainView: Content) {
         super.init(
@@ -114,6 +217,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     }
     
     override open func invalidateIntrinsicContentSize() {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }
@@ -142,6 +249,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     
     @_optimize(speed)
     override open func layout() {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }
@@ -153,6 +264,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     override open func resizeSubviews(
         withOldSize oldSize: NSSize
     ) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+        
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }
@@ -164,6 +279,10 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     override open func resize(
         withOldSuperviewSize oldSize: NSSize
     ) {
+        guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+            return
+        }
+
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }

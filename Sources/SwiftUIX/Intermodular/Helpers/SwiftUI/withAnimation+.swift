@@ -53,6 +53,7 @@ public func _withoutAppKitOrUIKitAnimation<Result>(
     #elseif os(macOS)
     NSAnimationContext.beginGrouping()
     NSAnimationContext.current.duration = 0
+    NSAnimationContext.current.timingFunction = nil
     result = body()
     NSAnimationContext.endGrouping()
     #else

@@ -286,6 +286,14 @@ extension OptionalDimensions {
             height: height ?? replacement.height
         )
     }
+    
+    public func toCGSize() -> CGSize? {
+        guard let width, let height else {
+            return nil
+        }
+        
+        return CGSize(width: width, height: height)
+    }
 }
 
 extension AppKitOrUIKitLayoutSizeProposal {

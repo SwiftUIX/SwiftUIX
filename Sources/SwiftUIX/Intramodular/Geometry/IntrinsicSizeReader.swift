@@ -43,7 +43,7 @@ public struct _AxisSizeReader<Content: View>: View {
     
     public init(
         _ axis: Axis,
-        content: @escaping (CGSize?) -> Content
+        @ViewBuilder content: @escaping (CGSize?) -> Content
     ) {
         self.axis = axis
         self.content = content

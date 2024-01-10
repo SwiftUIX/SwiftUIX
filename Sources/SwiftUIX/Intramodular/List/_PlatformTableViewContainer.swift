@@ -25,6 +25,18 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         tableView.style = .plain
         tableView.usesAutomaticRowHeights = true
         
+        tableView.dataSource = coordinator
+        tableView.delegate = coordinator
+
+        let column = NSTableColumn(
+            identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer")
+        )
+        
+        column.isEditable = false
+        column.title = ""
+        
+        tableView.addTableColumn(column)
+
         return tableView
     }()
     
@@ -67,41 +79,55 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     }
     
     private func _setUp() {
-        backgroundColor = .clear
-        hasVerticalScroller = true
-        hasHorizontalScroller = false
-        autohidesScrollers = true
         automaticallyAdjustsContentInsets = false
-        
+        autoresizingMask = []
+        autoresizesSubviews = false
+        backgroundColor = .clear
+        layerContentsRedrawPolicy = .never
+
         self.coordinator.tableViewContainer = self
-        
-        let column = NSTableColumn(
-            identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer")
-        )
-        
-        column.title = ""
-        
-        let contentView = _ClipView()
-        
-        contentView.parent = self
-        
-        self.contentView = contentView
-        
-        tableView.addTableColumn(column)
-        
-        tableView.dataSource = coordinator
-        tableView.delegate = coordinator
-        
+                
         documentView = _tableView
         
         _setUpTableViewObserver()
+        
+        if !(contentView is _ClipView) {
+            swapClipView()
+        }
     }
             
+    open override func isAccessibilityElement() -> Bool {
+        return false
+    }
+
+    open override func accessibilityParent() -> Any? {
+        return nil
+    }
+
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        if !(contentView is _ClipView) {
+            swapClipView()
+        }
+    }
+
+    private func swapClipView() {
+        wantsLayer = true
+        let documentView = self.documentView
+        let clipView = _ClipView(frame: contentView.frame)
+        clipView.parent = self
+        contentView = clipView
+        self.documentView = documentView
+    }
+
     func performEnforcingScrollOffsetBehavior(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
         _ operation: () -> Void
     ) {
+        assert(self.contentView is _ClipView)
+        
         guard behavior == .maintainOnChangeOfBounds else {
             assert(behavior == []) // other behaviors aren't supported right now
             
@@ -205,16 +231,31 @@ extension _PlatformTableViewContainer {
     class _ClipView: NSClipView {
         weak var parent: _PlatformTableViewContainer!
         
+        override init(frame frameRect: NSRect) {
+            super.init(frame: frameRect)
+            
+            autoresizingMask = []
+            autoresizesSubviews = false
+        }
+    
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func isAccessibilityElement() -> Bool {
+            return false
+        }
+        
+        override func accessibilityParent() -> Any? {
+            return nil
+        }
+        
         override func scroll(_ point: NSPoint) {
             guard !parent._disableScrollFuckery else {
                 return
             }
             
             super.scroll(point)
-        }
-        
-        override func awakeFromNib() {
-            super.awakeFromNib()
         }
         
         override func viewBoundsChanged(
@@ -242,9 +283,12 @@ extension _PlatformTableViewContainer {
 extension _PlatformTableViewContainer {
     func invalidateEntireRowHeightCache() {
         NSAnimationContext.beginGrouping()
+        
         NSAnimationContext.current.duration = 0
-        let entireTableView: IndexSet = .init(0 ..< self.tableView.numberOfRows)
-        self.tableView.noteHeightOfRows(withIndexesChanged: entireTableView)
+        NSAnimationContext.current.timingFunction = nil
+
+        self.tableView.noteHeightOfRows(withIndexesChanged: IndexSet(0..<self.tableView.numberOfRows))
+
         NSAnimationContext.endGrouping()
     }
 }
@@ -258,6 +302,7 @@ extension NSTableView {
         NSAnimationContext.runAnimationGroup { context in
             if visibleRect.origin.y > 0 {
                 context.duration = 0
+                context.timingFunction = nil
             }
             
             let oldScrollOffset = visibleRect.origin

@@ -10,6 +10,14 @@ public struct _CocoaListPreferences: Sendable {
     mutating func mergeInPlace(with other: Self) {
         self.cell.mergeInPlace(with: other.cell)
     }
+    
+    func mergingInPlace(with other: Self) -> Self {
+        var result = self
+        
+        result.mergeInPlace(with: other)
+        
+        return result
+    }
 }
 
 extension _CocoaListPreferences {

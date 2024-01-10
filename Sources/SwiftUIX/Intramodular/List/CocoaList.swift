@@ -27,16 +27,16 @@ import SwiftUI
 /// }
 /// ```
 public struct CocoaList<Content: View>: View {
-    private let _content: AnyView
+    private let _content: (Self) -> AnyView
     
     var _cocoaListPreferences: _CocoaListPreferences = nil
     
-    public init(_content: AnyView) {
-        self._content = _content
+    public init<V: View>(_content: @escaping (Self) -> V) {
+        self._content = { _content($0).eraseToAnyView() }
     }
     
     public var body: some View {
-        _content
+        _content(self)
             .transformEnvironment(\._cocoaListPreferences) {
                 $0.mergeInPlace(with: _cocoaListPreferences)
             }
@@ -45,18 +45,20 @@ public struct CocoaList<Content: View>: View {
     public init(
         @ViewBuilder content: () -> Content
     ) {
-        let content = _VariadicViewAdapter(content) { content in
-            withEnvironmentValue(\._cocoaListPreferences) { preferences in
-                _CocoaList(
-                    configuration: _VariadicViewChildren._CocoaListContentAdapter(
-                        content.children,
-                        preferences: preferences
-                    )
-                )
-            }
-        }
+        let content = content()
         
-        self.init(_content: content.eraseToAnyView())
+        self.init(_content: { representable in
+            _VariadicViewAdapter(content) { content in
+                withEnvironmentValue(\._cocoaListPreferences) { preferences in                    
+                    return _CocoaList(
+                        configuration: _VariadicViewChildren._CocoaListContentAdapter(
+                            content.children,
+                            preferences: preferences.mergingInPlace(with: representable._cocoaListPreferences)
+                        )
+                    )
+                }
+            }
+        })
     }
 }
 #else

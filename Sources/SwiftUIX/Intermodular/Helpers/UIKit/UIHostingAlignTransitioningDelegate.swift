@@ -130,7 +130,7 @@ extension ModalPresentationStyle {
                     }
                 }
                 .modify { content in
-                    #if os(tvOS)
+                    #if !os(tvOS)
                     content.onTapGesture(perform: dismiss)
                     #else
                     content
