@@ -38,6 +38,12 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         self.cornerView = nil
         self.usesAutomaticRowHeights = true
         self.wantsLayer = true
+        self.intercellSpacing = .zero
+        self.headerView = nil
+        self.backgroundColor = .clear
+        self.selectionHighlightStyle = .none
+        self.style = .plain
+        self.usesAutomaticRowHeights = true
     }
     
     public override func setFrameOrigin(_ newOrigin: NSPoint) {

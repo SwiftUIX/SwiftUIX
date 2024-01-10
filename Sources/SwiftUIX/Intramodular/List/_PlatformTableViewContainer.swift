@@ -19,12 +19,6 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     private lazy var _tableView: _PlatformTableView<Configuration> = {
         let tableView = _PlatformTableView<Configuration>(listRepresentable: self.coordinator)
         
-        tableView.headerView = nil
-        tableView.backgroundColor = .clear
-        tableView.selectionHighlightStyle = .none
-        tableView.style = .plain
-        tableView.usesAutomaticRowHeights = true
-        
         tableView.dataSource = coordinator
         tableView.delegate = coordinator
 
@@ -80,11 +74,10 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     
     private func _setUp() {
         automaticallyAdjustsContentInsets = false
-        autoresizingMask = []
-        autoresizesSubviews = false
         backgroundColor = .clear
         layerContentsRedrawPolicy = .never
-
+        contentInsets = AppKitOrUIKitEdgeInsets(.zero)
+        
         self.coordinator.tableViewContainer = self
                 
         documentView = _tableView
