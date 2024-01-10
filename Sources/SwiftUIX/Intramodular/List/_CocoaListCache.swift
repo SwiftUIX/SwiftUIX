@@ -208,7 +208,9 @@ extension _CocoaListCache {
         
         public let id: ItemPath
                 
+        #if os(macOS)
         var displayAttributes = _PlatformTableCellView<Configuration>.ContentHostingView.DisplayAttributesCache()
+        #endif
         var lastContentSize: CGSize?
 
         public init(

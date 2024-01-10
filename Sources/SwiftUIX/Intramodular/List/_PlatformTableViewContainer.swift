@@ -11,7 +11,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     private var _coordinator: _CocoaList<Configuration>.Coordinator!
     
     var _disableScrollFuckery: Bool = false
-
+    
     var coordinator: _CocoaList<Configuration>.Coordinator {
         _coordinator!
     }
@@ -21,7 +21,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         
         tableView.dataSource = coordinator
         tableView.delegate = coordinator
-
+        
         let column = NSTableColumn(
             identifier: NSUserInterfaceItemIdentifier(rawValue: "_SwiftUIX_PlatformTableViewContainer")
         )
@@ -30,7 +30,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         column.title = ""
         
         tableView.addTableColumn(column)
-
+        
         return tableView
     }()
     
@@ -45,7 +45,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     ) {
         
     }
-
+    
     var tableView: _PlatformTableView<Configuration> {
         _tableView
     }
@@ -79,7 +79,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         contentInsets = AppKitOrUIKitEdgeInsets(.zero)
         
         self.coordinator.tableViewContainer = self
-                
+        
         documentView = _tableView
         
         _setUpTableViewObserver()
@@ -88,15 +88,15 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             swapClipView()
         }
     }
-            
+    
     open override func isAccessibilityElement() -> Bool {
         return false
     }
-
+    
     open override func accessibilityParent() -> Any? {
         return nil
     }
-
+    
     open override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -104,7 +104,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             swapClipView()
         }
     }
-
+    
     private func swapClipView() {
         wantsLayer = true
         let documentView = self.documentView
@@ -113,7 +113,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         contentView = clipView
         self.documentView = documentView
     }
-
+    
     func performEnforcingScrollOffsetBehavior(
         _ behavior: ScrollContentOffsetBehavior,
         animated: Bool,
@@ -181,25 +181,21 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             
             return
         }
-        
-        guard oldFrame.size.isRegularAndNonZero else {
-            return
-        }
-        
+                
         let newFrame = _tableView.frame
         
         _latestTableViewFrame = newFrame
-                
+        
         _performHidingScrollIndicators {
             _scrollOffsetCorrectionOnTableViewFrameChange?()
             _scrollOffsetCorrectionOnTableViewFrameChange = nil
         }
         
-        /*if oldFrame.height != newFrame.height {
+        if oldFrame.height != newFrame.height {
             if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
                 scrollTo(.bottom)
             }
-        }*/
+        }
     }
     
     private func _performHidingScrollIndicators(
@@ -226,11 +222,8 @@ extension _PlatformTableViewContainer {
         
         override init(frame frameRect: NSRect) {
             super.init(frame: frameRect)
-            
-            autoresizingMask = []
-            autoresizesSubviews = false
         }
-    
+        
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -268,7 +261,7 @@ extension _PlatformTableViewContainer {
         override func constrainBoundsRect(
             _ proposedBounds: NSRect
         ) -> NSRect {
-             super.constrainBoundsRect(proposedBounds)
+            super.constrainBoundsRect(proposedBounds)
         }
     }
 }
@@ -279,9 +272,9 @@ extension _PlatformTableViewContainer {
         
         NSAnimationContext.current.duration = 0
         NSAnimationContext.current.timingFunction = nil
-
+        
         self.tableView.noteHeightOfRows(withIndexesChanged: IndexSet(0..<self.tableView.numberOfRows))
-
+        
         NSAnimationContext.endGrouping()
     }
 }
