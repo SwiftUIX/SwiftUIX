@@ -211,7 +211,13 @@ extension _CocoaListCache {
         #if os(macOS)
         var displayAttributes = _PlatformTableCellView<Configuration>.ContentHostingView.DisplayAttributesCache()
         #endif
-        var lastContentSize: CGSize?
+        var lastContentSize: CGSize? {
+            didSet {
+                if let lastContentSize {
+                    assert(lastContentSize.isRegularAndNonZero)
+                }
+            }
+        }
 
         public init(
             parent: _CocoaListCache,

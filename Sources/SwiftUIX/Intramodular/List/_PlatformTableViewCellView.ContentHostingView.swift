@@ -117,11 +117,11 @@ extension _PlatformTableCellView {
         }
         
         override func _assembleCocoaHostingView() {
-            #if swift(>=5.9)
+#if swift(>=5.9)
             if #available(macOS 14.0, *) {
                 sceneBridgingOptions = []
             }
-            #endif
+#endif
         }
         
         override func _refreshCocoaHostingView() {
@@ -147,7 +147,9 @@ extension _PlatformTableCellView {
                 contentHostingViewCoordinator.stateFlags.insert(.dirtySize)
                 
                 DispatchQueue.main.async {
-                    self.contentHostingViewCoordinator.objectWillChange.send()
+                    withoutAnimation {
+                        self.contentHostingViewCoordinator.objectWillChange.send()
+                    }
                 }
             }
             
@@ -160,7 +162,10 @@ extension _PlatformTableCellView {
                 contentHostingViewCoordinator.stateFlags.insert(.payloadDidJustUpdate)
                 
                 DispatchQueue.main.async {
-                    self.contentHostingViewCoordinator.objectWillChange.send()
+                    withoutAnimation {
+                        self.contentHostingViewCoordinator.objectWillChange.send()
+                    }
+                    
                     self.contentHostingViewCoordinator.stateFlags.remove(.payloadDidJustUpdate)
                 }
             }
@@ -334,7 +339,9 @@ extension _PlatformTableCellView.ContentHostingView {
         if size.isRegularAndNonZero {
             let last = cache.lastContentSize
             
-            cache.lastContentSize = size
+            if cache.lastContentSize != size {
+                cache.lastContentSize = size
+            }
             
             guard !_hostingViewStateFlags.contains(.didJustMoveToSuperview) else {
                 return
@@ -408,7 +415,7 @@ extension _PlatformTableCellView {
             return false
         }
         
-        var width: CGFloat? {
+        private var _width: CGFloat? {
             guard let parent = coordinator.parent else {
                 return nil
             }
@@ -424,9 +431,17 @@ extension _PlatformTableCellView {
             return nil
         }
         
-        var height: CGFloat? {
+        private var _height: CGFloat? {
             guard let parent = coordinator.parent else {
                 return nil
+            }
+            
+            let firstRenderComplete = coordinator.stateFlags.contains(.firstRenderComplete)
+            
+            if !firstRenderComplete {
+                guard !parent._hostingViewStateFlags.contains(.didJustMoveToSuperview) else {
+                    return nil
+                }
             }
             
             if !didAppear || coordinator.stateFlags.contains(.payloadDidJustUpdate) {
@@ -440,16 +455,40 @@ extension _PlatformTableCellView {
             return nil
         }
         
+        private var width: CGFloat? {
+            guard let _width else {
+                return nil
+            }
+            
+            assert(_width > 0)
+            
+            return _width
+        }
+        
+        private var height: CGFloat? {
+            guard let _height else {
+                return nil
+            }
+            
+            assert(_height > 0)
+            
+            return _height
+        }
+        
         var body: some View {
             payload.content
                 .onAppear {
                     if !didAppear {
-                        didAppear = true
+                        withoutAnimation {
+                            didAppear = true
+                        }
                     }
                 }
                 .onDisappear {
                     if didAppear {
-                        didAppear = false
+                        withoutAnimation {
+                            didAppear = false
+                        }
                     }
                 }
                 .transaction { transaction in
@@ -468,13 +507,13 @@ extension _PlatformTableCellView {
             case isStoredInCache
             case dirtySize
         }
-            
+        
         var stateFlags: Set<StateFlag> = []
         
         var isPendingReuse: Bool {
             stateFlags.contains(.isStoredInCache) || !stateFlags.contains(.firstRenderComplete)
         }
-
+        
         fileprivate(set) weak var parent: ContentHostingView?
         
         let listRepresentable: _CocoaList<Configuration>.Coordinator
