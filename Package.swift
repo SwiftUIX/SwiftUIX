@@ -33,7 +33,13 @@ let package = Package(
                 "_SwiftUIX"
             ],
             swiftSettings: [
-                .unsafeFlags(["-enable-library-evolution"])
+                .unsafeFlags([
+                    "-enable-library-evolution",
+                    "-Xfrontend",
+                    "-disable-typo-correction",
+                    "-Xfrontend",
+                    "-disable-verify-exclusivity",
+                ])
             ]
         )
     ]

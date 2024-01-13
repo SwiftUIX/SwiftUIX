@@ -10,19 +10,7 @@ import SwiftUI
 
 final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTableView {
     let listRepresentable: _CocoaList<Configuration>.Coordinator
-    
-    override var rowHeight: CGFloat {
-        get {
-            super.rowHeight
-        } set {
-            super.rowHeight = newValue
-        }
-    }
-    
-    public override func viewDidChangeBackingProperties() {
         
-    }
-
     override var intrinsicContentSize: NSSize {
         CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
     }
@@ -45,13 +33,7 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         self.style = .plain
         self.usesAutomaticRowHeights = true
     }
-    
-    public override func setFrameOrigin(_ newOrigin: NSPoint) {
-        super.setFrameOrigin(newOrigin)
         
-        self.updateTrackingAreas()
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -62,6 +44,10 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         super.resizeSubviews(withOldSize: oldSize)
     }
     
+    public override func viewDidChangeBackingProperties() {
+        
+    }
+
     override func invalidateIntrinsicContentSize() {
         
     }

@@ -9,11 +9,13 @@ import SwiftUI
 @_spi(Internal)
 open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationType>: NSScrollView {
     private var _coordinator: _CocoaList<Configuration>.Coordinator!
-    
-    var _disableScrollFuckery: Bool = false
-    
+        
     var coordinator: _CocoaList<Configuration>.Coordinator {
         _coordinator!
+    }
+    
+    override open var intrinsicContentSize: NSSize {
+        CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
     }
     
     private lazy var _tableView: _PlatformTableView<Configuration> = {
@@ -70,6 +72,10 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             
             invalidateEntireRowHeightCache()
         }
+    }
+    
+    override open func invalidateIntrinsicContentSize() {
+         
     }
     
     private func _setUp() {
@@ -237,10 +243,6 @@ extension _PlatformTableViewContainer {
         }
         
         override func scroll(_ point: NSPoint) {
-            guard !parent._disableScrollFuckery else {
-                return
-            }
-            
             super.scroll(point)
         }
         
@@ -251,10 +253,6 @@ extension _PlatformTableViewContainer {
         }
         
         override func setBoundsOrigin(_ newOrigin: NSPoint) {
-            guard !parent._disableScrollFuckery else {
-                return
-            }
-            
             super.setBoundsOrigin(newOrigin)
         }
         
@@ -276,35 +274,6 @@ extension _PlatformTableViewContainer {
         self.tableView.noteHeightOfRows(withIndexesChanged: IndexSet(0..<self.tableView.numberOfRows))
         
         NSAnimationContext.endGrouping()
-    }
-}
-
-extension NSTableView {
-    func performEnforcingScrollOffsetBehavior(
-        _ behavior: ScrollContentOffsetBehavior,
-        animated: Bool,
-        operation update: () -> Void
-    ) {
-        NSAnimationContext.runAnimationGroup { context in
-            if visibleRect.origin.y > 0 {
-                context.duration = 0
-                context.timingFunction = nil
-            }
-            
-            let oldScrollOffset = visibleRect.origin
-            let previousHeight = bounds.size.height
-            
-            update()
-            
-            var newScrollOffset = oldScrollOffset
-            newScrollOffset.y += (bounds.size.height - previousHeight)
-            
-            if oldScrollOffset.y == 0 {
-                scroll(oldScrollOffset)
-            } else if newScrollOffset.y > oldScrollOffset.y {
-                scroll(newScrollOffset)
-            }
-        }
     }
 }
 

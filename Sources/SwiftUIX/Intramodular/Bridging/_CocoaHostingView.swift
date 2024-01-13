@@ -18,6 +18,7 @@ public enum _CocoaHostingViewConfigurationFlag {
     case invisible
     case disableResponderChain
     case suppressRelayout
+    case suppressIntrinsicContentSizeInvalidation
 }
 
 open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
@@ -45,6 +46,8 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         }
     }
     
+    public var _overrideSizeForUpdateConstraints: OptionalDimensions = nil
+    
 #if os(macOS)
     @_optimize(speed)
     @inline(__always)
@@ -55,9 +58,73 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
             guard !_hostingViewConfigurationFlags.contains(.invisible) else {
                 return
             }
-
+            
+            guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+                return
+            }
+            
             super.needsLayout = newValue
         }
+    }
+    
+    @_optimize(speed)
+    @inline(__always)
+    override open var needsUpdateConstraints: Bool {
+        get {
+            super.needsUpdateConstraints
+        } set {
+            guard !_hostingViewConfigurationFlags.contains(.invisible) else {
+                return
+            }
+            
+            super.needsUpdateConstraints = newValue
+        }
+    }
+    
+    override open func updateConstraints() {
+        var constraintsToRemove: [NSLayoutConstraint] = []
+        var newConstraints: [NSLayoutConstraint] = []
+        
+        if let overrideWidth = _overrideSizeForUpdateConstraints.width {
+            if let constraint = constraints.first(where: { $0.firstAttribute == .width || $0.secondAttribute == .width && $0.constant == overrideWidth }), constraint.constant != overrideWidth {
+                /*let newConstraint = copyLayoutConstraint(constraint, constant: overrideWidth)
+                
+                constraintsToRemove.append(constraint)
+                newConstraints.append(newConstraint)*/
+                
+                constraint.constant = overrideWidth
+            }
+        }
+
+        if let overrideHeight = _overrideSizeForUpdateConstraints.height {
+            if let constraint = constraints.first(where: { $0.firstAttribute == .height || $0.secondAttribute == .height && $0.constant == overrideHeight }), constraint.constant != overrideHeight {
+                /*let newConstraint = copyLayoutConstraint(constraint, constant: overrideHeight)
+                
+                constraintsToRemove.append(constraint)
+                newConstraints.append(newConstraint)*/
+                
+                constraint.constant = overrideHeight
+            }
+        }
+        
+        removeConstraints(constraintsToRemove)
+        addConstraints(newConstraints)
+
+        self._overrideSizeForUpdateConstraints = nil
+
+        super.updateConstraints()
+    }
+    
+    func copyLayoutConstraint(_ constraint: NSLayoutConstraint, constant: CGFloat) -> NSLayoutConstraint {
+        return NSLayoutConstraint(
+            item: constraint.firstItem!,
+            attribute: constraint.firstAttribute,
+            relatedBy: constraint.relation,
+            toItem: constraint.secondItem,
+            attribute: constraint.secondAttribute,
+            multiplier: constraint.multiplier,
+            constant: constant
+        )
     }
 #endif
     
@@ -76,7 +143,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return false
         }
-
+        
         if _hostingViewConfigurationFlags.contains(.disableResponderChain) {
             return false
         }
@@ -85,7 +152,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     }
 #endif
     
-    #if os(macOS)
+#if os(macOS)
     override open func draw(_ dirtyRect: NSRect) {
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
@@ -117,7 +184,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         super.setNeedsDisplay(invalidRect)
     }
-        
+    
     override open func hitTest(_ point: NSPoint) -> NSView? {
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return nil
@@ -133,7 +200,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         return super.cursorUpdate(with: event)
     }
-
+    
     override open func scrollWheel(with event: NSEvent) {
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
@@ -161,7 +228,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         return super.touchesBegan(with: event)
     }
-
+    
     override open func touchesMoved(with event: NSEvent) {
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
@@ -177,7 +244,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         
         return super.touchesEnded(with: event)
     }
-    #endif
+#endif
     
     public init(mainView: Content) {
         super.init(
@@ -220,8 +287,12 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
         }
-
+        
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
+            return
+        }
+        
+        guard !_hostingViewConfigurationFlags.contains(.suppressIntrinsicContentSizeInvalidation) else {
             return
         }
         
@@ -252,7 +323,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
         }
-
+        
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }
@@ -282,7 +353,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         guard !_hostingViewConfigurationFlags.contains(.invisible) else {
             return
         }
-
+        
         guard !_hostingViewConfigurationFlags.contains(.suppressRelayout) else {
             return
         }

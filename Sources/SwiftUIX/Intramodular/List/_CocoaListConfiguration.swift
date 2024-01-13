@@ -5,10 +5,6 @@
 import Swift
 import SwiftUI
 
-public enum _CocoaListUnsafeFlag {
-    
-}
-
 public protocol _CocoaListConfigurationType {
     associatedtype Data: _CocoaListDataSourceType
     associatedtype ViewProvider: _CocoaListViewProviderType where Data.ItemType == ViewProvider.ItemType, Data.SectionType == ViewProvider.SectionType
