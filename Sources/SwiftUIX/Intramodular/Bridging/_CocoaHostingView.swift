@@ -82,34 +82,18 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     }
     
     override open func updateConstraints() {
-        var constraintsToRemove: [NSLayoutConstraint] = []
-        var newConstraints: [NSLayoutConstraint] = []
-        
         if let overrideWidth = _overrideSizeForUpdateConstraints.width {
             if let constraint = constraints.first(where: { $0.firstAttribute == .width || $0.secondAttribute == .width && $0.constant == overrideWidth }), constraint.constant != overrideWidth {
-                /*let newConstraint = copyLayoutConstraint(constraint, constant: overrideWidth)
-                
-                constraintsToRemove.append(constraint)
-                newConstraints.append(newConstraint)*/
-                
                 constraint.constant = overrideWidth
             }
         }
 
         if let overrideHeight = _overrideSizeForUpdateConstraints.height {
             if let constraint = constraints.first(where: { $0.firstAttribute == .height || $0.secondAttribute == .height && $0.constant == overrideHeight }), constraint.constant != overrideHeight {
-                /*let newConstraint = copyLayoutConstraint(constraint, constant: overrideHeight)
-                
-                constraintsToRemove.append(constraint)
-                newConstraints.append(newConstraint)*/
-                
                 constraint.constant = overrideHeight
             }
         }
         
-        removeConstraints(constraintsToRemove)
-        addConstraints(newConstraints)
-
         self._overrideSizeForUpdateConstraints = nil
 
         super.updateConstraints()

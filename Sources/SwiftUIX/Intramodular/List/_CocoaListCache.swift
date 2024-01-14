@@ -172,6 +172,12 @@ public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
             }
         }
     }
+    
+    func invalidateSize() {
+        for cache in self._cheapItemCaches.values {
+            cache.lastContentSize = nil
+        }
+    }
 }
 
 #if os(macOS)

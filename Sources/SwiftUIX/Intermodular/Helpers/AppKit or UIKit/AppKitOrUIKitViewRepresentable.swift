@@ -344,7 +344,10 @@ extension AppKitOrUIKitViewRepresentable {
     }
     
     @MainActor
-    public static func dismantleNSView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
+    public static func dismantleNSView(
+        _ view: AppKitOrUIKitViewType,
+        coordinator: Coordinator
+    ) {
         let represented = view as? _AppKitOrUIKitRepresented
         
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)

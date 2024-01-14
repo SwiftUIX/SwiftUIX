@@ -82,7 +82,7 @@ extension View {
 }
 
 // MARK: - Auxiliary
-
-struct _CocoaListItemID: Hashable {
-    let id: AnyHashable
+ 
+public struct _CocoaListItemID: Hashable {
+    public let id: AnyHashable
 }

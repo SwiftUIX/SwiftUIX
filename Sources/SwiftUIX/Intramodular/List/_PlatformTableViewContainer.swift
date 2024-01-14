@@ -9,7 +9,7 @@ import SwiftUI
 @_spi(Internal)
 open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationType>: NSScrollView {
     private var _coordinator: _CocoaList<Configuration>.Coordinator!
-        
+    
     var coordinator: _CocoaList<Configuration>.Coordinator {
         _coordinator!
     }
@@ -69,20 +69,21 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     func reloadData(animated: Bool = true) {
         performEnforcingScrollOffsetBehavior([], animated: animated) {
             tableView.reloadData()
-            
-            invalidateEntireRowHeightCache()
         }
     }
     
     override open func invalidateIntrinsicContentSize() {
-         
+        
     }
     
     private func _setUp() {
         automaticallyAdjustsContentInsets = false
         backgroundColor = .clear
-        layerContentsRedrawPolicy = .never
         contentInsets = AppKitOrUIKitEdgeInsets(.zero)
+        wantsLayer = true
+        
+        isHorizontalContentSizeConstraintActive = false
+        isVerticalContentSizeConstraintActive = false
         
         self.coordinator.tableViewContainer = self
         
@@ -93,14 +94,6 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         if !(contentView is _ClipView) {
             swapClipView()
         }
-    }
-    
-    open override func isAccessibilityElement() -> Bool {
-        return false
-    }
-    
-    open override func accessibilityParent() -> Any? {
-        return nil
     }
     
     open override func awakeFromNib() {
@@ -187,7 +180,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             
             return
         }
-                
+        
         let newFrame = _tableView.frame
         
         _latestTableViewFrame = newFrame
@@ -226,20 +219,27 @@ extension _PlatformTableViewContainer {
     class _ClipView: NSClipView {
         weak var parent: _PlatformTableViewContainer!
         
+        override open var intrinsicContentSize: NSSize {
+            CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
+        }
+        
         override init(frame frameRect: NSRect) {
             super.init(frame: frameRect)
+            
+            isHorizontalContentSizeConstraintActive = false
+            isVerticalContentSizeConstraintActive = false
         }
         
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
         
-        override func isAccessibilityElement() -> Bool {
-            return false
+        override func viewDidChangeBackingProperties() {
+            
         }
         
-        override func accessibilityParent() -> Any? {
-            return nil
+        override func invalidateIntrinsicContentSize() {
+            
         }
         
         override func scroll(_ point: NSPoint) {

@@ -8,6 +8,10 @@ import SwiftUI
 
 extension _PlatformTableCellView {
     final class ContentHostingView: _CocoaHostingView<ContentHostingContainer> {
+        override static var requiresConstraintBasedLayout: Bool {
+            true
+        }
+
         public struct DisplayAttributesCache {
             var _preferredIntrinsicContentSize: OptionalDimensions? = nil
         }
@@ -24,8 +28,24 @@ extension _PlatformTableCellView {
         
         private(set) var contentHostingViewCoordinator: ContentHostingViewCoordinator!
         
-        public var listRepresentable: _CocoaList<Configuration>.Coordinator {
-            contentHostingViewCoordinator.listRepresentable
+        public var listRepresentable: _CocoaList<Configuration>.Coordinator? {
+            contentHostingViewCoordinator?.listRepresentable
+        }
+        
+        override var needsUpdateConstraints: Bool {
+            get {
+                super.needsUpdateConstraints
+            } set {
+                guard let listRepresentable else {
+                    return
+                }
+                
+                guard !listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) else {
+                    return
+                }
+                
+                super.needsUpdateConstraints = newValue
+            }
         }
         
         override var fittingSize: NSSize {
@@ -59,9 +79,9 @@ extension _PlatformTableCellView {
             
             return result
         }
-        
+                
         override var intrinsicContentSize: CGSize {
-            guard let tableView = parent?.superview else {
+            guard let tableView = parent?.superview?.superview ?? parent?.superview else {
                 return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
             }
             
@@ -110,6 +130,8 @@ extension _PlatformTableCellView {
                 )
             )
             
+            wantsLayer = true
+            
             self.contentHostingViewCoordinator = self.mainView.coordinator
             self.contentHostingViewCoordinator.parent = self
             
@@ -136,21 +158,14 @@ extension _PlatformTableCellView {
                 let newHeight = _preferredIntrinsicContentSize.height,
                 existing.height != newHeight
             {
-                frame.size.height = newHeight
+                _overrideSizeForUpdateConstraints.height = newHeight
+                needsUpdateConstraints = true
                 
                 _writeToCache(size: frame.size)
-                
-                invalidateIntrinsicContentSize()
                 
                 _reportAsInvalidatedToListRepresentable()
                 
                 contentHostingViewCoordinator.stateFlags.insert(.dirtySize)
-                
-                DispatchQueue.main.async {
-                    withoutAnimation {
-                        self.contentHostingViewCoordinator.objectWillChange.send()
-                    }
-                }
             }
             
             displayCache._preferredIntrinsicContentSize = _preferredIntrinsicContentSize
@@ -162,17 +177,14 @@ extension _PlatformTableCellView {
                 contentHostingViewCoordinator.stateFlags.insert(.payloadDidJustUpdate)
                 
                 DispatchQueue.main.async {
-                    withoutAnimation {
-                        self.contentHostingViewCoordinator.objectWillChange.send()
-                    }
-                    
+                    // self.contentHostingViewCoordinator.objectWillChange.send()
                     self.contentHostingViewCoordinator.stateFlags.remove(.payloadDidJustUpdate)
                 }
             }
         }
         
         func payloadDidUpdate() {
-            _refreshCocoaHostingView()
+            
         }
         
         override func viewWillMove(
@@ -184,19 +196,25 @@ extension _PlatformTableCellView {
             
             super.viewWillMove(toSuperview: newSuperview)
             
+            guard let listRepresentable = listRepresentable else {
+                assertionFailure()
+                
+                return
+            }
+            
             if newSuperview == nil {
                 if listRepresentable.configuration.preferences.cell.viewHostingOptions.detachHostingView {
                     _tearDownConstraints()
                 }
             } else {
                 if let lastContentSize = (newSuperview as? _PlatformTableCellView)?._cheapCache?.lastContentSize {
-                    if frame.size != lastContentSize {
-                        self.frame.size = lastContentSize
-                    }
+                    _overrideSizeForUpdateConstraints = .init(lastContentSize)
                 }
             }
             
-            _updateSizingOptions(parent: newSuperview as? _PlatformTableCellView)
+            if newSuperview != nil {
+                _updateSizingOptions(parent: newSuperview as? _PlatformTableCellView)
+            }
         }
         
         override func viewDidMoveToSuperview() {
@@ -225,15 +243,11 @@ extension _PlatformTableCellView {
             _writeToCache(size: frame.size)
         }
         
-        override var needsUpdateConstraints: Bool {
-            get {
-                super.needsUpdateConstraints
-            } set {
-                super.needsUpdateConstraints = newValue
-            }
-        }
-        
         override func updateConstraintsForSubtreeIfNeeded() {
+            guard let listRepresentable else {
+                return
+            }
+            
             guard !listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) else {
                 return
             }
@@ -246,6 +260,10 @@ extension _PlatformTableCellView {
         }
         
         override func invalidateIntrinsicContentSize() {
+            guard let listRepresentable else {
+                return
+            }
+            
             if !contentHostingViewCoordinator.stateFlags.contains(.dirtySize) {
                 if contentHostingViewCoordinator.stateFlags.contains(.firstRenderComplete) {
                     guard !listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) else {
@@ -260,6 +278,10 @@ extension _PlatformTableCellView {
             
             contentHostingViewCoordinator.stateFlags.remove(.dirtySize)
             
+            guard !listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) else {
+                return
+            }
+            
             super.invalidateIntrinsicContentSize()
             
             if let parent {
@@ -268,7 +290,9 @@ extension _PlatformTableCellView {
                 } else {
                     parent._cheapCache?.lastContentSize = nil
                     
-                    listRepresentable.invalidationContext.indexes.insert(parent.indexPath!.item)
+                    if !_hostingViewStateFlags.contains(.didJustMoveToSuperview) {
+                        listRepresentable.invalidationContext.indexes.insert(parent.indexPath!.item)
+                    }
                 }
             }
         }
@@ -311,7 +335,7 @@ extension _PlatformTableCellView {
 
 extension _PlatformTableCellView.ContentHostingView {
     func _reportAsInvalidatedToListRepresentable() {
-        guard let parent else {
+        guard let listRepresentable, let parent else {
             assertionFailure()
             
             return
@@ -321,6 +345,10 @@ extension _PlatformTableCellView.ContentHostingView {
     }
     
     private func _writeToCache(size: CGSize) {
+        guard let listRepresentable else {
+            return
+        }
+        
         guard
             let parent = parent,
             let cache = parent._cheapCache, !contentHostingViewCoordinator.stateFlags.contains(.payloadDidJustUpdate)
@@ -356,6 +384,10 @@ extension _PlatformTableCellView.ContentHostingView {
     }
     
     fileprivate func _setUpConstraints() {
+        guard let listRepresentable, listRepresentable.configuration.preferences.cell.viewHostingOptions.useAutoLayout else {
+            return
+        }
+        
         guard let superview else {
             return
         }
@@ -377,13 +409,19 @@ extension _PlatformTableCellView.ContentHostingView {
     }
     
     fileprivate func _tearDownConstraints() {
+        guard let listRepresentable else {
+            return
+        }
+        
+        guard listRepresentable.configuration.preferences.cell.viewHostingOptions.useAutoLayout else {
+            return
+        }
+        
         guard let currentConstraints = self._constraintsWithSuperview else {
             return
         }
         
         NSLayoutConstraint.deactivate(currentConstraints)
-        
-        removeConstraints(currentConstraints)
         
         self._constraintsWithSuperview = nil
     }
@@ -397,14 +435,14 @@ extension _PlatformTableCellView {
         
         var payload: Payload
         
-        @State private var didAppear: Bool = false
+        @ViewStorage private var didAppear: Bool = false
         
         private var disableAnimations: Bool {
             guard didAppear else {
                 return true
             }
             
-            if coordinator.listRepresentable.tableView?.inLiveResize == true {
+            if coordinator.listRepresentable?.tableView?.inLiveResize == true {
                 return true
             }
             
@@ -476,26 +514,20 @@ extension _PlatformTableCellView {
         }
         
         var body: some View {
-            payload.content
-                .onAppear {
-                    if !didAppear {
-                        withoutAnimation {
+            _UnaryViewAdaptor(
+                payload.content
+                    .onAppear {
+                        if !didAppear {
                             didAppear = true
                         }
                     }
-                }
-                .onDisappear {
-                    if didAppear {
-                        withoutAnimation {
-                            didAppear = false
-                        }
+                    .transaction { transaction in
+                        transaction.disablesAnimations = disableAnimations
                     }
-                }
-                .transaction { transaction in
-                    transaction.disablesAnimations = disableAnimations
-                }
-                ._geometryGroup(.if(.available))
-                .frame(width: width, height: height)
+                    ._geometryGroup(.if(.available))
+                    .frame(width: width, height: height)
+            )
+            .id(payload.id)
         }
     }
     
@@ -516,7 +548,7 @@ extension _PlatformTableCellView {
         
         fileprivate(set) weak var parent: ContentHostingView?
         
-        let listRepresentable: _CocoaList<Configuration>.Coordinator
+        weak var listRepresentable: _CocoaList<Configuration>.Coordinator?
         
         init(listRepresentable: _CocoaList<Configuration>.Coordinator) {
             self.listRepresentable = listRepresentable

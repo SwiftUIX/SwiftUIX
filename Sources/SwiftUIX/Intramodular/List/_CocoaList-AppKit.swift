@@ -35,15 +35,21 @@ extension _CocoaList: NSViewRepresentable {
         updateCocoaScrollProxy()
         
         context.coordinator.representableWillUpdate()
-                
         context.coordinator.configuration = configuration
-
         context.coordinator.representableDidUpdate()
         
         view.representableDidUpdate(self, context: context)
     }
     
-    public func makeCoordinator() -> Coordinator {
+    @MainActor
+    public static func dismantleNSView(
+        _ view: NSViewType,
+        coordinator: Coordinator
+    ) {
+        coordinator.cache.invalidate()
+    }
+    
+    func makeCoordinator() -> Coordinator {
         Coordinator(configuration: configuration)
     }
 }
@@ -62,9 +68,7 @@ extension _CocoaList {
 }
 
 extension _CocoaList {
-    class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
-        lazy var template = _PlatformTableCellView(parent: self.tableViewContainer!, identifier: NSUserInterfaceItemIdentifier("_PlatformTableCellView"))
-        
+    class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {        
         var stateFlags: Set<StateFlag> = []
         lazy var cache = _CocoaListCache<Configuration>(owner: self)
         var preferredScrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
@@ -132,14 +136,7 @@ extension _CocoaList {
         }
                 
         // MARK: - NSTableViewDataSource
-        
-        func tableView(
-            _ tableView: NSTableView,
-            rowViewForRow row: Int
-        ) -> NSTableRowView? {
-            _PlatformTableView<Configuration>._NSTableRowView(parent: tableView as! _PlatformTableView)
-        }
-        
+                
         func tableView(
             _ tableView: NSTableView,
             heightOfRow row: Int
@@ -149,7 +146,7 @@ extension _CocoaList {
                     return height
                 }
             }
-            
+                        
             switch configuration.preferences.cell.sizingOptions {
                 case .auto:
                     return NSTableCellView.automaticSize.height
@@ -191,10 +188,27 @@ extension _CocoaList {
         
         func tableView(
             _ tableView: NSTableView,
+            rowViewForRow row: Int
+        ) -> NSTableRowView? {
+            let identifier = NSUserInterfaceItemIdentifier("_PlatformTableRowView")
+            
+            var rowView = tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableView<Configuration>._NSTableRowView
+            
+            if rowView == nil {
+                rowView = _PlatformTableView<Configuration>._NSTableRowView(parent: tableView as! _PlatformTableView<Configuration>)
+                
+                rowView?.identifier = identifier
+            }
+            
+            return rowView
+        }
+        
+        func tableView(
+            _ tableView: NSTableView,
             viewFor tableColumn: NSTableColumn?,
             row: Int
         ) -> NSView? {
-            guard let tableViewContainer, let tableView = self.tableView else {
+            guard let tableViewContainer else {
                 assertionFailure()
                 
                 return nil
@@ -211,37 +225,59 @@ extension _CocoaList {
                 identifier: identifier
             )
             
+            let payload = _PlatformTableCellView.Payload(
+                itemPath: itemPath,
+                item: item,
+                content: configuration.viewProvider.rowContent(item)
+            )
+            
             view.indexPath = IndexPath(item: row, section: 0)
             
             view.prepareForUse(
-                payload: _PlatformTableCellView.Payload(
-                    itemPath: itemPath,
-                    item: item,
-                    content: configuration.viewProvider.rowContent(item)
-                ),
+                payload: payload,
                 tableView: tableView
             )
-            
+                        
             return view
-        }
-            
-        func tableView(
-            _ tableView: NSTableView,
-            didAdd rowView: NSTableRowView,
-            forRow row: Int
-        ) {
-            if rowView.translatesAutoresizingMaskIntoConstraints {
-                rowView.translatesAutoresizingMaskIntoConstraints = false
-            }
         }
     }
 }
 
 extension _PlatformTableView {
     class _NSTableRowView: NSTableRowView {
+        override static var requiresConstraintBasedLayout: Bool {
+            true
+        }
+
         unowned let parent: _PlatformTableView
         
+        override var translatesAutoresizingMaskIntoConstraints: Bool {
+            get {
+                false
+            } set {
+                super.translatesAutoresizingMaskIntoConstraints = false
+            }
+        }
+        
+        override var intrinsicContentSize: NSSize {
+            CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
+        }
+        
         override var fittingSize: NSSize {
+            if let cell {
+                if parent.listRepresentable.configuration.preferences.cell.viewHostingOptions.detachHostingView {
+                    if cell.contentHostingView.intrinsicContentSize.isRegularAndNonZero {
+                        return cell.contentHostingView.intrinsicContentSize
+                    }
+                }
+                
+                if frame.size.isRegularAndNonZero, frame.size == cell.contentHostingView.intrinsicContentSize {
+                    return cell.contentHostingView.intrinsicContentSize
+                } else if frame.size.height == self.parent.rowHeight {
+                    return cell.contentHostingView.intrinsicContentSize
+                }
+            }
+            
             var result = super.fittingSize
             
             if let superview = self.superview {
@@ -260,26 +296,39 @@ extension _PlatformTableView {
             
             return result
         }
+        
+        var skipFirst: Bool = true
 
-        override var intrinsicContentSize: NSSize {
-            if let cell {
-                return cell.intrinsicContentSize
-            } else {
-                var result = CGSize(
-                    width: AppKitOrUIKitView.noIntrinsicMetric,
-                    height: AppKitOrUIKitView.noIntrinsicMetric
-                )
-                
-                if let superview = self.superview {
-                    if superview.frame.size.isRegularAndNonZero {
-                        result.width = superview.frame.size.width
+        override var needsUpdateConstraints: Bool {
+            get {
+                super.needsUpdateConstraints
+            } set {
+                if skipFirst {
+                    skipFirst = false
+                    
+                    return
+                }
+            
+                if let cell, cell.contentHostingView.intrinsicContentSize.isRegularAndNonZero {
+                    if cell.contentHostingView.frame.size == self.frame.size {
+                        return
+                    } else {
+                        if self.frame.height == self.parent.rowHeight {
+                            self.frame.size = cell.contentHostingView.frame.size
+                            
+                            return
+                        }
                     }
                 }
+
+                if subviews.isEmpty {
+                    return
+                }
                 
-                return result
+                //super.needsUpdateConstraints = newValue
             }
         }
-        
+                
         var cell: _PlatformTableCellView<Configuration>? {
             if let cell = (self.subviews.first as? _PlatformTableCellView<Configuration>), cell._cheapCache?.lastContentSize != nil {
                 return cell
@@ -287,31 +336,25 @@ extension _PlatformTableView {
             
             return nil
         }
-        
-        /*override var fittingSize: NSSize {
-            if let cell {
-                return cell.contentHostingView.fittingSize
-            }
-            
-            return super.fittingSize
-        }*/
-        
+                
         init(parent: _PlatformTableView) {
             self.parent = parent
             
             super.init(frame: .zero)
             
-            self.autoresizingMask = []
-            self.autoresizesSubviews = false
-            self.translatesAutoresizingMaskIntoConstraints = true
+            if self.parent.listRepresentable.configuration.preferences.cell.viewHostingOptions.useAutoLayout {
+                self.translatesAutoresizingMaskIntoConstraints = false
+            }
+            
+            isHorizontalContentSizeConstraintActive = false
+            isVerticalContentSizeConstraintActive = false
+            
+            autoresizesSubviews = false
+            wantsLayer = true
         }
         
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
-        }
-                
-        override func updateConstraintsForSubtreeIfNeeded() {
-            super.updateConstraintsForSubtreeIfNeeded()
         }
     }
 }
@@ -350,6 +393,16 @@ extension _CocoaList.Coordinator {
     }
     
     func clearInvalidationContext() {
+        guard !stateFlags.contains(.isFirstRun) else {
+            if !invalidationContext.indexes.isEmpty {
+                tableView?.noteHeightOfRows(withIndexesChanged: invalidationContext.indexes)
+            }
+            
+            invalidationContext = .init()
+
+            return
+        }
+        
         let context = invalidationContext
         
         if !context.indexes.isEmpty {

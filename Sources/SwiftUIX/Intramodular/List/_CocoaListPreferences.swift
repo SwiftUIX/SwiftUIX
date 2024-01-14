@@ -23,6 +23,7 @@ public struct _CocoaListPreferences: Sendable {
 extension _CocoaListPreferences {
     public struct Cell: Sendable {
         public struct ViewHostingOptions: Hashable, Sendable {
+            public var useAutoLayout: Bool = true
             public var detachHostingView: Bool = false
         }
         

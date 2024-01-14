@@ -21,38 +21,41 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     var stateFlags: Set<_StateFlag> {
         _stateFlags
     }
-    
+        
+    override var translatesAutoresizingMaskIntoConstraints: Bool {
+        get {
+            false
+        } set {
+            super.translatesAutoresizingMaskIntoConstraints = false
+        }
+    }
+
     override var fittingSize: NSSize {
         var result = super.fittingSize
         
-        if let superview = self.superview {
-            if superview.frame.size.isRegularAndNonZero {
-                result.width = superview.frame.size.width
-            }
+        if let superview = self.superview, superview.frame.size.isRegularAndNonZero {
+            result.width = superview.frame.size.width
         }
         
         if result.height == 0 {
             assertionFailure()
         }
+        
         return result
     }
     
-    override var wantsDefaultClipping: Bool {
-        false
+    override var intrinsicContentSize: NSSize {
+        super.intrinsicContentSize
     }
 
-   /* override var intrinsicContentSize: NSSize {
-        var result = super.intrinsicContentSize
-        
-        if let superview = self.superview, superview.frame.size.isRegularAndNonZero {
-            if result.width == AppKitOrUIKitView.noIntrinsicMetric {
-                result.width = superview.frame.size.width
-            }
+    override var needsUpdateConstraints: Bool {
+        get {
+            super.needsUpdateConstraints
+        } set {
+            //super.needsUpdateConstraints = newValue
         }
-        
-        return result
-    }*/
-
+    }
+    
     private var _contentHostingView: ContentHostingView? {
         didSet {
             if let _contentHostingView {
@@ -60,7 +63,9 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
                     assertionFailure()
                 }
                 
-                addSubview(_contentHostingView)
+                _contentHostingView.withCriticalScope([.suppressIntrinsicContentSizeInvalidation]) {
+                    addSubview(_contentHostingView)
+                }
             } else {
                 if let oldValue, oldValue.superview != nil {
                     assertionFailure()
@@ -68,7 +73,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             }
         }
     }
-    
+        
     var contentHostingView: ContentHostingView {
         get {
             if self._stateFlags.contains(.preparedForReuse) {
@@ -101,13 +106,24 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         
         super.init(frame: .zero)
         
-        self.autoresizesSubviews = false
         self.identifier = identifier
-        self.translatesAutoresizingMaskIntoConstraints = true
+        
+        if self.parent.configuration.preferences.cell.viewHostingOptions.useAutoLayout {
+            self.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        isHorizontalContentSizeConstraintActive = false
+        isVerticalContentSizeConstraintActive = false
+        
+        autoresizesSubviews = false
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidChangeBackingProperties() {
+        
     }
     
     override func viewDidMoveToSuperview() {
@@ -184,7 +200,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         }
         
         self.payload = payload
-
+       
         _withoutAppKitOrUIKitAnimation {
             if let contentHostingView = _contentHostingView {
                 _updateContentHostingView(contentHostingView, payload: payload)
@@ -197,7 +213,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             _prepareContentHostingViewForUse()
         }
     }
-    
+
     private func _prepareContentHostingViewForUse() {
         guard let _contentHostingView else {
             return
@@ -215,18 +231,22 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             
             if let preferredSize {
                 if contentHostingView.frame.size != preferredSize {
-                    contentHostingView.frame.size = preferredSize
+                    contentHostingView._overrideSizeForUpdateConstraints = .init(preferredSize)
                 }
             }
-                        
-            contentHostingView.payload = payload
             
-            if let preferredSize {
-                assert(contentHostingView.frame.size == preferredSize)
-            }
+            contentHostingView.payload = payload
         } else {
             contentHostingView.payload = payload
         }
+        
+        if let _fastRowHeight, let cachedHeight = _contentHostingView?.displayCache._preferredIntrinsicContentSize?.height, cachedHeight != _fastRowHeight {
+            contentHostingView.invalidateIntrinsicContentSize()
+            
+            contentHostingView.needsUpdateConstraints = true
+        }
+        
+        contentHostingView._refreshCocoaHostingView()
     }
         
     /// Refreshes the content hosting view.
@@ -235,7 +255,7 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
     open func refreshCellContent() {
         contentHostingView._refreshCocoaHostingView()
     }
-    
+        
     @discardableResult
     private func _initializeContentHostingView(
         tableView: NSTableView? = nil
@@ -255,19 +275,14 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         let result: ContentHostingView
         
         if let _result = self._expensiveCache?.decacheContentView() {
-            let bestSizeEstimate = self._cheapCache?.lastContentSize ?? self.frame.size
+           // let bestSizeEstimate = self._cheapCache?.lastContentSize ?? self.frame.size
 
             result = _result
-                                    
-            if result._hostingViewConfigurationFlags.contains(.invisible) {
-                result._hostingViewConfigurationFlags.remove(.invisible)
-                //assertionFailure()
-            }
                         
             if !result.frame.size._isInvalidForIntrinsicContentSize, result.frame.size != self.frame.size {
-                self.frame.size = result.frame.size
+                // self.frame.size = result.frame.size
             } else if result.frame.size._isInvalidForIntrinsicContentSize {
-                result.frame.size = bestSizeEstimate
+                // result.frame.size = bestSizeEstimate
             }
             
             self._contentHostingView = result
@@ -277,14 +292,13 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             result = ContentHostingView(payload: payload, listRepresentable: self.parent)
             
             if let bestSizeEstimate, bestSizeEstimate.isRegularAndNonZero, result.frame.size._isInvalidForIntrinsicContentSize {
-                result.frame.size = bestSizeEstimate
+                result._overrideSizeForUpdateConstraints = .init(bestSizeEstimate)
             }
-            
+                        
             self._contentHostingView = result
         }
         
         assert(result.superview != nil)
-        assert(!result._hostingViewConfigurationFlags.contains(.invisible))
         
         return result
     }
@@ -300,11 +314,9 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
             
         let newSize: CGSize = OptionalDimensions(normalNonZeroDimensionsFrom: _contentHostingView.frame.size).replacingUnspecifiedDimensions(by: frame.size)
         
-        if !newSize._isInvalidForIntrinsicContentSize {
-            _withoutAppKitOrUIKitAnimation {
-                _contentHostingView.frame.size = newSize
-                
-                _contentHostingView._SwiftUIX_setNeedsLayout()
+        if !self.parent.configuration.preferences.cell.viewHostingOptions.detachHostingView {
+            if !newSize._isInvalidForIntrinsicContentSize {
+                _contentHostingView._overrideSizeForUpdateConstraints = .init(newSize)
             }
         }
     }
