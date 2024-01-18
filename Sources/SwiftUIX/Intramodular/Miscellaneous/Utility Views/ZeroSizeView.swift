@@ -8,45 +8,67 @@ import Swift
 import SwiftUI
 
 /// A zero-size view for when `EmptyView` just doesn't work.
-@frozen
-public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
-    public final class AppKitOrUIKitViewType: AppKitOrUIKitView {
+fileprivate struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
+    final class AppKitOrUIKitViewType: AppKitOrUIKitView {
         public override var intrinsicContentSize: CGSize {
             .zero
         }
         
         #if os(macOS)
-        override public var acceptsFirstResponder: Bool {
+        override var acceptsFirstResponder: Bool {
             false
+        }
+
+        override var fittingSize: NSSize {
+            .zero
+        }
+
+        override var needsUpdateConstraints: Bool {
+            get {
+                false
+            } set {
+                if super.needsUpdateConstraints {
+                    super.needsUpdateConstraints = false
+                }
+            }
         }
         #endif
         
-        public override init(frame: CGRect) {
+        override init(frame: CGRect) {
             super.init(frame: .zero)
         }
         
-        public required init?(coder: NSCoder) {
+        required init?(coder: NSCoder) {
             super.init(coder: coder)
         }
         
+        
+        override func invalidateIntrinsicContentSize() {
+            
+        }
+        
         #if os(iOS)
-        public override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
             .zero
         }
         
-        public override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
+        override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
             .zero
+        }
+        #elseif os(macOS)
+        override func updateConstraintsForSubtreeIfNeeded() {
+            
         }
         #endif
     }
     
-    @inlinable
-    public init() {
+    init() {
         
     }
     
-    @inlinable
-    public func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitViewType {
+    func makeAppKitOrUIKitView(
+        context: Context
+    ) -> AppKitOrUIKitViewType {
         let view = AppKitOrUIKitViewType()
         
         #if os(iOS)
@@ -64,13 +86,15 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
         return view
     }
     
-    @inlinable
-    public func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
+    func updateAppKitOrUIKitView(
+        _ view: AppKitOrUIKitViewType,
+        context: Context
+    ) {
         view.frame.size = .zero
     }
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    public func sizeThatFits(
+    func sizeThatFits(
         _ proposal: ProposedViewSize,
         view: AppKitOrUIKitViewType,
         context: Context
@@ -79,6 +103,7 @@ public struct _ZeroSizeView: AppKitOrUIKitViewRepresentable {
     }
 }
 
+@frozen
 public struct ZeroSizeView: View {
     public var body: some View {
         _ZeroSizeView()
@@ -97,7 +122,6 @@ public struct ZeroSizeView: View {
 /// A zero-size view for when `EmptyView` just doesn't work.
 @frozen
 public struct ZeroSizeView: View {
-    @inlinable
     public var body: some View {
         Color.almostClear
             .frame(width: 0, height: 0)
@@ -105,7 +129,6 @@ public struct ZeroSizeView: View {
             .accessibility(hidden: true)
     }
     
-    @inlinable
     public init() {
         
     }
