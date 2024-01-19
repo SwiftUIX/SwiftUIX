@@ -20,7 +20,7 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 # Requirements
 
 > [!Note]
-> Swift 5.9 is the latest release for Swift and adds supports for macros, support for Swift 5.8 will be dropped soon.
+> Swift 5.9 is the latest release for Swift and adds support for macros, support for Swift 5.8 will be dropped soon.
 
 - Deployment target: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1 beta 6 (Xcode Xcode 15.1 beta 3)
 - Xcode 15.0+ 
