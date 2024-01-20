@@ -10,63 +10,76 @@ public typealias ArrayBuilder = _ArrayBuilder
 #endif
 
 @resultBuilder
-public class _ArrayBuilder<Element> {
-    @inlinable
+public struct _ArrayBuilder<Element> {
+    @_optimize(speed)
+    @_transparent
     public static func buildBlock() -> [Element] {
         return []
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildBlock(_ element: Element) -> [Element] {
         return [element]
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildBlock(_ elements: Element...) -> [Element] {
         return elements
     }
-
+    
+    @_optimize(speed)
+    @_transparent
     public static func buildBlock(_ arrays: [Element]...) -> [Element] {
-        Array(arrays.joined())
+        arrays.flatMap({ $0 })
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildEither(first component: Element) -> [Element] {
         return [component]
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildEither(first component: [Element]) -> [Element] {
         return component
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildEither(second component: [Element]) -> [Element] {
-        return component
+        component
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildExpression(_ element: Element) -> [Element] {
         [element]
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildExpression(_ element: Element?) -> [Element] {
         element.map({ [$0] }) ?? []
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildExpression(_ elements: [Element]) -> [Element] {
         elements
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildOptional(_ component: [Element]?) -> [Element] {
         return component ?? []
     }
 
-    @inlinable
+    @_optimize(speed)
+    @_transparent
     public static func buildArray(_ contents: [[Element]]) -> [Element] {
-        Array(contents.joined())
+        contents.flatMap({ $0 })
     }
 }

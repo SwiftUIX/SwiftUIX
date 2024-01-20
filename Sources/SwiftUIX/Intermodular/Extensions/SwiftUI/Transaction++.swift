@@ -15,4 +15,24 @@ extension Transaction {
             return true
         }
     }
+    
+    public mutating func disableAnimations() {
+        if animation == nil && disablesAnimations {
+            return
+        }
+        
+        animation = nil
+        disablesAnimations = true
+    }
+}
+
+public func _withTransactionIfNotNil<Result>(
+    _ transaction: Transaction?,
+    body: () throws -> Result
+) rethrows -> Result {
+    if let transaction {
+        return try withTransaction(transaction, body)
+    } else {
+        return try body()
+    }
 }

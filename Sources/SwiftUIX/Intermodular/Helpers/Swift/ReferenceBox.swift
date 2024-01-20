@@ -198,6 +198,27 @@ final class WeakReferenceBox<T: AnyObject>: _SwiftUIX_AnyIndirectValueBox {
     }
 }
 
+@propertyWrapper
+final class UnsafeWeakReferenceBox<T>: _SwiftUIX_AnyIndirectValueBox {
+    private weak var value: AnyObject?
+    
+    var wrappedValue: T? {
+        get {
+            value.map({ $0 as! T })
+        } set {
+            value = newValue.map({ $0 as AnyObject })
+        }
+    }
+    
+    init(_ value: T?) {
+        self.value = value.map({ $0 as AnyObject })
+    }
+    
+    init(wrappedValue value: T?) {
+        self.value = value.map({ $0 as AnyObject })
+    }
+}
+
 @_spi(Internal)
 @propertyWrapper
 public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {

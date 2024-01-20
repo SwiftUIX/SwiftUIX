@@ -196,6 +196,13 @@ extension Binding {
         )
     }
     
+    public func _asOptional() -> Binding<Optional<Value>> {
+        .init(
+            get: { self.wrappedValue },
+            set: { self.wrappedValue = $0 ?? self.wrappedValue }
+        )
+    }
+    
     public func withDefaultValue<T>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
         .init(
             get: { self.wrappedValue ?? defaultValue },

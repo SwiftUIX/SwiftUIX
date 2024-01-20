@@ -15,6 +15,14 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
     }
         
+    override var usesAutomaticRowHeights: Bool {
+        get {
+            true
+        } set {
+            super.usesAutomaticRowHeights = true
+        }
+    }
+    
     override var translatesAutoresizingMaskIntoConstraints: Bool {
         get {
             super.translatesAutoresizingMaskIntoConstraints
@@ -53,13 +61,13 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         self.autoresizesSubviews = false
         self.backgroundColor = .clear
         self.cornerView = nil
-        self.rowSizeStyle = .custom
+        self.floatsGroupRows = false
         self.headerView = nil
         self.intercellSpacing = .zero
+        self.rowSizeStyle = .custom
         self.selectionHighlightStyle = .none
         self.style = .plain
         self.usesAutomaticRowHeights = true
-        self.wantsLayer = true
     }
         
     required init?(coder: NSCoder) {
@@ -76,10 +84,6 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         super.resizeSubviews(withOldSize: oldSize)
     }
     
-    override func viewDidChangeBackingProperties() {
-        
-    }
-
     override func invalidateIntrinsicContentSize() {
         
     }
@@ -91,7 +95,17 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
             listRepresentable.stateFlags.remove(.isNSTableViewPreparingContent)
         }
         
-        super.prepareContent(in: visibleRect)
+        if !listRepresentable.stateFlags.contains(.isWithinSwiftUIUpdate) {
+            listRepresentable.clearInvalidationContext()
+        }
+        
+        _withTransactionIfNotNil(listRepresentable.invalidationContext.transaction) {
+            super.prepareContent(in: visibleRect)
+        }
+
+        if !listRepresentable.stateFlags.contains(.isWithinSwiftUIUpdate) {
+            listRepresentable.clearInvalidationContext()
+        }
     }
             
     override func noteHeightOfRows(

@@ -18,15 +18,17 @@ public final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
     @usableFromInline
     var markedForDeletion: Set<Key> = []
     
-    public init(maximumCapacity: Int = 100) {
+    public init(maximumCapacity: Int) {
         self.maximumCapacity = maximumCapacity
     }
     
     @_optimize(speed)
     @usableFromInline
     func _appendNode(_ node: Node) {
-        if nodes.count - markedForDeletion.count >= maximumCapacity {
-            _removeFirstValidNode()
+        if (nodes.count - markedForDeletion.count) >= maximumCapacity {
+            if let lraNode = head {
+                _removeNode(lraNode)
+            }
         }
         
         if let oldTail = tail {

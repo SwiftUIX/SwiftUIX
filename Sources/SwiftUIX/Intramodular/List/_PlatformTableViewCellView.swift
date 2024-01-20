@@ -11,6 +11,10 @@ import SwiftUI
 class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTableCellView {
     let parent: _CocoaList<Configuration>.Coordinator
     
+    public var listRepresentable: _CocoaList<Configuration>.Coordinator? {
+        parent
+    }
+    
     private var _frameObserver: NSObjectProtocol?
     private var _lastFrameSize: CGSize? = nil
     private var _stateFlags: Set<_StateFlag> = [.preparedForReuse]
@@ -156,6 +160,20 @@ class _PlatformTableCellView<Configuration: _CocoaListConfigurationType>: NSTabl
         super.invalidateIntrinsicContentSize()
     }
     
+    override func wantsForwardedScrollEvents(for axis: NSEvent.GestureAxis) -> Bool {
+        axis == .horizontal
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        if let listRepresentable {
+            if listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) ||  (_contentHostingView?.contentHostingViewCoordinator.stateFlags.contains(.payloadDidJustUpdate) ?? false) {
+                return nil
+            }
+        }
+        
+        return super.hitTest(point)
+    }
+
     override func prepareForReuse() {
         guard self.indexPath != nil && self.payload != nil else {
             assertionFailure()

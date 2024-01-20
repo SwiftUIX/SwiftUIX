@@ -24,7 +24,9 @@ let package = Package(
             name: "_SwiftUIX",
             dependencies: [],
             swiftSettings: [
-                .unsafeFlags(["-enable-library-evolution"])
+                .unsafeFlags([
+                    "-enable-library-evolution", "-suppress-warnings"
+                ])
             ]
         ),
         .target(

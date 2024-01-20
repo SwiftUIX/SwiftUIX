@@ -129,9 +129,7 @@ extension _PlatformTableCellView {
                     payload: payload
                 )
             )
-            
-            wantsLayer = true
-            
+                        
             self.contentHostingViewCoordinator = self.mainView.coordinator
             self.contentHostingViewCoordinator.parent = self
             
@@ -139,11 +137,11 @@ extension _PlatformTableCellView {
         }
         
         override func _assembleCocoaHostingView() {
-#if swift(>=5.9)
+            #if swift(>=5.9)
             if #available(macOS 14.0, *) {
                 sceneBridgingOptions = []
             }
-#endif
+            #endif
         }
         
         override func _refreshCocoaHostingView() {
@@ -181,6 +179,20 @@ extension _PlatformTableCellView {
                     self.contentHostingViewCoordinator.stateFlags.remove(.payloadDidJustUpdate)
                 }
             }
+        }
+        
+        override func wantsForwardedScrollEvents(for axis: NSEvent.GestureAxis) -> Bool {
+            axis == .horizontal
+        }
+
+        override func hitTest(_ point: NSPoint) -> NSView? {
+            if let listRepresentable {
+                if listRepresentable.stateFlags.contains(.isNSTableViewPreparingContent) || contentHostingViewCoordinator.stateFlags.contains(.payloadDidJustUpdate) {
+                    return nil
+                }
+            }
+            
+            return super.hitTest(point)
         }
         
         func payloadDidUpdate() {
@@ -436,7 +448,8 @@ extension _PlatformTableCellView {
         var payload: Payload
         
         @ViewStorage private var didAppear: Bool = false
-        
+        @ViewStorage private var sustainFrameOverride: Bool = false
+
         private var disableAnimations: Bool {
             guard didAppear else {
                 return true
@@ -451,6 +464,22 @@ extension _PlatformTableCellView {
             }
             
             return false
+        }
+        
+        private var _shouldOverrideFrame: Bool {
+            guard let parent = coordinator.parent else {
+                return false
+            }
+            
+            let firstRenderComplete = coordinator.stateFlags.contains(.firstRenderComplete)
+            
+            if !firstRenderComplete {
+                guard !parent._hostingViewStateFlags.contains(.didJustMoveToSuperview) else {
+                    return false
+                }
+            }
+            
+            return true
         }
         
         private var _width: CGFloat? {
@@ -473,16 +502,8 @@ extension _PlatformTableCellView {
             guard let parent = coordinator.parent else {
                 return nil
             }
-            
-            let firstRenderComplete = coordinator.stateFlags.contains(.firstRenderComplete)
-            
-            if !firstRenderComplete {
-                guard !parent._hostingViewStateFlags.contains(.didJustMoveToSuperview) else {
-                    return nil
-                }
-            }
-            
-            if !didAppear || coordinator.stateFlags.contains(.payloadDidJustUpdate) {
+                                    
+            if coordinator.stateFlags.contains(.payloadDidJustUpdate) {
                 if let result = OptionalDimensions(intrinsicContentSize: parent._bestIntrinsicContentSizeEstimate).height {
                     return result
                 } else {
@@ -509,6 +530,16 @@ extension _PlatformTableCellView {
             }
             
             assert(_height > 0)
+
+            let _shouldOverrideFrame = self._shouldOverrideFrame
+            
+            if sustainFrameOverride && !_shouldOverrideFrame {
+                return _height
+            }
+            
+            guard _shouldOverrideFrame else {
+                return nil
+            }
             
             return _height
         }
@@ -522,10 +553,19 @@ extension _PlatformTableCellView {
                         }
                     }
                     .transaction { transaction in
-                        transaction.disablesAnimations = disableAnimations
+                        transaction.disableAnimations()
                     }
                     ._geometryGroup(.if(.available))
                     .frame(width: width, height: height)
+                    .onChange(of: _shouldOverrideFrame) { should in
+                        if should {
+                            sustainFrameOverride = true
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) {
+                                sustainFrameOverride = false
+                            }
+                        }
+                    }
             )
             .id(payload.id)
         }

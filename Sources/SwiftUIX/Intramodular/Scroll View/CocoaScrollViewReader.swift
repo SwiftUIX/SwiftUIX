@@ -10,7 +10,8 @@ import SwiftUI
 
 /// A proxy value allowing the collection views within a view hierarchy to be manipulated programmatically.
 public struct CocoaScrollViewProxy {
-    weak var base: (any _AppKitOrUIKitHostingScrollViewType)?
+    @UnsafeWeakReferenceBox
+    var base: (any _AppKitOrUIKitHostingScrollViewType)?
     
     init(base: (any _AppKitOrUIKitHostingScrollViewType)? = nil) {
         self.base = base
@@ -37,7 +38,8 @@ public struct CocoaScrollViewReader<Content: View>: View {
     
     public let content: (CocoaScrollViewProxy) -> Content
     
-    @State var _cocoaScrollViewProxy = CocoaScrollViewProxy()
+    @PersistentObject var _cocoaScrollViewProxy = _SwiftUIX_ObservableReferenceBox<CocoaScrollViewProxy?>(.init())
+    
     @State var invalidate: Bool = false
     
     public init(
@@ -47,8 +49,8 @@ public struct CocoaScrollViewReader<Content: View>: View {
     }
     
     public var body: some View {
-        content(_environment_cocoaScrollViewProxy?.wrappedValue ?? _cocoaScrollViewProxy)
-            .environment(\._cocoaScrollViewProxy, $_cocoaScrollViewProxy)
+        content(_cocoaScrollViewProxy.wrappedValue!)
+            .environment(\._cocoaScrollViewProxy, _cocoaScrollViewProxy)
     }
 }
 
@@ -56,10 +58,10 @@ public struct CocoaScrollViewReader<Content: View>: View {
 
 extension EnvironmentValues {
     fileprivate struct _CocoaScrollViewProxyKey: SwiftUI.EnvironmentKey {
-        static let defaultValue: Binding<CocoaScrollViewProxy>? = nil
+        static let defaultValue: _SwiftUIX_ObservableReferenceBox<CocoaScrollViewProxy?> = _SwiftUIX_ObservableReferenceBox(nil)
     }
     
-    var _cocoaScrollViewProxy: Binding<CocoaScrollViewProxy>? {
+    var _cocoaScrollViewProxy: _SwiftUIX_ObservableReferenceBox<CocoaScrollViewProxy?> {
         get {
             self[_CocoaScrollViewProxyKey.self]
         } set {

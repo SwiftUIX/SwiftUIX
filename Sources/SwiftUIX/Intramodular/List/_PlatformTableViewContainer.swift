@@ -105,11 +105,14 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
     }
     
     private func swapClipView() {
-        wantsLayer = true
+        self.wantsLayer = true
+        
         let documentView = self.documentView
         let clipView = _ClipView(frame: contentView.frame)
+        
         clipView.parent = self
-        contentView = clipView
+        
+        self.contentView = clipView
         self.documentView = documentView
     }
     
@@ -138,10 +141,6 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
             let previousHeight = tableView.bounds.size.height
             
             operation()
-            
-            guard !isContentWithinBounds else {
-                return
-            }
             
             let SwiftUIX_newScrollOffset = self.contentOffset
             
@@ -192,7 +191,7 @@ open class _PlatformTableViewContainer<Configuration: _CocoaListConfigurationTyp
         
         if oldFrame.height != newFrame.height {
             if _latestTableViewFrame?.maxY == _tableView.visibleRect.maxY {
-                scrollTo(.bottom)
+                // scrollTo(.bottom)
             }
         }
     }
@@ -219,21 +218,31 @@ extension _PlatformTableViewContainer {
     class _ClipView: NSClipView {
         weak var parent: _PlatformTableViewContainer!
         
+        override open var needsUpdateConstraints: Bool {
+            get {
+                false
+            } set {
+                
+            }
+        }
+
         override open var intrinsicContentSize: NSSize {
             CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
         }
-        
+                
         override init(frame frameRect: NSRect) {
             super.init(frame: frameRect)
             
             isHorizontalContentSizeConstraintActive = false
             isVerticalContentSizeConstraintActive = false
+            
+            // self.wantsLayer = true
         }
         
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
+                
         override func viewDidChangeBackingProperties() {
             
         }
@@ -241,7 +250,7 @@ extension _PlatformTableViewContainer {
         override func invalidateIntrinsicContentSize() {
             
         }
-        
+                
         override func scroll(_ point: NSPoint) {
             super.scroll(point)
         }

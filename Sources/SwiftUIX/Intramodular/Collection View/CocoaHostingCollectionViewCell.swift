@@ -540,7 +540,9 @@ extension CocoaCollectionElementHostingController {
         }
     }
     
-    fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(from cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>) {
+    fileprivate func unmount<SectionHeaderContent: View, SectionFooterContent: View, Content: View>(
+        from cell: CocoaHostingCollectionViewCell<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType, SectionHeaderContent, SectionFooterContent, Content>
+    ) {
         if cell.shouldUseCachedContentHostingController {
             if parent != nil {
                 _withoutAppKitOrUIKitAnimation {

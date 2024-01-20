@@ -81,7 +81,11 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
                     y: 0
                 )
                 
-                tableView.scrollToEndOfDocument(nil)
+                DispatchQueue.main.async {
+                    self.tableView.scrollToEndOfDocument(nil)
+                    
+                    self.reflectScrolledClipView(self.contentView)
+                }
                 
                 return
             case .trailing:
@@ -104,20 +108,18 @@ extension _PlatformTableViewContainer: _AppKitOrUIKitHostingScrollViewType {
 
 #if os(macOS)
 extension NSScrollView {
-    public var documentSize: NSSize {
+    fileprivate var documentSize: NSSize {
         contentView.documentRect.size
     }
     
-    var isContentWithinBounds: Bool {
+    fileprivate var isContentWithinBounds: Bool {
         let contentSize = documentSize
         let scrollViewSize = self.bounds.size
         let insets = self.contentInsets
         
-        // Calculate effective content size by considering insets
         let effectiveWidth = contentSize.width + insets.left + insets.right
         let effectiveHeight = contentSize.height + insets.top + insets.bottom
         
-        // Check if content size is within or equal to the scroll view's bounds
         return effectiveWidth <= scrollViewSize.width && effectiveHeight <= scrollViewSize.height
     }
 }

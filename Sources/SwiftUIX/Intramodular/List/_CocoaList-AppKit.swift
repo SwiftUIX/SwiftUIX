@@ -27,14 +27,23 @@ extension _CocoaList: NSViewRepresentable {
         context: Context
     ) {
         func updateCocoaScrollProxy() {
-            if !(context.environment._cocoaScrollViewProxy?.base.wrappedValue === view) {
-                context.environment._cocoaScrollViewProxy?.base.wrappedValue = view
+            guard context.environment._cocoaScrollViewProxy.wrappedValue != nil else {
+                return
+            }
+            
+            let proxyBox = context.environment._cocoaScrollViewProxy
+            
+            if !(proxyBox.wrappedValue?.base === view) {
+                DispatchQueue.main.async {
+                    proxyBox.wrappedValue?.base = view
+                }
             }
         }
         
         updateCocoaScrollProxy()
-        
+            
         context.coordinator.representableWillUpdate()
+        context.coordinator.invalidationContext.transaction = context.transaction
         context.coordinator.configuration = configuration
         context.coordinator.representableDidUpdate()
         
@@ -60,10 +69,16 @@ extension _CocoaList {
         case dataChanged
         case didJustReload
         case isNSTableViewPreparingContent
+        case isWithinSwiftUIUpdate
     }
     
     class InvalidationContext {
+        var transaction = Transaction()
         var indexes: IndexSet = []
+        
+        init() {
+            transaction.disableAnimations()
+        }
     }
 }
 
@@ -108,10 +123,14 @@ extension _CocoaList {
         }
         
         func representableWillUpdate() {
-            
+            stateFlags.insert(.isWithinSwiftUIUpdate)
         }
         
         func representableDidUpdate() {
+            defer {
+                stateFlags.remove(.isWithinSwiftUIUpdate)
+            }
+            
             guard let view = tableViewContainer else {
                 return
             }
@@ -220,25 +239,29 @@ extension _CocoaList {
             let sectionID = configuration.data.payload.first!.model[keyPath: configuration.data.sectionID]
             let itemPath = _CocoaListCache<Configuration>.ItemPath(item: itemID, section: sectionID)
             
-            let view = (tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableCellView<Configuration>) ?? _PlatformTableCellView<Configuration>(
-                parent: tableViewContainer,
-                identifier: identifier
-            )
-            
-            let payload = _PlatformTableCellView.Payload(
-                itemPath: itemPath,
-                item: item,
-                content: configuration.viewProvider.rowContent(item)
-            )
-            
-            view.indexPath = IndexPath(item: row, section: 0)
-            
-            view.prepareForUse(
-                payload: payload,
-                tableView: tableView
-            )
-                        
-            return view
+            return autoreleasepool {
+                let view = (tableView.makeView(withIdentifier: identifier, owner: self) as? _PlatformTableCellView<Configuration>) ?? _PlatformTableCellView<Configuration>(
+                    parent: tableViewContainer,
+                    identifier: identifier
+                )
+                
+                let payload = _PlatformTableCellView.Payload(
+                    itemPath: itemPath,
+                    item: item,
+                    content: configuration.viewProvider.rowContent(item)
+                )
+                
+                view.indexPath = IndexPath(item: row, section: 0)
+                
+                _withTransactionIfNotNil(invalidationContext.transaction) {
+                    view.prepareForUse(
+                        payload: payload,
+                        tableView: tableView
+                    )
+                }
+                
+                return view
+            }
         }
     }
 }
@@ -353,6 +376,10 @@ extension _PlatformTableView {
             wantsLayer = true
         }
         
+        override func drawBackground(in dirtyRect: NSRect) {
+            
+        }
+        
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -434,7 +461,9 @@ extension _CocoaList.Coordinator {
             
             cell.payload?.content = configuration.viewProvider.rowContent(item)
             
-            cell.refreshCellContent()
+            _withTransactionIfNotNil(self.invalidationContext.transaction) {
+                cell.refreshCellContent()
+            }
         }
     }
 
