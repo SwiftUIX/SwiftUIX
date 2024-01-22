@@ -12,6 +12,46 @@ public enum _IfAvailable {
     case `if`(Available)
 }
 
+public enum _SwiftUI_TargetPlatformType {
+    case iOS
+    case macOS
+    case tvOS
+    case visionOS
+    case watchOS
+}
+
+#if os(iOS)
+extension _SwiftUI_TargetPlatformType {
+    public static var current: Self {
+        Self.iOS
+    }
+}
+#elseif os(macOS)
+extension _SwiftUI_TargetPlatformType {
+    public static var current: Self {
+        Self.macOS
+    }
+}
+#elseif os(tvOS)
+extension _SwiftUI_TargetPlatformType {
+    public static var current: Self {
+        Self.tvOS
+    }
+}
+#elseif os(visionOS)
+extension _SwiftUI_TargetPlatformType {
+    public static var current: Self {
+        Self.visionOS
+    }
+}
+#elseif os(watchOS)
+extension _SwiftUI_TargetPlatformType {
+    public static var current: Self {
+        Self.watchOS
+    }
+}
+#endif
+
 public enum _SwiftUI_TargetPlatform {
     public enum iOS {
         case iOS

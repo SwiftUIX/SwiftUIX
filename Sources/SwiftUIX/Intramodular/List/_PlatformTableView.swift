@@ -99,9 +99,7 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
             listRepresentable.clearInvalidationContext()
         }
         
-        _withTransactionIfNotNil(listRepresentable.invalidationContext.transaction) {
-            super.prepareContent(in: visibleRect)
-        }
+        super.prepareContent(in: visibleRect)
 
         if !listRepresentable.stateFlags.contains(.isWithinSwiftUIUpdate) {
             listRepresentable.clearInvalidationContext()

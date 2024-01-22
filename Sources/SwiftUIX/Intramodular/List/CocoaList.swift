@@ -53,7 +53,9 @@ public struct CocoaList<Content: View>: View {
                     return _CocoaList(
                         configuration: _VariadicViewChildren._CocoaListContentAdapter(
                             content.children,
-                            preferences: preferences.mergingInPlace(with: representable._cocoaListPreferences)
+                            preferences: preferences.mergingInPlace(
+                                with: representable._cocoaListPreferences
+                            )
                         )
                     )
                 }

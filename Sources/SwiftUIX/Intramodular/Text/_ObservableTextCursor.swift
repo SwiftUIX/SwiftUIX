@@ -41,9 +41,7 @@ extension _ObservableTextCursor {
                 
                 return nil
             }
-            
-            print(geometry.size)
-            
+                        
             self.range = range
             self.geometry = geometry
         }

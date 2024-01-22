@@ -253,13 +253,11 @@ extension _CocoaList {
                 
                 view.indexPath = IndexPath(item: row, section: 0)
                 
-                _withTransactionIfNotNil(invalidationContext.transaction) {
-                    view.prepareForUse(
-                        payload: payload,
-                        tableView: tableView
-                    )
-                }
-                
+                view.prepareForUse(
+                    payload: payload,
+                    tableView: tableView
+                )
+
                 return view
             }
         }

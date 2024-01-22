@@ -424,10 +424,4 @@ extension View {
 }
 #endif
 
-extension NSTextStorage {
-    public var _SwiftUIX_attributedString: NSAttributedString {
-        self
-    }
-}
-
 #endif
