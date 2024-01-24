@@ -113,7 +113,14 @@ extension View {
         separator separatorVisibility: Visibility = .automatic,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        let content = content()
+        modifier(
+            _AddTopOrBottomBar(
+                barContent: content(),
+                placement: .bottom,
+                separatorVisibility: separatorVisibility
+            )
+        )
+        /*let content = content()
         
         IntrinsicSizeReader { size in
             self.toolbar {
@@ -122,7 +129,7 @@ extension View {
                         .frame(maxWidth: 512)
                 }
             }
-        }
+        }*/
     }
 }
 #endif
