@@ -54,6 +54,8 @@ public struct PaginationView<Page: View>: View {
     @inlinable
     @DelayedState public var _progressionController: ProgressionController?
     
+    private var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
+    
     var paginationState: Binding<PaginationState>?
         
     @inlinable
@@ -124,6 +126,7 @@ public struct PaginationView<Page: View>: View {
                 }
             }
             .environment(\.progressionController, _progressionController)
+            .environment(\._scrollViewConfiguration, _scrollViewConfiguration)
         }
     }
 }
@@ -462,6 +465,14 @@ extension PaginationView {
 extension PaginationView {
     public func paginationState(_ paginationState: Binding<PaginationState>) -> Self {
         then({ $0.paginationState = paginationState })
+    }
+}
+
+extension PaginationView {
+    
+    /// Performs an action upon scroll content-offset change.
+    public func onOffsetChange(_ body: @escaping (ScrollView<AnyView>.ContentOffset) -> ()) -> Self {
+        then({ $0._scrollViewConfiguration.onOffsetChange = body })
     }
 }
 
