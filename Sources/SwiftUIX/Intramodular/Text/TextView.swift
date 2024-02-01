@@ -56,6 +56,7 @@ public struct TextView<Label: View>: View {
                 )
             }
         }
+        ._geometryGroup(.if(.available))
     }
 }
 

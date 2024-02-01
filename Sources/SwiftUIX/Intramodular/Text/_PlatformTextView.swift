@@ -156,8 +156,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredHorizontalContentHuggingPriority = preferredMaximumDimensions.width == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .horizontal) != desiredHorizontalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -167,8 +167,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             }
             
             let desiredVerticalContentHuggingPriority = preferredMaximumDimensions.height == nil
-            ? AppKitOrUIKitLayoutPriority.defaultLow
-            : AppKitOrUIKitLayoutPriority.defaultHigh
+                ? AppKitOrUIKitLayoutPriority.defaultLow
+                : AppKitOrUIKitLayoutPriority.defaultHigh
             
             if contentHuggingPriority(for: .vertical) != desiredVerticalContentHuggingPriority {
                 setContentHuggingPriority(
@@ -190,6 +190,12 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     var _cachedIntrinsicContentSizeUsedAtLeastOnce: Bool = false
     
     override open var intrinsicContentSize: CGSize {
+        if let _fixedSize = configuration._fixedSize {
+            if _fixedSize == (false, false) {
+                return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
+            }
+        }
+        
         if let result = representableCache._cachedIntrinsicContentSize {
             _cachedIntrinsicContentSizeUsedAtLeastOnce = true
             
@@ -201,6 +207,16 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             
             return result
         }
+    }
+    
+    var _SwiftUIX_intrinsicContentSizeIsDisabled: Bool {
+        if let _fixedSize = configuration._fixedSize {
+            if _fixedSize == (false, false) {
+                return true
+            }
+        }
+        
+        return false
     }
     
     public convenience required init(
@@ -568,6 +584,12 @@ extension _PlatformTextView {
             return nil
         }
                 
+        if let _fixedSize = configuration._fixedSize {
+            if _fixedSize == (false, false) {
+                return nil
+            }
+        }
+        
         if let cached = representableCache.sizeThatFits(proposal: proposal) {
             return cached
         } else {

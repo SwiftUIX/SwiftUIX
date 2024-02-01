@@ -15,6 +15,10 @@ extension _PlatformTextView {
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
+        #if os(visionOS)
+        view.hoverStyle = .none
+        #endif
+
         let requiresAttributedText = false
             || context.environment._textView_requiresAttributedText
             || configuration.requiresAttributedText

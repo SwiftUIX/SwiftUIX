@@ -7,6 +7,21 @@ import Swift
 import SwiftUI
 
 extension CGSize {
+    public struct _SwiftUIX_HashableRepresentation: Hashable {
+        let base: CGSize
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(base.width)
+            hasher.combine(base.height)
+        }
+    }
+    
+    public var _SwiftUIX_hashableRepresentation: _SwiftUIX_HashableRepresentation {
+        _SwiftUIX_HashableRepresentation(base: self)
+    }
+}
+
+extension CGSize {
     @_optimize(speed)
     @inline(__always)
     public static var infinite: CGSize {

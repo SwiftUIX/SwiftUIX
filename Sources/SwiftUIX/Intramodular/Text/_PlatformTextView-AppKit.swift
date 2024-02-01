@@ -93,10 +93,15 @@ extension _PlatformTextView {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView {
     private func _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded() {
-        guard let textContainer = textContainer else {
+        defer {
+            _needsIntrinsicContentSizeInvalidation = false
+            _wantsRelayout = false
+        }
+        
+        guard let textContainer = textContainer, !_SwiftUIX_intrinsicContentSizeIsDisabled else {
             return
         }
-                
+                        
         if _needsIntrinsicContentSizeInvalidation {
             invalidateIntrinsicContentSize()
             
@@ -115,9 +120,6 @@ extension _PlatformTextView {
                 _SwiftUIX_layoutIfNeeded()
             }
         }
-        
-        _needsIntrinsicContentSizeInvalidation = false
-        _wantsRelayout = false
     }
     
     private func _computeIntrinsicContentSize() -> CGSize? {
