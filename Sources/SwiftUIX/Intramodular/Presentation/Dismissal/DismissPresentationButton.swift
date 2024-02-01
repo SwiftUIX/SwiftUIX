@@ -25,6 +25,13 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
     
     public var body: some View {
         Button(action: dismiss, label: { label })
+            .modify { content in
+                if #available(iOS 14.0, macOS 11.0, *) {
+                    content.keyboardShortcut("w")
+                } else {
+                    content
+                }
+            }
     }
     
     public func dismiss() {
