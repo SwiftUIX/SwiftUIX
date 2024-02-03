@@ -11,7 +11,7 @@ public struct SearchToken: Codable, Hashable {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension UISearchToken {
     var _SwiftUIX_text: String {
         representedObject as! String

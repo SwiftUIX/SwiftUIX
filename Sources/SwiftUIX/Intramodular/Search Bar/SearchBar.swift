@@ -5,7 +5,7 @@
 import Swift
 import SwiftUI
 
-#if (os(iOS) && canImport(CoreTelephony)) || os(macOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 /// A specialized view for receiving search-related information from the user.
 public struct SearchBar: DefaultTextInputType {
@@ -31,7 +31,7 @@ public struct SearchBar: DefaultTextInputType {
     
     private var appKitOrUIKitFont: AppKitOrUIKitFont?
     private var appKitOrUIKitForegroundColor: AppKitOrUIKitColor?
-    #if os(iOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
     private var appKitOrUIKitSearchFieldBackgroundColor: UIColor?
     private var searchBarStyle: UISearchBar.Style = .minimal
     private var iconImageConfiguration: [UISearchBar.Icon: AppKitOrUIKitImage] = [:]
@@ -40,7 +40,7 @@ public struct SearchBar: DefaultTextInputType {
     private var showsCancelButton: Bool?
     private var onCancel: () -> Void = { }
     
-    #if os(iOS) || targetEnvironment(macCatalyst)
+    #if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
     private var returnKeyType: UIReturnKeyType?
     private var enablesReturnKeyAutomatically: Bool?
     private var isSecureTextEntry: Bool = false
@@ -95,7 +95,7 @@ public struct SearchBar: DefaultTextInputType {
     }
 }
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
@@ -485,7 +485,7 @@ extension SearchBar {
 
 // MARK: - Auxiliary
 
-#if os(iOS) || targetEnvironment(macCatalyst)
+#if os(iOS) || os(visionOS) || targetEnvironment(macCatalyst)
 private final class _UISearchBar: UISearchBar {
     var isFirstResponderBinding: Binding<Bool>?
         
