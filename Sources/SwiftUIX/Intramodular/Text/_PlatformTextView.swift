@@ -92,6 +92,24 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         return result
     }
     
+    #if os(macOS)
+    override open var needsUpdateConstraints: Bool {
+        get {
+            guard !representatableStateFlags.contains(.dismantled) else {
+                return false
+            }
+            
+            return super.needsUpdateConstraints
+        } set {
+            guard !representatableStateFlags.contains(.dismantled) else {
+                return
+            }
+            
+            super.needsUpdateConstraints = true
+        }
+    }
+    #endif
+    
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open var textStorage: NSTextStorage {
         if let textStorage = _customTextStorage {
@@ -100,7 +118,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             return super.textStorage
         }
     }
-    #else
+    #elseif os(macOS)
     override open var textStorage: NSTextStorage? {
         if let textStorage = _customTextStorage {
             return textStorage
@@ -279,6 +297,10 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     override open func layoutSubviews() {
         super.layoutSubviews()
         
+        guard !representatableStateFlags.contains(.dismantled) else {
+            return
+        }
+
         verticallyCenterTextIfNecessary()
     }
     #elseif os(macOS)
