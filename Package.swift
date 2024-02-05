@@ -38,8 +38,6 @@ let package = Package(
                 .unsafeFlags([
                     "-enable-library-evolution",
                     "-Xfrontend",
-                    "-disable-typo-correction",
-                    "-Xfrontend",
                     "-disable-verify-exclusivity",
                 ])
             ]
