@@ -153,7 +153,7 @@ extension PaginationView {
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
-        content: () -> ForEach<Data, ID, Page>
+        @ViewBuilder content: () -> ForEach<Data, ID, Page>
     ) {
         self.init(
             content: .init(content()),
@@ -168,7 +168,7 @@ extension PaginationView {
         axis: Axis = .horizontal,
         transitionStyle: UIPageViewController.TransitionStyle = .scroll,
         showsIndicators: Bool = true,
-        content: () -> ForEach<Data, ID, Page>
+        @ViewBuilder content: () -> ForEach<Data, ID, Page>
     ) where Data.Element: Identifiable {
         self.init(
             content: .init(content()),
