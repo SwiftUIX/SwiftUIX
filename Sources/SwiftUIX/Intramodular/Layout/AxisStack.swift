@@ -5,6 +5,11 @@
 import Swift
 import SwiftUI
 
+public enum _SwiftUIX_AxisStackLayoutDirection {
+    case forward
+    case reverse
+}
+
 /// A view that arranges its children in a vertical/horizontal line.
 @frozen
 public struct AxisStack<Content: View>: View {
@@ -13,7 +18,6 @@ public struct AxisStack<Content: View>: View {
     public let spacing: CGFloat?
     public let content: Content
     
-    @inlinable
     public var body: some View {
         if axis == .x {
             HStack(
@@ -37,7 +41,6 @@ public struct AxisStack<Content: View>: View {
 }
 
 extension AxisStack {
-    @inlinable
     public init(
         axis: Axis3D,
         alignment: Alignment = .center,
@@ -50,7 +53,6 @@ extension AxisStack {
         self.content = content()
     }
     
-    @inlinable
     public init(
         axis: Axis,
         alignment: Alignment = .center,
