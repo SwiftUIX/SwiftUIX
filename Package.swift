@@ -37,8 +37,6 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags([
                     "-enable-library-evolution",
-                    "-Xfrontend",
-                    "-disable-verify-exclusivity",
                 ])
             ]
         )
