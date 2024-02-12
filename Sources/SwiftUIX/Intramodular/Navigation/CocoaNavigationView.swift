@@ -192,4 +192,34 @@ extension NavigationLink {
             label: label
         )
     }
+    
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+    public init<V: Hashable>(
+        _tag tag: V,
+        selection: Binding<V>,
+        @ViewBuilder destination: () -> Destination,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(
+            tag: tag,
+            selection: selection._asOptional(defaultValue: tag),
+            destination: destination,
+            label: label
+        )
+    }
+    
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+    public init<V: Hashable>(
+        _ title: String,
+        _tag tag: V,
+        selection: Binding<V>,
+        @ViewBuilder destination: () -> Destination
+    ) where Label == Text {
+        self.init(
+            title,
+            tag: tag,
+            selection: selection._asOptional(defaultValue: tag),
+            destination: destination
+        )
+    }
 }

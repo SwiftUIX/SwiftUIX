@@ -27,7 +27,7 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
         Button(action: dismiss, label: { label })
             .modify { content in
                 if #available(iOS 14.0, macOS 11.0, tvOS 17.0, watchOS 9.0, *) {
-                    #if !os(tvOS)
+                    #if !os(tvOS) && !os(watchOS)
                     content
                         .keyboardShortcut("w")
                     #else
