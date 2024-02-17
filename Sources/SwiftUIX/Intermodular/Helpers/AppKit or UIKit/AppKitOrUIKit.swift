@@ -23,6 +23,7 @@ public typealias AppKitOrUIKitControlEvent = UIControl.Event
 public typealias AppKitOrUIKitEdgeInsets = UIEdgeInsets
 public typealias AppKitOrUIKitEvent = UIEvent
 public typealias AppKitOrUIKitFont = UIFont
+public typealias AppKitOrUIKitFontDescriptor = UIFontDescriptor
 public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
 public typealias AppKitOrUIKitImage = UIImage
@@ -117,6 +118,7 @@ public typealias AppKitOrUIKitControl = NSControl
 public typealias AppKitOrUIKitEdgeInsets = NSEdgeInsets
 public typealias AppKitOrUIKitEvent = NSEvent
 public typealias AppKitOrUIKitFont = NSFont
+public typealias AppKitOrUIKitFontDescriptor = NSFontDescriptor
 public typealias AppKitOrUIKitHostingController<Content: View> = NSHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = NSHostingView<Content>
 public typealias AppKitOrUIKitImage = NSImage
@@ -508,6 +510,18 @@ public func _withAppKitOrUIKitAnimation(
     
     _isAnimatingAppKitOrUIKit = false
 }
+
+#if os(iOS)
+extension AppKitOrUIKitFontDescriptor.SymbolicTraits {
+    public static let bold: Self = Self.traitBold
+    public static let italic: Self = Self.traitItalic
+}
+#elseif os(macOS)
+extension AppKitOrUIKitFontDescriptor.SymbolicTraits {
+    public static let traitBold = Self.bold
+    public static let traitItalic = Self.italic
+}
+#endif
 
 extension AppKitOrUIKitViewController {
     public func _SwiftUIX_setNeedsLayout() {

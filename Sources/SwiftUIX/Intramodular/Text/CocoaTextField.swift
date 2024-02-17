@@ -63,14 +63,7 @@ public struct CocoaTextField<Label: View>: View {
     
     @Environment(\.font) var font
     @Environment(\.multilineTextAlignment) var multilineTextAlignment
-    
-    #if os(iOS) || targetEnvironment(macCatalyst)
-    @available(macCatalystApplicationExtension, unavailable)
-    @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
-    private let keyboard = Keyboard.main
-    #endif
-    
+        
     private var label: Label
     private var text: Binding<String>
     private var isEditing: Binding<Bool>

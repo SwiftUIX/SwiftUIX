@@ -237,12 +237,23 @@ extension View {
     @available(macCatalystApplicationExtension, unavailable)
     @available(iOSApplicationExtension, unavailable)
     @available(tvOSApplicationExtension, unavailable)
-    public func navigationSearchBar(_ searchBar: () -> SearchBar) -> some View {
-        background(_NavigationSearchBarConfigurator(searchBar: searchBar(), searchResultsContent: { EmptyView() }))
+    public func navigationSearchBar(
+        _ searchBar: () -> SearchBar
+    ) -> some View {
+        background(
+            _NavigationSearchBarConfigurator(
+                searchBar: searchBar(),
+                searchResultsContent: {
+                    EmptyView()
+                }
+            )
+        )
     }
     
     /// Hides the integrated search bar when scrolling any underlying content.
-    public func navigationSearchBarHiddenWhenScrolling(_ hidesSearchBarWhenScrolling: Bool) -> some View {
+    public func navigationSearchBarHiddenWhenScrolling(
+        _ hidesSearchBarWhenScrolling: Bool
+    ) -> some View {
         environment(\._hidesNavigationSearchBarWhenScrolling, hidesSearchBarWhenScrolling)
     }
 }
