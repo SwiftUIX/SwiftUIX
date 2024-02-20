@@ -25,6 +25,8 @@ struct _PaginationView<Page: View> {
     
     let configuration: Configuration
     
+    @Environment(\._scrollViewConfiguration) private var _scrollViewConfiguration: CocoaScrollViewConfiguration
+    
     @Binding var currentPageIndex: Int
     @Binding var progressionController: ProgressionController?
     
@@ -138,6 +140,7 @@ extension _PaginationView: UIViewControllerRepresentable {
         updateScrollViewConfiguration: do {
             let scrollViewConfiguration = context.environment._scrollViewConfiguration
             
+            uiViewController.internalScrollView?.delegate = context.coordinator
             uiViewController.internalScrollView?.isScrollEnabled = scrollViewConfiguration.isScrollEnabled
         }
         
@@ -219,7 +222,7 @@ extension _PaginationView: UIViewControllerRepresentable {
 
 extension _PaginationView {
     @usableFromInline
-    class Coordinator: NSObject {
+    class Coordinator: NSObject, UIScrollViewDelegate {
         var parent: _PaginationView
         var isInitialPageIndexApplied: Bool = false
         var isTransitioning: Bool = false
@@ -292,6 +295,14 @@ extension _PaginationView {
             }
                         
             isTransitioning = false
+        }
+        
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            if let onOffsetChange = parent._scrollViewConfiguration.onOffsetChange {
+                onOffsetChange(
+                    scrollView.contentOffset(forContentType: AnyView.self)
+                )
+            }
         }
     }
     
