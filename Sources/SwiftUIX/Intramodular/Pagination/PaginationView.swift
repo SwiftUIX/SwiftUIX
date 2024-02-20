@@ -57,7 +57,7 @@ public struct PaginationView<Page: View>: View {
     private var _scrollViewConfiguration: CocoaScrollViewConfiguration<AnyView> = nil
     
     var paginationState: Binding<PaginationState>?
-        
+    
     @inlinable
     public init(
         content: AnyForEach<Page>,
@@ -120,8 +120,8 @@ public struct PaginationView<Page: View>: View {
                         currentPage: currentPageIndex ?? $_currentPageIndex
                     ).rotationEffect(
                         axis == .vertical
-                            ? .init(degrees: 90)
-                            : .init(degrees: 0)
+                        ? .init(degrees: 90)
+                        : .init(degrees: 0)
                     )
                 }
             }
@@ -254,7 +254,7 @@ extension PaginationView {
             showsIndicators: showsIndicators
         )
     }
-  
+    
     @inlinable
     public init<C0: View, C1: View, C2: View, C3: View>(
         axis: Axis = .horizontal,
@@ -469,10 +469,13 @@ extension PaginationView {
 }
 
 extension PaginationView {
-    
-    /// Performs an action upon scroll content-offset change.
-    public func onOffsetChange(_ body: @escaping (ScrollView<AnyView>.ContentOffset) -> ()) -> Self {
-        then({ $0._scrollViewConfiguration.onOffsetChange = body })
+    /// Adds a modifier for this view that fires an action when the scroll content offset changes.
+    public func onOffsetChange(
+        _ body: @escaping (ScrollView<AnyView>.ContentOffset) -> ()
+    ) -> Self {
+        then {
+            $0._scrollViewConfiguration.onOffsetChange = body
+        }
     }
 }
 

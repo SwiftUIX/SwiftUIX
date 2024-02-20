@@ -14,14 +14,7 @@ public struct SearchBar: DefaultTextInputType {
     fileprivate var searchTokens: Binding<[SearchToken]>?
     
     var customAppKitOrUIKitClass: AppKitOrUIKitSearchBar.Type?
-    
-    #if os(iOS) || targetEnvironment(macCatalyst)
-    @available(macCatalystApplicationExtension, unavailable)
-    @available(iOSApplicationExtension, unavailable)
-    @available(tvOSApplicationExtension, unavailable)
-    @ObservedObject private var keyboard = Keyboard.main
-    #endif
-    
+        
     private let onEditingChanged: (Bool) -> Void
     private let onCommit: () -> Void
     private var isInitialFirstResponder: Bool?
