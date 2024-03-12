@@ -6,7 +6,7 @@ import SwiftUI
 
 @frozen
 public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View {
-    private let content: _TypedVariadicView<Content>
+    private let content: _SwiftUI_VariadicView<Content>
     private let id: KeyPath<_VariadicViewChildren.Subview, ID>
     private let subview: (Int, _VariadicViewChildren.Subview) -> Subview
     private var transform: ((_VariadicViewChildren) -> [_VariadicViewChildren.Subview])?
@@ -32,7 +32,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     }
 
     public init(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         id: KeyPath<_VariadicViewChildren.Subview, ID>,
         @ViewBuilder _ subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) {
@@ -43,7 +43,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     }
     
     public init<Trait: _ViewTraitKey>(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         id: KeyPath<Trait.Value, ID>,
         @ViewBuilder content subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
@@ -55,7 +55,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     }
     
     public init<Trait: _ViewTraitKey>(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         id: KeyPath<Trait.Value, ID?>,
         @ViewBuilder content subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
@@ -71,7 +71,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
 
 extension _ForEachSubview {
     public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
-        _ source: _TypedVariadicView<Content>,
+        _ source: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         @ViewBuilder content: @escaping (_VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
     ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == AnyView {
@@ -91,7 +91,7 @@ extension _ForEachSubview {
     }
     
     public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
-        enumerating source: _TypedVariadicView<Content>,
+        enumerating source: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         @ViewBuilder content: @escaping (Int, _VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
     ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == _ConditionalContent<_Subview, EmptyView> {
@@ -109,7 +109,7 @@ extension _ForEachSubview {
     }
     
     public init<Key: _ViewTraitKey>(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         id: KeyPath<_ViewTraitKeys, Key.Type>,
         @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == Key.Value {
@@ -121,21 +121,21 @@ extension _ForEachSubview {
     }
     
     public init(
-        _ content: _TypedVariadicView<Content>,
+        _ content: _SwiftUI_VariadicView<Content>,
         @ViewBuilder subview: @escaping (_VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
         self.init(enumerating: content, id: \.id, { index, child in subview(child) })
     }
     
     public init(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         @ViewBuilder enumerating subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
         self.init(enumerating: content, id: \.id, subview)
     }
     
     public init(
-        enumerating content: _TypedVariadicView<Content>,
+        enumerating content: _SwiftUI_VariadicView<Content>,
         @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
         self.init(

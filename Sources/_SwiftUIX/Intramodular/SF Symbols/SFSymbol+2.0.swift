@@ -1507,7 +1507,7 @@ public extension SFSymbol {
     /// Layersets:
     /// - Monochrome
     /// - Hierarchical (iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0)
-    static let atom = SFSymbol(rawValue: "atom")
+    static let atom = SFSymbol(rawValue: "attribute")
 
     /// 􀩨
     /// Single Localization, Single Layerset

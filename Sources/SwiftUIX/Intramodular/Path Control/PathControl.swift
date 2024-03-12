@@ -178,8 +178,12 @@ extension EnvironmentValues {
 fileprivate extension Binding where Value == String? {
     func toFileURL() -> Binding<URL?> {
         .init(
-            get: { self.wrappedValue.map({ NSString(string: $0).expandingTildeInPath as String }).flatMap(URL.init(fileURLWithPath:)) },
-            set: { self.wrappedValue = $0?.path }
+            get: {
+                self.wrappedValue.map({ NSString(string: $0).expandingTildeInPath as String }).flatMap(URL.init(fileURLWithPath:))
+            },
+            set: {
+                self.wrappedValue = $0?.path
+            }
         )
     }
 }

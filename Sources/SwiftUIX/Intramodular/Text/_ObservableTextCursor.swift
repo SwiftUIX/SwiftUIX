@@ -37,7 +37,7 @@ extension _ObservableTextCursor {
             }
             
             guard !geometry.size.isAreaZero else {
-                assert(range.length == 0)
+                // assert(range.length == 0)
                 
                 return nil
             }

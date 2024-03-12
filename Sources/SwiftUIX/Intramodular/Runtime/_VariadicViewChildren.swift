@@ -7,12 +7,12 @@ import SwiftUI
 @frozen
 public struct _VariadicViewChildren: View {
     @usableFromInline
-    let base: _VariadicView.Children
+    let base: SwiftUI._VariadicView.Children
     
     @usableFromInline
     @_optimize(speed)
     @_transparent
-    init(erasing base: _VariadicView.Children) {
+    init(erasing base: SwiftUI._VariadicView.Children) {
         self.base = base
     }
     
@@ -27,12 +27,12 @@ extension _VariadicViewChildren: Identifiable {
     @frozen
     public struct ID: Hashable {
         @usableFromInline
-        let base: _VariadicView.Children
+        let base: SwiftUI._VariadicView.Children
         
         @_optimize(speed)
         @_transparent
         @usableFromInline
-        init(base: _VariadicView.Children) {
+        init(base: SwiftUI._VariadicView.Children) {
             self.base = base
         }
         
@@ -97,12 +97,12 @@ extension _VariadicViewChildren {
     @frozen
     public struct Subview: View, Identifiable {
         @usableFromInline
-        var element: _VariadicView.Children.Element
+        var element: SwiftUI._VariadicView.Children.Element
         
         @usableFromInline
         @_optimize(speed)
         @_transparent
-        init(_ element: _VariadicView.Children.Element) {
+        init(_ element: SwiftUI._VariadicView.Children.Element) {
             self.element = element
         }
         

@@ -8,32 +8,32 @@ import SwiftUI
 public struct _VariadicViewAdapter<Source: View, Content: View>: View {
     @frozen
     @usableFromInline
-    struct Root: _VariadicView.MultiViewRoot {
+    struct Root: SwiftUI._VariadicView.MultiViewRoot {
         @usableFromInline
-        var content: (_TypedVariadicView<Source>) -> Content
+        var content: (_SwiftUI_VariadicView<Source>) -> Content
         
         @usableFromInline
         @_transparent
-        init(content: @escaping (_TypedVariadicView<Source>) -> Content) {
+        init(content: @escaping (_SwiftUI_VariadicView<Source>) -> Content) {
             self.content = content
         }
         
         @_transparent
         @usableFromInline
-        func body(children: _VariadicView.Children) -> some View {
-            content(_TypedVariadicView(children))
+        func body(children: SwiftUI._VariadicView.Children) -> some View {
+            content(_SwiftUI_VariadicView(children))
         }
     }
     
     @usableFromInline
     let source: Source
     @usableFromInline
-    let content: (_TypedVariadicView<Source>) -> Content
+    let content: (_SwiftUI_VariadicView<Source>) -> Content
     
     @_transparent
     public init(
         _ source: Source,
-        @ViewBuilder content: @escaping (_TypedVariadicView<Source>) -> Content
+        @ViewBuilder content: @escaping (_SwiftUI_VariadicView<Source>) -> Content
     ) {
         self.source = source
         self.content = content
@@ -42,11 +42,22 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
     @_transparent
     public init(
         @ViewBuilder _ source: () -> Source,
-        @ViewBuilder content: @escaping (_TypedVariadicView<Source>) -> Content
+        @ViewBuilder content: @escaping (_SwiftUI_VariadicView<Source>) -> Content
     ) {
         self.init(source(), content: content)
     }
-    
+        
+    @_transparent
+    public var body: some View {
+        SwiftUI._VariadicView.Tree(Root(content: content)) {
+            source
+        }
+    }
+}
+
+// MARK: - Initializers
+
+extension _VariadicViewAdapter {
     public init<Subview: View>(
         enumerating source: Source,
         @ViewBuilder subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
@@ -55,17 +66,14 @@ public struct _VariadicViewAdapter<Source: View, Content: View>: View {
             _ForEachSubview(enumerating: content, enumerating: subview)
         }
     }
-    
-    @_transparent
-    public var body: some View {
-        _VariadicView.Tree(Root(content: content)) {
-            source
-        }
-    }
 }
 
+// MARK: - Internal
+
 @frozen
-public struct _TypedVariadicView<Content: View>: View {
+public struct _SwiftUI_VariadicView<Content: View>: View {
+    public typealias Child = _VariadicViewChildren.Element
+    
     public var children: _VariadicViewChildren
     
     @_transparent
@@ -75,7 +83,7 @@ public struct _TypedVariadicView<Content: View>: View {
     
     @usableFromInline
     @_transparent
-    init(_ children: _VariadicView.Children) {
+    init(_ children: SwiftUI._VariadicView.Children) {
         self.children = _VariadicViewChildren(erasing: children)
     }
     
@@ -85,7 +93,7 @@ public struct _TypedVariadicView<Content: View>: View {
     }
 }
 
-extension _TypedVariadicView {
+extension _SwiftUI_VariadicView {
     public subscript<Key: _ViewTraitKey, Value>(
         _ key: Key.Type
     ) -> Value? where Key.Value == Optional<Value> {
