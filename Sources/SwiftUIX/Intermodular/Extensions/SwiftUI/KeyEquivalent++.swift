@@ -35,6 +35,7 @@ extension KeyEquivalent {
         lhs.character == rhs.character
     }
     
+    @_disfavoredOverload
     public static func == (lhs: KeyEquivalent, rhs: KeyEquivalent) -> Bool {
         lhs.character == rhs.character
     }
