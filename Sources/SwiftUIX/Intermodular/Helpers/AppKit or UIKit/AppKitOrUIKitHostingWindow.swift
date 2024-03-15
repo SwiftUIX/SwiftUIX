@@ -697,8 +697,8 @@ extension AppKitOrUIKitHostingWindow {
         if configuration.windowPosition != position {
             configuration.windowPosition = position
         }
-
-        guard let sourceWindow = windowPresentationController?._sourceAppKitOrUIKitWindow ?? position._sourceAppKitOrUIKitWindow else {
+        
+        guard let sourceWindow = windowPresentationController?._sourceAppKitOrUIKitWindow ?? position._sourceAppKitOrUIKitWindow ?? AppKitOrUIKitApplication.shared.windows.first else {
             assertionFailure()
             
             return
@@ -709,17 +709,19 @@ extension AppKitOrUIKitHostingWindow {
                 origin: position,
                 size: self.frame.size
             )
-
+            
             rect.origin.y = sourceWindow.frame.height - position.y
             
             position = sourceWindow.convertToScreen(rect).origin
-                             
+            
             let origin = CGPoint(
                 x: position.x - (self.frame.size.width / 2),
                 y: position.y - (self.frame.size.height / 2)
             )
             
             setFrameOrigin(origin)
+        } else if let position = position.first(where: { $0._cocoaScreen == .main })?.1 {
+            setFrameOrigin(position)
         } else if let (_, _) = position.first(where: { $0._cocoaScreen != nil }) {
             assertionFailure("unimplemented")
         } else {

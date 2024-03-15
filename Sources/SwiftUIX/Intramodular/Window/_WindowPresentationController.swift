@@ -84,6 +84,14 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         }
     }
     
+    public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>) {
+        contentWindow?.setPosition(position)
+        #if os(macOS)
+        contentWindow?.orderFront(nil)
+        // contentWindow?.level = .screenSaver
+        #endif
+    }
+    
     init(
         content: Content,
         windowStyle: _WindowStyle = .default,
@@ -178,16 +186,16 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             let userInterfaceStyle: UIUserInterfaceStyle = preferredColorScheme == .light ? .light : .dark
             
             if contentWindow.overrideUserInterfaceStyle != userInterfaceStyle {
-                _assignIfNotEqual(userInterfaceStyle, to: &window.overrideUserInterfaceStyle)
+                window._assignIfNotEqual(userInterfaceStyle, to: \.overrideUserInterfaceStyle)
                 
                 if let rootViewController = contentWindow.rootViewController {
-                    _assignIfNotEqual(userInterfaceStyle, to: &rootViewController.overrideUserInterfaceStyle)
+                    rootViewController._assignIfNotEqual(userInterfaceStyle, to: \.overrideUserInterfaceStyle)
                 }
             }
             #endif
             
             #if os(iOS) || os(tvOS)
-            _assignIfNotEqual(UIWindow.Level(rawValue: window.windowLevel.rawValue + 1), to: &contentWindow.windowLevel)
+            contentWindow._assignIfNotEqual(UIWindow.Level(rawValue: window.windowLevel.rawValue + 1), to: \.windowLevel)
             #endif
             
             contentWindow._sizeWindowToNonZeroFitThenPerform {

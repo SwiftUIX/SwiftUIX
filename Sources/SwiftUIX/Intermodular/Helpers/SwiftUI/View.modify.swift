@@ -5,7 +5,6 @@
 import SwiftUI
 
 extension View {
-    /// Modifies the view based on a predicate.
     @ViewBuilder
     public func modify<T: View>(
         @ViewBuilder transform: (Self) -> T
