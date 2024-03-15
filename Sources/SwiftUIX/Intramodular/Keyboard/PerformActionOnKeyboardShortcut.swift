@@ -110,7 +110,7 @@ extension View {
     @available(watchOS, unavailable)
     public func onKeyboardShortcut(
         _ key: KeyEquivalent,
-        modifiers: EventModifiers = [],
+        modifiers: EventModifiers = [.command],
         disabled: Bool = false,
         perform action: @escaping () -> Void
     ) -> some View {
@@ -129,7 +129,7 @@ extension View {
     @available(watchOS, unavailable)
     public func onKeyboardShortcut<Action: DynamicAction>(
         _ key: KeyEquivalent,
-        modifiers: EventModifiers = [],
+        modifiers: EventModifiers = [.command],
         disabled: Bool = false,
         perform action: Action
     ) -> some View {

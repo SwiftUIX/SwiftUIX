@@ -67,9 +67,10 @@ extension PathControl: NSViewRepresentable {
         
         nsView.target = context.coordinator
         nsView.action = #selector(context.coordinator.pathItemClicked)
-        
         nsView.delegate = context.coordinator
-        
+
+        nsView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
         nsView.focusRingType = .none
         
         return nsView
@@ -82,13 +83,13 @@ extension PathControl: NSViewRepresentable {
         context.coordinator.onItemClick = onItemClick
         
         if context.environment.pathControlStyle is StandardPathControlStyle {
-            nsView.pathStyle = .standard
+            nsView._assignIfNotEqual(.standard, to: \.pathStyle)
         } else if context.environment.pathControlStyle is PopUpPathControlStyle {
-            nsView.pathStyle = .popUp
+            nsView._assignIfNotEqual(.popUp, to: \.pathStyle)
         }
         
-        nsView.controlSize = .init(context.environment.controlSize)
-        nsView.placeholderString = placeholder
+        nsView._assignIfNotEqual(.init(context.environment.controlSize), to: \.controlSize)
+        nsView._assignIfNotEqual(placeholder, to: \.placeholderString)
         
         switch onItemClick {
             case .openItem:

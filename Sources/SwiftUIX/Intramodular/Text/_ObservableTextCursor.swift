@@ -70,9 +70,9 @@ public final class _ObservableTextCursor: ObservableObject {
         }
         
         owner._performOrSchedulePublishingChanges {
-            _assignIfNotEqual(owner._caretTextPosition, to: &self.positionInText)
-            _assignIfNotEqual(owner._SwiftUIX_caretGeometry, to: &self.location)
-            _assignIfNotEqual(TextSelection(from: owner), to: &self.textSelection)
+            _assignIfNotEqual(owner._caretTextPosition, to: \.positionInText)
+            _assignIfNotEqual(owner._SwiftUIX_caretGeometry, to: \.location)
+            _assignIfNotEqual(TextSelection(from: owner), to: \.textSelection)
         }
     }
 }

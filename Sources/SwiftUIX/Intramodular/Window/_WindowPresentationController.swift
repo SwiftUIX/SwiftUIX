@@ -140,7 +140,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             #if os(macOS)
             if contentWindow.configuration.canBecomeKey == true, !contentWindow.isKeyWindow {
                 if let appKeyWindow = AppKitOrUIKitApplication.shared.firstKeyWindow, appKeyWindow !== contentWindow {
-                    _assignIfNotEqual(NSWindow.Level(rawValue: appKeyWindow.level.rawValue + 1), to: &contentWindow.level)
+                    contentWindow._assignIfNotEqual(NSWindow.Level(rawValue: appKeyWindow.level.rawValue + 1), to: \.level)
                 }
             }
             #endif
