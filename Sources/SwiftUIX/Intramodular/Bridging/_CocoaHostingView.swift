@@ -22,6 +22,7 @@ public enum _CocoaHostingViewConfigurationFlag {
 }
 
 open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
+    public typealias MainView = Content
     public typealias RootView = CocoaHostingControllerContent<Content>
     
     public var _SwiftUIX_cancellables: [AnyCancellable] = []

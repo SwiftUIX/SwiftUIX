@@ -146,7 +146,12 @@ extension View {
 @available(tvOSApplicationExtension, unavailable)
 public struct WindowProxy {
     weak var window: AppKitOrUIKitHostingWindowProtocol?
-    
+
+    @MainActor
+    public var _appKitOrUIKitWindow: AppKitOrUIKitWindow? {
+        window
+    }
+
     public func orderFrontRegardless() {
         guard let window = window else {
             return assertionFailure()
@@ -163,11 +168,22 @@ public struct WindowProxy {
         }
         
         #if os(iOS) || os(tvOS)
-        assertionFailure()
+        let currentGreatestWindowLevel = (AppKitOrUIKitWindow._firstKeyInstance?.windowLevel ?? UIWindow.Level.alert)
+        
+        window.windowLevel = UIWindow.Level(rawValue: currentGreatestWindowLevel.rawValue + 1)
         #elseif os(macOS)
-        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        if #available(macOS 13.0, *) {
+            window.collectionBehavior.insert(.auxiliary)
+        } else {
+            window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        }
+        
         window.level = .screenSaver
         #endif
+    }
+    
+    public func dismiss() {
+        window?.dismiss()
     }
 }
 

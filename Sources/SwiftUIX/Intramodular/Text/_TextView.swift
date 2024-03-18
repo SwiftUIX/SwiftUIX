@@ -128,14 +128,31 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         }
     }
     
+    static func dismantleAppKitOrUIKitView(
+        _ view: AppKitOrUIKitViewType,
+        coordinator: Coordinator
+    ) {
+        guard let view = (view as? (any _PlatformTextView_Type)) else {
+            return
+        }
+
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+            view._textEditorProxyBase?.wrappedValue = nil
+        }
+    }
+    
     private func donateProxy(
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
         if let proxyBinding = context.environment._textViewProxy, let view = view as? _PlatformTextView<Label> {
             if let existing = proxyBinding.wrappedValue.base {
-                assert(existing === view)
-            } else {
+                if existing.representatableStateFlags.contains(.dismantled) {
+                    proxyBinding.wrappedValue._base.wrappedValue = nil
+                }
+            }
+            
+            if proxyBinding.wrappedValue.base !== view {
                 proxyBinding.wrappedValue.base = view
             }
         }

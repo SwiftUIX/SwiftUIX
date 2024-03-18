@@ -6,6 +6,10 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 extension AppKitOrUIKitFont {
+    public var _SwiftUIX_estimatedLineHeight: CGFloat {
+        fatalError("unimplemented")
+    }
+
     func scaled(
         by ratio: CGFloat
     ) -> AppKitOrUIKitFont {
@@ -19,6 +23,10 @@ extension AppKitOrUIKitFont {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitFont {
+    public var _SwiftUIX_estimatedLineHeight: CGFloat {
+        floor(ascender + abs(descender) + leading)
+    }
+
     func scaled(
         by ratio: CGFloat
     ) -> NSFont {

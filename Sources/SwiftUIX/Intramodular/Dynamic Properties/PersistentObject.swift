@@ -53,7 +53,6 @@ public struct PersistentObject<Value>: DynamicProperty {
         self._observedObjectContainer = .init(initialValue: .init(base: nil))
     }
     
-    
     public mutating func update() {
         _objectContainer.update()
         _observedObjectContainer.update()

@@ -55,18 +55,38 @@ public struct OptionalDimensions: ExpressibleByNilLiteral, Hashable {
     }
 }
 
+extension OptionalDimensions {
+    public var specifiedDimensionsAreNonZero: Bool {
+        var result = true
+        
+        if let width {
+            result = result && (width != 0)
+        }
+        
+        if let height {
+            result = result && (height != 0)
+        }
+        
+        return result
+    }
+}
+
 // MARK: - Extensions
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 extension OptionalDimensions {
-    public init(normalNonZeroDimensionsFrom size: CGSize) {
+    public init(
+        normalNonZeroDimensionsFrom size: CGSize
+    ) {
         self.init(
             width: (size.width.isNormal && !size.width.isZero) ? size.width : nil,
             height: (size.height.isNormal && !size.height.isZero) ? size.height : nil
         )
     }
     
-    public init(intrinsicContentSize: CGSize) {
+    public init(
+        intrinsicContentSize: CGSize
+    ) {
         self.init(
             width: (intrinsicContentSize.width == AppKitOrUIKitView.noIntrinsicMetric || intrinsicContentSize.width == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.width,
             height: (intrinsicContentSize.height == AppKitOrUIKitView.noIntrinsicMetric || intrinsicContentSize.height == CGFloat.greatestFiniteMagnitude) ? nil : intrinsicContentSize.height

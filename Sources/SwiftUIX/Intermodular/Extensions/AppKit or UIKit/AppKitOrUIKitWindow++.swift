@@ -14,8 +14,11 @@ extension AppKitOrUIKitWindow {
         #if os(iOS) || os(macOS)
         return AppKitOrUIKitApplication.shared.firstKeyWindow
         #else
-        assertionFailure("unimplemented")
-        
+        return AppKitOrUIKitApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .first(where: { $0 is UIWindowScene })
+            .flatMap({ $0 as? UIWindowScene })?.windows
+            .first(where: \.isKeyWindow)
         return nil
         #endif
     }

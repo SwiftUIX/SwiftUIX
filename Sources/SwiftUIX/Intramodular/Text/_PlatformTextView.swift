@@ -12,6 +12,7 @@ import SwiftUI
 public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
     associatedtype Label: View
     
+    var _textEditorProxyBase: _TextEditorProxy._Base? { get }
     var _wantsTextKit1: Bool? { get }
     var _customTextStorage: NSTextStorage?  { get }
     var _lastInsertedString: String?  { get }
@@ -52,6 +53,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     @_spi(Internal)
     public internal(set) var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration!
     
+    public var _textEditorProxyBase: _TextEditorProxy._Base?
+    
     public internal(set) var _wantsTextKit1: Bool?
     public internal(set) var _customTextStorage: NSTextStorage?
     public internal(set) var _lastInsertedString: String?
@@ -64,7 +67,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     private var _lazyTextEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never>? = nil
     
     private var _lazy_observableTextCursor: _ObservableTextCursor? = nil
-
+    
     @_spi(Internal)
     public var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> {
         guard let publisher = _lazyTextEditorEventPublisher else {
@@ -283,6 +286,10 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         configuration: TextView<Label>._Configuration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+            self._textEditorProxyBase = context.environment._textViewProxy?.wrappedValue._base
+        } 
+        
         _PlatformTextView<Label>.updateAppKitOrUIKitTextView(
             self,
             data: data,

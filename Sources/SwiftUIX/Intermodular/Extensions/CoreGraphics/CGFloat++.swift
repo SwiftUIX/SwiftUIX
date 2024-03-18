@@ -1,5 +1,5 @@
 //
-//  Copyright (c) FamPay
+// Copyright (c) Vatsal Manot
 //
 
 import CoreGraphics
@@ -15,6 +15,16 @@ extension CGFloat {
     }
 }
 #endif
+
+extension CGFloat {
+    public static func _sum(_ lhs: Self?, _ rhs: Self?) -> Self {
+        (lhs ?? 0) + (rhs ?? 0)
+    }
+    
+    public static func _sum(_ x: Self?, _ y: Self?, _ z: Self?) -> Self {
+        (x ?? 0) + (y ?? 0) + (z ?? 0)
+    }
+}
 
 @_transparent
 func min(_ lhs: Double, _ rhs: CGFloat?) -> Double {

@@ -201,15 +201,17 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
         }
         #elseif os(macOS)
         if let backgroundColor = configuration.backgroundColor?.toAppKitOrUIKitColor() {
-            self.backgroundColor = backgroundColor
+            _assignIfNotEqual(backgroundColor, to: \.backgroundColor)
         }
         
-        if self.backgroundColor == .clear {
-            _assignIfNotEqual(false, to: \.isOpaque)
-            _assignIfNotEqual(false, to: \.hasShadow)
-        } else {
-            _assignIfNotEqual(true, to: \.isOpaque)
-            _assignIfNotEqual(true, to: \.hasShadow)
+        if configuration.style != .plain {
+            if self.backgroundColor == .clear {
+                _assignIfNotEqual(false, to: \.isOpaque)
+                _assignIfNotEqual(false, to: \.hasShadow)
+            } else {
+                _assignIfNotEqual(true, to: \.isOpaque)
+                _assignIfNotEqual(true, to: \.hasShadow)
+            }
         }
         
         if configuration.style == .default {
@@ -288,6 +290,11 @@ public final class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindo
                 self.contentViewController = contentViewController
                 self.configuration.style = style
                 
+                if #available(macOS 13.0, *) {
+                    collectionBehavior.insert(.auxiliary)
+                }
+                
+                level = .floating
                 backgroundColor = NSColor.clear
                 isOpaque = false
                 styleMask.insert(NSWindow.StyleMask.fullSizeContentView)

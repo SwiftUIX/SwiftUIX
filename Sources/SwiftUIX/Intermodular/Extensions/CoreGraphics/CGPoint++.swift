@@ -1,5 +1,5 @@
 //
-//  Copyright (c) FamPay
+// Copyright (c) Vatsal Manot
 //
 
 import CoreGraphics

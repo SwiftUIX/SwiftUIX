@@ -48,9 +48,6 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
     public var rootView: Content {
         didSet {
             _contentViewController.mainView.content = rootView
-            
-            _contentViewController._SwiftUIX_setNeedsLayout()
-            _contentViewController._SwiftUIX_layoutIfNeeded()
         }
     }
     

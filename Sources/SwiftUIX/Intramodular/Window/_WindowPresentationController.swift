@@ -11,7 +11,6 @@ import SwiftUI
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
-@MainActor
 public final class _WindowPresentationController<Content: View>: ObservableObject {
     public var content: Content {
         didSet {
@@ -42,8 +41,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         _updateWorkItem?.cancel()
         _updateWorkItem = nil
         
-        let item = DispatchWorkItem {
-            self._update()
+        let item = DispatchWorkItem { [weak self] in
+            self?._update()
         }
         
         DispatchQueue.main.async(execute: item)
@@ -61,7 +60,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     
     @Published public var isVisible: Bool {
         didSet {
-            if contentWindow == nil || isVisible != oldValue {                
+            if contentWindow == nil || isVisible != oldValue {
                 _setNeedsUpdate()
             }
         }
@@ -86,10 +85,9 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     
     public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>) {
         contentWindow?.setPosition(position)
-        #if os(macOS)
+#if os(macOS)
         contentWindow?.orderFront(nil)
-        // contentWindow?.level = .screenSaver
-        #endif
+#endif
     }
     
     init(
@@ -124,7 +122,19 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     ) {
         self.init(content: content())
     }
-        
+    
+    public convenience init(
+        style: _WindowStyle,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(
+            content: content(),
+            windowStyle: style,
+            canBecomeKey: true,
+            isVisible: true
+        )
+    }
+    
     public func show() {
         isVisible = true
         
@@ -144,36 +154,36 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         
         if let contentWindow = contentWindow, contentWindow.isHidden == !isVisible {
             contentWindow.rootView = content
-
-            #if os(macOS)
+            
+#if os(macOS)
             if contentWindow.configuration.canBecomeKey == true, !contentWindow.isKeyWindow {
                 if let appKeyWindow = AppKitOrUIKitApplication.shared.firstKeyWindow, appKeyWindow !== contentWindow {
                     contentWindow._assignIfNotEqual(NSWindow.Level(rawValue: appKeyWindow.level.rawValue + 1), to: \.level)
                 }
             }
-            #endif
+#endif
             
             return
         }
         
         if isVisible {
-            #if !os(macOS)
+#if !os(macOS)
             guard let window = AppKitOrUIKitWindow._firstKeyInstance, let windowScene = window.windowScene else {
                 return
             }
-            #endif
+#endif
             
-            #if os(macOS)
+#if os(macOS)
             let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(
                 rootView: content,
                 style: windowStyle
             )
-            #else
+#else
             let contentWindow = self.contentWindow ?? AppKitOrUIKitHostingWindow(
                 windowScene: windowScene,
                 rootView: content
             )
-            #endif
+#endif
             
             contentWindow.windowPresentationController = self
             
@@ -181,8 +191,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             
             contentWindow.rootView = content
             contentWindow.configuration.canBecomeKey = canBecomeKey
-                        
-            #if os(iOS)
+            
+#if os(iOS)
             let userInterfaceStyle: UIUserInterfaceStyle = preferredColorScheme == .light ? .light : .dark
             
             if contentWindow.overrideUserInterfaceStyle != userInterfaceStyle {
@@ -192,18 +202,22 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
                     rootViewController._assignIfNotEqual(userInterfaceStyle, to: \.overrideUserInterfaceStyle)
                 }
             }
-            #endif
+#endif
             
-            #if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
             contentWindow._assignIfNotEqual(UIWindow.Level(rawValue: window.windowLevel.rawValue + 1), to: \.windowLevel)
-            #endif
+#endif
             
-            contentWindow._sizeWindowToNonZeroFitThenPerform {
+            contentWindow._sizeWindowToNonZeroFitThenPerform { [weak self] in
                 contentWindow.show()
-            }
-            
-            if canBecomeKey == false {
-                assert(!contentWindow.isKeyWindow)
+                
+                guard let `self` = self else {
+                    return
+                }
+                
+                if self.canBecomeKey == false {
+                    assert(!contentWindow.isKeyWindow)
+                }
             }
         } else {
             contentWindow?.hide()
@@ -222,6 +236,18 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
             }
         )
     }
+    
+    private func _tearDown() {
+        _updateWorkItem?.cancel()
+        
+        hide()
+        
+        _updateWorkItem?.cancel()
+    }
+    
+    deinit {
+        _tearDown()
+    }
 }
 
 #if os(macOS)
@@ -237,7 +263,7 @@ extension _WindowPresentationController {
             isVisible: false
         )
     }
-
+    
     @available(macOS 11.0, *)
     @available(iOS, unavailable)
     @available(tvOS, unavailable)
@@ -280,7 +306,7 @@ public enum _WindowStyle {
     case hiddenTitleBar
     case plain
     case titleBar
-
+    
     @available(macOS 11.0, *)
     @available(iOS, unavailable)
     @available(tvOS, unavailable)

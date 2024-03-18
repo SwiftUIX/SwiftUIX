@@ -330,6 +330,12 @@ extension AppKitOrUIKitViewRepresentable {
         _ view: AppKitOrUIKitViewType, 
         context: Context
     ) {
+        weak var _view = view
+        
+        guard let view = _view else {
+            return
+        }
+        
         let represented = view as? _AppKitOrUIKitRepresented
         
         represented?.representatableStateFlags.insert(.updateInProgress)
@@ -358,7 +364,9 @@ extension AppKitOrUIKitViewRepresentable {
 
 extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrUIKitRepresented {
     @MainActor
-    public func makeNSView(context: Context) -> AppKitOrUIKitViewType {
+    public func makeNSView(
+        context: Context
+    ) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
     
@@ -379,7 +387,10 @@ extension AppKitOrUIKitViewRepresentable where AppKitOrUIKitViewType: _AppKitOrU
     }
 
     @MainActor
-    public static func dismantleNSView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator) {
+    public static func dismantleNSView(
+        _ view: AppKitOrUIKitViewType,
+        coordinator: Coordinator
+    ) {
         dismantleAppKitOrUIKitView(view, coordinator: coordinator)
         
         view.representatableStateFlags.insert(.dismantled)
