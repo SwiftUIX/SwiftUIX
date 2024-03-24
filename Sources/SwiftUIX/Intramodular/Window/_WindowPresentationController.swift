@@ -327,6 +327,15 @@ public enum _WindowStyle {
     }
 }
 
+#if os(macOS)
+extension _WindowPresentationController {
+    public func bringToFront() {
+        self.contentWindow?.level = .screenSaver
+        self.contentWindow?.orderFrontRegardless()
+    }
+}
+#endif
+
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)

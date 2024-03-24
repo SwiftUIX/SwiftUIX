@@ -6,6 +6,14 @@ import CoreGraphics
 import Swift
 import SwiftUI
 
+public func _SwiftUIX_floor(_ size: CGSize) -> CGSize {
+    CGSize(width: floor(size.width), height: floor(size.height))
+}
+
+public func _SwiftUIX_ceil(_ size: CGSize) -> CGSize {
+    CGSize(width: ceil(size.width), height: ceil(size.height))
+}
+
 extension CGSize {
     public struct _SwiftUIX_HashableRepresentation: Hashable {
         let base: CGSize

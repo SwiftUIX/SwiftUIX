@@ -541,6 +541,15 @@ extension View {
         windowPosition(CGPoint(x: x, y: y))
     }
     
+    public func windowPosition(
+        _ point: _CoordinateSpaceRelative<CGPoint>
+    ) -> some View {
+        preference(
+            key: _SwiftUIX_WindowPreferenceKeys.Position.self,
+            value: point
+        )
+    }
+    
     /// Sets the background color of the presented window.
     public func windowOverlayBackgroundColor(_ backgroundColor: Color) -> some View {
         preference(key: _SwiftUIX_WindowPreferenceKeys.BackgroundColor.self, value: backgroundColor)
@@ -727,8 +736,15 @@ extension AppKitOrUIKitHostingWindow {
             )
             
             setFrameOrigin(origin)
-        } else if let position = position.first(where: { $0._cocoaScreen == .main })?.1 {
-            setFrameOrigin(position)
+        } else if let (point, position) = position.first(where: { $0._cocoaScreen != nil }) {
+            let screen = point._cocoaScreen!
+            
+            let origin = CGPoint(
+                x: position.x,
+                y: screen.height - (position.y + self.frame.size.height)
+            )
+
+            setFrameOrigin(origin)
         } else if let (_, _) = position.first(where: { $0._cocoaScreen != nil }) {
             assertionFailure("unimplemented")
         } else {

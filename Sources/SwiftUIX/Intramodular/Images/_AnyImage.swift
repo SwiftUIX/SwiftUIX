@@ -10,6 +10,7 @@ public typealias ImageName = _AnyImage.Name
 
 /// A portable representation of an image.
 public enum _AnyImage: Hashable, @unchecked Sendable {
+    @frozen
     public enum Name: Hashable, @unchecked Sendable {
         case bundleResource(String, in: Bundle? = .main)
         case system(String)

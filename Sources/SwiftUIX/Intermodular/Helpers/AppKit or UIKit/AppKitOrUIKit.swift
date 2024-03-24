@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+@_spi(Internal) import _SwiftUIX
+
 import Swift
 import SwiftUI
 
@@ -24,6 +26,7 @@ public typealias AppKitOrUIKitEdgeInsets = UIEdgeInsets
 public typealias AppKitOrUIKitEvent = UIEvent
 public typealias AppKitOrUIKitFont = UIFont
 public typealias AppKitOrUIKitFontDescriptor = UIFontDescriptor
+public typealias AppKitOrUIKitGraphicsImageRenderer = UIGraphicsImageRenderer
 public typealias AppKitOrUIKitHostingController<Content: View> = UIHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = UIHostingView<Content>
 public typealias AppKitOrUIKitImage = UIImage
@@ -119,6 +122,8 @@ public typealias AppKitOrUIKitEdgeInsets = NSEdgeInsets
 public typealias AppKitOrUIKitEvent = NSEvent
 public typealias AppKitOrUIKitFont = NSFont
 public typealias AppKitOrUIKitFontDescriptor = NSFontDescriptor
+@_spi(Internal)
+public typealias AppKitOrUIKitGraphicsImageRenderer = NSGraphicsImageRenderer
 public typealias AppKitOrUIKitHostingController<Content: View> = NSHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = NSHostingView<Content>
 public typealias AppKitOrUIKitImage = NSImage
@@ -164,24 +169,6 @@ extension NSAppearance {
     }
 }
 
-extension NSColor {
-    @_disfavoredOverload
-    public static var label: NSColor {
-        NSColor.labelColor
-    }
-    
-    @_disfavoredOverload
-    public static var separator: NSColor {
-        NSColor.separatorColor
-    }
-}
-
-extension NSEdgeInsets {
-    var edgeInsets: EdgeInsets {
-        .init(top: top, leading: left, bottom: bottom, trailing: right)
-    }
-}
-
 @available(iOS 15.0, macOS 10.15, watchOS 9.0, *)
 @available(tvOS, unavailable)
 extension NSButton.ControlSize {
@@ -207,6 +194,24 @@ extension NSButton.ControlSize {
     }
 }
 
+extension NSColor {
+    @_disfavoredOverload
+    public static var label: NSColor {
+        NSColor.labelColor
+    }
+    
+    @_disfavoredOverload
+    public static var separator: NSColor {
+        NSColor.separatorColor
+    }
+}
+
+extension NSEdgeInsets {
+    var edgeInsets: EdgeInsets {
+        .init(top: top, leading: left, bottom: bottom, trailing: right)
+    }
+}
+
 extension NSFont {
     @available(macOS 11.0, *)
     public static func preferredFont(forTextStyle textStyle: TextStyle) -> NSFont {
@@ -223,6 +228,12 @@ extension NSImage {
         )
         
         self.init(cgImage: cgImage, size: size)
+    }
+}
+
+extension NSImage.SymbolConfiguration {
+    public convenience init(pointSize: CGFloat) {
+        self.init(pointSize: pointSize, weight: .regular)
     }
 }
 
