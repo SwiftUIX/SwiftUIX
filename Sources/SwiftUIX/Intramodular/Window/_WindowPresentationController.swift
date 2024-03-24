@@ -334,6 +334,12 @@ extension _WindowPresentationController {
         self.contentWindow?.orderFrontRegardless()
     }
 }
+#else
+extension _WindowPresentationController {
+    public func bringToFront() {
+
+    }
+}
 #endif
 
 @available(macCatalystApplicationExtension, unavailable)

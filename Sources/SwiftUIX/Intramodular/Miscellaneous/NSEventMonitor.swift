@@ -9,6 +9,10 @@ import Combine
 import Swift
 import SwiftUI
 
+public protocol NSEventMonitorType {
+    
+}
+
 public final class NSEventMonitor {
     public enum Context {
         case local

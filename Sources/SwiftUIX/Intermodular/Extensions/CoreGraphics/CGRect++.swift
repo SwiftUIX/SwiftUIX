@@ -106,3 +106,27 @@ extension CGRect {
         )
     }
 }
+
+extension Collection where Element == CGRect {
+    /// Calculates the minimum enclosing CGRect that encompasses all CGRects in the array.
+    /// - Returns: The minimum enclosing CGRect, or `.zero` if the array is empty.
+    public func _SwiftUIX_minimumEnclosingRect() -> CGRect {
+        guard !self.isEmpty else {
+            return .zero
+        }
+        
+        var minX = CGFloat.infinity
+        var minY = CGFloat.infinity
+        var maxX = -CGFloat.infinity
+        var maxY = -CGFloat.infinity
+        
+        for rect in self {
+            minX = Swift.min(minX, rect.minX)
+            minY = Swift.min(minY, rect.minY)
+            maxX = Swift.max(maxX, rect.maxX)
+            maxY = Swift.max(maxY, rect.maxY)
+        }
+        
+        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+    }
+}
