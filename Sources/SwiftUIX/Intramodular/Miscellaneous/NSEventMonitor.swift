@@ -9,15 +9,21 @@ import Combine
 import Swift
 import SwiftUI
 
-public protocol NSEventMonitorType {
-    
+public enum NSEventMonitorContext {
+    case local
+    case global
 }
 
-public final class NSEventMonitor {
-    public enum Context {
-        case local
-        case global
-    }
+public protocol _NSEventMonitorType {
+    init(
+        context: NSEventMonitorContext,
+        matching: NSEvent.EventTypeMask,
+        handleEvent: @escaping (NSEvent) -> NSEvent?
+    ) throws
+}
+
+public final class NSEventMonitor: _NSEventMonitorType {
+    public typealias Context = NSEventMonitorContext
     
     private let context: Context
     private let eventTypeMask: NSEvent.EventTypeMask
