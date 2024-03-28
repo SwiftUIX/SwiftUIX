@@ -250,6 +250,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     }
 }
 
+// MARK: - Initializers
+
 #if os(macOS)
 extension _WindowPresentationController {
     public convenience init(
@@ -299,6 +301,29 @@ extension _WindowPresentationController {
 }
 #endif
 
+// MARK: - Extensions
+
+#if os(macOS)
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
+extension _WindowPresentationController {
+    public func bringToFront() {
+        self.contentWindow?.level = .screenSaver
+        self.contentWindow?.orderFrontRegardless()
+    }
+}
+#else
+@available(macCatalystApplicationExtension, unavailable)
+@available(iOSApplicationExtension, unavailable)
+@available(tvOSApplicationExtension, unavailable)
+extension _WindowPresentationController {
+    public func bringToFront() {
+        
+    }
+}
+#endif
+
 // MARK: - Auxiliary
 
 public enum _WindowStyle {
@@ -326,21 +351,6 @@ public enum _WindowStyle {
         }
     }
 }
-
-#if os(macOS)
-extension _WindowPresentationController {
-    public func bringToFront() {
-        self.contentWindow?.level = .screenSaver
-        self.contentWindow?.orderFrontRegardless()
-    }
-}
-#else
-extension _WindowPresentationController {
-    public func bringToFront() {
-
-    }
-}
-#endif
 
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)

@@ -12,6 +12,11 @@ extension View {
         y: CGFloat,
         blur: CGFloat
     ) -> some View {
-        shadow(color: color, radius: blur / 2, x: x, y: y)
+        shadow(
+            color: color,
+            radius: blur / 2,
+            x: x,
+            y: y
+        )
     }
 }

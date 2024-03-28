@@ -22,8 +22,8 @@ extension _HashIdentifiable {
 
 extension Hashable {
     @inlinable
-    public var hashIdentifiable: _HashIdentifiableValue<Self> {
-        .init(self)
+    package var hashIdentifiable: _HashIdentifiableValue<Self> {
+        _HashIdentifiableValue(self)
     }
 }
 
@@ -32,7 +32,7 @@ public struct _HashIdentifiableValue<Value: Hashable>: CustomStringConvertible, 
     public let value: Value
     
     public var description: String {
-        .init(describing: value)
+        String(describing: value)
     }
     
     @inlinable
