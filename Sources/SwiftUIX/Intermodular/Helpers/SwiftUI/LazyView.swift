@@ -9,7 +9,7 @@ import SwiftUI
 public struct LazyView<Body: View>: View {
     @Environment(\._lazyViewResolver) private var _lazyViewResolver
     
-    private let destination: () -> Body
+    public let destination: () -> Body
     
     @_optimize(none)
     @inline(never)
@@ -63,7 +63,7 @@ public struct _DeferredView<Content: View>: View {
     }
     
     public var body: some View {
-        PassthroughView {
+        Group {
             if didAppear2 {
                 content()
             } else if didAppear {
