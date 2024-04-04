@@ -18,12 +18,34 @@ import UIKit
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
-    
+
+    @Environment(\._textViewConfigurationMutation) private var _textViewConfigurationMutation
+        
     @ObservedObject var updater: EmptyObservableObject
     
     let data: _TextViewDataBinding
-    let configuration: Configuration
+    let _configuration: Configuration
     let customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
+    
+    var configuration: Configuration {
+        var result = _configuration
+        
+        _textViewConfigurationMutation(&result)
+        
+        return result
+    }
+    
+    init(
+        updater: EmptyObservableObject,
+        data: _TextViewDataBinding,
+        configuration: Configuration,
+        customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
+    ) {
+        self.updater = updater
+        self.data = data
+        self._configuration = configuration
+        self.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
+    }
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)

@@ -10,7 +10,8 @@ import SwiftUI
 public struct _TextViewConfiguration {
     public var _fixedSize: (Bool, Bool)? = nil
     
-    var isConstant: Bool = false
+    public var isContentCopyable: Bool = true
+    public var isConstant: Bool = false
     
     public var onEditingChanged: (Bool) -> Void = { _ in }
     public var onCommit: (() -> Void)?
@@ -262,5 +263,23 @@ extension View {
 extension View {
     public func lineBreakMode(_ lineBreakMode: NSLineBreakMode) -> some View {
         environment(\.lineBreakMode, lineBreakMode)
+    }
+}
+
+// MARK: - Internal
+
+extension EnvironmentValues {
+    public struct _TextViewConfigurationMutationKey: EnvironmentKey {
+        public typealias Value = (inout _TextViewConfiguration) -> Void
+        
+        public static let defaultValue: Value = { _ in }
+    }
+    
+    public var _textViewConfigurationMutation: _TextViewConfigurationMutationKey.Value {
+        get {
+            self[_TextViewConfigurationMutationKey.self]
+        } set {
+            self[_TextViewConfigurationMutationKey.self] = newValue
+        }
     }
 }
