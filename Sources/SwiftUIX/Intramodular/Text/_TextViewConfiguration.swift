@@ -268,6 +268,8 @@ extension View {
 
 // MARK: - Internal
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+
 extension EnvironmentValues {
     public struct _TextViewConfigurationMutationKey: EnvironmentKey {
         public typealias Value = (inout _TextViewConfiguration) -> Void
@@ -283,3 +285,5 @@ extension EnvironmentValues {
         }
     }
 }
+
+#endif
