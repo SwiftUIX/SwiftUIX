@@ -204,12 +204,24 @@ extension Binding {
     }
     
     public func withDefaultValue<T>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
-        .init(
+        Binding<T>(
             get: { self.wrappedValue ?? defaultValue },
             set: { self.wrappedValue = $0 }
         )
     }
     
+    public func withDefaultValue<T: Equatable>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
+        Binding<T>(
+            get: {
+                self.wrappedValue ?? defaultValue
+            },
+            set: {
+                self.wrappedValue = $0
+            }
+        )
+        .removeDuplicates()
+    }
+
     public func forceUnwrap<T>() -> Binding<T> where Value == Optional<T> {
         .init(
             get: { self.wrappedValue! },
