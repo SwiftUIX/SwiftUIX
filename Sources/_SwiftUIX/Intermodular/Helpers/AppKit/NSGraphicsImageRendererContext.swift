@@ -5,8 +5,8 @@
 #if os(macOS)
 
 import AppKit
+import SwiftUI
 
-@_spi(Internal)
 public class NSGraphicsImageRendererFormat {
     public var scale: Double = 1
     
@@ -15,7 +15,6 @@ public class NSGraphicsImageRendererFormat {
     }
 }
 
-@_spi(Internal)
 public class NSGraphicsImageRendererContext {
     public let cgContext: CGContext
     
@@ -32,7 +31,6 @@ public class NSGraphicsImageRendererContext {
     }
 }
 
-@_spi(Internal)
 public class NSGraphicsImageRenderer {
     public let size: CGSize
     public let format: NSGraphicsImageRendererFormat

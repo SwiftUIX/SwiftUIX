@@ -122,7 +122,6 @@ public typealias AppKitOrUIKitEdgeInsets = NSEdgeInsets
 public typealias AppKitOrUIKitEvent = NSEvent
 public typealias AppKitOrUIKitFont = NSFont
 public typealias AppKitOrUIKitFontDescriptor = NSFontDescriptor
-@_spi(Internal)
 public typealias AppKitOrUIKitGraphicsImageRenderer = NSGraphicsImageRenderer
 public typealias AppKitOrUIKitHostingController<Content: View> = NSHostingController<Content>
 public typealias AppKitOrUIKitHostingView<Content: View> = NSHostingView<Content>

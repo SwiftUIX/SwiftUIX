@@ -6,16 +6,19 @@
 
 import AppKit
 
-@_spi(Internal)
 extension NSImage {
+    @_spi(Internal)
     public var cgImage: CGImage? {
         var frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
        
         return self.cgImage(forProposedRect: &frame, context: nil, hints: nil)
     }
+    
+    public var _SwiftUIX_cgImage: CGImage? {
+        cgImage
+    }
 }
 
-@_spi(Internal)
 extension NSImage {
     public enum Orientation: UInt32 {
         case up = 1
@@ -65,7 +68,6 @@ extension NSImage {
     }
 }
 
-@_spi(Internal)
 extension NSImage {
     public var scale: CGFloat {
         guard let screen = NSScreen.main else {
@@ -83,16 +85,16 @@ extension NSImage {
     }
     
     public func draw(
-        at point: NSPoint
+        at position: NSPoint
     ) {
-        let rect = NSRect(
-            origin: point,
-            size: self.size
+        self.draw(
+            at: position,
+            from: NSRect(x: 0, y: 0, width: self.size.width, height: self.size.height),
+            operation: .copy,
+            fraction: 1
         )
-        
-        self.draw(in: rect)
     }
-    
+
     public func draw(
         at point: NSPoint,
         blendMode: NSCompositingOperation,
@@ -103,7 +105,12 @@ extension NSImage {
             size: self.size
         )
         
-        self.draw(in: rect, from: NSRect.zero, operation: blendMode, fraction: alpha)
+        self.draw(
+            in: rect,
+            from: NSRect.zero,
+            operation: blendMode,
+            fraction: alpha
+        )
     }
 }
 

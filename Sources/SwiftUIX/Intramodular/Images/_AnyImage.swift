@@ -167,6 +167,8 @@ extension AppKitOrUIKitImage {
                 if let bundle {
                     if let url = bundle.urlForImageResource(name) {
                         self.init(byReferencing: url)
+                    } else if bundle == Bundle.main {
+                        self.init(imageLiteralResourceName: name)
                     } else {
                         assertionFailure()
                         
