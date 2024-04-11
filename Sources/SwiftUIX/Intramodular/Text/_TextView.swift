@@ -154,7 +154,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         _ view: AppKitOrUIKitViewType,
         coordinator: Coordinator
     ) {
-        guard let view = (view as? (any _PlatformTextView_Type)) else {
+        guard let view = (view as? (any _PlatformTextViewType)) else {
             return
         }
 

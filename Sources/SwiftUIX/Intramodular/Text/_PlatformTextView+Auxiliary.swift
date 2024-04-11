@@ -23,7 +23,7 @@ extension AppKitOrUIKitTextView {
     func _SwiftUIX_replaceTextStorage(
         _ textStorage: NSTextStorage
     ) {
-        guard let layoutManager = (self as? (any _PlatformTextView_Type))?._SwiftUIX_makeLayoutManager() ?? _SwiftUIX_layoutManager else {
+        guard let layoutManager = (self as? (any _PlatformTextViewType))?._SwiftUIX_makeLayoutManager() ?? _SwiftUIX_layoutManager else {
             assertionFailure()
             
             return

@@ -9,13 +9,15 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
-public protocol _PlatformTextView_Type: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
+public protocol _PlatformTextViewType: _AppKitOrUIKitRepresented, AppKitOrUIKitTextView {
     associatedtype Label: View
+    
+    var _SwiftUIX_textViewConfiguration: _TextViewConfiguration { get }
     
     var _textEditorProxyBase: _TextEditorProxy._Base? { get }
     var _wantsTextKit1: Bool? { get }
     var _customTextStorage: NSTextStorage?  { get }
-    var _lastInsertedString: String?  { get }
+    var _lastInsertedString: NSAttributedString?  { get }
     var _wantsRelayout: Bool  { get }
     var _isTextLayoutInProgress: Bool? { get }
     var _needsIntrinsicContentSizeInvalidation: Bool { get set }
@@ -50,6 +52,11 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     public internal(set) var data: _TextViewDataBinding = .string(.constant(""))
     @_spi(Internal)
     public internal(set) var configuration = TextView<Label>._Configuration()
+    
+    public var _SwiftUIX_textViewConfiguration: _TextViewConfiguration {
+        configuration
+    }
+    
     @_spi(Internal)
     public internal(set) var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration!
     
@@ -57,7 +64,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     public internal(set) var _wantsTextKit1: Bool?
     public internal(set) var _customTextStorage: NSTextStorage?
-    public internal(set) var _lastInsertedString: String?
+    public internal(set) var _lastInsertedString: NSAttributedString?
     public internal(set) var _wantsRelayout: Bool = false
     public internal(set) var _isTextLayoutInProgress: Bool? = nil
     
@@ -361,6 +368,24 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     #endif
     
     #if os(macOS)
+    open override func draggingEntered(
+        _ sender: NSDraggingInfo
+    ) -> NSDragOperation {
+        _SwiftUIX_draggingEntered(sender)
+    }
+    
+    open override func draggingUpdated(_ sender: any NSDraggingInfo) -> NSDragOperation {
+        _SwiftUIX_draggingUpdated(sender)
+    }
+
+    override open func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        _SwiftUIX_performDragOperation(sender)
+    }
+
+    override open func draggingExited(_ sender: (any NSDraggingInfo)?) {
+        _SwiftUIX_draggingExited(sender)
+    }
+        
     open override func insertText(
         _ insertString: Any,
         replacementRange: NSRange
@@ -371,8 +396,8 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
             return
         }
         
-        if let text = (insertString as? String) ?? (insertString as? NSAttributedString)?.string {
-            _lastInsertedString = text
+        if let text = insertString as? String {
+            _lastInsertedString = NSAttributedString(string: text)
             
             let currentLength = textStorage.length
             
@@ -388,6 +413,33 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
                     )
                 )
             }
+        } else if let insertString = insertString as? NSAttributedString {
+            _lastInsertedString = insertString
+            
+            let currentLength = textStorage.length
+            
+            if insertString._isSingleTextAttachment {
+                if replacementRange.length == 0 {
+                    textStorage.replaceCharacters(in: replacementRange, with: insertString)
+                } else {
+                    assertionFailure()
+                }
+            } else {
+                super.insertText(insertString, replacementRange: replacementRange)
+            }
+            
+            if replacementRange.location == currentLength {
+                _publishTextEditorEvent(
+                    .append(text: insertString)
+                )
+            } else {
+                _publishTextEditorEvent(
+                    .insert(
+                        text: insertString,
+                        range: replacementRange.location == 0 ? nil : replacementRange
+                    )
+                )
+            }
         } else {
             super.insertText(insertString, replacementRange: replacementRange)
         }
@@ -397,15 +449,25 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         in affectedCharRange: NSRange,
         replacementString: String?
     ) -> Bool {
-        if let _lastInsertedString = _lastInsertedString, replacementString == _lastInsertedString {
+        if let _lastInsertedString = _lastInsertedString, replacementString == _lastInsertedString.string {
             self._lastInsertedString = nil
         } else if let replacementString = replacementString {
-            self._publishTextEditorEvent(.replace(text: .init(string: replacementString), range: affectedCharRange))
+            self._publishTextEditorEvent(
+                .replace(
+                    text: NSAttributedString(string: replacementString),
+                    range: affectedCharRange
+                )
+            )
         } else {
             if _lazyTextEditorEventSubject != nil {
                 let deletedText = _SwiftUIX_attributedText.attributedSubstring(from: affectedCharRange)
                 
-                self._publishTextEditorEvent(.delete(text: deletedText, range: affectedCharRange))
+                self._publishTextEditorEvent(
+                    .delete(
+                        text: deletedText,
+                        range: affectedCharRange
+                    )
+                )
             }
         }
         
@@ -711,13 +773,25 @@ extension _PlatformTextView {
 
 @_spi(Internal)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension _PlatformTextView: _PlatformTextView_Type {
+extension _PlatformTextView: _PlatformTextViewType {
     func _publishTextEditorEvent(_ event: _SwiftUIX_TextEditorEvent) {
         DispatchQueue.main.async {
             self._performOrSchedulePublishingChanges {
                 self._lazyTextEditorEventSubject?.send(event)
             }
         }
+    }
+}
+
+// MARK: - Helpers
+
+extension NSAttributedString {
+    var _isSingleTextAttachment: Bool {
+        guard length == 1, self.string.first! == Character(UnicodeScalar(NSTextAttachment.character)!) else {
+            return false
+        }
+        
+        return true
     }
 }
 

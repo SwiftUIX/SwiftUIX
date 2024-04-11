@@ -55,9 +55,9 @@ public final class _TextEditorProxy: Equatable, ObservableObject {
     private var _fakeTextCursor = _ObservableTextCursor(owner: nil)
     
     @_spi(Internal)
-    public var base: (any _PlatformTextView_Type)? {
+    public var base: (any _PlatformTextViewType)? {
         get {
-            _base.wrappedValue.map({ $0 as! any _PlatformTextView_Type })
+            _base.wrappedValue.map({ $0 as! any _PlatformTextViewType })
         } set {
             objectWillChange.send()
             
