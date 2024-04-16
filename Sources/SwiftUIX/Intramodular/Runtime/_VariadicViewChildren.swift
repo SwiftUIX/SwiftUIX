@@ -125,7 +125,7 @@ extension _VariadicViewChildren {
             @_transparent
             get {
                 element[Key.self]
-            } 
+            }
             
             @_optimize(speed)
             @_transparent
@@ -141,7 +141,7 @@ extension _VariadicViewChildren {
             @_transparent
             get {
                 element[_ViewTraitKeys()[keyPath: key]]
-            } 
+            }
             
             @_optimize(speed)
             @_transparent
@@ -186,5 +186,19 @@ extension _VariadicViewChildren.Subview {
                 base[trait: keyPath]
             }
         }
+    }
+}
+
+extension _VariadicViewChildren.Subview {
+    public struct _ScrollElementID: Hashable {
+        public let base: _VariadicViewChildren.Subview.ID
+        
+        public func hash(into hasher: inout Hasher) {
+            base.hash(into: &hasher)
+        }
+    }
+    
+    public var _scrollElementID: _ScrollElementID {
+        _ScrollElementID(base: self.id)
     }
 }
