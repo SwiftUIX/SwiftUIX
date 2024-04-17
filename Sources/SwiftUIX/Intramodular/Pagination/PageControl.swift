@@ -18,6 +18,10 @@ public struct PageControl {
     var defersCurrentPageDisplay: Bool?
     @usableFromInline
     var hidesForSinglePage: Bool?
+    @usableFromInline
+    var indicatorImages: [Int: UIImage]?
+    @usableFromInline
+    var currentPageIndicatorImages: [Int: UIImage]?
     
     @inlinable
     public init(numberOfPages: Int, currentPage: Binding<Int>) {
@@ -72,6 +76,24 @@ extension PageControl: UIViewRepresentable {
             if let backgroundStyle = context.environment.pageControlBackgroundStyle {
                 uiView.backgroundStyle = backgroundStyle
             }
+            
+            if let indicators = indicatorImages {
+                for (page, image) in indicators {
+                    uiView.setIndicatorImage(image, forPage: page)
+                }
+            }
+            
+            uiView.preferredIndicatorImage = context.environment.preferredIndicatorImage
+        }
+        
+        if #available(iOS 16.0, tvOS 16.0, *) {
+            if let currentPageIndicators = currentPageIndicatorImages {
+                for (page, image) in currentPageIndicators {
+                    uiView.setCurrentPageIndicatorImage(image, forPage: page)
+                }
+            }
+            
+            uiView.preferredCurrentPageIndicatorImage = context.environment.preferredCurrentPageIndicatorImage
         }
         
         if let hidesForSinglePage = hidesForSinglePage {
@@ -103,6 +125,36 @@ extension PageControl {
     public func hidesForSinglePage(_ hidesForSinglePage: Bool) -> Self {
         then({ $0.hidesForSinglePage = hidesForSinglePage })
     }
+
+    @available(iOS 14.0, tvOS 14.0, *)
+    @inlinable
+    public func indicatorImage(forPage page: Int) -> UIImage? {
+        indicatorImages?[page]
+    }
+    
+    @available(iOS 14.0, tvOS 14.0, *)
+    @inlinable
+    public func setIndicatorImage(_ image: UIImage?, forPage page: Int) -> Self {
+        then({
+            if $0.indicatorImages == nil { $0.indicatorImages = [:] }
+            $0.indicatorImages?[page] = image
+        })
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @inlinable
+    public func currentPageIndicatorImage(forPage page: Int) -> UIImage? {
+        currentPageIndicatorImages?[page]
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @inlinable
+    public func setCurrentPageIndicatorImage(_ image: UIImage?, forPage page: Int) -> Self {
+        then({
+            if $0.currentPageIndicatorImages == nil { $0.currentPageIndicatorImages = [:] }
+            $0.currentPageIndicatorImages?[page] = image
+        })
+    }
 }
 
 extension View {
@@ -120,6 +172,18 @@ extension View {
     @inlinable
     public func currentPageIndicatorTintColor(_ color: Color) -> some View {
         environment(\.currentPageIndicatorTintColor, color)
+    }
+    
+    @available(iOS 14.0, tvOS 14.0, *)
+    @inlinable
+    public func preferredIndicatorImage(_ image: UIImage) -> some View {
+        environment(\.preferredIndicatorImage, image)
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @inlinable
+    public func preferredCurrentPageIndicatorImage(_ image: UIImage) -> some View {
+        environment(\.preferredCurrentPageIndicatorImage, image)
     }
 }
 
@@ -143,6 +207,20 @@ extension PageControl {
     struct CurrentTintColorEnvironmentKey: EnvironmentKey {
         @usableFromInline
         static let defaultValue: Color? = nil
+    }
+    
+    @available(iOS 14.0, tvOS 14.0, *)
+    @usableFromInline
+    struct PreferredIndicatorImageEnvironmentKey: EnvironmentKey {
+        @usableFromInline
+        static let defaultValue: UIImage? = nil
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @usableFromInline
+    struct PreferredCurrentPageIndicatorImage: EnvironmentKey {
+        @usableFromInline
+        static let defaultValue: UIImage? = nil
     }
 }
 
@@ -172,6 +250,26 @@ extension EnvironmentValues {
             self[PageControl.CurrentTintColorEnvironmentKey.self]
         } set {
             self[PageControl.CurrentTintColorEnvironmentKey.self] = newValue
+        }
+    }
+    
+    @available(iOS 14.0, tvOS 14.0, *)
+    @inlinable
+    public var preferredIndicatorImage: UIImage? {
+        get {
+            self[PageControl.PreferredIndicatorImageEnvironmentKey.self]
+        } set {
+            self[PageControl.PreferredIndicatorImageEnvironmentKey.self] = newValue
+        }
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @inlinable
+    public var preferredCurrentPageIndicatorImage: UIImage? {
+        get {
+            self[PageControl.PreferredCurrentPageIndicatorImage.self]
+        } set {
+            self[PageControl.PreferredCurrentPageIndicatorImage.self] = newValue
         }
     }
 }
