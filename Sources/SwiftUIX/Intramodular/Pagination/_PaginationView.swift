@@ -21,6 +21,8 @@ struct _PaginationView<Page: View> {
         let cyclesPages: Bool
         let initialPageIndex: Int?
         let paginationState: Binding<PaginationState>?
+        let indicatorImages: [Int: UIImage]?
+        let currentPageIndicatorImages: [Int: UIImage]?
     }
     
     let configuration: Configuration
@@ -199,6 +201,26 @@ extension _PaginationView: UIViewControllerRepresentable {
         if #available(iOS 14.0, tvOS 14.0, *) {
             if let backgroundStyle = context.environment.pageControlBackgroundStyle {
                 uiViewController.pageControl?.backgroundStyle = backgroundStyle
+            }
+            
+            if let pageControl = uiViewController.pageControl, pageControl.numberOfPages == content.count {
+                if let indicators = configuration.indicatorImages {
+                    for (page, image) in indicators {
+                        pageControl.setIndicatorImage(image, forPage: page)
+                    }
+                }
+                pageControl.preferredIndicatorImage = context.environment.preferredIndicatorImage
+            }
+        }
+        
+        if #available(iOS 16.0, *) {
+            if let pageControl = uiViewController.pageControl, pageControl.numberOfPages == content.count {
+                if let preferredIndicators = configuration.currentPageIndicatorImages {
+                    for (page, image) in preferredIndicators {
+                        pageControl.setCurrentPageIndicatorImage(image, forPage: page)
+                    }
+                }
+                pageControl.preferredCurrentPageIndicatorImage = context.environment.preferredCurrentPageIndicatorImage
             }
         }
         

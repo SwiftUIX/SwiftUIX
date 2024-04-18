@@ -45,6 +45,11 @@ public struct PaginationView<Page: View>: View {
     @usableFromInline
     var currentPageIndex: Binding<Int>?
     
+    @usableFromInline
+    var indicatorImages: [Int: UIImage]?
+    @usableFromInline
+    var currentPageIndicatorImages: [Int: UIImage]?
+    
     /// The current page index internally used by `PaginationView`.
     /// Never access this directly, it is marked public as a workaround to a compiler bug.
     @inlinable
@@ -108,7 +113,10 @@ public struct PaginationView<Page: View>: View {
                         interPageSpacing: interPageSpacing,
                         cyclesPages: cyclesPages,
                         initialPageIndex: initialPageIndex,
-                        paginationState: paginationState
+                        paginationState: paginationState,
+                        
+                        indicatorImages: indicatorImages,
+                        currentPageIndicatorImages: currentPageIndicatorImages
                     ),
                     currentPageIndex: currentPageIndex ?? $_currentPageIndex,
                     progressionController: $_progressionController
@@ -476,6 +484,28 @@ extension PaginationView {
         then {
             $0._scrollViewConfiguration.onOffsetChange = body
         }
+    }
+}
+
+// MARK: - Unofficial API
+
+extension PaginationView {
+    @available(iOS 14.0, tvOS 14.0, *)
+    @inlinable
+    public func setIndicatorImage(_ image: UIImage?, forPage page: Int) -> Self {
+        then({
+            if $0.indicatorImages == nil { $0.indicatorImages = [:] }
+            $0.indicatorImages?[page] = image
+        })
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, *)
+    @inlinable
+    public func setCurrentPageIndicatorImage(_ image: UIImage?, forPage page: Int) -> Self {
+        then({
+            if $0.currentPageIndicatorImages == nil { $0.currentPageIndicatorImages = [:] }
+            $0.currentPageIndicatorImages?[page] = image
+        })
     }
 }
 
