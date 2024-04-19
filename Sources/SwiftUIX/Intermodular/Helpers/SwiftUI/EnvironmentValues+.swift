@@ -66,7 +66,8 @@ extension View {
 }
 
 extension EnvironmentValues {
-    fileprivate subscript<T>(
+    @_spi(Internal)
+    public subscript<T>(
         _type type: _SwiftUIX_Metatype<T.Type>
     ) -> T? {
         get {

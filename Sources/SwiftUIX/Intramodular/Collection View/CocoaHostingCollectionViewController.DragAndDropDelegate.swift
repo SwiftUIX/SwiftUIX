@@ -31,15 +31,24 @@ extension CocoaHostingCollectionViewController {
             return [UIDragItem(itemProvider: NSItemProvider())]
         }
         
-        func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        func collectionView(
+            _ collectionView: UICollectionView,
+            dragPreviewParametersForItemAt indexPath: IndexPath
+        ) -> UIDragPreviewParameters? {
             .init()
         }
         
-        func collectionView(_ collectionView: UICollectionView, dragSessionWillBegin session: UIDragSession) {
+        func collectionView(
+            _ collectionView: UICollectionView,
+            dragSessionWillBegin session: UIDragSession
+        ) {
             parent.configuration.isDragActive?.wrappedValue = true
         }
         
-        func collectionView(_ collectionView: UICollectionView, dragSessionDidEnd session: UIDragSession) {
+        func collectionView(
+            _ collectionView: UICollectionView,
+            dragSessionDidEnd session: UIDragSession
+        ) {
             parent.configuration.isDragActive?.wrappedValue = false
         }
         
