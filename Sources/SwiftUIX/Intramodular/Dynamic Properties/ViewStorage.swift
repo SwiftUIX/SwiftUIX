@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@frozen
 @propertyWrapper
 public struct ViewStorage<Value>: DynamicProperty {
     public final class ValueBox: AnyObservableValue<Value> {
