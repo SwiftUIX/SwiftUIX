@@ -47,6 +47,7 @@ public struct _TextViewConfiguration {
     
     public var _dropDelegate: Any?
     
+    #if !os(tvOS)
     @available(iOS 16.0, macOS 13.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
@@ -57,6 +58,7 @@ public struct _TextViewConfiguration {
             _dropDelegate = newValue
         }
     }
+    #endif
     
     var requiresAttributedText: Bool {
         kerning != nil

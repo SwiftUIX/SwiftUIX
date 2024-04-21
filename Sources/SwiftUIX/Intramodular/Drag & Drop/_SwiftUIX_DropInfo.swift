@@ -6,13 +6,16 @@ import _SwiftUIX
 import SwiftUI
 import UniformTypeIdentifiers
 
+@available(iOS 13.4, macOS 10.15, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 public protocol _SwiftUI_DropInfoProtocol {
     var location: CGPoint { get }
     
-    @available(iOS 14.0, macOS 11.0, *)
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
     func hasItemsConforming(to contentTypes: [UTType]) -> Bool
     
-    @available(iOS 14.0, macOS 11.0, *)
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
     func itemProviders(for contentTypes: [UTType]) -> [NSItemProvider]
 }
 
@@ -28,10 +31,12 @@ public struct _SwiftUIX_DropInfo: _SwiftUI_DropInfoProtocol {
         self.location = draggingInfo.draggingLocation
     }
     
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
     public func hasItemsConforming(to contentTypes: [UTType]) -> Bool {
         return draggingInfo.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: nil)
     }
     
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
     public func itemProviders(for contentTypes: [UTType]) -> [NSItemProvider] {
         draggingInfo.itemProviders
     }

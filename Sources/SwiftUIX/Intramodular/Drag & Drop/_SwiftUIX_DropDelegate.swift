@@ -20,6 +20,7 @@ public protocol _SwiftUIX_DropDelegate<DropInfoType> {
     @MainActor func dropExited(info: DropInfoType)
 }
 
+#if os(iOS) || os(macOS) || os(visionOS)
 @available(iOS 14.0, macOS 10.15, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
@@ -78,3 +79,4 @@ public struct _SwiftUIX_AnyDropDelegate<DropInfo: _SwiftUI_DropInfoProtocol>: _S
         _onDropExit(info)
     }
 }
+#endif
