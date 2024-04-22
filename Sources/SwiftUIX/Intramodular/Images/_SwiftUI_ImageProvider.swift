@@ -63,24 +63,28 @@ public enum _SwiftUI_ImageProvider {
             case .system(let name): do {
 #if os(iOS) || os(tvOS) || os(watchOS)
                 let scale: UIImage.SymbolScale = {
-                    guard let scale = environment.imageScale else { return .unspecified }
+                    let scale = environment.imageScale
+                    
                     switch scale {
-                        case .small: return .small
-                        case .medium: return .medium
-                        case .large: return .large
+                        case .small: 
+                            return .small
+                        case .medium:
+                            return .medium
+                        case .large:
+                            return .large
                         @unknown default:
                             return .unspecified
                     }
                 }()
-                let config = try? environment.font?.toAppKitOrUIKitFont().map {
-                    UIImage.SymbolConfiguration(
+                let configuration = (try? environment.font?.toAppKitOrUIKitFont()).map {
+                    AppKitOrUIKitImage.SymbolConfiguration(
                         font: $0,
                         scale: scale
                     )
-                } ?? UIImage.SymbolConfiguration(scale: scale)
-                return UIImage(
+                } ?? AppKitOrUIKitImage.SymbolConfiguration(scale: scale)
+                return AppKitOrUIKitImage(
                     systemName: name,
-                    withConfiguration: config
+                    withConfiguration: configuration
                 )
 #elseif os(macOS)
                 if #available(macOS 11.0, *) {
