@@ -72,7 +72,7 @@ public enum _SwiftUI_ImageProvider {
                             return .unspecified
                     }
                 }()
-                let config = environment.font?.toUIFont().map {
+                let config = try? environment.font?.toAppKitOrUIKitFont().map {
                     UIImage.SymbolConfiguration(
                         font: $0,
                         scale: scale
@@ -121,5 +121,19 @@ public enum _SwiftUI_ImageProvider {
 #endif
             }
         }
+    }
+}
+
+extension Image {
+#if os(macOS)
+    public typealias _AppKitOrUIKitType = NSImage
+#elseif os(iOS) || os(tvOS) || os(watchOS)
+    public typealias _AppKitOrUIKitType = UIImage
+#endif
+    
+    public func _toAppKitOrUIKitImage(
+        in environment: EnvironmentValues
+    ) -> _AppKitOrUIKitType? {
+        _SwiftUI_ImageProvider(for: self)?.resolved(in: environment)
     }
 }

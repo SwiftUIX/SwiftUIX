@@ -8,7 +8,6 @@ import Combine
 import Swift
 import SwiftUI
 
-@_spi(Internal)
 public enum _SwiftUIX_TextEditorEvent: Hashable {
     case insert(text: NSAttributedString, range: NSRange?)
     case delete(text: NSAttributedString, range: NSRange)
@@ -73,7 +72,6 @@ public final class _TextEditorProxy: Equatable, ObservableObject {
         base?._observableTextCursor ?? _fakeTextCursor
     }
     
-    @_spi(Internal)
     public var _textEditorEventsPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never>? {
         base?._textEditorEventPublisher
     }
