@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
+
 #if os(macOS)
 import AppKit
 #endif
@@ -12,34 +14,9 @@ import SwiftUI
 import UIKit
 #endif
 
-/// An enumeration that represents either a screen or a SwiftUI `CoordinateSpace`.
-public enum _ScreenOrCoordinateSpace: Hashable {
-    case cocoa(Screen?)
-    case coordinateSpace(CoordinateSpace)
-    
-    public var _cocoaScreen: Screen? {
-        guard case .cocoa(let screen) = self else {
-            return nil
-        }
-        
-        return screen
-    }
-}
-
-extension _ScreenOrCoordinateSpace {
-    public static var local: Self {
-        .coordinateSpace(.local)
-    }
-    
-    public static var global: Self {
-        .coordinateSpace(.global)
-    }
-}
-
 /// A value relative to one or multiple coordinate spaces.
 public struct _CoordinateSpaceRelative<Value: Equatable>: Equatable {
     private weak var __sourceAppKitOrUIKitWindow: NSObject?
-        
     private var storage: [_ScreenOrCoordinateSpace: Value] = [:]
     
     init(
@@ -58,12 +35,6 @@ public struct _CoordinateSpaceRelative<Value: Equatable>: Equatable {
         self.storage[space] = value
     }
     
-    public func first(
-        where predicate: (_ScreenOrCoordinateSpace) -> Bool
-    ) -> (_ScreenOrCoordinateSpace, Value)? {
-        storage.first(where: { predicate($0.key) })
-    }
-    
     public subscript(
         _ key: _ScreenOrCoordinateSpace
     ) -> Value? {
@@ -73,7 +44,9 @@ public struct _CoordinateSpaceRelative<Value: Equatable>: Equatable {
             storage[key] = newValue
         }
     }
-    
+}
+
+extension _CoordinateSpaceRelative {
     public subscript<T>(
         _ keyPath: KeyPath<Value, T>
     ) -> _CoordinateSpaceRelative<T> {
@@ -96,6 +69,12 @@ public struct _CoordinateSpaceRelative<Value: Equatable>: Equatable {
                 self.storage[key]![keyPath: keyPath] = newValue
             }
         }
+    }
+    
+    public func first(
+        where predicate: (_ScreenOrCoordinateSpace) -> Bool
+    ) -> (_ScreenOrCoordinateSpace, Value)? {
+        storage.first(where: { predicate($0.key) })
     }
 }
 
@@ -150,3 +129,5 @@ extension _CoordinateSpaceRelative where Value == CGRect {
         }
     }
 }
+
+#endif

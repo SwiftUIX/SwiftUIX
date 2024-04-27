@@ -147,8 +147,6 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         of positioningView: NSView,
         preferredEdge: NSRectEdge
     ) {
-        assert(!positioningView.frame.size.isAreaZero)
-        
         _rightfulKeyWindow = NSWindow._firstKeyInstance
         _rightfulFirstResponder = NSWindow._firstKeyInstance?.firstResponder
         
@@ -162,9 +160,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
             of: positioningView,
             preferredEdge: preferredEdge
         )
-        
-        assert(isShown)
-        
+                
         if self.behavior == .transient {
             DispatchQueue.main.async {
                 self.enforceTransientBehavior()
