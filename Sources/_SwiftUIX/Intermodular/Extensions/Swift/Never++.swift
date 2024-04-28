@@ -6,11 +6,11 @@ import Swift
 import SwiftUI
 
 extension Never {
-    static func produce() -> Never {
+    public static func _SwiftUIX_produce() -> Never {
         Swift.fatalError()
     }
     
-    static func produce<T>(from _: T) -> Never {
+    public static func _SwiftUIX_produce<T>(from _: T) -> Never {
         Swift.fatalError()
     }
 }
@@ -18,7 +18,7 @@ extension Never {
 #if swift(<5.5)
 extension Never: Identifiable {
     public var id: Never {
-        Self.produce()
+        Self._SwiftUIX_produce()
     }
 }
 #endif

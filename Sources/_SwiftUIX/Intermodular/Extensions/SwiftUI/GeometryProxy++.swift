@@ -6,7 +6,7 @@ import Swift
 import SwiftUI
 
 extension GeometryProxy {
-    var _globalFrame: CGRect {
+    public var _SwiftUIX_globalFrame: CGRect {
         frame(in: .global)
     }
 }

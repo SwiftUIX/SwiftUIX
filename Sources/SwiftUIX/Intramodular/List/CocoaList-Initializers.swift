@@ -57,8 +57,8 @@ extension CocoaList where SectionType == _KeyPathHashIdentifiableValue<Int, Int>
     ) where Data == AnyRandomAccessCollection<ListSection<SectionType, ItemType>>, Items.Element == _ItemType, ItemType == _KeyPathHashIdentifiableValue<_ItemType, _ItemID> {
         self.init(
             AnyRandomAccessCollection([ListSection(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items.elements(identifiedBy: id))]),
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
+            sectionHeader: Never._SwiftUIX_produce,
+            sectionFooter: Never._SwiftUIX_produce,
             rowContent: { rowContent($0.value) }
         )
     }
@@ -75,8 +75,8 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionType == _KeyP
         
         self.init(
             data,
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
+            sectionHeader: Never._SwiftUIX_produce,
+            sectionFooter: Never._SwiftUIX_produce,
             rowContent: rowContent
         )
     }
@@ -92,8 +92,8 @@ extension CocoaList where Data: RangeReplaceableCollection, SectionType == _KeyP
         
         self.init(
             data,
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
+            sectionHeader: Never._SwiftUIX_produce,
+            sectionFooter: Never._SwiftUIX_produce,
             rowContent: content.content
         )
     }
@@ -107,8 +107,8 @@ extension CocoaList where Data == Array<ListSection<SectionType, ItemType>>, Sec
     ) where Items.Element == ItemType {
         self.init(
             [.init(_KeyPathHashIdentifiableValue(value: 0, keyPath: \.self), items: items)],
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
+            sectionHeader: Never._SwiftUIX_produce,
+            sectionFooter: Never._SwiftUIX_produce,
             rowContent: rowContent
         )
     }

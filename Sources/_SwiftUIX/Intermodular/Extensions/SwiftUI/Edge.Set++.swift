@@ -6,7 +6,8 @@ import Swift
 import SwiftUI
 
 extension Edge.Set {
-    init(edge: Edge) {
+    @_disfavoredOverload
+    public init(edge: Edge) {
         switch edge {
             case .top:
                 self = .top

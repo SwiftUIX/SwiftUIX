@@ -28,7 +28,10 @@ extension GroupBox where Label == AnyView {
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension GroupBox {
-    public init(@ViewBuilder label: () -> Label, @ViewBuilder content: () -> Content) {
+    public init(
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder content: () -> Content
+    ) {
         self.init(label: label(), content: content)
     }
 }

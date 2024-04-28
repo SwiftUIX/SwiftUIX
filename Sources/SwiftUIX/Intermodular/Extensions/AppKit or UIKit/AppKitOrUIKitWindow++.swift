@@ -19,7 +19,6 @@ extension AppKitOrUIKitWindow {
             .first(where: { $0 is UIWindowScene })
             .flatMap({ $0 as? UIWindowScene })?.windows
             .first(where: \.isKeyWindow)
-        return nil
         #endif
     }
     
@@ -31,7 +30,6 @@ extension AppKitOrUIKitWindow {
         endEditing(true)
         #endif
     }
-    
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)

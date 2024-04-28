@@ -9,6 +9,17 @@ import Swift
 import SwiftUI
 
 extension NSColor {
+    @_disfavoredOverload
+    public static var label: NSColor {
+        NSColor.labelColor
+    }
+    
+    @_disfavoredOverload
+    public static var separator: NSColor {
+        NSColor.separatorColor
+    }
+
+    @_disfavoredOverload
     public static var placeholderText: NSColor {
         return .placeholderTextColor
     }

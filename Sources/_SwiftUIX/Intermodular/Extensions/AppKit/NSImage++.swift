@@ -5,17 +5,28 @@
 #if os(macOS)
 
 import AppKit
+import SwiftUI
 
 extension NSImage {
     @_spi(Internal)
     public var cgImage: CGImage? {
         var frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-       
+        
         return self.cgImage(forProposedRect: &frame, context: nil, hints: nil)
     }
     
     public var _SwiftUIX_cgImage: CGImage? {
         cgImage
+    }
+
+    @_disfavoredOverload
+    public convenience init?(cgImage: CGImage) {
+        let size = NSSize(
+            width: cgImage.width,
+            height: cgImage.height
+        )
+        
+        self.init(cgImage: cgImage, size: size)
     }
 }
 

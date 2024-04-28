@@ -20,7 +20,7 @@ extension Menu {
     }
     
     public init(
-        systemImage: SFSymbolName,
+        systemImage: SFSymbol,
         @ViewBuilder content: () -> Content
     ) where Label == Image {
         self.init(systemImage: systemImage.rawValue, content: content)
@@ -43,7 +43,7 @@ extension Menu {
     }
     
     public init(
-        systemImage: SFSymbolName,
+        systemImage: SFSymbol,
         @ViewBuilder content: () -> Content
     ) where Label == Image {
         self.init(systemImage: systemImage.rawValue, content: content)

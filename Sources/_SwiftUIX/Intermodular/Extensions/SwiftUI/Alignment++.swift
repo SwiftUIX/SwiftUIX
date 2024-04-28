@@ -25,14 +25,15 @@ extension Alignment {
 }
 
 extension HorizontalAlignment {
-    init(from alignment: TextAlignment) {
+    @_disfavoredOverload
+    public init(from alignment: TextAlignment) {
         switch alignment {
-        case .center:
-            self = .center
-        case .leading:
-            self = .leading
-        case .trailing:
-            self = .trailing
+            case .center:
+                self = .center
+            case .leading:
+                self = .leading
+            case .trailing:
+                self = .trailing
         }
     }
 }

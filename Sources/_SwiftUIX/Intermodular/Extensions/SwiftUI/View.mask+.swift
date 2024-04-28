@@ -33,10 +33,7 @@ extension View {
     ) -> some View {
         self.mask(
             Rectangle()
-                .overlay(alignment: alignment) {
-                    mask()
-                        .blendMode(.destinationOut)
-                }
+                .overlay(mask().blendMode(.destinationOut), alignment: alignment)
         )
     }
 }

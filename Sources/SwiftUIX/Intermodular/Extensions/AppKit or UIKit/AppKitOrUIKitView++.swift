@@ -2,10 +2,39 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
-
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || os(visionOS)
+extension AppKitOrUIKitView {
+    public func _SwiftUIX_setNeedsDisplay() {
+        
+    }
+    
+    public func _SwiftUIX_setNeedsLayout() {
+        setNeedsLayout()
+    }
+    
+    public func _SwiftUIX_layoutIfNeeded() {
+        layoutIfNeeded()
+    }
+}
+#elseif os(macOS)
+extension AppKitOrUIKitView {
+    public func _SwiftUIX_setNeedsDisplay() {
+        needsDisplay = true
+    }
+    
+    public func _SwiftUIX_setNeedsLayout() {
+        needsLayout = true
+    }
+    
+    public func _SwiftUIX_layoutIfNeeded() {
+        layout()
+    }
+}
+#endif
+
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitView {
     @usableFromInline
     var isHorizontalContentHuggingPriorityHigh: Bool {
@@ -36,7 +65,7 @@ extension AppKitOrUIKitView {
     ) -> AppKitOrUIKitView? {
         findSubview(where: predicate)
     }
-
+    
     private func findSubview<T: AppKitOrUIKitView>(
         ofKind kind: T.Type
     ) -> T? {
@@ -73,5 +102,4 @@ extension AppKitOrUIKitView {
         return nil
     }
 }
-
 #endif

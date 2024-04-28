@@ -18,16 +18,6 @@ extension View {
     }
 }
 
-// MARK: - View.eraseToAnyView
-
-extension View {
-    /// Returns a type-erased version of `self`.
-    @inlinable
-    public func eraseToAnyView() -> AnyView {
-        return .init(self)
-    }
-}
-
 // MARK: - View.background
 
 extension View {

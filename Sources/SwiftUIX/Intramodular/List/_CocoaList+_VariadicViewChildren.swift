@@ -89,13 +89,13 @@ extension _VariadicViewChildren._CocoaListContentAdapter {
         
         public var sectionHeader: (SectionType) -> SectionHeader {
             return { _ in
-                Never.produce()
+                Never._SwiftUIX_produce()
             }
         }
         
         public var sectionFooter: (SectionType) -> SectionFooter {
             return { _ in
-                Never.produce()
+                Never._SwiftUIX_produce()
             }
         }
         

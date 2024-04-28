@@ -42,8 +42,8 @@ extension CollectionView {
             internalBody:
                 _CollectionView(
                     .diffableDataSource(dataSource),
-                    sectionHeader: Never.produce,
-                    sectionFooter: Never.produce,
+                    sectionHeader: Never._SwiftUIX_produce,
+                    sectionFooter: Never._SwiftUIX_produce,
                     rowContent: { rowContent($1) }
                 )
                 .eraseToAnyView()
@@ -57,8 +57,8 @@ extension CollectionView {
         self.init(
             internalBody: _CollectionView(
                 CollectionOfOne(ListSection<Int, _IdentifierHashedValue<Data.Element>>(0, items: data.lazy.map(_IdentifierHashedValue.init))),
-                sectionHeader: Never.produce,
-                sectionFooter: Never.produce,
+                sectionHeader: Never._SwiftUIX_produce,
+                sectionFooter: Never._SwiftUIX_produce,
                 rowContent: { rowContent($1.value) }
             )
             .eraseToAnyView()
@@ -99,8 +99,8 @@ extension CollectionView {
                         }
                     )
                 ),
-                sectionHeader: Never.produce,
-                sectionFooter: Never.produce,
+                sectionHeader: Never._SwiftUIX_produce,
+                sectionFooter: Never._SwiftUIX_produce,
                 rowContent: { rowContent($1.value.value) }
             )
             .eraseToAnyView()

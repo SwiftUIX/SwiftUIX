@@ -79,8 +79,8 @@ extension _CocoaList {
                     )
                 ]
             ),
-            sectionHeader: Never.produce,
-            sectionFooter: Never.produce,
+            sectionHeader: Never._SwiftUIX_produce,
+            sectionFooter: Never._SwiftUIX_produce,
             rowContent: {
                 rowContent($0.value)
             }
