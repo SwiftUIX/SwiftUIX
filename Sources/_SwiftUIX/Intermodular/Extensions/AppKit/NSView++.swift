@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if os(macOS) || targetEnvironment(macCatalyst)
+#if os(macOS)
 
 import AppKit
 import SwiftUI
