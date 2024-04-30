@@ -14,7 +14,7 @@ extension NSDraggingInfo {
             return []
         }
         
-        var items = pasteboardItems.map { pasteboardItem in
+        let items = pasteboardItems.map { pasteboardItem in
             let itemProvider = NSItemProvider()
             
             for type in pasteboardItem.types {
