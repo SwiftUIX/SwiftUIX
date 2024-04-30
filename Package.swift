@@ -22,15 +22,13 @@ let package = Package(
     targets: [
         .target(
             name: "_SwiftUIX",
-            dependencies: [],
-            swiftSettings: []
+            dependencies: []
         ),
         .target(
             name: "SwiftUIX",
             dependencies: [
                 "_SwiftUIX"
-            ],
-            swiftSettings: []
+            ]
         )
     ]
 )
