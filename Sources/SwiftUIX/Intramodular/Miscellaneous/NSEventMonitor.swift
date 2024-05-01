@@ -5,6 +5,7 @@
 #if os(macOS)
 
 import AppKit
+import Carbon
 import Combine
 import Swift
 import SwiftUI
@@ -131,7 +132,7 @@ extension View {
     @available( macOS 12.0, *)
     public func onAppKitKeyboardShortcutEvent(
         _ key: KeyEquivalent,
-        modifiers: EventModifiers = [.command],
+        modifiers: SwiftUI.EventModifiers = [.command],
         perform action: @escaping () -> Void
     ) -> some View {
         onAppKitKeyboardShortcutEvent(
@@ -154,6 +155,24 @@ private struct _AttachNSEventMonitor: ViewModifier {
                 eventMonitor.handleEvent = handleEvent
             }
         }
+    }
+}
+
+extension NSEvent {
+    public var _SwiftUIX_isEscapeCharacter: Bool {
+        guard let characters, characters.count == 1 else {
+            return false
+        }
+        
+        guard characters.first! == KeyEquivalent.escape.character else {
+            return false
+        }
+        
+        guard keyCode == kVK_Escape else {
+            return false
+        }
+        
+        return true
     }
 }
 

@@ -25,19 +25,19 @@ extension AppKitOrUIKitTextView {
     public var _SwiftUIX_selectedTextRange: NSRange? {
         selectedRange
     }
-        
+    
     public var _SwiftUIX_text: String {
         text ?? ""
     }
-
+    
     public var _SwiftUIX_attributedText: NSAttributedString {
         attributedText ?? NSAttributedString()
     }
-
+    
     var defaultParagraphStyle: NSParagraphStyle? {
         NSParagraphStyle.default
     }
-        
+    
     func adjustFontSizeToFitWidth() {
         guard !text.isEmpty && !bounds.size.equalTo(CGSize.zero) else {
             return
@@ -57,6 +57,38 @@ extension AppKitOrUIKitTextView {
             }
         }
     }
+    
+    public func insertText(
+        _ insertString: Any,
+        replacementRange: NSRange
+    ) {
+        guard let text = (insertString as? String) else {
+            assertionFailure("Unsupported type: \(type(of: insertString))")
+            
+            return
+        }
+        
+        let startPosition: UITextPosition
+        
+        if let range = selectedTextRange {
+            startPosition = range.start
+        } else {
+            startPosition = beginningOfDocument
+        }
+        
+        let startIndex = self.offset(from: beginningOfDocument, to: startPosition)
+        
+        let replaceStartIndex = startIndex + replacementRange.location
+        let replaceEndIndex = replaceStartIndex + replacementRange.length
+        
+        if
+            let replaceStartPosition: UITextPosition = self.position(from: beginningOfDocument, offset: replaceStartIndex),
+            let replaceEndPosition: UITextPosition = self.position(from: beginningOfDocument, offset: replaceEndIndex),
+            let textRange = self.textRange(from: replaceStartPosition, to: replaceEndPosition)
+        {
+            replace(textRange, withText: text)
+        }
+    }
 }
 #elseif os(macOS)
 extension AppKitOrUIKitTextView {
@@ -67,7 +99,7 @@ extension AppKitOrUIKitTextView {
     public var _SwiftUIX_layoutManager: NSLayoutManager? {
         layoutManager
     }
-        
+    
     public var _SwiftUIX_textStorage: NSTextStorage? {
         textStorage
     }
@@ -78,14 +110,14 @@ extension AppKitOrUIKitTextView {
         guard let range = selectedRanges.first as? NSRange else {
             return nil
         }
-
+        
         return range
     }
-            
+    
     public var _SwiftUIX_text: String {
         string
     }
-
+    
     public var _SwiftUIX_attributedText: NSAttributedString {
         get {
             attributedString()
@@ -151,7 +183,7 @@ extension AppKitOrUIKitTextView {
         
         return lineHeight + lineSpacing
     }
-
+    
     var _lastLineParagraphStyle: NSParagraphStyle? {
         guard let textStorage = _SwiftUIX_textStorage else {
             return defaultParagraphStyle
@@ -187,7 +219,7 @@ extension AppKitOrUIKitTextView {
         
         return paragraphStyle
     }
-            
+    
     func _sizeThatFits(
         width: CGFloat
     ) -> CGSize? {
@@ -200,17 +232,17 @@ extension AppKitOrUIKitTextView {
         guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
             return nil
         }
-                
+        
         let originalSize = frame.size
         let originalTextContainerSize = textContainer.containerSize
-      
+        
         guard width.isNormal && width != .greatestFiniteMagnitude else {
             return nil
         }
-      
+        
         // frame.size.width = width
         textContainer.containerSize = CGSize(width: width, height: 10000000.0)
-
+        
         defer {
             textContainer.size = originalTextContainerSize
             frame.size.width = originalSize.width
@@ -223,7 +255,7 @@ extension AppKitOrUIKitTextView {
         
         /// Uncommenting out this line without also uncommenting out `frame.size.width = width` will result in placeholder max width being returned.
         // let glyphRange = layoutManager.glyphRange(for: textContainer)
-
+        
         layoutManager.ensureLayout(for: textContainer)
         
         let usedRect = layoutManager.usedRect(for: textContainer)
@@ -240,7 +272,7 @@ extension AppKitOrUIKitTextView {
                 defer {
                     frame.size.width = originalSize.width
                 }
-
+                
                 layoutManager.ensureLayout(for: textContainer)
                 
                 let usedRect2 = layoutManager.usedRect(for: textContainer)
@@ -256,7 +288,7 @@ extension AppKitOrUIKitTextView {
                 return usedRect2.size
             }
         }
-
+        
         if usedRect.size._hasPlaceholderDimensions(for: .textContainer) {
             assertionFailure()
         }
