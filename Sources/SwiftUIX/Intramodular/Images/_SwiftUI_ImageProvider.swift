@@ -106,7 +106,7 @@ public enum _SwiftUI_ImageProvider {
             case let .appKitOrUIKitImage(image):
                 return image
             case let .cgImage(image, scale, orientation): do {
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
                 let orientation: UIImage.Orientation = {
                     switch orientation {
                         case .down: return .down
@@ -131,7 +131,7 @@ public enum _SwiftUI_ImageProvider {
 extension Image {
 #if os(macOS)
     public typealias _AppKitOrUIKitType = NSImage
-#elseif os(iOS) || os(tvOS) || os(watchOS)
+#elseif os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
     public typealias _AppKitOrUIKitType = UIImage
 #endif
     

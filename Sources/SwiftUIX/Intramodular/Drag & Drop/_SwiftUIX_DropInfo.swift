@@ -41,7 +41,7 @@ public struct _SwiftUIX_DropInfo: _SwiftUI_DropInfoProtocol {
         draggingInfo.itemProviders
     }
 }
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
 import UIKit
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
@@ -234,7 +234,7 @@ extension NSTextView {
     }
 }
 
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
 extension UITextView {
     func _SwiftUIX_dropInteraction(

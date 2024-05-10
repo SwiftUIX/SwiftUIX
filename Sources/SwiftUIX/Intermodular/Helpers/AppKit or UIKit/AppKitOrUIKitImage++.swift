@@ -31,7 +31,7 @@ extension AppKitOrUIKitImage {
         self.draw(in: rect)
         newImage.unlockFocus()
         return newImage
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
         self.draw(in: CGRect(origin: .zero, size: newSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
