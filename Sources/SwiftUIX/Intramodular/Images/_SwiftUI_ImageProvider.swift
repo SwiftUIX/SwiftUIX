@@ -61,7 +61,7 @@ public enum _SwiftUI_ImageProvider {
     func resolved(in environment: EnvironmentValues) -> Image._AppKitOrUIKitType? {
         switch self {
             case .system(let name): do {
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
                 let scale: UIImage.SymbolScale = {
                     let scale = environment.imageScale
                     
@@ -94,7 +94,7 @@ public enum _SwiftUI_ImageProvider {
 #endif
             }
             case let .named(name, bundle): do {
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
                 return UIImage(named: name, in: bundle, with: nil)
 #elseif os(macOS)
                 if #available(macOS 14.0, *), let bundle {
