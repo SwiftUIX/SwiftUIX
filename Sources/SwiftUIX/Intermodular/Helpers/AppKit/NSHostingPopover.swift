@@ -55,9 +55,7 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
         self.rootView = rootView
         
         super.init()
-        
-        _contentViewController.parentPopover = self
-        
+                
         self.animates = true
     }
     
@@ -170,8 +168,10 @@ open class NSHostingPopover<Content: View>: NSPopover, NSPopoverDelegate, AppKit
     
     override open func close() {
         _cleanUpPostShow()
-        
+                
         super.close()
+        
+        self.contentViewController = nil
     }
     
     override open func performClose(_ sender: Any?) {

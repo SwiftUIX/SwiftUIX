@@ -9,9 +9,19 @@ import AppKit
 import Swift
 import SwiftUI
 
-public enum _MenuBarExtraLabelContent: Hashable {
+public enum _MenuBarExtraLabelContent: Hashable, View {
     case image(_AnyImage, size: CGSize?)
     case text(String)
+    
+    public var body: some View {
+        switch self {
+            case .image(let image, let size):
+                image
+                    .frame(size)
+            case .text(let text):
+                Text(text)
+        }
+    }
     
     public func hash(into hasher: inout Hasher) {
         switch self {
@@ -27,14 +37,28 @@ public enum _MenuBarExtraLabelContent: Hashable {
 }
 
 /// A model that represents an item which can be placed in the menu bar.
-public struct MenuBarItem<ID, Content: View> {
+public struct MenuBarItem<ID, Label: View, Content: View> {
     public let id: ID
     
     fileprivate let length: CGFloat?
-    fileprivate let label: _MenuBarExtraLabelContent
     
+    public let label: Label
     public let content: Content
     
+    public init(
+        id: ID,
+        length: CGFloat?,
+        label: Label,
+        content: Content
+    ) {
+        self.id = id
+        self.length = length
+        self.label = label
+        self.content = content
+    }
+}
+
+extension MenuBarItem where Label == _MenuBarExtraLabelContent {
     fileprivate init(
         id: ID,
         length: CGFloat?,
@@ -83,7 +107,12 @@ public struct MenuBarItem<ID, Content: View> {
         text: String,
         @ViewBuilder content: () -> Content
     ) {
-        self.init(id: id, length: length, label: .text(text), content: content())
+        self.init(
+            id: id,
+            length: length,
+            label: .text(text),
+            content: content()
+        )
     }
 }
 
@@ -105,7 +134,11 @@ extension View {
     ) -> some View {
         modifier(
             InsertMenuBarPopover(
-                item: MenuBarItem(id: id, image: image, content: content),
+                item: MenuBarItem(
+                    id: id,
+                    image: image,
+                    content: content
+                ),
                 isActive: isActive
             )
         )
@@ -147,34 +180,70 @@ extension View {
 // MARK: - Auxiliary
 
 #if os(macOS)
-public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Content: View> {
-    let cocoaStatusBar = NSStatusBar.system
-    let cocoaStatusItem: NSStatusItem
+public class _AnyCocoaMenuBarExtraCoordinator: ObservableObject {
+    fileprivate init() {
+        
+    }
+}
+
+public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Label: View, Content: View>: _AnyCocoaMenuBarExtraCoordinator {
+    private let cocoaStatusBar = NSStatusBar.system
     
-    public var item: MenuBarItem<ID, Content>
+    var cocoaStatusItem: NSStatusItem?
+    
+    public var item: MenuBarItem<ID, Label, Content>
     public var action: () -> Void
     
+    private var popover: _AppKitMenuBarExtraPopover<ID, Label, Content>? = nil
+    
     public init(
-        item: MenuBarItem<ID, Content>,
+        item: MenuBarItem<ID, Label, Content>,
         action: @escaping () -> Void
     ) {
         self.item = item
         self.action = action
         
-        cocoaStatusItem = cocoaStatusBar.statusItem(
-            withLength: item.length ?? NSStatusItem.variableLength
-        )
-        
-        cocoaStatusItem.button?.action = #selector(didActivate)
-        cocoaStatusItem.button?.target = self
+        super.init()
         
         DispatchQueue.asyncOnMainIfNecessary {
+            self.cocoaStatusItem = self.cocoaStatusBar.statusItem(
+                withLength: item.length ?? NSStatusItem.variableLength
+            )
+            
+            self.cocoaStatusItem?.button?.action = #selector(self.didActivate)
+            self.cocoaStatusItem?.button?.target = self
+            
             self.update()
         }
     }
     
+    public convenience init(
+        id: ID,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder label: () -> Label
+    ) {
+        let item = MenuBarItem<ID, Label, Content>(
+            id: id,
+            length: nil,
+            label: label(),
+            content: content()
+        )
+        
+        let popover: _SwiftUIX_ObservableReferenceBox<_AppKitMenuBarExtraPopover<ID, Label, Content>?> = .init(wrappedValue: nil)
+        
+        self.init(
+            item: item,
+            action: {
+                popover.wrappedValue?.toggle()
+            }
+        )
+        
+        popover.wrappedValue = _AppKitMenuBarExtraPopover(coordinator: self)
+        
+    }
+    
     private func update() {
-        cocoaStatusItem.update(from: item)
+        cocoaStatusItem?.update(from: item)
     }
     
     @objc private func didActivate(_ sender: AnyObject?) {
@@ -182,34 +251,96 @@ public class _CocoaMenuBarExtraCoordinator<ID: Equatable, Content: View> {
     }
     
     deinit {
-        cocoaStatusBar.removeStatusItem(cocoaStatusItem)
+        if let cocoaStatusItem {
+            cocoaStatusBar.removeStatusItem(cocoaStatusItem)
+        }
     }
 }
 
 extension NSStatusItem {
-    fileprivate func update<ID, Content>(
-        from item: MenuBarItem<ID, Content>
+    private static var NSStatusItem_labelHostingView_objcAssociationKey: UInt = 0
+    
+    fileprivate var labelHostingView: NSHostingView<AnyView>? {
+        get {
+            if let result = objc_getAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey) as? NSHostingView<AnyView> {
+                return result
+            }
+            
+            return nil
+        } set {
+            objc_setAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+    
+    fileprivate func update<ID, Label, Content>(
+        from item: MenuBarItem<ID, Label, Content>
     ) {
         self.length = item.length ?? NSStatusItem.variableLength
         
         if let button = button {
-            switch item.label {
-                case .image(let image, let imageSize):
-                    button.image = image.appKitOrUIKitImage
-                    button.image?.size = imageSize ?? .init(width: 18, height: 18)
-                    button.image?.isTemplate = true
-                case .text(let string):
-                    button.title = string
+            if let label = item.label as? _MenuBarExtraLabelContent {
+                switch label {
+                    case .image(let image, let imageSize):
+                        button.image = image.appKitOrUIKitImage
+                        button.image?.size = imageSize ?? .init(width: 18, height: 18)
+                        button.image?.isTemplate = true
+                    case .text(let string):
+                        button.title = string
+                }
+            } else {
+                for subview in button.subviews {
+                    if subview !== self.labelHostingView {
+                        subview.removeFromSuperview()
+                    }
+                }
+                
+                let _labelHostingViewRootView: AnyView = item.label
+                    .frame(minHeight: button.frame.height == 0 ? nil : button.frame.height)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .controlSize(.small)
+                    .font(.title3)
+                    .imageScale(.medium)
+                    .padding(.horizontal, .extraSmall)
+                    .eraseToAnyView()
+                
+                let hostingView: NSHostingView<AnyView> = self.labelHostingView ?? {
+                    let result = NSHostingView(
+                        rootView:_labelHostingViewRootView
+                    )
+                    
+                    if #available(macOS 13.0, *) {
+                        result.sizingOptions = [.intrinsicContentSize]
+                    }
+                    
+                    self.labelHostingView = result
+                    
+                    button.addSubview(result)
+                    
+                    return result
+                }()
+                
+                hostingView.rootView = _labelHostingViewRootView
+                hostingView.invalidateIntrinsicContentSize()
+                
+                if !hostingView.intrinsicContentSize.isAreaZero {
+                    hostingView.frame.size = hostingView.intrinsicContentSize
+                    hostingView._SwiftUIX_setNeedsLayout()
+                    
+                    button.setFrameSize(hostingView.intrinsicContentSize)
+                    
+                    button._SwiftUIX_setNeedsLayout()
+                    button._SwiftUIX_layoutIfNeeded()
+                }
             }
         }
     }
 }
 
-struct InsertMenuBarPopover<ID: Equatable, PopoverContent: View>: ViewModifier {
-    let item: MenuBarItem<ID, PopoverContent>
+struct InsertMenuBarPopover<ID: Equatable, Label: View, PopoverContent: View>: ViewModifier {
+    let item: MenuBarItem<ID, Label, PopoverContent>
     let isActive: Binding<Bool>?
     
-    @State private var popover: _AppKitMenuBarExtraPopover<ID, PopoverContent>? = nil
+    @State private var popover: _AppKitMenuBarExtraPopover<ID, Label, PopoverContent>? = nil
     
     @ViewBuilder
     func body(content: Content) -> some View {

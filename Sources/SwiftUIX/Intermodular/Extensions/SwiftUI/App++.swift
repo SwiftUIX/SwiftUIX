@@ -21,3 +21,4 @@ extension App {
 enum AppQuitError: Error {
     case unsupported
 }
+

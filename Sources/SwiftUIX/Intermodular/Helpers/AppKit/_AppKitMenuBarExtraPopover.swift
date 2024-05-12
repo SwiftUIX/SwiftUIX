@@ -9,15 +9,17 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
-public class _AppKitMenuBarExtraPopover<ID: Equatable, Content: View>: NSHostingPopover<Content> {
-    private lazy var menuBarExtraCoordinator = _CocoaMenuBarExtraCoordinator<ID, Content>(
+public class _AppKitMenuBarExtraPopover<ID: Equatable, Label: View, Content: View>: NSHostingPopover<Content> {
+    private var eventMonitor: Any?
+    
+    private lazy var menuBarExtraCoordinator = _CocoaMenuBarExtraCoordinator<ID, Label, Content>(
         item: item,
         action: { [weak self] in
             self?.togglePopover(sender: nil)
         }
     )
     
-    public var item: MenuBarItem<ID, Content> {
+    public var item: MenuBarItem<ID, Label, Content> {
         didSet {
             menuBarExtraCoordinator.item = item
         }
@@ -33,19 +35,58 @@ public class _AppKitMenuBarExtraPopover<ID: Equatable, Content: View>: NSHosting
         }
     }
     
-    public init(item: MenuBarItem<ID, Content>) {
+    override public var wantsTransientBehaviorEnforcement: Bool {
+        false
+    }
+    
+    public init(item: MenuBarItem<ID, Label, Content>) {
         self.item = item
         
         super.init(rootView: item.content)
-        
-        menuBarExtraCoordinator.item = item
-        
-        behavior = NSPopover.Behavior.transient
-        
+                        
         _ = Unmanaged.passUnretained(self).retain() // fixes a crash
+                
+        _setUpMenuBarExtraPopover()
         
         if let _isActiveBinding, _isActiveBinding.wrappedValue, !isShown {
             present(nil)
+        }
+    }
+    
+    public init(coordinator: _CocoaMenuBarExtraCoordinator<ID, Label, Content>) {
+        self.item = coordinator.item
+        
+        super.init(rootView: item.content)
+
+        self.menuBarExtraCoordinator = coordinator
+        
+        _ = Unmanaged.passUnretained(self).retain() // fixes a crash
+                    
+        _setUpMenuBarExtraPopover()
+        
+        if let _isActiveBinding, _isActiveBinding.wrappedValue, !isShown {
+            present(nil)
+        }
+    }
+    
+    private func _setUpMenuBarExtraPopover() {
+        behavior = NSPopover.Behavior.transient
+        animates = false
+        
+        _setShouldHideAnchor(true)
+
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let `self` = self, let button = self.menuBarExtraCoordinator.cocoaStatusItem?.button else {
+                return
+            }
+            
+            if self.isShown {
+                let location = button.convert(event.locationInWindow, from: nil)
+                
+                if !button.bounds.contains(location) {
+                    self.close()
+                }
+            }
         }
     }
     
@@ -61,24 +102,38 @@ public class _AppKitMenuBarExtraPopover<ID: Equatable, Content: View>: NSHosting
         }
     }
     
+    public func toggle() {
+        togglePopover(sender: nil)
+    }
+    
     private func present(_ sender: AnyObject?) {
-        guard let statusBarButton = menuBarExtraCoordinator.cocoaStatusItem.button else {
+        guard let statusBarButton = menuBarExtraCoordinator.cocoaStatusItem?.button else {
             return
         }
+                
+        var relativeFrame = statusBarButton.bounds
         
-        NSApp.activate(ignoringOtherApps: true)
+        relativeFrame.origin.y = -5
         
-        animates = false
-        
+        self.animates = false
+
         show(
-            relativeTo: statusBarButton.bounds,
+            relativeTo: relativeFrame,
             of: statusBarButton,
             preferredEdge: NSRectEdge.maxY
         )
-        
-        animates = true
-        
+                
         _isActiveBinding?.wrappedValue = true
+    }
+    
+    private func activateApplication() {
+        if NSApplication.shared.activationPolicy() != .accessory {
+            if #available(macOS 14.0, *) {
+                NSApp.activate()
+            } else {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        }
     }
     
     private func hide(_ sender: AnyObject?) {
