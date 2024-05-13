@@ -23,7 +23,7 @@ extension _PlatformTextView {
         
         view._update(data: data, configuration: configuration, context: context)
     }
-    
+        
     private func _update(
         data: _TextViewDataBinding,
         configuration: TextView<Label>._Configuration,
@@ -35,7 +35,8 @@ extension _PlatformTextView {
         _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: \.isEditable)
         _assignIfNotEqual(.zero, to: \.textContainerInset)
         _assignIfNotEqual(true, to: \.usesAdaptiveColorMappingForDarkAppearance)
-        
+        _assignIfNotEqual(configuration.isSelectable, to: \.isSelectable)
+
         if let font = try? configuration.cocoaFont ?? context.environment.font?.toAppKitOrUIKitFont() {
             _assignIfNotEqual(font, to: \.self.font)
             
