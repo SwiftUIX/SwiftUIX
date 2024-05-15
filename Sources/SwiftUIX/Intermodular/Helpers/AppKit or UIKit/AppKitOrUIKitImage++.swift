@@ -6,7 +6,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(tvOS)
 extension AppKitOrUIKitImage {
     public var _SwiftUIX_cgImage: CGImage? {
         cgImage
@@ -31,7 +31,7 @@ extension AppKitOrUIKitImage {
         self.draw(in: rect)
         newImage.unlockFocus()
         return newImage
-#elseif os(iOS) || os(visionOS)
+#elseif os(iOS) || os(tvOS) || os(visionOS)
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
         self.draw(in: CGRect(origin: .zero, size: newSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()

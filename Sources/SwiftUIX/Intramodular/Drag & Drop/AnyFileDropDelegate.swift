@@ -2,10 +2,14 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if os(iOS) || os(macOS) || os(visionOS)
+
 import SwiftUI
 import UniformTypeIdentifiers
 
-@available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 @MainActor
 public class AnyFileDropDelegate: DropDelegate, ObservableObject {
     public class DroppedItem: ObservableObject {
@@ -107,7 +111,9 @@ public class AnyFileDropDelegate: DropDelegate, ObservableObject {
     }
 }
 
-@available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 extension AnyFileDropDelegate {
     @MainActor
     class DropInteraction {
@@ -136,9 +142,15 @@ extension AnyFileDropDelegate {
     }
 }
 
-@available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 extension View {
-    public func onFileDrop(delegate: AnyFileDropDelegate) -> some View {
+    public func onFileDrop(
+        delegate: AnyFileDropDelegate
+    ) -> some View {
         self.onDrop(of: [.fileURL], delegate: delegate)
     }
 }
+
+#endif
