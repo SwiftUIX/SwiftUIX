@@ -18,6 +18,10 @@ import UIKit
 public class Screen: ObservableObject {
     public static let main = Screen()
     
+    public static var bounds: CGRect {
+        main.bounds
+    }
+    
     public var bounds: CGRect  {
         #if os(iOS) || os(tvOS)
         return UIScreen.main.bounds

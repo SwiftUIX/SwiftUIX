@@ -17,12 +17,25 @@ extension CGFloat {
 #endif
 
 extension CGFloat {
-    public static func _sum(_ lhs: Self?, _ rhs: Self?) -> Self {
+    public static func _sum(
+        _ lhs: Self?,
+        _ rhs: Self?
+    ) -> Self {
         (lhs ?? 0) + (rhs ?? 0)
     }
     
-    public static func _sum(_ x: Self?, _ y: Self?, _ z: Self?) -> Self {
-        (x ?? 0) + (y ?? 0) + (z ?? 0)
+    public static func _sum(
+        _ x: Self?,
+        _ y: Self?,
+        _ z: Self?
+    ) -> Self {
+        var result: Self = 0
+        
+        result += (x ?? 0)
+        result += (y ?? 0)
+        result += (z ?? 0)
+        
+        return result
     }
 }
 

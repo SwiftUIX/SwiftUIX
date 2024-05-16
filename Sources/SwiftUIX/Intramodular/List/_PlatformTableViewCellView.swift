@@ -394,7 +394,12 @@ extension _PlatformTableCellView {
     }
     
     var _maximumContentViewWidth: CGFloat? {
-        frame.width - ((enclosingScrollView?.contentInsets.left ?? 0) + (enclosingScrollView?.contentInsets.right ?? 0))
+        var result: CGFloat = frame.width
+        
+        result -= (enclosingScrollView?.contentInsets.left ?? 0)
+        result -= (enclosingScrollView?.contentInsets.right ?? 0)
+        
+        return result
     }
     
     var _fastRowHeight: CGFloat? {

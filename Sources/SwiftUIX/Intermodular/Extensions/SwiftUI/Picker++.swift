@@ -83,7 +83,7 @@ extension Picker where Label == Text, SelectionValue: Hashable, Content == AnyVi
         title: KeyPath<SelectionValue, String>,
         section: KeyPath<SelectionValue, String>
     ) {
-        let groupedValues = Dictionary(
+        let groupedValues = Dictionary<String, [(SelectionValue, String)]>(
             grouping: values.map({ ($0, $0[keyPath: title]) }),
             by: { value, title in
                 value[keyPath: section]

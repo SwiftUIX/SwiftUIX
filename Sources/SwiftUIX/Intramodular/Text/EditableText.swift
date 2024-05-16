@@ -203,31 +203,9 @@ public struct EditableText: View {
     private var editableDisplay: some View {
         Group {
             if lineLimit == 1 {
-                TextField(
-                    "",
-                    text: $textBeingEdited,
-                    onEditingChanged: { isEditing in
-                        onEditingChanged(isEditing)
-                    },
-                    onCommit: {
-                        endEditing()
-                    }
-                )
-                .textFieldStyle(.roundedBorder)
-                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(1)
+                _lineLimitOneTextField
             } else {
-                TextView(
-                    "",
-                    text: $textBeingEdited,
-                    onEditingChanged: { isEditing in
-                        onEditingChanged(isEditing)
-                    },
-                    onCommit: {
-                        endEditing()
-                    }
-                )
-                .fixedSize(horizontal: false, vertical: true)
+                _noLineLimitTextView
             }
         }
         ._overrideOnExitCommand {
@@ -235,6 +213,36 @@ public struct EditableText: View {
         }
     }
 
+    private var _lineLimitOneTextField: some View {
+        TextField(
+            "" as String,
+            text: $textBeingEdited,
+            onEditingChanged: { (isEditing: Bool) in
+                onEditingChanged(isEditing)
+            },
+            onCommit: {
+                endEditing()
+            }
+        )
+        .textFieldStyle(.roundedBorder)
+        .fixedSize(horizontal: false, vertical: true)
+        .lineLimit(1)
+    }
+    
+    private var _noLineLimitTextView: some View {
+        TextView(
+            "" as String,
+            text: $textBeingEdited,
+            onEditingChanged: { (isEditing: Bool) in
+                onEditingChanged(isEditing)
+            },
+            onCommit: {
+                endEditing()
+            }
+        )
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    
     private func onEditingChanged(_ isEditing: Bool) {
         #if !os(macOS)
         if editMode == nil {

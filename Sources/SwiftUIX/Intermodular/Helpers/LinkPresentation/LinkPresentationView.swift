@@ -301,14 +301,17 @@ struct _LPLinkViewRepresentable<Placeholder: View>: AppKitOrUIKitViewRepresentab
 
 fileprivate extension LPLinkMetadata {
     func _isEqual(to other: LPLinkMetadata) -> Bool {
-        true
-            && originalURL == other.originalURL
-            && url == other.url
-            && title == other.title
-            && iconProvider == other.iconProvider
-            && imageProvider == other.imageProvider
-            && videoProvider == other.videoProvider
-            && remoteVideoURL == other.remoteVideoURL
+        var result = true
+       
+        result = result && originalURL == other.originalURL
+        result = result && url == other.url
+        result = result && title == other.title
+        result = result && iconProvider == other.iconProvider
+        result = result && imageProvider == other.imageProvider
+        result = result && videoProvider == other.videoProvider
+        result = result && remoteVideoURL == other.remoteVideoURL
+        
+        return result
     }
 }
 
