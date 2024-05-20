@@ -8,13 +8,26 @@ import SwiftUI
 extension App {
     // Programmatically quit the current application.
     public static func quit() throws {
-        #if os(macOS)
+#if os(macOS)
         NSApplication.shared.terminate(nil)
-        #else
+#else
         throw AppQuitError.unsupported
-        #endif
+#endif
     }
 }
+
+#if os(macOS)
+@MainActor
+extension App {
+    public static var _isRunningFromApplicationsDirectory: Bool {
+        NSApplication._SwiftUIX_isRunningFromApplicationsDirectory
+    }
+    
+    public static func _copyToApplicationsDirectory() throws {
+        try NSApplication._SwiftUIX_copyToApplicationsDirectoryIfNeeded()
+    }
+}
+#endif
 
 // MARK: - Auxiliary
 

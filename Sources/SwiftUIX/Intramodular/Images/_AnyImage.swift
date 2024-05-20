@@ -47,6 +47,10 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
         
         self = .appKitOrUIKitImage(image)
     }
+    
+    public init(_ image: AppKitOrUIKitImage) {
+        self = .appKitOrUIKitImage(image)
+    }
 }
 
 extension _AnyImage: View {
@@ -206,6 +210,15 @@ extension Image {
                     self.init(systemName: .nosign)
                 }
             }
+        }
+    }
+
+    public init(_ image: _AnyImage) {
+        switch image {
+            case .appKitOrUIKitImage(let image):
+                self.init(image: image)
+            case .named(let name):
+                self.init(name)
         }
     }
 }

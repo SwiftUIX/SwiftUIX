@@ -248,8 +248,14 @@ public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
 @_spi(Internal)
 @propertyWrapper
 public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
+    public let objectWillChange: ObservableObjectPublisher
+    
     public weak var value: T? {
         willSet {            
+            guard newValue !== value else {
+                return
+            }
+            
             objectWillChange.send()
         }
     }
@@ -262,8 +268,21 @@ public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: Observabl
         }
     }
     
+    public var projectedValue: _SwiftUIX_ObservableWeakReferenceBox {
+        self
+    }
+    
     public init(_ value: T?) {
         self.value = value
+        
+        self.objectWillChange = .init()
+    }
+    
+    public init(
+        _ value: T?
+    ) where T: ObservableObject, T.ObjectWillChangePublisher == ObservableObjectPublisher {
+        self.value = value
+        self.objectWillChange = value?.objectWillChange ?? .init()
     }
 }
 

@@ -17,7 +17,22 @@ extension NSApplication {
 }
 
 extension NSApplication {
-    public func _SwiftUIX_copyToApplicationsFolderIfNeeded() throws {
+    public static var _SwiftUIX_isRunningFromApplicationsDirectory: Bool = {
+        let bundleURL = Bundle.main.bundleURL
+        let applicationsURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+        
+        if bundleURL.deletingLastPathComponent() == applicationsURL {
+            return true
+        } else {
+            return false
+        }
+    }()
+    
+    enum CopyToApplicationsDirectoryError: Error {
+        case unknown(Error)
+    }
+    
+    public static func _SwiftUIX_copyToApplicationsDirectoryIfNeeded() throws {
         let bundleURL = Bundle.main.bundleURL
         
         // Assert that the bundle URL points to an .app bundle
@@ -48,9 +63,8 @@ extension NSApplication {
             }
             
             try fileManager.copyItem(at: bundleURL, to: destinationURL)
-            print("Successfully copied the app to the Applications folder.")
         } catch {
-            assertionFailure("Failed to copy the app to the Applications folder. Error: \(error)")
+            throw CopyToApplicationsDirectoryError.unknown(error)
         }
     }
 }

@@ -9,7 +9,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
-public class _AppKitMenuBarExtraPopover<ID: Equatable, Label: View, Content: View>: NSHostingPopover<Content> {
+public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View>: NSHostingPopover<Content> {
     private var eventMonitor: Any?
     
     private lazy var menuBarExtraCoordinator = _CocoaMenuBarExtraCoordinator<ID, Label, Content>(
@@ -35,7 +35,7 @@ public class _AppKitMenuBarExtraPopover<ID: Equatable, Label: View, Content: Vie
         }
     }
     
-    override public var wantsTransientBehaviorEnforcement: Bool {
+    override public var _SwiftUIX_wantsFixForTransientNSPopover: Bool {
         false
     }
     
@@ -70,7 +70,7 @@ public class _AppKitMenuBarExtraPopover<ID: Equatable, Label: View, Content: Vie
     }
     
     private func _setUpMenuBarExtraPopover() {
-        behavior = NSPopover.Behavior.transient
+        behavior = NSPopover.Behavior.semitransient
         animates = false
         
         _setShouldHideAnchor(true)
@@ -116,7 +116,9 @@ public class _AppKitMenuBarExtraPopover<ID: Equatable, Label: View, Content: Vie
         relativeFrame.origin.y = -5
         
         self.animates = false
-
+        
+        assert(delegate != nil)
+        
         show(
             relativeTo: relativeFrame,
             of: statusBarButton,

@@ -86,8 +86,16 @@ extension NSSize {
 }
 
 extension NSWindow {
-    public var isHidden: Bool {
-        !isVisible
+    @objc open var isHidden: Bool {
+        get {
+            !isVisible
+        } set {
+            let isVisible = !newValue
+            
+            if self.isVisible != isVisible {
+                self.setIsVisible(isVisible)
+            }
+        }
     }
 }
 

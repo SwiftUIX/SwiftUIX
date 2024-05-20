@@ -13,6 +13,11 @@ public protocol _opaque_AppKitOrUIKitHostingControllerProtocol {
 
 @MainActor
 public protocol AppKitOrUIKitHostingControllerProtocol: _opaque_AppKitOrUIKitHostingControllerProtocol, AppKitOrUIKitViewController {
+    #if os(macOS)
+    @available(macOS 13.0, *)
+    var sizingOptions: NSHostingSizingOptions { get set }
+    #endif
+    
     @MainActor
     func sizeThatFits(in _: CGSize) -> CGSize
 }
