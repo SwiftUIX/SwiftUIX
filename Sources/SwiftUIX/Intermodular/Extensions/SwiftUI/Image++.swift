@@ -25,6 +25,14 @@ extension Image {
         #endif
     }
     
+    public init?(image: AppKitOrUIKitImage?) {
+        guard let image else {
+            return nil
+        }
+        
+        self.init(image: image)
+    }
+    
     public init(cgImage: CGImage) {
         #if os(macOS)
         self.init(nsImage: NSImage(cgImage: cgImage, size: .zero))

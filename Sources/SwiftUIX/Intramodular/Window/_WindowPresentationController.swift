@@ -184,6 +184,19 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         )
     }
     
+    public convenience init(
+        style: _WindowStyle,
+        visible: Bool,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(
+            content: content(),
+            windowStyle: style,
+            canBecomeKey: true,
+            isVisible: visible
+        )
+    }
+    
     public func show() {
         isVisible = true
         
