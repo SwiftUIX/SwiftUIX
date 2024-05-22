@@ -16,6 +16,7 @@ extension NSApplication {
     }
 }
 
+@available(macCatalyst, unavailable)
 extension NSApplication {
     public static var _SwiftUIX_isRunningFromApplicationsDirectory: Bool = {
         let bundleURL = Bundle.main.bundleURL
