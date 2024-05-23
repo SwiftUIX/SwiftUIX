@@ -2,9 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
+import SwiftUI
 
-import Foundation
-
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 extension StateObject {
     /// A property wrapper type that subscribes to an (optional) observable object and invalidates a view whenever the observable object changes.
     @propertyWrapper
