@@ -13,6 +13,14 @@ public struct _TypeToViewTraitKeyAdaptor<T>: _ViewTraitKey {
 }
 
 extension View {
+    public func _SwiftUIX_trait<Value>(
+        _: Value.Type,
+        _ value: Value
+    ) -> some View {
+        return self._trait(_TypeToViewTraitKeyAdaptor<Value>.self, value)
+    }
+
+    @available(*, deprecated)
     public func trait<Value>(
         _: Value.Type,
         _ value: Value
