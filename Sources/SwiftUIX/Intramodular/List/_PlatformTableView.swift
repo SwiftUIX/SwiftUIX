@@ -33,6 +33,7 @@ final class _PlatformTableView<Configuration: _CocoaListConfigurationType>: NSTa
         }
     }
     
+    /// We ignore setting `needsUpdateConstraints` because it seems to improve performance without actually changing this.
     override var needsUpdateConstraints: Bool {
         get {
             super.needsUpdateConstraints

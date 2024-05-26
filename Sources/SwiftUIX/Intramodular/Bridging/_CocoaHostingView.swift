@@ -13,11 +13,24 @@ public enum _CocoaHostingViewStateFlag {
     case didJustMoveToSuperview
 }
 
+/// These are special flags that can be set for `_CocoaHostingView` to temporarily override UIKit/AppKit behavior.
+///
+/// You do this by calling
+///
+/// ```swift
+/// myView.withCriticalScope([.myDesiredFlag1]) {
+///     ... some operation
+/// }
+/// ```
+///
+/// And during the execution of your operation, that flag will be in effect. It is used by `_PlatformTableView` and other performance-critical views to override UIKit/AppKit to make it play nicer with SwiftUI and avoid redundant computation where we (the developer) know that SwiftUI is already observing/handling some computation, and UIKit/AppKit needs to be suppressed.
 @frozen
 public enum _CocoaHostingViewConfigurationFlag {
     case invisible
     case disableResponderChain
+    /// Makes calls to `invalidateIntrinsicContentSize()`, `layout()`, `resizeSubviews(withOldSize:)`, `resize(withOldSuperviewSize:)` a no-op.
     case suppressRelayout
+    /// Makes calls to `invalidateIntrinsicContentSize()`.
     case suppressIntrinsicContentSizeInvalidation
 }
 

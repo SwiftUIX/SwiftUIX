@@ -7,6 +7,7 @@ import SwiftUI
 
 extension View {
     /// Causes the view to greedily fill into its container.
+    @_disfavoredOverload
     @inlinable
     public func frame(
         _ size: _GreedyFrameSize,
@@ -15,6 +16,7 @@ extension View {
         modifier(GreedyFrameModifier(width: .greedy, height: .greedy, alignment: alignment))
     }
     
+    @_disfavoredOverload
     @inlinable
     public func frame(
         width: _GreedyFrameSize,
@@ -45,6 +47,7 @@ extension View {
             )
     }
 
+    @_disfavoredOverload
     @inlinable
     public func frame(
         width: _GreedyFrameSize,
@@ -54,6 +57,7 @@ extension View {
         modifier(GreedyFrameModifier(width: .greedy, height: height.map({ .fixed($0) }), alignment: alignment))
     }
     
+    @_disfavoredOverload
     @inlinable
     public func frame(
         width: CGFloat?,
@@ -63,6 +67,7 @@ extension View {
         modifier(GreedyFrameModifier(width: width.map({ .fixed($0) }), height: .greedy, alignment: alignment))
     }
     
+    @_disfavoredOverload
     @inlinable
     public func frame(
         height: _GreedyFrameSize,
@@ -71,6 +76,7 @@ extension View {
         modifier(GreedyFrameModifier(width: nil, height: .greedy, alignment: alignment))
     }
     
+    @_disfavoredOverload
     @inlinable
     public func frame(
         _ size: _GreedyFrameSize,
@@ -85,6 +91,7 @@ extension View {
         }
     }
     
+    @_disfavoredOverload
     @available(*, message: "greedyFrame() is deprecated, use frame(.greedy) instead")
     public func greedyFrame(alignment: Alignment = .center) -> some View {
         frame(.greedy)
@@ -92,6 +99,7 @@ extension View {
 }
 
 extension View {
+    @_disfavoredOverload
     @inlinable
     public func relativeHeight(
         _ ratio: CGFloat,
@@ -105,6 +113,7 @@ extension View {
         }
     }
     
+    @_disfavoredOverload
     @inlinable
     public func relativeWidth(
         _ ratio: CGFloat,
@@ -118,6 +127,7 @@ extension View {
         }
     }
     
+    @_disfavoredOverload
     @inlinable
     public func relativeSize(
         width widthRatio: CGFloat?,
@@ -136,6 +146,7 @@ extension View {
 
 extension View {
     /// Causes the view to fill into its container.
+    @_disfavoredOverload
     @inlinable
     public func fill(alignment: Alignment = .center) -> some View {
         relativeSize(width: 1.0, height: 1.0, alignment: alignment)
@@ -144,6 +155,7 @@ extension View {
 
 extension View {
     /// Causes the view to greedily fill to fit into its container.
+    @_disfavoredOverload
     @inlinable
     public func fit() -> some View {
         GeometryReader { geometry in
