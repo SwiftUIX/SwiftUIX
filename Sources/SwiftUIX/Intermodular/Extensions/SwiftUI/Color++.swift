@@ -558,6 +558,59 @@ extension Color {
 
 // MARK: - Helpers
 
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+extension AttributedString {
+    public struct _SwiftUIX_Color: Codable, Hashable, Sendable {
+        public let red: Double
+        public let green: Double
+        public let blue: Double
+        public let alpha: Double
+        
+        public init(red: Double, green: Double, blue: Double, alpha: Double) {
+            self.red = red
+            self.green = green
+            self.blue = blue
+            self.alpha = alpha
+        }
+    }
+}
+
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+extension AttributedString._SwiftUIX_Color {
+    public init?(
+        _SwiftUIX_hexadecimal hex: String
+    ) {
+        var hex = hex
+        
+        if hex.hasPrefix("#") {
+            hex.removeFirst()
+        }
+        
+        guard let int = UInt64(hex, radix: 16) else {
+            return nil
+        }
+        
+        let r, g, b, a: UInt64
+        
+        switch hex.count {
+            case 6:
+                (r, g, b) = (int >> 16 & 0xff, int >> 8 & 0xff, int & 0xff)
+                a = 255
+            case 8:
+                (r, g, b, a) = (int >> 24 & 0xff, int >> 16 & 0xff, int >> 8 & 0xff, int & 0xff)
+            default:
+                return nil
+        }
+        
+        self.init(
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            alpha: Double(a) / 255
+        )
+    }
+}
+
 #if os(macOS)
 extension NSAppearance {
     public enum _SwiftUIX_UserInterfaceStyle {
