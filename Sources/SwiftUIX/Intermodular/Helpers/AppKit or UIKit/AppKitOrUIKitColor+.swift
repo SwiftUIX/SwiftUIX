@@ -187,7 +187,7 @@ extension Color {
         if let colorScheme {
             switch colorScheme {
                 case .light:
-                    return result.resolvedColor(with: .init(userInterfaceStyle: .dark))
+                    return result.resolvedColor(with: .init(userInterfaceStyle: .light))
                 case .dark:
                     return result.resolvedColor(with: .init(userInterfaceStyle: .dark))
                 @unknown default:
