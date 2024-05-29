@@ -28,9 +28,12 @@ public class AnyFileDropDelegate: DropDelegate, ObservableObject {
         }
     }
     
+    private let onDrag: ([DroppedItem]) -> Void = { _ in }
     private let onDrop: ([DroppedItem]) -> Void
     
-    public init(onDrop: @escaping ([DroppedItem]) -> Void) {
+    public init(
+        onDrop: @escaping ([DroppedItem]) -> Void
+    ) {
         self.onDrop = onDrop
     }
     
@@ -92,7 +95,7 @@ public class AnyFileDropDelegate: DropDelegate, ObservableObject {
     }
     
     public func dropExited(info: DropInfo) {
-        _endDropInteraction()
+
     }
     
     public func performDrop(info: DropInfo) -> Bool {
