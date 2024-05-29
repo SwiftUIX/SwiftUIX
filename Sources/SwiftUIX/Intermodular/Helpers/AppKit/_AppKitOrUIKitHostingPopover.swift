@@ -26,7 +26,7 @@ public protocol _AppKitOrUIKitHostingPopoverType: _AnyAppKitOrUIKitHostingPopove
     func _SwiftUIX_applyFixForTransientNSPopover()
 }
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 open class _AnyAppKitOrUIKitHostingPopover: NSObject, _AppKitOrUIKitHostingPopoverType {
     @_spi(Internal)
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil

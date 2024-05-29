@@ -34,12 +34,20 @@ extension AppKitOrUIKitFont {
     }
     
     public var monospaced: AppKitOrUIKitFont {
-        let settings: [UIFontDescriptor.FeatureKey: Any] = [
-            .featureIdentifier: kNumberSpacingType,
-            .typeIdentifier: kMonospacedNumbersSelector
-        ]
+        let settings: [UIFontDescriptor.FeatureKey: Any]
         
-        return addingAttributes([.featureSettings: [settings]])
+        if #available(visionOS 1.0, *) {
+            settings = [:]
+            
+            return withSymbolicTraits(.traitMonoSpace) ?? self
+        } else {
+            settings = [
+                .featureIdentifier: kNumberSpacingType,
+                .typeIdentifier: kMonospacedNumbersSelector
+            ]
+            
+            return addingAttributes([.featureSettings: [settings]])
+        }
     }
 }
 
