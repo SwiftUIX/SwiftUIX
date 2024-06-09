@@ -172,7 +172,7 @@ extension Binding {
         transform: @escaping (Data.Element) -> TransformedElement,
         backTransform: @escaping (TransformedElement) -> Data.Element
     ) where Value == _AnyMutableRandomAccessCollection<TransformedElement> {
-        var transformedData = _LazyBidirectionalMapMutableRandomAccessCollection(
+        var transformedData: _LazyBidirectionalMapMutableRandomAccessCollection<Data, TransformedElement> = _LazyBidirectionalMapMutableRandomAccessCollection(
             base: data.wrappedValue,
             transform: transform,
             backTransform: backTransform
@@ -182,9 +182,9 @@ extension Binding {
             get: {
                 _AnyMutableRandomAccessCollection(transformedData)
             },
-            set: { newValue in
+            set: { (newValue: _AnyMutableRandomAccessCollection<TransformedElement>) in
                 transformedData = _LazyBidirectionalMapMutableRandomAccessCollection(
-                    base: newValue.base as! Data,
+                    base: (newValue.base as! _LazyBidirectionalMapMutableRandomAccessCollection<Data, TransformedElement>).base,
                     transform: transform,
                     backTransform: backTransform
                 )

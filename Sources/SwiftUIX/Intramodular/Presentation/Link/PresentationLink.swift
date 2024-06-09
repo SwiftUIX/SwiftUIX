@@ -434,7 +434,9 @@ extension PresentationLink {
 
 extension View {
     /// Adds a destination to present when this view is pressed.
-    public func onPress<Destination: View>(present destination: Destination) -> some View {
+    public func onPress<Destination: View>(
+        present destination: Destination
+    ) -> some View {
         modifier(_PresentOnPressViewModifier(destination: destination))
     }
     

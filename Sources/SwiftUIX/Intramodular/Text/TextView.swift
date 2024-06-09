@@ -323,7 +323,7 @@ extension TextView {
             do {
                 $0.configuration.cocoaFont = try font.toAppKitOrUIKitFont()
             } catch {
-                // print(error)
+                debugPrint(error)
             }
         }
     }
