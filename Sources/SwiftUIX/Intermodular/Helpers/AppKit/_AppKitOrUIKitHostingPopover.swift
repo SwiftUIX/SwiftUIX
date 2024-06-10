@@ -12,7 +12,7 @@ import Combine
 import Swift
 import SwiftUI
 
-public protocol _AppKitOrUIKitHostingPopoverType: _AnyAppKitOrUIKitHostingPopover, ObservableObject {
+public protocol _AppKitOrUIKitHostingPopoverType: _AnyAppKitOrUIKitHostingPopover {
     @_spi(Internal)
     var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences { get set }
     
@@ -28,7 +28,6 @@ public protocol _AppKitOrUIKitHostingPopoverType: _AnyAppKitOrUIKitHostingPopove
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 open class _AnyAppKitOrUIKitHostingPopover: NSObject, _AppKitOrUIKitHostingPopoverType {
-    @_spi(Internal)
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil
     
     public var isDetached: Bool {
@@ -57,7 +56,6 @@ open class _AnyAppKitOrUIKitHostingPopover: NSObject, _AppKitOrUIKitHostingPopov
 }
 #elseif os(macOS)
 open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopoverType {
-    @_spi(Internal)
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil
 
     open func _SwiftUIX_layoutImmediately() {
@@ -80,7 +78,7 @@ open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopo
 
 #if os(macOS)
 /// An AppKit popover that hosts SwiftUI view hierarchy.
-open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSPopoverDelegate {
+open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSPopoverDelegate, ObservableObject {
     typealias _ContentWrappingView = _AppKitOrUIKitHostingWindowContent<Content>
     typealias _ContentViewControllerType = CocoaHostingController<_ContentWrappingView>
     
@@ -350,6 +348,12 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
             )
             
             self._detachedWindow = window
+            
+            if #available(macOS 14.0, *) {
+                NSApplication.shared.activate()
+            } else {
+                NSApplication.shared.activate(ignoringOtherApps: true)
+            }
             
             return window
         }
