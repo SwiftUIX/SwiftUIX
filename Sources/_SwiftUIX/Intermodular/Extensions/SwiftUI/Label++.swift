@@ -9,6 +9,25 @@ import SwiftUI
 extension Label where Title == Text {
     /// Creates a label with a system icon image and a title generated from a
     /// localized string.
+    @_disfavoredOverload
+    @available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+    public init(_ titleKey: LocalizedStringKey, icon: Icon) {
+        self.init(title: { Text(titleKey) }, icon: { icon })
+    }
+    
+    /// Creates a label with a system icon image and a title generated from a
+    /// string.
+    @_disfavoredOverload
+    @available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+    public init<S: StringProtocol>(_ title: S,  icon: Icon) {
+        self.init(title: { Text(title) }, icon: { icon })
+    }
+}
+
+@available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
+extension Label where Title == Text {
+    /// Creates a label with a system icon image and a title generated from a
+    /// localized string.
     @available(iOS 14.0, OSX 10.16, tvOS 14.0, watchOS 7.0, *)
     public init(_ titleKey: LocalizedStringKey, @ViewBuilder icon: () -> Icon) {
         self.init(title: { Text(titleKey) }, icon: icon)

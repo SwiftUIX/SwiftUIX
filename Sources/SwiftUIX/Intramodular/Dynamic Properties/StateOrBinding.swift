@@ -54,4 +54,22 @@ public struct StateOrBinding<Value>: DynamicProperty {
     public init(_ binding: Binding<Value>) {
         self.storage = .binding(binding)
     }
+    
+    @inlinable
+    public init(_ binding: Binding<Value>?, initialValue: Value) {
+        if let binding {
+            self.storage = .binding(binding)
+        } else {
+            self.storage = .state(.init(initialValue: initialValue))
+        }
+    }
+    
+    @inlinable
+    public init<T>(_ binding: Binding<T?>?) where Value == Optional<T> {
+        if let binding {
+            self.storage = .binding(binding)
+        } else {
+            self.storage = .state(.init(initialValue: Value.init(nilLiteral: ())))
+        }
+    }
 }
