@@ -4,15 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
-
-#if os(iOS) || os(visionOS) || os(tvOS)
-extension AppKitOrUIKitImage {
-    public var _SwiftUIX_cgImage: CGImage? {
-        cgImage
-    }
-}
-#endif
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 extension AppKitOrUIKitImage {
     public func _SwiftUIX_resizeImage(

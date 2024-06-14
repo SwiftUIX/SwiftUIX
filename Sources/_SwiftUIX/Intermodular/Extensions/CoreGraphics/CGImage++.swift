@@ -17,7 +17,7 @@ extension CGImage {
 #if canImport(CoreVideo)
 extension CGImage {
     public func _SwiftUIX_toPixelBuffer() -> CVPixelBuffer? {
-        let imageWidth: Int  = Int(width)
+        let imageWidth: Int = Int(width)
         let imageHeight: Int = Int(height)
         let attributes: [NSObject:AnyObject] = [
             kCVPixelBufferPixelFormatTypeKey: Int(kCVPixelFormatType_32BGRA) as CFNumber,
