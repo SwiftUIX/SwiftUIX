@@ -22,15 +22,9 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
     
     case appKitOrUIKitImage(AppKitOrUIKitImage)
     case named(Name)
-    
-    public init(systemName: String) {
-        self = .named(.system(systemName))
-    }
-    
-    public init(systemName: SFSymbolName) {
-        self.init(systemName: systemName.rawValue)
-    }
-    
+}
+
+extension _AnyImage {
     public var appKitOrUIKitImage: AppKitOrUIKitImage? {
         switch self {
             case .appKitOrUIKitImage(let image):
@@ -39,7 +33,11 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
                 return .init(named: name)
         }
     }
-    
+}
+
+// MARK: - Initializers
+
+extension _AnyImage {
     public init?(_ image: AppKitOrUIKitImage?) {
         guard let image else {
             return nil
@@ -51,21 +49,13 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
     public init(_ image: AppKitOrUIKitImage) {
         self = .appKitOrUIKitImage(image)
     }
-}
-
-extension _AnyImage: View {
-    public var body: some View {
-        switch self {
-            case .appKitOrUIKitImage(let image):
-                Image(image: image)
-            case .named(let name):
-                switch name {
-                    case .bundleResource(let name, let bundle):
-                        Image(name, bundle: bundle)
-                    case .system(let name):
-                        Image(_systemName: name)
-                }
-        }
+    
+    public init(systemName: String) {
+        self = .named(.system(systemName))
+    }
+    
+    public init(systemName: SFSymbolName) {
+        self.init(systemName: systemName.rawValue)
     }
 }
 
@@ -75,11 +65,11 @@ extension _AnyImage: Codable {
     private enum _DecodingError: Error {
         case unsupported
     }
-
+    
     private enum _EncodingError: Error {
         case unsupported
     }
-        
+    
     public init(from decoder: Decoder) throws {
         do {
             self = try .named(Name(from: decoder))
@@ -150,6 +140,22 @@ extension _AnyImage.Name: Codable {
     }
 }
 
+extension _AnyImage: View {
+    public var body: some View {
+        switch self {
+            case .appKitOrUIKitImage(let image):
+                Image(image: image)
+            case .named(let name):
+                switch name {
+                    case .bundleResource(let name, let bundle):
+                        Image(name, bundle: bundle)
+                    case .system(let name):
+                        Image(_systemName: name)
+                }
+        }
+    }
+}
+
 // MARK: - Auxiliary
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
@@ -212,7 +218,7 @@ extension Image {
             }
         }
     }
-
+    
     public init(_ image: _AnyImage) {
         switch image {
             case .appKitOrUIKitImage(let image):
@@ -220,5 +226,10 @@ extension Image {
             case .named(let name):
                 self.init(name)
         }
+    }
+    
+    @_disfavoredOverload
+    public init(image: _AnyImage) {
+        self.init(image)
     }
 }
