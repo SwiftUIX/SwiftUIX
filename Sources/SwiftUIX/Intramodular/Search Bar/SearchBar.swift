@@ -511,17 +511,3 @@ private final class _UISearchBar: UISearchBar {
 #endif
 
 #endif
-
-// MARK: - Development Preview -
-
-#if (os(iOS) && canImport(CoreTelephony)) || targetEnvironment(macCatalyst)
-@available(macCatalystApplicationExtension, unavailable)
-@available(iOSApplicationExtension, unavailable)
-@available(tvOSApplicationExtension, unavailable)
-struct SearchBar_Previews: PreviewProvider {
-    static var previews: some View {
-        SearchBar("Search...", text: .constant(""))
-            .searchBarStyle(.minimal)
-    }
-}
-#endif

@@ -190,14 +190,3 @@ extension NSControl.ControlSize {
 }
 
 #endif
-
-#if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-struct ActivityIndicator_Previews: PreviewProvider {
-    static var previews: some View {
-        ActivityIndicator()
-            .tintColor(.red)
-    }
-}
-
-#endif
