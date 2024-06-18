@@ -74,6 +74,14 @@ public class Screen: ObservableObject {
     }
 }
 
+#if os(macOS)
+extension Screen {
+    public convenience init(_ screen: NSScreen?) {
+        self.init() // FIXME: currently defaults to NSScreen.main
+    }
+}
+#endif
+
 // MARK: - Extensions
 
 extension Screen {

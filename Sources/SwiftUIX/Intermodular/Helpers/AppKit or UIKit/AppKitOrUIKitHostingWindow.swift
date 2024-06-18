@@ -635,7 +635,7 @@ extension View {
     }
     
     public func windowPosition(
-        _ point: _CoordinateSpaceRelative<CGPoint>
+        _ point: _CoordinateSpaceRelative<CGPoint>?
     ) -> some View {
         preference(
             key: _SwiftUIX_WindowPreferenceKeys.Position.self,

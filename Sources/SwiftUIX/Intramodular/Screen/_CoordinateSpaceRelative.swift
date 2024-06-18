@@ -78,7 +78,7 @@ extension _CoordinateSpaceRelative {
     }
 }
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 extension _CoordinateSpaceRelative {
     public var _sourceAppKitOrUIKitWindow: AppKitOrUIKitWindow? {
         get {
@@ -130,4 +130,40 @@ extension _CoordinateSpaceRelative where Value == CGRect {
     }
 }
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
+extension _CoordinateSpaceRelative {
+    public var origin: _CoordinateSpaceRelative<CGPoint> {
+        get {
+            _CoordinateSpaceRelative<CGPoint>(
+                storage: storage.mapValues({ $0.origin }),
+                _sourceAppKitOrUIKitWindow: self._sourceAppKitOrUIKitWindow
+            )
+        }
+    }
+}
+#endif
+
+// MARK: - Supplementary
+
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
+#if os(macOS)
+extension AppKitOrUIKitWindow {
+    public var _coordinateSpaceRelativeFrame: _CoordinateSpaceRelative<CGRect> {
+        var frame = frame
+        
+        frame.origin.y = Screen.main.height - (frame.origin.y + frame.height)
+        
+        let result = _CoordinateSpaceRelative(frame, in: .cocoa(screen))
+        
+        return result
+    }
+}
+#else
+extension AppKitOrUIKitWindow {
+    public var _coordinateSpaceRelativeFrame: _CoordinateSpaceRelative<CGRect> {
+        fatalError("unimplemented")
+    }
+}
+#endif
+#endif
 #endif

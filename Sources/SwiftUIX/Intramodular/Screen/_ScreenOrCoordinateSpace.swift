@@ -10,7 +10,7 @@ import SwiftUI
 public enum _ScreenOrCoordinateSpace: Hashable {
     case cocoa(Screen?)
     case coordinateSpace(CoordinateSpace)
-    
+        
     public var _cocoaScreen: Screen? {
         guard case .cocoa(let screen) = self else {
             return nil
@@ -19,6 +19,16 @@ public enum _ScreenOrCoordinateSpace: Hashable {
         return screen
     }
 }
+
+#if os(macOS)
+extension _ScreenOrCoordinateSpace {
+    public static func cocoa(
+        _ screen: NSScreen?
+    ) -> Self {
+        Self.cocoa(screen.map({ Screen($0) }))
+    }
+}
+#endif
 
 extension _ScreenOrCoordinateSpace {
     public static var local: Self {

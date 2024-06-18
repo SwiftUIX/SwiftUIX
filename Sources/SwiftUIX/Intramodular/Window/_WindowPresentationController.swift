@@ -113,9 +113,15 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
     }
     
     public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>) {
-        contentWindow?.setPosition(position)
+        guard let contentWindow else {
+            debugPrint("contentWindow is nil, cannot set position")
+            
+            return
+        }
+        
+        contentWindow.setPosition(position)
 #if os(macOS)
-        contentWindow?.orderFront(nil)
+        contentWindow.orderFront(nil)
 #endif
     }
     

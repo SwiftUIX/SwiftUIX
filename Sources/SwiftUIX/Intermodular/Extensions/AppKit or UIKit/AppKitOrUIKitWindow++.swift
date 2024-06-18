@@ -10,6 +10,21 @@ import SwiftUI
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitWindow {
+    public static var _SwiftUIX_allInstances: [AppKitOrUIKitWindow] {
+        #if os(macOS)
+        return AppKitOrUIKitApplication.shared.windows
+        #else
+        return AppKitOrUIKitApplication.shared.connectedScenes
+            .filter({ $0.activationState == .foregroundActive })
+            .first(where: { $0 is UIWindowScene })
+            .flatMap({ $0 as? UIWindowScene })?.windows ?? []
+        #endif
+    }
+    
+    public static var _SwiftUIX_largestInstanceByArea: AppKitOrUIKitWindow? {
+        _SwiftUIX_allInstances.max(by: { ($0.frame.size.width * $0.frame.size.height) > ($1.frame.size.width * $1.frame.size.height) })
+    }
+
     public static var _firstKeyInstance: AppKitOrUIKitWindow? {
         #if os(iOS) || os(macOS)
         return AppKitOrUIKitApplication.shared.firstKeyWindow
