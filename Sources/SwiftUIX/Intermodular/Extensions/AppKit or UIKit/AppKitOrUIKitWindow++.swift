@@ -22,7 +22,7 @@ extension AppKitOrUIKitWindow {
     }
     
     public static var _SwiftUIX_largestInstanceByArea: AppKitOrUIKitWindow? {
-        _SwiftUIX_allInstances.max(by: { ($0.frame.size.width * $0.frame.size.height) > ($1.frame.size.width * $1.frame.size.height) })
+        _SwiftUIX_allInstances.max(by: { ($0.frame.size.width * $0.frame.size.height) < ($1.frame.size.width * $1.frame.size.height) })
     }
 
     public static var _firstKeyInstance: AppKitOrUIKitWindow? {
