@@ -23,37 +23,65 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
     var cocoaStatusItem: NSStatusItem?
     
     public var item: MenuBarItem<ID, Label, Content>
-    public var action: () -> Void
+    public var action: @MainActor () -> Void
     
     private var popover: _AppKitMenuBarExtraPopover<ID, Label, Content>? = nil
     
     public override var id: AnyHashable {
         item.id
     }
-
+    
     public init(
         item: MenuBarItem<ID, Label, Content>,
-        action: @escaping () -> Void
+        action: @MainActor @escaping () -> Void
     ) {
         self.item = item
         self.action = action
         
         super.init()
         
-        DispatchQueue.asyncOnMainIfNecessary {
-            self.cocoaStatusItem = self.cocoaStatusBar.statusItem(
+        DispatchQueue.asyncOnMainIfNecessary(true) {
+            let item = self.cocoaStatusBar.statusItem(
                 withLength: item.length ?? NSStatusItem.variableLength
             )
             
-            self.cocoaStatusItem?.button?.action = #selector(self.didActivate)
-            self.cocoaStatusItem?.button?.target = self
+            if let button = item.button {
+                button.action = #selector(self.didActivate)
+                button.target = self
+            }
+            
+            self.cocoaStatusItem = item
             
             self.update()
         }
     }
     
+    private func update() {
+        cocoaStatusItem?.update(from: item)
+    }
+    
+    @MainActor(unsafe)
+    @objc private func didActivate(
+        _ sender: AnyObject?
+    ) {
+        DispatchQueue.asyncOnMainIfNecessary {
+            self.action()
+        }
+    }
+    
+    deinit {
+        if let cocoaStatusItem {
+            cocoaStatusBar.removeStatusItem(cocoaStatusItem)
+        }
+    }
+}
+
+// MARK: - Initializers
+
+extension _CocoaMenuBarExtraCoordinator {
     public convenience init(
         id: ID,
+        action: (@MainActor () -> Void)?,
         @ViewBuilder content: () -> Content,
         @ViewBuilder label: () -> Label
     ) {
@@ -69,19 +97,50 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
         self.init(
             item: item,
             action: {
+                action?()
+                
                 popover.wrappedValue?.toggle()
             }
         )
         
         popover.wrappedValue = _AppKitMenuBarExtraPopover(coordinator: self)
-        
+    }
+    
+    public convenience init(
+        id: ID,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(
+            id: id,
+            action: nil,
+            content: content,
+            label: label
+        )
     }
     
     public convenience init(
         @ViewBuilder content: () -> Content,
         @ViewBuilder label: () -> Label
     ) where ID == AnyHashable {
-        self.init(id: UUID().uuidString, content: content, label: label)
+        self.init(
+            id: UUID().uuidString,
+            content: content,
+            label: label
+        )
+    }
+    
+    public convenience init(
+        action: @MainActor @escaping () -> Void,
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder content: () -> Content
+    ) where ID == AnyHashable {
+        self.init(
+            id: UUID().uuidString,
+            action: action,
+            content: content,
+            label: label
+        )
     }
     
     public convenience init(
@@ -92,21 +151,9 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
             Image(systemName: systemImage)
         }
     }
-    
-    private func update() {
-        cocoaStatusItem?.update(from: item)
-    }
-    
-    @objc private func didActivate(_ sender: AnyObject?) {
-        action()
-    }
-    
-    deinit {
-        if let cocoaStatusItem {
-            cocoaStatusBar.removeStatusItem(cocoaStatusItem)
-        }
-    }
 }
+
+// MARK: - Auxiliary
 
 extension NSStatusItem {
     private static var NSStatusItem_labelHostingView_objcAssociationKey: UInt = 0
@@ -128,60 +175,62 @@ extension NSStatusItem {
     ) {
         self.length = item.length ?? NSStatusItem.variableLength
         
-        if let button = button {
-            if let label = item.label as? _MenuBarExtraLabelContent {
-                switch label {
-                    case .image(let image, let imageSize):
-                        button.image = image.appKitOrUIKitImage
-                        button.image?.size = imageSize ?? .init(width: 18, height: 18)
-                        button.image?.isTemplate = true
-                    case .text(let string):
-                        button.title = string
+        guard let button = button else {
+            return
+        }
+        
+        if let label = item.label as? _MenuBarExtraLabelContent {
+            switch label {
+                case .image(let image, let imageSize):
+                    button.image = image.appKitOrUIKitImage
+                    button.image?.size = imageSize ?? .init(width: 18, height: 18)
+                    button.image?.isTemplate = true
+                case .text(let string):
+                    button.title = string
+            }
+        } else {            
+            for subview in button.subviews {
+                if subview !== self.labelHostingView {
+                    subview.removeFromSuperview()
                 }
-            } else {
-                for subview in button.subviews {
-                    if subview !== self.labelHostingView {
-                        subview.removeFromSuperview()
-                    }
+            }
+            
+            let _labelHostingViewRootView: AnyView = item.label
+                .frame(minHeight: button.frame.height == 0 ? nil : button.frame.height)
+                .fixedSize(horizontal: true, vertical: true)
+                .controlSize(.small)
+                .font(.title3)
+                .imageScale(.medium)
+                .padding(.horizontal, .extraSmall)
+                .eraseToAnyView()
+            
+            let hostingView: NSHostingView<AnyView> = self.labelHostingView ?? {
+                let result = NSHostingView(
+                    rootView:_labelHostingViewRootView
+                )
+                
+                if #available(macOS 13.0, *) {
+                    result.sizingOptions = [.intrinsicContentSize]
                 }
                 
-                let _labelHostingViewRootView: AnyView = item.label
-                    .frame(minHeight: button.frame.height == 0 ? nil : button.frame.height)
-                    .fixedSize(horizontal: true, vertical: true)
-                    .controlSize(.small)
-                    .font(.title3)
-                    .imageScale(.medium)
-                    .padding(.horizontal, .extraSmall)
-                    .eraseToAnyView()
+                self.labelHostingView = result
                 
-                let hostingView: NSHostingView<AnyView> = self.labelHostingView ?? {
-                    let result = NSHostingView(
-                        rootView:_labelHostingViewRootView
-                    )
-                    
-                    if #available(macOS 13.0, *) {
-                        result.sizingOptions = [.intrinsicContentSize]
-                    }
-                    
-                    self.labelHostingView = result
-                    
-                    button.addSubview(result)
-                    
-                    return result
-                }()
+                button.addSubview(result)
                 
-                hostingView.rootView = _labelHostingViewRootView
-                hostingView.invalidateIntrinsicContentSize()
+                return result
+            }()
+            
+            hostingView.rootView = _labelHostingViewRootView
+            hostingView.invalidateIntrinsicContentSize()
+            
+            if !hostingView.intrinsicContentSize.isAreaZero {
+                hostingView.frame.size = hostingView.intrinsicContentSize
+                hostingView._SwiftUIX_setNeedsLayout()
                 
-                if !hostingView.intrinsicContentSize.isAreaZero {
-                    hostingView.frame.size = hostingView.intrinsicContentSize
-                    hostingView._SwiftUIX_setNeedsLayout()
-                    
-                    button.setFrameSize(hostingView.intrinsicContentSize)
-                    
-                    button._SwiftUIX_setNeedsLayout()
-                    button._SwiftUIX_layoutIfNeeded()
-                }
+                button.setFrameSize(hostingView.intrinsicContentSize)
+                
+                button._SwiftUIX_setNeedsLayout()
+                button._SwiftUIX_layoutIfNeeded()
             }
         }
     }
