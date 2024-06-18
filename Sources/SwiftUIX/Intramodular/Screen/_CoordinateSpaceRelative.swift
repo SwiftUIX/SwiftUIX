@@ -131,7 +131,7 @@ extension _CoordinateSpaceRelative where Value == CGRect {
 }
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
-extension _CoordinateSpaceRelative {
+extension _CoordinateSpaceRelative where Value == CGRect {
     public var origin: _CoordinateSpaceRelative<CGPoint> {
         get {
             _CoordinateSpaceRelative<CGPoint>(
