@@ -217,11 +217,16 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         #endif
     }
     
-    public func _namedViewDescription(for name: AnyHashable) -> _NamedViewDescription? {
+    public func _namedViewDescription(
+        for name: AnyHashable
+    ) -> _NamedViewDescription? {
         _namedViewDescriptions[name]
     }
     
-    public func _setNamedViewDescription(_ description: _NamedViewDescription?, for name: AnyHashable) {
+    public func _setNamedViewDescription(
+        _ description: _NamedViewDescription?,
+        for name: AnyHashable
+    ) {
         _namedViewDescriptions[name] = description
     }
     

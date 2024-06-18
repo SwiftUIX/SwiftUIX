@@ -15,6 +15,10 @@ public struct _AppKitOrUIKitHostingWindowContent<Content: View>: View {
     @PersistentObject private var _windowBox: _SwiftUIX_ObservableWeakReferenceBox<AppKitOrUIKitHostingWindow<Content>>
     @PersistentObject private var _popoverBox: _SwiftUIX_ObservableWeakReferenceBox<_AnyAppKitOrUIKitHostingPopover>
     
+    var isEmptyView: Bool {
+        Content.self == EmptyView.self
+    }
+    
     var _window: AppKitOrUIKitHostingWindow<Content>? {
         get {
             _windowBox.wrappedValue

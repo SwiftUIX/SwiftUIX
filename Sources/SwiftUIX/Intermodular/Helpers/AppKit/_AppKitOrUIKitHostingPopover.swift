@@ -145,6 +145,10 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
         of positioningView: NSView,
         preferredEdge: NSRectEdge
     ) {
+        guard !_contentViewController.mainView.isEmptyView else {
+            return
+        }
+        
         if _sizeContentToFit() {
             _showWellSized(
                 relativeTo: positioningRect,
@@ -372,6 +376,10 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
     
     @discardableResult
     public func _sizeContentToFit() -> Bool {
+        guard !_contentViewController.mainView.isEmptyView else {
+            return true
+        }
+        
         let _contentViewController: CocoaHostingController = _contentViewController
         
         if _contentViewController.preferredContentSize.isAreaZero {
