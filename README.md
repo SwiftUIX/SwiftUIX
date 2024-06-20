@@ -20,10 +20,10 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 # Requirements
 
 > [!Note]
-> Swift 5.9 is the latest release for Swift and adds support for macros, support for Swift 5.8 will be dropped soon.
+> Swift 5.10 is the minimum Swift version required to build SwiftUIX, Swift 5.9 is no longer supported.
 
-- Deployment target: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1 beta 6 (Xcode Xcode 15.1 beta 3)
-- Xcode 15.0+ 
+- Deployment targets: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1
+- Xcode 15.4+ 
 
 # Installation
 
