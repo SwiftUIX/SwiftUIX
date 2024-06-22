@@ -43,9 +43,24 @@ extension EnvironmentValues {
 }
 
 extension Environment {
+    @_disfavoredOverload
     public init<T>(
         _type: T.Type
     ) where Value == Optional<T> {
         self.init(\EnvironmentValues.[_type: _SwiftUIX_Metatype<T.Type>(_type)])
+    }
+    
+    public init(
+        _type: Value.Type
+    ) where Value: ExpressibleByNilLiteral {
+        let keyPath: KeyPath<EnvironmentValues, Value> = \EnvironmentValues.[_type: _SwiftUIX_Metatype<Value.Type>(_type)]._unwrappedDefaultingToNilLiteral
+        
+        self.init(keyPath)
+    }
+}
+
+extension Optional where Wrapped: ExpressibleByNilLiteral {
+    public var _unwrappedDefaultingToNilLiteral: Wrapped {
+        self ?? Wrapped(nilLiteral: ())
     }
 }

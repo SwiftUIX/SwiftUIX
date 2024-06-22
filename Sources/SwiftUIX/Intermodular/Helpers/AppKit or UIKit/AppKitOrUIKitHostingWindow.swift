@@ -611,19 +611,7 @@ extension View {
             value: allowed
         )
     }
-    
-    /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
-    ///
-    /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
-    public func windowPosition(
-        _ offset: CGPoint?
-    ) -> some View {
-        preference(
-            key: _SwiftUIX_WindowPreferenceKeys.Position.self,
-            value: offset.map({ _CoordinateSpaceRelative<CGPoint>($0, in: .coordinateSpace(.global)) })
-        )
-    }
-    
+        
     /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
     ///
     /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using an `x` and `y` offset.
@@ -634,12 +622,25 @@ extension View {
         windowPosition(CGPoint(x: x, y: y))
     }
     
+    @_disfavoredOverload
     public func windowPosition(
         _ point: _CoordinateSpaceRelative<CGPoint>?
     ) -> some View {
         preference(
             key: _SwiftUIX_WindowPreferenceKeys.Position.self,
             value: point
+        )
+    }
+    
+    /// Positions the center of this window at the specified coordinates in the screen's coordinate space.
+    ///
+    /// Use the `windowPosition(x:y:)` modifier to place the center of a window at a specific coordinate in the screen using `offset`.
+    public func windowPosition(
+        _ offset: CGPoint?
+    ) -> some View {
+        preference(
+            key: _SwiftUIX_WindowPreferenceKeys.Position.self,
+            value: offset.map({ _CoordinateSpaceRelative<CGPoint>($0, in: .coordinateSpace(.global)) })
         )
     }
     
