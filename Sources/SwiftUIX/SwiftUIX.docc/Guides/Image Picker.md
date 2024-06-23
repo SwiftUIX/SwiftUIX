@@ -1,4 +1,4 @@
-##  What is `ImagePicker`?
+#  What is `ImagePicker`?
 
 The `ImagePicker` in SwiftUIX is a simple, efficient, and native SwiftUI way to display an equivalent of `UIImagePickerController`.
 
@@ -32,7 +32,7 @@ struct ContentView: View {
 
 ## Parameters
 
-`ImagePicker.init(data:encoding:onCancel)`
+``ImagePicker.init(data:encoding:onCancel)``
 
 The `ImagePicker` takes in 3 parameters: `data`, `encoding` and `onCancel`. `onCancel` is optional.
 

@@ -52,7 +52,7 @@ struct MyOptimizedView: View {
 
 While the implementation has now become more complex, your view now only updates when `isNavigationBarVisible` updates, which only happens when the scroll content offset's y-value goes below or above a certain threshold. Changing `scrollContentOffset` does not trigger an update because it is not marked as a `@Published` variable.
 
-This is where `@ViewStorage`. Instead of having to implement a custom model class each time you encounter this scenario, `@ViewStorage` provides a stateful, but non-view-invalidating, means to store a value.
+This is where `@ViewStorage` becomes useful. Instead of having to implement a custom model class each time you encounter this scenario, `@ViewStorage` provides a stateful, but non-view-invalidating, means to store a value.
 
 ```swift
 struct MyCleanOptimizedView: View {
