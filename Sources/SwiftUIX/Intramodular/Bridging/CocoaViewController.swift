@@ -14,6 +14,11 @@ public protocol _CocoaHostingControllerOrView: AppKitOrUIKitResponder {
     var _hostingViewConfigurationFlags: Set<_CocoaHostingViewConfigurationFlag> { get }
     var _hostingViewStateFlags: Set<_CocoaHostingViewStateFlag> { get }
     var _observedPreferenceValues: _ObservedPreferenceValues { get }
+    
+    func withCriticalScope<Result>(
+        _ flags: Set<_CocoaHostingViewConfigurationFlag>,
+        perform action: () -> Result
+    ) -> Result
 }
 
 public protocol CocoaViewController: AppKitOrUIKitViewController {

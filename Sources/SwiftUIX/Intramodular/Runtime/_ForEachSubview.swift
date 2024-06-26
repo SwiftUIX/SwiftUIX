@@ -9,28 +9,23 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     private let content: _SwiftUI_VariadicView<Content>
     private let id: KeyPath<_VariadicViewChildren.Subview, ID>
     private let subview: (Int, _VariadicViewChildren.Subview) -> Subview
+    
     private var transform: ((_VariadicViewChildren) -> [_VariadicViewChildren.Subview])?
+    private var filter: ((_VariadicViewChildren.Subview) -> Bool)?
     
     public var body: some View {
-        if let transform {
-            ForEach(
-                transform(content.children)._enumerated(),
-                id: \.element[_keyPath: id]
-            ) { (index, element) in
-                subview(index, element)
-                    .id(element[_keyPath: id])
-            }
-        } else {
-            ForEach(
-                content.children._enumerated(),
-                id: \.element[_keyPath: id]
-            ) { (index, element) in
-                subview(index, element)
-                    .id(element[_keyPath: id])
-            }
+        let result: (LazyMapSequence<Array<_VariadicViewChildren.Element>.Indices, (index: Array<_VariadicViewChildren.Element>.Index, element: _VariadicViewChildren.Element)>) = (transform.map({ $0(content.children) })?.filter({ filter?($0) ?? true })._enumerated() ?? content.children.filter({ filter?($0) ?? true })._enumerated())
+
+        ForEach(result, id: \.element[_keyPath: id]) { (index: Int, element: _VariadicViewChildren.Subview) in
+            let id: ID = element[_keyPath: id]
+            
+            subview(index, element)
+                .cocoaListItem(id: id)
+                .id(id)
+                .tag(id)
         }
     }
-
+    
     public init(
         enumerating content: _SwiftUI_VariadicView<Content>,
         id: KeyPath<_VariadicViewChildren.Subview, ID>,
@@ -54,6 +49,21 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
         self.transform = nil
     }
     
+    public init<Trait: _ViewTraitKey, UnwrappedTraitValue>(
+        enumerating content: _SwiftUI_VariadicView<Content>,
+        trait: KeyPath<_ViewTraitKeys, Trait.Type>,
+        id: KeyPath<UnwrappedTraitValue, ID>,
+        @ViewBuilder content subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
+    ) where Trait.Value == Optional<UnwrappedTraitValue> {
+        self.content = content
+        self.id = (\_VariadicViewChildren.Subview[trait: trait]).appending(path: \.unsafelyUnwrapped).appending(path: id)
+        self.subview = subview
+        self.transform = nil
+        self.filter = { (subview: _VariadicViewChildren.Subview) in
+            subview[trait: trait] != nil
+        }
+    }
+    
     public init<Trait: _ViewTraitKey>(
         enumerating content: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
@@ -70,35 +80,52 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
 }
 
 extension _ForEachSubview {
-    public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
+    public init<Trait: _ViewTraitKey, UnwrappedTraitValue: Identifiable, _Subview: View>(
         _ source: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
         @ViewBuilder content: @escaping (_VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
-    ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == AnyView {
+    ) where Trait.Value == Optional<UnwrappedTraitValue>, ID == UnwrappedTraitValue.ID, Subview == _ConditionalContent<_Subview, EmptyView> {
         self.init(
             enumerating: source,
             trait: trait,
-            id: \.?.id
-        ) { (index: Int, subview: _VariadicViewChildren.Subview) -> AnyView in
+            id: \.id
+        ) { (index: Int, subview: _VariadicViewChildren.Subview) -> _ConditionalContent<_Subview, EmptyView> in
             if let traitValue = subview[trait: trait] {
-                return content(subview, traitValue)
-                    .eraseToAnyView()
+                content(subview, traitValue)
             } else {
-                return EmptyView()
-                    .eraseToAnyView()
+                EmptyView()
             }
         }
     }
     
-    public init<Trait: _ViewTraitKey, UnwrappedTraitValue, _Subview: View>(
+    public init<Trait: _ViewTraitKey, UnwrappedTraitValue: Identifiable, _Subview: View>(
         enumerating source: _SwiftUI_VariadicView<Content>,
         trait: KeyPath<_ViewTraitKeys, Trait.Type>,
+        id: KeyPath<UnwrappedTraitValue, ID>,
         @ViewBuilder content: @escaping (Int, _VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
-    ) where Trait.Value == Optional<UnwrappedTraitValue>, UnwrappedTraitValue: Identifiable, ID == Optional<UnwrappedTraitValue.ID>, Subview == _ConditionalContent<_Subview, EmptyView> {
+    ) where Trait.Value == Optional<UnwrappedTraitValue>, ID == UnwrappedTraitValue.ID, Subview == _ConditionalContent<_Subview, EmptyView> {
         self.init(
             enumerating: source,
             trait: trait,
-            id: \.?.id
+            id: id
+        ) { (index: Int, subview: _VariadicViewChildren.Subview) -> _ConditionalContent<_Subview, EmptyView> in
+            if let traitValue = subview[trait: trait] {
+                return ViewBuilder.buildEither(first: content(index, subview, traitValue))
+            } else {
+                return ViewBuilder.buildEither(second: EmptyView())
+            }
+        }
+    }
+
+    public init<Trait: _ViewTraitKey, UnwrappedTraitValue: Identifiable, _Subview: View>(
+        enumerating source: _SwiftUI_VariadicView<Content>,
+        trait: KeyPath<_ViewTraitKeys, Trait.Type>,
+        @ViewBuilder content: @escaping (Int, _VariadicViewChildren.Subview, UnwrappedTraitValue) -> _Subview
+    ) where Trait.Value == Optional<UnwrappedTraitValue>, ID == UnwrappedTraitValue.ID, Subview == _ConditionalContent<_Subview, EmptyView> {
+        self.init(
+            enumerating: source,
+            trait: trait,
+            id: \.id
         ) { (index: Int, subview: _VariadicViewChildren.Subview) -> _ConditionalContent<_Subview, EmptyView> in
             if let traitValue = subview[trait: trait] {
                 return ViewBuilder.buildEither(first: content(index, subview, traitValue))
@@ -124,14 +151,23 @@ extension _ForEachSubview {
         _ content: _SwiftUI_VariadicView<Content>,
         @ViewBuilder subview: @escaping (_VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
-        self.init(enumerating: content, id: \.id, { index, child in subview(child) })
+        self.init(
+            enumerating: content,
+            id: \.id
+        ) { index, child in
+            subview(child)
+        }
     }
     
     public init(
         enumerating content: _SwiftUI_VariadicView<Content>,
         @ViewBuilder enumerating subview: @escaping (Int, _VariadicViewChildren.Subview) -> Subview
     ) where ID == AnyHashable {
-        self.init(enumerating: content, id: \.id, subview)
+        self.init(
+            enumerating: content,
+            id: \.id,
+            subview
+        )
     }
     
     public init(

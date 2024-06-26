@@ -203,12 +203,14 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         )
     }
     
+    @MainActor
     public func show() {
         isVisible = true
         
         _setNeedsUpdate(immediately: true)
     }
     
+    @MainActor
     public func hide() {
         isVisible = false
         
@@ -227,6 +229,7 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         )
     }
     
+    @MainActor(unsafe)
     private func _tearDown() {
         _updateWorkItem?.cancel()
         

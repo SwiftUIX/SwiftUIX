@@ -655,7 +655,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         }
         
         if representatableStateFlags.contains(.updateInProgress) {
-            DispatchQueue.main.async {
+            Task.detached(priority: .userInitiated) { @MainActor in
                 operation()
             }
         } else {
@@ -774,8 +774,8 @@ extension _PlatformTextView {
 @_spi(Internal)
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _PlatformTextView: _PlatformTextViewType {
-    func _publishTextEditorEvent(_ event: _SwiftUIX_TextEditorEvent) {
-        DispatchQueue.main.async {
+    func _publishTextEditorEvent(_ event: _SwiftUIX_TextEditorEvent) {                
+        Task.detached(priority: .userInitiated) { @MainActor in
             self._performOrSchedulePublishingChanges {
                 self._lazyTextEditorEventSubject?.send(event)
             }

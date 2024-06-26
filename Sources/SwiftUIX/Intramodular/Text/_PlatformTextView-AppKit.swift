@@ -141,6 +141,7 @@ extension _PlatformTextView {
             return nil
         }
         
+        let oldIntrinsicContentSize: CGSize? = self.intrinsicContentSize
         let proposal = AppKitOrUIKitLayoutSizeProposal(width: frame.size.width, height: nil)
         let intrinsicContentSize: CGSize?
         
@@ -148,6 +149,12 @@ extension _PlatformTextView {
             intrinsicContentSize = cached.toAppKitOrUIKitIntrinsicContentSize()
         } else {
             intrinsicContentSize = _sizeThatFits(proposal: proposal)?.toAppKitOrUIKitIntrinsicContentSize()
+            
+            if let oldIntrinsicContentSize, let intrinsicContentSize {
+                if intrinsicContentSize.width == oldIntrinsicContentSize.width || intrinsicContentSize.width == frame.width {
+                    representableCache._sizeThatFitsCache[.init(width: self.frame.width, height: nil)] = intrinsicContentSize
+                }
+            }
         }
         
         guard let intrinsicContentSize else {

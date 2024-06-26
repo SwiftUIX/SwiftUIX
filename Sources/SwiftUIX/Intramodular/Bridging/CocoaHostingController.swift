@@ -131,6 +131,15 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func withCriticalScope<Result>(
+        _ flags: Set<_CocoaHostingViewConfigurationFlag>,
+        perform action: () -> Result
+    ) -> Result {
+        assertionFailure("unimplemented")
+    
+        return action()
+    }
+    
     public func _configureSizingOptions(for type: AppKitOrUIKitResponder.Type) {
         #if os(macOS)
         switch type {

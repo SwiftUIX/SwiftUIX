@@ -209,6 +209,10 @@ extension CGSize {
     var _isInvalidForIntrinsicContentSize: Bool {
         width._isInvalidForIntrinsicContentSize || height._isInvalidForIntrinsicContentSize
     }
+    
+    var _nilIfIsInvalidForIntrinsicContentSize: CGSize? {
+        _isInvalidForIntrinsicContentSize ? nil : self
+    }
 
     /// Whether the size contains a `AppKitOrUIKitView.noIntrinsicMetric` or an infinity.
     @_optimize(speed)
