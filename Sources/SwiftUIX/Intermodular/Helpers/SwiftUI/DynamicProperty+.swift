@@ -45,6 +45,15 @@ public func withInlineStateObject<Object: ObservableObject, Content: View>(
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
+@_disfavoredOverload
+public func withInlineStateObject<Object: ObservableObject, Content: View>(
+    _ object: @autoclosure @escaping () -> Object?,
+    @ViewBuilder content: @escaping (Object?) -> Content
+) -> some View {
+    WithInlineOptionalStateObject(object(), content: { content($0.wrappedValue) })
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object,
     @ViewBuilder content: @escaping (ObservedObject<Object>.Wrapper) -> Content
@@ -115,6 +124,25 @@ private struct WithInlineStateObject<Object: ObservableObject, Content: View>: V
     init(
         _ object: @autoclosure @escaping () -> Object,
         @ViewBuilder content: @escaping (StateObject<Object>) -> Content
+    ) {
+        self._object = .init(wrappedValue: object())
+        self.content = content
+    }
+    
+    var body: some View {
+        content(_object)
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
+private struct WithInlineOptionalStateObject<Object: ObservableObject, Content: View>: View {
+    @StateObject.Optional var object: Object?
+    
+    let content: (StateObject<Object>.Optional) -> Content
+    
+    init(
+        _ object: @autoclosure @escaping () -> Object?,
+        @ViewBuilder content: @escaping (StateObject<Object>.Optional) -> Content
     ) {
         self._object = .init(wrappedValue: object())
         self.content = content
