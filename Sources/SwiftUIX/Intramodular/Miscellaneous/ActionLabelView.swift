@@ -93,8 +93,7 @@ extension ActionLabelView where Label == Text {
     }
 }
 
-// FIXME: Uncomment once Xcode 13.3 fixes this segfault.
-/*@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Button where Label == SwiftUI.Label<Text, Image> {
     public init(
         _ title: String,
@@ -105,17 +104,16 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
             Label(title, systemImage: systemImage)
         }
     }
-}*/
-
+}
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-extension Button where Label == SwiftUI.Label<Text, Image> {
-    public init(
+extension Button {
+    public init<Icon: View>(
         _ title: String,
-        systemImage: SFSymbolName,
-        action: @escaping () -> Void
-    ) {
+        action: @escaping () -> Void,
+        @ViewBuilder icon: () -> Icon
+    ) where Label == SwiftUI.Label<Text, Icon> {
         self.init(action: action) {
-            Label(title, systemImage: systemImage)
+            Label(title, icon: icon)
         }
     }
 }
