@@ -129,11 +129,11 @@ public enum _SwiftUI_ImageProvider {
 }
 
 extension Image {
-#if os(macOS)
+    #if os(macOS)
     public typealias _AppKitOrUIKitType = NSImage
-#elseif os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
+    #elseif os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
     public typealias _AppKitOrUIKitType = UIImage
-#endif
+    #endif
     
     public func _toAppKitOrUIKitImage(
         in environment: EnvironmentValues
