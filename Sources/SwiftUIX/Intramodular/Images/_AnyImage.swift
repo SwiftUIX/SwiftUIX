@@ -30,7 +30,18 @@ extension _AnyImage {
             case .appKitOrUIKitImage(let image):
                 return image
             case .named(let name):
-                return .init(named: name)
+                return AppKitOrUIKitImage(named: name)
+        }
+    }
+}
+
+extension _AnyImage {
+    public var jpegData: Data? {
+        switch self {
+            case .appKitOrUIKitImage:
+                return appKitOrUIKitImage?._SwiftUIX_jpegData
+            case .named:
+                return appKitOrUIKitImage?._SwiftUIX_jpegData
         }
     }
 }
