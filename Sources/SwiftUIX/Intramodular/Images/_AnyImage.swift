@@ -106,6 +106,10 @@ extension _AnyImage {
                 return appKitOrUIKitImage?._SwiftUIX_jpegData
         }
     }
+    
+    public init?(jpegData: Data) {
+        self.init(AppKitOrUIKitImage(_SwiftUIX_jpegData: jpegData))
+    }
 }
 
 // MARK: - Initializers

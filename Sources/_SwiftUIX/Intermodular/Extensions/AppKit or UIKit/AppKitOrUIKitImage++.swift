@@ -41,6 +41,10 @@ extension AppKitOrUIKitImage {
         
         return self.jpegData(compressionQuality: 1.0)
     }
+    
+    public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
+        self.init(data: jpegData)
+    }
 }
 #endif
 
@@ -100,6 +104,10 @@ extension AppKitOrUIKitImage {
         }
         
         return bitmapImage.representation(using: .jpeg, properties: [:])
+    }
+    
+    public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
+        self.init(data: jpegData)
     }
 }
 #endif

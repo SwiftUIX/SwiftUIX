@@ -181,9 +181,9 @@ extension NSStatusItem {
         
         if let label = item.label as? _MenuBarExtraLabelContent {
             switch label {
-                case .image(let image, let imageSize):
+                case .image(let image):
                     button.image = image.appKitOrUIKitImage
-                    button.image?.size = imageSize ?? .init(width: 18, height: 18)
+                    button.image?.size = CGSize(image._preferredSize, default: CGSize(width: 18, height: 18))
                     button.image?.isTemplate = true
                 case .text(let string):
                     button.title = string
