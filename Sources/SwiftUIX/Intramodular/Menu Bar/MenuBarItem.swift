@@ -54,7 +54,9 @@ extension MenuBarItem where Label == _MenuBarExtraLabelContent {
         self.init(
             id: id,
             length: length ?? 28.0,
-            label: .image(image, size: imageSize ?? CGSize(width: 18.0, height: 18.0)),
+            label: .image(
+                image._preferredSize(imageSize ?? CGSize(width: 18.0, height: 18.0))
+            ),
             content: content()
         )
     }
@@ -69,7 +71,9 @@ extension MenuBarItem where Label == _MenuBarExtraLabelContent {
         self.init(
             id: id,
             length: length,
-            label: .image(.named(image), size: imageSize),
+            label: .image(
+                _AnyImage(named: image)._preferredSize(imageSize)
+            ),
             content: content()
         )
     }
@@ -153,14 +157,13 @@ extension View {
 // MARK: - Auxiliary
 
 public enum _MenuBarExtraLabelContent: Hashable, View {
-    case image(_AnyImage, size: CGSize?)
+    case image(_AnyImage)
     case text(String)
     
     public var body: some View {
         switch self {
-            case .image(let image, let size):
+            case .image(let image):
                 image
-                    .frame(size)
             case .text(let text):
                 Text(text)
         }
@@ -168,11 +171,8 @@ public enum _MenuBarExtraLabelContent: Hashable, View {
     
     public func hash(into hasher: inout Hasher) {
         switch self {
-            case .image(let image, let size):
+            case .image(let image):
                 image.hash(into: &hasher)
-                
-                (size?.width)?.hash(into: &hasher)
-                (size?.height)?.hash(into: &hasher)
             case .text(let string):
                 string.hash(into: &hasher)
         }

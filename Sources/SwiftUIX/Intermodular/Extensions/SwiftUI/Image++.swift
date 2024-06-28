@@ -62,13 +62,11 @@ extension Image {
 }
 
 extension Image {
-    public func resizable(_ resizable: Bool) -> some View {
-        PassthroughView {
-            if resizable {
-                self.resizable()
-            } else {
-                self
-            }
+    public func resizable(_ resizable: Bool?) -> Image {
+        if let resizable, resizable {
+            self.resizable()
+        } else {
+            self
         }
     }
     

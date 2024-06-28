@@ -9,7 +9,8 @@ import SwiftUI
 public typealias ImageName = _AnyImage.Name
 
 /// A portable representation of an image.
-public enum _AnyImage: Hashable, @unchecked Sendable {
+@frozen
+public struct _AnyImage: Hashable, @unchecked Sendable {
     @frozen
     public enum Name: Hashable, @unchecked Sendable {
         case bundleResource(String, in: Bundle? = .main)
@@ -20,13 +21,74 @@ public enum _AnyImage: Hashable, @unchecked Sendable {
         }
     }
     
-    case appKitOrUIKitImage(AppKitOrUIKitImage)
-    case named(Name)
+    public enum Payload: Hashable {
+        case appKitOrUIKitImage(AppKitOrUIKitImage)
+        case named(Name)
+    }
+    
+    let payload: Payload
+    
+    var resizable: Bool?
+    var _preferredSize: OptionalDimensions = nil
+    
+    public init(payload: Payload) {
+        self.payload = payload
+    }
+    
+    public init(named name: Name) {
+        self.init(payload: .named(name))
+    }
 }
 
 extension _AnyImage {
+    public func resizable(
+        _ resizable: Bool
+    ) -> Self {
+        var result = self
+        
+        result.resizable = resizable
+        
+        return result
+    }
+    
+    public func _preferredSize(
+        _ size: OptionalDimensions
+    ) -> Self {
+        var result = self
+        
+        result._preferredSize = size
+        
+        return result
+    }
+    
+    public func _preferredSize(
+        _ size: CGSize?
+    ) -> Self {
+        self._preferredSize(OptionalDimensions(size))
+    }
+}
+
+extension _AnyImage {
+    public var _SwiftUI_image: Image {
+        let result: Image = {
+            switch payload {
+                case .appKitOrUIKitImage(let image):
+                    Image(image: image)
+                case .named(let name):
+                    switch name {
+                        case .bundleResource(let name, let bundle):
+                            Image(name, bundle: bundle)
+                        case .system(let name):
+                            Image(_systemName: name)
+                    }
+            }
+        }()
+        
+        return result.resizable(resizable)
+    }
+    
     public var appKitOrUIKitImage: AppKitOrUIKitImage? {
-        switch self {
+        switch payload {
             case .appKitOrUIKitImage(let image):
                 return image
             case .named(let name):
@@ -37,7 +99,7 @@ extension _AnyImage {
 
 extension _AnyImage {
     public var jpegData: Data? {
-        switch self {
+        switch payload {
             case .appKitOrUIKitImage:
                 return appKitOrUIKitImage?._SwiftUIX_jpegData
             case .named:
@@ -54,15 +116,15 @@ extension _AnyImage {
             return nil
         }
         
-        self = .appKitOrUIKitImage(image)
+        self.init(payload: .appKitOrUIKitImage(image))
     }
     
     public init(_ image: AppKitOrUIKitImage) {
-        self = .appKitOrUIKitImage(image)
+        self.init(payload: .appKitOrUIKitImage(image))
     }
     
     public init(systemName: String) {
-        self = .named(.system(systemName))
+        self.init(payload: .named(.system(systemName)))
     }
     
     public init(systemName: SFSymbolName) {
@@ -83,14 +145,14 @@ extension _AnyImage: Codable {
     
     public init(from decoder: Decoder) throws {
         do {
-            self = try .named(Name(from: decoder))
+            self.init(payload: try Payload.named(Name(from: decoder)))
         } catch {
             throw _DecodingError.unsupported
         }
     }
     
     public func encode(to encoder: Encoder) throws {
-        switch self {
+        switch payload {
             case .named(let name):
                 try name.encode(to: encoder)
             case .appKitOrUIKitImage:
@@ -153,17 +215,7 @@ extension _AnyImage.Name: Codable {
 
 extension _AnyImage: View {
     public var body: some View {
-        switch self {
-            case .appKitOrUIKitImage(let image):
-                Image(image: image)
-            case .named(let name):
-                switch name {
-                    case .bundleResource(let name, let bundle):
-                        Image(name, bundle: bundle)
-                    case .system(let name):
-                        Image(_systemName: name)
-                }
-        }
+        _SwiftUI_image
     }
 }
 
@@ -231,7 +283,7 @@ extension Image {
     }
     
     public init(_ image: _AnyImage) {
-        switch image {
+        switch image.payload {
             case .appKitOrUIKitImage(let image):
                 self.init(image: image)
             case .named(let name):
