@@ -11,56 +11,67 @@ public typealias ImageName = _AnyImage.Name
 /// A portable representation of an image.
 @frozen
 public struct _AnyImage: Hashable, @unchecked Sendable {
+    /// Represents the name or identifier of an image.
     @frozen
     public enum Name: Hashable, @unchecked Sendable {
+        /// An image resource from a bundle.
         case bundleResource(String, in: Bundle? = .main)
+        /// A system image.
         case system(String)
         
+        /// Creates a system image name from an SF Symbol name.
         public static func system(_ symbol: SFSymbolName) -> Self {
             .system(symbol.rawValue)
         }
     }
     
+    /// Represents the underlying image data.
     public enum Payload: Hashable {
+        /// An AppKit or UIKit image.
         case appKitOrUIKitImage(AppKitOrUIKitImage)
+        /// A named image.
         case named(Name)
     }
     
+    /// The underlying image data.
     let payload: Payload
     
+    /// Indicates whether the image is resizable.
     var resizable: Bool?
+    /// The preferred size of the image.
     var _preferredSize: OptionalDimensions = nil
     
+    /// Initializes an _AnyImage with the given payload.
     public init(payload: Payload) {
         self.payload = payload
     }
     
+    /// Initializes an _AnyImage with the given name.
     public init(named name: Name) {
         self.init(payload: .named(name))
     }
 }
 
 extension _AnyImage {
+    /// Sets the resizable property of the image.
     public func resizable(
         _ resizable: Bool
     ) -> Self {
         var result = self
-        
         result.resizable = resizable
-        
         return result
     }
     
+    /// Sets the preferred size of the image.
     public func _preferredSize(
         _ size: OptionalDimensions
     ) -> Self {
         var result = self
-        
         result._preferredSize = size
-        
         return result
     }
     
+    /// Sets the preferred size of the image using CGSize.
     public func _preferredSize(
         _ size: CGSize?
     ) -> Self {
@@ -69,6 +80,7 @@ extension _AnyImage {
 }
 
 extension _AnyImage {
+    /// Converts the _AnyImage to a SwiftUI Image.
     public var _SwiftUI_image: Image {
         let result: Image = {
             switch payload {
@@ -87,6 +99,7 @@ extension _AnyImage {
         return result.resizable(resizable)
     }
     
+    /// Returns the AppKit or UIKit representation of the image.
     public var appKitOrUIKitImage: AppKitOrUIKitImage? {
         switch payload {
             case .appKitOrUIKitImage(let image):
@@ -98,6 +111,7 @@ extension _AnyImage {
 }
 
 extension _AnyImage {
+    /// Returns the JPEG data representation of the image.
     public var jpegData: Data? {
         switch payload {
             case .appKitOrUIKitImage:
@@ -107,6 +121,7 @@ extension _AnyImage {
         }
     }
     
+    /// Initializes an _AnyImage from JPEG data.
     public init?(jpegData: Data) {
         self.init(AppKitOrUIKitImage(_SwiftUIX_jpegData: jpegData))
     }
@@ -115,6 +130,7 @@ extension _AnyImage {
 // MARK: - Initializers
 
 extension _AnyImage {
+    /// Initializes an _AnyImage from an optional AppKit or UIKit image.
     public init?(_ image: AppKitOrUIKitImage?) {
         guard let image else {
             return nil
@@ -123,14 +139,17 @@ extension _AnyImage {
         self.init(payload: .appKitOrUIKitImage(image))
     }
     
+    /// Initializes an _AnyImage from an AppKit or UIKit image.
     public init(_ image: AppKitOrUIKitImage) {
         self.init(payload: .appKitOrUIKitImage(image))
     }
     
+    /// Initializes an _AnyImage with a system image name.
     public init(systemName: String) {
         self.init(payload: .named(.system(systemName)))
     }
     
+    /// Initializes an _AnyImage with an SF Symbol name.
     public init(systemName: SFSymbolName) {
         self.init(systemName: systemName.rawValue)
     }
@@ -218,6 +237,7 @@ extension _AnyImage.Name: Codable {
 }
 
 extension _AnyImage: View {
+    /// The content and behavior of the view.
     public var body: some View {
         _SwiftUI_image
     }
@@ -227,6 +247,7 @@ extension _AnyImage: View {
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitImage {
+    /// Initializes an AppKitOrUIKitImage with the given _AnyImage.Name.
     public convenience init?(named name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
@@ -238,6 +259,7 @@ extension AppKitOrUIKitImage {
 }
 #elseif os(macOS)
 extension AppKitOrUIKitImage {
+    /// Initializes an AppKitOrUIKitImage with the given _AnyImage.Name.
     public convenience init?(named name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
@@ -270,6 +292,7 @@ extension AppKitOrUIKitImage {
 // MARK: - Helpers
 
 extension Image {
+    /// Initializes an Image with the given _AnyImage.Name.
     public init(_ name: _AnyImage.Name) {
         switch name {
             case .bundleResource(let name, let bundle):
@@ -286,6 +309,7 @@ extension Image {
         }
     }
     
+    /// Initializes an Image with the given _AnyImage.
     public init(_ image: _AnyImage) {
         switch image.payload {
             case .appKitOrUIKitImage(let image):
@@ -295,6 +319,7 @@ extension Image {
         }
     }
     
+    /// Initializes an Image with the given _AnyImage.
     @_disfavoredOverload
     public init(image: _AnyImage) {
         self.init(image)
