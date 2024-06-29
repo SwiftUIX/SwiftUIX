@@ -224,7 +224,7 @@ public struct EditableText: View {
                 endEditing()
             }
         )
-        .textFieldStyle(.roundedBorder)
+        .textFieldStyle(.plain)
         .fixedSize(horizontal: false, vertical: true)
         .lineLimit(1)
     }
