@@ -74,8 +74,8 @@ extension AttributedText {
     
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     @_disfavoredOverload
-    public func foregroundColor(_ foregroundColor: Color) -> Self {
-        then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor.toUIColor() })
+    public func foregroundColor(_ foregroundColor: Color?) -> Self {
+        then({ $0.configuration.appKitOrUIKitForegroundColor = foregroundColor?.toUIColor() })
     }
     #endif
 }
