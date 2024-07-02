@@ -52,18 +52,18 @@ extension View {
     /// - Parameters:
     ///     - color: The color to use for the navigation bar.
     @inlinable
-    public func navigationBarColor(_ color: Color) -> some View {
+    public func navigationBarColor(_ color: Color?) -> some View {
         _configureUINavigationBar { navigationBar in
-            navigationBar.backgroundColor = color.toUIColor()
-            navigationBar.barTintColor = color.toUIColor()
+            navigationBar.backgroundColor = color?.toUIColor()
+            navigationBar.barTintColor = color?.toUIColor()
         }
     }
     
     /// Configures the tint color of the navigation bar for this view.
     @inlinable
-    public func navigationBarTint(_ color: Color) -> some View {
+    public func navigationBarTint(_ color: Color?) -> some View {
         _configureUINavigationBar { navigationBar in
-            navigationBar.tintColor = color.toAppKitOrUIKitColor()
+            navigationBar.tintColor = color?.toAppKitOrUIKitColor()
         }
     }
 
