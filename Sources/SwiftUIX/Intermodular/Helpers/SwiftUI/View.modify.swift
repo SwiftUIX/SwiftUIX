@@ -70,7 +70,7 @@ extension View {
         forUnwrapped value: Value?,
         transform: (Value) -> AnyViewModifier
     ) -> some View {
-        if let value {
+        if let value, !(value is EmptyView) {
             modifier(transform(value))
         } else {
             self

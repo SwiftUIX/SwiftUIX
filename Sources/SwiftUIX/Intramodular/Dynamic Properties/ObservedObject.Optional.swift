@@ -10,7 +10,7 @@ extension ObservedObject {
     /// A property wrapper type that subscribes to an (optional) observable object and invalidates a view whenever the observable object changes.
     @propertyWrapper
     public struct Optional: DynamicProperty {
-        private typealias Container = _ObservableObjectBox<ObjectType, ObjectType?>
+        private typealias Container = _ObservableObjectMutableBox<ObjectType, ObjectType?>
         
         private let base: ObjectType?
         

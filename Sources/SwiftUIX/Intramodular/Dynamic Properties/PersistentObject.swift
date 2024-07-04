@@ -11,9 +11,9 @@ import SwiftUI
 public struct PersistentObject<Value>: DynamicProperty {
     private let thunk: () -> AnyObject?
     
-    @State private var objectContainer: _AnyObservableObjectBox<Value>
+    @State private var objectContainer: _AnyObservableObjectMutableBox<Value>
     
-    @ObservedObject private var observedObjectContainer: _AnyObservableObjectBox<Value>
+    @ObservedObject private var observedObjectContainer: _AnyObservableObjectMutableBox<Value>
     
     public var wrappedValue: Value {
         get {
@@ -45,16 +45,16 @@ public struct PersistentObject<Value>: DynamicProperty {
         wrappedValue thunk: @autoclosure @escaping () -> Value
     ) where Value: ObservableObject {
         self.thunk = thunk
-        self._objectContainer = State(initialValue: _ObservableObjectBox(makeBase: thunk))
-        self._observedObjectContainer = ObservedObject(initialValue: _ObservableObjectBox(makeBase: thunk))
+        self._objectContainer = State(initialValue: _ObservableObjectMutableBox(makeBase: thunk))
+        self._observedObjectContainer = ObservedObject(initialValue: _ObservableObjectMutableBox(makeBase: thunk))
     }
     
     public init<T: ObservableObject>(
         wrappedValue thunk: @autoclosure @escaping () -> Value
     ) where Value == Optional<T> {
         self.thunk = { thunk() }
-        self._objectContainer = State(initialValue: _ObservableObjectBox(base: nil))
-        self._observedObjectContainer = ObservedObject(initialValue: _ObservableObjectBox(base: nil))
+        self._objectContainer = State(initialValue: _ObservableObjectMutableBox(base: nil))
+        self._observedObjectContainer = ObservedObject(initialValue: _ObservableObjectMutableBox(base: nil))
     }
     
     public init<T: ObservableObject & _SwiftUIX_MutablePropertyWrapperObject>(
@@ -62,8 +62,8 @@ public struct PersistentObject<Value>: DynamicProperty {
     ) where Value: ObservableObject, Value == T._SwiftUIX_WrappedValueType {
         self.thunk = { thunk() }
         
-        let makeBox: (() -> _AnyObservableObjectBox<T._SwiftUIX_WrappedValueType>) = {
-            _ObservableObjectBox<T, T._SwiftUIX_WrappedValueType>(
+        let makeBox: (() -> _AnyObservableObjectMutableBox<T._SwiftUIX_WrappedValueType>) = {
+            _ObservableObjectMutableBox<T, T._SwiftUIX_WrappedValueType>(
                 base: nil,
                 wrappedValue: { (propertyWrapper: inout T?) in
                     let _propertyWrapper: T

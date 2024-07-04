@@ -686,9 +686,9 @@ extension _PlatformTextView {
         } else {
             assert(proposal.size.maximum == nil)
             
-            let _sizeThatFits = _uncachedSizeThatFits(for: targetWidth)
+            let _sizeThatFits: CGSize? = _uncachedSizeThatFits(for: targetWidth)
             
-            guard var result = _sizeThatFits else {
+            guard var result: CGSize = _sizeThatFits else {
                 return nil
             }
             

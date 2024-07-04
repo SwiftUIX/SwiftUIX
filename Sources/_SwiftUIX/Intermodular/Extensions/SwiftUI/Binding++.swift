@@ -210,7 +210,9 @@ extension Binding {
         )
     }
     
-    public func withDefaultValue<T: Equatable>(_ defaultValue: T) -> Binding<T> where Value == Optional<T> {
+    public func withDefaultValue<T: Equatable>(
+        _ defaultValue: T
+    ) -> Binding<T> where Value == Optional<T> {
         Binding<T>(
             get: {
                 self.wrappedValue ?? defaultValue
