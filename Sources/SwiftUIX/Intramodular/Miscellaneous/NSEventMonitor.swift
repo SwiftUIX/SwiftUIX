@@ -84,21 +84,25 @@ extension View {
     public func onAppKitEvent(
         context: NSEventMonitor.Context = .local,
         matching mask: NSEvent.EventTypeMask,
+        using eventMonitorType: _NSEventMonitorType.Type = NSEventMonitor.self,
         perform action: @escaping (NSEvent) -> NSEvent?
     ) -> some View {
         modifier(
             _AttachNSEventMonitor(
-                eventMonitor: .init(context: context, matching: mask),
-                handleEvent: action
+                context: context,
+                eventMask: mask,
+                handleEvent: action,
+                eventMonitorType: eventMonitorType
             )
         )
     }
     
     public func onAppKitKeyboardShortcutEvent(
         context: NSEventMonitor.Context = .local,
+        using eventMonitorType: _NSEventMonitorType.Type = NSEventMonitor.self,
         perform action: @escaping (KeyboardShortcut) -> Bool
     ) -> some View {
-        onAppKitEvent(context: context, matching: [.keyDown]) { event in
+        onAppKitEvent(context: context, matching: [.keyDown], using: eventMonitorType) { event in
             guard let shortcut = KeyboardShortcut(from: event) else {
                 return event
             }
@@ -112,9 +116,15 @@ extension View {
     @available( macOS 12.0, *)
     public func onAppKitKeyboardShortcutEvent(
         _ shortcutToMatch: KeyboardShortcut,
+        context: NSEventMonitor.Context = .local,
+        using eventMonitorType: _NSEventMonitorType.Type = NSEventMonitor.self,
         perform action: @escaping () -> Void
     ) -> some View {
-        onAppKitEvent(context: .local, matching: [.keyDown]) { event in
+        onAppKitEvent(
+            context: .local,
+            matching: [.keyDown],
+            using: eventMonitorType
+        ) { (event: NSEvent) in
             guard let shortcut = KeyboardShortcut(from: event) else {
                 return event
             }
@@ -133,10 +143,14 @@ extension View {
     public func onAppKitKeyboardShortcutEvent(
         _ key: KeyEquivalent,
         modifiers: SwiftUI.EventModifiers = [.command],
+        context: NSEventMonitor.Context = .local,
+        using eventMonitorType: _NSEventMonitorType.Type = NSEventMonitor.self,
         perform action: @escaping () -> Void
     ) -> some View {
         onAppKitKeyboardShortcutEvent(
-            .init(key, modifiers: modifiers),
+            KeyboardShortcut(key, modifiers: modifiers),
+            context: context,
+            using: eventMonitorType,
             perform: action
         )
     }
@@ -145,14 +159,38 @@ extension View {
 // MARK: - Auxiliary
 
 private struct _AttachNSEventMonitor: ViewModifier {
-    @State var eventMonitor: NSEventMonitor
-    
+    let context: NSEventMonitor.Context
+    let eventMask: NSEvent.EventTypeMask
     let handleEvent: (NSEvent) -> NSEvent?
+    
+    let eventMonitorType: any _NSEventMonitorType.Type
+    
+    @ViewStorage private var handleEventTrampoline: (NSEvent) -> NSEvent?
+    @ViewStorage private var eventMonitor: (any _NSEventMonitorType)!
+    
+    init(
+        context: NSEventMonitor.Context,
+        eventMask: NSEvent.EventTypeMask,
+        handleEvent: @escaping (NSEvent) -> NSEvent?,
+        eventMonitorType: any _NSEventMonitorType.Type
+    ) {
+        self.context = context
+        self.eventMask = eventMask
+        self.handleEvent = handleEvent
+        self.eventMonitorType = eventMonitorType
+        self._handleEventTrampoline = .init(wrappedValue: handleEvent)
+    }
     
     func body(content: Content) -> some View {
         content.background {
             PerformAction {
-                eventMonitor.handleEvent = handleEvent
+                self.handleEventTrampoline = handleEvent
+                
+                if self.eventMonitor == nil {
+                    self.eventMonitor = try! eventMonitorType.init(context: context, matching: eventMask, handleEvent: {
+                        self.handleEventTrampoline($0)
+                    })
+                }
             }
         }
     }

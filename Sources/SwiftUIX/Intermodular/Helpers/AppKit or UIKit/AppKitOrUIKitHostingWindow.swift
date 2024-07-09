@@ -117,8 +117,38 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     }
     
     #if os(macOS)
+    override open var alphaValue: CGFloat {
+        get {
+            super.alphaValue
+        } set {
+            super.alphaValue = newValue
+            
+            if newValue == 0.0 {
+                if isKeyWindow {
+                    resignKey()
+                }
+                
+                if _SwiftUIX_isFirstResponder {
+                    resignFirstResponder()
+                }
+            }
+        }
+    }
+    
+    override public var canBecomeMain: Bool {
+        guard !alphaValue.isZero, !isHidden else {
+            return false
+        }
+        
+        return super.canBecomeKey
+    }
+    
     override public var canBecomeKey: Bool {
-        _SwiftUIX_windowConfiguration.canBecomeKey ?? super.canBecomeKey
+        guard !alphaValue.isZero, !isHidden else {
+            return false
+        }
+
+        return _SwiftUIX_windowConfiguration.canBecomeKey ?? super.canBecomeKey
     }
     #endif
         
@@ -470,7 +500,6 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         
         self._contentWindowController = contentWindowController
         
-        self.alphaValue = 0.0
         self.isHidden = false
 
         if _SwiftUIX_windowConfiguration.windowPosition == nil {
@@ -478,12 +507,9 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
             
             DispatchQueue.main.async {
                 self.applyPreferredConfiguration()
-                self.alphaValue = 1.0
             }
         } else {
             contentWindowController.showWindow(self)
-            
-            self.alphaValue = 1.0
         }
         #else
         isHidden = false

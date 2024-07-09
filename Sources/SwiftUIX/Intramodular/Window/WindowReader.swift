@@ -80,6 +80,11 @@ extension _WindowPresentationController {
         self.contentWindow?.level = .screenSaver
         self.contentWindow?.orderFrontRegardless()
     }
+    
+    public func moveToBack() {
+        self.contentWindow?.level = .normal
+        self.contentWindow?.orderOut(nil)
+    }
 }
 #else
 @available(macCatalystApplicationExtension, unavailable)
