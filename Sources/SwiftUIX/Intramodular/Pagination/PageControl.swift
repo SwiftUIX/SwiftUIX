@@ -113,12 +113,12 @@ extension View {
     }
     
     @inlinable
-    public func pageIndicatorTintColor(_ color: Color) -> some View {
+    public func pageIndicatorTintColor(_ color: Color?) -> some View {
         environment(\.pageIndicatorTintColor, color)
     }
     
     @inlinable
-    public func currentPageIndicatorTintColor(_ color: Color) -> some View {
+    public func currentPageIndicatorTintColor(_ color: Color?) -> some View {
         environment(\.currentPageIndicatorTintColor, color)
     }
 }
