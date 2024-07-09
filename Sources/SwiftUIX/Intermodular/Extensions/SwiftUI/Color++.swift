@@ -385,7 +385,10 @@ extension Color {
     /// - Parameter hexadecimal: A hexadecimal representation of the color.
     ///
     /// - Returns: A `Color` from the given color code. Returns `nil` if the code is invalid.
-    public init!(hexadecimal string: String) {
+    public init!(
+        _ colorSpace: Color.RGBColorSpace = .sRGB,
+        hexadecimal string: String
+    ) {
         var string: String = string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         
         if string.hasPrefix("#") {
@@ -413,7 +416,7 @@ extension Color {
             
             let gray = Double(g) / 255.0
             
-            self.init(.sRGB, red: gray, green: gray, blue: gray, opacity: 1)
+            self.init(colorSpace, red: gray, green: gray, blue: gray, opacity: 1)
         } else if string.count == 4 {
             let mask = 0x00FF
             
@@ -423,7 +426,7 @@ extension Color {
             let gray = Double(g) / 255.0
             let alpha = Double(a) / 255.0
             
-            self.init(.sRGB, red: gray, green: gray, blue: gray, opacity: alpha)
+            self.init(colorSpace, red: gray, green: gray, blue: gray, opacity: alpha)
         } else if string.count == 6 {
             let mask = 0x0000FF
             
@@ -435,7 +438,7 @@ extension Color {
             let green = Double(g) / 255.0
             let blue = Double(b) / 255.0
             
-            self.init(.sRGB, red: red, green: green, blue: blue, opacity: 1)
+            self.init(colorSpace, red: red, green: green, blue: blue, opacity: 1)
         } else if string.count == 8 {
             let mask = 0x000000FF
             
@@ -449,7 +452,7 @@ extension Color {
             let blue = Double(b) / 255.0
             let alpha = Double(a) / 255.0
             
-            self.init(.sRGB, red: red, green: green, blue: blue, opacity: alpha)
+            self.init(colorSpace, red: red, green: green, blue: blue, opacity: alpha)
         } else {
             return nil
         }
