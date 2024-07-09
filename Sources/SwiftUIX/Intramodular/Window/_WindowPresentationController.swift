@@ -8,10 +8,16 @@ import Combine
 import Swift
 import SwiftUI
 
+public class _AnyWindowPresentationController: ObservableObject {
+    init() {
+        
+    }
+}
+
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
-public final class _WindowPresentationController<Content: View>: ObservableObject {
+public final class _WindowPresentationController<Content: View>: _AnyWindowPresentationController {
     public enum ContentBacking {
         case view(Content)
         case hostingController(AppKitOrUIKitHostingWindow<Content>._ContentViewControllerType)
@@ -136,6 +142,8 @@ public final class _WindowPresentationController<Content: View>: ObservableObjec
         self.canBecomeKey = canBecomeKey
         self.isVisible = isVisible
         
+        super.init()
+
         if isVisible, content.hostingController != nil {
             self._update()
             
@@ -416,4 +424,18 @@ extension AppKitOrUIKitHostingWindow {
     }
 }
 
+#endif
+
+#if os(macOS)
+extension NSDocument {
+    public func addWindowController<T>(
+        _ controller: _WindowPresentationController<T>
+    ) {
+        guard let windowController = controller._sourceAppKitOrUIKitWindow?.windowController else {
+            return
+        }
+        
+        self.addWindowController(windowController)
+    }
+}
 #endif

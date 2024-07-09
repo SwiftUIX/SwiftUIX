@@ -59,7 +59,7 @@ public struct PersistentObject<Value>: DynamicProperty {
     
     public init<T: ObservableObject & _SwiftUIX_MutablePropertyWrapperObject>(
         unwrapping thunk: @autoclosure @escaping () -> T
-    ) where Value: ObservableObject, Value == T._SwiftUIX_WrappedValueType {
+    ) where Value == T._SwiftUIX_WrappedValueType {
         self.thunk = { thunk() }
         
         let makeBox: (() -> _AnyObservableObjectMutableBox<T._SwiftUIX_WrappedValueType>) = {
@@ -91,7 +91,7 @@ public struct PersistentObject<Value>: DynamicProperty {
     
     public init<T: ObservableObject & _SwiftUIX_MutablePropertyWrapperObject>(
         unwrapping thunk: @escaping () -> T
-    ) where Value: ObservableObject, Value == T._SwiftUIX_WrappedValueType {
+    ) where Value == T._SwiftUIX_WrappedValueType {
         self.init(unwrapping: thunk())
     }
     

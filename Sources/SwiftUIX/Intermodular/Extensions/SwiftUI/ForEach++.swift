@@ -166,6 +166,51 @@ extension ForEach where Content: View {
     }
 }
 
+extension ForEach where Content: View {
+    public init<Key: Comparable, Value>(
+        sorting dictionary: Dictionary<Key, Value>,
+        id: KeyPath<Key, ID>,
+        @ViewBuilder content: @escaping (Key, Value) -> Content
+    ) where Data == [Dictionary<Key, Value>.Element], ID == Dictionary<ID, Value>.Key {
+        let data: Data = dictionary.sorted(by: {
+            $0.key < $1.key
+        })
+        let content: (Data.Element) -> Content = { content($0.key, $0.value) }
+        let keyPath: KeyPath<Data.Element, ID> = (\Data.Element.key).appending(path: id)
+        
+        self.init(data, id: keyPath, content: content)
+    }
+    
+    public init<Key: Hashable, Comparator: Comparable, Value>(
+        sorting dictionary: Dictionary<Key, Value>,
+        by comparator: KeyPath<Key, Comparator>,
+        id: KeyPath<Key, ID>,
+        @ViewBuilder content: @escaping (Key, Value) -> Content
+    ) where Data == [Dictionary<Key, Value>.Element], ID == Dictionary<ID, Value>.Key {
+        let data: Data = dictionary.sorted(by: { (lhs: (key: Key, value: Value), rhs: (key: Key, value: Value)) -> Bool in
+            return lhs.key[keyPath: comparator] < rhs.key[keyPath: comparator]
+        })
+        let content: (Data.Element) -> Content = { content($0.key, $0.value) }
+        let keyPath: KeyPath<Data.Element, ID> = (\Data.Element.key).appending(path: id)
+        
+        self.init(data, id: keyPath, content: content)
+    }
+    
+    public init<Key: Hashable, Value>(
+        sorting dictionary: Dictionary<Key, Value>,
+        by comparator: KeyPath<Key, ID>,
+        @ViewBuilder content: @escaping (Key, Value) -> Content
+    ) where Data == [Dictionary<Key, Value>.Element], ID: Comparable & Hashable {
+        let data: Data = dictionary.sorted(by: { (lhs: (key: Key, value: Value), rhs: (key: Key, value: Value)) -> Bool in
+            return lhs.key[keyPath: comparator] < rhs.key[keyPath: comparator]
+        })
+        let content: (Data.Element) -> Content = { content($0.key, $0.value) }
+        let keyPath: KeyPath<Data.Element, ID> = (\Data.Element.key).appending(path: comparator)
+        
+        self.init(data, id: keyPath, content: content)
+    }
+}
+
 // MARK: - Auxiliary
 
 extension Binding {
