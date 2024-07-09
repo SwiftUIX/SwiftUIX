@@ -14,7 +14,9 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
     
     public var wrappedValue: Value {
         get {
-            valueBox.value
+            let result: Value = valueBox.value
+            
+            return result
         } nonmutating set {
             valueBox.value = newValue
         }
@@ -115,7 +117,9 @@ extension UserStorage {
                     storedValue = newValue
                     
                     _isEncodingValueToStore = true
+                   
                     try store.encode(newValue, forKey: key)
+                                        
                     _isEncodingValueToStore = false
                 } catch {
                     if _isStrict {

@@ -6,8 +6,15 @@ import Foundation
 import Swift
 
 extension UserDefaults {
-    func decode<Value: Codable>(_ type: Value.Type = Value.self, forKey key: String) throws -> Value? {
-        try decode(Value.self, from: object(forKey: key))
+    func decode<Value: Codable>(
+        _ type: Value.Type = Value.self,
+        forKey key: String
+    ) throws -> Value? {
+        if (type == URL.self) || (type == Optional<URL>.self), let url = self.url(forKey: key) as? Value {
+            return url
+        }
+        
+        return try decode(Value.self, from: object(forKey: key))
     }
     
     func decode<Value: Codable>(_ type: Value.Type, from object: Any?) throws -> Value? {
@@ -16,7 +23,13 @@ extension UserDefaults {
         }
         
         if type is URL.Type || type is Optional<URL>.Type {
-            return object as? Value
+            if let value = object as? Value {
+                return value
+            } else if let value = object as? String {
+                return URL(string: value) as? Value
+            } else {
+                throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Failed to decode URL from \(object)"))
+            }
         } else if let value = object as? Value {
             return value
         } else if let data = object as? Data {
