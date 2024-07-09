@@ -46,3 +46,17 @@ public struct LazyState<Value>: DynamicProperty {
         _cachedWrappedValue = value
     }
 }
+
+// MARK: - Conformances
+
+extension LazyState: Equatable where Value: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension LazyState: Hashable where Value: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        _wrappedValue.hash(into: &hasher)
+    }
+}

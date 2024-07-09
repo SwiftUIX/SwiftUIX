@@ -50,6 +50,20 @@ public struct ViewStorage<Value>: DynamicProperty {
     }
 }
 
+// MARK: - Conformances
+
+extension ViewStorage: Equatable where Value: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrappedValue == rhs.wrappedValue
+    }
+}
+
+extension ViewStorage: Hashable where Value: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        wrappedValue.hash(into: &hasher)
+    }
+}
+
 // MARK: - API
 
 extension ViewStorage {

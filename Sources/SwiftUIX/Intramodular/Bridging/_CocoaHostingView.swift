@@ -269,6 +269,11 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         _assembleCocoaHostingView()
     }
     
+    @_disfavoredOverload
+    public convenience init(rootView: Content) {
+        self.init(mainView: rootView)
+    }
+    
     public required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

@@ -98,7 +98,7 @@ extension _VariadicViewChildren {
     public struct Subview: View, Identifiable {
         @usableFromInline
         var element: SwiftUI._VariadicView.Children.Element
-        
+                
         @usableFromInline
         @_optimize(speed)
         @_transparent
