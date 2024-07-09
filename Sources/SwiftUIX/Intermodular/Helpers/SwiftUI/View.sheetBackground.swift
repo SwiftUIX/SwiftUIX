@@ -24,6 +24,10 @@ struct _UpdateSheetBackground: ViewModifier {
 
     @State private var didSet: Bool = false
     
+    init(color: Color?) {
+        self.color = color
+    }
+
     func body(content: Content) -> some View {
         content.onAppKitOrUIKitViewControllerResolution { viewController in
             guard !didSet else {
@@ -41,7 +45,7 @@ struct _UpdateSheetBackground: ViewModifier {
             #else
             if #available(macOS 11, *) {
                 viewController.view.wantsLayer = true
-                viewController.view.layer?.backgroundColor = color.cgColor
+                viewController.view.layer?.backgroundColor = color?.cgColor
             }
             #endif
         }
