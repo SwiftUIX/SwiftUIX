@@ -128,14 +128,8 @@ extension UserStorage {
                 storedValue ?? defaultValue
             } set {
                 do {
-                    if let storedValue {
-                        if self._areValuesEqual(storedValue, newValue) == true {
-                            return
-                        }
-                    }
-                    
                     objectWillChange.send()
-
+                    
                     storedValue = newValue
                     
                     _isEncodingValueToStore = true

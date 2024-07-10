@@ -12,11 +12,14 @@ public struct PersistentObject<Value>: DynamicProperty {
     private let thunk: () -> AnyObject?
     
     @State private var objectContainer: _AnyObservableObjectMutableBox<Value>
-    
-    @ObservedObject private var observedObjectContainer: _AnyObservableObjectMutableBox<Value>
+    @State private var foo: Bool = false
+
+    @ObservedObject package var observedObjectContainer: _AnyObservableObjectMutableBox<Value>
     
     public var wrappedValue: Value {
         get {
+            _ = foo
+            
             if let object = objectContainer.__unsafe_opaque_base {
                 observedObjectContainer.__unsafe_opaque_base = object
                 
@@ -30,6 +33,8 @@ public struct PersistentObject<Value>: DynamicProperty {
                 return objectContainer.wrappedValue
             }
         } nonmutating set {
+            _ = foo
+            
             observedObjectContainer.objectWillChange.send()
             
             objectContainer.wrappedValue = newValue
@@ -98,6 +103,10 @@ public struct PersistentObject<Value>: DynamicProperty {
     public mutating func update() {
         _objectContainer.update()
         _observedObjectContainer.update()
+    }
+    
+    public func _toggleFoo() {
+        foo.toggle()
     }
 }
 

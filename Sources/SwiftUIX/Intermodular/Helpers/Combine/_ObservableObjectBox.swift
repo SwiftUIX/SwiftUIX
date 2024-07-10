@@ -246,15 +246,12 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
         }
         
         baseSubscription = objectWillChangePublisher
-            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 guard let `self` = self else {
                     return
                 }
                 
-                DispatchQueue.asyncOnMainIfNecessary {
-                    `self`.objectWillChange.send()
-                }
+                `self`.objectWillChange.send()
             })
     }
 }

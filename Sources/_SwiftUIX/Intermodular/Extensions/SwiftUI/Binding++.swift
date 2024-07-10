@@ -190,16 +190,39 @@ extension Binding {
 
 extension Binding {
     public func _asOptional(defaultValue: Value) -> Binding<Optional<Value>> {
-        .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 ?? defaultValue }
+        Binding<Optional<Value>>(
+            get: {
+                self.wrappedValue
+            },
+            set: {
+                self.wrappedValue = $0 ?? defaultValue
+            }
+        )
+    }
+    
+    public func _asOptional(defaultValue: Value) -> Binding<Optional<Value>> where Value: Equatable {
+        Binding<Optional<Value>>(
+            get: {
+                self.wrappedValue
+            },
+            set: { (newValue: Value?) in
+                if let newValue {
+                    self.wrappedValue = newValue
+                } else {
+                    self.wrappedValue = defaultValue
+                }
+            }
         )
     }
     
     public func _asOptional() -> Binding<Optional<Value>> {
-        .init(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 ?? self.wrappedValue }
+        Binding<Optional<Value>>(
+            get: {
+                self.wrappedValue
+            },
+            set: {
+                self.wrappedValue = $0 ?? self.wrappedValue
+            }
         )
     }
     
