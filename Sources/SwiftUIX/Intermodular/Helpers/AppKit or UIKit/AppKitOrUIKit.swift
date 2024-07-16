@@ -94,6 +94,14 @@ extension NSWindow {
             
             if self.isVisible != isVisible {
                 self.setIsVisible(isVisible)
+                
+                if isVisible {
+                    DispatchQueue.main.async {
+                        #if os(macOS)
+                        NotificationCenter.default.post(name: NSWindow.didBecomeVisibleNotification, object: self)
+                        #endif
+                    }
+                }
             }
         }
     }

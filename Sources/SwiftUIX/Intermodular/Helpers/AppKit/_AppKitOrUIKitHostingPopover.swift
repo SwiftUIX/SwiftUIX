@@ -76,23 +76,39 @@ open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopo
 }
 #endif
 
+public struct _AppKitOrUIKitHostingPopoverConfiguration: ExpressibleByNilLiteral {
+    fileprivate let _onClose: (() -> Void)?
+    
+    public init(
+        onClose: (() -> Void)? = nil
+    ) {
+        self._onClose = onClose
+    }
+    
+    public init(nilLiteral: ()) {
+        self.init()
+    }
+}
+
 #if os(macOS)
 /// An AppKit popover that hosts SwiftUI view hierarchy.
 open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSPopoverDelegate, ObservableObject {
     typealias _ContentWrappingView = _AppKitOrUIKitHostingWindowContent<Content>
     typealias _ContentViewControllerType = CocoaHostingController<_ContentWrappingView>
     
+    public let configuration: _AppKitOrUIKitHostingPopoverConfiguration
+    
     private weak var _rightfulKeyWindow: NSWindow?
     private weak var _rightfulFirstResponder: AppKitOrUIKitResponder?
     
-    public var _detachedWindow: AppKitOrUIKitHostingWindow<Content>?
+    public private(set) var _detachedWindow: AppKitOrUIKitHostingWindow<Content>?
     
     private var _contentViewController: _ContentViewControllerType {
         if let contentViewController = contentViewController {
             return contentViewController as! _ContentViewControllerType
         } else {
             let result = _ContentViewControllerType(
-                mainView: .init(
+                mainView: _AppKitOrUIKitHostingWindowContent(
                     window: nil,
                     popover: self,
                     content: rootView
@@ -102,6 +118,8 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
             result._SwiftUIX_parentNSPopover = self
             
             self.contentViewController = result
+            
+            assert(result.mainView._popover != nil)
             
             result.mainView.initialized = true
             
@@ -122,9 +140,13 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
         
         return self.behavior == .transient
     }
-    
-    public init(rootView: Content) {
+        
+    public init(
+        rootView: Content,
+        configuration: _AppKitOrUIKitHostingPopoverConfiguration = nil
+    ) {
         self.rootView = rootView
+        self.configuration = configuration
         
         super.init()
         
@@ -149,22 +171,14 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
             return
         }
         
-        if _sizeContentToFit() {
+        DispatchQueue.asyncOnMainIfNecessary(force: _sizeContentToFit()) {
             _showWellSized(
                 relativeTo: positioningRect,
                 of: positioningView,
                 preferredEdge: preferredEdge
             )
-        } else {
-            DispatchQueue.main.async {
-                assert(self._sizeContentToFit())
-                
-                self._showWellSized(
-                    relativeTo: positioningRect,
-                    of: positioningView,
-                    preferredEdge: preferredEdge
-                )
-            }
+            
+            assert(self._contentViewController.mainView._popover != nil)
         }
     }
     
@@ -254,6 +268,7 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
         super.close()
         
         self.contentViewController = nil
+        
     }
     
     override open func performClose(_ sender: Any?) {

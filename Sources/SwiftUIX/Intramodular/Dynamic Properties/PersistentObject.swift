@@ -20,25 +20,20 @@ public struct PersistentObject<Value>: DynamicProperty {
         get {
             _ = foo
             
-            if let object = objectContainer.__unsafe_opaque_base {
-                observedObjectContainer.__unsafe_opaque_base = object
-                
+            if objectContainer.__unsafe_opaque_base != nil {                
                 return objectContainer.wrappedValue
             } else {
-                let object = thunk()
-                
-                objectContainer.__unsafe_opaque_base = object
-                observedObjectContainer.__unsafe_opaque_base = object
-                
-                return objectContainer.wrappedValue
+                return _thunkUnconditionally()
             }
         } nonmutating set {
             _ = foo
             
             observedObjectContainer.objectWillChange.send()
+
+            objectContainer.__unsafe_opaque_base = newValue
+            observedObjectContainer.__unsafe_opaque_base = objectContainer.__unsafe_opaque_base
             
-            objectContainer.wrappedValue = newValue
-            observedObjectContainer.wrappedValue = newValue
+            foo.toggle()
         }
     }
     
@@ -103,6 +98,31 @@ public struct PersistentObject<Value>: DynamicProperty {
     public mutating func update() {
         _objectContainer.update()
         _observedObjectContainer.update()
+    }
+    
+    
+    @discardableResult
+    private func _thunkUnconditionally() -> Value {
+        var isFirstThunk: Bool = false
+        
+        if objectContainer.__unsafe_opaque_base == nil {
+            assert(observedObjectContainer.__unsafe_opaque_base == nil)
+            
+            isFirstThunk = true
+        }
+        
+        let result: AnyObject? = thunk()
+        
+        objectContainer.__unsafe_opaque_base = result
+        observedObjectContainer.__unsafe_opaque_base = result
+        
+        if isFirstThunk {
+            Task.detached { @MainActor in
+                foo.toggle()
+            }
+        }
+        
+        return observedObjectContainer.wrappedValue
     }
     
     public func _toggleFoo() {

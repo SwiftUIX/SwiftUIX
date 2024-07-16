@@ -7,7 +7,7 @@ import Swift
 
 @_spi(Internal)
 public class _AnyObservableObjectMutableBox<WrappedValue>: ObservableObject {
-    public var __unsafe_opaque_base: AnyObject? {
+    public var __unsafe_opaque_base: Any? {
         get {
             fatalError()
         } set {
@@ -39,19 +39,19 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
             if _equate(oldValue, base), baseSubscription != nil {
                 return
             }
+                    
+            subscribe()
             
             if oldValue != nil {
                 objectWillChange.send()
             }
-            
-            subscribe()
         }
     }
     
-    override public var __unsafe_opaque_base: AnyObject? {
+    override public var __unsafe_opaque_base: Any? {
         get {
             if let base {
-                return base as AnyObject
+                return base
             } else {
                 return nil
             }

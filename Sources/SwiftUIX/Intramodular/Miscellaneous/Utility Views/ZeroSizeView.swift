@@ -108,8 +108,9 @@ public struct ZeroSizeView: View {
     public var body: some View {
         _ZeroSizeView()
             .frame(width: 0, height: 0)
-            .accessibility(hidden: true)
+            .clipped()
             .allowsHitTesting(false)
+            .accessibility(hidden: true)
     }
     
     public init() {

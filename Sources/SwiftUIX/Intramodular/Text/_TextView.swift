@@ -18,9 +18,9 @@ import UIKit
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
-
+    
     @Environment(\._textViewConfigurationMutation) private var _textViewConfigurationMutation
-        
+    
     @ObservedObject var updater: EmptyObservableObject
     
     let data: _TextViewDataBinding
@@ -88,7 +88,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         if let _view = view as? _PlatformTextView<Label> {
             _view.representableUpdater = updater
         }
-
+        
         customAppKitOrUIKitClassConfiguration.update(view, context)
         
         if let view = view as? _PlatformTextView<Label> {
@@ -101,11 +101,11 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         
         view.delegate = context.coordinator
         
-        #if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
         view.backgroundColor = nil
-        #elseif os(macOS)
+#elseif os(macOS)
         view.focusRingType = .none
-        #endif
+#endif
         
         donateProxy(view, context: context)
         
@@ -119,15 +119,15 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         
         return view
     }
-        
+    
     func updateAppKitOrUIKitView(
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
         donateProxy(view, context: context)
-
+        
         customAppKitOrUIKitClassConfiguration.update(view, context)
-
+        
         _withoutAppKitOrUIKitAnimation(context.transaction.disablesAnimations) {
             if let view = view as? _PlatformTextView<Label> {
                 assert(view.representatableStateFlags.contains(.updateInProgress))
@@ -157,7 +157,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         guard let view = (view as? (any _PlatformTextViewType)) else {
             return
         }
-
+        
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             view._textEditorProxyBase?.wrappedValue = nil
         }
@@ -167,14 +167,18 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
-        if let proxyBinding = context.environment._textViewProxy, let view = view as? _PlatformTextView<Label> {
-            if let existing = proxyBinding.wrappedValue.base {
-                if existing.representatableStateFlags.contains(.dismantled) {
-                    proxyBinding.wrappedValue._base.wrappedValue = nil
-                }
+        guard let proxyBinding = context.environment._textViewProxy, let view = view as? _PlatformTextView<Label> else {
+            return
+        }
+        
+        if let existing = proxyBinding.wrappedValue.base {
+            if existing.representatableStateFlags.contains(.dismantled) {
+                proxyBinding.wrappedValue._base.wrappedValue = nil
             }
-            
-            if proxyBinding.wrappedValue.base !== view {
+        }
+        
+        if proxyBinding.wrappedValue.base !== view {
+            Task.detached(priority: .userInitiated) { @MainActor in
                 proxyBinding.wrappedValue.base = view
             }
         }
@@ -215,7 +219,7 @@ extension _TextView {
             guard textView.markedTextRange == nil, data != self.data.wrappedValue else {
                 return
             }
-                        
+            
             self.data.wrappedValue = data
         }
         
@@ -227,20 +231,20 @@ extension _TextView {
             if configuration.dismissKeyboardOnReturn {
                 if text == "\n" {
                     DispatchQueue.main.async {
-                        #if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
                         guard textView.isFirstResponder else {
                             return
                         }
                         
-                        #if os(visionOS)
+#if os(visionOS)
                         guard !textView.text.isEmpty else {
                             return
                         }
-                        #endif
+#endif
                         self.configuration.onCommit?()
                         
                         textView.resignFirstResponder()
-                        #endif
+#endif
                     }
                     
                     return false
@@ -276,22 +280,22 @@ extension _TextView {
         }
         
         /*func textView(
-            _ view: NSTextView,
-            write cell: NSTextAttachmentCellProtocol,
-            at charIndex: Int,
-            to pboard: NSPasteboard,
-            type: NSPasteboard.PasteboardType
-        ) -> Bool {
-            return false // TODO: Implement
-        }
-        
-        func textView(
-            _ view: NSTextView,
-            writablePasteboardTypesFor cell: NSTextAttachmentCellProtocol,
-            at charIndex: Int
-        ) -> [NSPasteboard.PasteboardType] {
-            return [] // TODO: Implement
-        }*/
+         _ view: NSTextView,
+         write cell: NSTextAttachmentCellProtocol,
+         at charIndex: Int,
+         to pboard: NSPasteboard,
+         type: NSPasteboard.PasteboardType
+         ) -> Bool {
+         return false // TODO: Implement
+         }
+         
+         func textView(
+         _ view: NSTextView,
+         writablePasteboardTypesFor cell: NSTextAttachmentCellProtocol,
+         at charIndex: Int
+         ) -> [NSPasteboard.PasteboardType] {
+         return [] // TODO: Implement
+         }*/
         
         func textDidBeginEditing(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else {
@@ -307,7 +311,7 @@ extension _TextView {
             guard let textView = notification.object as? NSTextView else {
                 return
             }
-                        
+            
             let data = textView._currentTextViewData(kind: data.wrappedValue.kind)
             
             guard data != self.data.wrappedValue else {
@@ -315,7 +319,7 @@ extension _TextView {
             }
             
             (textView as? _PlatformTextView<Label>)?._needsIntrinsicContentSizeInvalidation = true
-
+            
             self.data.wrappedValue = data
         }
         
@@ -337,7 +341,7 @@ extension _TextView {
     func makeCoordinator() -> Coordinator {
         Coordinator(updater: updater, data: data, configuration: configuration)
     }
-
+    
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public func sizeThatFits(
         _ proposal: ProposedViewSize,
@@ -351,7 +355,7 @@ extension _TextView {
         guard !view.representatableStateFlags.contains(.dismantled) else {
             return nil
         }
-
+        
         guard let size = view._sizeThatFits(
             proposal: AppKitOrUIKitLayoutSizeProposal(
                 proposal,
@@ -360,7 +364,7 @@ extension _TextView {
         ) else {
             return nil
         }
-                
+        
         return size
     }
 }

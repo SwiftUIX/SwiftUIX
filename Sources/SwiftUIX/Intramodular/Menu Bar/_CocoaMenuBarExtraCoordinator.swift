@@ -40,7 +40,7 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
         
         super.init()
         
-        DispatchQueue.asyncOnMainIfNecessary(true) {
+        DispatchQueue.asyncOnMainIfNecessary(force: true) {
             let item = self.cocoaStatusBar.statusItem(
                 withLength: item.length ?? NSStatusItem.variableLength
             )

@@ -15,8 +15,9 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindo
     var _SwiftUIX_windowConfiguration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func _SwiftUIX_present()
+    func _SwiftUIX_waitForShow() async
     func _SwiftUIX_dismiss()
-    
+
     func show()
     func hide()
 
@@ -24,6 +25,9 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindo
     func refreshPosition()
     @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
+    
+    func bringToFront()
+    func moveToBack()
 }
 #else
 public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
@@ -32,6 +36,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
     var _SwiftUIX_windowConfiguration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
     func _SwiftUIX_present()
+    func _SwiftUIX_waitForShow() async
     func _SwiftUIX_dismiss()
 
     func show()
@@ -41,6 +46,9 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
     func refreshPosition()
     @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
+    
+    func bringToFront()
+    func moveToBack()
 }
 #endif
 
@@ -224,10 +232,20 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     }
     #endif
     
-    #if os(iOS)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+    public var isVisible: Bool {
+        !isHidden && windowLevel >= .normal && alpha > 0
+    }
+    
     override public var isHidden: Bool {
         didSet {
             _rootHostingViewController.rootView.content.isPresented = !isHidden
+        }
+    }
+    #elseif os(macOS)
+    override open var isVisible: Bool {
+        get {
+            super.isVisible
         }
     }
     #endif
@@ -346,7 +364,10 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
                 self.init(contentViewController: contentViewController)
         }
         
-        contentViewController.mainView._window = self
+        Task.detached { @MainActor in
+            contentViewController.mainView._window = self
+        }
+        
         contentViewController.mainView.initialized = true
         
         if self.contentViewController == nil {
@@ -485,6 +506,10 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     // MARK: - API
     
     public func show() {
+        if let controller = windowPresentationController {
+            controller._showWasCalledOnWindow()
+        }
+
         _SwiftUIX_present()
     }
 
@@ -506,6 +531,8 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
             contentWindowController.showWindow(self)
             
             DispatchQueue.main.async {
+                assert(self._rootHostingViewController.mainView._window != nil)
+                
                 self.applyPreferredConfiguration()
             }
         } else {
@@ -537,9 +564,9 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         
     #if os(macOS)
     override open func close() {
-        super.close()
-        
         _SwiftUIX_tearDownForWindowDidClose()
+
+        super.close()
     }
     #else
     @objc open func close() {
@@ -552,10 +579,10 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     public func windowWillClose(_ notification: Notification) {
         _NSWindow_didWindowJustClose = true
         
-#if os(macOS)
+        #if os(macOS)
         self._contentWindowController?.window = nil
         self._contentWindowController = nil
-#endif
+        #endif
 
         DispatchQueue.main.async {
             self.isVisibleBinding.wrappedValue = false
@@ -566,21 +593,23 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     
     private func _SwiftUIX_tearDownForWindowDidClose() {
         #if os(macOS)
-        self._contentWindowController?.window = nil
-        self._contentWindowController = nil
+        if self._contentWindowController != nil {
+            self._contentWindowController?.window = nil
+            self._contentWindowController = nil
+        }
         
         if let popover = self._rootHostingViewController._SwiftUIX_parentNSPopover as? _AnyAppKitOrUIKitHostingPopover, popover.isDetached {
             popover._SwiftUIX_detachedWindowDidClose()
         }
         #else
-        isHidden = true
-        isUserInteractionEnabled = false
-        windowScene = nil
+        _assignIfNotEqual(false, to: \.isHidden)
+        _assignIfNotEqual(false, to: \.isUserInteractionEnabled)
+        _assignIfNotEqual(nil, to: \.windowScene)
         #endif
-
-        if isVisibleBinding.wrappedValue {
-            isVisibleBinding.wrappedValue = false
-        }
+        
+        _assignIfNotEqual(false, to: \.isVisibleBinding.wrappedValue)
+        
+        windowPresentationController?._windowDidJustClose()
     }
 }
 
@@ -759,5 +788,31 @@ extension AppKitOrUIKitHostingWindow {
     }
 }
 #endif
+
+#if os(macOS)
+extension NSWindow {
+    static var didBecomeVisibleNotification: Notification.Name {
+        Notification.Name("com.vmanot.SwiftUIX.AppKitOrUIKitHostingWindow.didBecomeVisibleNotification")
+    }
+}
+#endif
+
+extension AppKitOrUIKitHostingWindow {
+    public func _SwiftUIX_waitForShow() async {
+        guard let _rootHostingViewController, _rootHostingViewController._hostingViewStateFlags.contains(.hasAppearedAndIsCurrentlyVisible) else {
+            return
+        }
+        
+        await withUnsafeContinuation { continuation in
+            NotificationCenter.default.addObserver(forName: AppKitOrUIKitWindow.didBecomeVisibleNotification, object: self, queue: .main) { _ in
+                Task { @MainActor in
+                    NotificationCenter.default.removeObserver(self, name: AppKitOrUIKitWindow.didBecomeVisibleNotification, object: nil)
+                    
+                    continuation.resume()
+                }
+            }
+        }
+    }
+}
 
 #endif

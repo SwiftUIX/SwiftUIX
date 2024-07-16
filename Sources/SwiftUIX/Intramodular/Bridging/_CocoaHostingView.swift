@@ -11,6 +11,7 @@ import SwiftUI
 @frozen
 public enum _CocoaHostingViewStateFlag {
     case didJustMoveToSuperview
+    case hasAppearedAndIsCurrentlyVisible
 }
 
 /// These are special flags that can be set for `_CocoaHostingView` to temporarily override UIKit/AppKit behavior.

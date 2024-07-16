@@ -152,7 +152,7 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
         }
         #endif
     }
-    
+
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func loadView() {
         super.loadView()
@@ -161,7 +161,39 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
+    #elseif os(macOS)
+    override open func viewWillAppear() {
+        super.viewWillAppear()
+    }
     
+    override open func viewDidAppear() {
+        super.viewDidAppear()
+        
+        #if os(macOS)
+        if self.parent == nil {
+            DispatchQueue.main.async {
+                self._hostingViewStateFlags.insert(.hasAppearedAndIsCurrentlyVisible)
+            }
+        } else {
+            _hostingViewStateFlags.insert(.hasAppearedAndIsCurrentlyVisible)
+        }
+        #else
+        _hostingViewStateFlags.insert(.hasAppearedAndIsCurrentlyVisible)
+        #endif
+    }
+    
+    override open func viewWillDisappear() {
+        super.viewWillDisappear()
+    }
+    
+    override open func viewDidDisappear() {
+        super.viewDidDisappear()
+        
+        _hostingViewStateFlags.remove(.hasAppearedAndIsCurrentlyVisible)
+    }
+    #endif
+    
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
