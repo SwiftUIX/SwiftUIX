@@ -65,7 +65,7 @@ public func _withoutAppKitOrUIKitAnimation<Result>(
     return result
 }
 
-#if canImport(QuartzCore)
+#if canImport(QuartzCore) && !os(watchOS)
 extension CATransaction {
     @usableFromInline
     static var _SwiftUIX_actionsAreDisabled: Bool = false
