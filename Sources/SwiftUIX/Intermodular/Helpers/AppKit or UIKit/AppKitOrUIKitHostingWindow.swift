@@ -124,7 +124,15 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         }
     }
     
-    #if os(macOS)
+    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+    open var alphaValue: CGFloat {
+        get {
+            self.rootViewController?.view.alpha ?? 1
+        } set {
+            self.rootViewController?.view.alpha = newValue
+        }
+    }
+    #elseif os(macOS)
     override open var alphaValue: CGFloat {
         get {
             super.alphaValue
