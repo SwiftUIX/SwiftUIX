@@ -4,6 +4,7 @@
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+import Combine
 import SwiftUI
 
 @available(macCatalystApplicationExtension, unavailable)
@@ -74,5 +75,94 @@ extension AppKitOrUIKitWindow {
     }
 }
 #endif
+
+#if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+extension AppKitOrUIKitWindow {
+    open var alphaValue: CGFloat {
+        get {
+            self.rootViewController?.view.alpha ?? 1
+        } set {
+            self.rootViewController?.view.alpha = newValue
+        }
+    }
+}
+#endif
+
+extension AppKitOrUIKitWindow {
+    public var _SwiftUIX_isInRegularDisplay: Bool {
+        guard !isHidden else {
+            return false
+        }
+        
+        guard alphaValue != 0.0 else {
+            return false
+        }
+        
+        guard !_isNSStatusBarWindow else {
+            return false
+        }
+        
+        return true
+    }
+
+    public var _isSwiftUIWindow: Bool {
+        let className: String = NSStringFromClass(type(of: self))
+        
+        if className == "SwiftUI.SwiftUIWindow" {
+            return true
+        }
+        
+        if className == "SwiftUI.AppKitWindow" {
+            return true
+        }
+        
+        if className.hasPrefix("SwiftUI.") {
+            return true
+        }
+        
+        return false
+    }
+    
+    public var _isNSStatusBarWindow: Bool {
+        NSStringFromClass(type(of: self)).contains("NSStatusBarWindow")
+    }
+}
+
+extension AppKitOrUIKitWindow {
+    public struct _TransitionPhasePublisher: Publisher {
+        public enum Output {
+            case didBecomeKey
+            case didResignKey
+            case willClose
+        }
+        
+        public typealias Failure = Never
+        
+        public init() {
+            
+        }
+        
+        public func receive<S: Subscriber>(
+            subscriber: S
+        ) where S.Input == Output, S.Failure == Failure {
+            let notificationCenter = NotificationCenter.default
+            
+            #if os(iOS) || os(tvOS)
+            let publisher = Publishers.MergeMany(
+                notificationCenter.publisher(for: UIWindow.didBecomeKeyNotification).map { _ in Output.didBecomeKey },
+                notificationCenter.publisher(for: UIWindow.didResignKeyNotification).map { _ in Output.didResignKey }
+            )
+            #elseif os(macOS)
+            let publisher = Publishers.MergeMany(
+                notificationCenter.publisher(for: NSWindow.didBecomeKeyNotification).map { _ in Output.didBecomeKey },
+                notificationCenter.publisher(for: NSWindow.didResignKeyNotification).map { _ in Output.didResignKey },
+                notificationCenter.publisher(for: NSWindow.willCloseNotification).map { _ in Output.willClose }
+            )
+            #endif
+            
+            publisher.receive(subscriber: subscriber)
+        }
+    }
+}
 
 #endif

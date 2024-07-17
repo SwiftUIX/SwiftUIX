@@ -124,15 +124,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         }
     }
     
-    #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
-    open var alphaValue: CGFloat {
-        get {
-            self.rootViewController?.view.alpha ?? 1
-        } set {
-            self.rootViewController?.view.alpha = newValue
-        }
-    }
-    #elseif os(macOS)
+    #if os(macOS)
     override open var alphaValue: CGFloat {
         get {
             super.alphaValue
@@ -168,6 +160,20 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     }
     #endif
         
+    private var _disableBecomingKeyWindow: Bool {
+        if let canBecomeKey = _SwiftUIX_windowConfiguration.canBecomeKey {
+            guard canBecomeKey else {
+                return true
+            }
+        }
+        
+        if alphaValue == 0.0 && isHidden {
+            return true
+        }
+        
+        return false
+    }
+
     public var _rootHostingViewController: CocoaHostingController<_AppKitOrUIKitHostingWindowContent<Content>>! {
         get {
             #if os(macOS)
@@ -467,10 +473,8 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     }
     
     override public func makeKey() {
-        if let canBecomeKey = _SwiftUIX_windowConfiguration.canBecomeKey {
-            guard canBecomeKey else {
-                return
-            }
+        guard !_disableBecomingKeyWindow else {
+            return 
         }
         
         super.makeKey()
@@ -499,12 +503,18 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         
         super.makeKey()
     }
+            
+    override public func makeKeyAndOrderFront(_ sender: Any?) {
+        if _disableBecomingKeyWindow {
+            super.orderFront(nil)
+        } else {
+            super.makeKeyAndOrderFront(nil)
+        }
+    }
     
     override public func becomeKey() {
-        if let canBecomeKey = _SwiftUIX_windowConfiguration.canBecomeKey {
-            guard canBecomeKey else {
-                return
-            }
+        guard !_disableBecomingKeyWindow else {
+            return
         }
         
         super.becomeKey()
@@ -615,7 +625,9 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         _assignIfNotEqual(nil, to: \.windowScene)
         #endif
         
-        _assignIfNotEqual(false, to: \.isVisibleBinding.wrappedValue)
+        if isVisibleBinding.wrappedValue {
+            isVisibleBinding.wrappedValue = false
+        }
         
         windowPresentationController?._windowDidJustClose()
     }

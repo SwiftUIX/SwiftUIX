@@ -12,19 +12,59 @@ public protocol _AppKitOrUIKitApplicationDelegateItem: Identifiable {
 
 @propertyWrapper
 public struct _CocoaApplicationDelegateAdaptor: DynamicProperty {
+    private static var configuration: Configuration!
     private static var items: (() -> [any _AppKitOrUIKitApplicationDelegateItem])?
     
     public final class AppDelegate: NSObject, NSApplicationDelegate {
         private var items: [AnyHashable: any _AppKitOrUIKitApplicationDelegateItem] = [:]
         
+        private var configuration: Configuration {
+            _CocoaApplicationDelegateAdaptor.configuration
+        }
+        
         override init() {
             
         }
         
-        public func applicationDidFinishLaunching(_ notification: Notification) {
+        private var _activationPolicy: NSApplication.ActivationPolicy?
+        
+        public func applicationWillFinishLaunching(_ notification: Notification) {
+            if configuration.noWindowsOnLaunch {
+                _activationPolicy = NSApp.activationPolicy()
+                
+                NSApp.setActivationPolicy(.prohibited)
+            }
+        }
+        
+        public func applicationDidFinishLaunching(
+            _ notification: Notification
+        ) {
             for item in (_CocoaApplicationDelegateAdaptor.items?() ?? []) {
                 self.items[item._opaque_id] = item
             }
+            
+            if configuration.noWindowsOnLaunch {
+                for window in AppKitOrUIKitWindow._SwiftUIX_allInstances {
+                    window.close()
+                }
+            }
+            
+            if configuration.noWindowsOnLaunch {
+                NSApp.setActivationPolicy(_activationPolicy ?? .regular)
+                
+                self._activationPolicy = nil
+            }
+        }
+        
+        public func applicationWillHide(_ notification: Notification) {
+            
+        }
+        
+        public func applicationShouldHandleReopen(
+            _ sender: NSApplication,
+            hasVisibleWindows: Bool
+        ) -> Bool {
+            return true
         }
     }
     
@@ -35,11 +75,25 @@ public struct _CocoaApplicationDelegateAdaptor: DynamicProperty {
         
     }
     
+    public struct Configuration: Hashable, Sendable {
+        public let noWindowsOnLaunch: Bool
+        
+        public init(noWindowsOnLaunch: Bool) {
+            self.noWindowsOnLaunch = noWindowsOnLaunch
+        }
+        
+        public init() {
+            self.init(noWindowsOnLaunch: false)
+        }
+    }
+    
     public init(
-        @SwiftUIX._ArrayBuilder<any _AppKitOrUIKitApplicationDelegateItem> _ items: @escaping () -> [any _AppKitOrUIKitApplicationDelegateItem]
+        configuration: Configuration = .init(),
+        @SwiftUIX._ArrayBuilder<any _AppKitOrUIKitApplicationDelegateItem> _ items: @escaping () -> [any _AppKitOrUIKitApplicationDelegateItem] = { [] }
     ) {
         self.init()
         
+        Self.configuration = configuration
         Self.items = items
     }
 }
@@ -57,3 +111,4 @@ extension _AnyCocoaMenuBarExtraCoordinator: _AppKitOrUIKitApplicationDelegateIte
     
 }
 #endif
+

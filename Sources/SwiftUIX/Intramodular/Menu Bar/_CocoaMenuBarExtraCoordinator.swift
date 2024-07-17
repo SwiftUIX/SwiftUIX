@@ -23,9 +23,22 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
     var cocoaStatusItem: NSStatusItem?
     
     public var item: MenuBarItem<ID, Label, Content>
-    public var action: @MainActor () -> Void
+    public var action: (@MainActor () -> Void)?
     
-    private var popover: _AppKitMenuBarExtraPopover<ID, Label, Content>? = nil
+    package private(set) var makePopover: (() -> _AppKitMenuBarExtraPopover<ID, Label, Content>)?
+    package private(set) var popover: _AppKitMenuBarExtraPopover<ID, Label, Content>? = nil
+    
+    public var wantsPopover: Bool {
+        guard Content.self != EmptyView.self else {
+            return false
+        }
+        
+        guard makePopover != nil else {
+            return false
+        }
+        
+        return true
+    }
     
     public override var id: AnyHashable {
         item.id
@@ -33,31 +46,51 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
     
     public init(
         item: MenuBarItem<ID, Label, Content>,
-        action: @MainActor @escaping () -> Void
+        action: (@MainActor () -> Void)?
     ) {
         self.item = item
         self.action = action
         
         super.init()
         
-        DispatchQueue.asyncOnMainIfNecessary(force: true) {
-            let item = self.cocoaStatusBar.statusItem(
-                withLength: item.length ?? NSStatusItem.variableLength
-            )
-            
-            if let button = item.button {
-                button.action = #selector(self.didActivate)
-                button.target = self
+        Task.detached {
+            Task(priority: .userInitiated) { @MainActor in
+                while !NSApplication.shared.isRunning {
+                    try await Task._SwiftUIX_sleep(seconds: 0.1)
+                }
+                
+                self._setUp()
             }
-            
-            self.cocoaStatusItem = item
-            
-            self.update()
         }
     }
     
-    private func update() {
-        cocoaStatusItem?.update(from: item)
+    private func _setUp() {
+        guard self.cocoaStatusItem == nil else {
+            return
+        }
+        
+        assert(NSApplication.shared.isRunning)
+        
+        let item = self.cocoaStatusBar.statusItem(
+            withLength: item.length ?? NSStatusItem.variableLength
+        )
+        
+        if let button = item.button {
+            button.action = #selector(self.didActivate)
+            button.target = self
+        }
+        
+        self.cocoaStatusItem = item
+        
+        if wantsPopover {
+            self.popover = self.makePopover?()
+        }
+        
+        self._update()
+    }
+    
+    private func _update() {
+        cocoaStatusItem?.update(from: item, coordinator: self)
     }
     
     @MainActor(unsafe)
@@ -65,7 +98,7 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
         _ sender: AnyObject?
     ) {
         DispatchQueue.asyncOnMainIfNecessary {
-            self.action()
+            self.action?()
         }
     }
     
@@ -88,6 +121,7 @@ extension _CocoaMenuBarExtraCoordinator {
         let item = MenuBarItem<ID, Label, Content>(
             id: id,
             length: nil,
+            action: action,
             label: label(),
             content: content()
         )
@@ -103,7 +137,15 @@ extension _CocoaMenuBarExtraCoordinator {
             }
         )
         
-        popover.wrappedValue = _AppKitMenuBarExtraPopover(coordinator: self)
+        self.makePopover = {
+            assert(popover.wrappedValue == nil)
+            
+            let result = _AppKitMenuBarExtraPopover(coordinator: self)
+            
+            popover.wrappedValue = result
+            
+            return result
+        }
     }
     
     public convenience init(
@@ -131,7 +173,7 @@ extension _CocoaMenuBarExtraCoordinator {
     }
     
     public convenience init(
-        action: @MainActor @escaping () -> Void,
+        action: (@MainActor () -> Void)?,
         @ViewBuilder label: () -> Label,
         @ViewBuilder content: () -> Content
     ) where ID == AnyHashable {
@@ -153,88 +195,36 @@ extension _CocoaMenuBarExtraCoordinator {
     }
 }
 
-// MARK: - Auxiliary
+// MARK: - Supplementary
 
-extension NSStatusItem {
-    private static var NSStatusItem_labelHostingView_objcAssociationKey: UInt = 0
+public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {    
+    @State var base: _AnyCocoaMenuBarExtraCoordinator
     
-    fileprivate var labelHostingView: NSHostingView<AnyView>? {
-        get {
-            if let result = objc_getAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey) as? NSHostingView<AnyView> {
-                return result
-            }
-            
-            return nil
-        } set {
-            objc_setAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
+    public init(@ViewBuilder content: () -> Content, @ViewBuilder label: () -> Label) {
+        base = _CocoaMenuBarExtraCoordinator(
+            action: { },
+            label: label,
+            content: content
+        )
     }
     
-    fileprivate func update<ID, Label, Content>(
-        from item: MenuBarItem<ID, Label, Content>
-    ) {
-        self.length = item.length ?? NSStatusItem.variableLength
-        
-        guard let button = button else {
-            return
-        }
-        
-        if let label = item.label as? _MenuBarExtraLabelContent {
-            switch label {
-                case .image(let image):
-                    button.image = image.appKitOrUIKitImage
-                    button.image?.size = CGSize(image._preferredSize, default: CGSize(width: 18, height: 18))
-                    button.image?.isTemplate = true
-                case .text(let string):
-                    button.title = string
-            }
-        } else {            
-            for subview in button.subviews {
-                if subview !== self.labelHostingView {
-                    subview.removeFromSuperview()
-                }
-            }
-            
-            let _labelHostingViewRootView: AnyView = item.label
-                .frame(minHeight: button.frame.height == 0 ? nil : button.frame.height)
-                .fixedSize(horizontal: true, vertical: true)
-                .controlSize(.small)
-                .font(.title3)
-                .imageScale(.medium)
-                .padding(.horizontal, .extraSmall)
-                .eraseToAnyView()
-            
-            let hostingView: NSHostingView<AnyView> = self.labelHostingView ?? {
-                let result = NSHostingView(
-                    rootView:_labelHostingViewRootView
-                )
-                
-                if #available(macOS 13.0, *) {
-                    result.sizingOptions = [.intrinsicContentSize]
-                }
-                
-                self.labelHostingView = result
-                
-                button.addSubview(result)
-                
-                return result
-            }()
-            
-            hostingView.rootView = _labelHostingViewRootView
-            hostingView.invalidateIntrinsicContentSize()
-            
-            if !hostingView.intrinsicContentSize.isAreaZero {
-                hostingView.frame.size = hostingView.intrinsicContentSize
-                hostingView._SwiftUIX_setNeedsLayout()
-                
-                button.setFrameSize(hostingView.intrinsicContentSize)
-                
-                button._SwiftUIX_setNeedsLayout()
-                button._SwiftUIX_layoutIfNeeded()
-            }
-        }
+    public init(
+        action: @MainActor @escaping () -> Void,
+        @ViewBuilder label: () -> Label
+    ) where Content == EmptyView {
+        base = _CocoaMenuBarExtraCoordinator(
+            action: action,
+            label: label,
+            content: { EmptyView() }
+        )
+    }
+    
+    public var body: some Scene {
+        _EmptyScene()
     }
 }
+
+// MARK: - Auxiliary
 
 struct InsertMenuBarPopover<ID: Hashable, Label: View, PopoverContent: View>: ViewModifier {
     let item: MenuBarItem<ID, Label, PopoverContent>
