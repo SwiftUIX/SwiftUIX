@@ -78,7 +78,7 @@ extension AppKitOrUIKitWindow {
 
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitWindow {
-    open var alphaValue: CGFloat {
+    @objc open var alphaValue: CGFloat {
         get {
             self.rootViewController?.view.alpha ?? 1
         } set {
