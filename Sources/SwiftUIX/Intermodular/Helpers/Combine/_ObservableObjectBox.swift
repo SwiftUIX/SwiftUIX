@@ -57,6 +57,14 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
             }
         } set {
             if let newValue {
+                if let newValue = (newValue as? _opaque_Optional) {
+                    guard newValue.isNotNil else {
+                        base = nil
+                        
+                        return
+                    }
+                }
+                
                 base = .some(newValue as! Value)
             } else {
                 base = nil
@@ -259,5 +267,15 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
 extension ObservableObject {
     fileprivate var _SwiftUIX_opaque_objectWillChange: AnyPublisher<Void, Never> {
         objectWillChange.map({ _ in () }).eraseToAnyPublisher()
+    }
+}
+
+private protocol _opaque_Optional {
+    var isNotNil: Bool { get }
+}
+
+extension Optional: _opaque_Optional {
+    fileprivate var isNotNil: Bool {
+        self != nil
     }
 }

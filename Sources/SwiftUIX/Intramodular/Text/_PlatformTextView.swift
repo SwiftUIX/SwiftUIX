@@ -366,7 +366,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         super.resignFirstResponder()
     }
     #endif
-    
+            
     #if os(macOS)
     open override func draggingEntered(
         _ sender: NSDraggingInfo

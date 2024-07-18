@@ -191,8 +191,8 @@ extension _AppKitOrUIKitHostingWindowContent {
         let isPresentationInitialized: Bool
         let presentationContentType: any View.Type
         
-        var _window: AppKitOrUIKitHostingWindow<Content>?
-        var _popover: _AnyAppKitOrUIKitHostingPopover?
+        weak var _window: AppKitOrUIKitHostingWindow<Content>?
+        weak var _popover: _AnyAppKitOrUIKitHostingPopover?
         
         var isPresented: Bool {
             if let _popover {

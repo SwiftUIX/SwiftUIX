@@ -37,6 +37,18 @@ extension PopoverAttachmentTarget {
         
         self = .rect(frame, in: .global)
     }
+    
+    public init?(
+        _ proxy: GeometryProxy
+    ) {
+        let frame = proxy.frame(in: .global)
+        
+        guard frame.width != .zero && frame.height != .zero else {
+            return nil
+        }
+        
+        self = .rect(frame, in: .global)
+    }
 }
 
 extension PopoverAttachmentTarget {

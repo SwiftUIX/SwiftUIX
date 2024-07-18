@@ -180,15 +180,19 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
             if let contentViewController = contentViewController as? CocoaHostingController<_AppKitOrUIKitHostingWindowContent<Content>> {
                 return contentViewController
             } else {
+                guard let rootView: Content = copyOfRootView else {
+                    return nil
+                }
+                
                 let contentViewController = CocoaHostingController(
                     mainView: _AppKitOrUIKitHostingWindowContent(
                         window: self,
                         popover: nil,
-                        content: copyOfRootView!
+                        content: rootView
                     )
                 )
                                 
-                copyOfRootView = nil
+                self.copyOfRootView = nil
                 
                 self.contentViewController = contentViewController
                 
@@ -616,7 +620,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
             self._contentWindowController = nil
         }
         
-        if let popover = self._rootHostingViewController._SwiftUIX_parentNSPopover as? _AnyAppKitOrUIKitHostingPopover, popover.isDetached {
+        if let rootHostingViewController = self._rootHostingViewController, let popover = rootHostingViewController._SwiftUIX_parentNSPopover as? _AnyAppKitOrUIKitHostingPopover, popover.isDetached {
             popover._SwiftUIX_detachedWindowDidClose()
         }
         #else

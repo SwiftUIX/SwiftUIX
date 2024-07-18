@@ -6,15 +6,14 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+@MainActor
 public struct PresentWindow<Content: View>: View {
     private let content: () -> Content
     private let windowStyle: _WindowStyle
     private let position: _CoordinateSpaceRelative<CGPoint>?
     
-    @MainActor(unsafe)
     @PersistentObject var presentationController: _WindowPresentationController<Content>
     
-    @MainActor(unsafe)
     public init(
         style: _WindowStyle,
         position: _CoordinateSpaceRelative<CGPoint>? = nil,

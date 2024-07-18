@@ -140,6 +140,34 @@ extension View {
     }
     
     @available( macOS 12.0, *)
+    public func onAppKitKeyboardShortcutEvents(
+        _ shortcuts: [KeyboardShortcut],
+        context: NSEventMonitor.Context = .local,
+        using eventMonitorType: _NSEventMonitorType.Type = NSEventMonitor.self,
+        perform action: @escaping (KeyboardShortcut) -> Void
+    ) -> some View {
+        let shortcuts = Set(shortcuts)
+        
+        return onAppKitEvent(
+            context: .local,
+            matching: [.keyDown],
+            using: eventMonitorType
+        ) { (event: NSEvent) in
+            guard let shortcut = KeyboardShortcut(from: event) else {
+                return event
+            }
+            
+            guard shortcuts.contains(shortcut) else {
+                return event
+            }
+            
+            _ = action(shortcut)
+            
+            return nil
+        }
+    }
+    
+    @available( macOS 12.0, *)
     public func onAppKitKeyboardShortcutEvent(
         _ key: KeyEquivalent,
         modifiers: SwiftUI.EventModifiers = [.command],

@@ -24,3 +24,12 @@ class _SwiftUIX_ReferenceBox<T> {
         self.init(value: wrappedValue)
     }
 }
+
+@propertyWrapper
+public final class _SwiftUIX_UnsafeSendableReferenceBox<T>: @unchecked Sendable {
+    public var wrappedValue: T
+    
+    public init(wrappedValue: T) {
+        self.wrappedValue = wrappedValue
+    }
+}

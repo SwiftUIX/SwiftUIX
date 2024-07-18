@@ -7,9 +7,24 @@
 import AppKit
 import SwiftUI
 
-extension NSVisualEffectView.Material: CaseIterable {
+extension NSVisualEffectView.Material: Swift.CaseIterable {
     public static var allCases: [Self] {
-        [.titlebar, .selection, .menu, .popover, .sidebar, .headerView, .sheet, .windowBackground, .hudWindow, .fullScreenUI, .toolTip, .contentBackground, .underWindowBackground, .underPageBackground]
+        [
+            .titlebar,
+            .selection,
+            .menu,
+            .popover,
+            .sidebar,
+            .headerView,
+            .sheet,
+            .windowBackground,
+            .hudWindow,
+            .fullScreenUI,
+            .toolTip,
+            .contentBackground,
+            .underWindowBackground,
+            .underPageBackground
+        ]
     }
     
     public var name: String {

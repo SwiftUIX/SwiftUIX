@@ -59,7 +59,7 @@ private protocol _opaque_Optional {
 }
 
 extension Optional: _opaque_Optional {
-    var isNotNil: Bool {
+    fileprivate var isNotNil: Bool {
         self != nil
     }
 }
