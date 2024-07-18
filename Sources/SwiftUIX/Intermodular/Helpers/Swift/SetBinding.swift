@@ -35,7 +35,7 @@ public struct SetBinding<Value> {
     public var projectedValue: Binding<Value> {
         .init(
             get: { fatalError() },
-            set: set
+            set: { set($0) }
         )
     }
     

@@ -14,7 +14,7 @@ public struct _ForEachSubview<Content: View, ID: Hashable, Subview: View>: View 
     private var filter: ((_VariadicViewChildren.Subview) -> Bool)?
     
     public var body: some View {
-        let result: (LazyMapSequence<Array<_VariadicViewChildren.Element>.Indices, (index: Array<_VariadicViewChildren.Element>.Index, element: _VariadicViewChildren.Element)>) = (transform.map({ $0(content.children) })?.filter({ filter?($0) ?? true })._enumerated() ?? content.children.filter({ filter?($0) ?? true })._enumerated())
+        let result: (LazyMapSequence<Array<_VariadicViewChildren.Element>.Indices, (index: Array<_VariadicViewChildren.Element>.Index, element: _VariadicViewChildren.Element)>) = (transform.map({ $0(content.children) })?.filter({ filter?($0) ?? true })._SwiftUIX_enumerated() ?? content.children.filter({ filter?($0) ?? true })._SwiftUIX_enumerated())
 
         ForEach(result, id: \.element[_keyPath: id]) { (index: Int, element: _VariadicViewChildren.Subview) in
             let id: ID = element[_keyPath: id]
@@ -194,7 +194,7 @@ extension _ForEachSubview {
 
 extension Collection {
     @_transparent
-    fileprivate func _enumerated() -> LazyMapCollection<Self.Indices, (index: Self.Index, element: Self.Element)> {
+    fileprivate func _SwiftUIX_enumerated() -> LazyMapCollection<Self.Indices, (index: Self.Index, element: Self.Element)> {
         indices.lazy.map({ (index: $0, element: self[$0]) })
     }
 }

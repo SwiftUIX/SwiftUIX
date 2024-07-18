@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@MainActor
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

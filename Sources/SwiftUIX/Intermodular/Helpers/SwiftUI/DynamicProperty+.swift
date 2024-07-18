@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@MainActor
 public func withInlineState<Value, Content: View>(
     initialValue: Value,
     @ViewBuilder content: @escaping (Binding<Value>) -> Content
@@ -14,6 +15,7 @@ public func withInlineState<Value, Content: View>(
 }
 
 @_disfavoredOverload
+@MainActor
 public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     _ object: Object,
     @ViewBuilder content: @escaping (Object) -> Content
@@ -21,6 +23,7 @@ public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     WithInlineObservedObject(object, content: { content($0.wrappedValue) })
 }
 
+@MainActor
 public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     _ object: Object,
     @ViewBuilder content: @escaping (ObservedObject<Object>.Wrapper) -> Content
@@ -28,6 +31,7 @@ public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     WithInlineObservedObject(object, content: { content($0.projectedValue) })
 }
 
+@MainActor
 public func withInlineObservedObject<Object: ObservableObject, Content: View>(
     _ object: Object?,
     @ViewBuilder content: (Object?) -> Content
@@ -37,6 +41,7 @@ public func withInlineObservedObject<Object: ObservableObject, Content: View>(
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 @_disfavoredOverload
+@MainActor
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object,
     @ViewBuilder content: @escaping (Object) -> Content
@@ -46,6 +51,7 @@ public func withInlineStateObject<Object: ObservableObject, Content: View>(
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
 @_disfavoredOverload
+@MainActor
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object?,
     @ViewBuilder content: @escaping (Object?) -> Content
@@ -54,6 +60,7 @@ public func withInlineStateObject<Object: ObservableObject, Content: View>(
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0,  *)
+@MainActor
 public func withInlineStateObject<Object: ObservableObject, Content: View>(
     _ object: @autoclosure @escaping () -> Object,
     @ViewBuilder content: @escaping (ObservedObject<Object>.Wrapper) -> Content
@@ -62,6 +69,7 @@ public func withInlineStateObject<Object: ObservableObject, Content: View>(
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@MainActor
 public func withInlineTimerState<Content: View>(
     interval: TimeInterval,
     @ViewBuilder content: @escaping (Int) -> Content

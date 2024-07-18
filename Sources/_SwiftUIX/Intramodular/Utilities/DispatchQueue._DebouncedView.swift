@@ -38,9 +38,10 @@ extension DispatchQueue {
     }
     
     @_spi(Internal)
+    @_disfavoredOverload
     public func _debounce(
         for debounceInterval: DispatchTimeInterval?
     ) -> _DebouncedView {
-        .init(queue: self, debounceInterval: debounceInterval)
+        _DebouncedView(queue: self, debounceInterval: debounceInterval)
     }
 }

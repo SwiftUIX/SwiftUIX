@@ -45,7 +45,10 @@ extension EnvironmentObject.Optional {
     public struct Wrapper {
         fileprivate let base: EnvironmentObject.Optional
         
-        public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject?> {
+        @MainActor
+        public subscript<Subject>(
+            dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>
+        ) -> Binding<Subject?> {
             Binding<Subject?>(get: {
                 self.base.wrappedValue?[keyPath: keyPath]
             }, set: {

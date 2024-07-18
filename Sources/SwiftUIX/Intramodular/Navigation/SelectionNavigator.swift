@@ -36,7 +36,7 @@ fileprivate struct SelectionNavigator<Selection: Hashable, Destination: View>: V
     private var isActive: Binding<Bool> {
         .init(
             get: { self.selection.wrappedValue != nil },
-            set: setIsActive
+            set: { setIsActive($0) }
         )
     }
     

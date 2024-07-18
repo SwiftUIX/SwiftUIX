@@ -135,6 +135,7 @@ extension PersistentObject {
     public struct Wrapper {
         public let base: PersistentObject
         
+        @MainActor
         public var binding: Binding<Value> {
             Binding<Value>(
                 get: {
@@ -146,6 +147,7 @@ extension PersistentObject {
             )
         }
         
+        @MainActor
         public subscript<T>(
             dynamicMember keyPath: ReferenceWritableKeyPath<Value, T>
         ) -> Binding<T> {

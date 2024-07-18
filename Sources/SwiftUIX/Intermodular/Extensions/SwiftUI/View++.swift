@@ -143,6 +143,7 @@ extension View {
 
 // MARK: - View.onAppear
 
+@MainActor
 extension View {
     public func onAppearOnce(perform action: @escaping () -> Void) -> some View {
         withInlineState(initialValue: false) { $didAppear in

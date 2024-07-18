@@ -67,6 +67,7 @@ private struct _OnLongHover: ViewModifier {
             }
     }
     
+    @MainActor
     @ViewBuilder
     private var emptyRecognizerView: some View {
         withInlineTimerState(interval: minimumDuration) { tick in

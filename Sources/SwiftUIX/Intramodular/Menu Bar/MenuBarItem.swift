@@ -112,6 +112,7 @@ extension MenuBarItem: Identifiable where ID: Hashable {
 
 #if os(macOS)
 
+@MainActor
 extension View {
     /// Adds a menu bar item configured to present a popover when clicked.
     public func menuBarItem<ID: Hashable, Content: View>(

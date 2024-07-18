@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@MainActor
 extension View {
     /// Fixes the weird gray background for SidebarListStyle() on Mac Catalyst.
     public func _fixSidebarListStyle() -> some View {

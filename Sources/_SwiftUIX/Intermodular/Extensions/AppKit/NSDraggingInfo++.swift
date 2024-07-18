@@ -19,17 +19,18 @@ extension NSDraggingInfo {
             
             for type in pasteboardItem.types {
                 itemProvider.registerDataRepresentation(forTypeIdentifier: type.rawValue, visibility: .all) { completion in
-                    DispatchQueue.global(qos: .userInitiated).async {
+                    Task { @MainActor in
                         if let data = pasteboardItem.data(forType: type) {
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 completion(data, nil)
                             }
                         } else {
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 completion(nil, NSError(domain: "DataErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data could not be fetched for type \(type.rawValue)"]))
                             }
                         }
                     }
+                    
                     return nil
                 }
             }

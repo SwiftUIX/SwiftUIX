@@ -79,6 +79,7 @@ extension ViewStorage {
     }
 }
 
+@MainActor
 extension ViewStorage {
     @ViewBuilder
     public func withObservedValue<Content: View>(

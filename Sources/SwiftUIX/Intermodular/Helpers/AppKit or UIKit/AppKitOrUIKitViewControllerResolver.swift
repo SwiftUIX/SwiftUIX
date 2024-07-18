@@ -163,6 +163,7 @@ extension View {
 }
 
 #if os(iOS) ||  os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+@MainActor
 @ViewBuilder
 public func withAppKitOrUIKitViewController<Content: View>(
     @ViewBuilder _ content: @escaping (AppKitOrUIKitViewController?) -> Content
