@@ -11,10 +11,17 @@ extension View {
         disabled: Bool,
         perform: @escaping () -> Void
     ) -> some View {
-        gesture(
-            TapGesture(count: count).onEnded(perform),
-            including: disabled ? .subviews : .all
-        )
+        if disabled {
+            gesture(
+                TapGesture(count: count).onEnded(perform),
+                including: .subviews
+            )
+        } else {
+            gesture(
+                TapGesture(count: count).onEnded(perform),
+                including: .all
+            )
+        }
     }
     
     /// Adds an action to perform when the _background_ of this view recognizes a tap gesture.

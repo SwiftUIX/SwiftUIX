@@ -7,6 +7,14 @@ import Swift
 import SwiftUI
 
 @MainActor
+public func withInlineState<Content: View>(
+    _ type: Bool.Type,
+    @ViewBuilder content: @escaping (Binding<Bool>) -> Content
+) -> some View {
+    WithInlineState(initialValue: false, content: content)
+}
+
+@MainActor
 public func withInlineState<Value, Content: View>(
     initialValue: Value,
     @ViewBuilder content: @escaping (Binding<Value>) -> Content

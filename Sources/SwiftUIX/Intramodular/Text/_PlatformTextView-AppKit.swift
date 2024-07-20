@@ -37,6 +37,10 @@ extension _PlatformTextView {
         _assignIfNotEqual(true, to: \.usesAdaptiveColorMappingForDarkAppearance)
         _assignIfNotEqual(configuration.isSelectable, to: \.isSelectable)
 
+        if let automaticQuoteSubstitutionDisabled = configuration.automaticQuoteSubstitutionDisabled {
+            _assignIfNotEqual(!automaticQuoteSubstitutionDisabled, to: \.isAutomaticQuoteSubstitutionEnabled)
+        }
+        
         if let font = try? configuration.cocoaFont ?? context.environment.font?.toAppKitOrUIKitFont() {
             _assignIfNotEqual(font, to: \.self.font)
             

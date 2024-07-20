@@ -26,6 +26,7 @@ public struct _TextViewConfiguration {
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var autocapitalization: UITextAutocapitalizationType?
     #endif
+    var automaticQuoteSubstitutionDisabled: Bool?
     @_spi(Internal)
     public var cocoaFont: AppKitOrUIKitFont?
     @_spi(Internal)
@@ -272,9 +273,7 @@ extension View {
     public func adjustsFontSizeToFitWidth(_ adjustsFontSizeToFitWidth: Bool) -> some View {
         environment(\.adjustsFontSizeToFitWidth, adjustsFontSizeToFitWidth)
     }
-}
 
-extension View {
     public func lineBreakMode(_ lineBreakMode: NSLineBreakMode) -> some View {
         environment(\.lineBreakMode, lineBreakMode)
     }

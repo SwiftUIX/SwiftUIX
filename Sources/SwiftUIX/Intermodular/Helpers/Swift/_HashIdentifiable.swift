@@ -97,6 +97,12 @@ public struct _ArbitrarilyIdentifiedValue<Value, ID: Hashable>: CustomStringConv
         self.value = value
         self._id = id
     }
+    
+    @_transparent
+    public init(value: Value, id: ID) {
+        self.value = value
+        self._id = { _ in id }
+    }
 }
 
 @frozen
