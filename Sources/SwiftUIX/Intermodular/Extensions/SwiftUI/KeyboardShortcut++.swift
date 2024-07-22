@@ -72,6 +72,36 @@ extension SwiftUI.EventModifiers {
         
         return result
     }
+    
+    public init(_from eventFlags: CGEventFlags) {
+        var modifiers: Self = []
+        
+        if eventFlags.contains(.maskAlphaShift) {
+            modifiers.insert(.capsLock)
+        }
+        
+        if eventFlags.contains(.maskShift) {
+            modifiers.insert(.shift)
+        }
+        
+        if eventFlags.contains(.maskControl) {
+            modifiers.insert(.control)
+        }
+        
+        if eventFlags.contains(.maskAlternate) {
+            modifiers.insert(.option)
+        }
+        
+        if eventFlags.contains(.maskCommand) {
+            modifiers.insert(.command)
+        }
+        
+        if eventFlags.contains(.maskNumericPad) {
+            modifiers.insert(.numericPad)
+        }
+        
+        self = modifiers
+    }
 }
 #endif
 

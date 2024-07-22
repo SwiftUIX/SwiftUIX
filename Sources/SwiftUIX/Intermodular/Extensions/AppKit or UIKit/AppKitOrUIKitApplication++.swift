@@ -25,10 +25,12 @@ extension AppKitOrUIKitApplication {
     }
     
     public func _SwiftUIX_orderFront() {
-        NSApplication.shared.activate(ignoringOtherApps: true)
+        NSApplication.shared.activate(ignoringOtherApps: false)
         
-        AppKitOrUIKitWindow._SwiftUIX_allInstances.first?.becomeMain()
-        AppKitOrUIKitWindow._SwiftUIX_allInstances.first?.makeKeyAndOrderFront(nil)
+        Task.detached { @MainActor in
+            AppKitOrUIKitWindow._SwiftUIX_allInstances.first?.becomeMain()
+            AppKitOrUIKitWindow._SwiftUIX_allInstances.first?.makeKeyAndOrderFront(nil)
+        }
     }
 }
 #endif
