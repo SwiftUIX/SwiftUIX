@@ -1,3 +1,9 @@
+//
+// Copyright (c) Vatsal Manot
+//
+
+ #if os(iOS) || targetEnvironment(macCatalyst)
+
 import SwiftUI
 import UIKit
 
