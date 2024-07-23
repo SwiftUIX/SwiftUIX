@@ -251,6 +251,22 @@ LinkPresentationView(url: url)
 
 - `View/windowOverlay(isKeyAndVisible:content:)` - Makes a window key and visible when a given condition is true.
 
+### Edit Menu
+
+- `View/editMenu(isVisible:content:)` - Adds an edit menu to the view.
+
+  ```swift
+  Text("Hello, world!")
+      .editMenu(isVisible: $isEditMenuVisible) {
+          EditMenuItem("Copy") {
+              // Perform copy action
+          }
+          EditMenuItem("Paste") {
+              // Perform paste action
+          }
+      }
+  ```
+
 # Contributing
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.

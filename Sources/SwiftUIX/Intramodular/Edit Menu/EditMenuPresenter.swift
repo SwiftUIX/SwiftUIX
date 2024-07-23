@@ -1,5 +1,5 @@
 //
-// Copyright (c) Texts HQ
+// Copyright (c) Vatsal Manot
 //
 
 #if os(iOS) || targetEnvironment(macCatalyst)
@@ -50,10 +50,16 @@ private struct EditMenuPresenter: ViewModifier {
 
 // MARK: - API
 
+/// A struct representing an item in the edit menu.
 public struct EditMenuItem {
     let title: String
     let action: Action
     
+    /// Creates a new edit menu item with the given title and action.
+    ///
+    /// - Parameters:
+    ///   - title: The title of the menu item.
+    ///   - action: The action to perform when the menu item is selected.
     public init(_ title: String, action: @escaping () -> Void) {
         self.title = title
         self.action = .init(action)
@@ -61,6 +67,27 @@ public struct EditMenuItem {
 }
 
 extension View {
+    /// Adds an edit menu to the view.
+    ///
+    /// - Parameters:
+    ///   - isVisible: A binding to a Boolean value that determines whether the edit menu is visible.
+    ///   - content: A closure that returns an array of `EditMenuItem` representing the items in the edit menu.
+    /// - Returns: A view with the edit menu added.
+    ///
+    /// Use this modifier to add an edit menu to a view. The edit menu is a context menu that appears when the user interacts with the view, providing options for actions such as copy, paste, etc.
+    ///
+    /// Example usage:
+    /// ```
+    /// Text("Hello, world!")
+    ///     .editMenu(isVisible: $isEditMenuVisible) {
+    ///         EditMenuItem("Copy") {
+    ///             // Perform copy action
+    ///         }
+    ///         EditMenuItem("Paste") {
+    ///             // Perform paste action
+    ///         }
+    ///     }
+    /// ```
     public func editMenu(
         isVisible: Binding<Bool>,
         @_ArrayBuilder<EditMenuItem> content: @escaping () -> [EditMenuItem]
