@@ -218,7 +218,7 @@ LinkPresentationView(url: url)
 
 ### Status Bar
 
-- `View/statusItem(id,image:`) - Adds a status bar item configured to present a popover when clicked
+- `View/statusItem(id:image:`) - Adds a status bar item configured to present a popover when clicked
 
   ```swift
   Text("Hello, world!")
