@@ -85,7 +85,9 @@ extension _PlatformTextView {
         if _currentTextViewData(kind: self.data.wrappedValue.kind) != data.wrappedValue {
             _needsIntrinsicContentSizeInvalidation = true
             
-            setDataValue(data.wrappedValue)
+            if !_providesCustomSetDataValueMethod {
+                setDataValue(data.wrappedValue)
+            }
         }
         
         self.data = data
@@ -129,7 +131,7 @@ extension _PlatformTextView {
     
     private func _computeIntrinsicContentSize() -> CGSize? {
         if let _fixedSize = configuration._fixedSize {
-            switch _fixedSize {
+            switch _fixedSize.value {
                 case (false, false):
                     return nil
                 case (false, true):
@@ -157,6 +159,7 @@ extension _PlatformTextView {
             if let oldIntrinsicContentSize, let intrinsicContentSize {
                 if intrinsicContentSize.width == oldIntrinsicContentSize.width || intrinsicContentSize.width == frame.width {
                     representableCache._sizeThatFitsCache[.init(width: self.frame.width, height: nil)] = intrinsicContentSize
+                    representableCache._sizeThatFitsCache[.init(width: nil, height: nil)] = intrinsicContentSize
                 }
             }
         }
@@ -188,7 +191,7 @@ extension _PlatformTextView {
         }
         
         if let fixedSize = configuration._fixedSize {
-            if fixedSize == (false, false) {
+            if fixedSize.value == (false, false) {
                 if textContainer.heightTracksTextView == false {
                     textContainer.widthTracksTextView = true
                     textContainer.heightTracksTextView = true

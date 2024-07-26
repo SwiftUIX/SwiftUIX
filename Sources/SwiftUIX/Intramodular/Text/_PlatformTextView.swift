@@ -75,6 +75,10 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     private var _lazy_observableTextCursor: _ObservableTextCursor? = nil
     
+    open var _providesCustomSetDataValueMethod: Bool {
+        false
+    }
+    
     @_spi(Internal)
     public var _textEditorEventPublisher: AnyPublisher<_SwiftUIX_TextEditorEvent, Never> {
         guard let publisher = _lazyTextEditorEventPublisher else {
@@ -219,7 +223,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     override open var intrinsicContentSize: CGSize {
         if let _fixedSize = configuration._fixedSize {
-            if _fixedSize == (false, false) {
+            if _fixedSize.value == (false, false) {
                 return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
             }
         }
@@ -239,7 +243,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
     
     var _SwiftUIX_intrinsicContentSizeIsDisabled: Bool {
         if let _fixedSize = configuration._fixedSize {
-            if _fixedSize == (false, false) {
+            if _fixedSize.value == (false, false) {
                 return true
             }
         }
@@ -294,7 +298,7 @@ open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManage
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self._textEditorProxyBase = context.environment._textViewProxy?.wrappedValue._base
+            self._textEditorProxyBase = context.environment._textViewProxyBinding.wrappedValue?.wrappedValue._base
         } 
         
         _PlatformTextView<Label>.updateAppKitOrUIKitTextView(
@@ -676,7 +680,7 @@ extension _PlatformTextView {
         }
                 
         if let _fixedSize = configuration._fixedSize {
-            if _fixedSize == (false, false) {
+            if _fixedSize.value == (false, false) {
                 return nil
             }
         }
@@ -696,7 +700,7 @@ extension _PlatformTextView {
                 var _result = result._filterPlaceholderDimensions(for: .textContainer)
                 
                 if let _fixedSize = configuration._fixedSize {
-                    switch _fixedSize {
+                    switch _fixedSize.value {
                         case (false, false):
                             if (_result.width ?? 0) < targetWidth {
                                 _result.width = targetWidth
@@ -759,12 +763,12 @@ extension _PlatformTextView {
 
             /// DO NOT REMOVE.
             if usedRect.isAreaZero {
-                return _sizeThatFits(width: width)
+                return _sizeThatFitsWidth(width)
             }
             
             return usedRect
         } else {
-            return _sizeThatFits(width: width)
+            return _sizeThatFitsWidth(width)
         }
     }
 }

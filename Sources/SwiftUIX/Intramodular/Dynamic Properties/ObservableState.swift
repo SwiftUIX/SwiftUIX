@@ -32,8 +32,8 @@ public struct ObservableState<Value>: DynamicProperty {
     }
     
     /// The binding value, as "unwrapped" by accessing `$foo` on a `@Binding` property.
-    public var projectedValue: ObservedValue<Value> {
-        .init(base)
+    public var projectedValue: Wrapper {
+        Wrapper(base: $base.map(\.wrappedValue))
     }
     
     /// Initialize with the provided initial value.
@@ -44,5 +44,32 @@ public struct ObservableState<Value>: DynamicProperty {
     
     public mutating func update() {
         self.observedBase = base
+    }
+}
+
+extension ObservableState {
+    @dynamicMemberLookup
+    public struct Wrapper {
+        @Binding var base: Value
+        
+        public var binding: Binding<Value> {
+            $base
+        }
+        
+        public subscript<T>(
+            dynamicMember keyPath: ReferenceWritableKeyPath<Value, T>
+        ) -> Binding<T> {
+            get {
+                $base.map(keyPath)
+            }
+        }
+
+        public subscript<T>(
+            dynamicMember keyPath: ReferenceWritableKeyPath<Value, T>
+        ) -> ObservedValue<T> where Value: ObservableObject {
+            get {
+                ObservedValue(keyPath, on: base)
+            }
+        }
     }
 }

@@ -28,6 +28,10 @@ extension App {
         get {
             _SwiftUIX_AppActivationPolicy(from: NSApplication.shared.activationPolicy())
         } nonmutating set {
+            guard newValue != self._SwiftUIX_appActivationPolicy else {
+                return
+            }
+            
             switch newValue {
                 case .regular:
                     NSApplication.shared.setActivationPolicy(.regular)
@@ -40,7 +44,7 @@ extension App {
     }
 }
 
-public enum _SwiftUIX_AppActivationPolicy {
+public enum _SwiftUIX_AppActivationPolicy: Hashable {
     case regular
     case accessory
     case prohibited

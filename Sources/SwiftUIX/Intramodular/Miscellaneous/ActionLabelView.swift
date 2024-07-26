@@ -15,6 +15,7 @@ public protocol ActionLabelView: View {
 // MARK: - Implementation-
 
 extension ActionLabelView {
+    @_disfavoredOverload
     public init(action: @escaping () -> Void, @ViewBuilder label: () -> Label) {
         self.init(action: .init(action), label: label)
     }
@@ -105,6 +106,7 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
         }
     }
 }
+
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Button {
     public init<Icon: View>(
@@ -121,7 +123,10 @@ extension Button {
 // MARK: - Conformances
 
 extension Button: ActionLabelView {
-    public init(action: Action, @ViewBuilder label: () -> Label) {
-        self.init(action: action.perform, label: label)
+    public init(
+        action: Action,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.init(action: { action.perform() }, label: label)
     }
 }

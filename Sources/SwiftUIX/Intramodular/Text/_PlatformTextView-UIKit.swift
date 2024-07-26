@@ -78,7 +78,7 @@ extension _PlatformTextView {
         
         view.textContainer.lineFragmentPadding = .zero
         view.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
-        view.textContainerInset = configuration.textContainerInset
+        view.textContainerInset = AppKitOrUIKitEdgeInsets(configuration.textContainerInsets)
         
         if data.wrappedValue.kind != .cocoaTextStorage {
             if requiresAttributedText {
@@ -180,7 +180,7 @@ extension _PlatformTextView {
             } else if !isScrollEnabled {
                 return .init(
                     width: bounds.width,
-                    height: _sizeThatFits(width: bounds.width)?.height ?? AppKitOrUIKitView.noIntrinsicMetric
+                    height: _sizeThatFitsWidth(bounds.width)?.height ?? AppKitOrUIKitView.noIntrinsicMetric
                 )
             } else {
                 return .init(

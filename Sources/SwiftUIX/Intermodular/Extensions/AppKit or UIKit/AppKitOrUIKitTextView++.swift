@@ -220,8 +220,8 @@ extension AppKitOrUIKitTextView {
         return paragraphStyle
     }
     
-    func _sizeThatFits(
-        width: CGFloat
+    func _sizeThatFitsWidth(
+        _ width: CGFloat
     ) -> CGSize? {
         _sizeThatFitsWithoutCopying(width: width)
     }

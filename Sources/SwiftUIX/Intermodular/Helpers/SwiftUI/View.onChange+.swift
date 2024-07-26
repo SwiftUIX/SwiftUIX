@@ -177,9 +177,9 @@ private struct _StreamChangesForValue<Value: Equatable>: ViewModifier {
     let value: Value
     let transform: (AnyPublisher<Value, Never>) -> Cancellable
     
-    @State private var valuePublisher = PassthroughSubject<Value, Never>()
-    @State private var subscription: Cancellable?
-    @State private var cancellable: AnyCancellable?
+    @ViewStorage private var valuePublisher = PassthroughSubject<Value, Never>()
+    @ViewStorage private var subscription: Cancellable?
+    @ViewStorage private var cancellable: AnyCancellable?
     
     func body(content: Content) -> some View {
         content

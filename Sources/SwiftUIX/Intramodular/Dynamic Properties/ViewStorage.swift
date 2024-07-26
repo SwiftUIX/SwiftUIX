@@ -8,7 +8,7 @@ import SwiftUI
 
 @frozen
 @propertyWrapper
-public struct ViewStorage<Value>: DynamicProperty {
+public struct ViewStorage<Value>: Identifiable, DynamicProperty {
     public final class ValueBox: AnyObservableValue<Value> {
         @Published fileprivate var value: Value
         
@@ -25,6 +25,10 @@ public struct ViewStorage<Value>: DynamicProperty {
             
             super.init()
         }
+    }
+    
+    public var id: ObjectIdentifier {
+        ObjectIdentifier(valueBox)
     }
     
     @State fileprivate var _valueBox: ValueBox

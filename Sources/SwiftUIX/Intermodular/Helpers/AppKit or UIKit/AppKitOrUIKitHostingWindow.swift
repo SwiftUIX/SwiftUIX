@@ -129,6 +129,10 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         get {
             super.alphaValue
         } set {
+            guard newValue != super.alphaValue else {
+                return
+            }
+            
             super.alphaValue = newValue
             
             if newValue == 0.0 {

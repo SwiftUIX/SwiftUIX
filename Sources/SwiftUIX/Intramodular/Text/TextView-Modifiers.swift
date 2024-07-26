@@ -18,7 +18,7 @@ import UIKit
 extension TextView {
     public func _fixedSize(horizontal: Bool, vertical: Bool) -> Self {
         then {
-            $0.configuration._fixedSize = (horizontal, vertical)
+            $0.textViewConfiguration._fixedSize = .init((horizontal, vertical))
         }
     }
 }
@@ -54,7 +54,7 @@ extension TextView {
 @available(watchOS, unavailable)
 extension TextView {
     public func onDeleteBackward(perform action: @escaping () -> Void) -> Self {
-        then({ $0.configuration.onDeleteBackward = action })
+        then({ $0.textViewConfiguration.onDeleteBackward = action })
     }
 }
 
@@ -62,11 +62,11 @@ extension TextView {
 @available(watchOS, unavailable)
 extension TextView {
     public func isInitialFirstResponder(_ isInitialFirstResponder: Bool) -> Self {
-        then({ $0.configuration.isInitialFirstResponder = isInitialFirstResponder })
+        then({ $0.textViewConfiguration.isInitialFirstResponder = isInitialFirstResponder })
     }
     
     public func focused(_ isFocused: Binding<Bool>) -> Self {
-        then({ $0.configuration.isFocused = isFocused })
+        then({ $0.textViewConfiguration.isFocused = isFocused })
     }
 }
 
@@ -77,7 +77,7 @@ extension TextView {
     public func autocapitalization(
         _ autocapitalization: UITextAutocapitalizationType
     ) -> Self {
-        then({ $0.configuration.autocapitalization = autocapitalization })
+        then({ $0.textViewConfiguration.autocapitalization = autocapitalization })
     }
 }
 #endif
@@ -88,7 +88,7 @@ extension TextView {
     public func automaticQuoteSubstitutionDisabled(
         _ disabled: Bool
     ) -> Self {
-        then({ $0.configuration.automaticQuoteSubstitutionDisabled = disabled })
+        then({ $0.textViewConfiguration.automaticQuoteSubstitutionDisabled = disabled })
     }
 }
 
@@ -98,47 +98,47 @@ extension TextView {
     public func foregroundColor(
         _ foregroundColor: Color
     ) -> Self {
-        then({ $0.configuration.cocoaForegroundColor = foregroundColor.toAppKitOrUIKitColor() })
+        then({ $0.textViewConfiguration.cocoaForegroundColor = foregroundColor.toAppKitOrUIKitColor() })
     }
     
     @_disfavoredOverload
     public func foregroundColor(
         _ foregroundColor: AppKitOrUIKitColor
     ) -> Self {
-        then({ $0.configuration.cocoaForegroundColor = foregroundColor })
+        then({ $0.textViewConfiguration.cocoaForegroundColor = foregroundColor })
     }
     
     public func placeholderColor(
         _ foregroundColor: Color
     ) -> Self {
-        then({ $0.configuration.placeholderColor = foregroundColor.toAppKitOrUIKitColor() })
+        then({ $0.textViewConfiguration.placeholderColor = foregroundColor.toAppKitOrUIKitColor() })
     }
     
     @_disfavoredOverload
     public func placeholderColor(
         _ placeholderColor: AppKitOrUIKitColor
     ) -> Self {
-        then({ $0.configuration.placeholderColor = placeholderColor })
+        then({ $0.textViewConfiguration.placeholderColor = placeholderColor })
     }
     
     public func tint(
         _ tint: Color
     ) -> Self {
-        then({ $0.configuration.tintColor = tint.toAppKitOrUIKitColor() })
+        then({ $0.textViewConfiguration.tintColor = tint.toAppKitOrUIKitColor() })
     }
     
     @_disfavoredOverload
     public func tint(
         _ tint: AppKitOrUIKitColor
     ) -> Self {
-        then({ $0.configuration.tintColor = tint })
+        then({ $0.textViewConfiguration.tintColor = tint })
     }
     
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func linkForegroundColor(
         _ linkForegroundColor: Color?
     ) -> Self {
-        then({ $0.configuration.linkForegroundColor = linkForegroundColor?.toAppKitOrUIKitColor() })
+        then({ $0.textViewConfiguration.linkForegroundColor = linkForegroundColor?.toAppKitOrUIKitColor() })
     }
 #endif
     
@@ -147,7 +147,7 @@ extension TextView {
     ) -> Self {
         then {
             do {
-                $0.configuration.cocoaFont = try font.toAppKitOrUIKitFont()
+                $0.textViewConfiguration.cocoaFont = try font.toAppKitOrUIKitFont()
             } catch {
                 debugPrint(error)
             }
@@ -158,33 +158,33 @@ extension TextView {
     public func font(
         _ font: AppKitOrUIKitFont?
     ) -> Self {
-        then({ $0.configuration.cocoaFont = font })
+        then({ $0.textViewConfiguration.cocoaFont = font })
     }
     
     public func kerning(
         _ kerning: CGFloat
     ) -> Self {
-        then({ $0.configuration.kerning = kerning })
+        then({ $0.textViewConfiguration.kerning = kerning })
     }
     
     @_disfavoredOverload
     public func textContainerInset(
         _ textContainerInset: AppKitOrUIKitInsets
     ) -> Self {
-        then({ $0.configuration.textContainerInset = textContainerInset })
+        then({ $0.textViewConfiguration.textContainerInsets = textContainerInset._SwiftUI_edgeInsets })
     }
     
     public func textContainerInset(
         _ textContainerInset: EdgeInsets
     ) -> Self {
-        then({ $0.configuration.textContainerInset = AppKitOrUIKitInsets(textContainerInset) })
+        then({ $0.textViewConfiguration.textContainerInsets = textContainerInset })
     }
     
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public func textContentType(
         _ textContentType: UITextContentType?
     ) -> Self {
-        then({ $0.configuration.textContentType = textContentType })
+        then({ $0.textViewConfiguration.textContentType = textContentType })
     }
 #endif
 }
@@ -195,13 +195,13 @@ extension TextView {
     public func editable(
         _ editable: Bool
     ) -> Self {
-        then({ $0.configuration.isEditable = editable })
+        then({ $0.textViewConfiguration.isEditable = editable })
     }
     
     public func isSelectable(
         _ isSelectable: Bool
     ) -> Self {
-        then({ $0.configuration.isSelectable = isSelectable })
+        then({ $0.textViewConfiguration.isSelectable = isSelectable })
     }
 }
 
@@ -211,13 +211,13 @@ extension TextView {
     public func dismissKeyboardOnReturn(
         _ dismissKeyboardOnReturn: Bool
     ) -> Self {
-        then({ $0.configuration.dismissKeyboardOnReturn = dismissKeyboardOnReturn })
+        then({ $0.textViewConfiguration.dismissKeyboardOnReturn = dismissKeyboardOnReturn })
     }
     
     public func enablesReturnKeyAutomatically(
         _ enablesReturnKeyAutomatically: Bool
     ) -> Self {
-        then({ $0.configuration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
+        then({ $0.textViewConfiguration.enablesReturnKeyAutomatically = enablesReturnKeyAutomatically })
     }
 }
 
@@ -228,13 +228,13 @@ extension TextView {
     public func keyboardType(
         _ keyboardType: UIKeyboardType
     ) -> Self {
-        then({ $0.configuration.keyboardType = keyboardType })
+        then({ $0.textViewConfiguration.keyboardType = keyboardType })
     }
     
     public func returnKeyType(
         _ returnKeyType: UIReturnKeyType
     ) -> Self {
-        then({ $0.configuration.returnKeyType = returnKeyType })
+        then({ $0.textViewConfiguration.returnKeyType = returnKeyType })
     }
 }
 #endif

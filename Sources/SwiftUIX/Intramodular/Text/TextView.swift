@@ -23,15 +23,15 @@ public struct TextView<Label: View>: View {
     
     var label: Label
     var data: _TextViewDataBinding
-    var configuration: _Configuration
+    var textViewConfiguration: _TextViewConfiguration
     var customAppKitOrUIKitClassConfiguration = _CustomAppKitOrUIKitClassConfiguration()
     
     @State var representableUpdater = EmptyObservableObject()
     
     public var body: some View {
         ZStack(alignment: .top) {
-            if let _fixedSize = configuration._fixedSize {
-                switch _fixedSize {
+            if let _fixedSize = textViewConfiguration._fixedSize {
+                switch _fixedSize.value {
                     case (false, false):
                         XSpacer()
                     default:
@@ -42,16 +42,16 @@ public struct TextView<Label: View>: View {
             ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
                 if data.wrappedValue.isEmpty {
                     label
-                        .font(configuration.cocoaFont.map(Font.init) ?? font)
-                        .foregroundColor(Color(configuration.placeholderColor ?? .placeholderText))
+                        .font(textViewConfiguration.cocoaFont.map(Font.init) ?? font)
+                        .foregroundColor(Color(textViewConfiguration.placeholderColor ?? .placeholderText))
                         .animation(.none)
-                        .padding(configuration.textContainerInset.edgeInsets)
+                        .padding(textViewConfiguration.textContainerInsets)
                 }
                 
                 _TextView<Label>(
                     updater: representableUpdater,
                     data: data,
-                    configuration: configuration,
+                    textViewConfiguration: textViewConfiguration,
                     customAppKitOrUIKitClassConfiguration: customAppKitOrUIKitClassConfiguration
                 )
             }
@@ -72,7 +72,7 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.data = data
-        self.configuration = configuration
+        self.textViewConfiguration = configuration
     }
 
     public init(
@@ -82,7 +82,7 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.data = .string(text)
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: false,
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
@@ -121,7 +121,7 @@ extension TextView where Label == EmptyView {
                 }
             )
         )
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: false,
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
@@ -133,7 +133,7 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.data = .string(.constant(text))
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: true,
             onEditingChanged: { _ in },
             onCommit: { }
@@ -145,7 +145,7 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.data = .cocoaAttributedString(.constant(text))
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: true,
             onEditingChanged: { _ in },
             onCommit: { }
@@ -158,7 +158,7 @@ extension TextView where Label == EmptyView {
     ) {
         self.label = EmptyView()
         self.data = .attributedString(Binding<AttributedString>.constant(text))
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: true,
             onEditingChanged: { _ in },
             onCommit: { }
@@ -177,7 +177,7 @@ extension TextView: DefaultTextInputType where Label == Text {
     ) {
         self.label = Text(title)
         self.data = .string(text)
-        self.configuration = .init(
+        self.textViewConfiguration = .init(
             isConstant: false,
             onEditingChanged: onEditingChanged,
             onCommit: onCommit
@@ -212,7 +212,7 @@ extension TextView {
     public func isFirstResponder(
         _ isFirstResponder: Bool
     ) -> Self {
-        then({ $0.configuration.isFirstResponder = isFirstResponder })
+        then({ $0.textViewConfiguration.isFirstResponder = isFirstResponder })
     }
     
     @available(*, deprecated, renamed: "TextView.editable(_:)")
@@ -221,7 +221,6 @@ extension TextView {
     ) -> Self {
         self.editable(isEditable)
     }
-    
 }
 
 #endif

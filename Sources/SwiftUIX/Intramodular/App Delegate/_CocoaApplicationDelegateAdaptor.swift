@@ -45,7 +45,17 @@ public struct _CocoaApplicationDelegateAdaptor: DynamicProperty {
             
             if configuration.noWindowsOnLaunch {
                 for window in AppKitOrUIKitWindow._SwiftUIX_allInstances {
-                    window.close()
+                    guard window._SwiftUIX_isInRegularDisplay else {
+                        return
+                    }
+                    
+                    window.resignMain()
+                    
+                    Task { @MainActor in
+                        if window.isVisible {
+                            window.close()
+                        }
+                    }
                 }
             }
             

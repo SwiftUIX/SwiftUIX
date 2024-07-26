@@ -20,6 +20,7 @@ extension AppKitOrUIKitApplication {
                 continue
             }
             
+            window.resignMain()
             window.close()
         }
     }

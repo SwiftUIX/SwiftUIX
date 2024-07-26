@@ -36,6 +36,11 @@ public struct LazyState<Value>: DynamicProperty {
         self.initialWrappedValue = initial
     }
     
+    /// Initialize with the provided initial value.
+    public init(wrappedValue: @autoclosure @escaping () -> Value) {
+        self.init(initial: wrappedValue)
+    }
+
     public mutating func update() {
         guard _cachedWrappedValue == nil else {
             return

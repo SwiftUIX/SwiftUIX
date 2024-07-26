@@ -16,7 +16,7 @@ import UIKit
 // MARK: - Implementation
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-struct _TextView<Label: View> {
+struct _TextView<Label: View>: Equatable {
     typealias Configuration = TextView<Label>._Configuration
     
     @Environment(\._textViewConfigurationMutation) private var _textViewConfigurationMutation
@@ -24,11 +24,12 @@ struct _TextView<Label: View> {
     @ObservedObject var updater: EmptyObservableObject
     
     let data: _TextViewDataBinding
-    let _configuration: Configuration
-    let customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
+    let unresolvedTextViewConfiguration: _TextViewConfiguration
     
-    var configuration: Configuration {
-        var result = _configuration
+    @_SwiftUIX_RenderIgnored var customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
+    
+    var textViewConfiguration: Configuration {
+        var result = unresolvedTextViewConfiguration
         
         _textViewConfigurationMutation(&result)
         
@@ -38,13 +39,20 @@ struct _TextView<Label: View> {
     init(
         updater: EmptyObservableObject,
         data: _TextViewDataBinding,
-        configuration: Configuration,
+        textViewConfiguration: _TextViewConfiguration,
         customAppKitOrUIKitClassConfiguration: TextView<Label>._CustomAppKitOrUIKitClassConfiguration
     ) {
         self.updater = updater
         self.data = data
-        self._configuration = configuration
+        self.unresolvedTextViewConfiguration = textViewConfiguration
         self.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        true
+            && (lhs.data.wrappedValue == rhs.data.wrappedValue)
+            && (lhs.unresolvedTextViewConfiguration == rhs.unresolvedTextViewConfiguration)
+            && (lhs.$customAppKitOrUIKitClassConfiguration == rhs.$customAppKitOrUIKitClassConfiguration)
     }
 }
 
@@ -94,24 +102,24 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         if let view = view as? _PlatformTextView<Label> {
             view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
             view.data = data
-            view.configuration = configuration
+            view.configuration = textViewConfiguration
             
             view.representableWillAssemble(context: context)
         }
         
         view.delegate = context.coordinator
         
-#if os(iOS) || os(tvOS)
+        #if os(iOS) || os(tvOS)
         view.backgroundColor = nil
-#elseif os(macOS)
+        #elseif os(macOS)
         view.focusRingType = .none
-#endif
+        #endif
         
         donateProxy(view, context: context)
         
         if context.environment.isEnabled {
-            DispatchQueue.main.async {
-                if (configuration.isInitialFirstResponder ?? configuration.isFocused?.wrappedValue) ?? false {
+            Task.detached(priority: .userInitiated) { @MainActor in
+                if (textViewConfiguration.isInitialFirstResponder ?? textViewConfiguration.isFocused?.wrappedValue) ?? false {
                     view._SwiftUIX_becomeFirstResponder()
                 }
             }
@@ -128,25 +136,23 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         
         customAppKitOrUIKitClassConfiguration.update(view, context)
         
-        _withoutAppKitOrUIKitAnimation(context.transaction.disablesAnimations) {
-            if let view = view as? _PlatformTextView<Label> {
-                assert(view.representatableStateFlags.contains(.updateInProgress))
-                
-                view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
-                
-                view.representableDidUpdate(
-                    data: self.data,
-                    configuration: configuration,
-                    context: context
-                )
-            } else {
-                _PlatformTextView<Label>.updateAppKitOrUIKitTextView(
-                    view,
-                    data: self.data,
-                    configuration: configuration,
-                    context: context
-                )
-            }
+        if let view = view as? _PlatformTextView<Label> {
+            assert(view.representatableStateFlags.contains(.updateInProgress))
+            
+            view.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
+            
+            view.representableDidUpdate(
+                data: self.data,
+                configuration: textViewConfiguration,
+                context: context
+            )
+        } else {
+            _PlatformTextView<Label>.updateAppKitOrUIKitTextView(
+                view,
+                data: self.data,
+                configuration: textViewConfiguration,
+                context: context
+            )
         }
     }
     
@@ -167,7 +173,7 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
         _ view: AppKitOrUIKitViewType,
         context: Context
     ) {
-        guard let proxyBinding = context.environment._textViewProxy, let view = view as? _PlatformTextView<Label> else {
+        guard let proxyBinding = context.environment._textViewProxyBinding.wrappedValue, let view = view as? _PlatformTextView<Label> else {
             return
         }
         
@@ -302,7 +308,7 @@ extension _TextView {
                 return
             }
             
-            data.wrappedValue = textView._currentTextViewData(kind: data.wrappedValue.kind)
+            _ = textView
             
             configuration.onEditingChanged(true)
         }
@@ -314,13 +320,23 @@ extension _TextView {
             
             let data = textView._currentTextViewData(kind: data.wrappedValue.kind)
             
-            guard data != self.data.wrappedValue else {
-                return
+            if let textView = textView as? _PlatformTextView<Label> {
+                if !textView._providesCustomSetDataValueMethod {
+                    guard data != self.data.wrappedValue else {
+                        return
+                    }
+                    
+                    self.data.wrappedValue = data
+                    
+                    textView.invalidateIntrinsicContentSize()
+                }
+            } else {
+                guard data != self.data.wrappedValue else {
+                    return
+                }
+                
+                self.data.wrappedValue = data
             }
-            
-            (textView as? _PlatformTextView<Label>)?._needsIntrinsicContentSizeInvalidation = true
-            
-            self.data.wrappedValue = data
         }
         
         func textDidEndEditing(_ notification: Notification) {
@@ -328,9 +344,9 @@ extension _TextView {
                 return
             }
             
-            configuration.onEditingChanged(false)
+            _ = textView
             
-            data.wrappedValue = textView._currentTextViewData(kind: data.wrappedValue.kind)
+            configuration.onEditingChanged(false)
         }
     }
 }
@@ -339,7 +355,7 @@ extension _TextView {
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 extension _TextView {
     func makeCoordinator() -> Coordinator {
-        Coordinator(updater: updater, data: data, configuration: configuration)
+        Coordinator(updater: updater, data: data, configuration: textViewConfiguration)
     }
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
@@ -359,7 +375,7 @@ extension _TextView {
         guard let size = view._sizeThatFits(
             proposal: AppKitOrUIKitLayoutSizeProposal(
                 proposal,
-                fixedSize: configuration._fixedSize
+                fixedSize: textViewConfiguration._fixedSize?.value
             )
         ) else {
             return nil

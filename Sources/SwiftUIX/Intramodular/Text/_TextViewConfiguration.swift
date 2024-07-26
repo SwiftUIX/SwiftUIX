@@ -7,21 +7,67 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
-public struct _TextViewConfiguration {
-    public var _fixedSize: (Bool, Bool)? = nil
+@propertyWrapper
+public struct _SwiftUIX_RenderIgnored<Wrapped>: Hashable, DynamicProperty {
+    @ViewStorage private var wrappedValueBox: Wrapped
+    
+    public var wrappedValue: Wrapped
+    
+    private var _hasUpdatedOnce: Bool = false
+    private var _randomID = Int.random(in: 0...Int.max)
+    
+    public var projectedValue: Self {
+        self
+    }
+    
+    public init(wrappedValue: Wrapped) {
+        self.wrappedValue = wrappedValue
+        self._wrappedValueBox = .init(wrappedValue: wrappedValue)
+    }
+    
+    public mutating func update() {
+        if !_hasUpdatedOnce {
+            _hasUpdatedOnce = true
+        }
+        
+        wrappedValueBox = wrappedValue
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        guard lhs._hasUpdatedOnce && rhs._hasUpdatedOnce else {
+            return lhs._randomID == rhs._randomID
+        }
+        
+        return lhs._wrappedValueBox.id == rhs._wrappedValueBox.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        if _hasUpdatedOnce {
+            hasher.combine(_randomID)
+        }
+        
+        hasher.combine(_wrappedValueBox.id)
+    }
+}
+
+public struct _TextViewConfiguration: Hashable, DynamicProperty {
+    public var _fixedSize: _SwiftUIX_FixedSizeInfo? = nil
     public var isContentCopyable: Bool = true
     public var isConstant: Bool = false
     
-    public var onEditingChanged: (Bool) -> Void = { _ in }
-    public var onCommit: (() -> Void)?
-    public var onDeleteBackward: () -> Void = { }
+    @_SwiftUIX_RenderIgnored public var onEditingChanged: (Bool) -> Void = { _ in }
+    @_SwiftUIX_RenderIgnored public var onCommit: (() -> Void)?
+    @_SwiftUIX_RenderIgnored public var onDeleteBackward: () -> Void = { }
     
     var isInitialFirstResponder: Bool?
     var isFirstResponder: Bool?
-    var isFocused: Binding<Bool>? = nil
+    @_SwiftUIX_HashableBinding.Optional var isFocused: Binding<Bool>? = nil
     
     public var isEditable: Bool = true
     public var isSelectable: Bool = true
+        
+    @_SwiftUIX_HashableEdgeInsets
+    var textContainerInsets: EdgeInsets = EdgeInsets.zero
     
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var autocapitalization: UITextAutocapitalizationType?
@@ -35,7 +81,6 @@ public struct _TextViewConfiguration {
     var kerning: CGFloat?
     var linkForegroundColor: AppKitOrUIKitColor?
     var placeholderColor: AppKitOrUIKitColor?
-    var textContainerInset: AppKitOrUIKitInsets = .init(EdgeInsets.zero)
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     var textContentType: UITextContentType?
     #endif
@@ -46,7 +91,7 @@ public struct _TextViewConfiguration {
     var returnKeyType: UIReturnKeyType?
     #endif
     
-    public var _dropDelegate: Any?
+    @_SwiftUIX_RenderIgnored public var _dropDelegate: Any?
     
     #if !os(tvOS)
     @available(iOS 16.0, macOS 13.0, *)
@@ -59,7 +104,7 @@ public struct _TextViewConfiguration {
             _dropDelegate = newValue
         }
     }
-    #endif
+#endif
     
     var requiresAttributedText: Bool {
         kerning != nil
@@ -183,7 +228,7 @@ extension AppKitOrUIKitTextView {
                     
                     return .cocoaTextStorage({ nil })
                 }
-                                
+                
                 return .cocoaTextStorage({ [weak textStorage] in
                     textStorage
                 })
@@ -201,7 +246,7 @@ extension AppKitOrUIKitTextView {
                 }
         }
     }
-
+    
     public func setDataValue(
         _ data: _TextViewDataBinding.Value
     ) {
@@ -273,7 +318,7 @@ extension View {
     public func adjustsFontSizeToFitWidth(_ adjustsFontSizeToFitWidth: Bool) -> some View {
         environment(\.adjustsFontSizeToFitWidth, adjustsFontSizeToFitWidth)
     }
-
+    
     public func lineBreakMode(_ lineBreakMode: NSLineBreakMode) -> some View {
         environment(\.lineBreakMode, lineBreakMode)
     }

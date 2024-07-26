@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 public enum _TextViewDataBinding {
-    public enum Value: Equatable {
+    public enum Value {
         public enum Kind {
             case cocoaTextStorage
             case string
@@ -19,7 +19,7 @@ public enum _TextViewDataBinding {
         case cocoaTextStorage(() -> NSTextStorage?)
         case string(String)
         case cocoaAttributedString(NSAttributedString)
-        case attributedString(Any)
+        case attributedString(any Hashable)
         
         var kind: Kind {
             switch self {
@@ -121,26 +121,6 @@ public enum _TextViewDataBinding {
                     }
             }
         }
-        
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            if let lhs = lhs.cocoaTextStorageValue, let rhs = rhs.cocoaTextStorageValue {
-                return lhs === rhs
-            } else if let lhs = lhs.stringValue, let rhs = rhs.stringValue {
-                return lhs == rhs
-            } else if let lhs = lhs.cocoaAttributedStringValue, let rhs = rhs.cocoaAttributedStringValue {
-                return lhs === rhs || lhs.isEqual(to: rhs)
-            } else {
-                if #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) {
-                    if let lhs = lhs.attributedStringValue, let rhs = rhs.attributedStringValue {
-                        return lhs == rhs
-                    }
-                }
-            }
-            
-            assertionFailure("unsupported")
-            
-            return false
-        }
     }
     
     case cocoaTextStorage(() -> NSTextStorage?)
@@ -188,6 +168,28 @@ public enum _TextViewDataBinding {
                     assertionFailure()
             }
         }
+    }
+}
+
+extension _TextViewDataBinding.Value: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        if let lhs = lhs.cocoaTextStorageValue, let rhs = rhs.cocoaTextStorageValue {
+            return lhs === rhs
+        } else if let lhs = lhs.stringValue, let rhs = rhs.stringValue {
+            return lhs == rhs
+        } else if let lhs = lhs.cocoaAttributedStringValue, let rhs = rhs.cocoaAttributedStringValue {
+            return lhs === rhs || lhs.isEqual(to: rhs)
+        } else {
+            if #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) {
+                if let lhs = lhs.attributedStringValue, let rhs = rhs.attributedStringValue {
+                    return lhs == rhs
+                }
+            }
+        }
+        
+        assertionFailure("unsupported")
+        
+        return false
     }
 }
 

@@ -21,8 +21,8 @@ extension UIColor {
 }
 
 extension UIEdgeInsets {
-    var edgeInsets: EdgeInsets {
-        .init(top: top, leading: left, bottom: bottom, trailing: right)
+    var _SwiftUI_edgeInsets: EdgeInsets {
+        EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
     }
 }
 
@@ -70,6 +70,12 @@ extension UIUserInterfaceStyle {
 import AppKit
 
 public typealias AppKitOrUIKitGraphicsImageRenderer = NSGraphicsImageRenderer
+
+extension NSEdgeInsets {
+    public var _SwiftUI_edgeInsets: EdgeInsets {
+        EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
+    }
+}
 
 extension NSImage.SymbolConfiguration {
     public convenience init(pointSize: CGFloat) {
