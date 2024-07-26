@@ -71,6 +71,7 @@ public protocol AppKitOrUIKitViewRepresentable: _AppKitOrUIKitRepresentable, NSV
     @MainActor
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context)
     
+    @MainActor
     static func dismantleAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, coordinator: Coordinator)
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)

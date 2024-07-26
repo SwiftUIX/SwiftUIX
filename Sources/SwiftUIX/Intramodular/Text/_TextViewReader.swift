@@ -39,16 +39,12 @@ public struct _TextViewReader<Content: View>: View {
     ) {
         self.content = content
     }
-    
+
     public var body: some View {
+        let proxyBinding = $proxy.binding
+        
         content(proxy)
-            .environment(
-                \._textViewProxyBinding,
-                 .init(
-                    get: { proxy },
-                    set: { proxy = $0 }
-                 )
-            )
+            .environment(\._textViewProxyBinding, .init(wrappedValue: proxyBinding))
     }
 }
 

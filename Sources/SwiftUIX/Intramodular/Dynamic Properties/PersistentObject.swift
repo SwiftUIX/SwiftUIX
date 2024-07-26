@@ -162,3 +162,7 @@ extension PersistentObject {
         }
     }
 }
+
+extension PersistentObject: @unchecked Sendable where Value: Sendable {
+    
+}

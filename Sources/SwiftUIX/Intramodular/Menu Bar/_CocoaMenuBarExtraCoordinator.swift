@@ -93,7 +93,6 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
         cocoaStatusItem?.update(from: item, coordinator: self)
     }
     
-    @MainActor(unsafe)
     @objc private func didActivate(
         _ sender: AnyObject?
     ) {
