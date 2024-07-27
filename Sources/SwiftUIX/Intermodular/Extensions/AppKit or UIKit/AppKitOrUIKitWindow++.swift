@@ -147,7 +147,7 @@ extension AppKitOrUIKitWindow {
         ) where S.Input == Output, S.Failure == Failure {
             let notificationCenter = NotificationCenter.default
             
-            #if os(iOS) || os(tvOS)
+            #if os(iOS) || os(tvOS) || os(visionOS)
             let publisher = Publishers.MergeMany(
                 notificationCenter.publisher(for: UIWindow.didBecomeKeyNotification).map { _ in Output.didBecomeKey },
                 notificationCenter.publisher(for: UIWindow.didResignKeyNotification).map { _ in Output.didResignKey }
