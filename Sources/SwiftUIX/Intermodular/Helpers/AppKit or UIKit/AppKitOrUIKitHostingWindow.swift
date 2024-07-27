@@ -24,7 +24,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindo
     @_spi(Internal)
     func refreshPosition()
     @_spi(Internal)
-    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
+    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>?)
     
     func bringToFront()
     func moveToBack()
@@ -45,7 +45,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
     @_spi(Internal)
     func refreshPosition()
     @_spi(Internal)
-    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>)
+    func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>?)
     
     func bringToFront()
     func moveToBack()
@@ -57,20 +57,34 @@ extension AppKitOrUIKitHostingWindowProtocol {
     public func refreshPosition() {
         fatalError("unimplemented")
     }
-    
+}
+
+#if !os(macOS)
+extension AppKitOrUIKitHostingWindowProtocol {
     public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>) {
         fatalError("unimplemented")
     }
 }
+#endif
 
 public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
     public var canBecomeKey: Bool?
-    public var allowTouchesToPassThrough: Bool = false
+    public var allowTouchesToPassThrough: Bool?
     @_spi(Internal)
     public var windowPosition: _CoordinateSpaceRelative<CGPoint>?
     public var isTitleBarHidden: Bool?
     public var backgroundColor: Color?
+    public var preferredColorScheme: ColorScheme?
+    
+    public mutating func mergeInPlace(with other: Self) {
+        self.canBecomeKey = other.canBecomeKey ?? self.canBecomeKey
+        self.allowTouchesToPassThrough = other.allowTouchesToPassThrough ?? self.allowTouchesToPassThrough
+        self.windowPosition = other.windowPosition ?? self.windowPosition
+        self.isTitleBarHidden = other.isTitleBarHidden ?? self.isTitleBarHidden
+        self.backgroundColor = other.backgroundColor ?? self.backgroundColor
+        self.preferredColorScheme = other.preferredColorScheme ?? self.preferredColorScheme
+    }
 }
 
 @available(macCatalystApplicationExtension, unavailable)
@@ -116,7 +130,9 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
             }
             #elseif os(macOS)
             if oldValue.allowTouchesToPassThrough != _SwiftUIX_windowConfiguration.allowTouchesToPassThrough {
-                ignoresMouseEvents = oldValue.allowTouchesToPassThrough
+                if let allowTouchesToPassThrough = _SwiftUIX_windowConfiguration.allowTouchesToPassThrough {
+                    ignoresMouseEvents = allowTouchesToPassThrough
+                }
             }
             #endif
             
@@ -562,7 +578,13 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
                 self.applyPreferredConfiguration()
             }
         } else {
+            self.applyPreferredConfiguration()
+
             contentWindowController.showWindow(self)
+            
+            DispatchQueue.main.async {
+                self.applyPreferredConfiguration()
+            }
         }
         #else
         isHidden = false
@@ -742,8 +764,12 @@ extension View {
 extension AppKitOrUIKitHostingWindow {
     @_spi(Internal)
     public func setPosition(
-        _ position: _CoordinateSpaceRelative<CGPoint>
+        _ position: _CoordinateSpaceRelative<CGPoint>?
     ) {
+        guard let position else {
+            return
+        }
+        
         if _SwiftUIX_windowConfiguration.windowPosition != position {
             _SwiftUIX_windowConfiguration.windowPosition = position
         }
@@ -768,8 +794,12 @@ extension AppKitOrUIKitHostingWindow {
 extension AppKitOrUIKitHostingWindow {
     @_spi(Internal)
     public func setPosition(
-        _ position: _CoordinateSpaceRelative<CGPoint>
+        _ position: _CoordinateSpaceRelative<CGPoint>?
     ) {
+        guard let position else {
+            return
+        }
+
         // contentView?._SwiftUIX_setDebugBackgroundColor(NSColor.red)
         
         // This isn't a `guard` because we do not want to exit early. Even if the window position is the same, the actual desired position may have changed (window position can be relative).

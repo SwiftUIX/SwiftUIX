@@ -31,7 +31,17 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
         }
     }
     
-    public let windowStyle: _WindowStyle
+    @Published private var configuration: _AppKitOrUIKitHostingWindowConfiguration {
+        didSet {
+            if configuration != oldValue {
+                _setNeedsUpdate()
+            }
+        }
+    }
+ 
+    public var windowStyle: _WindowStyle {
+        configuration.style
+    }
     
     private var _content: ContentBacking {
         didSet {
@@ -91,11 +101,11 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
         _updateWorkItem = item
     }
     
-    @Published public var canBecomeKey: Bool {
-        didSet {
-            if _contentWindow == nil || canBecomeKey != oldValue {
-                _setNeedsUpdate()
-            }
+    public var canBecomeKey: Bool {
+        get {
+            self.configuration.canBecomeKey ?? true
+        } set {
+            self.configuration.canBecomeKey = newValue
         }
     }
     
@@ -118,15 +128,19 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
     @_spi(Internal)
     public var _contentWindow: AppKitOrUIKitHostingWindow<Content>? {
         didSet {
+            if _contentWindow !== oldValue {
+                oldValue?._SwiftUIX_dismiss()
+            }
+            
             _bindVisibilityToContentWindow()
         }
     }
 
-    @Published public var preferredColorScheme: ColorScheme? {
-        didSet {
-            if _contentWindow == nil || preferredColorScheme != oldValue {
-                _setNeedsUpdate()
-            }
+    public var preferredColorScheme: ColorScheme? {
+        get {
+            self.configuration.preferredColorScheme
+        } set {
+            self.configuration.preferredColorScheme = newValue
         }
     }
             
@@ -134,17 +148,12 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
         self._contentWindow ?? _makeContentWindowUnconditionally()
     }
     
-    public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>) {
-        guard let _contentWindow else {
-            debugPrint("contentWindow is nil, cannot set position")
-            
-            return
+    public func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>?) {
+        if let _contentWindow {
+            _contentWindow.setPosition(position)
+        } else {
+            configuration.windowPosition = position
         }
-        
-        _contentWindow.setPosition(position)
-        #if os(macOS)
-        _contentWindow.orderFront(nil)
-        #endif
     }
     
     init(
@@ -153,17 +162,18 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
         canBecomeKey: Bool,
         isVisible: Bool
     ) {
+        self.configuration = .init(style: windowStyle, canBecomeKey: canBecomeKey)
         self._content = content
-        self.windowStyle = windowStyle
-        self.canBecomeKey = canBecomeKey
         self._isVisible = isVisible
         
         super.init()
 
-        if isVisible, content.hostingController != nil {
-            self._update()
-            
-            assert(_contentWindow != nil)
+        if isVisible {
+            if content.hostingController != nil {
+                self._update()
+                
+                assert(_contentWindow != nil)
+            }
         } else {
             Task.detached(priority: .userInitiated) { @MainActor in
                 self._update()
@@ -236,8 +246,8 @@ extension _WindowPresentationController {
             }
             #endif
 
-            let contentWindow = _makeContentWindowUnconditionally()
-                        
+            let contentWindow = self.contentWindow
+                                    
             #if os(iOS)
             let userInterfaceStyle: UIUserInterfaceStyle = preferredColorScheme == .light ? .light : .dark
             
@@ -255,11 +265,13 @@ extension _WindowPresentationController {
             #endif
             
             contentWindow._sizeWindowToNonZeroFitThenPerform { [weak self] in
-                contentWindow.show()
-                
                 guard let `self` = self else {
                     return
                 }
+                
+                contentWindow._SwiftUIX_windowConfiguration.mergeInPlace(with: self.configuration)
+                
+                contentWindow.show()
                 
                 if self.canBecomeKey == false {
                     assert(!contentWindow.isKeyWindow)

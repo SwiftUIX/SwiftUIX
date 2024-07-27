@@ -23,10 +23,17 @@ public struct PresentWindow<Content: View>: View {
         self.windowStyle = style
         self.position = position
         
-        self._presentationController = .init(wrappedValue: _WindowPresentationController(
-            style: style,
-            content: content
-        ))
+        self._presentationController = .init(wrappedValue: {
+            let controller = _WindowPresentationController(
+                style: style,
+                visible: false,
+                content: content
+            )
+            
+            controller.setPosition(position)
+            
+            return controller
+        }())
     }
     
     public var body: some View {
@@ -42,11 +49,8 @@ public struct PresentWindow<Content: View>: View {
     private func present() {
         self.presentationController.content = content()
         
+        presentationController.setPosition(position)
         presentationController.show()
-        
-        if let position {
-            presentationController.setPosition(position)
-        }
         
         DispatchQueue.main.async {
             presentationController.bringToFront()
