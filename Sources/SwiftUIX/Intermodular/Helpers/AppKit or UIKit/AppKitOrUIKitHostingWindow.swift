@@ -483,7 +483,7 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     
     #if os(iOS)
     override public func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        guard _SwiftUIX_windowConfiguration.allowTouchesToPassThrough else {
+        guard (_SwiftUIX_windowConfiguration.allowTouchesToPassThrough ?? false) else {
             return super.hitTest(point, with: event)
         }
         
