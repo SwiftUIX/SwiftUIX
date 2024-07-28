@@ -10,7 +10,6 @@ import SwiftUI
 
 #if os(macOS)
 public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindowDelegate {
-    @_spi(Internal)
     var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences { get set }
     var _SwiftUIX_windowConfiguration: _AppKitOrUIKitHostingWindowConfiguration { get set }
     
@@ -21,9 +20,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow, NSWindo
     func show()
     func hide()
 
-    @_spi(Internal)
     func refreshPosition()
-    @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>?)
     
     func bringToFront()
@@ -42,9 +39,7 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
     func show()
     func hide()
 
-    @_spi(Internal)
     func refreshPosition()
-    @_spi(Internal)
     func setPosition(_ position: _CoordinateSpaceRelative<CGPoint>?)
     
     func bringToFront()
@@ -52,7 +47,6 @@ public protocol AppKitOrUIKitHostingWindowProtocol: AppKitOrUIKitWindow {
 }
 #endif
 
-@_spi(Internal)
 extension AppKitOrUIKitHostingWindowProtocol {
     public func refreshPosition() {
         fatalError("unimplemented")
@@ -71,7 +65,6 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
     public var canBecomeKey: Bool?
     public var allowTouchesToPassThrough: Bool?
-    @_spi(Internal)
     public var windowPosition: _CoordinateSpaceRelative<CGPoint>?
     public var isTitleBarHidden: Bool?
     public var backgroundColor: Color?
@@ -104,7 +97,6 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     private var _contentWindowController: NSWindowController?
     #endif
     
-    @_spi(Internal)
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil
 
     /// The window's preferred configuration.
@@ -663,7 +655,6 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     }
 }
 
-@_spi(Internal)
 extension AppKitOrUIKitHostingWindow {
     public func refreshPosition() {
         guard let windowPosition = _SwiftUIX_windowConfiguration.windowPosition else {
@@ -762,7 +753,6 @@ extension View {
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
-    @_spi(Internal)
     public func setPosition(
         _ position: _CoordinateSpaceRelative<CGPoint>?
     ) {
@@ -792,7 +782,6 @@ extension AppKitOrUIKitHostingWindow {
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
 extension AppKitOrUIKitHostingWindow {
-    @_spi(Internal)
     public func setPosition(
         _ position: _CoordinateSpaceRelative<CGPoint>?
     ) {

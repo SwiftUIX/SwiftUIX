@@ -4,6 +4,7 @@
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
+import Combine
 import SwiftUI
 import UniformTypeIdentifiers
 

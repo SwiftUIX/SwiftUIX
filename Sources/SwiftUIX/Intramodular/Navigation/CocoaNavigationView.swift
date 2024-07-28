@@ -73,7 +73,7 @@ extension CocoaNavigationView {
                     interactivePopGestureRecognizer?.delegate = self
                 }
             }
-
+            
             override func viewWillAppear(_ animated: Bool) {
                 self.view.backgroundColor = nil
                 
@@ -220,6 +220,32 @@ extension NavigationLink {
             tag: tag,
             selection: selection._asOptional(defaultValue: tag),
             destination: destination
+        )
+    }
+    
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+    public init(
+        _ title: String,
+        _isActive isActive: Binding<Bool>,
+        @ViewBuilder destination: () -> Destination
+    ) where Label == Text {
+        self.init(
+            title,
+            isActive: isActive,
+            destination: destination
+        )
+    }
+    
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 7.0, *)
+    public init(
+        _ title: String,
+        _isActive isActive: Binding<Bool>,
+        destination: Destination
+    ) where Label == Text {
+        self.init(
+            title,
+            isActive: isActive,
+            destination: { destination }
         )
     }
 }
