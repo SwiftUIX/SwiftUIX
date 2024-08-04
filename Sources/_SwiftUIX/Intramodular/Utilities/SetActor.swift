@@ -12,7 +12,7 @@
 
 import Foundation
 
-public final class SetActor<Option: SetAlgebra, ReactionType> {
+public final class _SwiftUIX_SetActor<Option: SetAlgebra, ReactionType> {
     public enum Action {
         case onEmpty
         case onChange
@@ -116,7 +116,7 @@ public final class SetActor<Option: SetAlgebra, ReactionType> {
             let onEmptyReactions = reactions.filter {
                 guard case let .onInsertion(newOption) = $0.action,
                       newOption == option else {
-                
+                    
                     return false
                 }
                 
@@ -140,7 +140,7 @@ public final class SetActor<Option: SetAlgebra, ReactionType> {
                       newOption == option else {
                     return false
                 }
-            
+                
                 return true
             }
             
@@ -157,7 +157,7 @@ public final class SetActor<Option: SetAlgebra, ReactionType> {
     
 }
 
-public extension SetActor where ReactionType: Equatable {
+public extension _SwiftUIX_SetActor where ReactionType: Equatable {
     func removeAllReactions(_ type: ReactionType) {
         reactions.removeAll(where: { $0.type == type })
     }

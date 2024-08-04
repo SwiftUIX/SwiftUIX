@@ -378,7 +378,7 @@ extension _WindowPresentationController {
             content: content(),
             windowStyle: style,
             canBecomeKey: true,
-            isVisible: true
+            isVisible: false
         )
     }
     

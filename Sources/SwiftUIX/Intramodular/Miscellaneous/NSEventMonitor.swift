@@ -26,6 +26,31 @@ public protocol _NSEventMonitorType {
     func stop() throws
 }
 
+@available(macOS 12.0, *)
+extension _NSEventMonitorType {
+    public init(
+        matching shortcuts: [KeyboardShortcut],
+        context: NSEventMonitor.Context = .local,
+        perform action: @escaping (KeyboardShortcut) -> Void
+    ) throws {
+        let shortcuts = Set(shortcuts)
+        
+        try self.init(context: context, matching: [.keyDown]) { event -> NSEvent? in
+            guard let shortcut = KeyboardShortcut(from: event) else {
+                return event
+            }
+            
+            guard shortcuts.contains(shortcut) else {
+                return event
+            }
+            
+            _ = action(shortcut)
+            
+            return nil
+        }
+    }
+}
+
 public final class NSEventMonitor: _NSEventMonitorType {
     public typealias Context = NSEventMonitorContext
     
@@ -163,7 +188,7 @@ extension View {
         }
     }
     
-    @available( macOS 12.0, *)
+    @available(macOS 12.0, *)
     public func onAppKitKeyboardShortcutEvents(
         _ shortcuts: [KeyboardShortcut],
         context: NSEventMonitor.Context = .local,

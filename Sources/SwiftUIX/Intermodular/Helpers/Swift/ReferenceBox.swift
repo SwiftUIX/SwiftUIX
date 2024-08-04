@@ -219,7 +219,6 @@ final class UnsafeWeakReferenceBox<T>: _SwiftUIX_AnyIndirectValueBox {
     }
 }
 
-@_spi(Internal)
 @propertyWrapper
 public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
     @Published public var value: Value
@@ -245,7 +244,6 @@ public final class _SwiftUIX_ObservableReferenceBox<Value>: ObservableObject {
     }
 }
 
-@_spi(Internal)
 @propertyWrapper
 public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: ObservableObject {
     public let objectWillChange: ObservableObjectPublisher
