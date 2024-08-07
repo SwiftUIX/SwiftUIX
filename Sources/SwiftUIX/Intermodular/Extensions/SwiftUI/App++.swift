@@ -4,17 +4,24 @@
 
 import SwiftUI
 
+#if os(macOS)
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension App {
     // Programmatically quit the current application.
     public static func quit() throws {
-#if os(macOS)
         NSApplication.shared.terminate(nil)
-#else
         throw AppQuitError.unsupported
-#endif
     }
 }
+#else
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension App {
+    // Programmatically quit the current application.
+    public static func quit() throws {
+
+    }
+}
+#endif
 
 #if os(macOS)
 @MainActor
@@ -23,8 +30,8 @@ extension App {
         NSApplication._SwiftUIX_isRunningFromApplicationsDirectory
     }
     
-    public static func _copyToApplicationsDirectory() throws {
-        try NSApplication._SwiftUIX_copyToApplicationsDirectoryIfNeeded()
+    public static func _copyAppToApplicationsDirectoryIfNeeded() throws {
+        try NSApplication._SwiftUIX_copyAppToApplicationsDirectoryIfNeeded()
     }
 }
 #endif

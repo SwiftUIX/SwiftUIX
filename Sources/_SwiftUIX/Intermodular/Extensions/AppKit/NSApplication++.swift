@@ -33,7 +33,7 @@ extension NSApplication {
         case unknown(Error)
     }
     
-    public static func _SwiftUIX_copyToApplicationsDirectoryIfNeeded() throws {
+    public static func _SwiftUIX_copyAppToApplicationsDirectoryIfNeeded() throws {
         let bundleURL = Bundle.main.bundleURL
         
         // Assert that the bundle URL points to an .app bundle
