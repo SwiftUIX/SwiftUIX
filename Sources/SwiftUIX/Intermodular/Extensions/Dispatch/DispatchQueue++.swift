@@ -18,19 +18,19 @@ extension DispatchQueue {
 
         if shouldRunAsync {
             DispatchQueue.main.async {
-                MainActor.backportAssumeIsolated(work)
+                MainActor.assumeIsolatedIfPossible(work)
             }
         } else {
-            MainActor.backportAssumeIsolated(work)
+            MainActor.assumeIsolatedIfPossible(work)
         }
     }
 }
 
 extension MainActor {
-    /// Backport version of iOS 17 `assumIsolated` function.
+    /// Compatible with previous system versions of `assumeIsolated` method from iOS 17 
     @_spi(Internal)
     @_transparent
-    public static func backportAssumeIsolated(_ work: @MainActor @escaping () -> Void) {
+    public static func assumeIsolatedIfPossible(_ work: @MainActor @escaping () -> Void) {
         if #available(iOS 17.0, *) {
             assumeIsolated {
                 work()
