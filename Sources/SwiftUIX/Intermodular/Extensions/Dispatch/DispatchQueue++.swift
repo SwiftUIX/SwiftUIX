@@ -13,24 +13,32 @@ extension DispatchQueue {
         force: Bool? = nil,
         @_implicitSelfCapture execute work: @MainActor @escaping () -> ()
     ) {
-        if let force {
-            guard force == false else {
-                DispatchQueue.main.async(execute: {
-                    MainActor.assumeIsolated {
-                        work()
-                    }
-                })
-                
-                return
+        // Check if the code needs to be executed asynchronously on the main
+        let shouldRunAsync = force ?? !Thread.isMainThread
+
+        if shouldRunAsync {
+            DispatchQueue.main.async {
+                MainActor.backportAssumeIsolated(work)
             }
+        } else {
+            MainActor.backportAssumeIsolated(work)
         }
-        
-        if Thread.isMainThread {
-            MainActor.assumeIsolated {
+    }
+}
+
+extension MainActor {
+    /// Backport version of iOS 17 `assumIsolated` function.
+    @_spi(Internal)
+    @_transparent
+    public static func backportAssumeIsolated(_ work: @MainActor @escaping () -> Void) {
+        if #available(iOS 17.0, *) {
+            assumeIsolated {
                 work()
             }
         } else {
-            DispatchQueue.main.async(execute: work)
+            Task { @MainActor in
+                work()
+            }
         }
     }
 }
