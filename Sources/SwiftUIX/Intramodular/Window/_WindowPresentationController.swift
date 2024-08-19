@@ -119,7 +119,8 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
             
             _isVisible = newValue
             
-            if _contentWindow == nil {
+            if _contentWindow == nil || _isVisible == isVisible
+            {
                 _setNeedsUpdate()
             }
         }
