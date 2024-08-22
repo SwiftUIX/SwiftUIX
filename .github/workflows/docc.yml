@@ -4,9 +4,9 @@
 
 name: DocC Runner
 
-on:
-  push:
-    branches: ["master", "doc/docc-support"]
+# on:
+#   push:
+#     branches: ["master", "doc/docc-support"]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
