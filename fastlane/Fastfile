@@ -64,3 +64,13 @@ lane :generate_xcodeproj do |options|
     xcconfig: "SwiftUIX.xcconfig"
   )
 end
+
+lane :docc do
+  sh("cd .. && swift package resolve;")
+  sh("cd .. && xcodebuild docbuild -scheme SwiftUIX -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';")
+  $(xcrun --find docc) process-archive \
+    transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/SwiftUIX.doccarchive \
+    --output-path docs \
+    --hosting-base-path 'SwiftUIX';
+  echo "<script>window.location.href += \"/documentation/swiftuix\"</script>" > docs/index.html;
+end

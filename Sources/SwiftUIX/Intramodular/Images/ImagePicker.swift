@@ -5,7 +5,40 @@
 import SwiftUI
 
 #if os(iOS) || targetEnvironment(macCatalyst)
-/// A SwiftUI port of `UIImagePickerController`.
+/// This is a SwiftUI port of the UIKit `UIImagePickerController`.
+///
+/// The SwiftUIX `ImagePicker` is a simple, efficient, and native SwiftUI way to display the equivalent of a `UIImagePickerController`.
+///
+/// ## Usage
+///
+/// To use the Image Picker, define a variable of type `Data` and pass it into `ImagePicker`. The user's picked image can be accessed from the variable.
+///
+/// ```swift
+/// struct ContentView: View {
+///     @State var image: Data?
+///
+///     var body: some View {
+///         VStack {
+///             ImagePicker(data: $image, encoding: .png, onCancel: { })
+///             if let image = image {
+///             Image(data: image)?
+///                 .resizable()
+///                 .aspectRatio(contentMode: .fill)
+///                 .frame(width: 200,height: 200)
+///                 .clipped()
+///             }
+///         }
+///     }
+/// }
+/// ```
+///
+/// The `ImagePicker` takes in 3 parameters: `data`, `encoding` and `onCancel`. `onCancel` is optional.
+///
+/// The `data` parameter takes in a optional `Data` type binding. In the code example above, the value of variable `image` will be provided by the `ImagePicker`. If you want to display the result of the `ImagePicker`, simply use `Image(data:)` to convert the `Data` into an `Image`.
+///
+/// The `encoding` parameter is an `enum` that takes in either JPEG or PNG as the encoding format. PNG or Portable Network Graphics is a loseless format for images. JPEG offers the compression quality parameter that can be 1 (very low quality) or 100 (very high quality)
+///
+/// `onCancel` specifies a closure to be run when the "Cancel" button is pressed.
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
     
@@ -80,6 +113,13 @@ public struct ImagePicker: UIViewControllerRepresentable {
 // MARK: - API
 
 extension ImagePicker {
+
+
+    /// Create an image picker with picker controller info.
+    ///
+    /// - Parameters:
+    ///   - info: Image picker controller information.
+    ///   - onCancel: An action to trigger when the image picker cancels.
     public init(
         info: Binding<[UIImagePickerController.InfoKey: Any]?>,
         onCancel: (() -> Void)? = nil
@@ -91,6 +131,12 @@ extension ImagePicker {
         self.onCancel = onCancel
     }
     
+    /// Create an image picker with an image binding and a certain encoding.
+    ///
+    /// - Parameters:
+    ///   - image: The image binding to use.
+    ///   - encoding: The image encoding to use.
+    ///   - onCancel: An action to trigger when the image picker cancels.
     public init(
         image: Binding<AppKitOrUIKitImage?>,
         encoding: Image.Encoding? = nil,
@@ -102,7 +148,13 @@ extension ImagePicker {
         self.encoding = encoding
         self.onCancel = onCancel
     }
-    
+
+    /// Create an image picker with image data binding and a certain encoding.
+    ///
+    /// - Parameters:
+    ///   - image: The image data binding to use.
+    ///   - encoding: The image encoding to use.
+    ///   - onCancel: An action to trigger when the image picker cancels.
     public init(
         data: Binding<Data?>,
         encoding: Image.Encoding? = nil,

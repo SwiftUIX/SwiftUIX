@@ -13,9 +13,11 @@ SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of c
 - [Support](#support)
 - [Credits](#credits)
 
+
 # Why
 
 The goal of this project is to **complement** the SwiftUI standard library, offering hundreds of extensions and views that empower you, the developer, to build applications with the ease promised by the revolution that is SwiftUI.
+
 
 # Requirements
 
@@ -24,6 +26,7 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 - Deployment targets: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1
 - Xcode 15.4+ 
+
 
 # Installation
 
@@ -46,9 +49,17 @@ dependencies: [
 4. Click **Finish**.
 5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
-# Contents
 
-All documentation is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
+# Documentation
+
+The SwiftUIX documentation can be found at:
+
+https://swiftuix.github.io/SwiftUIX/documentation/swiftuix/
+
+All documentation that hasn't been migrated here is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
+
+
+# Contents
 
 While the project itself is stable and heavily being used in production, its documentation is **work-in-progress**. Contributions are encouraged and welcomed.
 
@@ -267,6 +278,7 @@ LinkPresentationView(url: url)
       }
   ```
 
+
 # Contributing
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
@@ -274,9 +286,11 @@ SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. 
 To create an Xcode project for SwiftUIX run `bundle install; bundle exec fastlane generate_xcodeproj`.
 To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`.
 
+
 # License
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
+
 
 # Support
 
@@ -287,8 +301,12 @@ Maintaining SwiftUIX is a massively time-consuming endeavour. If you're reliant 
 - [Contributing](#contributing)
 - [Donating via Patreon](http://patreon.com/vmanot)
 
+
 # Credits
 
 SwiftUIX is led and maintained by [@vatsal_manot](http://twitter.com/vatsal_manot).
 
 Special thanks to [Brett Best](https://github.com/Brett-Best), [Nathan Tanner](https://github.com/nathantannar4), [Kabir Oberai](https://github.com/kabiroberai) and many more.
+
+
+[Documentation]: [https://swiftuix.github.io/SwiftUIX/documentation/swiftuix/]

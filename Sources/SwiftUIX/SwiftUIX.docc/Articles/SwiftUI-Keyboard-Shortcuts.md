@@ -1,4 +1,4 @@
-# Keyboard Shortcuts
+# SwiftUI Keyboard Shortcuts
 
 The `onKeyboardShortcut(_:perform:)` modifier adds an action to perform when this view recognizes a keyboard shortcut.
 
@@ -12,4 +12,3 @@ struct ContentView: View {
     }
 }
 ```
-
