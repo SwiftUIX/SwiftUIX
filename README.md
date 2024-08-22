@@ -267,6 +267,7 @@ LinkPresentationView(url: url)
       }
   ```
 
+
 # Contributing
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
@@ -274,9 +275,11 @@ SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. 
 To create an Xcode project for SwiftUIX run `bundle install; bundle exec fastlane generate_xcodeproj`.
 To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`.
 
+
 # License
 
 SwiftUIX is licensed under the [MIT License](https://vmanot.mit-license.org).
+
 
 # Support
 

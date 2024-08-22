@@ -1,4 +1,4 @@
-#  View Extensions
+# SwiftUI View Extensions
 
 SwiftUIX provides several useful extensions to the SwiftUI View protocol.
 

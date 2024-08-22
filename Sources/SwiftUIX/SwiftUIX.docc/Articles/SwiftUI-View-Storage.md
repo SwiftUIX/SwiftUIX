@@ -1,4 +1,4 @@
-#  View Storage
+# SwiftUI View Storage
 
 SwiftUIX provides a ``ViewStorage`` property wrapper, which can be used to add non-observable storage capabilities to a view property.
 
