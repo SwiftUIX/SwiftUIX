@@ -100,7 +100,7 @@ bundle install; bundle exec fastlane build
 
 ### SwiftUI
 
-- TBD
+- <doc:View-Extensions>
 
 
 [Logo]: https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png
