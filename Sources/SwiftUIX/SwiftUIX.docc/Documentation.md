@@ -98,9 +98,10 @@ bundle install; bundle exec fastlane build
 
 - TBD
 
-### SwiftUI
+### SwiftUI Articles
 
-- <doc:View-Extensions>
+- <doc:SwiftUI-View-Extensions>
+- <doc:SwiftUI-View-Storage>
 
 
 [Logo]: https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png
