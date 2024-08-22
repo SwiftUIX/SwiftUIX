@@ -97,9 +97,9 @@ bundle install; bundle exec fastlane build
 
 ### Articles
 
+- <doc:SwiftUI-Keyboard-Shortcuts>
 - <doc:SwiftUI-View-Extensions>
 - <doc:SwiftUI-View-Storage>
-
 
 ### UIKit → SwiftUI
 
@@ -108,6 +108,11 @@ bundle install; bundle exec fastlane build
 ### SwiftUI
 
 - ``ImagePicker``
+
+### SwiftUI Extensions
+
+- ``SwiftUI/View``
+
 
 
 [Logo]: https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png
