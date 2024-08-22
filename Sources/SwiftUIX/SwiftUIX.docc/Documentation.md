@@ -2,7 +2,7 @@
 
 SwiftUIX is an exhaustive expansion of the standard SwiftUI library.
 
-![Logo](https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png)
+![Logo][Logo]
 
 SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of components, extensions and utilities to complement the standard library.
 
@@ -16,7 +16,7 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 
 ## Installation
 
-The preferred way of installing SwiftUIX is via the [Swift Package Manager](https://swift.org/package-manager/).
+The preferred way of installing SwiftUIX is via the [Swift Package Manager][SPM].
 
 ```
 https://github.com/SwiftUIX/SwiftUIX.git
@@ -68,15 +68,27 @@ Swift 5.10 is the minimum Swift version required to build SwiftUIX. Swift 5.9 is
 
 ## Documentation
 
-While this documentation is being worked on, all documentstion is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
+While this documentation is being worked on, all documentstion is available via the [repository wiki][Wiki].
 
 While the project itself is stable and heavily being used in production, its documentation is **work-in-progress**.
 
 
 
-## Contents
+## Contributing
 
-Aiming to be the definitive source of information, code examples, etc. for this repository, this documentation will put less things on this page, and instead split things up in articles, namespaces, etc. 
+SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects][Projects] section before raising a bug or feature request, as it may already be under progress.
+
+To create an Xcode project for SwiftUIX, run this command:
+
+```
+bundle install; bundle exec fastlane generate_xcodeproj
+```
+
+To check the automated builds for SwiftUIX, run this command:
+
+```
+bundle install; bundle exec fastlane build
+```
 
 
 
@@ -89,3 +101,18 @@ Aiming to be the definitive source of information, code examples, etc. for this 
 ### SwiftUI
 
 - TBD
+
+
+[Logo]: https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png
+
+[License]: https://vmanot.mit-license.org
+[Patreon]: http://patreon.com/vmanot
+[Projects]: https://github.com/SwiftUIX/SwiftUIX/projects
+[Wiki]: https://github.com/SwiftUIX/SwiftUIX/wiki
+
+[Vatsal]: http://twitter.com/vatsal_manot
+[Brett]: https://github.com/Brett-Best
+[Kabir]: https://github.com/kabiroberai
+[Nathan]: https://github.com/nathantannar4
+
+[SPM]: https://swift.org/package-manager/
