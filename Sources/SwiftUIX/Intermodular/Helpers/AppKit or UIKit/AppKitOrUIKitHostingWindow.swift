@@ -84,6 +84,7 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
+@_documentation(visibility: internal)
 open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
     public typealias _ContentViewControllerType = CocoaHostingController<_AppKitOrUIKitHostingWindowContent<Content>>
     

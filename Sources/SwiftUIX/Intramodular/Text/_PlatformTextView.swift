@@ -43,6 +43,7 @@ public protocol _PlatformTextViewType: _AppKitOrUIKitRepresented, AppKitOrUIKitT
 
 /// The main `UITextView` subclass used by `TextView`.
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@_documentation(visibility: internal)
 open class _PlatformTextView<Label: View>: AppKitOrUIKitTextView, NSLayoutManagerDelegate, NSTextStorageDelegate {
     public var representatableStateFlags: _AppKitOrUIKitRepresentableStateFlags = []
     public var representableCache: _AppKitOrUIKitRepresentableCache = nil

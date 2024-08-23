@@ -13,7 +13,6 @@ import SwiftUI
 /// You can read more about how to use this property wrapper in the <doc:SwiftUI-View-Storage> article.
 @frozen
 @propertyWrapper
-@_documentation(visibility: internal)
 public struct ViewStorage<Value>: Identifiable, DynamicProperty {
     public final class ValueBox: AnyObservableValue<Value> {
         @Published fileprivate var value: Value

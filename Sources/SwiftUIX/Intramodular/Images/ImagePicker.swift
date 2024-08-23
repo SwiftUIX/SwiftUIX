@@ -39,7 +39,6 @@ import SwiftUI
 /// The `encoding` parameter is an `enum` that takes in either JPEG or PNG as the encoding format. PNG or Portable Network Graphics is a loseless format for images. JPEG offers the compression quality parameter that can be 1 (very low quality) or 100 (very high quality)
 ///
 /// `onCancel` specifies a closure to be run when the "Cancel" button is pressed.
-@_documentation(visibility: internal)
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
     
