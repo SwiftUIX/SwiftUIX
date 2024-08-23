@@ -7,6 +7,7 @@
 import Quartz
 import SwiftUI
 
+@_documentation(visibility: internal)
 public class QuickLookPreviewItem: NSObject, QLPreviewItem {
     public var previewItemURL: URL?
     public var previewItemTitle: String?

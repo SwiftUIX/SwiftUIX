@@ -15,6 +15,7 @@ import UIKit
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 /// A representation of the device's screen.
+@_documentation(visibility: internal)
 public class Screen: ObservableObject {
     public static let main = Screen()
     

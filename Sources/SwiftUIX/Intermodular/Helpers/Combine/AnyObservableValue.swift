@@ -7,6 +7,7 @@ import Swift
 
 /// An abstract base class for an observable value box.
 @dynamicMemberLookup
+@_documentation(visibility: internal)
 public class AnyObservableValue<Value>: _SwiftUIX_AnyIndirectValueBox, ObservableObject {
     public var wrappedValue: Value {
         get {

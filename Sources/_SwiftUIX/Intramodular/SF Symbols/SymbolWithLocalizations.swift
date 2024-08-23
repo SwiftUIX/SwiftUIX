@@ -12,6 +12,7 @@ public protocol SymbolLocalization {
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith1Localization<L1: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -20,6 +21,7 @@ public class SymbolWith1Localization<L1: SymbolLocalization>: SFSymbol {
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith2Localizations<L1: SymbolLocalization, L2: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -31,6 +33,7 @@ public class SymbolWith2Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith3Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -45,6 +48,7 @@ public class SymbolWith3Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith4Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization, L4: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -62,6 +66,7 @@ public class SymbolWith4Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith5Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization, L4: SymbolLocalization, L5: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -82,6 +87,7 @@ public class SymbolWith5Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith6Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization, L4: SymbolLocalization, L5: SymbolLocalization, L6: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -105,6 +111,7 @@ public class SymbolWith6Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith7Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization, L4: SymbolLocalization, L5: SymbolLocalization, L6: SymbolLocalization, L7: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]
@@ -131,6 +138,7 @@ public class SymbolWith7Localizations<L1: SymbolLocalization, L2: SymbolLocaliza
 
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SymbolWith8Localizations<L1: SymbolLocalization, L2: SymbolLocalization, L3: SymbolLocalization, L4: SymbolLocalization, L5: SymbolLocalization, L6: SymbolLocalization, L7: SymbolLocalization, L8: SymbolLocalization>: SFSymbol {
     public subscript(dynamicMember keyPath: KeyPath<L1, SFSymbol>) -> SFSymbol {
         L1(source: self)[keyPath: keyPath]

@@ -6,6 +6,7 @@ import Combine
 import Swift
 
 @_spi(Internal)
+@_documentation(visibility: internal)
 public class _AnyObservableObjectMutableBox<WrappedValue>: ObservableObject {
     public var __unsafe_opaque_base: Any? {
         get {

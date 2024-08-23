@@ -1,5 +1,6 @@
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public class SFSymbol: RawRepresentable, Equatable, Hashable {
     public let rawValue: String
 

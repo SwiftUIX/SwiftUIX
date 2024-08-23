@@ -8,6 +8,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public class _AnyWindowPresentationController: ObservableObject {
     init() {
         

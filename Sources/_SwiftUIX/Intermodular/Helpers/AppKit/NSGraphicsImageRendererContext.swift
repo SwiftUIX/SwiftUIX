@@ -7,14 +7,14 @@
 import AppKit
 import SwiftUI
 
+@_documentation(visibility: internal)
 public class NSGraphicsImageRendererFormat {
     public var scale: Double = 1
     
-    public init() {
-        
-    }
+    public init() {}
 }
 
+@_documentation(visibility: internal)
 public class NSGraphicsImageRendererContext {
     public let cgContext: CGContext
     
@@ -31,6 +31,7 @@ public class NSGraphicsImageRendererContext {
     }
 }
 
+@_documentation(visibility: internal)
 public class NSGraphicsImageRenderer {
     public let size: CGSize
     public let format: NSGraphicsImageRendererFormat
