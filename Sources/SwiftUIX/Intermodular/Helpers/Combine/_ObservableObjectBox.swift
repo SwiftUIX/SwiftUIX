@@ -4,6 +4,7 @@
 
 import Combine
 import Swift
+import SwiftUI
 
 @_spi(Internal)
 @_documentation(visibility: internal)

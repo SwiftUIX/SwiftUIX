@@ -4,6 +4,7 @@
 
 import CoreGraphics
 import Swift
+import SwiftUI
 
 extension CGRect {
     public var minimumDimensionLength: CGFloat {

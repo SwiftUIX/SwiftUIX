@@ -6,6 +6,8 @@
 
 import UIKit
 
+import SwiftUI
+
 public typealias AppKitOrUIKitApplication = UIApplication
 public typealias AppKitOrUIKitApplicationDelegate = UIApplicationDelegate
 @available(iOS 14.0, tvOS 14.0, *)

@@ -5,6 +5,7 @@
 #if canImport(UIKit)
 
 import Swift
+import SwiftUI
 import UIKit
 
 extension UIRectEdge {
