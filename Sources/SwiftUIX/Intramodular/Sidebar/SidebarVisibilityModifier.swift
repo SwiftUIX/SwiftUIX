@@ -19,6 +19,7 @@ private struct SidebarVisibilityModifier: ViewModifier {
 
 // MARK: - API
 
+@_documentation(visibility: internal)
 public enum _SidebarVisibility {
     case automatic
     case visible

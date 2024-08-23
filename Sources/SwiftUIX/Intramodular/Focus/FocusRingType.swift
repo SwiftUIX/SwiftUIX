@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum FocusRingType: UInt {
     case `default` = 0
     case none      = 1

@@ -10,6 +10,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum NSEventMonitorContext {
     case local
     case global
@@ -51,6 +52,7 @@ extension _NSEventMonitorType {
     }
 }
 
+@_documentation(visibility: internal)
 public final class NSEventMonitor: _NSEventMonitorType {
     public typealias Context = NSEventMonitorContext
     

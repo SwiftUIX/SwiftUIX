@@ -10,7 +10,8 @@ import UIKit
 
 @_documentation(visibility: internal)
 public struct PaginationState: Hashable {
-    public enum TransitionDirection: Hashable {
+    @_documentation(visibility: internal)
+public enum TransitionDirection: Hashable {
         case backward
         case forward
     }

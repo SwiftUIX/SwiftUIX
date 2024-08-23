@@ -28,7 +28,8 @@ public struct _AppKitOrUIKitRepresentableStateFlags: OptionSet {
 
 @_documentation(visibility: internal)
 public struct _AppKitOrUIKitRepresentableCache: ExpressibleByNilLiteral {
-    public enum Attribute {
+    @_documentation(visibility: internal)
+public enum Attribute {
         case intrinsicContentSize
     }
     

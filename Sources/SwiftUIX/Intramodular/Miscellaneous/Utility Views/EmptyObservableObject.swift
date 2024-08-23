@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 /// An empty `ObservableObject` for utility purposes.
+@_documentation(visibility: internal)
 public final class EmptyObservableObject: ObservableObject, Hashable {
     public init() {
         

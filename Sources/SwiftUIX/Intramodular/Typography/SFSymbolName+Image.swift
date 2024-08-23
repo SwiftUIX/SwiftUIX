@@ -54,7 +54,8 @@ extension AppKitOrUIKitImage {
         }
     }
     
-    public enum ImageRenderingMode {
+    @_documentation(visibility: internal)
+public enum ImageRenderingMode {
         case alwaysOriginal
     }
     

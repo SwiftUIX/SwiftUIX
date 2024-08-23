@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum PresentationTransitionPhase {
     case willBegin
     case didEnd

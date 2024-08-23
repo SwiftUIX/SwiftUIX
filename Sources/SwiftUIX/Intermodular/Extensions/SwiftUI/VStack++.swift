@@ -6,7 +6,8 @@ import Swift
 import SwiftUI
 
 extension VStack {
-    public enum _ProportionalFill {
+    @_documentation(visibility: internal)
+public enum _ProportionalFill {
         case proportionally
     }
     

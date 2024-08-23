@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum PopoverAttachmentTarget {
     case rect(_CoordinateSpaceRelative<CGRect>)
     

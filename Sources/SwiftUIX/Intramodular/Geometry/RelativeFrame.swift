@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum FrameDimensionType: Hashable {
     case width
     case height
@@ -109,6 +110,7 @@ public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
     }
 }
 
+@_documentation(visibility: internal)
 public enum RelativeFrameDimension: Hashable {
     public struct FractionalValue: Hashable {
         let dimension: FrameDimensionType

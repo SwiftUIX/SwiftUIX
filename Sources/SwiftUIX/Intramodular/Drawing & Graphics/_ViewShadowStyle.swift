@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum _ViewShadowStyle {
     case drop(
         color: Color = .init(.sRGBLinear, white: 0, opacity: 0.33),

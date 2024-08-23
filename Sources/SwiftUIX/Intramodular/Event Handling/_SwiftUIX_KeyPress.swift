@@ -57,7 +57,8 @@ extension _SwiftUIX_KeyPress {
         public static let all: Self = [.down, .repeat, .up]
     }
     
-    public enum Result: Hashable, Sendable {
+    @_documentation(visibility: internal)
+public enum Result: Hashable, Sendable {
         /// The action consumed the event, preventing dispatch from continuing.
         case handled
         /// The action ignored the event, allowing dispatch to continue.

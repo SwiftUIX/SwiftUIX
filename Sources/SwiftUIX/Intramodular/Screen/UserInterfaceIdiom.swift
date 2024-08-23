@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum UserInterfaceIdiom: Hashable {
     case carPlay
     case mac

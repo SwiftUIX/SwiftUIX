@@ -427,6 +427,7 @@ extension EnvironmentValues {
 }
 
 /// The keyboard type to be displayed.
+@_documentation(visibility: internal)
 public enum _TextField_KeyboardType {
     case `default`
     case asciiCapable

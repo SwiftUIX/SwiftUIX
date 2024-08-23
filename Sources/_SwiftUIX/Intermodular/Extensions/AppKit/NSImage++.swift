@@ -31,7 +31,8 @@ extension NSImage {
 }
 
 extension NSImage {
-    public enum Orientation: UInt32 {
+    @_documentation(visibility: internal)
+public enum Orientation: UInt32 {
         case up = 1
         case upMirrored = 2
         case down = 3

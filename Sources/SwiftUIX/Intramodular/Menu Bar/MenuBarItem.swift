@@ -170,6 +170,7 @@ extension View {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public enum _MenuBarExtraLabelContent: Hashable, View {
     case image(_AnyImage)
     case text(String)

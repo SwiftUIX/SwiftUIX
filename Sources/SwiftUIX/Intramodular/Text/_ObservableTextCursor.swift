@@ -48,6 +48,7 @@ extension _ObservableTextCursor {
     }
 }
 
+@_documentation(visibility: internal)
 public final class _ObservableTextCursor: ObservableObject {
     private weak var owner: (any _PlatformTextViewType)?
     

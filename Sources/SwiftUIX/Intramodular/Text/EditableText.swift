@@ -12,7 +12,8 @@ import SwiftUI
 @available(watchOS, unavailable)
 @_documentation(visibility: internal)
 public struct EditableText: View {
-    public enum Activation {
+    @_documentation(visibility: internal)
+public enum Activation {
         case onDoubleTap
     }
     

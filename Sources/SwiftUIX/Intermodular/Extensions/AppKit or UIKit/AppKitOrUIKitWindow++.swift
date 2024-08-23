@@ -130,7 +130,8 @@ extension AppKitOrUIKitWindow {
 
 extension AppKitOrUIKitWindow {
     public struct _TransitionPhasePublisher: Publisher {
-        public enum Output {
+        @_documentation(visibility: internal)
+public enum Output {
             case didBecomeKey
             case didResignKey
             case willClose

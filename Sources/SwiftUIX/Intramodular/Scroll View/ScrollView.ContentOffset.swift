@@ -7,7 +7,8 @@ import Swift
 
 @_documentation(visibility: internal)
 public struct ScrollViewContentOffset: Hashable {
-    public enum Origin {
+    @_documentation(visibility: internal)
+public enum Origin {
         case topLeading
         case bottomTrailing
     }

@@ -26,6 +26,7 @@ public class _AnyObservableObjectMutableBox<WrappedValue>: ObservableObject {
 }
 
 @_spi(Internal)
+@_documentation(visibility: internal)
 public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObservableObjectMutableBox<WrappedValue> {
     private var baseSubscription: AnyCancellable?
     

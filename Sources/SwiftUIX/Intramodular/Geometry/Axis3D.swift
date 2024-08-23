@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// The horizontal, vertical or zertical dimension in a 3D coordinate system.
+@_documentation(visibility: internal)
 public enum Axis3D {
     case x
     case y

@@ -29,7 +29,8 @@ public struct LazyView<Body: View>: View {
 
 @_documentation(visibility: internal)
 public struct LazyAppearViewProxy {
-    public enum Appearance: Equatable {
+    @_documentation(visibility: internal)
+public enum Appearance: Equatable {
         case active
         case inactive
     }
@@ -95,7 +96,8 @@ public struct _DeferredView<Content: View>: View {
 /// A view that appears lazily.
 @_documentation(visibility: internal)
 public struct LazyAppearView<Content: View>: View {
-    public enum Placeholder {
+    @_documentation(visibility: internal)
+public enum Placeholder {
         case hiddenFrame // frame of content.hidden()
     }
     

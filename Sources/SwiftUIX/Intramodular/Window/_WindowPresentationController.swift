@@ -18,8 +18,10 @@ public class _AnyWindowPresentationController: ObservableObject {
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
+@_documentation(visibility: internal)
 public final class _WindowPresentationController<Content: View>: _AnyWindowPresentationController {
-    public enum ContentBacking {
+    @_documentation(visibility: internal)
+public enum ContentBacking {
         case view(Content)
         case hostingController(AppKitOrUIKitHostingWindow<Content>._ContentViewControllerType)
         

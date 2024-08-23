@@ -98,7 +98,8 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = _SwiftUIX_WKWebView
     
     struct Configuration: Hashable {
-        public enum Source: Hashable, Sendable {
+        @_documentation(visibility: internal)
+public enum Source: Hashable, Sendable {
             case url(URL)
             case htmlString(String)
             

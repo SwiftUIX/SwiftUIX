@@ -45,6 +45,7 @@ extension App {
     }
 }
 
+@_documentation(visibility: internal)
 public enum _SwiftUIX_AppActivationPolicy: Hashable {
     case regular
     case accessory

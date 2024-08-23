@@ -8,7 +8,8 @@ import AppKit
 
 @_documentation(visibility: internal)
 open class _SwiftUIX_NSDocument: NSDocument {
-    public enum UnsafeFlag: Hashable, Sendable {
+    @_documentation(visibility: internal)
+public enum UnsafeFlag: Hashable, Sendable {
         case ephemeral
     }
     

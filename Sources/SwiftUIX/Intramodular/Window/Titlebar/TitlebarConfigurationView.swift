@@ -8,6 +8,7 @@ import AppKit
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum _WindowToolbarStyle {
     case automatic
     case expanded

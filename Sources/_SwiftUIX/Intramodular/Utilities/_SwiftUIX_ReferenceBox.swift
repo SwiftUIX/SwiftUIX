@@ -26,6 +26,7 @@ class _SwiftUIX_ReferenceBox<T> {
 }
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public final class _SwiftUIX_UnsafeSendableReferenceBox<T>: @unchecked Sendable {
     public var wrappedValue: T
     

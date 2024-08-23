@@ -342,6 +342,7 @@ protocol _opaque_FrameModifiedContent {
 }
 
 @_frozen
+@_documentation(visibility: internal)
 public enum _GreedyFrameSize {
     case greedy
 }

@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public final class _ObservedPreferenceValues: ObservableObject {
     private var observers: [ObjectIdentifier: [(Any) -> Void]] = [:]
     
