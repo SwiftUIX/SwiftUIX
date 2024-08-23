@@ -7,6 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 
+@_documentation(visibility: internal)
 open class UIHostingScrollView<Content: View>: UIScrollView, UIScrollViewDelegate, _AppKitOrUIKitHostingScrollViewType {
     var _isUpdating: Bool = false
     

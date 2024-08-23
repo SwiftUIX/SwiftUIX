@@ -90,6 +90,7 @@ public struct _PreferenceTraitKeyOverride<Key: _PreferenceTraitKey>: _ViewTraitK
     }
 }
 
+@_documentation(visibility: internal)
 open class _ArrayReducePreferenceTraitKey<Element: Equatable>: _PreferenceTraitKey {
     public typealias Value = [Element]
     

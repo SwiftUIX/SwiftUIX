@@ -35,6 +35,7 @@ public enum _CocoaHostingViewConfigurationFlag {
     case suppressIntrinsicContentSizeInvalidation
 }
 
+@_documentation(visibility: internal)
 open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
     public typealias MainView = Content
     public typealias RootView = CocoaHostingControllerContent<Content>

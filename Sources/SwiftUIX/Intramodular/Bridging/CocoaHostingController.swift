@@ -22,6 +22,7 @@ public struct CocoaHostingControllerConfiguration {
     var preferenceValueObservers: [AnyViewModifier] = []
 }
 
+@_documentation(visibility: internal)
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView, CocoaViewController {
     public var _configuration: CocoaHostingControllerConfiguration = .init() {
         didSet {
