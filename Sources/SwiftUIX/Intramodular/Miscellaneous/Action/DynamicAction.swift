@@ -31,6 +31,7 @@ extension _ActionPerformingView {
     }
 }
 
+@_documentation(visibility: internal)
 public struct WithDynamicAction<Action: DynamicAction, Content: View>: View {
     public let action: Action
     public let content: (Action) -> Content
@@ -45,6 +46,7 @@ public struct WithDynamicAction<Action: DynamicAction, Content: View>: View {
     }
 }
 
+@_documentation(visibility: internal)
 public struct DynamicActionButton<Action: DynamicAction, Label: View>: View {
     public let action: Action
     public let label: Label
@@ -96,6 +98,7 @@ extension View {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct _ExtendedDynamicAction<A: DynamicAction>: DynamicAction {
     let action: A
     let additionalAction: Action
@@ -119,6 +122,7 @@ struct _AddDynamicActionOnTapGesture<Action: DynamicAction>: ViewModifier {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _InsertDynamicAction<Base: _ActionPerformingView, Action: DynamicAction>: View {
     let base: Base
     let action: Action
@@ -128,6 +132,7 @@ public struct _InsertDynamicAction<Base: _ActionPerformingView, Action: DynamicA
     }
 }
 
+@_documentation(visibility: internal)
 public struct _AppendDynamicAction<Base: _ActionPerformingView, Action: DynamicAction>: View {
     let base: Base
     let action: Action

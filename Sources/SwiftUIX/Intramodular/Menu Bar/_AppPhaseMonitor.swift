@@ -6,8 +6,10 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public class _AppPhaseMonitor: NSObject {
-    public enum Phase {
+    @_documentation(visibility: internal)
+public enum Phase {
         case uninitialized
         case initialized
     }

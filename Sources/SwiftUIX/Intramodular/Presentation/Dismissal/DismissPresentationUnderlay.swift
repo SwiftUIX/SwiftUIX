@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct DismissPresentationUnderlay<Content: View>: View {
     @Environment(\.presentationManager) var presentationManager
     

@@ -8,6 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 /// A specialized view for receiving search-related information from the user.
+@_documentation(visibility: internal)
 public struct SearchBar: DefaultTextInputType {
     @Binding fileprivate var text: String
     

@@ -616,7 +616,8 @@ extension AttributedString._SwiftUIX_Color {
 
 #if os(macOS)
 extension NSAppearance {
-    public enum _SwiftUIX_UserInterfaceStyle {
+    @_documentation(visibility: internal)
+public enum _SwiftUIX_UserInterfaceStyle {
         case light
         case dark
     }

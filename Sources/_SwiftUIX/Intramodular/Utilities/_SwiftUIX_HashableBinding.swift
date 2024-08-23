@@ -5,6 +5,7 @@
 import SwiftUI
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct _SwiftUIX_HashableBinding<Wrapped: Hashable>: DynamicProperty, Hashable {
     public var wrappedValue: Binding<Wrapped>
     

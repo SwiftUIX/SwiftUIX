@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _AnyCocoaListItemID: Hashable {
     let _base: AnyHashable
     
@@ -17,6 +18,7 @@ public struct _AnyCocoaListItemID: Hashable {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _AnyCocoaListSectionID: Hashable {
     let _base: AnyHashable
     

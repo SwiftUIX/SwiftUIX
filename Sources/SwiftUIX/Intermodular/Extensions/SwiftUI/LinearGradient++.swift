@@ -6,7 +6,8 @@
 import Foundation
 
 extension LinearGradient {
-    public enum _LinearGradientDirection {
+    @_documentation(visibility: internal)
+public enum _LinearGradientDirection {
         case up
         case down
     }

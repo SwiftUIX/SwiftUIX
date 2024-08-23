@@ -5,10 +5,12 @@
 import SwiftUI
 
 /// A utility class encapsulating the capabilities of the device's Taptic Engine (if available).
+@_documentation(visibility: internal)
 public final class FeedbackGenerator {
     public static let shared = FeedbackGenerator()
     
-    public enum ImpactFeedbackStyle: Hashable {
+    @_documentation(visibility: internal)
+public enum ImpactFeedbackStyle: Hashable {
         case light
         case medium
         case heavy
@@ -16,13 +18,15 @@ public final class FeedbackGenerator {
         case rigid
     }
     
-    public enum NotificationFeedbackStyle: Hashable {
+    @_documentation(visibility: internal)
+public enum NotificationFeedbackStyle: Hashable {
         case success
         case warning
         case error
     }
     
-    public enum FeedbackStyle: Hashable {
+    @_documentation(visibility: internal)
+public enum FeedbackStyle: Hashable {
         case impact(ImpactFeedbackStyle)
         case notification(NotificationFeedbackStyle)
         case selection

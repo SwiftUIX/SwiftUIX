@@ -77,6 +77,7 @@ private struct AddKeyboardPadding: ViewModifier {
 
 // MARK: - API
 
+@_documentation(visibility: internal)
 public enum KeyboardPadding {
     case keyboard
     case keyboardForced // if you don't want this modifier automatically disabled for iOS 14

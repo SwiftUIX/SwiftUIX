@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct AnyModalPresentation: Identifiable {
     public var id: AnyHashable
     public var content: AnyPresentationView

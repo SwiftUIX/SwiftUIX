@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A view whose child is defined as a function of a preference value read from within the child.
+@_documentation(visibility: internal)
 public struct PreferenceReader<Key: SwiftUI.PreferenceKey, Content: View>: View where Key.Value: Equatable {
     private let content: (Key.Value) -> Content
     

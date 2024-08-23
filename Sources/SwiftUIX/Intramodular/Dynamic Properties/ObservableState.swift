@@ -8,6 +8,7 @@ import SwiftUI
 
 /// A @State-like property wrapper that offers affordances for observing value changes as a stream of publisher events.
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct ObservableState<Value>: DynamicProperty {
     @State private var base: ObservableValues.Root<Value>
     @ObservedObject private var observedBase: ObservableValues.Root<Value>

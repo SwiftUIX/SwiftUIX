@@ -9,6 +9,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
+@_documentation(visibility: internal)
 public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View>: NSHostingPopover<Content> {
     private var eventMonitor: Any?
     

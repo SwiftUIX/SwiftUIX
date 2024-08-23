@@ -53,6 +53,7 @@ private struct DefaultLocalizedErrorHandler: LocalizedErrorHandler {
 }
 
 /// Provides functionality for handling a localized error.
+@_documentation(visibility: internal)
 public struct HandleLocalizedErrorAction {
     fileprivate let base: LocalizedErrorHandler
     

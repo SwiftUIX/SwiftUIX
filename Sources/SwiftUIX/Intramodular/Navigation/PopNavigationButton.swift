@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A control which pops a view in a navigation stack.
+@_documentation(visibility: internal)
 public struct PopNavigationButton<Label: View>: ActionLabelView {    
     private let action: Action
     private let label: Label

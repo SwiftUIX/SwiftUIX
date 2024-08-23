@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 @MainActor
+@_documentation(visibility: internal)
 public class AnyFileDropDelegate: DropDelegate, ObservableObject {
     public class DroppedItem: ObservableObject {
         weak var owner: AnyFileDropDelegate?

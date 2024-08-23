@@ -8,6 +8,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+@_documentation(visibility: internal)
 public struct CocoaHostingControllerConfiguration {
     var _isMeasuringSize: Bool = false
     
@@ -21,6 +22,7 @@ public struct CocoaHostingControllerConfiguration {
     var preferenceValueObservers: [AnyViewModifier] = []
 }
 
+@_documentation(visibility: internal)
 open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView, CocoaViewController {
     public var _configuration: CocoaHostingControllerConfiguration = .init() {
         didSet {

@@ -11,10 +11,12 @@ public typealias ImageName = _AnyImage.Name
 
 /// A portable representation of an image.
 @frozen
+@_documentation(visibility: internal)
 public struct _AnyImage: Hashable, @unchecked Sendable {
     /// Represents the name or identifier of an image.
     @frozen
-    public enum Name: Hashable, @unchecked Sendable {
+    @_documentation(visibility: internal)
+public enum Name: Hashable, @unchecked Sendable {
         /// An image resource from a bundle.
         case bundleResource(String, in: Bundle? = .main)
         /// A system image.
@@ -27,7 +29,8 @@ public struct _AnyImage: Hashable, @unchecked Sendable {
     }
     
     /// Represents the underlying image data.
-    public enum Payload: Hashable {
+    @_documentation(visibility: internal)
+public enum Payload: Hashable {
         /// An AppKit or UIKit image.
         case appKitOrUIKitImage(AppKitOrUIKitImage)
         /// A named image.

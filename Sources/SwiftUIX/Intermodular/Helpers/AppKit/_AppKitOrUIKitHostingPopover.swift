@@ -27,6 +27,7 @@ public protocol _AppKitOrUIKitHostingPopoverType: _AnyAppKitOrUIKitHostingPopove
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)
+@_documentation(visibility: internal)
 open class _AnyAppKitOrUIKitHostingPopover: NSObject, _AppKitOrUIKitHostingPopoverType {
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil
     
@@ -55,6 +56,7 @@ open class _AnyAppKitOrUIKitHostingPopover: NSObject, _AppKitOrUIKitHostingPopov
     }
 }
 #elseif os(macOS)
+@_documentation(visibility: internal)
 open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopoverType {
     public var _SwiftUIX_hostingPopoverPreferences: _AppKitOrUIKitHostingPopoverPreferences = nil
 
@@ -76,6 +78,7 @@ open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopo
 }
 #endif
 
+@_documentation(visibility: internal)
 public struct _AppKitOrUIKitHostingPopoverConfiguration: ExpressibleByNilLiteral {
     fileprivate let _onClose: (() -> Void)?
     
@@ -92,6 +95,7 @@ public struct _AppKitOrUIKitHostingPopoverConfiguration: ExpressibleByNilLiteral
 
 #if os(macOS)
 /// An AppKit popover that hosts SwiftUI view hierarchy.
+@_documentation(visibility: internal)
 open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSPopoverDelegate, ObservableObject {
     typealias _ContentWrappingView = _AppKitOrUIKitHostingWindowContent<Content>
     typealias _ContentViewControllerType = CocoaHostingController<_ContentWrappingView>

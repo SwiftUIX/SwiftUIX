@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A container view that recursively defines its content as a function of the content's size.
+@_documentation(visibility: internal)
 public struct IntrinsicSizeReader<Content: View>: View {
     private let content: (CGSize?) -> Content
     
@@ -37,6 +38,7 @@ public struct IntrinsicSizeReader<Content: View>: View {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _AxisSizeReader<Content: View>: View {
     let axis: Axis
     let content: (CGSize?) -> Content
@@ -69,6 +71,7 @@ public struct _AxisSizeReader<Content: View>: View {
 }
 
 /// A container view that recursively defines its content as a function of the content's size.
+@_documentation(visibility: internal)
 public struct _IntrinsicGeometryValueReader<Content: View, Value: Equatable>: View {
     private let getValue: (CGRect) -> Value
     private let content: (Value) -> Content

@@ -61,6 +61,7 @@ extension AppKitOrUIKitHostingWindowProtocol {
 }
 #endif
 
+@_documentation(visibility: internal)
 public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
     public var canBecomeKey: Bool?
@@ -83,6 +84,7 @@ public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
 @available(macCatalystApplicationExtension, unavailable)
 @available(iOSApplicationExtension, unavailable)
 @available(tvOSApplicationExtension, unavailable)
+@_documentation(visibility: internal)
 open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKitOrUIKitHostingWindowProtocol {
     public typealias _ContentViewControllerType = CocoaHostingController<_AppKitOrUIKitHostingWindowContent<Content>>
     

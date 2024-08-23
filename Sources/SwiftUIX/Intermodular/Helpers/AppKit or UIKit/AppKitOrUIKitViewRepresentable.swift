@@ -501,6 +501,7 @@ extension AppKitOrUIKitViewControllerRepresentable {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct _SwiftUIX_EditableAppKitOrUIKitViewRepresentableContext: _AppKitOrUIKitViewRepresentableContext {
     public var coordinator: Void = ()
     public var transaction: Transaction

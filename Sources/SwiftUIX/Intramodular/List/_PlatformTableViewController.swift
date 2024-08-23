@@ -7,6 +7,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 
+@_documentation(visibility: internal)
 public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: Identifiable, Data: RandomAccessCollection, SectionHeader: View, SectionFooter: View, RowContent: View>: UITableViewController where Data.Element == ListSection<SectionModel, ItemType> {
     var _isDataDirty: Bool = false {
         didSet {

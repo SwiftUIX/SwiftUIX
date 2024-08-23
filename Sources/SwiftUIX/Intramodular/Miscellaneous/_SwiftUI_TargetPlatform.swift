@@ -4,14 +4,17 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public enum _IfAvailable {
-    public enum Available {
+    @_documentation(visibility: internal)
+public enum Available {
         case available
     }
     
     case `if`(Available)
 }
 
+@_documentation(visibility: internal)
 public enum _SwiftUI_TargetPlatformType {
     case iOS
     case macOS
@@ -52,40 +55,49 @@ extension _SwiftUI_TargetPlatformType {
 }
 #endif
 
+@_documentation(visibility: internal)
 public enum _SwiftUI_TargetPlatform {
-    public enum iOS {
+    @_documentation(visibility: internal)
+public enum iOS {
         case iOS
     }
     
-    public enum macOS {
+    @_documentation(visibility: internal)
+public enum macOS {
         case macOS
     }
     
-    public enum tvOS {
+    @_documentation(visibility: internal)
+public enum tvOS {
         case tvOS
     }
     
-    public enum visionOS {
+    @_documentation(visibility: internal)
+public enum visionOS {
         case visionOS
     }
 
-    public enum watchOS {
+    @_documentation(visibility: internal)
+public enum watchOS {
         case watchOS
     }
 }
 
+@_documentation(visibility: internal)
 public enum _TargetPlatformSpecific<Platform> {
     
 }
 
 extension _TargetPlatformSpecific where Platform == _SwiftUI_TargetPlatform.iOS {
-    public enum NavigationBarItemTitleDisplayMode {
+    @_documentation(visibility: internal)
+public enum NavigationBarItemTitleDisplayMode {
         case automatic
         case inline
         case large
     }
 }
 
+@_documentation(visibility: internal)
 public struct _TargetPlatformConditionalModifiable<Root, Platform> {
     public typealias SpecificTypes = _TargetPlatformSpecific<_SwiftUI_TargetPlatform.iOS>
     
@@ -261,7 +273,8 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 // MARK: - Auxiliary
 
 extension _SwiftUI_TargetPlatform.macOS {
-    public enum _ControlActiveState: Hashable, Sendable {
+    @_documentation(visibility: internal)
+public enum _ControlActiveState: Hashable, Sendable {
         case key
         case active
         case inactive

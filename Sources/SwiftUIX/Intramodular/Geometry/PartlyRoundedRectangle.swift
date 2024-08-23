@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct PartRoundedRectangle {
     public let corners: [RectangleCorner]
     public let cornerRadii: CGFloat

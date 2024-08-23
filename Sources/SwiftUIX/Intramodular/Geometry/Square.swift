@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct Square: InsettableShape {
     public typealias InsetShape = Square
     

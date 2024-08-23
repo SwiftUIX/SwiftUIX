@@ -6,8 +6,10 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public final class _PublisherObserver<P: Publisher, S: Scheduler>: ObservableObject, Subscriber {
-    public enum SubscriptionPolicy {
+    @_documentation(visibility: internal)
+public enum SubscriptionPolicy {
         case immediate
         case deferred
         

@@ -7,6 +7,7 @@
 import AppKit
 import SwiftUI
 
+@_documentation(visibility: internal)
 public class _AnyCocoaMenuBarExtraCoordinator: Identifiable, ObservableObject {
     public var id: AnyHashable {
         fatalError()
@@ -17,6 +18,7 @@ public class _AnyCocoaMenuBarExtraCoordinator: Identifiable, ObservableObject {
     }
 }
 
+@_documentation(visibility: internal)
 public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: View>: _AnyCocoaMenuBarExtraCoordinator {
     private let cocoaStatusBar = NSStatusBar.system
     
@@ -196,6 +198,7 @@ extension _CocoaMenuBarExtraCoordinator {
 
 // MARK: - Supplementary
 
+@_documentation(visibility: internal)
 public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {    
     @State var base: _AnyCocoaMenuBarExtraCoordinator
     

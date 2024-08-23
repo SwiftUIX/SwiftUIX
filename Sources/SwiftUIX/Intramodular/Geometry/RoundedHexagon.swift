@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct RoundedHexagon: Shape {
     struct Segment: CaseIterable {
         static let allCases: [Segment] = [

@@ -145,6 +145,7 @@ extension _SectionView where Parent == Text, Content: View, Footer == Text {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _SectionX<Header: View, Content: View, Footer: View>: _SectionView {
     public let header: Header
     public let content: Content

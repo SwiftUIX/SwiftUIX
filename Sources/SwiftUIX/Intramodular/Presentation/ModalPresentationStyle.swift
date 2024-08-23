@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A view's modal presentation style.
+@_documentation(visibility: internal)
 public enum ModalPresentationStyle: Equatable {
     case fullScreen
     
@@ -93,7 +94,8 @@ extension View {
 // MARK: - Auxiliary
 
 extension ModalPresentationStyle {
-    public enum _Comparison {
+    @_documentation(visibility: internal)
+public enum _Comparison {
         case popover
     }
     

@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct SearchToken: Codable, Hashable {
     public let text: String
 }

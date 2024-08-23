@@ -8,6 +8,7 @@ import Swift
 import SwiftUI
 
 /// A proxy value allowing the pagination views within a view hierarchy to be manipulated programmatically.
+@_documentation(visibility: internal)
 public struct PaginationViewProxy: Hashable {
     private let _progressionController = ReferenceBox<ProgressionController?>(nil)
     private let _hostingPageViewController = WeakReferenceBox<AnyObject>(nil)
@@ -54,6 +55,7 @@ public struct PaginationViewProxy: Hashable {
 }
 
 /// A view whose child is defined as a function of a `PaginationViewProxy` targeting the pagination views within the child.
+@_documentation(visibility: internal)
 public struct PaginationViewReader<Content: View>: View {
     private let content: (PaginationViewProxy) -> Content
     

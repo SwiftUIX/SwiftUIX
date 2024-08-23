@@ -10,6 +10,7 @@ import SwiftUI
 /// A property wrapper type for an observable object supplied by a parent or ancestor view, either directly or via `View/environmentObject(_:)`.
 @available(*, deprecated)
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct EnvironmentObjectOrObservedObject<Value: ObservableObject>: DynamicProperty {
     let defaultValue: () -> Value
     

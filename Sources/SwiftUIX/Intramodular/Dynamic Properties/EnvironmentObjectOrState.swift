@@ -8,6 +8,7 @@ import Swift
 import SwiftUI
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct EnvironmentObjectOrState<Value: ObservableObject>: DynamicProperty {
     @EnvironmentObject<Value>
     private var _wrappedValue0: Value

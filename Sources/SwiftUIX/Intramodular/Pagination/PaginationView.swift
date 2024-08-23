@@ -8,8 +8,10 @@ import Swift
 import SwiftUI
 import UIKit
 
+@_documentation(visibility: internal)
 public struct PaginationState: Hashable {
-    public enum TransitionDirection: Hashable {
+    @_documentation(visibility: internal)
+public enum TransitionDirection: Hashable {
         case backward
         case forward
     }
@@ -24,6 +26,7 @@ public struct PaginationState: Hashable {
 
 /// A view that paginates its children along a given axis.
 @frozen
+@_documentation(visibility: internal)
 public struct PaginationView<Page: View>: View {
     @usableFromInline
     let content: AnyForEach<Page>

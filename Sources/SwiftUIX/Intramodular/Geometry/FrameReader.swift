@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct FrameReaderProxy {
     /// Data from the preference key `_NamedViewDescription.PreferenceKey`.
     var preferenceData: [AnyHashable: _NamedViewDescription] = [:]
@@ -75,6 +76,7 @@ public struct FrameReaderProxy {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@_documentation(visibility: internal)
 public struct FrameReader<Content: View>: View {
     @Namespace var namespace
     

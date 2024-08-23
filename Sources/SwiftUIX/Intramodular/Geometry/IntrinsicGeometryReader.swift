@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A proxy for access to the size and coordinate space (for anchor resolution) of the content view.
+@_documentation(visibility: internal)
 public struct IntrinsicGeometryProxy: Equatable {
     private let localFrame: CGRect?
     private let globalFrame: CGRect?
@@ -67,6 +68,7 @@ public struct IntrinsicGeometryProxy: Equatable {
 }
 
 /// A container view that recursively defines its content as a function of the content's size and coordinate space.
+@_documentation(visibility: internal)
 public struct IntrinsicGeometryReader<Content: View>: View {
     private let coordinateSpace: CoordinateSpace?
     private let content: (IntrinsicGeometryProxy) -> Content
@@ -109,6 +111,7 @@ public struct IntrinsicGeometryReader<Content: View>: View {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _BackgroundGeometryReader<Content: View>: View {
     private struct GeometryPreferenceKey: PreferenceKey {
         typealias Value = _KeyPathEquatable<GeometryProxy, CGSize>?
@@ -160,6 +163,7 @@ public struct _BackgroundGeometryReader<Content: View>: View {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _AxesGeometryReader<Content: View>: View {
     private let axes: Axis.Set
     private let content: (IntrinsicGeometryProxy) -> Content

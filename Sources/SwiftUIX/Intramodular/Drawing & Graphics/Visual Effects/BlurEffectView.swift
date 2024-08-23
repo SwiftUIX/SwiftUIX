@@ -8,6 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
+@_documentation(visibility: internal)
 public struct BlurEffectView<Content: View>: View {
     private let content: Content
     private let style: UIBlurEffect.Style

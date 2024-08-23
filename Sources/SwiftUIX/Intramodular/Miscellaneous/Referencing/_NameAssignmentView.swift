@@ -84,6 +84,7 @@ extension View {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct _NamedViewDescriptionPreferenceKey: SwiftUI.PreferenceKey {
     public struct Value: Hashable, Sequence {
         public typealias Element = _NamedViewDescription

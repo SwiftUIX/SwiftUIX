@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _WithDynamicPropertyExistential<Property>: DynamicProperty, View {
     private let property: Property
     private let content: (Property) -> (any View)

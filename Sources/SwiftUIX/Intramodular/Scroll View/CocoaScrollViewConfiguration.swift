@@ -8,6 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 
 /// The properties of a `CocoaScrollView` instance.
+@_documentation(visibility: internal)
 public struct CocoaScrollViewConfiguration<Content: View>: ExpressibleByNilLiteral {
     var initialContentAlignment: Alignment?
     var axes: Axis.Set = [.vertical]
@@ -83,6 +84,7 @@ extension CocoaScrollViewConfiguration {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct ScrollContentOffsetBehavior: OptionSet {
     public static let maintainOnChangeOfBounds = Self(rawValue: 1 << 0)
     public static let maintainOnChangeOfContentSize = Self(rawValue: 1 << 1)

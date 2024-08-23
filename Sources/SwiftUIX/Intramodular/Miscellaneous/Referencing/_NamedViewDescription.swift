@@ -8,6 +8,7 @@ import SwiftUI
 /// A view description.
 ///
 /// The description is composed of two things - the view's name and the view's frame.
+@_documentation(visibility: internal)
 public struct _NamedViewDescription: Hashable {
     @usableFromInline
     let name: AnyHashable

@@ -7,7 +7,7 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
-
+@_documentation(visibility: internal)
 @objc public class CocoaPresentationCoordinator: NSObject, ObservableObject {
     /// The active modal presentation represented by the corresponding view controller.
     ///

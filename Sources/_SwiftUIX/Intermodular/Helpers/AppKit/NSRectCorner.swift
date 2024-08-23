@@ -7,6 +7,7 @@
 import AppKit
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct NSRectCorner: OptionSet {
     public static let allCorners: Self = [.topLeft, .topRight, .bottomLeft, .bottomRight]
     

@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _SwiftUIX_FixedSizeInfo: Codable, Hashable, Sendable {
     public var horizontal: Bool
     public var vertical: Bool

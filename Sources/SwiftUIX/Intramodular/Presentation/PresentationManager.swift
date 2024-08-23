@@ -14,6 +14,7 @@ public protocol PresentationManager {
 
 // MARK: - API
 
+@_documentation(visibility: internal)
 public struct _PresentationReader<Content: View>: View {
     @Environment(\.presentationManager) private var presentationManager
     
@@ -55,6 +56,7 @@ extension DynamicAction where Self == PresentationMode.DismissPresentationAction
     }
 }
 
+@_documentation(visibility: internal)
 public struct BooleanPresentationManager: PresentationManager  {
     @Binding public var isPresented: Bool
     
@@ -69,6 +71,7 @@ public struct BooleanPresentationManager: PresentationManager  {
 
 // MARK: - Conformances
 
+@_documentation(visibility: internal)
 public struct AnyPresentationManager: PresentationManager {
     private let isPresentedImpl: () -> Bool
     private let dismissImpl: () -> Void

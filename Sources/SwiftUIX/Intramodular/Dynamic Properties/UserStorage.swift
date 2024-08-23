@@ -9,6 +9,7 @@ import Swift
 import SwiftUI
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct UserStorage<Value: Codable>: DynamicProperty {
     @PersistentObject private var valueBox: ValueBox
     

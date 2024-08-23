@@ -7,6 +7,7 @@
 import SwiftUI
 import UIKit
 
+@_documentation(visibility: internal)
 public final class MutableAppKitOrUIKitViewWrapper<Base: UIView>: UIView {
     private var _base: Base?
     
@@ -55,6 +56,7 @@ public final class MutableAppKitOrUIKitViewWrapper<Base: UIView>: UIView {
 import AppKit
 import SwiftUI
 
+@_documentation(visibility: internal)
 public final class MutableAppKitOrUIKitViewWrapper<Base: NSView>: NSView {
     private var _base: Base?
     

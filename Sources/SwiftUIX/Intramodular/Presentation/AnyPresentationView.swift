@@ -6,6 +6,7 @@ import Combine
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct AnyPresentationView: View {
     enum Base {
         case native(AnyView)

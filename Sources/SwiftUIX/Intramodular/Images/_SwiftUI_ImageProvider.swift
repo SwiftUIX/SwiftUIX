@@ -6,6 +6,7 @@ import SwiftUI
 
 /// https://raw.githubusercontent.com/nathantannar4/Turbocharger/52f22b97dcefed06e274d66ccba0f659f8eefbd5/Sources/Turbocharger/Sources/Extensions/Image%2BExtensions.swift
 @_spi(Internal)
+@_documentation(visibility: internal)
 public enum _SwiftUI_ImageProvider {
     case system(String)
     case named(String, Bundle?)

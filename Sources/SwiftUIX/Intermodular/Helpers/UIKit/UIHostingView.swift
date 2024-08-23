@@ -9,6 +9,7 @@ import SwiftUI
 import UIKit
 
 /// A `UIView` subclass capable of hosting a SwiftUI view.
+@_documentation(visibility: internal)
 open class UIHostingView<Content: View>: UIView {
     struct _ContentContainer: View {
         weak var parent: _ContentHostingController?

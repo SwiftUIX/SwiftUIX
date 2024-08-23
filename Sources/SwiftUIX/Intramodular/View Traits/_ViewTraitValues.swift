@@ -35,6 +35,7 @@ extension _ViewTraitValuesProtocol {
 
 /// An analogue to `EnvironmentValues`, but for view traits.
 @frozen
+@_documentation(visibility: internal)
 public struct _ViewTraitValues {
     public var base: _ViewTraitValuesProtocol
     

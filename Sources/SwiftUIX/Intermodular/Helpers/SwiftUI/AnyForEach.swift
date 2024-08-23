@@ -8,6 +8,7 @@ import SwiftUI
 public typealias AnyForEachData = AnyRandomAccessCollection<AnyForEachElement>
 public typealias AnyForEach<Content> = ForEach<AnyForEachData, AnyHashable, Content>
 
+@_documentation(visibility: internal)
 public struct AnyForEachElement: Identifiable {
     public let index: AnyIndex
     public let value: Any

@@ -9,6 +9,7 @@ import UniformTypeIdentifiers
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 /// A representation of an underlying data item being dragged from one location to another.
+@_documentation(visibility: internal)
 public struct DragItem: Hashable {
     public final class PreferenceKey: TakeLastPreferenceKey<[DragItem]> {
         

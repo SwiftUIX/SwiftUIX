@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 @_spi(Internal)
+@_documentation(visibility: internal)
 public final class KeyedBoundedPriorityQueue<Key: Hashable, Value> {
     @usableFromInline
     var maximumCapacity: Int

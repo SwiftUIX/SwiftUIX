@@ -15,6 +15,7 @@ import UIKit
 #endif
 
 /// A value relative to one or multiple coordinate spaces.
+@_documentation(visibility: internal)
 public struct _CoordinateSpaceRelative<Value: Equatable>: Equatable {
     private weak var __sourceAppKitOrUIKitWindow: NSObject?
     private var storage: [_ScreenOrCoordinateSpace: Value] = [:]

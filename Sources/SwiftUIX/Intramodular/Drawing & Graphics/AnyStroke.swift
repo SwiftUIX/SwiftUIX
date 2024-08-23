@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+@_documentation(visibility: internal)
 public struct AnyStroke {
     public let content: AnyShapeStyle?
     public let style: StrokeStyle

@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct LazyState<Value>: DynamicProperty {
     private let initialWrappedValue: () -> Value
     

@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct EmptyAppKitOrUIKitViewRepresentable: View {
     private let update: (any _AppKitOrUIKitViewRepresentableContext) -> Void
     private let dismantle: () -> Void

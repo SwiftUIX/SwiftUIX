@@ -7,6 +7,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public final class _CocoaListCache<Configuration: _CocoaListConfigurationType> {
     private var _cheapItemCaches: [ItemPath: CheapItemCache] = [:]
     private var _expensiveItemCaches = KeyedBoundedPriorityQueue<ItemPath, ExpensiveItemCache>(maximumCapacity: 100)

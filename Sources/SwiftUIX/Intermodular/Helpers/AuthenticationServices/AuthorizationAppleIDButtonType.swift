@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 /// A type for the authorization button.
+@_documentation(visibility: internal)
 public enum AuthorizationAppleIDButtonType: Equatable {
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)
     case `continue`

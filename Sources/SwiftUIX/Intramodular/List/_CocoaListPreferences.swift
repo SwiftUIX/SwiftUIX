@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _CocoaListPreferences: Sendable {
     public var cell: Cell = nil
     
@@ -27,8 +28,10 @@ extension _CocoaListPreferences {
             public var detachHostingView: Bool = false
         }
         
-        public enum SizingOptions: Sendable {
-            public enum Custom: Sendable {
+        @_documentation(visibility: internal)
+public enum SizingOptions: Sendable {
+            @_documentation(visibility: internal)
+public enum Custom: Sendable {
                 case indexPath(@Sendable (IndexPath) -> OptionalDimensions)
             }
             

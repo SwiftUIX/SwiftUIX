@@ -9,6 +9,7 @@ import Swift
 import SwiftUI
 import WebKit
 
+@_documentation(visibility: internal)
 public struct WebView: View {
     private var configuration: _WebView.Configuration
     private var placeholder: AnyView?
@@ -97,7 +98,8 @@ struct _WebView: AppKitOrUIKitViewRepresentable {
     public typealias AppKitOrUIKitViewType = _SwiftUIX_WKWebView
     
     struct Configuration: Hashable {
-        public enum Source: Hashable, Sendable {
+        @_documentation(visibility: internal)
+public enum Source: Hashable, Sendable {
             case url(URL)
             case htmlString(String)
             

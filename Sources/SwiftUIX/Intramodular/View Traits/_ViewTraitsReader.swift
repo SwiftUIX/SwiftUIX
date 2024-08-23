@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _ViewTraitsReader<Key: _ViewTraitKey, Content: View>: View where Key.Value: Equatable {
     private let key: Key.Type
     private let content: ([AnyHashable: Key.Value]) -> Content

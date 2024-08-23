@@ -6,6 +6,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct AppKitOrUIKitViewControllerAdaptor<AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController>: AppKitOrUIKitViewControllerRepresentable {
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public typealias UIViewControllerType = AppKitOrUIKitViewControllerType

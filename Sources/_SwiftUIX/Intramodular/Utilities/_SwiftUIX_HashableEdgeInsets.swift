@@ -5,6 +5,7 @@
 import SwiftUI
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct _SwiftUIX_HashableEdgeInsets: Hashable, @unchecked Sendable {
     public static var zero: Self {
         Self(wrappedValue: .zero)

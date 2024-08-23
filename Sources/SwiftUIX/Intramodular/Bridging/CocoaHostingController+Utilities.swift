@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
+@_documentation(visibility: internal)
 public struct CocoaHostingControllerContent<Content: View>: View  {
     weak var parent: (any _CocoaHostingControllerOrView)?
 

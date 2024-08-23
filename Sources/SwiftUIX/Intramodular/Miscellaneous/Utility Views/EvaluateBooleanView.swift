@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct EvaluateBooleanView<Content: View>: View {
     @usableFromInline
     let content: Content?
