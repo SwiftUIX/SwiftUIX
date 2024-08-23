@@ -45,6 +45,7 @@ extension ProposedViewSize {
     }
 }
 
+@_documentation(visibility: internal)
 public struct RelativeFrame: ExpressibleByNilLiteral, Hashable {
     struct PreferenceKey: SwiftUI.PreferenceKey {
         static let defaultValue: [RelativeFrame] = []

@@ -8,6 +8,7 @@ import SwiftUI
 
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 @available(macOS, unavailable)
+@_documentation(visibility: internal)
 public struct FullScreenCoverLink<Destination: View, Label: View>: PresentationLinkView {
     private let destination: Destination
     private let label: Label

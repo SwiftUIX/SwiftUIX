@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 /// A control which presents navigated content when triggered.
+@_documentation(visibility: internal)
 public struct NavigationPresentationLink<Label: View, Destination: View>: View {
     @State private var isActive: Bool = false
     
@@ -30,6 +31,7 @@ public struct NavigationPresentationLink<Label: View, Destination: View>: View {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct NavigationPresentationManager: PresentationManager {
     let isActive: Binding<Bool>
     

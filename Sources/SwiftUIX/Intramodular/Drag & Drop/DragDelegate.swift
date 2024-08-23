@@ -15,12 +15,14 @@ public protocol DragDelegate {
 }
 
 /// The current state of a drag.
+@_documentation(visibility: internal)
 public struct DragInfo {
     public let items: [DragItem]
 }
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct AnyDragDelegate: DragDelegate {
     let dragBeganImpl: (DragInfo) -> ()
     let dragUpdatedImpl: (DragInfo) -> ()

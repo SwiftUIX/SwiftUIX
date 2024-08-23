@@ -8,6 +8,7 @@ import SwiftUI
 
 @dynamicMemberLookup
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct ObservedValue<Value>: DynamicProperty {
     @PersistentObject var base: AnyObservableValue<Value>
     

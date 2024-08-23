@@ -5,6 +5,7 @@
 import SwiftUI
 
 @frozen
+@_documentation(visibility: internal)
 public struct _VariadicViewAdapter<Source: View, Content: View>: View {
     @frozen
     @usableFromInline
@@ -71,6 +72,7 @@ extension _VariadicViewAdapter {
 // MARK: - Internal
 
 @frozen
+@_documentation(visibility: internal)
 public struct _SwiftUI_VariadicView<Content: View>: View {
     public typealias Child = _VariadicViewChildren.Element
     

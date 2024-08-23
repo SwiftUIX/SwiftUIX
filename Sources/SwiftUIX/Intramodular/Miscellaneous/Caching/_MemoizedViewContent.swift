@@ -7,6 +7,7 @@ import SwiftUI
 /// Caches a view against a given value.
 ///
 /// The cache is invalidated when the value changes.
+@_documentation(visibility: internal)
 public struct _CacheViewAgainstValue<Value: Equatable, Content: View>: View {
     private let value: Value
     private let content: () -> Content
@@ -41,6 +42,7 @@ public struct _CacheViewAgainstValue<Value: Equatable, Content: View>: View {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _MemoizedViewContent<Key: Hashable, Content: View>: View {
     private let key: Key
     private let capacity: Int?

@@ -14,6 +14,7 @@ public protocol _CocoaListViewProviderType {
     var rowContent: (ItemType) -> RowContent { get }
 }
 
+@_documentation(visibility: internal)
 public struct _CocoaListViewProvider<
     SectionType,
     ItemType,

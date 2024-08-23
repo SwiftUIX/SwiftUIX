@@ -6,6 +6,7 @@ import Swift
 import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
+@_documentation(visibility: internal)
 public struct DismissPresentationButton<Label: View>: ActionLabelView {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.presentationManager) private var presentationManager

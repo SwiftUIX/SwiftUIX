@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _AnyApp: SwiftUI.App {
     public var body: some Scene {
         _EmptyScene()

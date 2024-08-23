@@ -8,6 +8,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 @propertyWrapper
+@_documentation(visibility: internal)
 public struct _SwiftUIX_RenderIgnored<Wrapped>: Hashable, DynamicProperty {
     @ViewStorage private var wrappedValueBox: Wrapped
     
@@ -50,6 +51,7 @@ public struct _SwiftUIX_RenderIgnored<Wrapped>: Hashable, DynamicProperty {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _TextViewConfiguration: Hashable, DynamicProperty {
     public var _fixedSize: _SwiftUIX_FixedSizeInfo? = nil
     public var isContentCopyable: Bool = true

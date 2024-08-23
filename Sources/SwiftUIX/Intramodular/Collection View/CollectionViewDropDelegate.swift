@@ -8,6 +8,7 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+@_documentation(visibility: internal)
 public struct CollectionViewDropInfo: Hashable {
     public let dragItems: [DragItem]
     public let destination: Int?
@@ -25,6 +26,7 @@ public protocol CollectionViewDropDelegate {
 
 @available(iOS 13.4, *)
 @available(tvOS, unavailable)
+@_documentation(visibility: internal)
 public struct AnyCollectionViewDropDelegate: CollectionViewDropDelegate {
     let performDropImpl: (CollectionViewDropInfo) -> Bool
     let validateDropImpl: (CollectionViewDropInfo) -> Bool

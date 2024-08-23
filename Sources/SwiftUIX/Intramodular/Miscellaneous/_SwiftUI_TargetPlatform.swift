@@ -86,6 +86,7 @@ extension _TargetPlatformSpecific where Platform == _SwiftUI_TargetPlatform.iOS 
     }
 }
 
+@_documentation(visibility: internal)
 public struct _TargetPlatformConditionalModifiable<Root, Platform> {
     public typealias SpecificTypes = _TargetPlatformSpecific<_SwiftUI_TargetPlatform.iOS>
     

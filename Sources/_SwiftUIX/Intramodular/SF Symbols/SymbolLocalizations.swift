@@ -15,6 +15,7 @@ public enum Localization: String, Equatable {
 // MARK: - Static Localization
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ar: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -23,6 +24,7 @@ public struct Ar: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ar_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -31,6 +33,7 @@ public struct Ar_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ar_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -39,6 +42,7 @@ public struct Ar_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ar_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -47,6 +51,7 @@ public struct Ar_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ar_v4_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -55,6 +60,7 @@ public struct Ar_v4_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct He: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -63,6 +69,7 @@ public struct He: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct He_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -71,6 +78,7 @@ public struct He_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct He_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -79,6 +87,7 @@ public struct He_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Hi: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -87,6 +96,7 @@ public struct Hi: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Hi_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -95,6 +105,7 @@ public struct Hi_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Hi_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -103,6 +114,7 @@ public struct Hi_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Hi_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -111,6 +123,7 @@ public struct Hi_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ja: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -119,6 +132,7 @@ public struct Ja: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ja_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -127,6 +141,7 @@ public struct Ja_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ja_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -135,6 +150,7 @@ public struct Ja_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ja_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -143,6 +159,7 @@ public struct Ja_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ko: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -151,6 +168,7 @@ public struct Ko: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ko_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -159,6 +177,7 @@ public struct Ko_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ko_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -167,6 +186,7 @@ public struct Ko_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Ko_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -175,6 +195,7 @@ public struct Ko_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Rtl: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -183,6 +204,7 @@ public struct Rtl: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Rtl_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -191,6 +213,7 @@ public struct Rtl_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Rtl_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -199,6 +222,7 @@ public struct Rtl_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Rtl_v4: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -207,6 +231,7 @@ public struct Rtl_v4: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Th: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -215,6 +240,7 @@ public struct Th: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Th_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -223,6 +249,7 @@ public struct Th_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Th_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -231,6 +258,7 @@ public struct Th_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Th_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -239,6 +267,7 @@ public struct Th_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Zh: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -247,6 +276,7 @@ public struct Zh: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct ZhTraditional: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -255,6 +285,7 @@ public struct ZhTraditional: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct ZhTraditional_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -263,6 +294,7 @@ public struct ZhTraditional_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct ZhTraditional_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -271,6 +303,7 @@ public struct ZhTraditional_v3: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Zh_v2: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -279,6 +312,7 @@ public struct Zh_v2: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Zh_v2_1: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }
@@ -287,6 +321,7 @@ public struct Zh_v2_1: SymbolLocalization {
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@_documentation(visibility: internal)
 public struct Zh_v3: SymbolLocalization {
     let source: SFSymbol
     public init(source: SFSymbol) { self.source = source }

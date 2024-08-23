@@ -5,6 +5,7 @@
 import SwiftUI
 
 @frozen
+@_documentation(visibility: internal)
 public struct PreferenceValue<Key: PreferenceKey>: View {
     public let key: Key.Type
     public let value: Key.Value
@@ -21,6 +22,7 @@ public struct PreferenceValue<Key: PreferenceKey>: View {
 }
 
 @frozen
+@_documentation(visibility: internal)
 public struct TransformPreferenceValue<Key: PreferenceKey>: View {
     public let key: Key.Type
     public let callback: (inout Key.Value) -> Void

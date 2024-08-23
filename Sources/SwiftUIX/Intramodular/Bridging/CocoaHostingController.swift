@@ -8,6 +8,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+@_documentation(visibility: internal)
 public struct CocoaHostingControllerConfiguration {
     var _isMeasuringSize: Bool = false
     

@@ -61,6 +61,7 @@ extension AppKitOrUIKitHostingWindowProtocol {
 }
 #endif
 
+@_documentation(visibility: internal)
 public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
     public var style: _WindowStyle = .default
     public var canBecomeKey: Bool?

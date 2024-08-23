@@ -17,6 +17,7 @@ import UIKit
 #endif
 
 /// A toolbar item.
+@_documentation(visibility: internal)
 public struct TitlebarItem {
     public enum Content {
         #if os(iOS) || targetEnvironment(macCatalyst)
@@ -193,6 +194,7 @@ extension View {
 
 // MARK: - Auxiliary
 
+@_documentation(visibility: internal)
 public struct TitlebarConfigurationViewItemsPreferenceKey: PreferenceKey {
     public typealias Value = [TitlebarItem]?
     

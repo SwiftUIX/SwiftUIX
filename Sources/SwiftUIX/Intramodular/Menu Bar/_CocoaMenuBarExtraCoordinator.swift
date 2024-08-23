@@ -196,6 +196,7 @@ extension _CocoaMenuBarExtraCoordinator {
 
 // MARK: - Supplementary
 
+@_documentation(visibility: internal)
 public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {    
     @State var base: _AnyCocoaMenuBarExtraCoordinator
     

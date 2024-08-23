@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct ResultView<SuccessView: View, FailureView: View, Success, Failure: Error>: View {
     @usableFromInline
     let successView: SuccessView?

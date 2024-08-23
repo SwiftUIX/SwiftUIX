@@ -42,6 +42,7 @@ extension NavigationLink where Label == Text {
     }
 }
 
+@_documentation(visibility: internal)
 public struct _ActivateNavigationLink: Hashable {
     public let action: Action
     

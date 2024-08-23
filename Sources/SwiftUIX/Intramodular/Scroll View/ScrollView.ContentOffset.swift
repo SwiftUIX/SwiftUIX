@@ -5,6 +5,7 @@
 import SwiftUI
 import Swift
 
+@_documentation(visibility: internal)
 public struct ScrollViewContentOffset: Hashable {
     public enum Origin {
         case topLeading

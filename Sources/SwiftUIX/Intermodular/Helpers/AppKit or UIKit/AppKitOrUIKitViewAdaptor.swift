@@ -6,6 +6,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct AppKitOrUIKitViewAdaptor<Base: AppKitOrUIKitView>: AppKitOrUIKitViewRepresentable {
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
     public typealias UIViewType = Base

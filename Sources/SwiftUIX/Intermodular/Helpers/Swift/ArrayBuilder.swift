@@ -10,6 +10,7 @@ public typealias ArrayBuilder = _ArrayBuilder
 #endif
 
 @resultBuilder
+@_documentation(visibility: internal)
 public struct _ArrayBuilder<Element> {
     @_optimize(speed)
     @_transparent

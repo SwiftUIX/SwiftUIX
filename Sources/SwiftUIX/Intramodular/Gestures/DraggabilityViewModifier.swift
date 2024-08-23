@@ -8,6 +8,7 @@ import SwiftUI
 #if !os(tvOS)
 
 /// A view modifier that enables draggability.
+@_documentation(visibility: internal)
 public struct DraggabilityViewModifier: ViewModifier {
     @usableFromInline
     let minimumDistance: CGFloat

@@ -17,6 +17,7 @@ public class QuickLookPreviewItem: NSObject, QLPreviewItem {
     }
 }
 
+@_documentation(visibility: internal)
 public struct QuickLookPreview: NSViewRepresentable {
     public typealias NSViewType = QLPreviewView
     

@@ -7,6 +7,7 @@ import Swift
 import SwiftUI
 
 @frozen
+@_documentation(visibility: internal)
 public struct PassthroughView<Content: View>: _opaque_View, View {
     public let content: Content
     

@@ -4,6 +4,7 @@
 
 import Swift
 
+@_documentation(visibility: internal)
 public struct _LazyBidirectionalMapMutableRandomAccessCollection<C: MutableCollection & RandomAccessCollection, T>: MutableCollection, RandomAccessCollection {
     public typealias Index = C.Index
     public typealias Element = T

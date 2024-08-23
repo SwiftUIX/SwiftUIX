@@ -9,6 +9,7 @@ import SwiftUI
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
+@_documentation(visibility: internal)
 public struct _SwiftUIX_KeyPress: Hashable, Sendable {
     public let phase: Phases
     public let key: KeyEquivalent

@@ -76,6 +76,7 @@ open class _AnyAppKitOrUIKitHostingPopover: NSPopover, _AppKitOrUIKitHostingPopo
 }
 #endif
 
+@_documentation(visibility: internal)
 public struct _AppKitOrUIKitHostingPopoverConfiguration: ExpressibleByNilLiteral {
     fileprivate let _onClose: (() -> Void)?
     

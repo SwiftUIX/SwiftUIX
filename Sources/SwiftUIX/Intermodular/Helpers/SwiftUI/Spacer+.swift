@@ -7,6 +7,7 @@ import SwiftUI
 
 /// A horizontal spacer.
 @frozen
+@_documentation(visibility: internal)
 public struct HSpacer: View {
     @inlinable
     public var body: some View {
@@ -23,6 +24,7 @@ public struct HSpacer: View {
 
 /// A vertical spacer.
 @frozen
+@_documentation(visibility: internal)
 public struct VSpacer: View {
     @inlinable
     public var body: some View {
@@ -41,6 +43,7 @@ public struct VSpacer: View {
 ///
 /// `XSpacer` expands to fill its entire container.
 @frozen
+@_documentation(visibility: internal)
 public struct XSpacer: View {
     @inlinable
     public var body: some View {

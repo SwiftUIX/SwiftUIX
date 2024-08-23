@@ -9,6 +9,7 @@ import Swift
 import SwiftUI
 
 /// A display of a file system path or virtual path information.
+@_documentation(visibility: internal)
 public struct PathControl<Label> {
     fileprivate enum OnItemClick {
         case openItem
@@ -140,6 +141,7 @@ public protocol PathControlStyle {
     
 }
 
+@_documentation(visibility: internal)
 public struct StandardPathControlStyle: PathControlStyle {
     public init() {
         
@@ -152,6 +154,7 @@ extension PathControlStyle where Self == StandardPathControlStyle {
     }
 }
 
+@_documentation(visibility: internal)
 public struct PopUpPathControlStyle: PathControlStyle {
     public init() {
         

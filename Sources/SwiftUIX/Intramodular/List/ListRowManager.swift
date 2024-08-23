@@ -13,6 +13,7 @@ protocol _CellProxyBase {
     func deselect()
 }
 
+@_documentation(visibility: internal)
 public struct CellProxy {
     public struct InvalidationContext {
         public let newPreferredContentSize: OptionalDimensions?
@@ -57,6 +58,7 @@ public struct CellProxy {
     }
 }
 
+@_documentation(visibility: internal)
 public struct CellReader<Content: View>: View {
     @Environment(\._cellProxy) var _cellProxy
     

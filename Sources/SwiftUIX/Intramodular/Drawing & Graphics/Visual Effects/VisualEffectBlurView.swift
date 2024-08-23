@@ -8,6 +8,7 @@ import Swift
 import SwiftUI
 import UIKit
 
+@_documentation(visibility: internal)
 public struct VisualEffectBlurView<Content: View>: UIViewRepresentable {
     public typealias UIViewType = UIView
     

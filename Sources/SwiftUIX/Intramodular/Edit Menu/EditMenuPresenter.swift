@@ -51,6 +51,7 @@ private struct EditMenuPresenter: ViewModifier {
 // MARK: - API
 
 /// A struct representing an item in the edit menu.
+@_documentation(visibility: internal)
 public struct EditMenuItem {
     let title: String
     let action: Action

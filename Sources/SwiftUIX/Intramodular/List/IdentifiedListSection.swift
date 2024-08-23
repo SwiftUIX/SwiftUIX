@@ -5,6 +5,7 @@
 import Swift
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct IdentifiedListSection<SectionType, SectionIdentifierType: Hashable, ItemType, ItemIdentifierType: Hashable> {
     public let model: SectionType
     public let items: [ItemType]
@@ -23,6 +24,7 @@ public struct IdentifiedListSection<SectionType, SectionIdentifierType: Hashable
     }
 }
 
+@_documentation(visibility: internal)
 public struct IdentifiedListSections<SectionType, SectionIdentifierType: Hashable, ItemType, ItemIdentifierType: Hashable> {
     private let base: [IdentifiedListSection<SectionType, SectionIdentifierType, ItemType, ItemIdentifierType>]
     

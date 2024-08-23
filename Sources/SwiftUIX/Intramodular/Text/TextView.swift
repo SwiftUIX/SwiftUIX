@@ -15,6 +15,7 @@ import UIKit
 
 /// A control that displays an editable text interface.
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+@_documentation(visibility: internal)
 public struct TextView<Label: View>: View {
     public typealias _Configuration = _TextViewConfiguration
     

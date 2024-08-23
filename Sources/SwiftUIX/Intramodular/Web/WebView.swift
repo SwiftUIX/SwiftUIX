@@ -9,6 +9,7 @@ import Swift
 import SwiftUI
 import WebKit
 
+@_documentation(visibility: internal)
 public struct WebView: View {
     private var configuration: _WebView.Configuration
     private var placeholder: AnyView?

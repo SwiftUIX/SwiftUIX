@@ -7,6 +7,7 @@ import SwiftUI
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
+@_documentation(visibility: internal)
 public struct _CollectionViewConfiguration: ExpressibleByNilLiteral {
     public enum UnsafeFlag {
         case cacheCellContentHostingControllers

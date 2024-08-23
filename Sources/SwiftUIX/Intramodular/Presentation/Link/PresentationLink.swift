@@ -9,6 +9,7 @@ import SwiftUI
 /// A control which presents content when triggered.
 ///
 /// A revival of `PresentationLink` (from Xcode 11 beta 3).
+@_documentation(visibility: internal)
 public struct PresentationLink<Destination: View, Label: View>: PresentationLinkView {
     @Environment(\._environmentInsertions) private var environmentInsertions
     #if os(iOS) || os(macOS) || os(tvOS) || targetEnvironment(macCatalyst)

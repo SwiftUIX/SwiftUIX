@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+@_documentation(visibility: internal)
 public struct _CocoaListPreferences: Sendable {
     public var cell: Cell = nil
     

@@ -12,6 +12,7 @@ public enum _SwiftUIX_AxisStackLayoutDirection {
 
 /// A view that arranges its children in a vertical/horizontal line.
 @frozen
+@_documentation(visibility: internal)
 public struct AxisStack<Content: View>: View {
     public let axis: Axis3D
     public let alignment: Alignment

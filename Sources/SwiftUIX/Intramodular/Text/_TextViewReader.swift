@@ -29,6 +29,7 @@ public enum _SwiftUIX_TextEditorEvent: Hashable {
 }
 
 @available(macOS 11.0, *)
+@_documentation(visibility: internal)
 public struct _TextViewReader<Content: View>: View {
     private let content: (_TextEditorProxy) -> Content
     

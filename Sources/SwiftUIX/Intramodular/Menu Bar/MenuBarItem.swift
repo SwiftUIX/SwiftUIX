@@ -10,6 +10,7 @@ import Swift
 import SwiftUI
 
 /// A model that represents an item which can be placed in the menu bar.
+@_documentation(visibility: internal)
 public struct MenuBarItem<ID, Label: View, Content: View> {
     public let id: ID
     

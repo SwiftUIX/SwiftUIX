@@ -11,6 +11,7 @@ public typealias ImageName = _AnyImage.Name
 
 /// A portable representation of an image.
 @frozen
+@_documentation(visibility: internal)
 public struct _AnyImage: Hashable, @unchecked Sendable {
     /// Represents the name or identifier of an image.
     @frozen
