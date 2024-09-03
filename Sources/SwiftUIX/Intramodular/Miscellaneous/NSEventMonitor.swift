@@ -16,12 +16,17 @@ public enum NSEventMonitorContext {
     case global
 }
 
-public protocol _NSEventMonitorType {
+public protocol _NSEventMonitorType: AnyObject {
     init(
         context: NSEventMonitorContext,
         matching: NSEvent.EventTypeMask,
         handleEvent: @escaping (NSEvent) -> NSEvent?
     ) throws
+    
+    static func addGlobalMonitorForEvents(
+        matching mask: NSEvent.EventTypeMask,
+        handler block: @escaping (NSEvent) -> Void
+    ) -> Any?
     
     func start() throws
     func stop() throws
@@ -49,6 +54,19 @@ extension _NSEventMonitorType {
             
             return nil
         }
+    }
+}
+
+extension _NSEventMonitorType {
+    public static func addGlobalMonitorForEvents(
+        matching mask: NSEvent.EventTypeMask,
+        handler block: @escaping (NSEvent) -> Void
+    ) -> Any? {
+        try? Self(context: .global, matching: mask, handleEvent: { (event: NSEvent) in
+            block(event)
+            
+            return event
+        })
     }
 }
 

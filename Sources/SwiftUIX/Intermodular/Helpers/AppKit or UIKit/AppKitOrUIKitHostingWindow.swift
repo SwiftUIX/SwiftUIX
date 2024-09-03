@@ -559,10 +559,16 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
        
         let contentWindowController = self._contentWindowController ?? NSWindowController(window: self)
         
+        if self.contentViewController?.view.frame.size == Screen.bounds.size {
+            self.styleMask.insert(.fullSizeContentView)
+        }
+        
         self._contentWindowController = contentWindowController
         
         self.isHidden = false
 
+        assert(contentWindowController.window !== nil)
+        
         if _SwiftUIX_windowConfiguration.windowPosition == nil {
             contentWindowController.showWindow(self)
             
@@ -570,6 +576,8 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
                 assert(self._rootHostingViewController.mainView._window != nil)
                 
                 self.applyPreferredConfiguration()
+                
+                contentWindowController.window!.center()
             }
         } else {
             self.applyPreferredConfiguration()
@@ -613,6 +621,19 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
     #else
     @objc open func close() {
         _SwiftUIX_dismiss()
+    }
+    #endif
+    
+    #if os(macOS)
+    override open func constrainFrameRect(
+        _ frameRect: NSRect,
+        to screen: NSScreen?
+    ) -> NSRect {
+        if _SwiftUIX_windowConfiguration.style == .plain {
+            return frameRect
+        } else {
+            return super.constrainFrameRect(frameRect, to: nil)
+        }
     }
     #endif
     
@@ -798,11 +819,7 @@ extension AppKitOrUIKitHostingWindow {
             _SwiftUIX_windowConfiguration.windowPosition = position
         }
         
-        guard let sourceWindow = windowPresentationController?._sourceAppKitOrUIKitWindow ?? position._sourceAppKitOrUIKitWindow ?? AppKitOrUIKitApplication.shared.windows.first else {
-            assertionFailure()
-            
-            return
-        }
+        let sourceWindow: AppKitOrUIKitWindow? = windowPresentationController?._sourceAppKitOrUIKitWindow ?? position._sourceAppKitOrUIKitWindow
         
         if var position = position[.coordinateSpace(.global)] {
             var rect = CGRect(
@@ -810,10 +827,12 @@ extension AppKitOrUIKitHostingWindow {
                 size: self.frame.size
             )
             
-            rect.origin.y = sourceWindow.frame.height - position.y
-            
-            position = sourceWindow.convertToScreen(rect).origin
-            
+            if let sourceWindow {
+                rect.origin.y = sourceWindow.frame.height - position.y
+                
+                position = sourceWindow.convertToScreen(rect).origin
+            }
+                        
             let origin = CGPoint(
                 x: position.x - (self.frame.size.width / 2),
                 y: position.y - (self.frame.size.height / 2)

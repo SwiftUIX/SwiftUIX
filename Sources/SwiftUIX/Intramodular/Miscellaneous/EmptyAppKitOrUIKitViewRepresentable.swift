@@ -55,13 +55,13 @@ extension EmptyAppKitOrUIKitViewRepresentable {
         }
         
         /*public static func dismantleAppKitOrUIKitView(
-            _ view: Self,
-            coordinator: Coordinator
-        ) {
-            DispatchQueue.main.async {
-                view.dismantle()
-            }
-        }*/
+         _ view: Self,
+         coordinator: Coordinator
+         ) {
+         DispatchQueue.main.async {
+         view.dismantle()
+         }
+         }*/
     }
 }
 #elseif os(watchOS)

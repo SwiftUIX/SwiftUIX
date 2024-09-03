@@ -87,7 +87,7 @@ extension View {
 extension View {
     public func _SwiftUIX_onKeyPress(
         phases: _SwiftUIX_KeyPress.Phases = [.down, .repeat],
-        action: @escaping (_SwiftUIX_KeyPress) -> _SwiftUIX_KeyPress.Result
+        action: @escaping @MainActor (_SwiftUIX_KeyPress) -> _SwiftUIX_KeyPress.Result
     ) -> some View {
         self.onAppKitEvent(matching: .init(from: phases)) { (event: NSEvent) -> NSEvent? in
             guard let keyPress = _SwiftUIX_KeyPress(from: event) else {
@@ -152,7 +152,7 @@ extension View {
 @available(watchOS, unavailable)
 extension View {
     public func _overrideOnMoveCommand(
-        perform action: ((_SwiftUIX_MoveCommandDirection) -> _SwiftUIX_KeyPress.Result)?
+        perform action: (@MainActor (_SwiftUIX_MoveCommandDirection) -> _SwiftUIX_KeyPress.Result)?
     ) -> some View {
         _SwiftUIX_onKeyPress { keyPress in
             guard let action else {
@@ -168,7 +168,7 @@ extension View {
     }
     
     public func _overrideOnExitCommand(
-        perform action: (() -> _SwiftUIX_KeyPress.Result)?
+        perform action: (@MainActor () -> _SwiftUIX_KeyPress.Result)?
     ) -> some View {
         _SwiftUIX_onKeyPress { keyPress in
             guard let action else {
@@ -184,7 +184,7 @@ extension View {
     }
     
     public func _overrideOnExitCommand(
-        perform action: (() -> Void)?
+        perform action: (@MainActor () -> Void)?
     ) -> some View {
         _overrideOnExitCommand { () -> _SwiftUIX_KeyPress.Result in
             guard let action = action else {
@@ -198,7 +198,7 @@ extension View {
     }
     
     public func _overrideOnDeleteCommand(
-        perform action: (() -> _SwiftUIX_KeyPress.Result)?
+        perform action: (@MainActor () -> _SwiftUIX_KeyPress.Result)?
     ) -> some View {
         _SwiftUIX_onKeyPress { keyPress in
             guard let action else {
@@ -214,7 +214,7 @@ extension View {
     }
     
     public func _overrideOnDeleteCommand(
-        perform action: (() -> Void)?
+        perform action: (@MainActor () -> Void)?
     ) -> some View {
         _overrideOnDeleteCommand { () -> _SwiftUIX_KeyPress.Result in
             guard let action = action else {

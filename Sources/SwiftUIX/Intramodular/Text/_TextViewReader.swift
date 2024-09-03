@@ -41,7 +41,7 @@ public struct _TextViewReader<Content: View>: View {
     ) {
         self.content = content
     }
-
+    
     public var body: some View {
         let proxyBinding = $proxy.binding
         
@@ -76,7 +76,7 @@ public final class _TextEditorProxy: Hashable, ObservableObject, @unchecked Send
     public var isFocused: Bool {
         base?._SwiftUIX_isFirstResponder ?? false
     }
-
+    
     public var textCursor: _ObservableTextCursor {
         base?._observableTextCursor ?? _fakeTextCursor
     }
