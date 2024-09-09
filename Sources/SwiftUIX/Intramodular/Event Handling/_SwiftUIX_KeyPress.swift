@@ -112,6 +112,7 @@ extension View {
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension View {
+    @MainActor
     public func _SwiftUIX_onKeyPress(
         _ key: KeyEquivalent,
         action: @escaping () -> _SwiftUIX_KeyPress.Result
@@ -127,6 +128,7 @@ extension View {
         }
     }
     
+    @MainActor
     public func _SwiftUIX_onKeyPress(
         _ key: KeyEquivalent,
         modifiers: EventModifiers,

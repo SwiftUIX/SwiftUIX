@@ -132,6 +132,7 @@ public enum Activation {
     }
     
     @available(macOS, unavailable)
+    @MainActor
     @ViewBuilder
     private func editModeRespectingContent(editMode: Binding<EditMode>) -> some View {
         Group {
@@ -166,6 +167,7 @@ public enum Activation {
     }
     
     @ViewBuilder
+    @MainActor
     private func nonEditModeContent() -> some View {
         if !isEditing {
             staticDisplay
@@ -201,6 +203,7 @@ public enum Activation {
         }
     }
 
+    @MainActor
     @ViewBuilder
     private var editableDisplay: some View {
         Group {
