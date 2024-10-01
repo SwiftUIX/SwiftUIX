@@ -16,7 +16,7 @@ public struct _AnyImage: Hashable, @unchecked Sendable {
     /// Represents the name or identifier of an image.
     @frozen
     @_documentation(visibility: internal)
-public enum Name: Hashable, @unchecked Sendable {
+    public enum Name: Hashable, @unchecked Sendable {
         /// An image resource from a bundle.
         case bundleResource(String, in: Bundle? = .main)
         /// A system image.
@@ -30,7 +30,7 @@ public enum Name: Hashable, @unchecked Sendable {
     
     /// Represents the underlying image data.
     @_documentation(visibility: internal)
-public enum Payload: Hashable {
+    public enum Payload: Hashable {
         /// An AppKit or UIKit image.
         case appKitOrUIKitImage(AppKitOrUIKitImage)
         /// A named image.
@@ -250,6 +250,17 @@ extension _AnyImage: View {
 }
 
 // MARK: - Auxiliary
+
+extension _AnyImage {
+    public enum FileType: String, Codable, Hashable, Sendable {
+        case tiff
+        case bmp
+        case gif
+        case jpeg
+        case png
+        case jpeg2000
+    }
+}
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS) || targetEnvironment(macCatalyst)
 extension AppKitOrUIKitImage {
