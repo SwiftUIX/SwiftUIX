@@ -18,35 +18,53 @@ extension NSApplication {
 
 @available(macCatalyst, unavailable)
 extension NSApplication {
-    public static var _SwiftUIX_isRunningFromApplicationsDirectory: Bool = {
-        let bundleURL = Bundle.main.bundleURL
-        let applicationsURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+    public static var _SwiftUIX_isRunningFromApplicationsDirectory: Bool? {
+        let bundleURL: URL = Bundle.main.bundleURL
+        let applicationsURL: URL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+        var applicationsPath: String = applicationsURL.path
         
-        if bundleURL.deletingLastPathComponent() == applicationsURL {
+        if applicationsPath.hasSuffix("/") {
+            applicationsPath.removeLast()
+        }
+        
+        if bundleURL.deletingLastPathComponent().path.hasPrefix(applicationsURL.path) {
             return true
         } else {
-            return false
+            if bundleURL._isPossiblyTranslocated {
+                #if DEBUG
+                guard ProcessInfo.processInfo.environment["__XCODE_BUILT_PRODUCTS_DIR_PATHS"] == nil else {
+                    return false
+                }
+                #endif
+                
+                return nil
+            } else {
+                return false
+            }
         }
-    }()
-    
-    enum CopyToApplicationsDirectoryError: Error {
-        case unknown(Error)
     }
-    
-    public static func _SwiftUIX_copyAppToApplicationsDirectoryIfNeeded() throws {
-        let bundleURL = Bundle.main.bundleURL
+            
+    public static func _SwiftUIX_copyAppToApplicationsDirectoryIfNeeded(
+        applicationsDirectory: URL? = nil
+    ) throws {
+        guard _SwiftUIX_isRunningFromApplicationsDirectory == false else {
+            return
+        }
         
+        let bundle: Bundle = Bundle.main
+        let bundleURL: URL = bundle.bundleURL
+                
         // Assert that the bundle URL points to an .app bundle
         assert(bundleURL.pathExtension == "app", "The bundle URL must point to an .app bundle.")
         
         let fileManager = FileManager.default
-        let applicationsURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
-        
-        let destinationURL = applicationsURL.appendingPathComponent(bundleURL.lastPathComponent)
+        let applicationsDirectory: URL = applicationsDirectory ?? URL(fileURLWithPath: "/Applications", isDirectory: true)
+        let destinationURL: URL = applicationsDirectory.lastPathComponent.hasPrefix(bundleURL.lastPathComponent) ? applicationsDirectory : applicationsDirectory.appendingPathComponent(bundleURL.lastPathComponent)
         
         // Check if the app is already running from the /Applications folder
-        if bundleURL.deletingLastPathComponent() == applicationsURL {
-            print("The app is already running from the /Applications folder.")
+        if bundleURL.deletingLastPathComponent() == applicationsDirectory {
+            debugPrint("The app is already running from the /Applications folder.")
+            
             return
         }
         
@@ -57,7 +75,9 @@ extension NSApplication {
             if fileManager.fileExists(atPath: destinationURL.path) {
                 // Assert that the existing item at the destination URL is a directory (app bundle)
                 var isDirectory: ObjCBool = false
+                
                 fileManager.fileExists(atPath: destinationURL.path, isDirectory: &isDirectory)
+                
                 assert(isDirectory.boolValue, "The existing item at the destination URL must be a directory (app bundle).")
                 
                 try fileManager.removeItem(at: destinationURL)
@@ -68,6 +88,18 @@ extension NSApplication {
             throw CopyToApplicationsDirectoryError.unknown(error)
         }
     }
+    
+    fileprivate enum CopyToApplicationsDirectoryError: Error {
+        case unknown(Error)
+    }
 }
 
 #endif
+
+// MARK: - Auxiliary
+
+extension URL {
+    fileprivate var _isPossiblyTranslocated: Bool {
+        path.contains("AppTranslocation")
+    }
+}

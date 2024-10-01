@@ -18,7 +18,7 @@ extension App {
 extension App {
     // Programmatically quit the current application.
     public static func quit() throws {
-
+        
     }
 }
 #endif
@@ -26,12 +26,14 @@ extension App {
 #if os(macOS)
 @MainActor
 extension App {
-    public static var _isRunningFromApplicationsDirectory: Bool {
+    public static var _isRunningFromApplicationsDirectory: Bool? {
         NSApplication._SwiftUIX_isRunningFromApplicationsDirectory
     }
     
-    public static func _copyAppToApplicationsDirectoryIfNeeded() throws {
-        try NSApplication._SwiftUIX_copyAppToApplicationsDirectoryIfNeeded()
+    public static func _copyAppToApplicationsDirectoryIfNeeded(
+        applicationsDirectory: URL? = nil
+    ) throws {
+        try NSApplication._SwiftUIX_copyAppToApplicationsDirectoryIfNeeded(applicationsDirectory: applicationsDirectory)
     }
 }
 #endif
