@@ -16,7 +16,10 @@ public protocol ActionLabelView: View {
 
 extension ActionLabelView {
     @_disfavoredOverload
-    public init(action: @escaping () -> Void, @ViewBuilder label: () -> Label) {
+    public init(
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label
+    ) {
         self.init(action: .init(action), label: label)
     }
 }
@@ -123,6 +126,7 @@ extension Button {
 // MARK: - Conformances
 
 extension Button: ActionLabelView {
+    @_disfavoredOverload
     public init(
         action: Action,
         @ViewBuilder label: () -> Label
