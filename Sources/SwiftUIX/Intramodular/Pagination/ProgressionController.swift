@@ -32,13 +32,25 @@ extension EnvironmentValues {
 
 /// A button that triggers a regression.
 @_documentation(visibility: internal)
+@MainActor
 public struct PreviousButton<Label: View>: ActionLabelView, _ActionPerformingView {
     @Environment(\.progressionController) var progressionController
     
     private let action: Action
     private let label: Label
     
-    public init(action: Action, @ViewBuilder label: () -> Label) {
+    public init(
+        action: @escaping @MainActor () -> Void,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.action = Action(action)
+        self.label = label()
+    }
+
+    public init(
+        action: Action,
+        @ViewBuilder label: () -> Label
+    ) {
         self.action = action
         self.label = label()
     }
@@ -50,30 +62,43 @@ public struct PreviousButton<Label: View>: ActionLabelView, _ActionPerformingVie
     }
     
     public func transformAction(_ transform: (Action) -> Action) -> Self {
-        .init(action: transform(action), label: { label })
+        Self(action: transform(action), label: { label })
     }
 }
 
 /// A button that triggers a progression.
 @_documentation(visibility: internal)
+@MainActor
 public struct NextButton<Label: View>: ActionLabelView, _ActionPerformingView {
     @Environment(\.progressionController) var progressionController
     
     private let action: Action
     private let label: Label
     
-    public init(action: Action, @ViewBuilder label: () -> Label) {
-        self.action = action
+    public init(
+        action: @escaping @MainActor () -> Void,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.action = Action(action)
         self.label = label()
     }
     
+    public init(
+        action: Action,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.action = action
+        self.label = label()
+    }
+
     public var body: some View {
         Button(action: { self.progressionController?.moveToNext() }) {
             label
         }
     }
     
+    @MainActor
     public func transformAction(_ transform: (Action) -> Action) -> Self {
-        .init(action: transform(action), label: { label })
+        Self(action: transform(action), label: { label })
     }
 }

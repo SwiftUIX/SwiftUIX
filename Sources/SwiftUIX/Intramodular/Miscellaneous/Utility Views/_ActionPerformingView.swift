@@ -7,11 +7,13 @@ import SwiftUI
 
 /// A view with the primary goal of triggering an action.
 public protocol _ActionPerformingView: View {
+    @MainActor
     func transformAction(_: (Action) -> Action) -> Self
 }
 
 // MARK: - Extensions
 
+@MainActor
 extension _ActionPerformingView {
     public func insertAction(_ action: Action) -> Self {
         transformAction({ $0.insert(action) })

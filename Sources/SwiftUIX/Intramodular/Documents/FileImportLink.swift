@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 @_documentation(visibility: internal)
+@MainActor
 public struct FileImportLink<Label: View> {
     private let allowedContentTypes: [UTType]
     private let onCompletion: (Result<URL, Error>) -> Void

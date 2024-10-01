@@ -7,7 +7,7 @@ import SwiftUI
 
 /// A convenience around a closure of the type `() -> Void`.
 @_documentation(visibility: internal)
-public struct Action: DynamicAction, Hashable, Identifiable {
+public struct Action: DynamicAction, Hashable, Identifiable, @unchecked Sendable {
     public let id: AnyHashable?
     
     private let fakeID: AnyHashable?

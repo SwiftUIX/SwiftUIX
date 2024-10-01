@@ -7,6 +7,7 @@ import SwiftUI
 
 /// A control which dismisses an active presentation when triggered.
 @_documentation(visibility: internal)
+@MainActor
 public struct DismissPresentationButton<Label: View>: ActionLabelView {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.presentationManager) private var presentationManager
@@ -63,7 +64,7 @@ public struct DismissPresentationButton<Label: View>: ActionLabelView {
 
 extension DismissPresentationButton where Label == Image {
     @available(OSX 11.0, *)
-    public init(action: @escaping () -> Void = { }) {
+    public init(action: @MainActor @escaping () -> Void = { }) {
         self.init(action: action) {
             Image(systemName: .xmarkCircleFill)
         }
