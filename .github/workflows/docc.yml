@@ -37,7 +37,7 @@ jobs:
           xcode-version: '15.2.0'
       - name: Build DocC
         run: |
-          bash docc.sh
+          bash scripts/docc.sh
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
