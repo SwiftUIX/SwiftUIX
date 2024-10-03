@@ -6,6 +6,7 @@
 
 import Combine
 import Swift
+import SwiftUI
 @_spi(Internal) import _SwiftUIX
 
 @available(*, deprecated, renamed: "_ObservableTextCursor")

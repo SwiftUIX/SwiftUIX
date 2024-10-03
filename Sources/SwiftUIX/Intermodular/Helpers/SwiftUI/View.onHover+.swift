@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+import SwiftUI
+
 @available(iOS 13, OSX 10.15, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

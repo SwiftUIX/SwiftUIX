@@ -3,6 +3,7 @@
 //
 
 import Swift
+import SwiftUI
 
 extension Task where Success == Never, Failure == Never {
     public static func _SwiftUIX_sleep(seconds: TimeInterval) async throws {

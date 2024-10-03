@@ -4,6 +4,7 @@
 
 import Combine
 import Swift
+import SwiftUI
 
 /// An abstract base class for an observable value box.
 @dynamicMemberLookup

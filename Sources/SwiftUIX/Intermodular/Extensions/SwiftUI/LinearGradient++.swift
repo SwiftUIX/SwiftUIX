@@ -2,8 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
-
 import Foundation
+import SwiftUI
 
 extension LinearGradient {
     @_documentation(visibility: internal)
