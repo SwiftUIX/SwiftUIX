@@ -9,3 +9,5 @@ xcuserdata/
 fastlane/*
 !fastlane/Fastfile
 !fastlane/Pluginfile
+
+docs/
