@@ -24,30 +24,20 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - id: pages
         name: Setup Pages
         uses: actions/configure-pages@v4
-      - name: Select Xcode 15.1
+      - name: Select Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.1.0'
+          xcode-version: '15.2.0'
       - name: Build DocC
         run: |
-          swift package resolve;
-          
-          xcodebuild docbuild -scheme SwiftUIX -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
-
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/SwiftUIX.doccarchive \
-            --output-path docs \
-            --hosting-base-path 'SwiftUIX';
-
-          echo "<script>window.location.href += \"/documentation/swiftuix\"</script>" > docs/index.html;
-          
+          bash docc.sh
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
