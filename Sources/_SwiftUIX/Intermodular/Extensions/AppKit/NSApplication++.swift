@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Foundation
+
 #if os(macOS) || targetEnvironment(macCatalyst)
 
 import AppKit
