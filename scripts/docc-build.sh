@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# This script can be run with `bash docc-build.sh` from the Terminal.
+# This script builds DocC documentation for hosting on GitHub pages.
 
-# It builds DocC documentation for hosting on GitHub pages.
-
-# Resolve Swift package and build DocC documentation
+# Build DocC documentation
 swift package resolve;
 xcodebuild docbuild -scheme SwiftUIX -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
 
@@ -14,5 +12,5 @@ $(xcrun --find docc) process-archive \
     --output-path docs \
     --hosting-base-path 'SwiftUIX';
 
-# Inject a redirect script into the root path
+# Inject a redirect script into the empty documentation root
 echo "<script>window.location.href += \"/documentation/swiftuix\"</script>" > docs/index.html;
