@@ -8,10 +8,10 @@ import SwiftUI
 
 /// An enumeration that represents either a screen or a SwiftUI `CoordinateSpace`.
 @_documentation(visibility: internal)
-public enum _ScreenOrCoordinateSpace: Hashable {
+public enum _ScreenOrCoordinateSpace: Hashable, @unchecked Sendable {
     case cocoa(Screen?)
     case coordinateSpace(CoordinateSpace)
-        
+    
     public var _cocoaScreen: Screen? {
         guard case .cocoa(let screen) = self else {
             return nil

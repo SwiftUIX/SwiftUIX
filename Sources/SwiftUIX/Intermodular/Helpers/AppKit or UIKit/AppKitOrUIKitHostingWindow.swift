@@ -62,14 +62,32 @@ extension AppKitOrUIKitHostingWindowProtocol {
 #endif
 
 @_documentation(visibility: internal)
-public struct _AppKitOrUIKitHostingWindowConfiguration: Equatable {
-    public var style: _WindowStyle = .default
+public struct _AppKitOrUIKitHostingWindowConfiguration: Hashable, Sendable {
+    public var style: _WindowStyle
     public var canBecomeKey: Bool?
     public var allowTouchesToPassThrough: Bool?
     public var windowPosition: _CoordinateSpaceRelative<CGPoint>?
     public var isTitleBarHidden: Bool?
     public var backgroundColor: Color?
     public var preferredColorScheme: ColorScheme?
+
+    public init(
+        style: _WindowStyle = .default,
+        canBecomeKey: Bool? = nil,
+        allowTouchesToPassThrough: Bool? = nil,
+        windowPosition: _CoordinateSpaceRelative<CGPoint>? = nil,
+        isTitleBarHidden: Bool? = nil,
+        backgroundColor: Color? = nil,
+        preferredColorScheme: ColorScheme? = nil
+    ) {
+        self.style = style
+        self.canBecomeKey = canBecomeKey
+        self.allowTouchesToPassThrough = allowTouchesToPassThrough
+        self.windowPosition = windowPosition
+        self.isTitleBarHidden = isTitleBarHidden
+        self.backgroundColor = backgroundColor
+        self.preferredColorScheme = preferredColorScheme
+    }
     
     public mutating func mergeInPlace(with other: Self) {
         self.canBecomeKey = other.canBecomeKey ?? self.canBecomeKey
@@ -392,8 +410,12 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
                 hasShadow = false
             case .titleBar:
                 self.init(contentViewController: contentViewController)
+                
+                self._SwiftUIX_windowConfiguration.style = style
             case ._transparent:
                 self.init(contentViewController: contentViewController)
+                
+                self._SwiftUIX_windowConfiguration.style = style
         }
         
         Task.detached { @MainActor in
@@ -405,6 +427,8 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
         if self.contentViewController == nil {
             self.contentViewController = contentViewController
         }
+        
+        assert(self._SwiftUIX_windowConfiguration.style == style)
         
         performSetUp()
         
@@ -455,15 +479,17 @@ open class AppKitOrUIKitHostingWindow<Content: View>: AppKitOrUIKitWindow, AppKi
                 }
             }
             case ._transparent:
+                styleMask = [.borderless, .fullSizeContentView]
                 collectionBehavior = [.fullScreenPrimary]
                 level = .floating
-                isMovable = false
                 titleVisibility = .hidden
                 titlebarAppearsTransparent = true
-                
+                isMovable = true
+                isMovableByWindowBackground = true
+                ignoresMouseEvents = false
+
                 standardWindowButton(.closeButton)?.isHidden = true
                 standardWindowButton(.miniaturizeButton)?.isHidden = true
-                
                 standardWindowButton(.zoomButton)?.isHidden = true
                 
                 hasShadow = false
