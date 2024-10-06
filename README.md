@@ -309,4 +309,4 @@ SwiftUIX is led and maintained by [@vatsal_manot](http://twitter.com/vatsal_mano
 Special thanks to [Brett Best](https://github.com/Brett-Best), [Nathan Tanner](https://github.com/nathantannar4), [Kabir Oberai](https://github.com/kabiroberai) and many more.
 
 
-[Documentation]: [https://swiftuix.github.io/SwiftUIX/documentation/swiftuix/]
+[Documentation]: https://swiftuix.github.io/SwiftUIX
