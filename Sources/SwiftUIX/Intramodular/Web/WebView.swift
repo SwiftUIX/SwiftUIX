@@ -170,30 +170,41 @@ struct _WKWebViewRepresentable: AppKitOrUIKitViewRepresentable {
         
         context.coordinator.webView = view
         
-        switch configuration.source {
-            case .url:
-                break
-            case .htmlString(let string):
-                view.loadHTMLString(string, baseURL: nil)
-        }
-        
-        DispatchQueue.main.async {
-            self.appKitOrUIKitViewBinding?.wrappedValue = view
+        if let appKitOrUIKitViewBinding = self.appKitOrUIKitViewBinding {
+            DispatchQueue.main.async {
+                if appKitOrUIKitViewBinding.wrappedValue !== view {
+                    appKitOrUIKitViewBinding.wrappedValue = view
+                } else {
+                    view._SwiftUIX_setNeedsLayout()
+                }
+            }
         }
         
         return view
     }
     
     func updateAppKitOrUIKitView(_ view: AppKitOrUIKitViewType, context: Context) {
+        if view.navigationDelegate !== context.coordinator {
+            view.navigationDelegate = context.coordinator
+            
+            view.reload()
+        }
+        
         view._SwiftUIX_configuration = configuration
         
-        switch configuration.source {
-            case .url(let url):
-                if url != coordinator.activeLoadRequest?.url {
-                    coordinator.load(url)
-                }
-            case .htmlString:
-                break
+        if view._latestSource != configuration.source {
+            defer {
+                view._latestSource = configuration.source
+            }
+            
+            switch configuration.source {
+                case .url(let url):
+                    if url != coordinator.activeLoadRequest?.url {
+                        coordinator.load(url)
+                    }
+                case .htmlString(let string):
+                    view.loadHTMLString(string, baseURL: nil)
+            }
         }
     }
     
@@ -220,7 +231,6 @@ extension _WKWebViewRepresentable {
             didSet {
                 activeLoadRequest = nil
                 oldValue?.navigationDelegate = nil
-                webView?.navigationDelegate = self
             }
         }
         
@@ -229,6 +239,10 @@ extension _WKWebViewRepresentable {
         var activeLoadRequest: LoadRequest?
         
         func load(_ url: URL) {
+            guard let webView else {
+                return
+            }
+            
             self.activeLoadRequest = nil
             self.activeLoadRequest = .init(url: url, redirectedURL: nil)
             
@@ -236,7 +250,7 @@ extension _WKWebViewRepresentable {
                 self.isLoading = true
             }
             
-            webView?.load(URLRequest(url: url))
+            webView.load(URLRequest(url: url))
         }
         
         func webView(

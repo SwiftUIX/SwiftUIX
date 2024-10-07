@@ -20,6 +20,8 @@ public final class _SwiftUIX_WKWebView: WKWebView, WKNavigationDelegate {
         }
     }
     
+    var _latestSource: _WKWebViewRepresentable.Configuration.Source?
+    
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
         
