@@ -49,12 +49,22 @@ public struct _CocoaApplicationDelegateAdaptor: DynamicProperty {
                     guard window._SwiftUIX_isInRegularDisplay else {
                         return
                     }
-                    
+                                        
                     window.resignMain()
                     
+                    if window._SwiftUIX_isFirstResponder {
+                        window.resignFirstResponder()
+                    }
+
                     Task { @MainActor in
                         if window.isVisible {
                             window.close()
+                             
+                            Task.detached { @MainActor in
+                                if !window.isReleasedWhenClosed {
+                                    window.close()
+                                }
+                            }
                         }
                     }
                 }
