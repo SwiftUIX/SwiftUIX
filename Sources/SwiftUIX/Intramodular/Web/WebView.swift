@@ -157,7 +157,11 @@ struct _WKWebViewRepresentable: AppKitOrUIKitViewRepresentable {
         let webpagePreferences = WKWebpagePreferences()
         
         if let allowsContentJavaScript = self.configuration.allowsContentJavaScript {
-            webpagePreferences.allowsContentJavaScript = allowsContentJavaScript
+            if #available(iOS 14, macOS 11, *) {
+                webpagePreferences.allowsContentJavaScript = allowsContentJavaScript
+            } else {
+                // TODO: (@vatsal) handle earlier versions
+            }
         }
         
         let webViewConfiguration = WKWebViewConfiguration()
