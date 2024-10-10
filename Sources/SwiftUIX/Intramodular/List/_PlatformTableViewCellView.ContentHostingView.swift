@@ -556,7 +556,6 @@ extension _PlatformTableCellView {
                         transaction.disableAnimations()
                     }
                     ._geometryGroup(.if(.available))
-                    .frame(width: width, height: height)
                     .onChange(of: _shouldOverrideFrame) { should in
                         if should {
                             sustainFrameOverride = true
