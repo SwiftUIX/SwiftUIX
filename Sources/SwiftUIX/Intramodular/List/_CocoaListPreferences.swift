@@ -26,18 +26,19 @@ extension _CocoaListPreferences {
         public struct ViewHostingOptions: Hashable, Sendable {
             public var useAutoLayout: Bool = true
             public var detachHostingView: Bool = false
+            public var disableSizeOverride: Bool = false
         }
         
         @_documentation(visibility: internal)
-public enum SizingOptions: Sendable {
-            @_documentation(visibility: internal)
-public enum Custom: Sendable {
-                case indexPath(@Sendable (IndexPath) -> OptionalDimensions)
-            }
-            
+        public enum SizingOptions: Sendable {
             case auto
             case fixed(width: CGFloat?, height: CGFloat?)
             case custom(Custom)
+            
+            @_documentation(visibility: internal)
+            public enum Custom: Sendable {
+                case indexPath(@Sendable (IndexPath) -> OptionalDimensions)
+            }
         }
         
         public var viewHostingOptions: ViewHostingOptions = .init()
