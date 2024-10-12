@@ -183,7 +183,6 @@ extension _PlatformTableCellView {
         func payloadWillUpdate() {
             if contentHostingViewCoordinator.stateFlags.contains(.firstRenderComplete) {
                 contentHostingViewCoordinator.stateFlags.insert(.hasBeenReused)
-                contentHostingViewCoordinator.stateFlags.insert(.disableSizeOverride)
                 contentHostingViewCoordinator.stateFlags.insert(.payloadDidJustUpdate)
                 
                 DispatchQueue.main.async {
@@ -531,6 +530,10 @@ extension _PlatformTableCellView {
         }
         
         private var width: CGFloat? {
+            if coordinator.stateFlags.contains(.disableSizeOverride) {
+                return nil
+            }
+            
             guard let _width else {
                 return nil
             }
@@ -541,6 +544,10 @@ extension _PlatformTableCellView {
         }
         
         private var height: CGFloat? {
+            if coordinator.stateFlags.contains(.disableSizeOverride) {
+                return nil
+            }
+            
             guard let _height else {
                 return nil
             }
@@ -572,6 +579,7 @@ extension _PlatformTableCellView {
                         transaction.disableAnimations()
                     }
                     ._geometryGroup(.if(.available))
+                    .frame(width: width, height: height)
                     .onChange(of: _shouldOverrideFrame) { should in
                         if should {
                             sustainFrameOverride = true

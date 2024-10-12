@@ -26,6 +26,7 @@ extension _CocoaListPreferences {
         public struct ViewHostingOptions: Hashable, Sendable {
             public var useAutoLayout: Bool = true
             public var detachHostingView: Bool = false
+            public var disableSizeOverride: Bool = false
         }
         
         @_documentation(visibility: internal)
