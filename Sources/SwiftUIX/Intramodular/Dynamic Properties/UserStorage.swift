@@ -35,7 +35,8 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         )
     }
     
-    public func update() {
+    public mutating func update() {
+        self.valueBox._SwiftUI_DynamicProperty_update_called = true 
         self.valueBox._readInitial()
     }
     
@@ -112,6 +113,8 @@ extension UserStorage: Equatable where Value: Equatable {
 
 extension UserStorage {
     private class ValueBox: ObservableObject {
+        fileprivate var _SwiftUI_DynamicProperty_update_called: Bool = false
+        
         private let key: String
         private let defaultValue: Value
         private let store: UserDefaults
@@ -126,7 +129,7 @@ extension UserStorage {
         
         var value: Value {
             get {
-                storedValue ?? defaultValue
+                _readLatest()
             } set {
                 do {
                     objectWillChange.send()
@@ -134,9 +137,9 @@ extension UserStorage {
                     storedValue = newValue
                     
                     _isEncodingValueToStore = true
-                   
+                    
                     try store.encode(newValue, forKey: key)
-                                        
+                    
                     _isEncodingValueToStore = false
                 } catch {
                     if _isStrict {
@@ -162,6 +165,30 @@ extension UserStorage {
             self._isStrict = _isStrict
         }
         
+        fileprivate func _readLatest() -> Value {
+            if !_SwiftUI_DynamicProperty_update_called {
+                if storedValue == nil && storeSubscription == nil {
+                    _readInitial()
+                }
+            }
+            
+            let result: Value?
+            
+            if _SwiftUI_DynamicProperty_update_called {
+                result = storedValue ?? defaultValue
+            } else {
+                do {
+                    result = try self.store.decode(Value.self, forKey: key)
+                } catch {
+                    debugPrint(error)
+                    
+                    result = nil
+                }
+            }
+            
+            return result ?? defaultValue
+        }
+        
         fileprivate func _readInitial() {
             guard storeSubscription == nil else {
                 return
@@ -178,9 +205,9 @@ extension UserStorage {
                 .filter { _ in
                     !self._isEncodingValueToStore
                 }
-                .map {
+                .map { (value: Any) -> Value? in
                     do {
-                        return try self.store.decode(Value.self, from: $0)
+                        return try self.store.decode(Value.self, from: value)
                     } catch {
                         self.handleError(error)
                         
