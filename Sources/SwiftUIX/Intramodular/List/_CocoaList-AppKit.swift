@@ -257,6 +257,10 @@ extension _CocoaList {
                     payload: payload,
                     tableView: tableView
                 )
+                
+                if configuration.preferences.cell.viewHostingOptions.disableSizeOverride {
+                    view.contentHostingView.contentHostingViewCoordinator.stateFlags.insert(.disableSizeOverride)
+                }
 
                 return view
             }
@@ -449,6 +453,10 @@ extension _CocoaList.Coordinator {
         for cell in tableView.visibleTableViewCellViews() {
             guard let cell = cell as? _PlatformTableCellView<Configuration>, !cell.stateFlags.contains(.wasJustPutIntoUse) else {
                 continue
+            }
+            
+            if configuration.preferences.cell.viewHostingOptions.disableSizeOverride {
+                cell.contentHostingView.contentHostingViewCoordinator.stateFlags.insert(.disableSizeOverride)
             }
             
             guard let item = cell.payload?.item else {
