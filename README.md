@@ -54,7 +54,7 @@ dependencies: [
 
 The SwiftUIX documentation can be found at:
 
-https://SwiftUIX.github.io/SwiftUIX/documentation/SwiftUIX/
+https://swiftuix.github.io/SwiftUIX/documentation/swiftuix/
 
 All documentation that hasn't been migrated here is available via the [repository wiki](https://github.com/SwiftUIX/SwiftUIX/wiki).
 
