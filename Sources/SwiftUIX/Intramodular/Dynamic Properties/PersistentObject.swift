@@ -99,8 +99,11 @@ public struct PersistentObject<Value>: DynamicProperty {
     public mutating func update() {
         _objectContainer.update()
         _observedObjectContainer.update()
+        
+        if objectContainer.__unsafe_opaque_base == nil {
+            _thunkUnconditionally()
+        }
     }
-    
     
     @discardableResult
     private func _thunkUnconditionally() -> Value {
