@@ -145,6 +145,7 @@ extension NSWindow {
 public let NSAlert_Type = unsafeBitCast(NSClassFromString("NSAlert"), to: NSAlertProtocol.Type.self)
 public let NSOpenPanel_Type = unsafeBitCast(NSClassFromString("NSOpenPanel"), to: NSOpenPanelProtocol.Type.self)
 
+@available(macCatalyst, unavailable)
 extension NSWindow.Level {
     public static func + (lhs: Self, rhs: Int) -> Self {
         Self(rawValue: lhs.rawValue + rhs)
