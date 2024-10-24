@@ -8,9 +8,26 @@ import Foundation
 import Swift
 import SwiftUI
 
+public struct UserStorageConfiguration<Value> {
+    let key: String
+    let defaultValue: Value
+    let store: UserDefaults
+    var _areValuesEqual: (Value, Value) -> Bool?
+    var _isStrict: Bool = false
+    var deferUpdates: Bool = false
+}
+
+extension UserStorageConfiguration: @unchecked Sendable where Value: Sendable {
+    
+}
+
 @propertyWrapper
 @_documentation(visibility: internal)
 public struct UserStorage<Value: Codable>: DynamicProperty {
+    public typealias Configuration = UserStorageConfiguration
+    
+    let configuration: UserStorageConfiguration<Value>
+    
     @PersistentObject private var valueBox: ValueBox
     
     public var wrappedValue: Value {
@@ -36,8 +53,14 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
     }
     
     public mutating func update() {
-        self.valueBox._SwiftUI_DynamicProperty_update_called = true 
+        self.valueBox._SwiftUI_DynamicProperty_update_called = true
+        self.valueBox.configuration = configuration
         self.valueBox._readInitial()
+    }
+    
+    init(configuration: UserStorageConfiguration<Value>) {
+        self.configuration = configuration
+        self._valueBox = .init(wrappedValue: .init(configuration: configuration))
     }
     
     public init(
@@ -46,13 +69,12 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         store: UserDefaults = .standard,
         _isStrict: Bool = false
     ) {
-        self._valueBox = .init(
-            wrappedValue: .init(
+        self.init(
+            configuration: .init(
                 key: key,
                 defaultValue: wrappedValue,
                 store: store,
-                _areValuesEqual: { _, _ in nil },
-                _isStrict: _isStrict
+                _areValuesEqual: { _, _ in nil }
             )
         )
     }
@@ -63,17 +85,70 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
         store: UserDefaults = .standard,
         _isStrict: Bool = false
     ) where Value: Equatable {
-        self._valueBox = .init(
-            wrappedValue: .init(
+        self.init(
+            configuration: .init(
+                key: key,
+                defaultValue: wrappedValue,
+                store: store,
+                _areValuesEqual: { $0 == $1 }
+            )
+        )
+    }
+}
+
+// MARK: - Initializers
+
+extension UserStorage {
+    public init(
+        wrappedValue: Value,
+        _ key: String,
+        store: UserDefaults = .standard,
+        deferUpdates: Bool
+    ) {
+        self.init(
+            configuration: .init(
+                key: key,
+                defaultValue: wrappedValue,
+                store: store,
+                _areValuesEqual: { _, _ in nil },
+                deferUpdates: deferUpdates
+            )
+        )
+    }
+
+    public init(
+        _ key: String,
+        store: UserDefaults = .standard,
+        deferUpdates: Bool
+    ) where Value: ExpressibleByNilLiteral {
+        self.init(wrappedValue: nil, key, store: store, deferUpdates: deferUpdates)
+    }
+    
+    public init(
+        wrappedValue: Value,
+        _ key: String,
+        store: UserDefaults = .standard,
+        deferUpdates: Bool
+    ) where Value: Equatable & ExpressibleByNilLiteral {
+        self.init(
+            configuration: .init(
                 key: key,
                 defaultValue: wrappedValue,
                 store: store,
                 _areValuesEqual: { $0 == $1 },
-                _isStrict: _isStrict
+                deferUpdates: deferUpdates
             )
         )
     }
-    
+
+    public init(
+        _ key: String,
+        store: UserDefaults = .standard,
+        deferUpdates: Bool
+    ) where Value: Equatable & ExpressibleByNilLiteral {
+        self.init(wrappedValue: nil, key, store: store, deferUpdates: deferUpdates)
+    }
+
     public init(
         _ key: String,
         store: UserDefaults = .standard,
@@ -115,11 +190,7 @@ extension UserStorage {
     private class ValueBox: ObservableObject {
         fileprivate var _SwiftUI_DynamicProperty_update_called: Bool = false
         
-        private let key: String
-        private let defaultValue: Value
-        private let store: UserDefaults
-        private let _areValuesEqual: (Value, Value) -> Bool?
-        private let _isStrict: Bool
+        var configuration: UserStorageConfiguration<Value>
         
         fileprivate var storedValue: Value?
         
@@ -132,17 +203,23 @@ extension UserStorage {
                 _readLatest()
             } set {
                 do {
-                    objectWillChange.send()
+                    if configuration.deferUpdates {
+                        Task(priority: .userInitiated) { @MainActor in
+                            objectWillChange.send()
+                        }
+                    } else {
+                        objectWillChange.send()
+                    }
                     
                     storedValue = newValue
                     
                     _isEncodingValueToStore = true
                     
-                    try store.encode(newValue, forKey: key)
+                    try configuration.store.encode(newValue, forKey: configuration.key)
                     
                     _isEncodingValueToStore = false
                 } catch {
-                    if _isStrict {
+                    if configuration._isStrict {
                         assertionFailure(String(describing: error))
                     } else {
                         print(String(describing: error))
@@ -152,17 +229,9 @@ extension UserStorage {
         }
         
         init(
-            key: String,
-            defaultValue: Value,
-            store: UserDefaults,
-            _areValuesEqual: @escaping (Value, Value) -> Bool?,
-            _isStrict: Bool
+            configuration: UserStorageConfiguration<Value>
         ) {
-            self.key = key
-            self.defaultValue = defaultValue
-            self.store = store
-            self._areValuesEqual = _areValuesEqual
-            self._isStrict = _isStrict
+            self.configuration = configuration
         }
         
         fileprivate func _readLatest() -> Value {
@@ -175,10 +244,10 @@ extension UserStorage {
             let result: Value?
             
             if _SwiftUI_DynamicProperty_update_called {
-                result = storedValue ?? defaultValue
+                result = storedValue ?? configuration.defaultValue
             } else {
                 do {
-                    result = try self.store.decode(Value.self, forKey: key)
+                    result = try configuration.store.decode(Value.self, forKey: configuration.key)
                 } catch {
                     debugPrint(error)
                     
@@ -186,7 +255,7 @@ extension UserStorage {
                 }
             }
             
-            return result ?? defaultValue
+            return result ?? configuration.defaultValue
         }
         
         fileprivate func _readInitial() {
@@ -195,19 +264,19 @@ extension UserStorage {
             }
             
             do {
-                storedValue = try store.decode(Value.self, forKey: key) ?? defaultValue
+                storedValue = try configuration.store.decode(Value.self, forKey: configuration.key) ?? configuration.defaultValue
             } catch {
                 handleError(error)
             }
             
-            storeSubscription = store
-                .publisher(for: key, type: Any.self)
+            storeSubscription = configuration.store
+                .publisher(for: configuration.key, type: Any.self)
                 .filter { _ in
                     !self._isEncodingValueToStore
                 }
                 .map { (value: Any) -> Value? in
                     do {
-                        return try self.store.decode(Value.self, from: value)
+                        return try self.configuration.store.decode(Value.self, from: value)
                     } catch {
                         self.handleError(error)
                         
@@ -221,7 +290,7 @@ extension UserStorage {
                     }
                     
                     if let oldValue = self.storedValue, let newValue {
-                        guard !(self._areValuesEqual(newValue, oldValue) ?? false) else {
+                        guard !(configuration._areValuesEqual(newValue, oldValue) ?? false) else {
                             return
                         }
                     }
@@ -231,7 +300,7 @@ extension UserStorage {
         }
         
         private func handleError(_ error: Error) {
-            if _isStrict {
+            if configuration._isStrict {
                 assertionFailure(String(describing: error))
             } else {
                 print(String(describing: error))
