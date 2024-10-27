@@ -189,7 +189,7 @@ extension ImagePicker {
 
 // MARK: - Helpers
 
-#if os(iOS) || os(tvOS) || os(visionOS)
+#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
 extension UIImage {
     public func data(
         using encoding: Image.Encoding
