@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftUIX",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v13), 
         .macOS(.v11),
         .tvOS(.v13),
         .watchOS(.v6)

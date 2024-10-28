@@ -117,17 +117,28 @@ extension _AnyImage {
 extension _AnyImage {
     /// Returns the JPEG data representation of the image.
     public var jpegData: Data? {
-        switch payload {
-            case .appKitOrUIKitImage:
-                return appKitOrUIKitImage?._SwiftUIX_jpegData
-            case .named:
-                return appKitOrUIKitImage?._SwiftUIX_jpegData
-        }
+        return appKitOrUIKitImage?._SwiftUIX_jpegData
+    }
+    
+    /// Returns the PNG data representation of the image.
+    public var pngData: Data? {
+        return appKitOrUIKitImage?.data(using: .png)
     }
     
     /// Initializes an _AnyImage from JPEG data.
     public init?(jpegData: Data) {
         self.init(AppKitOrUIKitImage(_SwiftUIX_jpegData: jpegData))
+    }
+    
+    public init?(data: Data) {
+        self.init(AppKitOrUIKitImage(data: data))
+    }
+    
+    /// Initializes an _AnyImage with the given url.
+    public init?(contentsOf url: URL) {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        
+        self.init(data: data)
     }
 }
 

@@ -189,9 +189,8 @@ extension ImagePicker {
 
 // MARK: - Helpers
 
-#if os(iOS) || os(tvOS) || os(visionOS)
+#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
 extension UIImage {
-    @_spi(Internal)
     public func data(
         using encoding: Image.Encoding
     ) -> Data? {
@@ -221,7 +220,6 @@ extension UIImage {
 }
 #elseif os(macOS)
 extension NSImage {
-    @_spi(Internal)
     public func data(
         using encoding: Image.Encoding
     ) -> Data? {
