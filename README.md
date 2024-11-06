@@ -47,7 +47,7 @@ dependencies: [
 2. Paste the repository URL (`https://github.com/SwiftUIX/SwiftUIX`) and click **Next**.
 3. For **Rules**, select **Branch** (with branch set to `master`).
 4. Click **Finish**.
-5. Open the Project settings, add **SwiftUI.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
+5. Open the Project settings, add **SwiftUIX.framework** to the **Linked Frameworks and Libraries**, set **Status** to **Optional**.
 
 
 # Documentation
