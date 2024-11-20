@@ -6,10 +6,20 @@ import Combine
 import Swift
 import SwiftUI
 
+public struct ObservedValueConfiguration<Value> {
+    public var deferUpdates: Bool = false
+    
+    public init() {
+        
+    }
+}
+
 @dynamicMemberLookup
 @propertyWrapper
 @_documentation(visibility: internal)
 public struct ObservedValue<Value>: DynamicProperty {
+    public var configuration = ObservedValueConfiguration<Value>()
+    
     @PersistentObject var base: AnyObservableValue<Value>
     
     public var wrappedValue: Value {
@@ -21,11 +31,15 @@ public struct ObservedValue<Value>: DynamicProperty {
     }
     
     public var projectedValue: ObservedValue<Value> {
-        self
+        get {
+            self
+        } set {
+            self = newValue
+        }
     }
     
     public var binding: Binding<Value> {
-        .init(
+        Binding<Value>(
             get: { self.wrappedValue },
             set: { self.wrappedValue = $0 }
         )
@@ -34,14 +48,16 @@ public struct ObservedValue<Value>: DynamicProperty {
     public subscript<Subject>(
         dynamicMember keyPath: WritableKeyPath<Value, Subject>
     ) -> ObservedValue<Subject> {
-        .init(base[dynamicMember: keyPath])
+        ObservedValue<Subject>(base[dynamicMember: keyPath])
     }
 }
 
 // MARK: - API
 
 extension ObservedValue {
-    public init(_ base: @autoclosure @escaping () -> AnyObservableValue<Value>) {
+    public init(
+        _ base: @autoclosure @escaping () -> AnyObservableValue<Value>
+    ) {
         self._base = .init(wrappedValue: base())
     }
     
@@ -54,9 +70,18 @@ extension ObservedValue {
     
     public init<Root: ObservableObject>(
         _ keyPath: ReferenceWritableKeyPath<Root, Value>,
-        on root: Root
+        on root: Root,
+        deferUpdates: Bool? = nil
     ) {
-        self.init(ObservableValues.ObjectMember(root: root, keyPath: keyPath))
+        self.init(
+            ObservableValues.ObjectMember(
+                root: root,
+                keyPath: keyPath,
+                configuration: .init(
+                    deferUpdates: deferUpdates
+                )
+            )
+        )
     }
     
     public static func constant(

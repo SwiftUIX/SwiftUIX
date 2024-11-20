@@ -67,7 +67,7 @@ public final class _TextEditorProxy: Hashable, ObservableObject, @unchecked Send
                 return
             }
             
-            objectWillChange.send()
+            _objectWillChange_send()
             
             _base.wrappedValue = newValue
         }

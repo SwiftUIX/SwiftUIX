@@ -29,7 +29,7 @@ public struct PersistentObject<Value>: DynamicProperty {
         } nonmutating set {
             _ = foo
             
-            observedObjectContainer.objectWillChange.send()
+            observedObjectContainer._objectWillChange_send()
 
             objectContainer.__unsafe_opaque_base = newValue
             observedObjectContainer.__unsafe_opaque_base = objectContainer.__unsafe_opaque_base

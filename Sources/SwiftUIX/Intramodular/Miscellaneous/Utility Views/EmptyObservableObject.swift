@@ -14,7 +14,7 @@ public final class EmptyObservableObject: ObservableObject, Hashable {
     }
     
     public func notify() {
-        objectWillChange.send()
+        _objectWillChange_send()
     }
     
     public static func == (lhs: EmptyObservableObject, rhs: EmptyObservableObject) -> Bool {

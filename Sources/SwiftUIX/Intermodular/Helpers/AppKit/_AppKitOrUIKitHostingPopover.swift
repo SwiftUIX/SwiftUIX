@@ -361,7 +361,7 @@ open class NSHostingPopover<Content: View>: _AnyAppKitOrUIKitHostingPopover, NSP
         } else {
             let contentViewController = _contentViewController
                         
-            self.objectWillChange.send()
+            self._objectWillChange_send()
             
             let content = contentViewController.mainView.content
             

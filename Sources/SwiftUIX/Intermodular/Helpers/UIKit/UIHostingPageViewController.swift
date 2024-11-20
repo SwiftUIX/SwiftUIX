@@ -4,6 +4,7 @@
 
 #if (os(iOS) && canImport(CoreTelephony)) || os(tvOS) || targetEnvironment(macCatalyst)
 
+import _SwiftUIX
 import Swift
 import SwiftUI
 import UIKit
@@ -159,7 +160,7 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
         let activePageTransitionProgress = (scrollView.contentOffset.x - view.frame.size.width) / view.frame.size.width
 
         if paginationState != nil {
-            // _pageUpdateDriver.objectWillChange.send() // FIXME: This does not perform well.
+            // _pageUpdateDriver._objectWillChange_send() // FIXME: This does not perform well.
         }
         
         if activePageTransitionProgress == 0 {

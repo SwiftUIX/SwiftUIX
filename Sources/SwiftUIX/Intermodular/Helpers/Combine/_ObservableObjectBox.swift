@@ -56,7 +56,7 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
                 }
             }
 
-            objectWillChange.send()
+            _objectWillChange_send()
         } didSet {
             if _equate(oldValue, base), baseSubscription != nil {
                 return
@@ -279,7 +279,7 @@ public final class _ObservableObjectMutableBox<Value, WrappedValue>: _AnyObserva
                     return
                 }
                 
-                `self`.objectWillChange.send()
+                `self`._objectWillChange_send()
             })
     }
 }

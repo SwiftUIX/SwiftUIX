@@ -68,7 +68,7 @@ public class Screen: ObservableObject {
             object: nil,
             queue: .main,
             using: { [weak self] notification in
-                self?.objectWillChange.send()
+                self?._objectWillChange_send()
             }
         )
         #endif

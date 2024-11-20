@@ -175,7 +175,7 @@ extension _PlatformTableCellView {
                 contentHostingViewCoordinator.stateFlags.insert(.payloadDidJustUpdate)
                 
                 DispatchQueue.main.async {
-                    // self.contentHostingViewCoordinator.objectWillChange.send()
+                    // self.contentHostingViewCoordinator._objectWillChange_send()
                     self.contentHostingViewCoordinator.stateFlags.remove(.payloadDidJustUpdate)
                 }
             }

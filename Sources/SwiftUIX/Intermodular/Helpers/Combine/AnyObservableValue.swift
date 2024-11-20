@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import _SwiftUIX
 import Combine
 import Swift
 import SwiftUI
@@ -10,6 +11,24 @@ import SwiftUI
 @dynamicMemberLookup
 @_documentation(visibility: internal)
 public class AnyObservableValue<Value>: _SwiftUIX_AnyIndirectValueBox, ObservableObject {
+    public struct Configuration {
+        public var deferUpdates: Bool
+        
+        public init(
+            deferUpdates: Bool?
+        ) {
+            self.deferUpdates = deferUpdates ?? false
+        }
+        
+        public init() {
+            self.init(
+                deferUpdates: nil
+            )
+        }
+    }
+    
+    public var configuration = Configuration()
+    
     public var wrappedValue: Value {
         get {
             fatalError() // abstract
@@ -18,10 +37,10 @@ public class AnyObservableValue<Value>: _SwiftUIX_AnyIndirectValueBox, Observabl
         }
     }
     
-    internal init() {
-        
+    init(configuration: Configuration) {
+        self.configuration = configuration
     }
-    
+
     public subscript<Subject>(
         dynamicMember keyPath: WritableKeyPath<Value, Subject>
     ) -> AnyObservableValue<Subject> {
@@ -30,7 +49,7 @@ public class AnyObservableValue<Value>: _SwiftUIX_AnyIndirectValueBox, Observabl
     
     @_disfavoredOverload
     public subscript<Subject>(dynamicMember keyPath: WritableKeyPath<Value, Subject>) -> Binding<Subject> {
-        return .init(
+        return Binding<Subject>(
             get: { self.wrappedValue[keyPath: keyPath] },
             set: { self.wrappedValue[keyPath: keyPath] = $0 }
         )
@@ -51,16 +70,21 @@ enum ObservableValues {
             get {
                 root
             } set {
-                objectWillChange.send()
-                
+                _objectWillChange_send(deferred: configuration.deferUpdates)
+
                 root = newValue
                 
                 _objectDidChange.send()
             }
         }
         
-        public init(root: Root) {
+        public init(
+            root: Root,
+            configuration: AnyObservableValue<Root>.Configuration = .init()
+        ) {
             self.root = root
+            
+            super.init(configuration: configuration)
         }
     }
     
@@ -74,21 +98,29 @@ enum ObservableValues {
             get {
                 root.wrappedValue[keyPath: keyPath]
             } set {
-                objectWillChange.send()
-                
+                _objectWillChange_send(deferred: configuration.deferUpdates)
+
                 root.wrappedValue[keyPath: keyPath] = newValue
             }
         }
         
-        public init(root: AnyObservableValue<Root>, keyPath: WritableKeyPath<Root, Value>) {
+        public init(
+            root: AnyObservableValue<Root>,
+            keyPath: WritableKeyPath<Root, Value>,
+            configuration: AnyObservableValue<Value>.Configuration = .init()
+        ) {
             self.root = root
             self.keyPath = keyPath
             self.subscription = nil
             
-            super.init()
+            super.init(configuration: configuration)
             
-            subscription = root.objectWillChange.sink(receiveValue: { _ in
-                self.objectWillChange.send()
+            subscription = root.objectWillChange.sink(receiveValue: { [weak self] _ in
+                guard let `self` = self else {
+                    return
+                }
+                
+                self._objectWillChange_send(deferred: self.configuration.deferUpdates)
             })
         }
     }
@@ -104,21 +136,29 @@ enum ObservableValues {
             get {
                 root[keyPath: keyPath]
             } set {
-                objectWillChange.send()
+                _objectWillChange_send(deferred: configuration.deferUpdates)
                 
                 root[keyPath: keyPath] = newValue
             }
         }
         
-        public init(root: Root, keyPath: ReferenceWritableKeyPath<Root, Value>) {
+        public init(
+            root: Root,
+            keyPath: ReferenceWritableKeyPath<Root, Value>,
+            configuration: AnyObservableValue<Value>.Configuration = .init()
+        ) {
             self.root = root
             self.keyPath = keyPath
             self.subscription = nil
             
-            super.init()
+            super.init(configuration: configuration)
             
-            subscription = root.objectWillChange.sink(receiveValue: { _ in
-                self.objectWillChange.send()
+            subscription = root.objectWillChange.sink(receiveValue: { [weak self] _ in
+                guard let `self` = self else {
+                    return
+                }
+                
+                self._objectWillChange_send(deferred: self.configuration.deferUpdates)
             })
         }
     }

@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import _SwiftUIX
 import Combine
 import Dispatch
 import Swift
@@ -15,7 +16,7 @@ public struct TimerState: DynamicProperty {
     private class ValueBox: ObservableObject {
         var value: Int {
             willSet {
-                objectWillChange.send()
+                _objectWillChange_send()
             }
         }
         

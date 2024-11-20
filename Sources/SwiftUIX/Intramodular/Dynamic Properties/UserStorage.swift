@@ -205,10 +205,10 @@ extension UserStorage {
                 do {
                     if configuration.deferUpdates {
                         Task(priority: .userInitiated) { @MainActor in
-                            objectWillChange.send()
+                            _objectWillChange_send()
                         }
                     } else {
-                        objectWillChange.send()
+                        _objectWillChange_send()
                     }
                     
                     storedValue = newValue

@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import _SwiftUIX
 import Combine
 import Swift
 import SwiftUI
@@ -259,7 +260,7 @@ public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: Observabl
                 return
             }
             
-            objectWillChange.send()
+            _objectWillChange_send()
         }
     }
     
@@ -295,7 +296,7 @@ public final class _SwiftUIX_ObservableWeakReferenceBox<T: AnyObject>: Observabl
 public final class _SwiftUIX_WeakObservableReferenceBox<Value: AnyObject>: ObservableObject {
     public weak var value: Value? {
         didSet {
-            objectWillChange.send()
+            _objectWillChange_send()
         }
     }
     

@@ -28,7 +28,7 @@ public struct ViewStorage<Value>: Identifiable, DynamicProperty {
         fileprivate init(_ value: Value) {
             self.value = value
             
-            super.init()
+            super.init(configuration: AnyObservableValue.Configuration())
         }
     }
     
