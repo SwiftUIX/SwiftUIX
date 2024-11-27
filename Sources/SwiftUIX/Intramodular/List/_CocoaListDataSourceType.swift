@@ -63,7 +63,7 @@ extension _CocoaListDataSourceType where ID == _DefaultCocoaListDataSourceID {
     }
 }
 
-// MARK: - Implemented Conformances
+// MARK: - Conformees
 
 @_documentation(visibility: internal)
 public struct _AnyCocoaListDataSource<SectionType, ItemType>: _CocoaListDataSourceType {

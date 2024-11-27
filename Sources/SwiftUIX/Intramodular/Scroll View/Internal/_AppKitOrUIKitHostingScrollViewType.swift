@@ -12,7 +12,7 @@ public protocol _AppKitOrUIKitHostingScrollViewType: NSObject {
     func scrollTo(_ edge: Edge)
 }
 
-// MARK: - Implemented Conformances
+// MARK: - Conformees
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 extension UIHostingScrollView {

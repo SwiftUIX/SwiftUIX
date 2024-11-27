@@ -12,7 +12,7 @@ public enum _TextViewDataBinding {
     @_documentation(visibility: internal)
 public enum Value {
         @_documentation(visibility: internal)
-public enum Kind {
+        public enum Kind {
             case cocoaTextStorage
             case string
             case cocoaAttributedString

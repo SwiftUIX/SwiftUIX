@@ -27,7 +27,7 @@ public protocol _SwiftUIX_AnyIndirectValueBox<Value> {
     var wrappedValue: Value { get nonmutating set }
 }
 
-// MARK: - Implemented Conformances
+// MARK: - Conformees
 
 @propertyWrapper
 @_documentation(visibility: internal)
