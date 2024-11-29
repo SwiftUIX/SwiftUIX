@@ -37,7 +37,9 @@ private struct _QuickLookPreviewPanelPresenter: NSViewRepresentable {
         context.coordinator.isPresented = isPresented
         
         if isPresented.wrappedValue {
-            context.coordinator.show()
+            if !context.coordinator.isPanelVisible {
+                context.coordinator.show()
+            }
         } else {
             context.coordinator.hide()
         }
@@ -103,6 +105,10 @@ extension _QuickLookPreviewPanelPresenter {
         fileprivate var previewPanel: QLPreviewPanel?
         fileprivate var previewItems: [QLPreviewItem]?
         
+        fileprivate var isPanelVisible: Bool {
+            QLPreviewPanel.sharedPreviewPanelExists() && previewPanel?.isVisible == true
+        }
+
         fileprivate init(isPresented: Binding<Bool>) {
             self.isPresented = isPresented
             
@@ -117,7 +123,11 @@ extension _QuickLookPreviewPanelPresenter {
         }
         
         fileprivate func show() {
-            let panel = self.setupPreviewPanel()
+            let panel = self.setupPreviewPanelIfNecessary()
+            
+            guard !isPanelVisible else {
+                return
+            }
             
             panel.makeKeyAndOrderFront(nil)
         }
@@ -127,7 +137,7 @@ extension _QuickLookPreviewPanelPresenter {
         }
         
         @discardableResult
-        private func setupPreviewPanel() -> QLPreviewPanel {
+        private func setupPreviewPanelIfNecessary() -> QLPreviewPanel {
             if let previewPanel {
                 return previewPanel
             }

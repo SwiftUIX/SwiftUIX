@@ -30,6 +30,18 @@ extension AppKitOrUIKitResponder {
         _SwiftUIX_nearestResponder(where: { $0.isFirstResponder })
     }
     
+    public var _SwiftUIX_nearestWindow: AppKitOrUIKitWindow? {
+        if let controller = self as? UIViewController {
+            return controller.view._SwiftUIX_nearestWindow
+        } else if let view = self as? UIView {
+            return view.window ?? view.superview?._SwiftUIX_nearestWindow
+        } else {
+            assertionFailure()
+            
+            return nil
+        }
+    }
+    
     public func _SwiftUIX_nearestResponder(
         where predicate: (AppKitOrUIKitResponder) throws -> Bool
     ) rethrows -> AppKitOrUIKitResponder? {
@@ -81,9 +93,9 @@ extension AppKitOrUIKitResponder {
     
     public var _SwiftUIX_nearestWindow: AppKitOrUIKitWindow? {
         if let controller = self as? NSViewController {
-            return controller.view.window
+            return controller.view._SwiftUIX_nearestWindow
         } else if let view = self as? NSView {
-            return view.window ?? view.superview?.window
+            return view.window ?? view.superview?._SwiftUIX_nearestWindow
         } else {
             assertionFailure()
             
