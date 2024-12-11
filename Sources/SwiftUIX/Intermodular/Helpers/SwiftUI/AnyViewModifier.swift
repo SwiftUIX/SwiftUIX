@@ -39,12 +39,14 @@ public struct AnyViewModifier: ViewModifier {
 
 extension View {
     @ViewBuilder
-    func modifiers(_ modifiers: [AnyViewModifier]) -> some View {
+    func modifiers(
+        _ modifiers: [AnyViewModifier]
+    ) -> some View {
         if modifiers.isEmpty {
             self
         } else {
-            modifiers.reduce(eraseToAnyView()) { view, modifier in
-                view.modifier(modifier).eraseToAnyView()
+            modifiers.reduce(into: eraseToAnyView()) { (view, modifier) -> () in
+                view = view.modifier(modifier).eraseToAnyView()
             }
         }
     }

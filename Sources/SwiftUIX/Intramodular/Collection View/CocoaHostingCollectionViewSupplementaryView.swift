@@ -76,8 +76,10 @@ class CocoaHostingCollectionViewSupplementaryView<
         }
     }
     
-    override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-        return contentHostingController?.systemLayoutSizeFitting(targetSize) ?? .init(width: 1, height: 1)
+    override func systemLayoutSizeFitting(
+        _ targetSize: CGSize
+    ) -> CGSize {
+        return contentHostingController?.systemLayoutSizeFitting(targetSize) ?? CGSize._width1_height1
     }
     
     override func systemLayoutSizeFitting(
@@ -96,7 +98,7 @@ class CocoaHostingCollectionViewSupplementaryView<
         }
         
         guard let contentHostingController = contentHostingController else {
-            return .init(width: 1, height: 1)
+            return CGSize._width1_height1
         }
         
         return contentHostingController.systemLayoutSizeFitting(

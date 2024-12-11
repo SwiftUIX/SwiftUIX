@@ -28,7 +28,7 @@ extension _opaque_View where Self: View {
     
     @inlinable
     public func eraseToAnyView() -> AnyView {
-        .init(self)
+        AnyView(self)
     }
 }
 

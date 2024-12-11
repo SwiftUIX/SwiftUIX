@@ -229,10 +229,14 @@ extension AppKitOrUIKitTextView {
     private func _sizeThatFitsWithoutCopying(
         width: CGFloat
     ) -> CGSize? {
-        guard let textContainer = _SwiftUIX_textContainer, let layoutManager = _SwiftUIX_layoutManager, let textStorage = _SwiftUIX_textStorage else {
+        guard
+            let textContainer = _SwiftUIX_textContainer,
+            let layoutManager = _SwiftUIX_layoutManager,
+            let textStorage = _SwiftUIX_textStorage
+        else {
             return nil
         }
-        
+
         let originalSize = frame.size
         let originalTextContainerSize = textContainer.containerSize
         

@@ -316,13 +316,23 @@ extension AppKitOrUIKitViewRepresentable {
         nsView: AppKitOrUIKitViewType,
         context: Context
     ) -> CGSize? {
-        self.sizeThatFits(proposal, view: nsView, context: context)
+        let represented = nsView as? _AppKitOrUIKitRepresented
+        
+        represented?.representatableStateFlags.insert(.sizingInProgress)
+
+        let result: CGSize? = self.sizeThatFits(proposal, view: nsView, context: context)
+        
+        represented?.representatableStateFlags.remove(.sizingInProgress)
+        
+        return result
     }
 }
 
 extension AppKitOrUIKitViewRepresentable {
     @MainActor
-    public func makeNSView(context: Context) -> AppKitOrUIKitViewType {
+    public func makeNSView(
+        context: Context
+    ) -> AppKitOrUIKitViewType {
         makeAppKitOrUIKitView(context: context)
     }
     

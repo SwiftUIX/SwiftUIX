@@ -23,7 +23,8 @@ public struct _AppKitOrUIKitRepresentableStateFlags: OptionSet {
 
     public static let updateInProgress = Self(rawValue: 1 << 0)
     public static let didUpdateAtLeastOnce = Self(rawValue: 1 << 1)
-    public static let dismantled = Self(rawValue: 1 << 2)
+    public static let sizingInProgress = Self(rawValue: 1 << 2)
+    public static let dismantled = Self(rawValue: 1 << 3)
 }
 
 @_documentation(visibility: internal)

@@ -66,6 +66,12 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     }
     
     #if os(macOS)
+    override open var wantsDefaultClipping: Bool {
+        super.wantsDefaultClipping
+    }
+    #endif
+    
+    #if os(macOS)
     @_optimize(speed)
     @inline(__always)
     override open var needsLayout: Bool {

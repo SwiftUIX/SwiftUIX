@@ -16,7 +16,7 @@ import UIKit
 // MARK: - Implementation
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-struct _TextView<Label: View>: Equatable {
+struct _TextView<Label: View> {
     typealias Configuration = TextView<Label>._Configuration
     
     @Environment(\._textViewConfigurationMutation) private var _textViewConfigurationMutation
@@ -47,13 +47,6 @@ struct _TextView<Label: View>: Equatable {
         self.unresolvedTextViewConfiguration = textViewConfiguration
         self.customAppKitOrUIKitClassConfiguration = customAppKitOrUIKitClassConfiguration
     }
-    
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        true
-            && (lhs.data.wrappedValue == rhs.data.wrappedValue)
-            && (lhs.unresolvedTextViewConfiguration == rhs.unresolvedTextViewConfiguration)
-            && (lhs.$customAppKitOrUIKitClassConfiguration == rhs.$customAppKitOrUIKitClassConfiguration)
-    }
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
@@ -75,8 +68,11 @@ extension _TextView: AppKitOrUIKitViewRepresentable {
                     )
                 } else {
                     let layoutManager = NSLayoutManager()
+                    
                     textStorage.addLayoutManager(layoutManager)
+                    
                     let textContainer = NSTextContainer(size: .zero)
+                    
                     layoutManager.addTextContainer(textContainer)
                     
                     view = customAppKitOrUIKitClassConfiguration.class.init(
@@ -237,20 +233,20 @@ extension _TextView {
             if configuration.dismissKeyboardOnReturn {
                 if text == "\n" {
                     DispatchQueue.main.async {
-#if os(iOS) || os(visionOS)
+                        #if os(iOS) || os(visionOS)
                         guard textView.isFirstResponder else {
                             return
                         }
                         
-#if os(visionOS)
+                        #if os(visionOS)
                         guard !textView.text.isEmpty else {
                             return
                         }
-#endif
+                        #endif
                         self.configuration.onCommit?()
                         
                         textView.resignFirstResponder()
-#endif
+                        #endif
                     }
                     
                     return false
@@ -357,31 +353,17 @@ extension _TextView {
     func makeCoordinator() -> Coordinator {
         Coordinator(updater: updater, data: data, configuration: textViewConfiguration)
     }
-    
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    public func sizeThatFits(
-        _ proposal: ProposedViewSize,
-        view: AppKitOrUIKitViewType,
-        context: Context
-    ) -> CGSize? {
-        guard let view = view as? _PlatformTextView<Label> else {
-            return nil // TODO: Implement sizing for custom text views as well
-        }
-        
-        guard !view.representatableStateFlags.contains(.dismantled) else {
-            return nil
-        }
-        
-        guard let size = view._sizeThatFits(
-            proposal: AppKitOrUIKitLayoutSizeProposal(
-                proposal,
-                fixedSize: textViewConfiguration._fixedSize?.value
-            )
-        ) else {
-            return nil
-        }
-        
-        return size
+}
+
+// MARK: - Conformances
+
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
+extension _TextView: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        true
+            && (lhs.data.wrappedValue == rhs.data.wrappedValue)
+            && (lhs.unresolvedTextViewConfiguration == rhs.unresolvedTextViewConfiguration)
+            && (lhs.$customAppKitOrUIKitClassConfiguration == rhs.$customAppKitOrUIKitClassConfiguration)
     }
 }
 
@@ -411,77 +393,6 @@ extension EnvironmentValues {
             self[_ParagraphSpacingKey.self] = newValue
         }
     }
-    
-    struct _TextField_KeyboardTypeKey: EnvironmentKey {
-        static let defaultValue: _TextField_KeyboardType = .default
-    }
-    
-    @_spi(Internal)
-    public var _textField_keyboardType: _TextField_KeyboardType {
-        get {
-            self[_TextField_KeyboardTypeKey.self]
-        } set {
-            self[_TextField_KeyboardTypeKey.self] = newValue
-        }
-    }
 }
-
-/// The keyboard type to be displayed.
-@_documentation(visibility: internal)
-public enum _TextField_KeyboardType {
-    case `default`
-    case asciiCapable
-    case numbersAndPunctuation
-    case URL
-    case numberPad
-    case phonePad
-    case namePhonePad
-    case emailAddress
-    case decimalPad
-    case twitter
-    case webSearch
-    case asciiCapableNumberPad
-}
-
-#if os(iOS) || os(tvOS) || os(visionOS)
-extension UIKeyboardType {
-    public init(from keyboardType: _TextField_KeyboardType) {
-        switch keyboardType {
-            case .default:
-                self = .default
-            case .asciiCapable:
-                self = .asciiCapable
-            case .numbersAndPunctuation:
-                self = .numbersAndPunctuation
-            case .URL:
-                self = .URL
-            case .numberPad:
-                self = .numberPad
-            case .phonePad:
-                self = .phonePad
-            case .namePhonePad:
-                self = .namePhonePad
-            case .emailAddress:
-                self = .emailAddress
-            case .decimalPad:
-                self = .decimalPad
-            case .twitter:
-                self = .twitter
-            case .webSearch:
-                self = .webSearch
-            case .asciiCapableNumberPad:
-                self = .asciiCapable
-        }
-    }
-}
-#else
-extension View {
-    public func keyboardType(
-        _ keyboardType: _TextField_KeyboardType
-    ) -> some View {
-        environment(\._textField_keyboardType, keyboardType)
-    }
-}
-#endif
 
 #endif

@@ -59,6 +59,12 @@ extension CGSize {
     public var maximumDimensionLength: CGFloat {
         max(width, height)
     }
+    
+    @_optimize(speed)
+    @inline(__always)
+    public static var _width1_height1: CGSize {
+        CGSize(width: 1, height: 1)
+    }
 }
 
 extension CGSize {

@@ -59,12 +59,20 @@ extension _PlatformTextView {
     public func invalidateDisplay(
         for range: NSRange
     ) {
-        _SwiftUIX_layoutManager?.invalidateDisplay(forCharacterRange: range)
+        guard let layoutManager = _SwiftUIX_layoutManager else {
+            return
+        }
+        
+        layoutManager.invalidateDisplay(forCharacterRange: range)
     }
     
     public func _ensureLayoutForTextContainer() {
         if let textContainer = _SwiftUIX_textContainer {
-            _SwiftUIX_layoutManager?.invalidateLayout(forCharacterRange: .init(location: 0, length: _SwiftUIX_attributedText.length), actualCharacterRange: nil)
+            _SwiftUIX_layoutManager?.invalidateLayout(
+                forCharacterRange: .init(location: 0, length: _SwiftUIX_attributedText.length),
+                actualCharacterRange: nil
+            )
+            
             _SwiftUIX_layoutManager?.ensureLayout(for: textContainer)
         }
     }

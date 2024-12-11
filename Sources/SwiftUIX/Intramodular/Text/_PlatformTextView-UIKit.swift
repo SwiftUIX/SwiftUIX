@@ -4,6 +4,8 @@
 
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
+import _SwiftUIX
+import Foundation
 import SwiftUI
 import UIKit
 
@@ -19,7 +21,7 @@ extension _PlatformTextView {
         view.hoverStyle = .none
         #endif
 
-        let requiresAttributedText = false
+        let requiresAttributedText: Bool = false
             || context.environment._textView_requiresAttributedText
             || configuration.requiresAttributedText
             || data.wrappedValue.isAttributed
