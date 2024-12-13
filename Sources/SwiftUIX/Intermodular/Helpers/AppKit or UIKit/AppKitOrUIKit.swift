@@ -73,13 +73,21 @@ public typealias AppKitOrUIKitGraphicsImageRenderer = NSGraphicsImageRenderer
 
 extension NSEdgeInsets {
     public var _SwiftUI_edgeInsets: EdgeInsets {
-        EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
+        EdgeInsets(
+            top: top,
+            leading: left,
+            bottom: bottom,
+            trailing: right
+        )
     }
 }
 
 extension NSImage.SymbolConfiguration {
     public convenience init(pointSize: CGFloat) {
-        self.init(pointSize: pointSize, weight: .regular)
+        self.init(
+            pointSize: pointSize,
+            weight: .regular
+        )
     }
 }
 extension NSSize {
