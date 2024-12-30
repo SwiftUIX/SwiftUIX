@@ -49,6 +49,10 @@ extension _PlatformTableCellView {
         }
         
         override var fittingSize: NSSize {
+            if contentHostingViewCoordinator.stateFlags.contains(.disableSizeOverride) {
+                return super.fittingSize
+            }
+            
             if let size = OptionalDimensions(intrinsicContentSize: _bestIntrinsicContentSizeEstimate).toCGSize() {
                 return size
             }
@@ -80,7 +84,14 @@ extension _PlatformTableCellView {
             return result
         }
                 
+        /// The intrinsic size of the table cell view.
+        ///
+        /// This should be as fast as possible to make the list feel responsive and without any hitches.
         override var intrinsicContentSize: CGSize {
+            if contentHostingViewCoordinator.stateFlags.contains(.disableSizeOverride) {
+                return super.intrinsicContentSize
+            }
+            
             guard let tableView = parent?.superview?.superview ?? parent?.superview else {
                 return CGSize(width: AppKitOrUIKitView.noIntrinsicMetric, height: AppKitOrUIKitView.noIntrinsicMetric)
             }
@@ -488,7 +499,9 @@ extension _PlatformTableCellView {
             }
             
             if !didAppear || coordinator.stateFlags.contains(.payloadDidJustUpdate) {
-                if let width = OptionalDimensions(intrinsicContentSize: parent._bestIntrinsicContentSizeEstimate).width {
+                if coordinator.stateFlags.contains(.disableSizeOverride) {
+                    return nil
+                } else if let width = OptionalDimensions(intrinsicContentSize: parent._bestIntrinsicContentSizeEstimate).width {
                     return width
                 } else if parent.frame.size.width.isNormal {
                     return parent.frame.size.width
@@ -504,7 +517,9 @@ extension _PlatformTableCellView {
             }
                                     
             if coordinator.stateFlags.contains(.payloadDidJustUpdate) {
-                if let result = OptionalDimensions(intrinsicContentSize: parent._bestIntrinsicContentSizeEstimate).height {
+                if coordinator.stateFlags.contains(.disableSizeOverride) {
+                    return nil
+                } else if let result = OptionalDimensions(intrinsicContentSize: parent._bestIntrinsicContentSizeEstimate).height {
                     return result
                 } else {
                     return nil
@@ -515,6 +530,10 @@ extension _PlatformTableCellView {
         }
         
         private var width: CGFloat? {
+            if coordinator.stateFlags.contains(.disableSizeOverride) {
+                return nil
+            }
+            
             guard let _width else {
                 return nil
             }
@@ -525,6 +544,10 @@ extension _PlatformTableCellView {
         }
         
         private var height: CGFloat? {
+            if coordinator.stateFlags.contains(.disableSizeOverride) {
+                return nil
+            }
+            
             guard let _height else {
                 return nil
             }
@@ -578,6 +601,7 @@ extension _PlatformTableCellView {
             case hasBeenReused
             case isStoredInCache
             case dirtySize
+            case disableSizeOverride
         }
         
         var stateFlags: Set<StateFlag> = []
