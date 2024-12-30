@@ -55,6 +55,33 @@ extension _NSEventMonitorType {
             return nil
         }
     }
+    
+    public init(
+        matching shortcuts: [KeyboardShortcut],
+        context: NSEventMonitor.Context = .local,
+        perform action: @escaping (KeyboardShortcut) -> _SwiftUIX_KeyPress.Result
+    ) throws {
+        let shortcuts = Set(shortcuts)
+        
+        try self.init(context: context, matching: [.keyDown]) { event -> NSEvent? in
+            guard let shortcut = KeyboardShortcut(from: event) else {
+                return event
+            }
+            
+            guard shortcuts.contains(shortcut) else {
+                return event
+            }
+            
+            let result = action(shortcut)
+            
+            switch result {
+                case .handled:
+                    return nil
+                case .ignored:
+                    return event
+            }
+        }
+    }
 }
 
 extension _NSEventMonitorType {
