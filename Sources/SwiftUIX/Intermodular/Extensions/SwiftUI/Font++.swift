@@ -159,6 +159,14 @@ private enum _SwiftUIFontProvider {
         let mirror = Mirror(reflecting: subject)
         
         switch String(describing: type(of: subject)) {
+            case "StaticModifierProvider<BoldModifier>":
+                guard let base = mirror[_SwiftUIX_keyPath: "base.provider.base"] else {
+                    return nil
+                }
+                
+                self.init(from: base)
+                
+                self.setWeight(.bold)
             case "ModifierProvider<WeightModifier>":
                 guard let base = mirror[_SwiftUIX_keyPath: "base.provider.base"] else {
                     return nil
