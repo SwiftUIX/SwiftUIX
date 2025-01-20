@@ -42,6 +42,18 @@ extension AppKitOrUIKitImage {
         return self.jpegData(compressionQuality: 1.0)
     }
     
+    public var _SwiftUIX_ciImage: CIImage? {
+        if let underlyingCIImage: CIImage = self.ciImage {
+            return underlyingCIImage
+        }
+        
+        if let underlyingCGImage: CGImage = self.cgImage {
+            return CIImage(cgImage: underlyingCGImage)
+        }
+        
+        return nil
+    }
+    
     public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
         self.init(data: jpegData)
     }
@@ -61,8 +73,8 @@ extension AppKitOrUIKitImage {
 #if os(macOS)
 extension AppKitOrUIKitImage {
     public var _SwiftUIX_jpegData: Data? {
-        guard let tiffRepresentation = self.tiffRepresentation, let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else {
-            print("Failed to get TIFF representation or create bitmap image")
+        guard let tiffRepresentation: Data = self.tiffRepresentation, let bitmapImage: NSBitmapImageRep = NSBitmapImageRep(data: tiffRepresentation) else {
+            debugPrint("Failed to get TIFF representation or create bitmap image")
             return nil
         }
         
@@ -106,8 +118,25 @@ extension AppKitOrUIKitImage {
         return bitmapImage.representation(using: .jpeg, properties: [:])
     }
     
+    public var _SwiftUIX_ciImage: CIImage? {
+        guard let tiffRepresentation: Data = self.tiffRepresentation, let bitmapImage: NSBitmapImageRep = NSBitmapImageRep(data: tiffRepresentation) else {
+            debugPrint("Failed to get TIFF representation or create bitmap image")
+            return nil
+        }
+        
+        let ciImage = CIImage(bitmapImageRep: bitmapImage)
+        return ciImage
+    }
+    
     public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
         self.init(data: jpegData)
     }
+    
+    public convenience init(ciImage: CIImage) {
+        let rep: NSCIImageRep = NSCIImageRep(ciImage: ciImage)
+        self.init(size: rep.size)
+        self.addRepresentation(rep)
+    }
+    
 }
 #endif

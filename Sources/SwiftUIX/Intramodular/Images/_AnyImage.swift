@@ -134,6 +134,10 @@ extension _AnyImage {
         self.init(AppKitOrUIKitImage(data: data))
     }
     
+    public init(ciImage: CIImage) {
+        self.init(AppKitOrUIKitImage(ciImage: ciImage))
+    }
+    
     /// Initializes an _AnyImage with the given url.
     public init?(contentsOf url: URL) {
         guard let data = try? Data(contentsOf: url) else { return nil }
