@@ -125,6 +125,10 @@ extension _AnyImage {
         return appKitOrUIKitImage?.data(using: .png)
     }
     
+    public var ciImage: CIImage? {
+        return appKitOrUIKitImage?._SwiftUIX_ciImage
+    }
+    
     /// Initializes an _AnyImage from JPEG data.
     public init?(jpegData: Data) {
         self.init(AppKitOrUIKitImage(_SwiftUIX_jpegData: jpegData))
