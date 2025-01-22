@@ -41,7 +41,14 @@ extension AppKitOrUIKitImage {
         
         return self.jpegData(compressionQuality: 1.0)
     }
-    
+        
+    public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
+        self.init(data: jpegData)
+    }
+}
+
+#if canImport(CoreImage)
+extension AppKitOrUIKitImage {
     public var _SwiftUIX_ciImage: CIImage? {
         if let underlyingCIImage: CIImage = self.ciImage {
             return underlyingCIImage
@@ -53,11 +60,8 @@ extension AppKitOrUIKitImage {
         
         return nil
     }
-    
-    public convenience init?(_SwiftUIX_jpegData jpegData: Data) {
-        self.init(data: jpegData)
-    }
 }
+#endif
 #endif
 
 #if canImport(CoreVideo)
