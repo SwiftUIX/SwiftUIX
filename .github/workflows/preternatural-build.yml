@@ -1,0 +1,33 @@
+name: Build all  platforms using preternatural-build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preternatural-build:
+    name: ${{ matrix.command }} on  ${{ matrix.platform }} (Xcode ${{ matrix.xcode }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode: ['16.1']
+        scheme: ['SwiftUIX']
+        command: ['build']
+        platform: ['macOS', 'iOS', 'tvOS', 'watchOS']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+  
+      - name: Run Preternatural Build
+        uses: PreternaturalAI/preternatural-github-actions/preternatural-build@main
+        with:
+          xcode-version: ${{ matrix.xcode }}
+          platforms: "[${{ matrix.platform }}]"
