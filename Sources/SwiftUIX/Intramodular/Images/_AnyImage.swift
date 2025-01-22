@@ -2,6 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(CoreImage)
+import CoreImage
+#endif
 import Foundation
 import Swift
 import SwiftUI
@@ -124,7 +127,7 @@ extension _AnyImage {
     public var pngData: Data? {
         return appKitOrUIKitImage?.data(using: .png)
     }
-    
+        
     /// Initializes an _AnyImage from JPEG data.
     public init?(jpegData: Data) {
         self.init(AppKitOrUIKitImage(_SwiftUIX_jpegData: jpegData))
@@ -133,7 +136,7 @@ extension _AnyImage {
     public init?(data: Data) {
         self.init(AppKitOrUIKitImage(data: data))
     }
-    
+        
     /// Initializes an _AnyImage with the given url.
     public init?(contentsOf url: URL) {
         guard let data = try? Data(contentsOf: url) else { return nil }
@@ -141,6 +144,18 @@ extension _AnyImage {
         self.init(data: data)
     }
 }
+
+#if canImport(CoreImage)
+extension _AnyImage {
+    public var ciImage: CIImage? {
+        return appKitOrUIKitImage?._SwiftUIX_ciImage
+    }
+
+    public init(ciImage: CIImage) {
+        self.init(AppKitOrUIKitImage(ciImage: ciImage))
+    }
+}
+#endif
 
 // MARK: - Initializers
 
