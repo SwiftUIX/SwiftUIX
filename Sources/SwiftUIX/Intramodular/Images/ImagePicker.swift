@@ -19,7 +19,12 @@ import SwiftUI
 ///
 ///     var body: some View {
 ///         VStack {
-///             ImagePicker(data: $image, encoding: .png, onCancel: { })
+///             ImagePicker(
+///                 data: $image,
+///                 encoding: .png,
+///                 onCancel: { },
+///                 onImagePicked: { _ in }
+///             )
 ///             if let image = image {
 ///             Image(data: image)?
 ///                 .resizable()
@@ -32,13 +37,16 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// The `ImagePicker` takes in 3 parameters: `data`, `encoding` and `onCancel`. `onCancel` is optional.
+/// The `ImagePicker` takes in 4 parameters: `data`, `encoding`, `onCancel`, `onImagePicked`. `onCancel` and `onImagePicked` are optional, and the assignment of
+/// either will cause the `presentationManager`'s `dismiss` method to not be called for their respective action (i.e. dismissal on cancel, or dismissal on image selection)
 ///
 /// The `data` parameter takes in a optional `Data` type binding. In the code example above, the value of variable `image` will be provided by the `ImagePicker`. If you want to display the result of the `ImagePicker`, simply use `Image(data:)` to convert the `Data` into an `Image`.
 ///
 /// The `encoding` parameter is an `enum` that takes in either JPEG or PNG as the encoding format. PNG or Portable Network Graphics is a loseless format for images. JPEG offers the compression quality parameter that can be 1 (very low quality) or 100 (very high quality)
 ///
 /// `onCancel` specifies a closure to be run when the "Cancel" button is pressed.
+///
+/// `onImagePicked` specifies a closure to be run when the "Cancel" button is pressed.
 public struct ImagePicker: UIViewControllerRepresentable {
     public typealias UIViewControllerType = UIImagePickerController
     
@@ -54,6 +62,7 @@ public struct ImagePicker: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     var mediaTypes: [String]?
     var onCancel: (() -> Void)?
+    var onImagePicked: ((AppKitOrUIKitImage) -> Void)?
     
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         UIImagePickerController().then {
@@ -92,8 +101,11 @@ public struct ImagePicker: UIViewControllerRepresentable {
             base.info?.wrappedValue = info
             base.image?.wrappedValue = image
             base.data?.wrappedValue = (image?._fixOrientation() ?? image)?.data(using: base.encoding ?? .png)
-            
-            base.presentationManager.dismiss()
+            if let image, let onImagePicked = base.onImagePicked {
+              onImagePicked(image)
+            } else {
+              base.presentationManager.dismiss()
+            }
         }
         
         public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -117,54 +129,75 @@ extension ImagePicker {
 
     /// Create an image picker with picker controller info.
     ///
+    ///  Note: setting `onCancel` or `onImagePicked` will cause the
+    ///  presentationManager to not dismiss on its own, and the parent object
+    ///  will be responsible for its dismissal.
+    ///
     /// - Parameters:
     ///   - info: Image picker controller information.
     ///   - onCancel: An action to trigger when the image picker cancels.
+    ///   - onImagePicked: An action to trigger when an image was picked.
     public init(
         info: Binding<[UIImagePickerController.InfoKey: Any]?>,
-        onCancel: (() -> Void)? = nil
+        onCancel: (() -> Void)? = nil,
+        onImagePicked: ((AppKitOrUIKitImage) -> Void)? = nil
     ) {
         self.info = info
         self.image = nil
         self.data = nil
         self.encoding = nil
         self.onCancel = onCancel
+        self.onImagePicked = onImagePicked
     }
     
     /// Create an image picker with an image binding and a certain encoding.
+    ///
+    ///  Note: setting `onCancel` or `onImagePicked` will cause the
+    ///  presentationManager to not dismiss on its own, and the parent object
+    ///  will be responsible for its dismissal.
     ///
     /// - Parameters:
     ///   - image: The image binding to use.
     ///   - encoding: The image encoding to use.
     ///   - onCancel: An action to trigger when the image picker cancels.
+    ///   - onImagePicked: An action to trigger when an image was picked.
     public init(
         image: Binding<AppKitOrUIKitImage?>,
         encoding: Image.Encoding? = nil,
-        onCancel: (() -> Void)? = nil
+        onCancel: (() -> Void)? = nil,
+        onImagePicked: ((AppKitOrUIKitImage) -> Void)? = nil
     ) {
         self.info = nil
         self.image = image
         self.data = nil
         self.encoding = encoding
         self.onCancel = onCancel
+        self.onImagePicked = onImagePicked
     }
 
     /// Create an image picker with image data binding and a certain encoding.
+    ///
+    ///  Note: setting `onCancel` or `onImagePicked` will cause the
+    ///  presentationManager to not dismiss on its own, and the parent object
+    ///  will be responsible for its dismissal.
     ///
     /// - Parameters:
     ///   - image: The image data binding to use.
     ///   - encoding: The image encoding to use.
     ///   - onCancel: An action to trigger when the image picker cancels.
+    ///   - onImagePicked: An action to trigger when an image was picked.
     public init(
         data: Binding<Data?>,
         encoding: Image.Encoding? = nil,
-        onCancel: (() -> Void)? = nil
+        onCancel: (() -> Void)? = nil,
+        onImagePicked: ((AppKitOrUIKitImage) -> Void)? = nil
     ) {
         self.info = nil
         self.image = nil
         self.data = data
         self.encoding = encoding
         self.onCancel = onCancel
+        self.onImagePicked = onImagePicked
     }
 }
 
