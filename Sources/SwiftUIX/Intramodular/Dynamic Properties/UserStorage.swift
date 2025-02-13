@@ -30,12 +30,19 @@ public struct UserStorage<Value: Codable>: DynamicProperty {
     
     @PersistentObject private var valueBox: ValueBox
     
+    @State private var foo: Bool = false
+    
     public var wrappedValue: Value {
         get {
             let result: Value = valueBox.value
             
+            valueBox.foo = foo
+            
             return result
         } nonmutating set {
+            foo.toggle()
+            
+            valueBox.foo = foo
             valueBox.value = newValue
         }
     }
@@ -188,15 +195,12 @@ extension UserStorage: Equatable where Value: Equatable {
 
 extension UserStorage {
     private class ValueBox: ObservableObject {
+        fileprivate var foo: Bool = false
         fileprivate var _SwiftUI_DynamicProperty_update_called: Bool = false
-        
-        var configuration: UserStorageConfiguration<Value>
-        
+        fileprivate var configuration: UserStorageConfiguration<Value>
         fileprivate var storedValue: Value?
-        
-        private var storeSubscription: AnyCancellable?
-        
-        private var _isEncodingValueToStore: Bool = false
+        fileprivate var storeSubscription: AnyCancellable?
+        fileprivate var _isEncodingValueToStore: Bool = false
         
         var value: Value {
             get {
