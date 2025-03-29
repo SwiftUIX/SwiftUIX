@@ -75,6 +75,10 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
     open override var canBecomeFirstResponder: Bool {
         _canBecomeFirstResponder ?? super.canBecomeFirstResponder
     }
+    
+    open var acceptsFirstResponder: Bool {
+        self.canBecomeFirstResponder
+    }
     #endif
 
     public var shouldResizeToFitContent: Bool = false
@@ -298,6 +302,8 @@ open class CocoaHostingController<Content: View>: AppKitOrUIKitHostingController
             
             _didResizeParentWindowOnce = true
         }
+        #else
+        let _: Void = ();
         #endif
     }
 }
