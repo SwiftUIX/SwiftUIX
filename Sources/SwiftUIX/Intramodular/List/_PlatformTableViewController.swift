@@ -202,8 +202,8 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         prototypeSectionHeader.update()
         
         let height = prototypeSectionHeader
-            .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
+            .contentHostingController
+            .sizeThatFits(in: CGSize(width: tableView.bounds.width, height: UIView.layoutFittingExpandedSize.height))
             .height
         
         _sectionHeaderContentHeightCache[model.id] = height
@@ -256,8 +256,8 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         prototypeSectionFooter.update()
         
         let height = prototypeSectionFooter
-            .contentView
-            .systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
+            .contentHostingController
+            .sizeThatFits(in: CGSize(width: tableView.bounds.width, height: UIView.layoutFittingExpandedSize.height))
             .height
         
         _sectionFooterContentHeightCache[model.id] = height
@@ -307,7 +307,7 @@ public class _PlatformTableViewController<SectionModel: Identifiable, ItemType: 
         
         let height = prototypeCell
             .contentHostingController
-            .sizeThatFits(in: UIView.layoutFittingExpandedSize)
+            .sizeThatFits(in: CGSize(width: tableView.bounds.width, height: UIView.layoutFittingExpandedSize.height))
             .height
         
         _rowContentHeightCache[item.id] = height

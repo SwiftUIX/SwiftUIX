@@ -12,11 +12,7 @@ class _PlatformTableHeaderFooterView<SectionModel: Identifiable, Content: View>:
     var item: SectionModel!
     var makeContent: ((SectionModel) -> Content)!
     
-    private var contentHostingController: UIViewController!
-    
-    var rootView: some View {
-        self.makeContent(item).id(item.id)
-    }
+    var contentHostingController: UIHostingController<RootView>!
     
     public override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -34,7 +30,7 @@ class _PlatformTableHeaderFooterView<SectionModel: Identifiable, Content: View>:
             contentView.bounds.origin = .zero
             layoutMargins = .zero
             
-            contentHostingController = UIHostingController(rootView: rootView)
+            contentHostingController = UIHostingController(rootView: RootView(base: self))
             contentHostingController.view.backgroundColor = .clear
             contentHostingController.view.translatesAutoresizingMaskIntoConstraints = false
             
@@ -50,7 +46,24 @@ class _PlatformTableHeaderFooterView<SectionModel: Identifiable, Content: View>:
                 contentHostingController.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
             ])
         } else {
-            (contentHostingController as? UIHostingController)?.rootView = rootView
+            contentHostingController.rootView = RootView(base: self)
+        }
+    }
+}
+
+extension _PlatformTableHeaderFooterView {
+    struct RootView: View {
+        private let id: AnyHashable
+        private let content: Content
+        
+        init(base: _PlatformTableHeaderFooterView<SectionModel, Content>) {
+            self.content = base.makeContent(base.item)
+            self.id = base.item.id
+        }
+        
+        var body: some View {
+            content
+                .id(id)
         }
     }
 }
