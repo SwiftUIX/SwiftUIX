@@ -20,20 +20,11 @@ extension _TextView {
             return nil // TODO: Implement sizing for custom text views as well
         }
         
-        guard !view.representatableStateFlags.contains(.dismantled) else {
-            return nil
-        }
-        
-        let proposal = AppKitOrUIKitLayoutSizeProposal(
+        return view.representableSizeThatFits(
             proposal,
-            fixedSize: resolvedTextViewConfiguration._fixedSize?.value
+            textViewConfiguration: resolvedTextViewConfiguration,
+            context: context
         )
-        
-        guard let size: CGSize = view._sizeThatFits(proposal: proposal) else {
-            return nil
-        }
-        
-        return size
     }
 }
 

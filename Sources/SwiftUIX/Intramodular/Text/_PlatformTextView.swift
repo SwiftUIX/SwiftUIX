@@ -13,6 +13,8 @@ import SwiftUI
 public protocol _PlatformTextViewType: _AppKitOrUIKitRepresented, _AnyPlatformTextView {
     associatedtype Label: View
     
+    var textKitVersion: _TextKitVersion { get }
+    
     var _SwiftUIX_textViewConfiguration: _TextViewConfiguration { get }
     
     var _textEditorProxyBase: _TextEditorProxy._Base? { get }
@@ -46,6 +48,12 @@ public enum _AnyPlatformTextViewState {
     
 }
 
+/// The TextKit generation that a text view instance is using.
+public enum _TextKitVersion {
+    case v1   // NSTextStorage + NSLayoutManager + NSTextContainer
+    case v2   // NSTextContentStorage + NSTextLayoutManager + NSTextContainer
+}
+
 open class _AnyPlatformTextView: AppKitOrUIKitTextView, AppKitOrUIKitTextInputDelegate {
     public var representatableStateFlags: _AppKitOrUIKitRepresentableStateFlags = []
     public var representableCache: _AppKitOrUIKitRepresentableCache = nil
@@ -53,6 +61,14 @@ open class _AnyPlatformTextView: AppKitOrUIKitTextView, AppKitOrUIKitTextInputDe
 
     public let _wantsTextKit1: Bool?
  
+    public var isUsingTextKit2: Bool {
+        (_wantsTextKit1 ?? true) == false
+    }
+    
+    public var textKitVersion: _TextKitVersion {
+        self.isUsingTextKit2 == true ? .v2 : .v1
+    }
+
     public internal(set) var _customTextStorage: NSTextStorage?
 
     @_spi(Internal)
@@ -429,6 +445,28 @@ open class _PlatformTextView<Label: View>: _AnyPlatformTextView, NSLayoutManager
         )
         
         _lazy_observableTextCursor?.update()
+    }
+    
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    open func representableSizeThatFits(
+        _ proposal: ProposedViewSize,
+        textViewConfiguration: _TextViewConfiguration,
+        context: some _AppKitOrUIKitViewRepresentableContext
+    ) -> CGSize? {
+        guard !representatableStateFlags.contains(.dismantled) else {
+            return nil
+        }
+        
+        let proposal = AppKitOrUIKitLayoutSizeProposal(
+            proposal,
+            fixedSize: textViewConfiguration._fixedSize?.value
+        )
+        
+        guard let size: CGSize = self._sizeThatFits(proposal: proposal) else {
+            return nil
+        }
+        
+        return size
     }
     
     #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
