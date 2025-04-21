@@ -29,7 +29,7 @@ extension _ObservableTextCursor {
         }
         
         init?(from owner: (any _PlatformTextViewType)) {
-            guard let range = owner._SwiftUIX_selectedTextRange else {
+            guard let range = owner._SwiftUIX_naiveSelectedTextRange else {
                 return nil
             }
             
@@ -148,7 +148,7 @@ extension _ObservableTextCursor {
 
 extension AppKitOrUIKitTextView {
     var _caretTextPosition: Int? {
-        guard let selectedTextRange = _SwiftUIX_selectedTextRange else {
+        guard let selectedTextRange = _SwiftUIX_naiveSelectedTextRange else {
             return nil
         }
         

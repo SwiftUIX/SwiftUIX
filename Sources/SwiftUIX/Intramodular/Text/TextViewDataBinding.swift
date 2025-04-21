@@ -10,7 +10,7 @@ import SwiftUI
 @_documentation(visibility: internal)
 public enum _TextViewDataBinding {
     @_documentation(visibility: internal)
-public enum Value {
+    public enum Value {
         @_documentation(visibility: internal)
         public enum Kind {
             case cocoaTextStorage

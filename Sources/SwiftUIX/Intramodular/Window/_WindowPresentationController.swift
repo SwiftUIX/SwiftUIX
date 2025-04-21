@@ -21,7 +21,7 @@ public class _AnyWindowPresentationController: ObservableObject {
 @_documentation(visibility: internal)
 public final class _WindowPresentationController<Content: View>: _AnyWindowPresentationController {
     @_documentation(visibility: internal)
-public enum ContentBacking {
+    public enum ContentBacking {
         case view(Content)
         case hostingController(AppKitOrUIKitHostingWindow<Content>._ContentViewControllerType)
         

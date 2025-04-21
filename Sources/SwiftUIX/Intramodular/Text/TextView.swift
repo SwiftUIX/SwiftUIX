@@ -17,15 +17,13 @@ import UIKit
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
 @_documentation(visibility: internal)
 public struct TextView<Label: View>: View {
-    public typealias _Configuration = _TextViewConfiguration
-    
     @Environment(\.font) private var font
     @Environment(\.preferredMaximumLayoutWidth) private var preferredMaximumLayoutWidth
     
-    var label: Label
-    var data: _TextViewDataBinding
+    private var label: Label
+    private var data: _TextViewDataBinding
+    
     var textViewConfiguration: _TextViewConfiguration
-    var customAppKitOrUIKitClassConfiguration = _CustomAppKitOrUIKitClassConfiguration()
     
     @State var representableUpdater = EmptyObservableObject()
     
@@ -52,8 +50,7 @@ public struct TextView<Label: View>: View {
                 _TextView<Label>(
                     updater: representableUpdater,
                     data: data,
-                    textViewConfiguration: textViewConfiguration,
-                    customAppKitOrUIKitClassConfiguration: customAppKitOrUIKitClassConfiguration
+                    textViewConfiguration: textViewConfiguration
                 )
             }
         }
@@ -69,7 +66,7 @@ extension TextView where Label == EmptyView {
     @_spi(Internal)
     public init(
         data: _TextViewDataBinding,
-        configuration: _Configuration
+        configuration: _TextViewConfiguration
     ) {
         self.label = EmptyView()
         self.data = data

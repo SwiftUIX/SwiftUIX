@@ -5,6 +5,10 @@
 import Swift
 import SwiftUI
 
+public enum _AppKitOrUIKitRepresentableTaskLocalValues {
+    @TaskLocal public static var IS_MEASURING_SIZE_THAT_FITS: Bool = false
+}
+
 /// A Cocoa-touch view/view controller representable.
 public protocol _AppKitOrUIKitRepresentable {
     associatedtype Coordinator
@@ -316,15 +320,17 @@ extension AppKitOrUIKitViewRepresentable {
         nsView: AppKitOrUIKitViewType,
         context: Context
     ) -> CGSize? {
-        let represented = nsView as? _AppKitOrUIKitRepresented
-        
-        represented?.representatableStateFlags.insert(.sizingInProgress)
-
-        let result: CGSize? = self.sizeThatFits(proposal, view: nsView, context: context)
-        
-        represented?.representatableStateFlags.remove(.sizingInProgress)
-        
-        return result
+        _AppKitOrUIKitRepresentableTaskLocalValues.$IS_MEASURING_SIZE_THAT_FITS.withValue(true) {
+            let represented = nsView as? _AppKitOrUIKitRepresented
+            
+            represented?.representatableStateFlags.insert(.sizingInProgress)
+            
+            let result: CGSize? = self.sizeThatFits(proposal, view: nsView, context: context)
+            
+            represented?.representatableStateFlags.remove(.sizingInProgress)
+            
+            return result
+        }
     }
 }
 

@@ -397,6 +397,31 @@ extension _CocoaHostingView {
         
         return action()
     }
+    
+    @_optimize(speed)
+    @_transparent
+    @inlinable
+    @inline(__always)
+    public func withCriticalScope<Result>(
+        _ flags: Set<_CocoaHostingViewConfigurationFlag>,
+        perform action: () throws -> Result
+    ) rethrows -> Result {
+        let currentFlags = self._hostingViewConfigurationFlags
+                
+        self._hostingViewConfigurationFlags.formUnion(flags)
+        
+        do {
+            let result = try action()
+            
+            self._hostingViewConfigurationFlags = currentFlags
+
+            return result
+        } catch {
+            self._hostingViewConfigurationFlags = currentFlags
+
+            throw error
+        }
+    }
 }
 
 // MARK: - WIP

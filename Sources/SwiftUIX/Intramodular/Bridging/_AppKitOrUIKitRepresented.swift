@@ -30,7 +30,7 @@ public struct _AppKitOrUIKitRepresentableStateFlags: OptionSet {
 @_documentation(visibility: internal)
 public struct _AppKitOrUIKitRepresentableCache: ExpressibleByNilLiteral {
     @_documentation(visibility: internal)
-public enum Attribute {
+    public enum Attribute {
         case intrinsicContentSize
     }
     
@@ -49,7 +49,9 @@ public enum Attribute {
         }
     }
     
-    public func sizeThatFits(proposal: AppKitOrUIKitLayoutSizeProposal) -> CGSize? {
+    public func sizeThatFits(
+        proposal: AppKitOrUIKitLayoutSizeProposal
+    ) -> CGSize? {
         if let result = _sizeThatFitsCache[proposal] {
             return result
         } else if !_sizeThatFitsCache.isEmpty {

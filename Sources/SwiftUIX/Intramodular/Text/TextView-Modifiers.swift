@@ -29,14 +29,14 @@ extension TextView {
     public func _customAppKitOrUIKitClass(
         _ type: AppKitOrUIKitTextView.Type
     ) -> Self {
-        then({ $0.customAppKitOrUIKitClassConfiguration = .init(class: type) })
+        then({ $0.textViewConfiguration.customAppKitOrUIKitClassConfiguration = .init(class: type) })
     }
     
     public func _customAppKitOrUIKitClass<T: AppKitOrUIKitTextView>(
         _ type: T.Type,
-        update: @escaping _CustomAppKitOrUIKitClassConfiguration.UpdateOperation<T>
+        update: @escaping _AnyTextView._CustomAppKitOrUIKitClassConfiguration.UpdateOperation<T>
     ) -> Self {
-        then({ $0.customAppKitOrUIKitClassConfiguration = .init(class: type, update: update) })
+        then({ $0.textViewConfiguration.customAppKitOrUIKitClassConfiguration = .init(class: type, update: update) })
     }
     
     @_disfavoredOverload

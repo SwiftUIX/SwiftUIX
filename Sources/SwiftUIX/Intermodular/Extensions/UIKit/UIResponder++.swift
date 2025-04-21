@@ -8,7 +8,7 @@ import Swift
 import UIKit
 
 extension UIResponder {
-    var globalFrame: CGRect? {
+    public var _SwiftUIX_cocoaGlobalFrame: CGRect? {
         guard let view = self as? UIView else {
             return nil
         }

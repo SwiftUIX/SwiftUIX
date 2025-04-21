@@ -460,7 +460,7 @@ extension CocoaHostingCollectionViewCell {
         weak var base: CocoaHostingCollectionViewCell?
         
         var globalFrame: CGRect {
-            base?.globalFrame ?? .zero
+            base?._SwiftUIX_cocoaGlobalFrame ?? .zero
         }
         
         func invalidateLayout(with context: CellProxy.InvalidationContext) {

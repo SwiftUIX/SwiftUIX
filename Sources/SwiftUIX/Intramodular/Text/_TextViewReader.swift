@@ -57,7 +57,7 @@ public final class _TextEditorProxy: Hashable, ObservableObject, @unchecked Send
     let _base = WeakReferenceBox<AppKitOrUIKitTextView>(nil)
     
     private var _fakeTextCursor = _ObservableTextCursor(owner: nil)
-    
+        
     @_spi(Internal)
     public var base: (any _PlatformTextViewType)? {
         get {
@@ -70,6 +70,19 @@ public final class _TextEditorProxy: Hashable, ObservableObject, @unchecked Send
             _objectWillChange_send()
             
             _base.wrappedValue = newValue
+        }
+    }
+    
+    @_spi(Internal)
+    public func _withResolveBase(
+        perform operation: @escaping (any _PlatformTextViewType) -> Void
+    ) {
+        if let base {
+            operation(base)
+        } else {
+            Task.detached(priority: .userInitiated) { @MainActor in
+                operation(self.base!)
+            }
         }
     }
     
