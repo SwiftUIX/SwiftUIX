@@ -58,27 +58,27 @@ extension _SwiftUI_TargetPlatformType {
 @_documentation(visibility: internal)
 public enum _SwiftUI_TargetPlatform {
     @_documentation(visibility: internal)
-public enum iOS {
+    public enum iOS {
         case iOS
     }
     
     @_documentation(visibility: internal)
-public enum macOS {
+    public enum macOS {
         case macOS
     }
     
     @_documentation(visibility: internal)
-public enum tvOS {
+    public enum tvOS {
         case tvOS
     }
     
     @_documentation(visibility: internal)
-public enum visionOS {
+    public enum visionOS {
         case visionOS
     }
-
+    
     @_documentation(visibility: internal)
-public enum watchOS {
+    public enum watchOS {
         case watchOS
     }
 }
@@ -90,7 +90,7 @@ public enum _TargetPlatformSpecific<Platform> {
 
 extension _TargetPlatformSpecific where Platform == _SwiftUI_TargetPlatform.iOS {
     @_documentation(visibility: internal)
-public enum NavigationBarItemTitleDisplayMode {
+    public enum NavigationBarItemTitleDisplayMode {
         case automatic
         case inline
         case large
@@ -274,7 +274,7 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
 
 extension _SwiftUI_TargetPlatform.macOS {
     @_documentation(visibility: internal)
-public enum _ControlActiveState: Hashable, Sendable {
+    public enum _ControlActiveState: Hashable, Sendable {
         case key
         case active
         case inactive

@@ -85,6 +85,37 @@ extension AppKitOrUIKitWindow {
             self.rootViewController?.view.alpha = newValue
         }
     }
+
+    /// Converts a point from the window's coordinate system to screen coordinates.
+    /// 
+    /// - Parameter point: A point specified in the window's local coordinate system.
+    /// - Returns: The point converted to screen coordinates.
+    public func convertToScreen(
+        _ point: CGPoint
+    ) -> CGPoint {
+        // Convert the point to the window's coordinate space first
+        let pointInWindow = point
+        
+        // Convert to screen coordinates by applying the window's frame origin
+        // and taking into account the screen's bounds
+        let screenPoint = CGPoint(
+            x: pointInWindow.x + frame.origin.x,
+            y: pointInWindow.y + frame.origin.y
+        )
+        
+        return screenPoint
+    }
+    
+    /// Converts a rect from the window's coordinate system to screen coordinates.
+    ///
+    /// - Parameter rect: A rect specified in the window's local coordinate system.
+    /// - Returns: The rect converted to screen coordinates.
+    public func convertToScreen(
+        _ rect: CGRect
+    ) -> CGRect {
+        let origin = convertToScreen(rect.origin)
+        return CGRect(origin: origin, size: rect.size)
+    }
 }
 #endif
 
@@ -131,7 +162,7 @@ extension AppKitOrUIKitWindow {
 extension AppKitOrUIKitWindow {
     public struct _TransitionPhasePublisher: Publisher {
         @_documentation(visibility: internal)
-public enum Output {
+        public enum Output {
             case didBecomeKey
             case didResignKey
             case willClose

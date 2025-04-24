@@ -9,40 +9,44 @@ import AppKit
 import SwiftUI
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension _PlatformTextView {
+extension _AnyPlatformTextView {
     public static func updateAppKitOrUIKitTextView(
         _ view: AppKitOrUIKitTextView,
         data: _TextViewDataBinding,
-        configuration: TextView<Label>._Configuration,
+        textViewConfiguration: _TextViewConfiguration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
-        guard let view = view as? _PlatformTextView else {
+        guard let view = view as? _AnyPlatformTextView else {
             assertionFailure("unsupported")
             
             return
         }
         
-        view._update(data: data, configuration: configuration, context: context)
+        view._updatePlatformTextView(
+            data: data,
+            textViewConfiguration: textViewConfiguration,
+            context: context
+        )
     }
         
-    private func _update(
+    private func _updatePlatformTextView(
         data: _TextViewDataBinding,
-        configuration: TextView<Label>._Configuration,
-        context: some _AppKitOrUIKitViewRepresentableContext
+        textViewConfiguration: _TextViewConfiguration,
+        context: any _AppKitOrUIKitViewRepresentableContext
     ) {
         _assignIfNotEqual(true, to: \.allowsUndo)
         _assignIfNotEqual(.clear, to: \.backgroundColor)
         _assignIfNotEqual(false, to: \.drawsBackground)
-        _assignIfNotEqual(!configuration.isConstant && configuration.isEditable, to: \.isEditable)
+        _assignIfNotEqual(!textViewConfiguration.isConstant && textViewConfiguration.isEditable, to: \.isEditable)
         _assignIfNotEqual(.zero, to: \.textContainerInset)
         _assignIfNotEqual(true, to: \.usesAdaptiveColorMappingForDarkAppearance)
-        _assignIfNotEqual(configuration.isSelectable, to: \.isSelectable)
+        _assignIfNotEqual(textViewConfiguration.isSelectable, to: \.isSelectable)
 
-        if let automaticQuoteSubstitutionDisabled = configuration.automaticQuoteSubstitutionDisabled {
+        if let automaticQuoteSubstitutionDisabled = textViewConfiguration.automaticQuoteSubstitutionDisabled {
             _assignIfNotEqual(!automaticQuoteSubstitutionDisabled, to: \.isAutomaticQuoteSubstitutionEnabled)
         }
         
-        if let font = try? configuration.cocoaFont ?? context.environment.font?.toAppKitOrUIKitFont() {
+        if let font: AppKitOrUIKitFont = try? textViewConfiguration.cocoaFont ?? context.environment.font?.toAppKitOrUIKitFont() {
             _assignIfNotEqual(font, to: \.self.font)
             
             if let textStorage = _SwiftUIX_textStorage {
@@ -55,7 +59,7 @@ extension _PlatformTextView {
             }
         }
                 
-        if let foregroundColor = configuration.cocoaForegroundColor {
+        if let foregroundColor: AppKitOrUIKitColor = textViewConfiguration.cocoaForegroundColor {
             _assignIfNotEqual(foregroundColor, to: \.textColor)
 
             if let textStorage = _SwiftUIX_textStorage {
@@ -68,8 +72,9 @@ extension _PlatformTextView {
             }
         }
         
-        if let textContainer {
+        if let textContainer: NSTextContainer = _SwiftUIX_textContainer {
             textContainer._assignIfNotEqual(.zero, to: \.lineFragmentPadding)
+            textContainer._assignIfNotEqual(context.environment.lineBreakMode, to: \.lineBreakMode)
             textContainer._assignIfNotEqual((context.environment.lineLimit ?? 0), to: \.maximumNumberOfLines)
         }
         
@@ -79,7 +84,7 @@ extension _PlatformTextView {
         _assignIfNotEqual(true, to: \.isVerticallyResizable)
         _assignIfNotEqual([.width], to: \.autoresizingMask)
         
-        if let tintColor = configuration.tintColor {
+        if let tintColor = textViewConfiguration.tintColor {
             _assignIfNotEqual(tintColor, to: \.insertionPointColor)
         }
         
@@ -92,14 +97,14 @@ extension _PlatformTextView {
         }
         
         self.data = data
-        self.configuration = configuration
+        self.textViewConfiguration = textViewConfiguration
         
         _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded()
     }
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension _PlatformTextView {
+extension _AnyPlatformTextView {
     private func _invalidateIntrinsicContentSizeAndEnsureLayoutIfNeeded() {
         defer {
             _needsIntrinsicContentSizeInvalidation = false
@@ -111,7 +116,9 @@ extension _PlatformTextView {
         }
                         
         if _needsIntrinsicContentSizeInvalidation {
-            invalidateIntrinsicContentSize()
+            if !_SwiftUIX_intrinsicContentSizeIsDisabled {
+                invalidateIntrinsicContentSize()
+            }
             
             /*if let intrinsicContentSize = _computeIntrinsicContentSize() {
                 self.representableCache._cachedIntrinsicContentSize = intrinsicContentSize
@@ -131,7 +138,7 @@ extension _PlatformTextView {
     }
     
     private func _computeIntrinsicContentSize() -> CGSize? {
-        if let _fixedSize = configuration._fixedSize {
+        if let _fixedSize = textViewConfiguration._fixedSize {
             switch _fixedSize.value {
                 case (false, false):
                     return nil
@@ -187,11 +194,11 @@ extension _PlatformTextView {
     }
     
     private func _correctNSTextContainerSize() {
-        guard let textContainer else {
+        guard let textContainer: NSTextContainer else {
             return
         }
         
-        if let fixedSize = configuration._fixedSize {
+        if let fixedSize: _SwiftUIX_FixedSizeInfo = textViewConfiguration._fixedSize {
             if fixedSize.value == (false, false) {
                 if textContainer.heightTracksTextView == false {
                     textContainer.widthTracksTextView = true

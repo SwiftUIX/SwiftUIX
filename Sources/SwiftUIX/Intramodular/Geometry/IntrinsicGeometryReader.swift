@@ -155,7 +155,7 @@ public struct _BackgroundGeometryReader<Content: View>: View {
             }
             
             Task { @MainActor in
-                if geometry?._SwiftUIX_globalFrame != newValue._SwiftUIX_globalFrame {
+                if geometry?.globalFrame != newValue.globalFrame {
                     geometry = newValue
                 }
             }

@@ -2,57 +2,16 @@
 // Copyright (c) Vatsal Manot
 //
 
+import _SwiftUIX
 import Swift
 import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
-@propertyWrapper
-@_documentation(visibility: internal)
-public struct _SwiftUIX_RenderIgnored<Wrapped>: Hashable, DynamicProperty {
-    @ViewStorage private var wrappedValueBox: Wrapped
-    
-    public var wrappedValue: Wrapped
-    
-    private var _hasUpdatedOnce: Bool = false
-    private var _randomID = Int.random(in: 0...Int.max)
-    
-    public var projectedValue: Self {
-        self
-    }
-    
-    public init(wrappedValue: Wrapped) {
-        self.wrappedValue = wrappedValue
-        self._wrappedValueBox = .init(wrappedValue: wrappedValue)
-    }
-    
-    public mutating func update() {
-        if !_hasUpdatedOnce {
-            _hasUpdatedOnce = true
-        }
-        
-        wrappedValueBox = wrappedValue
-    }
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs._hasUpdatedOnce && rhs._hasUpdatedOnce else {
-            return lhs._randomID == rhs._randomID
-        }
-        
-        return lhs._wrappedValueBox.id == rhs._wrappedValueBox.id
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        if _hasUpdatedOnce {
-            hasher.combine(_randomID)
-        }
-        
-        hasher.combine(_wrappedValueBox.id)
-    }
-}
-
 @_documentation(visibility: internal)
 public struct _TextViewConfiguration: Hashable, DynamicProperty {
+    @_SwiftUIX_RenderIgnored var customAppKitOrUIKitClassConfiguration: _AnyTextView._CustomAppKitOrUIKitClassConfiguration?
+
     public var _fixedSize: _SwiftUIX_FixedSizeInfo? = nil
     public var isContentCopyable: Bool = true
     public var isConstant: Bool = false
@@ -106,7 +65,7 @@ public struct _TextViewConfiguration: Hashable, DynamicProperty {
             _dropDelegate = newValue
         }
     }
-#endif
+    #endif
     
     var requiresAttributedText: Bool {
         kerning != nil
@@ -120,39 +79,6 @@ public struct _TextViewConfiguration: Hashable, DynamicProperty {
         self.isConstant = isConstant
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
-    }
-}
-
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, *)
-extension TextView {
-    public struct _CustomAppKitOrUIKitClassConfiguration {
-        public typealias UpdateOperation<T> = (_ view: T, _ context: any _AppKitOrUIKitViewRepresentableContext) -> Void
-        
-        let `class`: AppKitOrUIKitTextView.Type
-        let update: UpdateOperation<AppKitOrUIKitTextView>
-        
-        init(
-            `class`: AppKitOrUIKitTextView.Type = _PlatformTextView<Label>.self
-        ) {
-            self.class = `class`
-            self.update = { _, _ in }
-        }
-        
-        init<T: AppKitOrUIKitTextView>(
-            `class`: T.Type,
-            update: @escaping UpdateOperation<T> = { _, _ in }
-        ) {
-            self.class = `class`
-            self.update = { view, context in
-                guard let view = view as? T else {
-                    assertionFailure()
-                    
-                    return
-                }
-                
-                update(view, context)
-            }
-        }
     }
 }
 

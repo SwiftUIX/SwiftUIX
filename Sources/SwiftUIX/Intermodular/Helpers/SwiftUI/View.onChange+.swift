@@ -6,7 +6,6 @@ import Combine
 import Swift
 import SwiftUI
 
-#if swift(>=5.9)
 extension View {
     @ViewBuilder
     public func _onChange<V: Equatable>(
@@ -22,17 +21,6 @@ extension View {
         }
     }
 }
-#else
-extension View {
-    @ViewBuilder
-    public func _onChange<V: Equatable>(
-        of value: V,
-        perform action: @escaping (V) -> Void
-    ) -> some View {
-        onChange(of: value, perform: action)
-    }
-}
-#endif
 
 extension View {
     /// Adds a modifier for this view that fires an action when a specific

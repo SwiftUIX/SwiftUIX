@@ -14,7 +14,7 @@ extension _PlatformTextView {
     public static func updateAppKitOrUIKitTextView(
         _ view: AppKitOrUIKitTextView,
         data: _TextViewDataBinding,
-        configuration: TextView<Label>._Configuration,
+        textViewConfiguration: _TextViewConfiguration,
         context: some _AppKitOrUIKitViewRepresentableContext
     ) {
         #if os(visionOS)
@@ -23,7 +23,7 @@ extension _PlatformTextView {
 
         let requiresAttributedText: Bool = false
             || context.environment._textView_requiresAttributedText
-            || configuration.requiresAttributedText
+            || textViewConfiguration.requiresAttributedText
             || data.wrappedValue.isAttributed
         
         var cursorOffset: Int?
@@ -35,16 +35,16 @@ extension _PlatformTextView {
         
     updateUserInteractability: do {
         #if !os(tvOS)
-        if !configuration.isEditable {
+        if !textViewConfiguration.isEditable {
             view.isEditable = false
         } else {
-            view.isEditable = configuration.isConstant
+            view.isEditable = textViewConfiguration.isConstant
             ? false
-            : context.environment.isEnabled && configuration.isEditable
+            : context.environment.isEnabled && textViewConfiguration.isEditable
         }
         #endif
         view.isScrollEnabled = context.environment._isScrollEnabled
-        view.isSelectable = configuration.isSelectable
+        view.isSelectable = textViewConfiguration.isSelectable
     }
         
     updateLayoutConfiguration: do {
@@ -56,19 +56,19 @@ extension _PlatformTextView {
             view.overrideUserInterfaceStyle = .init(context.environment.colorScheme)
         }
         
-        view.autocapitalizationType = configuration.autocapitalization ?? .sentences
+        view.autocapitalizationType = textViewConfiguration.autocapitalization ?? .sentences
         
-        let font: AppKitOrUIKitFont? = configuration.cocoaFont ?? (try? context.environment.font?.toAppKitOrUIKitFont())
+        let font: AppKitOrUIKitFont? = textViewConfiguration.cocoaFont ?? (try? context.environment.font?.toAppKitOrUIKitFont())
         
-        if let textColor = configuration.cocoaForegroundColor {
+        if let textColor = textViewConfiguration.cocoaForegroundColor {
             view._assignIfNotEqual(textColor, to: \.textColor)
         }
         
-        if let tintColor = configuration.tintColor {
+        if let tintColor = textViewConfiguration.tintColor {
             view._assignIfNotEqual(tintColor, to: \.tintColor)
         }
         
-        if let linkForegroundColor = configuration.linkForegroundColor {
+        if let linkForegroundColor = textViewConfiguration.linkForegroundColor {
             SwiftUIX._assignIfNotEqual(linkForegroundColor, to: &view.linkTextAttributes[.foregroundColor])
         } else {
             if view.linkTextAttributes[.foregroundColor] != nil {
@@ -76,52 +76,59 @@ extension _PlatformTextView {
             }
         }
         
-        view.textContentType = configuration.textContentType
+        view.textContentType = textViewConfiguration.textContentType
         
         view.textContainer.lineFragmentPadding = .zero
         view.textContainer.maximumNumberOfLines = context.environment.lineLimit ?? 0
-        view.textContainerInset = AppKitOrUIKitEdgeInsets(configuration.textContainerInsets)
+        view.textContainerInset = AppKitOrUIKitEdgeInsets(textViewConfiguration.textContainerInsets)
         
-        if data.wrappedValue.kind != .cocoaTextStorage {
-            if requiresAttributedText {
-                let paragraphStyle = NSMutableParagraphStyle()
+        switch data.wrappedValue {
+            case .cocoaTextStorage(let customTextStorage): do {
+                _ = customTextStorage
                 
-                paragraphStyle._assignIfNotEqual(context.environment.lineBreakMode, to: \.lineBreakMode)
-                paragraphStyle._assignIfNotEqual(context.environment.lineSpacing, to: \.lineSpacing)
-                
-                context.environment._textView_paragraphSpacing.map {
-                    paragraphStyle.paragraphSpacing = $0
-                }
-                
-                func attributedStringAttributes() -> [NSAttributedString.Key: Any] {
-                    var attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.paragraphStyle: paragraphStyle
-                    ]
+                break
+            }
+            default: do {
+                if requiresAttributedText {
+                    let paragraphStyle = NSMutableParagraphStyle()
                     
-                    if let font {
-                        attributes[.font] = font
+                    paragraphStyle._assignIfNotEqual(context.environment.lineBreakMode, to: \.lineBreakMode)
+                    paragraphStyle._assignIfNotEqual(context.environment.lineSpacing, to: \.lineSpacing)
+                    
+                    context.environment._textView_paragraphSpacing.map {
+                        paragraphStyle.paragraphSpacing = $0
                     }
                     
-                    if let kerning = configuration.kerning {
-                        attributes[.kern] = kerning
+                    func attributedStringAttributes() -> [NSAttributedString.Key: Any] {
+                        var attributes: [NSAttributedString.Key: Any] = [
+                            NSAttributedString.Key.paragraphStyle: paragraphStyle
+                        ]
+                        
+                        if let font {
+                            attributes[.font] = font
+                        }
+                        
+                        if let kerning = textViewConfiguration.kerning {
+                            attributes[.kern] = kerning
+                        }
+                        
+                        if let textColor = textViewConfiguration.cocoaForegroundColor {
+                            attributes[.foregroundColor] = textColor
+                        }
+                        
+                        return attributes
                     }
                     
-                    if let textColor = configuration.cocoaForegroundColor {
-                        attributes[.foregroundColor] = textColor
-                    }
-                    
-                    return attributes
-                }
-                
-                view.attributedText = data.wrappedValue.toAttributedString(attributes: attributedStringAttributes())
-            } else {
-                if let text = data.wrappedValue.stringValue {
-                    view.text = text
+                    view.attributedText = data.wrappedValue.toAttributedString(attributes: attributedStringAttributes())
                 } else {
-                    assertionFailure()
+                    if let text = data.wrappedValue.stringValue {
+                        view.text = text
+                    } else {
+                        assertionFailure()
+                    }
+                    
+                    view.font = font
                 }
-                
-                view.font = font
             }
         }
     }
@@ -140,20 +147,20 @@ extension _PlatformTextView {
     }
         
     updateKeyboardConfiguration: do {
-        view.enablesReturnKeyAutomatically = configuration.enablesReturnKeyAutomatically ?? false
-        view.keyboardType = configuration.keyboardType
-        view.returnKeyType = configuration.returnKeyType ?? .default
+        view.enablesReturnKeyAutomatically = textViewConfiguration.enablesReturnKeyAutomatically ?? false
+        view.keyboardType = textViewConfiguration.keyboardType
+        view.returnKeyType = textViewConfiguration.returnKeyType ?? .default
     }
         
     updateResponderChain: do {
         DispatchQueue.main.async {
-            if let isFocused = configuration.isFocused, view.window != nil {
+            if let isFocused = textViewConfiguration.isFocused, view.window != nil {
                 if isFocused.wrappedValue && !view.isFirstResponder {
                     view.becomeFirstResponder()
                 } else if !isFocused.wrappedValue && view.isFirstResponder {
                     view.resignFirstResponder()
                 }
-            } else if let isFirstResponder = configuration.isFirstResponder, view.window != nil {
+            } else if let isFirstResponder = textViewConfiguration.isFirstResponder, view.window != nil {
                 if isFirstResponder && !view.isFirstResponder, context.environment.isEnabled {
                     view.becomeFirstResponder()
                 } else if !isFirstResponder && view.isFirstResponder {
@@ -164,7 +171,7 @@ extension _PlatformTextView {
     }
         
         (view as? _PlatformTextView<Label>)?.data = data
-        (view as? _PlatformTextView<Label>)?.configuration = configuration
+        (view as? _PlatformTextView<Label>)?.textViewConfiguration = textViewConfiguration
     }
     
     func _sizeThatFits(_ size: CGSize? = nil) -> CGSize? {

@@ -114,3 +114,27 @@ extension _SwiftUI_VariadicView {
         self[_ViewTraitKeys()[keyPath: key]]
     }
 }
+
+// MARK: - Supplementary
+
+public struct _Interdivided<Content: View>: View {
+    let content: Content
+    
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+}
+
+extension _Interdivided {
+    public var body: some View {
+        _VariadicViewAdapter(content) { content in
+            _ForEachSubview(enumerating: content) { (index, subview) in
+                if !(index == 0){
+                    Divider()
+                }
+                
+                subview
+            }
+        }
+    }
+}
