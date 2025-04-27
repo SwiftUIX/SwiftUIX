@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        xcode: ['16.1']
+        xcode: ['16.1', '16.2'] # macos-latest runners don't yet have Xcode 16.3
         scheme: ['SwiftUIX']
         command: ['build']
         platform: ['macOS', 'iOS', 'tvOS', 'watchOS']
