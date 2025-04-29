@@ -15,7 +15,7 @@ public class _PlatformTableViewCell<ItemType: Identifiable, Content: View>: UITa
         let isSelected: Bool
     }
     
-    var tableViewController: UITableViewController!
+    weak var tableViewController: UITableViewController!
     var indexPath: IndexPath?
     
     var item: ItemType!
