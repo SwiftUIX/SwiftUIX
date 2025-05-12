@@ -5,6 +5,8 @@
 //  Created by Yasir on 12/05/25.
 //
 
+#if os(macOS)
+
 import SwiftUI
 import AppKit
 
@@ -152,3 +154,5 @@ public extension BrowserWrapper {
         return copy
     }
 }
+
+#endif
