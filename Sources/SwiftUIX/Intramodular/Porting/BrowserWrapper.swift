@@ -76,6 +76,10 @@ public struct BrowserWrapper: NSViewRepresentable {
         browser.autohidesScroller = autohidesScroller
         browser.separatesColumns = separatesColumns
         
+        browser.target = context.coordinator
+        browser.action = #selector(Coordinator.browserClicked(_:))
+        browser.sendAction(on: [.leftMouseDown])
+        
         browser.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             browser.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
@@ -101,6 +105,29 @@ public struct BrowserWrapper: NSViewRepresentable {
             self._selection = selection
         }
         
+        @objc func browserClicked(_ sender: Any?) {
+            guard let browser = sender as? NSBrowser,
+                  let indexPath = browser.selectionIndexPath else { return }
+
+            if let selectedNode = node(at: indexPath, from: rootItems) {
+                print("Selected node: \(selectedNode.title)")
+                selection = selectedNode
+            }
+        }
+
+        private func node(at indexPath: IndexPath, from items: [BrowserNode]) -> BrowserNode? {
+            var currentItems = items
+            var selectedNode: BrowserNode?
+
+            for index in indexPath {
+                guard index < currentItems.count else { return nil }
+                selectedNode = currentItems[index]
+                currentItems = selectedNode?.children ?? []
+            }
+
+            return selectedNode
+        }
+        
         public func browser(_ browser: NSBrowser, numberOfChildrenOfItem item: Any?) -> Int {
             let children = (item as? BrowserNode)?.children ?? rootItems
             return children.count
@@ -119,12 +146,6 @@ public struct BrowserWrapper: NSViewRepresentable {
         public func browser(_ browser: NSBrowser, objectValueForItem item: Any?) -> Any? {
             guard let node = item as? BrowserNode else { return nil }
             return node.title
-        }
-        
-        public func browser(_ browser: NSBrowser, setObjectValue object: Any?, forItem item: Any?) {
-            if let node = item as? BrowserNode {
-                selection = node
-            }
         }
     }
 }
