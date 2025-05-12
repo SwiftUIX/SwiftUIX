@@ -94,7 +94,27 @@ public struct BrowserWrapper: NSViewRepresentable {
         Coordinator(rootItems: rootItems, selection: $selection)
     }
     
-    public func updateNSView(_ nsView: NSBrowser, context: Context) {}
+    public func updateNSView(_ nsView: NSBrowser, context: Context) {
+        context.coordinator.rootItems = rootItems
+
+        let selectedIndexPath = nsView.selectionIndexPath
+
+        let lastColumn = nsView.lastColumn
+        if lastColumn >= 0 {
+            for column in 0...lastColumn {
+                nsView.reloadColumn(column)
+            }
+        } else {
+            nsView.loadColumnZero()
+        }
+
+        if let indexPath = selectedIndexPath {
+            for (columnIndex, index) in indexPath.enumerated() {
+                nsView.reloadColumn(columnIndex)
+                nsView.selectRowIndexes(IndexSet(integer: index), inColumn: columnIndex)
+            }
+        }
+    }
     
     public class Coordinator: NSObject, NSBrowserDelegate {
         var rootItems: [BrowserNode]
@@ -110,7 +130,6 @@ public struct BrowserWrapper: NSViewRepresentable {
                   let indexPath = browser.selectionIndexPath else { return }
 
             if let selectedNode = node(at: indexPath, from: rootItems) {
-                print("Selected node: \(selectedNode.title)")
                 selection = selectedNode
             }
         }
