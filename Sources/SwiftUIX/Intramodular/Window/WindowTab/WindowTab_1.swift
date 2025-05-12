@@ -5,17 +5,19 @@
 //  Created by Yasir on 12/05/25.
 //
 
+#if os(macOS) 
+
 import SwiftUI
 import AppKit
 
-public final class WindowTabController: ObservableObject {
+public final class WindowTabController_1: ObservableObject {
     private var windows: [NSWindow] = []
 
     public init() {}
 
     public func openTab<V: View>(
         title: String,
-        configuration: WindowConfigurable = DefaultWindowConfiguration(),
+        configuration: WindowConfigurable_1 = DefaultWindowConfiguration_1(),
         @ViewBuilder content: @escaping () -> V
     ) {
         let view = content()
@@ -38,17 +40,11 @@ public final class WindowTabController: ObservableObject {
     }
 }
 
-struct WindowTab: Identifiable {
-    let id = UUID()
-    let title: String
-    weak var window: NSWindow?
-}
-
-public protocol WindowConfigurable {
+public protocol WindowConfigurable_1 {
     func configure(_ window: NSWindow)
 }
 
-public struct DefaultWindowConfiguration: WindowConfigurable {
+public struct DefaultWindowConfiguration_1: WindowConfigurable_1 {
     public init() {}
 
     public func configure(_ window: NSWindow) {
@@ -58,19 +54,19 @@ public struct DefaultWindowConfiguration: WindowConfigurable {
     }
 }
 
-public struct WindowTabControllerKey: EnvironmentKey {
-    public static let defaultValue: WindowTabController = .init()
+public struct WindowTabController_1Key: EnvironmentKey {
+    public static let defaultValue: WindowTabController_1 = .init()
 }
 
 public extension EnvironmentValues {
-    var windowTabController: WindowTabController {
-        get { self[WindowTabControllerKey.self] }
-        set { self[WindowTabControllerKey.self] = newValue }
+    var windowTabController_1: WindowTabController_1 {
+        get { self[WindowTabController_1Key.self] }
+        set { self[WindowTabController_1Key.self] = newValue }
     }
 }
 
-public struct WindowTabControllerProvider<Content: View>: View {
-    @StateObject private var controller = WindowTabController()
+public struct WindowTabControllerProvider_1<Content: View>: View {
+    @StateObject private var controller = WindowTabController_1()
     private let content: () -> Content
 
     public init(@ViewBuilder content: @escaping () -> Content) {
@@ -79,6 +75,8 @@ public struct WindowTabControllerProvider<Content: View>: View {
 
     public var body: some View {
         content()
-            .environment(\.windowTabController, controller)
+            .environment(\.windowTabController_1, controller)
     }
 }
+
+#endif
