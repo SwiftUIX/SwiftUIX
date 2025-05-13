@@ -10,58 +10,56 @@
 import SwiftUI
 import AppKit
 
-public struct BrowserNode: Identifiable, Hashable {
-    public let id: UUID
-    public var title: String
-    public var color: NSColor
-    public var children: [BrowserNode]
+public protocol BrowserItem: Identifiable, Hashable {
+    var id: String { get }
+    var title: String { get }
+    var children: [Self] { get }
+    var isLeaf: Bool { get }
     
-    public var isLeaf: Bool {
-        children.isEmpty
-    }
-    
-    public init(id: UUID = UUID(), title: String, color: NSColor, children: [BrowserNode] = []) {
-        self.id = id
-        self.title = title
-        self.color = color
-        self.children = children
-    }
+    var color: NSColor? { get }
+}
+
+public extension BrowserItem {
+    var color: NSColor? { nil }
 }
 
 public class CustomBrowserCell: NSBrowserCell {
     public override func draw(withFrame cellFrame: NSRect, in controlView: NSView) {
-        guard let node = representedObject as? BrowserNode else {
+        guard let anyItem = representedObject as? any BrowserItem else {
             super.draw(withFrame: cellFrame, in: controlView)
             return
         }
-        
+
+        let title = anyItem.title
+        let color = anyItem.color
+
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 13),
-            .foregroundColor: node.color
+            .foregroundColor: color
         ]
-        
-        let string = NSAttributedString(string: node.title, attributes: attributes)
+
+        let string = NSAttributedString(string: title, attributes: attributes)
         let textRect = NSRect(
             x: cellFrame.origin.x + 4,
             y: cellFrame.origin.y + (cellFrame.height - string.size().height) / 2,
             width: cellFrame.width - 8,
             height: string.size().height
         )
-        
+
         string.draw(in: textRect)
     }
 }
 
-public struct BrowserWrapper: NSViewRepresentable {
-    public var rootItems: [BrowserNode]
-    @Binding public var selection: BrowserNode?
+public struct BrowserWrapper<Data: RandomAccessCollection>: NSViewRepresentable where Data.Element: BrowserItem {
+    public var rootItems: Data
+    @Binding public var selection: Data.Element?
     
     public var reusesColumns: Bool = false
     public var hasHorizontalScroller: Bool = true
     public var autohidesScroller: Bool = true
     public var separatesColumns: Bool = true
     
-    public init(rootItems: [BrowserNode], selection: Binding<BrowserNode?>) {
+    public init(rootItems: Data, selection: Binding<Data.Element?>) {
         self.rootItems = rootItems
         self._selection = selection
     }
@@ -117,10 +115,10 @@ public struct BrowserWrapper: NSViewRepresentable {
     }
     
     public class Coordinator: NSObject, NSBrowserDelegate {
-        var rootItems: [BrowserNode]
-        @Binding var selection: BrowserNode?
+        var rootItems: Data
+        @Binding var selection: Data.Element?
         
-        init(rootItems: [BrowserNode], selection: Binding<BrowserNode?>) {
+        init(rootItems: Data, selection: Binding<Data.Element?>) {
             self.rootItems = rootItems
             self._selection = selection
         }
@@ -129,14 +127,14 @@ public struct BrowserWrapper: NSViewRepresentable {
             guard let browser = sender as? NSBrowser,
                   let indexPath = browser.selectionIndexPath else { return }
 
-            if let selectedNode = node(at: indexPath, from: rootItems) {
+            if let selectedNode = node(at: indexPath, from: Array(rootItems)) {
                 selection = selectedNode
             }
         }
 
-        private func node(at indexPath: IndexPath, from items: [BrowserNode]) -> BrowserNode? {
+        private func node(at indexPath: IndexPath, from items: [Data.Element]) -> Data.Element? {
             var currentItems = items
-            var selectedNode: BrowserNode?
+            var selectedNode: Data.Element?
 
             for index in indexPath {
                 guard index < currentItems.count else { return nil }
@@ -148,47 +146,47 @@ public struct BrowserWrapper: NSViewRepresentable {
         }
         
         public func browser(_ browser: NSBrowser, numberOfChildrenOfItem item: Any?) -> Int {
-            let children = (item as? BrowserNode)?.children ?? rootItems
+            let children = (item as? Data.Element)?.children ?? Array(rootItems)
             return children.count
         }
         
         public func browser(_ browser: NSBrowser, child index: Int, ofItem item: Any?) -> Any {
-            let children = (item as? BrowserNode)?.children ?? rootItems
+            let children = (item as? Data.Element)?.children ?? Array(rootItems)
             return children[index]
         }
         
         public func browser(_ browser: NSBrowser, isLeafItem item: Any?) -> Bool {
-            guard let node = item as? BrowserNode else { return true }
+            guard let node = item as? Data.Element else { return true }
             return node.isLeaf
         }
         
         public func browser(_ browser: NSBrowser, objectValueForItem item: Any?) -> Any? {
-            guard let node = item as? BrowserNode else { return nil }
+            guard let node = item as? Data.Element else { return nil }
             return node.title
         }
     }
 }
 
 public extension BrowserWrapper {
-    func reusesColumns(_ value: Bool) -> BrowserWrapper {
+    func reusesColumns(_ value: Bool) -> Self {
         var copy = self
         copy.reusesColumns = value
         return copy
     }
     
-    func hasHorizontalScroller(_ value: Bool) -> BrowserWrapper {
+    func hasHorizontalScroller(_ value: Bool) -> Self {
         var copy = self
         copy.hasHorizontalScroller = value
         return copy
     }
     
-    func autohidesScroller(_ value: Bool) -> BrowserWrapper {
+    func autohidesScroller(_ value: Bool) -> Self {
         var copy = self
         copy.autohidesScroller = value
         return copy
     }
     
-    func separatesColumns(_ value: Bool) -> BrowserWrapper {
+    func separatesColumns(_ value: Bool) -> Self {
         var copy = self
         copy.separatesColumns = value
         return copy
