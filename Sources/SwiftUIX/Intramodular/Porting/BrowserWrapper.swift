@@ -23,57 +23,42 @@ public extension BrowserItem {
     var color: NSColor? { nil }
 }
 
-public class CustomBrowserCell: NSBrowserCell {
-    public override func draw(withFrame cellFrame: NSRect, in controlView: NSView) {
-        guard let anyItem = representedObject as? any BrowserItem else {
-            super.draw(withFrame: cellFrame, in: controlView)
-            return
-        }
-
-        let title = anyItem.title
-        let color = anyItem.color
-
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 13),
-            .foregroundColor: color
-        ]
-
-        let string = NSAttributedString(string: title, attributes: attributes)
-        let textRect = NSRect(
-            x: cellFrame.origin.x + 4,
-            y: cellFrame.origin.y + (cellFrame.height - string.size().height) / 2,
-            width: cellFrame.width - 8,
-            height: string.size().height
-        )
-
-        string.draw(in: textRect)
-    }
-}
-
 public struct BrowserWrapper<Data: RandomAccessCollection>: NSViewRepresentable where Data.Element: BrowserItem {
     public var rootItems: Data
     @Binding public var selection: Data.Element?
-    
+
     public var reusesColumns: Bool = false
     public var hasHorizontalScroller: Bool = true
     public var autohidesScroller: Bool = true
     public var separatesColumns: Bool = true
-    
+    public var allowsMultipleSelection: Bool = false
+    public var allowsEmptySelection: Bool = true
+    public var minColumnWidth: CGFloat = 100
+    public var maxVisibleColumns: Int = 3
+    public var backgroundColor: NSColor? = nil
+
     public init(rootItems: Data, selection: Binding<Data.Element?>) {
         self.rootItems = rootItems
         self._selection = selection
     }
-    
+
     public func makeNSView(context: Context) -> NSBrowser {
         let browser = NSBrowser()
         browser.delegate = context.coordinator
-        browser.setCellClass(CustomBrowserCell.self)
-        
+
         browser.reusesColumns = reusesColumns
         browser.hasHorizontalScroller = hasHorizontalScroller
         browser.autohidesScroller = autohidesScroller
         browser.separatesColumns = separatesColumns
+        browser.allowsMultipleSelection = allowsMultipleSelection
+        browser.allowsEmptySelection = allowsEmptySelection
+        browser.minColumnWidth = minColumnWidth
+        browser.maxVisibleColumns = maxVisibleColumns
         
+        if let bgColor = backgroundColor {
+            browser.backgroundColor = bgColor
+        }
+
         browser.target = context.coordinator
         browser.action = #selector(Coordinator.browserClicked(_:))
         browser.sendAction(on: [.leftMouseDown])
@@ -167,28 +152,58 @@ public struct BrowserWrapper<Data: RandomAccessCollection>: NSViewRepresentable 
     }
 }
 
-public extension BrowserWrapper {
-    func reusesColumns(_ value: Bool) -> Self {
+extension BrowserWrapper {
+    public func reusesColumns(_ value: Bool) -> Self {
         var copy = self
         copy.reusesColumns = value
         return copy
     }
-    
-    func hasHorizontalScroller(_ value: Bool) -> Self {
+
+    public func hasHorizontalScroller(_ value: Bool) -> Self {
         var copy = self
         copy.hasHorizontalScroller = value
         return copy
     }
-    
-    func autohidesScroller(_ value: Bool) -> Self {
+
+    public func autohidesScroller(_ value: Bool) -> Self {
         var copy = self
         copy.autohidesScroller = value
         return copy
     }
-    
-    func separatesColumns(_ value: Bool) -> Self {
+
+    public func separatesColumns(_ value: Bool) -> Self {
         var copy = self
         copy.separatesColumns = value
+        return copy
+    }
+
+    public func allowsMultipleSelection(_ value: Bool) -> Self {
+        var copy = self
+        copy.allowsMultipleSelection = value
+        return copy
+    }
+
+    public func allowsEmptySelection(_ value: Bool) -> Self {
+        var copy = self
+        copy.allowsEmptySelection = value
+        return copy
+    }
+
+    public func minColumnWidth(_ value: CGFloat) -> Self {
+        var copy = self
+        copy.minColumnWidth = value
+        return copy
+    }
+
+    public func maxVisibleColumns(_ value: Int) -> Self {
+        var copy = self
+        copy.maxVisibleColumns = value
+        return copy
+    }
+
+    public func backgroundColor(_ color: NSColor?) -> Self {
+        var copy = self
+        copy.backgroundColor = color
         return copy
     }
 }
