@@ -8,7 +8,7 @@ import SwiftUI
 #if os(iOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
 class _PlatformTableHeaderFooterView<SectionModel: Identifiable, Content: View>: UITableViewHeaderFooterView {
-    var parent: UITableViewController!
+    weak var parent: UITableViewController!
     var item: SectionModel!
     var makeContent: ((SectionModel) -> Content)!
     
