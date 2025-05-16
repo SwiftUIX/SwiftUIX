@@ -10,7 +10,7 @@ import SwiftUI
 
 @_spi(Internal)
 @_documentation(visibility: internal)
-public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View>: NSHostingPopover<Content> {
+public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View>: NSHostingPopover<_DeferredView<Content>> {
     private var eventMonitor: Any?
     
     private lazy var menuBarExtraCoordinator = _CocoaMenuBarExtraCoordinator<ID, Label, Content>(
@@ -43,7 +43,7 @@ public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View
     public init(item: MenuBarItem<ID, Label, Content>) {
         self.item = item
         
-        super.init(rootView: item.content)
+        super.init(rootView: _DeferredView(content: item.content))
                         
         _ = Unmanaged.passUnretained(self).retain() // fixes a crash
                 
@@ -57,7 +57,7 @@ public class _AppKitMenuBarExtraPopover<ID: Hashable, Label: View, Content: View
     public init(coordinator: _CocoaMenuBarExtraCoordinator<ID, Label, Content>) {
         self.item = coordinator.item
         
-        super.init(rootView: item.content)
+        super.init(rootView: _DeferredView(content: item.content))
 
         self.menuBarExtraCoordinator = coordinator
         

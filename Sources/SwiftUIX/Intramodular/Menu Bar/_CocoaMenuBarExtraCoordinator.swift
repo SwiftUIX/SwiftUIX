@@ -9,12 +9,24 @@ import SwiftUI
 
 @_documentation(visibility: internal)
 public class _AnyCocoaMenuBarExtraCoordinator: Identifiable, ObservableObject {
+    private static var allCases: [_AnyCocoaMenuBarExtraCoordinator] = [] // FIXME: Practically doesn't matter given that `Scene` result builders can't accomodate conditionals for `_CocoaMenuBarExtra` to be potentially removed but technically should be weak
+    
     public var id: AnyHashable {
         fatalError()
     }
     
     fileprivate init() {
+        _AnyCocoaMenuBarExtraCoordinator.allCases.append(self)
+    }
+    
+    func _update() {
         
+    }
+    
+    static func _updateAll() {
+        allCases.forEach({
+            $0._update()
+        })
     }
 }
 
@@ -91,8 +103,12 @@ public class _CocoaMenuBarExtraCoordinator<ID: Hashable, Label: View, Content: V
         self._update()
     }
     
-    private func _update() {
-        cocoaStatusItem?.update(from: item, coordinator: self)
+    override func _update() {
+        guard let statusItem: NSStatusItem = cocoaStatusItem else {
+            return
+        }
+        
+        statusItem.update(from: item, coordinator: self)
     }
     
     @objc private func didActivate(
@@ -116,15 +132,15 @@ extension _CocoaMenuBarExtraCoordinator {
     public convenience init(
         id: ID,
         action: (@MainActor () -> Void)?,
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder label: () -> Label
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder label: @escaping () -> Label
     ) {
         let item = MenuBarItem<ID, Label, Content>(
             id: id,
             length: nil,
             action: action,
-            label: label(),
-            content: content()
+            label: label,
+            content: content
         )
         
         let popover: _SwiftUIX_ObservableReferenceBox<_AppKitMenuBarExtraPopover<ID, Label, Content>?> = .init(wrappedValue: nil)
@@ -151,8 +167,8 @@ extension _CocoaMenuBarExtraCoordinator {
     
     public convenience init(
         id: ID,
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder label: () -> Label
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder label: @escaping () -> Label
     ) {
         self.init(
             id: id,
@@ -163,8 +179,8 @@ extension _CocoaMenuBarExtraCoordinator {
     }
     
     public convenience init(
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder label: () -> Label
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder label: @escaping () -> Label
     ) where ID == AnyHashable {
         self.init(
             id: UUID().uuidString,
@@ -175,8 +191,8 @@ extension _CocoaMenuBarExtraCoordinator {
     
     public convenience init(
         action: (@MainActor () -> Void)?,
-        @ViewBuilder label: () -> Label,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder label: @escaping () -> Label,
+        @ViewBuilder content: @escaping () -> Content
     ) where ID == AnyHashable {
         self.init(
             id: UUID().uuidString,
@@ -188,7 +204,7 @@ extension _CocoaMenuBarExtraCoordinator {
     
     public convenience init(
         systemImage: SFSymbolName,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) where ID == AnyHashable, Label == Image {
         self.init(id: UUID().uuidString, content: content) {
             Image(systemName: systemImage)
@@ -199,53 +215,76 @@ extension _CocoaMenuBarExtraCoordinator {
 // MARK: - Supplementary
 
 @_documentation(visibility: internal)
-public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {    
-    @State var base: _AnyCocoaMenuBarExtraCoordinator
+public struct _CocoaMenuBarExtra<Label: View, Content: View>: DynamicProperty, Scene {
+    @TimerState(interval: 0.01, maxCount: 1) var tick: Int
     
+    private let label: Label
+    private let content: Content
+
+    @StateObject private var base: _AnyCocoaMenuBarExtraCoordinator
+        
     public init(
-        @ViewBuilder label: () -> Label,
-        @ViewBuilder content: () -> Content
+        action: @MainActor @escaping () -> Void,
+        @ViewBuilder label: @escaping () -> Label,
+        @ViewBuilder content: @escaping () -> Content
     ) {
-        base = _CocoaMenuBarExtraCoordinator(
-            action: { },
+        self.label = label()
+        self.content = content()
+
+        _base = .init(wrappedValue: _CocoaMenuBarExtraCoordinator(
+            action: action,
             label: label,
             content: content
-        )
+        ))
+                
+        _AnyCocoaMenuBarExtraCoordinator._updateAll()
+    }
+
+    public init(
+        @ViewBuilder label: @escaping () -> Label,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.init(action: { }, label: label, content: content)
+    }
+
+    public init(
+        action: @MainActor @escaping () -> Void,
+        @ViewBuilder label: @escaping () -> Label
+    ) where Content == EmptyView {
+        self.init(action: action, label: label, content: { EmptyView() })
     }
 
     @available(*, deprecated, message: "Use init(label:content) instead.")
     @_disfavoredOverload
     public init(
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder label: () -> Label
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder label: @escaping () -> Label
     ) {
-        base = _CocoaMenuBarExtraCoordinator(
-            action: { },
-            label: label,
-            content: content
-        )
+        self.init(label: label, content: content)
     }
-    
-    public init(
-        action: @MainActor @escaping () -> Void,
-        @ViewBuilder label: () -> Label
-    ) where Content == EmptyView {
-        base = _CocoaMenuBarExtraCoordinator(
-            action: action,
-            label: label,
-            content: { EmptyView() }
-        )
-    }
-    
+        
     public init(
         _ titleKey: LocalizedStringKey,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) where Label == Text {
-        self.init(content: content, label: { Text(titleKey) })
+        self.init(label: { Text(titleKey) }, content: content)
     }
     
     public var body: some Scene {
-        _EmptyScene()
+        _EmptyScene().onChange(of: tick) { _ in
+            _ = base
+        }
+        
+        let _ = Task { @MainActor in
+            if let base = base as? _CocoaMenuBarExtraCoordinator<AnyHashable, Label, Content> {
+                base.item.label = { label }
+                base.item.content = { content }
+
+                base._update()
+            } else {
+                base._update()
+            }
+        }
     }
 }
 

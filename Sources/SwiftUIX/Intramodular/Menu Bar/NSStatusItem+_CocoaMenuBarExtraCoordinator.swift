@@ -7,18 +7,18 @@
 import AppKit
 import SwiftUI
 
+private var NSStatusItem_labelHostingView_objcAssociationKey: UInt = 0
+
 extension NSStatusItem {
-    private static var NSStatusItem_labelHostingView_objcAssociationKey: UInt = 0
-    
     fileprivate var labelHostingView: NSHostingView<AnyView>? {
         get {
-            if let result = objc_getAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey) as? NSHostingView<AnyView> {
-                return result
+            guard let result = objc_getAssociatedObject(self, &NSStatusItem_labelHostingView_objcAssociationKey) as? NSHostingView<AnyView> else {
+                return nil
             }
             
-            return nil
+            return result
         } set {
-            objc_setAssociatedObject(self, &NSStatusItem.NSStatusItem_labelHostingView_objcAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &NSStatusItem_labelHostingView_objcAssociationKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
     
@@ -32,7 +32,7 @@ extension NSStatusItem {
             return
         }
         
-        if let label = item.label as? _MenuBarExtraLabelContent {
+        if let label = item.label() as? _MenuBarExtraLabelContent {
             switch label {
                 case .image(let image):
                     button.image = image.appKitOrUIKitImage
@@ -50,7 +50,7 @@ extension NSStatusItem {
             
             let _labelHostingViewRootView: AnyView = { () -> AnyView in
                 Group {
-                    item.label
+                    item.label()
                         .frame(minHeight: button.frame.height == 0 ? nil : button.frame.height)
                         .fixedSize(horizontal: true, vertical: true)
                         .controlSize(.small)
@@ -63,21 +63,21 @@ extension NSStatusItem {
             }()
             
             let hostingView: NSHostingView<AnyView> = self.labelHostingView ?? {
-                let result = NSHostingView(
+                let result = NSHostingView<AnyView>(
                     rootView:_labelHostingViewRootView
                 )
                 
                 if #available(macOS 13.0, *) {
                     result.sizingOptions = [.minSize, .intrinsicContentSize]
                 }
-                
-                self.labelHostingView = result
-                
+                                
                 button.addSubview(result)
-                
+            
+                self.labelHostingView = result
+
                 return result
             }()
-            
+                        
             hostingView.rootView = _labelHostingViewRootView
             hostingView.invalidateIntrinsicContentSize()
             
