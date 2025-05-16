@@ -202,7 +202,23 @@ extension _CocoaMenuBarExtraCoordinator {
 public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {    
     @State var base: _AnyCocoaMenuBarExtraCoordinator
     
-    public init(@ViewBuilder content: () -> Content, @ViewBuilder label: () -> Label) {
+    public init(
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder content: () -> Content
+    ) {
+        base = _CocoaMenuBarExtraCoordinator(
+            action: { },
+            label: label,
+            content: content
+        )
+    }
+
+    @available(*, deprecated, message: "Use init(label:content) instead.")
+    @_disfavoredOverload
+    public init(
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder label: () -> Label
+    ) {
         base = _CocoaMenuBarExtraCoordinator(
             action: { },
             label: label,
@@ -219,6 +235,13 @@ public struct _CocoaMenuBarExtra<Label: View, Content: View>: Scene {
             label: label,
             content: { EmptyView() }
         )
+    }
+    
+    public init(
+        _ titleKey: LocalizedStringKey,
+        @ViewBuilder content: () -> Content
+    ) where Label == Text {
+        self.init(content: content, label: { Text(titleKey) })
     }
     
     public var body: some Scene {
