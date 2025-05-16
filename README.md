@@ -1,7 +1,5 @@
 # <img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX
 
-![CI](https://github.com/SwiftUIX/SwiftUIX/workflows/CI/badge.svg)
-
 SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
 
 - [Why](#why)
