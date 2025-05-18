@@ -197,7 +197,7 @@ open class _AnyPlatformTextView: AppKitOrUIKitTextView, AppKitOrUIKitTextInputDe
     
     // MARK: - UITextInputDelegate
 
-    #if os(iOS) || os(tvOS)
+    #if os(iOS) || os(tvOS) || os(visionOS)
     open func selectionWillChange(_ textInput: (any UITextInput)?) {
 
     }
