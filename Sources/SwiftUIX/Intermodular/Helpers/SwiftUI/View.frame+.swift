@@ -393,10 +393,10 @@ struct GreedyFrameModifier: _opaque_FrameModifier, ViewModifier {
     func body(content: Content) -> some View {
         content.frame(
             minWidth: width?.fixedValue,
-            idealWidth: width?.resolve(in: .greatestFiniteDimensions),
+            idealWidth: width?.fixedValue,
             maxWidth: width?.resolve(in: .greatestFiniteDimensions),
             minHeight: height?.fixedValue,
-            idealHeight: height?.resolve(in: .greatestFiniteDimensions),
+            idealHeight: height?.fixedValue,
             maxHeight: height?.resolve(in: .greatestFiniteDimensions),
             alignment: alignment
         )
