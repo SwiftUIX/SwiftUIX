@@ -19,3 +19,17 @@ extension NSAttributedString {
 }
 
 #endif
+
+/// NSTextAttachment.character -> NSAttachmentCharacter
+#if compiler(>=6.3)
+#if canImport(AppKit)
+import AppKit
+
+/// Fix for XCode 26.4
+extension NSTextAttachment {
+    static var character: Int {
+        NSAttachmentCharacter
+    }
+}
+#endif
+#endif
