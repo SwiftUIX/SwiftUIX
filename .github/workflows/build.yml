@@ -1,0 +1,70 @@
+# This workflow builds the project for all platforms.
+
+# For more information see:
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+
+name: Build Runner
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest # macos-15
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable # 16.4
+
+      - name: Install xcbeautify
+        run: brew install xcbeautify
+
+      - name: Build All Platforms
+        run: |
+          #!/bin/bash
+          set -eo pipefail
+
+          TARGET=""
+          PLATFORMS="iOS macOS tvOS watchOS xrOS"
+
+          if [ -z "$TARGET" ]; then
+            TARGET=$(swift package dump-package | python3 -c "import json,sys; print(json.load(sys.stdin)['name'])")
+            if [ -z "$TARGET" ]; then
+              echo "Error: Failed to resolve package name"
+              exit 1
+            fi
+          fi
+
+          build_platform() {
+            local PLATFORM=$1
+            echo "Building $TARGET for $PLATFORM..."
+            if ! NSUnbufferedIO=YES xcodebuild -scheme "$TARGET" -derivedDataPath .build -destination "generic/platform=$PLATFORM" 2>&1 | xcbeautify --renderer github-actions; then
+              echo "Failed to build $TARGET for $PLATFORM"
+              return 1
+            fi
+            echo "Successfully built $TARGET for $PLATFORM"
+          }
+
+          echo
+          echo "Building $TARGET for [$PLATFORMS]..."
+
+          for PLATFORM in $PLATFORMS; do
+            if ! build_platform "$PLATFORM"; then
+              exit 1
+            fi
+          done
+
+          echo
+          echo "Building $TARGET completed successfully!"
