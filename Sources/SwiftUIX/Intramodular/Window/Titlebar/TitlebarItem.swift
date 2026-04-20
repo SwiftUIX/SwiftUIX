@@ -20,7 +20,7 @@ import UIKit
 @_documentation(visibility: internal)
 public struct TitlebarItem {
     @_documentation(visibility: internal)
-public enum Content {
+    public enum Content {
         #if os(iOS) || targetEnvironment(macCatalyst)
         case systemSymbol(SFSymbolName)
         case systemItem(UIBarButtonItem.SystemItem)

@@ -42,7 +42,7 @@ extension KeyEquivalent {
 }
 #endif
 
-#if compiler(>=5.8)
+#if compiler(>=5.8) && compiler(<6.1)
 @available(iOS 14.0, macOS 11.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)

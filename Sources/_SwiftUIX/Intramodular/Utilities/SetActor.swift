@@ -15,7 +15,7 @@ import Foundation
 @_documentation(visibility: internal)
 public final class _SwiftUIX_SetActor<Option: SetAlgebra, ReactionType> {
     @_documentation(visibility: internal)
-public enum Action {
+    public enum Action {
         case onEmpty
         case onChange
         case onInsertion(_ option: Option)
@@ -23,7 +23,7 @@ public enum Action {
     }
     
     @_documentation(visibility: internal)
-public enum ExecutionType {
+    public enum ExecutionType {
         case once
         case eternal
     }

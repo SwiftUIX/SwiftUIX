@@ -32,7 +32,9 @@ let package = Package(
         ),
         .testTarget(
             name: "SwiftUIXTests",
-            dependencies: ["SwiftUIX"],
+            dependencies: [
+                "SwiftUIX"
+            ],
             path: "Tests"
         )
     ]

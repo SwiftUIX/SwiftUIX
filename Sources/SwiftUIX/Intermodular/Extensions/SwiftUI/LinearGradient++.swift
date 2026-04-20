@@ -7,7 +7,7 @@ import SwiftUI
 
 extension LinearGradient {
     @_documentation(visibility: internal)
-public enum _LinearGradientDirection {
+    public enum _LinearGradientDirection {
         case up
         case down
     }

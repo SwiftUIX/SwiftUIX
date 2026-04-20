@@ -30,6 +30,12 @@ extension CGSize {
 }
 
 extension CGSize {
+    public func _SwiftUIX_rounded(_ rule: FloatingPointRoundingRule) -> Self {
+        CGSize(width: self.width.rounded(rule), height: self.height.rounded(rule))
+    }
+}
+
+extension CGSize {
     @_optimize(speed)
     @inline(__always)
     public static var infinite: CGSize {

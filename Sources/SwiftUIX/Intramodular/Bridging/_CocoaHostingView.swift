@@ -4,6 +4,7 @@
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 
+import _SwiftUIX
 import Combine
 import Swift
 import SwiftUI
@@ -38,7 +39,7 @@ public enum _CocoaHostingViewConfigurationFlag {
 }
 
 @_documentation(visibility: internal)
-open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _CocoaHostingControllerOrView {
+open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHostingControllerContent<Content>>, _SwiftUIX_AppKitOrUIKitHostingViewProtocol, _CocoaHostingControllerOrView {
     public typealias MainView = Content
     public typealias RootView = CocoaHostingControllerContent<Content>
     
@@ -49,7 +50,7 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
     public var _hostingViewStateFlags: Set<_CocoaHostingViewStateFlag> = []
     public var _overrideSizeForUpdateConstraints: OptionalDimensions = nil
 
-    public var _configuration: CocoaHostingControllerConfiguration = .init() {
+    public var _configuration: CocoaHostingControllerOrViewConfiguration = .init() {
         didSet {
             rootView.parentConfiguration = _configuration
         }
@@ -65,6 +66,16 @@ open class _CocoaHostingView<Content: View>: AppKitOrUIKitHostingView<CocoaHosti
         }
     }
     
+    @_optimize(speed)
+    @inline(__always)
+    public var _SwiftUIX_hostedContent: RootView._Content {
+        get {
+            rootView.content
+        } set {
+            rootView.content = newValue
+        }
+    }
+
     #if os(macOS)
     override open var wantsDefaultClipping: Bool {
         super.wantsDefaultClipping

@@ -108,7 +108,7 @@ extension _AnyPlatformTextView {
             representableCache._sizeThatFitsCache[proposal] = result
             
             if result._isNormal {
-                if frame.size != result {
+                if frame.size._SwiftUIX_rounded(.down) != result._SwiftUIX_rounded(.down) {
                     frame.size = result
                 }
             }

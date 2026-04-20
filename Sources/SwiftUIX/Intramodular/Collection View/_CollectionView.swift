@@ -54,7 +54,7 @@ struct _CollectionView<
                 }
             }
         }
-
+        
         func updateCollectionViewLayout() {
             let collectionViewLayout = _CollectionViewLayout(
                 collectionViewController: uiViewController,

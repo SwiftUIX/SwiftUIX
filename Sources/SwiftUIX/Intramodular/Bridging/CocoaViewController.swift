@@ -8,9 +8,9 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 
-public protocol _CocoaHostingControllerOrView: AppKitOrUIKitResponder {
+public protocol _CocoaHostingControllerOrView<HostedView>: AppKitOrUIKitResponder, _CocoaSwiftUIViewHosting<Self.HostedView> {    
     var _SwiftUIX_cancellables: [AnyCancellable] { get set }
-    var _configuration: CocoaHostingControllerConfiguration { get set }
+    var _configuration: CocoaHostingControllerOrViewConfiguration { get set }
     var _hostingViewConfigurationFlags: Set<_CocoaHostingViewConfigurationFlag> { get }
     var _hostingViewStateFlags: Set<_CocoaHostingViewStateFlag> { get }
     var _observedPreferenceValues: _ObservedPreferenceValues { get }

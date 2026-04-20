@@ -8,14 +8,16 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS) || os(visionOS) || targetEnvironment(macCatalyst)
 @_documentation(visibility: internal)
 public struct CocoaHostingControllerContent<Content: View>: View  {
+    public typealias _Content = Content
+    
     weak var parent: (any _CocoaHostingControllerOrView)?
 
-    public var parentConfiguration: CocoaHostingControllerConfiguration
+    public var parentConfiguration: CocoaHostingControllerOrViewConfiguration
     public var content: Content
     
     init(
         parent: CocoaViewController?,
-        parentConfiguration: CocoaHostingControllerConfiguration,
+        parentConfiguration: CocoaHostingControllerOrViewConfiguration,
         content: Content
     ) {
         self.parentConfiguration = parentConfiguration

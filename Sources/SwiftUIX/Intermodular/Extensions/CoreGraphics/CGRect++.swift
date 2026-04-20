@@ -25,6 +25,15 @@ extension CGRect {
 }
 
 extension CGRect {
+    public func _SwiftUIX_rounded(_ rule: FloatingPointRoundingRule) -> Self {
+        Self(
+            origin: CGPoint(x: self.origin.x.rounded(rule), y: self.origin.y.rounded(rule)),
+            size: self.size._SwiftUIX_rounded(rule)
+        )
+    }
+}
+
+extension CGRect {
     public init(
         size: CGSize,
         container: CGSize,
