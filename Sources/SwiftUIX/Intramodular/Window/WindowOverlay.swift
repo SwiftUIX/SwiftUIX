@@ -15,15 +15,18 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
     private let content: Content
     private let canBecomeKey: Bool
     private let isVisible: Binding<Bool>
+    private let level: CGFloat?
 
     init(
         content: Content,
         canBecomeKey: Bool,
-        isVisible: Binding<Bool>
+        isVisible: Binding<Bool>,
+        level: CGFloat?
     ) {
         self.content = content
         self.canBecomeKey = canBecomeKey
         self.isVisible = isVisible
+        self.level = level
     }
     
     func makeAppKitOrUIKitViewController(
@@ -32,7 +35,8 @@ struct WindowOverlay<Content: View>: AppKitOrUIKitViewControllerRepresentable {
         AppKitOrUIKitViewControllerType(
             content: content,
             canBecomeKey: canBecomeKey,
-            isVisible: isVisible.wrappedValue
+            isVisible: isVisible.wrappedValue,
+            level: level
         )
     }
     
@@ -68,11 +72,12 @@ extension WindowOverlay {
     class AppKitOrUIKitViewControllerType: AppKitOrUIKitViewController {
         var windowPresentationController: _WindowPresentationController<Content>
         
-        init(content: Content, canBecomeKey: Bool, isVisible: Bool) {
+        init(content: Content, canBecomeKey: Bool, isVisible: Bool, level: CGFloat?) {
             self.windowPresentationController = _WindowPresentationController(
                 content: content,
                 canBecomeKey: canBecomeKey,
-                isVisible: isVisible
+                isVisible: isVisible,
+                level: level
             )
 
             super.init(nibName: nil, bundle: nil)
@@ -109,13 +114,15 @@ extension View {
     ///   - content: A closure returning the content of the window.
     public func windowOverlay<Content: View>(
         isVisible: Binding<Bool>,
+        level: CGFloat? = nil,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
         background(
             WindowOverlay(
                 content: content(),
                 canBecomeKey: false,
-                isVisible: isVisible
+                isVisible: isVisible,
+                level: level
             )
         )
     }
@@ -127,13 +134,15 @@ extension View {
     ///   - content: A closure returning the content of the window.
     public func windowOverlay<Content: View>(
         isKeyAndVisible: Binding<Bool>,
+        level: CGFloat? = nil,
         @ViewBuilder _ content: () -> Content
     ) -> some View {
         background(
             WindowOverlay(
                 content: content(),
                 canBecomeKey: true,
-                isVisible: isKeyAndVisible
+                isVisible: isKeyAndVisible,
+                level: level
             )
         )
     }
