@@ -1,5 +1,7 @@
 # <img align=top src="https://raw.githubusercontent.com/SwiftUIX/SwiftUIX/master/Assets/logo.png" width="36" height="36"> SwiftUIX
 
+[![CI/CD](https://github.com/SwiftUIX/SwiftUIX/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SwiftUIX/SwiftUIX/actions/workflows/build.yml)
+
 SwiftUIX attempts to fill the gaps of SwiftUI, providing an extensive suite of components, extensions and utilities to complement the standard library. This project is **by far** the most complete port of missing UIKit/AppKit functionality, striving to deliver it in the most Apple-like fashion possible.
 
 - [Why](#why)
@@ -22,8 +24,10 @@ The goal of this project is to **complement** the SwiftUI standard library, offe
 > [!Note]
 > Swift 5.10 is the minimum Swift version required to build SwiftUIX, Swift 5.9 is no longer supported.
 
-- Deployment targets: iOS 13, macOS 10.15, tvOS 13, watchOS 6 and visionOS 1
-- Xcode 15.4+ 
+- Deployment targets: iOS 13, macOS 11, Mac Catalyst 13, tvOS 13, watchOS 6 and visionOS 1
+- Minimum Xcode version: Xcode 15.4+
+- CI-verified Xcode versions: Xcode 16.x and Xcode 26.x
+- CI-verified destinations: iOS, macOS, Mac Catalyst, tvOS, watchOS and visionOS
 
 
 # Installation
