@@ -347,7 +347,7 @@ extension AppKitOrUIKitViewRepresentable {
         _ view: AppKitOrUIKitViewType, 
         context: Context
     ) {
-        weak let _view = view
+        weak var _view = view
         
         guard let view = _view else {
             return

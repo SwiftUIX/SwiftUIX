@@ -17,7 +17,19 @@ concurrency:
 
 jobs:
   build:
-    runs-on: macos-latest # macos-15
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Xcode 16
+            runner: macos-15
+            xcode-version: "16"
+          - name: Xcode 26
+            runner: macos-26
+            xcode-version: "26"
 
     steps:
       - name: Checkout Code
@@ -26,18 +38,31 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable # 16.4
+          xcode-version: ${{ matrix.xcode-version }}
+
+      - name: Show Xcode Version
+        run: xcodebuild -version
 
       - name: Install xcbeautify
-        run: brew install xcbeautify
+        run: |
+          if ! command -v xcbeautify >/dev/null 2>&1; then
+            brew install xcbeautify
+          fi
 
       - name: Build All Platforms
+        shell: bash
         run: |
-          #!/bin/bash
           set -eo pipefail
 
           TARGET=""
-          PLATFORMS="iOS macOS tvOS watchOS xrOS"
+          DESTINATIONS=(
+            "iOS|generic/platform=iOS"
+            "macOS|generic/platform=macOS"
+            "Mac Catalyst|platform=macOS,variant=Mac Catalyst,arch=arm64"
+            "tvOS|generic/platform=tvOS"
+            "watchOS|generic/platform=watchOS"
+            "visionOS|generic/platform=visionOS"
+          )
 
           if [ -z "$TARGET" ]; then
             TARGET=$(swift package dump-package | python3 -c "import json,sys; print(json.load(sys.stdin)['name'])")
@@ -47,21 +72,24 @@ jobs:
             fi
           fi
 
-          build_platform() {
-            local PLATFORM=$1
-            echo "Building $TARGET for $PLATFORM..."
-            if ! NSUnbufferedIO=YES xcodebuild -scheme "$TARGET" -derivedDataPath .build -destination "generic/platform=$PLATFORM" 2>&1 | xcbeautify --renderer github-actions; then
-              echo "Failed to build $TARGET for $PLATFORM"
+          build_destination() {
+            local NAME=$1
+            local DESTINATION=$2
+            echo "Building $TARGET for $NAME..."
+            if ! NSUnbufferedIO=YES xcodebuild -scheme "$TARGET" -derivedDataPath .build -destination "$DESTINATION" build 2>&1 | xcbeautify --renderer github-actions; then
+              echo "Failed to build $TARGET for $NAME"
               return 1
             fi
-            echo "Successfully built $TARGET for $PLATFORM"
+            echo "Successfully built $TARGET for $NAME"
           }
 
           echo
-          echo "Building $TARGET for [$PLATFORMS]..."
+          echo "Building $TARGET for configured destinations..."
 
-          for PLATFORM in $PLATFORMS; do
-            if ! build_platform "$PLATFORM"; then
+          for DESTINATION_PAIR in "${DESTINATIONS[@]}"; do
+            NAME="${DESTINATION_PAIR%%|*}"
+            DESTINATION="${DESTINATION_PAIR#*|}"
+            if ! build_destination "$NAME" "$DESTINATION"; then
               exit 1
             fi
           done
