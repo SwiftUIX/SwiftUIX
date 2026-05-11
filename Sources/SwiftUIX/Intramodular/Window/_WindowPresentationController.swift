@@ -60,6 +60,7 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
     
     @Published
     package var _isVisible: Bool = false
+    package var level: CGFloat?
     package var _externalIsVisibleBinding: Binding<Bool>?
     
     private var _updateWorkItem: DispatchWorkItem?
@@ -167,11 +168,13 @@ public final class _WindowPresentationController<Content: View>: _AnyWindowPrese
         content: ContentBacking,
         windowStyle: _WindowStyle = .default,
         canBecomeKey: Bool,
-        isVisible: Bool
+        isVisible: Bool,
+        level: CGFloat? = nil
     ) {
         self.configuration = .init(style: windowStyle, canBecomeKey: canBecomeKey)
         self._content = content
         self._isVisible = isVisible
+        self.level = level
         
         super.init()
 
@@ -268,7 +271,7 @@ extension _WindowPresentationController {
             #endif
             
             #if os(iOS) || os(tvOS)
-            contentWindow._assignIfNotEqual(UIWindow.Level(rawValue: keyAppWindow.windowLevel.rawValue + 1), to: \.windowLevel)
+            contentWindow._assignIfNotEqual(UIWindow.Level(rawValue: level ?? keyAppWindow.windowLevel.rawValue + 1), to: \.windowLevel)
             #endif
             
             contentWindow._sizeWindowToNonZeroFitThenPerform { [weak self] in
@@ -350,13 +353,15 @@ extension _WindowPresentationController {
         content: Content,
         windowStyle: _WindowStyle = .default,
         canBecomeKey: Bool,
-        isVisible: Bool
+        isVisible: Bool,
+        level: CGFloat? = nil
     ) {
         self.init(
             content: .view(content),
             windowStyle: windowStyle,
             canBecomeKey: canBecomeKey,
-            isVisible: isVisible
+            isVisible: isVisible,
+            level: level
         )
     }
     
