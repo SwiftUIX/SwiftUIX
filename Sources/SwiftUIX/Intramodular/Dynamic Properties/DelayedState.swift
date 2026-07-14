@@ -9,7 +9,7 @@ import SwiftUI
 @propertyWrapper
 @_documentation(visibility: internal)
 public struct DelayedState<Value>: DynamicProperty {
-    @inlinable
+    // `@inlinable` cannot reference `@State`'s private macro-generated storage.
     @State public var _wrappedValue: Value
     
     /// The current state value.

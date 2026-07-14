@@ -50,7 +50,7 @@ public struct PaginationView<Page: View>: View {
     
     /// The current page index internally used by `PaginationView`.
     /// Never access this directly, it is marked public as a workaround to a compiler bug.
-    @inlinable
+    // `@inlinable` cannot reference `@State`'s private macro-generated storage.
     @State public var _currentPageIndex = 0
     
     /// Never access this directly, it is marked public as a workaround to a compiler bug.

@@ -222,16 +222,18 @@ extension _TargetPlatformConditionalModifiable where Root: Scene, Platform == _S
         _ mode: SpecificTypes.NavigationBarItemTitleDisplayMode
     ) -> _TargetPlatformConditionalModifiable<some View, Platform> {
 #if os(iOS)
-        _TargetPlatformConditionalModifiable<_, Platform> {
-            switch mode {
-                case .automatic:
-                    root.navigationBarTitleDisplayMode(.automatic)
-                case .inline:
-                    root.navigationBarTitleDisplayMode(.inline)
-                case .large:
-                    root.navigationBarTitleDisplayMode(.inline)
+        _TargetPlatformConditionalModifiable<_, Platform>(
+            root: Group {
+                switch mode {
+                    case .automatic:
+                        root.navigationBarTitleDisplayMode(.automatic)
+                    case .inline:
+                        root.navigationBarTitleDisplayMode(.inline)
+                    case .large:
+                        root.navigationBarTitleDisplayMode(.inline)
+                }
             }
-        }
+        )
 #else
         self
 #endif
@@ -259,13 +261,11 @@ extension _TargetPlatformConditionalModifiable where Root: View, Platform == _Sw
         _ state: _SwiftUI_TargetPlatform.macOS._ControlActiveState
     ) -> _TargetPlatformConditionalModifiable<some View, Platform> {
         #if os(macOS)
-        _TargetPlatformConditionalModifiable<_, Platform> {
-            self.environment(\.controlActiveState, .init(state))
-        }
+        _TargetPlatformConditionalModifiable<_, Platform>(
+            root: self.environment(\.controlActiveState, .init(state))
+        )
         #else
-        _TargetPlatformConditionalModifiable<_, Platform> {
-            self
-        }
+        _TargetPlatformConditionalModifiable<_, Platform>(root: self)
         #endif
     }
 }
