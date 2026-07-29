@@ -285,8 +285,8 @@ LinkPresentationView(url: url)
 
 SwiftUIX welcomes contributions in the form of GitHub issues and pull-requests. Please refer the [projects](https://github.com/SwiftUIX/SwiftUIX/projects) section before raising a bug or feature request, as it may already be under progress.
 
-To create an Xcode project for SwiftUIX run `bundle install; bundle exec fastlane generate_xcodeproj`.
-To check the automated builds for SwiftUIX run `bundle install; bundle exec fastlane build`.
+SwiftUIX is a Swift package. To work on it in Xcode, open `Package.swift` from the cloned repository.
+To verify a local macOS build, run `xcodebuild -scheme SwiftUIX -destination 'generic/platform=macOS' build`.
 
 
 # License
