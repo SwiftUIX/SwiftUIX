@@ -39,14 +39,26 @@ class UIHostingPageViewController<Page: View>: UIPageViewController, _opaque_UIH
                 preheatViewControllersCache()
 
                 if let oldValue = oldValue, oldValue.count != content.count {
+                    let currentPageIndexOffset = (viewControllers?.first as? PageContentController).map({
+                        oldValue.data.distance(from: oldValue.data.startIndex, to: $0.mainView.index)
+                    })
                     cachedChildren = [:]
-                    
-                    if let firstViewController = viewController(for: content.data.startIndex) {
-                        setViewControllers(
-                            [firstViewController],
-                            direction: .forward,
-                            animated: false
+
+                    if content.isEmpty {
+                        setViewControllers([], direction: .forward, animated: false)
+                    } else {
+                        let pageIndex = content.data.index(
+                            content.data.startIndex,
+                            offsetBy: min(currentPageIndexOffset ?? 0, content.count - 1)
                         )
+
+                        if let pageViewController = viewController(for: pageIndex) {
+                            setViewControllers(
+                                [pageViewController],
+                                direction: .forward,
+                                animated: false
+                            )
+                        }
                     }
                 } else {
                     if let viewControllers = viewControllers?.compactMap({ $0 as? PageContentController }), let firstViewController = viewControllers.first, !viewControllers.isEmpty {
