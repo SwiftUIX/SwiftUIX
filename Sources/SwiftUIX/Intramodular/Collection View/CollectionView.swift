@@ -195,6 +195,7 @@ extension CollectionView {
         )
         
         _scrollViewConfiguration.axes = axes
+        collectionViewLayout = FlowCollectionViewLayout(axes)
     }
     
     public init<
