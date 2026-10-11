@@ -66,7 +66,9 @@ extension SafariView {
             
             viewControllerConfiguration.entersReaderIfAvailable = true
             
-            return .init(url: configuration.url, configuration: viewControllerConfiguration)
+            return UIViewControllerType(url: configuration.url, configuration: viewControllerConfiguration).then {
+                $0.delegate = context.coordinator
+            }
         }
         
         func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
