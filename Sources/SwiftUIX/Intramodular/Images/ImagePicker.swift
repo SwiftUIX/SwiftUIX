@@ -58,6 +58,19 @@ public struct ImagePicker: UIViewControllerRepresentable {
     public func makeUIViewController(context: Context) -> UIViewControllerType {
         UIImagePickerController().then {
             $0.delegate = context.coordinator
+            applyInitialPickerConfiguration($0)
+        }
+    }
+    
+    // sourceType is applied at creation because that is when UIImagePickerController builds its capture session.
+    @MainActor
+    func applyInitialPickerConfiguration(_ uiViewController: UIImagePickerController) {
+        if UIImagePickerController.isSourceTypeAvailable(sourceType), uiViewController.sourceType != sourceType {
+            uiViewController.sourceType = sourceType
+        }
+        
+        if uiViewController.sourceType == .camera {
+            uiViewController.cameraDevice = cameraDevice ?? .rear
         }
     }
     
@@ -65,7 +78,6 @@ public struct ImagePicker: UIViewControllerRepresentable {
         context.coordinator.base = self
         
         uiViewController.allowsEditing = allowsEditing
-        uiViewController.sourceType = sourceType
         
         if let mediaTypes = mediaTypes, uiViewController.mediaTypes != mediaTypes  {
             uiViewController.mediaTypes = mediaTypes
