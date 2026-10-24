@@ -51,6 +51,7 @@ final class SearchBarCompositionTests: XCTestCase {
 
         XCTAssertTrue(editor.hasMarkedText())
         XCTAssertEqual(editor.string, "ni")
+        XCTAssertTrue(window.firstResponder === editor)
 
         editor.unmarkText()
         text = "committed"
