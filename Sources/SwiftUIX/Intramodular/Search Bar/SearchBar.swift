@@ -308,7 +308,10 @@ extension SearchBar: NSViewRepresentable {
             _assignIfNotEqual(appKitOrUIKitFont, to: &nsView.font)
         }
 
-        _assignIfNotEqual(text, to: &nsView.stringValue)
+        // Replacing the field editor's text discards an in-progress IME composition.
+        if (nsView.currentEditor() as? NSTextView)?.hasMarkedText() != true {
+            _assignIfNotEqual(text, to: &nsView.stringValue)
+        }
     }
     
     final public class Coordinator: NSObject, NSSearchFieldDelegate {
