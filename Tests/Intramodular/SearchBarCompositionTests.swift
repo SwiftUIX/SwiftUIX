@@ -51,6 +51,15 @@ final class SearchBarCompositionTests: XCTestCase {
 
         XCTAssertTrue(editor.hasMarkedText())
         XCTAssertEqual(editor.string, "ni")
+
+        editor.unmarkText()
+        text = "committed"
+        host.rootView = SearchBar("After composition", text: binding)
+        host.layoutSubtreeIfNeeded()
+        let committed = expectation(description: "Unmarked text update completed")
+        DispatchQueue.main.async { committed.fulfill() }
+        await fulfillment(of: [committed], timeout: 2)
+        XCTAssertEqual(field.stringValue, "committed")
     }
 }
 #endif
